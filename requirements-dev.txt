@@ -1,0 +1,14 @@
+numpy
+protobuf
+codecov
+tensorflow
+keras
+coremltools
+pandas
+pytest
+pytest-cov
+scikit-learn
+scipy
+wheel
+xgboost
+lightgbm
