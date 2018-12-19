@@ -3,9 +3,9 @@ import numpy
 import onnx
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.datasets import load_iris
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import FloatTensorType
-from onnxmltools.utils import dump_data_and_model
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import FloatTensorType
+from test_utils import dump_data_and_model
 from distutils.version import StrictVersion
 
 class TestNaiveBayesConverter(unittest.TestCase):

@@ -9,9 +9,9 @@ from distutils.version import StrictVersion as _StrictVersion
 import warnings
 import onnxmltools
 import numpy as np
-from onnxmltools.convert.common.data_types import FloatTensorType
-from onnxmltools.utils import create_tensor
-from onnxmltools.utils import dump_data_and_model
+from scikitonx.common.data_types import FloatTensorType
+from test_utils import create_tensor
+from test_utils import dump_data_and_model
 from sklearn.decomposition import TruncatedSVD
 
 

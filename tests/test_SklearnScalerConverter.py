@@ -4,9 +4,9 @@ Tests scikit-learn's standard scaler converter.
 import unittest
 import numpy
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import Int64TensorType, FloatTensorType
-from onnxmltools.utils import dump_data_and_model
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import Int64TensorType, FloatTensorType
+from test_utils import dump_data_and_model
 
 
 class TestSklearnScalerConverter(unittest.TestCase):

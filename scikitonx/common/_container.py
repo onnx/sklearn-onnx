@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 import six
-from scikitonx.scikitonx.proto import helper
+from ..proto import helper
 from .interface import ModelContainer
 
 

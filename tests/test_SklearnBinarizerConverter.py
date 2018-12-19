@@ -1,12 +1,13 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import numpy
 from sklearn.preprocessing import Binarizer
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import FloatTensorType
-from onnxmltools.utils import dump_data_and_model
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import FloatTensorType
+from test_utils import dump_data_and_model
 
 
 class TestSklearnBinarizer(unittest.TestCase):

@@ -5,11 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
-import numpy
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
-from onnxmltools.utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from onnxmltools.utils import dump_multiple_regression, dump_single_regression
+from test_utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
+from test_utils import dump_multiple_regression, dump_single_regression
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):

@@ -4,9 +4,9 @@ Tests scikit-imputer converter.
 import unittest
 import numpy as np
 from sklearn.preprocessing import Imputer
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import FloatTensorType, Int64TensorType
-from onnxmltools.utils import dump_data_and_model
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import FloatTensorType, Int64TensorType
+from test_utils import dump_data_and_model
 
 
 class TestSklearnImputerConverter(unittest.TestCase):

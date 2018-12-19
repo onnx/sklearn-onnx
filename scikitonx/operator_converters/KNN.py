@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from scikitonx.scikitonx.proto import onnx_proto
+from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul, apply_reshape, apply_sub
 from ..common._registration import register_converter
 import numpy as np

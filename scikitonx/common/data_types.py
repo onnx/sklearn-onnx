@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 import numbers
-from scikitonx.scikitonx.proto import onnx_proto
+from ..proto import onnx_proto
 
 
 class DataType(object):

@@ -7,7 +7,7 @@
 import numpy as np
 import six, numbers
 from ..common._registration import register_converter
-from scikitonx.scikitonx.proto import onnx_proto
+from ..proto import onnx_proto
 
 
 def convert_sklearn_linear_classifier(scope, operator, container):

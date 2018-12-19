@@ -4,9 +4,9 @@ from sklearn import datasets
 from sklearn import linear_model
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import FloatTensorType
-from onnxmltools.utils import dump_data_and_model
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import FloatTensorType
+from test_utils import dump_data_and_model
 
 
 class TestGLMClassifierConverter(unittest.TestCase):

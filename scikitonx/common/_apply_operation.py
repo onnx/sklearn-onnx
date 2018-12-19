@@ -7,7 +7,7 @@
 # best to use those functions because they can produce ONNX operators according to the ONNX version specified in the
 # `container` argument. Notice that those function behaviors are defined in a way very similar to ONNX-1.2.
 
-from scikitonx.scikitonx.proto import onnx_proto
+from ..proto import onnx_proto
 
 def _create_name_or_use_existing_one(scope, op_type, name):
     if name is None:

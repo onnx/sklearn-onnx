@@ -8,9 +8,9 @@ import re
 import warnings
 from logging import getLogger
 from distutils.version import StrictVersion
-from scikitonx.scikitonx.proto import onnx
-from scikitonx.scikitonx.proto import helper
-from scikitonx.scikitonx.proto import get_opset_number_from_onnx
+from ..proto import onnx
+from ..proto import helper
+from ..proto import get_opset_number_from_onnx
 from . import _registration
 from . import utils
 from .data_types import *
@@ -624,7 +624,7 @@ class Topology:
         self._check_structure()
 
 
-def convert_topology(topology, model_name, doc_string, target_opset, targeted_onnx, channel_first_inputs=None):
+def convert_topology(topology, model_name, doc_string, target_opset, channel_first_inputs=None):
     '''
     This function is used to convert our Topology object defined in _parser.py into a ONNX model (type: ModelProto).
     :param topology: The Topology object we are going to convert
@@ -632,15 +632,9 @@ def convert_topology(topology, model_name, doc_string, target_opset, targeted_on
     assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
     :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
-    :param targeted_onnx[deprecated]: A string, which specifies the targeted ONNX version of the produced model. Possible values
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     '''
-    if targeted_onnx is not None and StrictVersion(targeted_onnx) != StrictVersion(onnx.__version__):
-        warnings.warn(
-            'targeted_onnx is deprecated, please specify target_opset for the target model.\n' +
-            '*** ONNX version conflict found. The installed version is %s while the targeted version is %s' % (
-                onnx.__version__, targeted_onnx))
 
     if target_opset is None:
         target_opset = get_opset_number_from_onnx()

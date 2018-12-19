@@ -1,13 +1,16 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(sys.argv[0]), 'test_utils'))
+
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
-from onnxmltools import convert_sklearn
-from onnxmltools.convert.common.data_types import StringTensorType
-from onnxmltools.utils import dump_data_and_model
-
+from scikitonx import convert_sklearn
+from scikitonx.common.data_types import FloatTensorType, StringTensorType
+from test_utils import dump_data_and_model
 
 class TestSklearnCountVectorizer(unittest.TestCase):
 
@@ -40,7 +43,6 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         # REVIEW: enable the test when the runtime implements the primitives.
         # dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer")
-        
 
 
 if __name__ == "__main__":

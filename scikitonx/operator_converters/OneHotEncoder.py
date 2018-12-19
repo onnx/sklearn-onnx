@@ -7,7 +7,7 @@
 import numbers
 import collections
 import numpy
-from scikitonx.scikitonx.proto import onnx_proto
+from ..proto import onnx_proto
 from ..common._registration import register_converter
 
 

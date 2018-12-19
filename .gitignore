@@ -28,6 +28,4 @@ build/
 htmlcov
 coverage.xml
 .coverage
-TESTDUMP
-temp_*.onnx
-tests/sklearn/tests/*
+__dump_data/

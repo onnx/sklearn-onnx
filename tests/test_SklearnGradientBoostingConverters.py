@@ -7,8 +7,8 @@
 import unittest
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
-from onnxmltools.utils import dump_binary_classification
-from onnxmltools.utils import dump_single_regression
+from test_utils import dump_binary_classification
+from test_utils import dump_single_regression
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):

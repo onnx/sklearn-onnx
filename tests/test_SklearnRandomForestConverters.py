@@ -9,8 +9,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
-from onnxmltools.utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from onnxmltools.utils import dump_multiple_regression, dump_single_regression
+from test_utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
+from test_utils import dump_multiple_regression, dump_single_regression
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
