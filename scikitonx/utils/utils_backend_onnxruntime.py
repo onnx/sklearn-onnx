@@ -5,6 +5,7 @@ import os
 import glob
 import pickle
 import numpy
+import warnings
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from .utils_backend import load_data_and_model, extract_options, ExpectedAssertionError, OnnxRuntimeAssertionError, compare_outputs
 

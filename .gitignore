@@ -25,18 +25,9 @@ build/
 # test generated files
 .pytest_cache
 .cache
-tests/utils/models/coreml_OneHotEncoder_BikeSharing_new.json
-tests/utils/models/coreml_OneHotEncoder_BikeSharing2.onnx
-tests/baseline/outmodels
 htmlcov
 coverage.xml
 .coverage
 TESTDUMP
 temp_*.onnx
 tests/sklearn/tests/*
-tests_backend/*.onnx
-tests/coreml/tests/*
-tests/end2end/tests/*
-tests/lightgbm/tests/*
-tests/build/*
-tests/tests/

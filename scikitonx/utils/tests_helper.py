@@ -7,7 +7,7 @@ import numpy
 import pickle
 import os
 import warnings
-from ..convert.common.data_types import FloatTensorType
+from ..common import FloatTensorType
 from .utils_backend import compare_backend, extract_options, evaluate_condition, is_backend_enabled
 
 
@@ -70,7 +70,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     runtime_test = dict(model=model, data=data)
     
     if folder is None:
-        folder = os.environ.get('ONNXTESTDUMP', 'tests')
+        folder = os.environ.get('ONNXTESTDUMP', '_dump_data')
     if not os.path.exists(folder):
         os.makedirs(folder)
     

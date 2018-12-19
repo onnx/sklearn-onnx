@@ -89,8 +89,9 @@ def search_converted_models(root=None):
     *dump_data_and_model*.
     """
     if root is None:
-        root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tests"))
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "_dump_data"))
         root = os.path.normpath(root)
+    if not os.path.exists(root):
     if not os.path.exists(root):
         raise FileNotFoundError("Unable to find '{0}'.".format(root))
     
