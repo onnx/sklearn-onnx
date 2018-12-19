@@ -26,7 +26,7 @@ class Variable:
         used to created its ONNX name (i.e., the field onnx_name below).
         :param onnx_name: A string indicating the variable's name in the converted model
         :param scope: A string. It's the name of the scope where this variable is declared
-        :param type: A type object defined in onnxmltools.convert.common.data_types.py; e.g., FloatTensorType
+        :param type: A type object defined in .common.data_types.py; e.g., FloatTensorType
         '''
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
@@ -761,7 +761,7 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
             raise RuntimeError(('The specified opset %d is too low to convert this model, ' +
                                'which requires at least opset %d.') % (container.target_opset, op_version))
         elif container.target_opset > op_version:
-            getLogger('onnxmltools').warning('The maximum opset needed by this model is only %d.' % op_version)
+            getLogger('scikitonx').warning('The maximum opset needed by this model is only %d.' % op_version)
 
     # Add extra information
     onnx_model.ir_version = onnx_proto.IR_VERSION

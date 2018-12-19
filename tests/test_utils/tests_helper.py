@@ -21,7 +21,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
 
     :param data: any kind of data
     :param model: any model
-    :param onnx: *onnx* model or *None* to use *onnxmltools* to convert it
+    :param onnx: *onnx* model or *None* to use an onnx converters to convert it
         only if the model accepts one float vector
     :param basemodel: three files are writen ``<basename>.data.pkl``,
         ``<basename>.model.pkl``, ``<basename>.model.onnx``

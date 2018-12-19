@@ -23,7 +23,6 @@ install:
       curl -L https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o $HOME/miniconda.sh;
     fi
   - export ONNX_VERSION="==1.2.3"
-  - export KERAS_VERSION="==2.0.8"
   - cd $HOME && bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - export LD_LIBRARY_PATH="$HOME/miniconda/lib:$LD_LIBRARY_PATH"
@@ -33,22 +32,13 @@ install:
   - conda install -c conda-forge protobuf
   - conda install -c conda-forge numpy
   - conda install -c conda-forge cmake
-  - conda install -c conda-forge openmpi
-  - conda install -c conda-forge tensorflow
   - cd $TRAVIS_BUILD_DIR && pip install -r requirements-dev.txt
-  - cd $TRAVIS_BUILD_DIR && pip install cntk
   - cd $TRAVIS_BUILD_DIR && pip install -I "onnx$ONNX_VERSION"
 
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
-      export ONNX_VERSION=;
-      export KERAS_VERSION=;
-      pip install -I git+https://github.com/apple/coremltools;
-    fi
-  - cd $TRAVIS_BUILD_DIR && pip install -I "keras$KERAS_VERSION"
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH=pwd
   - if [[ "$TRAVIS_PYTHON_VERSION" != "2.7" ]]; then
       pip install onnxruntime;
     fi
 
 script:
-  - python -m pytest --cov=onnxmltools --cov-report=term --cov-report=html --cov-report=xml tests
+  - python -m pytest --cov=scikitonx --cov-report=term --cov-report=html --cov-report=xml tests

@@ -3,7 +3,6 @@ Tests scikit-linear converter.
 """
 import unittest
 import numpy
-import onnxmltools
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 from scikitonx import convert_sklearn
@@ -155,19 +154,19 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_registration_convert_nusvr_model(self):
         model, X = self._fit_binary_classification(NuSVR())
-        model_onnx = onnxmltools.convert_sklearn(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = convert_sklearn(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRegNuSVR2")
 
     def test_registration_convert_nusvc_model(self):
         model, X = self._fit_multi_classification(NuSVC(probability=True))
-        model_onnx = onnxmltools.convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnMclNuSVCPT")
 
     def test_registration_convert_svc_model(self):
         model, X = self._fit_binary_classification(SVC(kernel='linear', probability=True))
-        model_onnx = onnxmltools.convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnBinNuSVCPT")
 

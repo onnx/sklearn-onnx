@@ -4,88 +4,8 @@
 # license information.
 #--------------------------------------------------------------------------
 
-import os
 from scikitonx.proto import onnx_proto
 from scikitonx.common import utils as convert_utils
-from os import path
-
-
-def load_model(file_path):
-    """
-    Loads an ONNX model to a ProtoBuf object.
-
-    :param file_path: ONNX file (full file name)
-    :return: ONNX model.
-
-    Example:
-
-    ::
-
-        from test_utils import load_model
-        onnx_model = load_model("SqueezeNet.onnx")
-    """
-    if not path.exists(file_path):
-        raise FileNotFoundError("{0} was not found.".format(file_path))
-    model = onnx_proto.ModelProto()
-    try:
-        with open(file_path, 'rb') as f:
-            model.ParseFromString(f.read())
-    except IOError:
-        print("File '{0}' could not be opened.".format(file_path))
-        return
-    except:
-        print("Could not load protobuf file.")
-        return
-
-    return model
-
-
-def save_model(model, file_path):
-    """
-    Saves an ONNX model to a ProtoBuf object.
-    :param model: ONNX model
-    :param file_path: ONNX file (full file name)
-
-    Example:
-
-    ::
-
-        from test_utils import save_model
-        save_model(onnx_model, 'c:/test_model.onnx')
-    """
-    directory = os.path.dirname(os.path.abspath(file_path))
-    if not path.exists(directory):
-        raise FileNotFoundError("Directory does not exist {0}".format(directory))
-    try:
-        with open(file_path, 'wb') as f:
-            f.write(model.SerializeToString())
-    except IOError:
-        print("Unable to write file to path '{0}', check if you have permissions.".format(file_path))
-        return
-    except:
-        print("Failed trying to save file '{0}'.".format(file_path))
-        return
-
-
-def save_text(model, file_path):
-    """
-    Save the ONNX model in text form.
-
-    :param model: ONNX model (object)
-    :param file_path: the path including file name to save the model
-
-    Example:
-
-    ::
-
-        from test_utils import save_text
-        save_text(onnx_model,"SqueezeNet.json")
-    """
-    try:
-        with open(file_path, "w") as f:
-            f.write(str(model))
-    except IOError:
-        print("Could not save file")
 
 
 def set_model_domain(model, domain):
