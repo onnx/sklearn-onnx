@@ -19,7 +19,9 @@ jobs:
         python.version: '3.5'
       Python36:
         python.version: '3.6'
-    maxParallel: 3
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
 
   steps:
   - task: CondaEnvironment@1
@@ -41,6 +43,7 @@ jobs:
 
   - script: |
       test '$(python.version)' != '2.7' && python -c "import onnxruntime"
+      pip install -e .
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
