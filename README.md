@@ -1,6 +1,6 @@
 | Linux | Windows |
 |-------|---------|
-| [![Build Status](https://travis-ci.org/onnx/scikitonx.svg?branch=master)](https://travis-ci.org/onnx/scikitonx) | [![Build status](https://ci.appveyor.com/api/projects/status/d1xav3amubypje4n?svg=true)](https://ci.appveyor.com/project/xadupre/onnxmltools) |
+| [![Build Status](https://dev.azure.com/onnxmltools/onnxmltools/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/onnxmltools/_build/latest?definitionId=4?branchName=master) | [![Build Status](https://dev.azure.com/onnxmltools/onnxmltools/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/onnxmltools/_build/latest?definitionId=4?branchName=master)|
 
 # Introduction 
 scikitonx is designed to convert the scikit-learn model to ONNX
