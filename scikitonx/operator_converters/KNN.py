@@ -162,18 +162,14 @@ def convert_sklearn_knn(scope, operator, container):
         output_label_name = [None] * len(classes)
         output_cast_label_name = [None] * len(classes)
         output_label_reduced_name = [None] * len(classes)
-        zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
 
         if np.issubdtype(knn.classes_.dtype, np.floating):
             class_type = onnx_proto.TensorProto.INT32
             classes = np.array(list(map(lambda x: int(x), classes)))
-            zipmap_attrs['classlabels_int64s'] = classes 
         elif np.issubdtype(knn.classes_.dtype, np.signedinteger):
             class_type = onnx_proto.TensorProto.INT32
-            zipmap_attrs['classlabels_int64s'] = classes
         else:
             classes = np.array([s.encode('utf-8') for s in classes])    
-            zipmap_attrs['classlabels_strings'] = classes
 
         for i in range(len(classes)):
             labels_name[i] = scope.get_unique_variable_name('class_labels_{}'.format(i))
@@ -216,7 +212,6 @@ def convert_sklearn_knn(scope, operator, container):
 
         cast_pred_label_name = scope.get_unique_variable_name('cast_pred_label')
         reshaped_pred_label_name = scope.get_unique_variable_name('reshaped_pred_label')
-        reduced_prob_name = scope.get_unique_variable_name('reduced_prob')
         ohe_result_name = scope.get_unique_variable_name('ohe_result')
 
         apply_cast(scope, topk_labels_name, cast_pred_label_name, container, to=onnx_proto.TensorProto.INT64)
@@ -230,10 +225,8 @@ def convert_sklearn_knn(scope, operator, container):
                      name=scope.get_unique_operator_name('OneHotEncoder'), cats_int64s=classes,
                      op_domain='ai.onnx.ml')
 
-        container.add_node('ReduceMean', ohe_result_name, 
-                           reduced_prob_name, name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
-        container.add_node('ZipMap', reduced_prob_name, operator.outputs[1].full_name,
-                           op_domain='ai.onnx.ml', **zipmap_attrs)
+        container.add_node('ReduceMean', ohe_result_name, operator.outputs[1].full_name,
+                           name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
     elif operator.type == 'SklearnKNeighborsRegressor':
         container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
                            topk_labels_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
