@@ -39,7 +39,7 @@ setup(
     license='MIT License',
     author='Microsoft Corporation',
     author_email='onnx@microsoft.com',
-    url='https://github.com/onnx/onnxmltools',
+    url='https://github.com/onnx/sklearn-onnx',
     packages=packages,
     include_package_data=True,
     install_requires=requirements,

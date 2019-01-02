@@ -7,6 +7,7 @@
 # To register converter for scikit-learn operators, import associated modules here.
 from . import Binarizer
 from . import CalibratedClassifierCV
+from . import Concat
 from . import DictVectorizer
 from . import DecisionTree
 from . import GradientBoosting
