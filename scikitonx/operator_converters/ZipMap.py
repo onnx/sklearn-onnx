@@ -11,7 +11,7 @@ def convert_sklearn_zipmap(scope, operator, container):
     zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
     if hasattr(operator, 'classlabels_int64s'):
         zipmap_attrs['classlabels_int64s'] = operator.classlabels_int64s
-    elif hasttr(operator, 'classlabels_strings'):
+    elif hasattr(operator, 'classlabels_strings'):
         zipmap_attrs['classlabels_strings'] = operator.classlabels_strings
     container.add_node('ZipMap', operator.inputs[-1].full_name, operator.outputs[0].full_name,
                        op_domain='ai.onnx.ml', **zipmap_attrs)
