@@ -6,31 +6,26 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_add, apply_cast, apply_div, apply_exp, apply_mul, apply_reshape
+from ..common._topology import FloatTensorType
 from ..common._registration import get_converter, register_converter
 from .._parse import sklearn_operator_name_map
 from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 import numpy as np
 
-class Output:
-    def __init__(self, full_name):
-        self.full_name = full_name
-
-class Oper:
-    def __init__(self, model, inputs, op_type, label_name, prob_tensor_name):
-        self.raw_operator = model
-        self.inputs = inputs
-        self.type = op_type
-        self.outputs = [Output(label_name), Output(prob_tensor_name)]
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container, model):
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
-    label_name = scope.get_unique_variable_name('label')
-    df_name = scope.get_unique_variable_name('probability_tensor')
-    this_operator = Oper(base_model, operator.inputs, op_type, label_name, df_name)
-    get_converter(op_type)(scope, this_operator, container)
     n_classes = len(model.classes_)
     prob_name = [None] * n_classes
+
+    this_operator = scope.declare_local_operator(op_type)
+    this_operator.raw_operator = base_model
+    this_operator.inputs = operator.inputs
+    label_name = scope.declare_local_variable('label')
+    df_name = scope.declare_local_variable('probability_tensor', FloatTensorType())
+    this_operator.outputs.append(label_name)
+    this_operator.outputs.append(df_name)
 
     concatenated_prob_name = scope.get_unique_variable_name('concatenated_prob')
 
@@ -44,7 +39,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container, mod
 
         container.add_initializer(k_name, onnx_proto.TensorProto.INT64, [], [k])
 
-        container.add_node('ArrayFeatureExtractor', [df_name, k_name],
+        container.add_node('ArrayFeatureExtractor', [df_name.full_name, k_name],
                            df_col_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
                            op_domain='ai.onnx.ml')
         T = df_col_name
@@ -108,9 +103,9 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container, mod
         class_prob_tensor_name = calc_prob_name
     return concatenated_prob_name
 
+
 def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
     op = operator.raw_operator
-    op_type = operator.type
     classes = op.classes_
     output_shape = [-1,]
 
