@@ -191,7 +191,7 @@ def _parse_sklearn(scope, model, inputs):
         return _parse_sklearn_pipeline(scope, model, inputs)
     elif isinstance(model, pipeline.FeatureUnion):
         return _parse_sklearn_feature_union(scope, model, inputs)
-    elif type(model) in sklearn_classifier_list:
+    elif type(model) in sklearn_classifier_list and type(model) not in [LinearSVC, SVC, NuSVC]:
         probability_tensor = _parse_sklearn_simple_model(scope, model, inputs)
         this_operator = scope.declare_local_operator('SklearnZipMap')
         this_operator.inputs = probability_tensor
