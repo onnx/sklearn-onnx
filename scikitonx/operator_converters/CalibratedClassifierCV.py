@@ -14,6 +14,93 @@ import numpy as np
 
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container, model):
+    # Computational graph:
+    #
+    # In the following graph, variable names are in lower case characters only
+    # and operator names are in upper case characters. We borrow operator names
+    # from the official ONNX spec: https://github.com/onnx/onnx/blob/master/docs/Operators.md
+    # All variables are followed by their shape in [].
+    #
+    # Symbols:
+    # M: Number of instances
+    # N: Number of features
+    # C: Number of classes
+    # CLASSIFIERCONVERTER: classifier converter corresponding to the op_type
+    # a: slope in sigmoid model
+    # b: intercept in sigmoid model
+    # k: variable in the range [0, C)
+    # input: input
+    # class_prob_tensor: tensor with class probabilities (output of this function)
+    #
+    # Graph:
+    #
+    #   input [M, N] -> CLASSIFIERCONVERTER -> label [M]
+    #                          |
+    #                          V
+    #                    probability_tensor [M, C]
+    #                          |
+    #         .----------------'---------.
+    #         |                          |
+    #         V                          V
+    # ARRAYFEATUREEXTRACTOR <- k [1] -> ARRAYFEATUREEXTRACTOR
+    #         |                          |
+    #         V                          V
+    #  transposed_df_col[M, 1]        transposed_df_col[M, 1]
+    #         |--------------------------|---------------------------.---------------------------.
+    #         |                          |                           |                           |
+    #         |if model.method='sigmoid' |                           | if model.method='isotonic'|
+    #         |                          |                           |                           |
+    #         V                          V                           | if out_of_bounds='clip'   |
+    #        MUL <-------- a -------->  MUL                          V                           V
+    #         |                          |                          CLIP        ...             CLIP
+    #         V                          V                           |                           |
+    #   a_df_prod [M, 1]  ...    a_df_prod [M, 1]                    V                           V
+    #         |                          |                        clipped_df [M, 1]  ...  clipped_df [M, 1]
+    #         V                          V                           |                           |
+    #       ADD <--------- b ---------> ADD                          '----------.----------------'
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #  exp_parameter [M, 1] ...   exp_parameter [M, 1]                          |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #        EXP        ...             EXP                                     |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #  exp_result [M, 1]  ...    exp_result [M, 1]                              |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #       ADD <------- unity -------> ADD                                     |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #  denominator [M, 1]  ...   denominator [M, 1]                             |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    #        DIV <------- unity ------> DIV                                     |
+    #         |                          |                                      |
+    #         V                          V                                      |
+    # sigmoid_predict_result [M, 1] ... sigmoid_predict_result [M, 1]           |
+    #         |                          |                                      |
+    #         '-----.--------------------'                                      |
+    #               |-----------------------------------------------------------'
+    #               |
+    #               V
+    #            CONCAT -> concatenated_prob [M, C]
+    #                          |
+    #        if  C = 2         |  if C != 2
+    #      .-------------------'-----------------------------------------.-------------------.
+    #      |                                                             |                   |
+    #      V                                                             |                   V
+    # ARRAYFEATUREEXTRACTOR <- col_number [1]                            |             REDUCESUM
+    #                   |                                                |                   |
+    #                   '--------------------------------.               V                   V
+    # unit_float_tensor [1] -> SUB <- first_col [M, 1] <-'              DIV <----------- reduced_prob [M]
+    #                           |                                        |
+    #                           V                                        |
+    #                         CONCAT                                     |
+    #                           |                                        |
+    #                           V                                        |
+    #                        class_prob_tensor [M, C] <------------------'
+
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
     n_classes = len(model.classes_)
@@ -101,10 +188,53 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container, mod
                    reduced_prob_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
         apply_div(scope, [concatenated_prob_name, reduced_prob_name], calc_prob_name, container, broadcast=1)
         class_prob_tensor_name = calc_prob_name
-    return concatenated_prob_name
+    return class_prob_tensor_name
 
 
 def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
+    # Computational graph:
+    #
+    # In the following graph, variable names are in lower case characters only
+    # and operator names are in upper case characters. We borrow operator names
+    # from the official ONNX spec: https://github.com/onnx/onnx/blob/master/docs/Operators.md
+    # All variables are followed by their shape in [].
+    #
+    # Symbols:
+    # M: Number of instances
+    # N: Number of features
+    # C: Number of classes
+    # CONVERT_BASE_ESTIMATOR: base estimator convert function defined above
+    # clf_length: number of calibrated classifiers
+    # input: input
+    # output: output
+    # class_prob: class probabilities
+    #
+    # Graph:
+    #
+    #                         input [M, N]
+    #                               |
+    #           .-------------------|--------------------------.
+    #           |                   |                          |
+    #           V                   V                          V
+    # CONVERT_BASE_ESTIMATOR  CONVERT_BASE_ESTIMATOR ... CONVERT_BASE_ESTIMATOR
+    #           |                   |                          |
+    #           V                   V                          V
+    #  prob_scores_0 [M, C]    prob_scores_1 [M, C] ... prob_scores_(clf_length-1) [M, C]
+    #           |                   |                          |
+    #           '-------------------|--------------------------'
+    #                               V
+    #       add_result [M, C] <--- SUM
+    #           |
+    #           '--> DIV <- clf_length [1]
+    #                 |
+    #                 V
+    #            class_prob [M, C] -> ARGMAX -> argmax_output [M, 1]
+    #                                                   |
+    #             classes -> ARRAYFEATUREEXTRACTOR  <---'
+    #                               |
+    #                               V
+    #                            output [1]
+
     op = operator.raw_operator
     classes = op.classes_
     output_shape = [-1,]
