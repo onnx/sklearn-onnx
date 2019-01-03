@@ -238,6 +238,7 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
     op = operator.raw_operator
     classes = op.classes_
     output_shape = [-1,]
+    class_type = onnx_proto.TensorProto.STRING
 
     if np.issubdtype(op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32

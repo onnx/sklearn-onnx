@@ -9,7 +9,7 @@ from ..common.utils import check_input_and_output_numbers
 
 
 def calculate_sklearn_zipmap(operator):
-    check_input_and_output_numbers(operator, output_count_range=1)
+    check_input_and_output_numbers(operator, output_count_range=2)
 
 
 register_shape_calculator('SklearnZipMap', calculate_sklearn_zipmap)

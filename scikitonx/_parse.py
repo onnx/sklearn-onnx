@@ -197,6 +197,7 @@ def _parse_sklearn(scope, model, inputs):
         this_operator.inputs = probability_tensor
 
         classes = model.classes_
+        label_type = Int64Type()
         if np.issubdtype(model.classes_.dtype, np.floating):
             classes = np.array(list(map(lambda x: int(x), classes)))
             this_operator.classlabels_int64s = classes
@@ -205,10 +206,13 @@ def _parse_sklearn(scope, model, inputs):
         else:
             classes = np.array([s.encode('utf-8') for s in classes])
             this_operator.classlabels_strings = classes
+            label_type = StringType()
 
-        output_variable = scope.declare_local_variable('output_variable', SequenceType(DictionaryType(Int64Type(),
-                                                       FloatTensorType())))
-        this_operator.outputs.append(output_variable)
+        output_label = scope.declare_local_variable('output_label', label_type)
+        output_probability = scope.declare_local_variable('output_probability',
+                             SequenceType(DictionaryType(label_type, FloatTensorType())))
+        this_operator.outputs.append(output_label)
+        this_operator.outputs.append(output_probability)
         return this_operator.outputs
     else:
         return _parse_sklearn_simple_model(scope, model, inputs)
