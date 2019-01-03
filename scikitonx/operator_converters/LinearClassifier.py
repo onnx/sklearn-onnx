@@ -65,7 +65,6 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         raise RuntimeError('Label vector must be a string or a integer tensor')
 
     label_name = operator.outputs[0].full_name
-    probability_tensor_name = scope.get_unique_variable_name('probability_tensor')
     
     if op.__class__.__name__ == 'LinearSVC' and op.classes_.shape[0] <= 2:
         raw_scores_tensor_name = scope.get_unique_variable_name('raw_scores_tensor')
@@ -81,32 +80,22 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                            operator.outputs[1].full_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
                            op_domain='ai.onnx.ml')
     else:
-        container.add_node(classifier_type, operator.inputs[0].full_name,
-                           [label_name, probability_tensor_name],
-                           op_domain='ai.onnx.ml', **classifier_attrs)
 
         # Make sure the probability sum is 1 over all classes
         if multi_class > 0 and op.__class__.__name__ != 'LinearSVC':
+            probability_tensor_name = scope.get_unique_variable_name('probability_tensor')
+            container.add_node(classifier_type, operator.inputs[0].full_name,
+                               [label_name, probability_tensor_name],
+                               op_domain='ai.onnx.ml', **classifier_attrs)
             normalized_probability_tensor_name = scope.get_unique_variable_name(probability_tensor_name + '_normalized')
             normalizer_type = 'Normalizer'
             normalizer_attrs = {'name': scope.get_unique_operator_name(normalizer_type), 'norm': 'L1'}
-            container.add_node(normalizer_type, probability_tensor_name, normalized_probability_tensor_name,
+            container.add_node(normalizer_type, probability_tensor_name, operator.outputs[1].full_name,
                                op_domain='ai.onnx.ml', **normalizer_attrs)
         else:
-            normalized_probability_tensor_name = probability_tensor_name
-
-        # Post-process probability tensor produced by LinearClassifier operator
-        zipmap_type = 'ZipMap'
-        zipmap_attrs = {'name': scope.get_unique_operator_name(zipmap_type)}
-        if all(isinstance(i, (six.string_types, six.text_type)) for i in class_labels):
-            zipmap_attrs['classlabels_strings'] = class_labels
-        elif all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in class_labels):
-            zipmap_attrs['classlabels_int64s'] = class_labels
-        else:
-            raise RuntimeError('Label vector must be a string or a integer tensor')
-
-        container.add_node(zipmap_type, normalized_probability_tensor_name, operator.outputs[1].full_name,
-                           op_domain='ai.onnx.ml', **zipmap_attrs)
+            container.add_node(classifier_type, operator.inputs[0].full_name,
+                               [label_name, operator.outputs[1].full_name],
+                               op_domain='ai.onnx.ml', **classifier_attrs)
 
 
 register_converter('SklearnLinearClassifier', convert_sklearn_linear_classifier)
