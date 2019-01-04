@@ -151,21 +151,16 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     classes_name = scope.get_unique_variable_name('classes')
     reduce_log_sum_exp_result_name = scope.get_unique_variable_name('reduce_log_sum_exp_result')
     log_prob_name = scope.get_unique_variable_name('log_prob')
-    prob_tensor_name = scope.get_unique_variable_name('prob_tensor')
     array_feature_extractor_result_name = scope.get_unique_variable_name('array_feature_extractor_result')
 
     class_type = onnx_proto.TensorProto.STRING
-    zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
     if np.issubdtype(nb.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
         classes = np.array(list(map(lambda x: int(x), classes)))
-        zipmap_attrs['classlabels_int64s'] = classes 
     elif np.issubdtype(nb.classes_.dtype, np.signedinteger):
         class_type = onnx_proto.TensorProto.INT32
-        zipmap_attrs['classlabels_int64s'] = classes
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
-        zipmap_attrs['classlabels_strings'] = classes
 
     container.add_initializer(feature_log_prob_name, onnx_proto.TensorProto.FLOAT,
                               feature_log_prob.shape, feature_log_prob.flatten())
@@ -255,9 +250,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                        axes=[1], keepdims=0)
     apply_reshape(scope, reduce_log_sum_exp_result_name, reshaped_log_prob_name, container, desired_shape=log_prob_shape)
     apply_sub(scope, [sum_result_name, reshaped_log_prob_name], log_prob_name, container, broadcast=1)
-    apply_exp(scope, log_prob_name, prob_tensor_name, container)
-    container.add_node('ZipMap', prob_tensor_name, operator.outputs[1].full_name,
-                           op_domain='ai.onnx.ml', **zipmap_attrs)
+    apply_exp(scope, log_prob_name, operator.outputs[1].full_name, container)
 
     container.add_node('ArrayFeatureExtractor', [classes_name, argmax_output_name],
                        array_feature_extractor_result_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'), op_domain='ai.onnx.ml')

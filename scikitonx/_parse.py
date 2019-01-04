@@ -6,9 +6,13 @@
 
 from .common._container import SklearnModelContainer
 from .common._topology import *
+import numpy as np
 
 # Pipeline
 from sklearn import pipeline
+
+# Calibrated classifier CV
+from sklearn.calibration import CalibratedClassifierCV
 
 # Column Transformer
 from sklearn.compose import ColumnTransformer
@@ -68,7 +72,8 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 # one output for everything not in the list.
 sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
                            GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
-                           ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier]
+                           ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
+                           CalibratedClassifierCV]
 
 # Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
 # are equivalent in terms of conversion.
@@ -80,7 +85,7 @@ def build_sklearn_operator_name_map():
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
-                    KNeighborsClassifier, KNeighborsRegressor,
+                    CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
                     MultinomialNB, BernoulliNB,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer]}
@@ -127,9 +132,9 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         # For classifiers, we may have two outputs, one for label and the other one for probabilities of all classes.
         # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
         label_variable = scope.declare_local_variable('label', FloatTensorType())
-        probability_map_variable = scope.declare_local_variable('probabilities', FloatTensorType())
+        probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
-        this_operator.outputs.append(probability_map_variable)
+        this_operator.outputs.append(probability_tensor_variable)
     else:
         # We assume that all scikit-learn operator can only produce a single float tensor.
         variable = scope.declare_local_variable('variable', FloatTensorType())
@@ -229,6 +234,28 @@ def _parse_sklearn(scope, model, inputs):
         return _parse_sklearn_feature_union(scope, model, inputs)
     elif isinstance(model, ColumnTransformer):
         return _parse_sklearn_column_transformer(scope, model, inputs)
+    elif type(model) in sklearn_classifier_list and type(model) not in [LinearSVC, SVC, NuSVC]:
+        probability_tensor = _parse_sklearn_simple_model(scope, model, inputs)
+        this_operator = scope.declare_local_operator('SklearnZipMap')
+        this_operator.inputs = probability_tensor
+        classes = model.classes_
+        label_type = Int64Type()
+
+        if np.issubdtype(model.classes_.dtype, np.floating):
+            classes = np.array(list(map(lambda x: int(x), classes)))
+            this_operator.classlabels_int64s = classes
+        elif np.issubdtype(model.classes_.dtype, np.signedinteger):
+            this_operator.classlabels_int64s = classes
+        else:
+            classes = np.array([s.encode('utf-8') for s in classes])
+            this_operator.classlabels_strings = classes
+            label_type = StringType()
+        output_label = scope.declare_local_variable('output_label', label_type)
+        output_probability = scope.declare_local_variable('output_probability',
+                             SequenceType(DictionaryType(label_type, FloatTensorType())))
+        this_operator.outputs.append(output_label)
+        this_operator.outputs.append(output_probability)
+        return this_operator.outputs
     else:
         return _parse_sklearn_simple_model(scope, model, inputs)
 
