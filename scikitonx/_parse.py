@@ -193,9 +193,9 @@ def _fetch_input_slice(scope, inputs, column_indices):
 def _parse_sklearn_column_transformer(scope, model, inputs):
     '''
     :param scope: Scope object
-    :param model: A scikit-learn Column Transformer object
+    :param model: A scikit-learn ColumnTransformer object
     :param inputs: A list of Variable objects
-    :return: A list of output variables produced by feature union
+    :return: A list of output variables produced by column transformer
     '''
     # Output variable name of each transform. It's a list of string.
     transformed_result_names = []
