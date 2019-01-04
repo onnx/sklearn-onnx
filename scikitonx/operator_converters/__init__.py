@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 # To register converter for scikit-learn operators, import associated modules here.
+from . import ArrayFeatureExtractor
 from . import Binarizer
 from . import CalibratedClassifierCV
 from . import Concat

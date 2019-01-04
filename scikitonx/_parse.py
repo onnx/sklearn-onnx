@@ -11,6 +11,12 @@ import numpy as np
 # Pipeline
 from sklearn import pipeline
 
+# Calibrated classifier CV
+from sklearn.calibration import CalibratedClassifierCV
+
+# Column Transformer
+from sklearn.compose import ColumnTransformer
+
 # Linear classifiers
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
@@ -33,9 +39,6 @@ from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
-
-# Calibrated classifier CV
-from sklearn.calibration import CalibratedClassifierCV
 
 # Support vector machines
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
@@ -178,6 +181,44 @@ def _parse_sklearn_feature_union(scope, model, inputs):
     return concat_operator.outputs
 
 
+def _fetch_input_slice(scope, inputs, column_indices):
+    array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
+    array_feature_extractor_operator.inputs = inputs
+    array_feature_extractor_operator.column_indices = column_indices
+    output_variable_name = scope.declare_local_variable('extracted_feature_columns', inputs[0].type)
+    array_feature_extractor_operator.outputs.append(output_variable_name)
+    return array_feature_extractor_operator.outputs
+
+
+def _parse_sklearn_column_transformer(scope, model, inputs):
+    '''
+    :param scope: Scope object
+    :param model: A scikit-learn ColumnTransformer object
+    :param inputs: A list of Variable objects
+    :return: A list of output variables produced by column transformer
+    '''
+    # Output variable name of each transform. It's a list of string.
+    transformed_result_names = []
+    # Encode each transform as our IR object
+    for name, transform, column_indices in model.transformers:
+        if isinstance(column_indices, slice):
+            column_indices = list(range(column_indices.start if column_indices.start is not None else 0,
+                                        column_indices.stop, column_indices.step if column_indices.step
+                                        is not None else 1))
+        transform_inputs = _fetch_input_slice(scope, inputs, column_indices)
+        transformed_result_names.append(_parse_sklearn_simple_model(scope, model.named_transformers_[name],
+                                                                    transform_inputs)[0])
+    # Create a Concat ONNX node
+    concat_operator = scope.declare_local_operator('SklearnConcat')
+    concat_operator.inputs = transformed_result_names
+
+    # Declare output name of scikit-learn ColumnTransformer
+    transformed_column_name = scope.declare_local_variable('transformed_column', FloatTensorType())
+    concat_operator.outputs.append(transformed_column_name)
+
+    return concat_operator.outputs
+
+
 def _parse_sklearn(scope, model, inputs):
     '''
     This is a delegate function. It doesn't nothing but invoke the correct parsing function according to the input
@@ -191,6 +232,8 @@ def _parse_sklearn(scope, model, inputs):
         return _parse_sklearn_pipeline(scope, model, inputs)
     elif isinstance(model, pipeline.FeatureUnion):
         return _parse_sklearn_feature_union(scope, model, inputs)
+    elif isinstance(model, ColumnTransformer):
+        return _parse_sklearn_column_transformer(scope, model, inputs)
     elif type(model) in sklearn_classifier_list and type(model) not in [LinearSVC, SVC, NuSVC]:
         probability_tensor = _parse_sklearn_simple_model(scope, model, inputs)
         this_operator = scope.declare_local_operator('SklearnZipMap')

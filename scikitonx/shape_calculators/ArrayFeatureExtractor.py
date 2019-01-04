@@ -8,10 +8,8 @@ from ..common._registration import register_shape_calculator
 from ..common.utils import check_input_and_output_numbers
 
 
-def calculate_sklearn_concat(operator):
+def calculate_sklearn_array_feature_extractor(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
-    N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type.shape = [N, 'None']
 
 
-register_shape_calculator('SklearnConcat', calculate_sklearn_concat)
+register_shape_calculator('SklearnArrayFeatureExtractor', calculate_sklearn_array_feature_extractor)
