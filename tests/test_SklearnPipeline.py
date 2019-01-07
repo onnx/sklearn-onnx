@@ -1,6 +1,6 @@
 import unittest
 import numpy
-from scikitonx import convert_sklearn
+from scikitonx import convert
 from scikitonx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
 
@@ -35,7 +35,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1',scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = convert(model, 'pipeline', [('input', FloatTensorType([1, 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelineScaler")
 
@@ -48,7 +48,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1', scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline',
+        model_onnx = convert(model, 'pipeline',
                                      [('input1', FloatTensorType([1, 1])),
                                       ('input2', FloatTensorType([1, 1]))])
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -66,7 +66,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1', scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline',
+        model_onnx = convert(model, 'pipeline',
                                      [('input1', Int64TensorType([1, 1])),
                                       ('input2', FloatTensorType([1, 1]))])
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)

@@ -16,13 +16,3 @@ __model_version__ = 0
 
 
 from .convert import convert
-from .common import utils
-
-
-def convert_sklearn(model, name=None, initial_types=None, doc_string='',
-                    target_opset=None, custom_conversion_functions=None, custom_shape_calculators=None):
-    if not utils.sklearn_installed():
-        raise RuntimeError('scikit-learn is not installed. Please install scikit-learn to use this feature.')
-
-    return convert(model, name, initial_types, doc_string, target_opset,
-                   custom_conversion_functions, custom_shape_calculators)

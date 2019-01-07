@@ -30,3 +30,6 @@ coverage.xml
 .coverage
 __dump_data/
 junit/
+docs/auto_examples
+docs/examples/graph*.*
+docs/examples/rf_iris.onnx

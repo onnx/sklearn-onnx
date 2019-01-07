@@ -4,7 +4,7 @@ Tests scikit-onehotencoder converter.
 import unittest
 import numpy
 from sklearn.preprocessing import OneHotEncoder
-from scikitonx import convert_sklearn
+from scikitonx import convert
 from scikitonx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
 
@@ -21,7 +21,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model = OneHotEncoder()
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]], dtype=numpy.int64)
         model.fit(data)
-        model_onnx = convert_sklearn(model, 'scikit-learn one-hot encoder',
+        model_onnx = convert(model, 'scikit-learn one-hot encoder',
                                      [('input', Int64TensorType([1, 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnOneHotEncoderInt64-SkipDim1")
@@ -32,7 +32,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model = OneHotEncoder(categories='auto')        
         model.fit(data)
         inputs = [('input1', StringTensorType([1, 2])), ('input2', Int64TensorType([1, 1]))]
-        model_onnx = convert_sklearn(model, 'one-hot encoder mixed-type inputs', inputs)
+        model_onnx = convert(model, 'one-hot encoder mixed-type inputs', inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnOneHotEncoderStringInt64",
                             allow_failure=True)
