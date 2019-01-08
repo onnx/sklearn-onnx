@@ -4,8 +4,8 @@
 # license information.
 #--------------------------------------------------------------------------
 
-from scikitonx.proto import onnx_proto
-from scikitonx.common import utils as convert_utils
+from skl2onnx.proto import onnx_proto
+from skl2onnx.common import utils as convert_utils
 
 
 def set_model_domain(model, domain):
