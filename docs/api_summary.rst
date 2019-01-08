@@ -12,11 +12,11 @@ in *onnxmltools*.
 Converters
 ==========
 
-.. autofunction:: scikitonx.convert
+.. autofunction:: skl2onnx.convert
 
 Utils
 =====
 
-.. autofunction:: scikitonx.utils.check_input_and_output_numbers
+.. autofunction:: skl2onnx.utils.check_input_and_output_numbers
 
-.. autofunction:: scikitonx.utils.check_input_and_output_types
+.. autofunction:: skl2onnx.utils.check_input_and_output_types

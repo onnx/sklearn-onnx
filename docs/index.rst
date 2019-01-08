@@ -37,8 +37,8 @@ to automatically check every converter with
     clr.fit(X_train, y_train)
 
     # Convert into ONNX format with onnxmltools
-    from scikitonx import convert
-    from scikitonx.common.data_types import FloatTensorType
+    from skl2onnx import convert
+    from skl2onnx.common.data_types import FloatTensorType
     initial_type = [('float_input', FloatTensorType([1, 4]))]
     onx = convert(clr, initial_types=initial_type)
     with open("rf_iris.onnx", "wb") as f:

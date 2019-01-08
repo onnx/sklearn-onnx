@@ -50,8 +50,8 @@ to convert other model formats into ONNX. Here we will use
 
 ::
 
-    from scikitonx import convert
-    from scikitonx.common.data_types import FloatTensorType
+    from skl2onnx import convert
+    from skl2onnx.common.data_types import FloatTensorType
 
     initial_type = [('float_input', FloatTensorType([1, 4]))]
     onx = convert(clr, initial_types=initial_type)
