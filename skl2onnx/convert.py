@@ -79,7 +79,7 @@ def convert(model, name=None, initial_types=None, doc_string='',
     '''
     if initial_types is None:
         raise ValueError('Initial types are required. See usage of convert(...) in \
-                         scikitonx.sklearn.convert for details')
+                         skl2onnx.convert for details')
 
     if name is None:
         name = str(uuid4().hex)

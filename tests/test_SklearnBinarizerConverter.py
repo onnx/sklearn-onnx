@@ -5,8 +5,8 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy
 from sklearn.preprocessing import Binarizer
-from scikitonx import convert_sklearn
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
 

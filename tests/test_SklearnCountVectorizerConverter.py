@@ -8,8 +8,8 @@ sys.path.append(os.path.join(os.path.dirname(sys.argv[0]), 'test_utils'))
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
-from scikitonx import convert_sklearn
-from scikitonx.common.data_types import FloatTensorType, StringTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from test_utils import dump_data_and_model
 
 class TestSklearnCountVectorizer(unittest.TestCase):
