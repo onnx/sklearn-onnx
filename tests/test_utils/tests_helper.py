@@ -7,7 +7,7 @@ import numpy
 import pickle
 import os
 import warnings
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType
 from .utils_backend import compare_backend, extract_options, evaluate_condition, is_backend_enabled
 
 
@@ -164,8 +164,8 @@ def convert_model(model, name, input_types):
     :return: *onnx* model
     """
     from sklearn.base import BaseEstimator
-    from scikitonx import convert
-    model, prefix = convert(model, name, input_types), "Sklearn"
+    from skl2onnx import convert_sklearn
+    model, prefix = convert_sklearn(model, name, input_types), "Sklearn"
     if model is None:
         raise RuntimeError("Unable to convert model of type '{0}'.".format(type(model)))
     return model, prefix

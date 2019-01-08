@@ -7,8 +7,8 @@ from sklearn import datasets
 from sklearn import linear_model
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import LinearSVR
-from scikitonx import convert
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
 

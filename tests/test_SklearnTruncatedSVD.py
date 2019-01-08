@@ -6,8 +6,8 @@
 
 import unittest
 import numpy as np
-from scikitonx.common.data_types import FloatTensorType
-from scikitonx import convert
+from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
 from test_utils import create_tensor
 from test_utils import dump_data_and_model
 from sklearn.decomposition import TruncatedSVD

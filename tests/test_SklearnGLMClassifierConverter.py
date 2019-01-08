@@ -4,8 +4,8 @@ from sklearn import datasets
 from sklearn import linear_model
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
-from scikitonx import convert
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
 

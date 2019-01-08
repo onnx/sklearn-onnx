@@ -4,8 +4,8 @@ Tests scikit-onehotencoder converter.
 import unittest
 import numpy
 from sklearn.preprocessing import OneHotEncoder
-from scikitonx import convert
-from scikitonx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
 
 

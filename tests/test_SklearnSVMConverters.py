@@ -5,8 +5,8 @@ import unittest
 import numpy
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
-from scikitonx import convert
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
 

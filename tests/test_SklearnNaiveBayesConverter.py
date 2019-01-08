@@ -3,8 +3,8 @@ import numpy
 import onnx
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.datasets import load_iris
-from scikitonx import convert
-from scikitonx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 from distutils.version import StrictVersion
 

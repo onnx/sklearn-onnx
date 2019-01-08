@@ -3,8 +3,8 @@ Tests scikit-learn's binarizer converter.
 """
 import unittest
 from sklearn.feature_extraction.text import TfidfVectorizer
-from scikitonx import convert
-from scikitonx.common.data_types import StringTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import StringTensorType
 # from test_utils import dump_data_and_model
 
 
