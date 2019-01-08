@@ -10,8 +10,9 @@ Common errors with onnxruntime
 This example looks into several common situations
 in which *onnxruntime* does not return the model 
 prediction but raises an exception instead.
-It starts by loading the model trained in example
-:ref:`l-logreg-example` which produced a logistic regression
+It starts by loading a model
+(see :ref:`l-rf-iris-example`).
+which produces a logistic regression
 trained on *Iris* datasets. The model takes
 a vector of dimension 2 and returns a class among three.
 """

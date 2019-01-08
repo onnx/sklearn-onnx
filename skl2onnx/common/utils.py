@@ -139,10 +139,13 @@ def check_input_and_output_numbers(operator, input_count_range=None, output_coun
     Check if the number of input(s)/output(s) is correct
 
     :param operator: A Operator object
-    :param input_count_range: A list of two integers or an integer. If it's a list the first/second element is the
-    minimal/maximal number of inputs. If it's an integer, it is equivalent to specify that number twice in a list. For
-    infinite ranges like 5 to infinity, you need to use [5, None].
-    :param output_count_range: A list of two integers or an integer. See input_count_range for its format.
+    :param input_count_range: A list of two integers or an integer.
+        If it's a list the first/second element is the
+        minimal/maximal number of inputs. If it's an integer, it is equivalent to 
+        specify that number twice in a list. For infinite ranges like 5 to infinity,
+        you need to use [5, None].
+    :param output_count_range: A list of two integers or an integer.
+        See input_count_range for its format.
     '''
     if isinstance(input_count_range, list):
         min_input_count = input_count_range[0]
@@ -188,8 +191,8 @@ def check_input_and_output_types(operator, good_input_types=None, good_output_ty
     Check if the type(s) of input(s)/output(s) is(are) correct
 
     :param operator: A Operator object
-    :param good_input_types: A list of allowed input types (e.g., [FloatTensorType, Int64TensorType]) or None. None
-    means that we skip the check of the input types.
+    :param good_input_types: A list of allowed input types (e.g., ``[FloatTensorType, Int64TensorType]``)
+        or ``None``. *None* means that we skip the check of the input types.
     :param good_output_types: A list of allowed output types. See good_input_types for its format.
     '''
     if good_input_types is not None:

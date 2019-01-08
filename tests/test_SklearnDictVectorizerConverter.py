@@ -14,7 +14,7 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model = DictVectorizer()
         data = [{'amy': 1., 'chin': 200.}, {'nice': 3., 'amy': 1.}]
         model.fit_transform(data)
-        model_onnx = convert(model, 'dictionary vectorizer',
+        model_onnx = convert_sklearn(model, 'dictionary vectorizer',
                                      [('input', DictionaryType(StringTensorType([1]), FloatTensorType([1])))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnDictVectorizer-OneOff-SkipDim1",

@@ -9,7 +9,7 @@ import os
 import sys
 import shutil
 import sphinx_gallery.gen_gallery
-import onnxmltools
+import skl2onnx
 import onnxruntime
 import sphinx_modern_theme
 
@@ -19,7 +19,7 @@ import sphinx_modern_theme
 project = 'scikit-onnx'
 copyright = '2018-2019, Microsoft'
 author = 'Microsoft'
-version = onnxmltools.__version__
+version = skl2onnx.__version__
 release = version
 
 # -- General configuration ---------------------------------------------------

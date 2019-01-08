@@ -24,7 +24,7 @@ class TestTruncatedSVD(unittest.TestCase):
 
         svd = TruncatedSVD(n_components=K)
         svd.fit(x)
-        model_onnx = convert(svd, initial_types=[('input', FloatTensorType(shape=[1, C]))])
+        model_onnx = convert_sklearn(svd, initial_types=[('input', FloatTensorType(shape=[1, C]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(x, svd, model_onnx, basename="SklearnTruncatedSVD")
 

@@ -15,4 +15,31 @@ __domain__ = "onnxml"
 __model_version__ = 0
 
 
-from .convert import convert
+from .convert import convert_sklearn
+
+
+def supported_converters(from_sklearn=False):
+    """
+    Returns the list of supported converters.
+    To find the converter associated to a specific model,
+    the library gets the name of the model class,
+    adds ``'Sklearn'`` as a prefix and retrieves
+    the associated converter if available.
+
+    :param from_sklearn: every supported model is mapped to converter
+        by a name prefixed with ``'Sklearn'``, the prefix is removed
+        if this parameter is False but the function only returns converters
+        whose name is prefixed by ``'Sklearn'``
+    :return: list of supported models as string
+    """
+    from .common._registration import _converter_pool
+    # The two following lines populates the list of supported converters.
+    from . import shape_calculators
+    from . import operator_converters
+
+    names = sorted(_converter_pool.keys())
+    if from_sklearn:
+        return [_[7:] for _ in names if _.startswith('Sklearn')]
+    else:
+        return list(names)
+
