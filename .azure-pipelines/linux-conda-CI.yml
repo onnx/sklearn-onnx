@@ -31,7 +31,8 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
-      conda config --set always_yes yes --set changeps1 no
+      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
+      conda config --set always_yes yes --set changeps1 no      
       conda install protobuf numpy
       python -m pip install --upgrade pip      
       test '$(python.version)' == '3.7' && git clone https://github.com/onnx/onnx.git --recursive
