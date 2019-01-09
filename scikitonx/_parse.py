@@ -65,6 +65,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
+from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
 
 # In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
 # one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
@@ -88,7 +90,9 @@ def build_sklearn_operator_name_map():
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
                     MultinomialNB, BernoulliNB,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
-                    CountVectorizer, TfidfVectorizer]}
+                    CountVectorizer, TfidfVectorizer,
+                    GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
+                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
