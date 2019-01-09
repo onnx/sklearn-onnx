@@ -1,6 +1,6 @@
 
 sklearn-onnx: Convert your scikit-learn model into ONNX
-======================================================
+=======================================================
 
 .. list-table:
     :header-rows: 1
