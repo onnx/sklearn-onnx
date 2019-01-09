@@ -12,6 +12,7 @@ from ..common._registration import register_converter
 def convert_sklearn_feature_selection(scope, operator, container):
     op = operator.raw_operator
     index = op.get_support(indices=True)  # Get indices of the features selected
+
     if index:
         column_indices_name = scope.get_unique_variable_name('column_indices')
 
