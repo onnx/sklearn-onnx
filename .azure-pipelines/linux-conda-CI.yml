@@ -32,16 +32,15 @@ jobs:
 
   - script: |
       conda config --set always_yes yes --set changeps1 no
-      conda install -c conda-forge protobuf typing
-      conda install -c conda-forge numpy
+      conda install protobuf numpy
       python -m pip install --upgrade pip      
-      git clone https://github.com/onnx/onnx.git --recursive
-      cd onnx
-      python setup.py install
-      cd ..
-      python -c "import onnx"
+      test '$(python.version)' == '3.7' && git clone https://github.com/onnx/onnx.git --recursive
+      test '$(python.version)' == '3.7' && cd onnx
+      test '$(python.version)' == '3.7' && python setup.py install
+      test '$(python.version)' == '3.7' && cd ..
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
+      python -c "import onnx"
       test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
