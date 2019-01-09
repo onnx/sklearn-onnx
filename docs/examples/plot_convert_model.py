@@ -11,7 +11,7 @@ Train and deploy a model usually involves the
 three following steps:
 
 * train a pipeline with *scikit-learn*,
-* convert it into *ONNX* with *scikit-onnx*,
+* convert it into *ONNX* with *sklearn-onnx*,
 * predict with *onnxruntime*.
 
 .. contents::

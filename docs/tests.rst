@@ -12,7 +12,7 @@ This package also uses
 `NumPy <http://www.numpy.org/>`_, 
 `ProtoBuf <https://developers.google.com/protocol-buffers/>`_
 and `scikit-learn <https://scikit-learn.org/stable/>`_.
-*scikit-onnx* converts models in ONNX format which
+*sklearn-onnx* converts models in ONNX format which
 can be then used to compute predictions with the
 backend of your choice. However, there exists a way
 to automatically check every converter with
@@ -22,7 +22,7 @@ to automatically check every converter with
 Test all existing converters
 ----------------------------
 
-This process requires to clone the *scikit-onnx* repository.
+This process requires to clone the *sklearn-onnx* repository.
 The following command runs all unit tests and generates
 dumps of models, inputs, expected outputs and converted models
 in folder ``TESTDUMP``.

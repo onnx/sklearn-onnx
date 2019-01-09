@@ -1,5 +1,5 @@
 
-scikit-onnx: Convert your scikit-learn model into ONNX
+sklearn-onnx: Convert your scikit-learn model into ONNX
 ======================================================
 
 .. list-table:
@@ -13,11 +13,11 @@ scikit-onnx: Convert your scikit-learn model into ONNX
             :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
 	    
 	    
-*scikit-onnx* enables you to convert models from
-`scikit-learn <https://scikit-learn.org/stable/>`_
+*sklearn-onnx* enables you to convert models from
+`sklearn-learn <https://scikit-learn.org/stable/>`_
 toolkits into `ONNX <https://onnx.ai>`_. 
 
-*scikit-onnx* converts models in ONNX format which
+*sklearn-onnx* converts models in ONNX format which
 can be then used to compute predictions with the
 backend of your choice. However, there exists a way
 to automatically check every converter with

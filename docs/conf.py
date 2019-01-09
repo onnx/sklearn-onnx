@@ -16,7 +16,7 @@ import sphinx_modern_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'scikit-onnx'
+project = 'sklearn-onnx'
 copyright = '2018-2019, Microsoft'
 author = 'Microsoft'
 version = skl2onnx.__version__
