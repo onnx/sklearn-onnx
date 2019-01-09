@@ -34,7 +34,9 @@ jobs:
       conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge protobuf
       conda install -c conda-forge numpy
-      python -m pip install --upgrade pip
+      python -m pip install --upgrade pip      
+      export ONNX-ML=1
+      pip install onnx      
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       test '$(python.version)' != '2.7' && pip install onnxruntime
