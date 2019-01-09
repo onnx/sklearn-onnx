@@ -35,7 +35,10 @@ jobs:
       conda install -c conda-forge protobuf typing
       conda install -c conda-forge numpy
       python -m pip install --upgrade pip      
-      pip install onnx
+      git clone https://github.com/onnx/onnx.git --recursive
+      cd onnx
+      python setup.py install
+      cd ..
       python -c "import onnx"
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
