@@ -41,4 +41,4 @@ install:
     fi
 
 script:
-  - python -m pytest --cov=scikitonx --cov-report=term --cov-report=html --cov-report=xml tests
+  - python -m pytest --cov=skl2onnx --cov-report=term --cov-report=html --cov-report=xml tests

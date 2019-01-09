@@ -3,8 +3,8 @@ Tests scikit-dictvectorizer converter.
 """
 import unittest
 from sklearn.feature_extraction import DictVectorizer
-from scikitonx import convert_sklearn
-from scikitonx.common.data_types import DictionaryType, StringTensorType, FloatTensorType
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import DictionaryType, StringTensorType, FloatTensorType
 from test_utils import dump_data_and_model
 
 
