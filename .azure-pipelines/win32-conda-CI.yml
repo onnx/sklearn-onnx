@@ -43,7 +43,7 @@ jobs:
   - script: |
       test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pip install -e .
-      pytest tests --doctest-modules --junitxml=junit/test-results.xml
+      pytest skl2onnx\tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - task: PublishTestResults@2

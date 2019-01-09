@@ -1,0 +1,28 @@
+digraph "mul test" {
+	graph [bb="0,0,348.29,96.167",
+		rankdir=LR
+	];
+	node [label="\N"];
+	"mul_1/Mul (op#0)\n input0 X\n input1 W\n output0 Y"	 [URL="javascript:alert('')",
+		height=1.3356,
+		pos="174.15,48.083",
+		width=2.3374];
+	Y0	 [height=0.5,
+		label=Y,
+		pos="321.29,48.083",
+		shape=octagon,
+		width=0.75];
+	"mul_1/Mul (op#0)\n input0 X\n input1 W\n output0 Y" -> Y0	 [pos="e,294.02,48.083 258.32,48.083 267.2,48.083 275.87,48.083 283.77,48.083"];
+	X0	 [height=0.5,
+		label=X,
+		pos="27,75.083",
+		shape=octagon,
+		width=0.75];
+	X0 -> "mul_1/Mul (op#0)\n input0 X\n input1 W\n output0 Y"	 [pos="e,93.89,62.826 54.285,70.194 62.979,68.577 73.194,66.676 83.922,64.681"];
+	W0	 [height=0.5,
+		label=W,
+		pos="27,21.083",
+		shape=octagon,
+		width=0.75];
+	W0 -> "mul_1/Mul (op#0)\n input0 X\n input1 W\n output0 Y"	 [pos="e,93.89,33.34 54.285,25.973 62.979,27.59 73.194,29.49 83.922,31.486"];
+}
