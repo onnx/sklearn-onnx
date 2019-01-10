@@ -190,5 +190,6 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnVarianceThreshold")
 
+
 if __name__ == "__main__":
     unittest.main()
