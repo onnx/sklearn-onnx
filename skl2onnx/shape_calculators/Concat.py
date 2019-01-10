@@ -11,6 +11,7 @@ from ..common.utils import check_input_and_output_numbers
 def calculate_sklearn_concat(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
     N = operator.inputs[0].type.shape[0]
+    operator.outputs[0].type = operator.inputs[0].type
     operator.outputs[0].type.shape = [N, 'None']
 
 
