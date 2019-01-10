@@ -36,12 +36,10 @@ jobs:
       python -m pip install --upgrade pip
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
-      test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
 
   - script: |
-      test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pip install -e .
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
