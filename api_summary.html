@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>API Summary</title>
+
+  <link rel="stylesheet" href="_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+</head>
+<body>
+<div class="container">
+  <div class="row" style="margin-top: 1rem;">
+    <div id="sidebar" class="col-xs-12 col-sm-3">
+      <a href="index.html">
+        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="_static/logo_main.png"/>
+      </a>
+      <div id="searchbox" style="display: none" role="search">
+        <form class="form-inline" action="search.html" method="get">
+          <div class="form-group">
+            <label class="sr-only" for="searchInput">Search</label>
+            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
+          <input type="hidden" name="check_keywords" value="yes"/>
+          <input type="hidden" name="area" value="default"/>
+        </form>
+      </div>
+
+      <hr>
+
+        <div id="toc">
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#converters">Converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_common_errors.html">Common errors with onnxruntime</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+      <div class="section" id="api-summary">
+<h1>API Summary<a class="headerlink" href="#api-summary" title="Permalink to this headline">¶</a></h1>
+<p>Summary of public functions and classes exposed
+in <em>onnxmltools</em>.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#converters" id="id1">Converters</a></li>
+<li><a class="reference internal" href="#utils" id="id2">Utils</a></li>
+</ul>
+</div>
+<div class="section" id="converters">
+<h2><a class="toc-backref" href="#id1">Converters</a><a class="headerlink" href="#converters" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="skl2onnx.convert_sklearn">
+<code class="descclassname">skl2onnx.</code><code class="descname">convert_sklearn</code><span class="sig-paren">(</span><em>model</em>, <em>name=None</em>, <em>initial_types=None</em>, <em>doc_string=''</em>, <em>target_opset=None</em>, <em>custom_conversion_functions=None</em>, <em>custom_shape_calculators=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/convert.html#convert_sklearn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.convert_sklearn" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function produces an equivalent ONNX model of the given scikit-learn model.
+The supported converters is returned by function
+<a class="reference internal" href="#skl2onnx.supported_converters" title="skl2onnx.supported_converters"><code class="xref py py-func docutils literal notranslate"><span class="pre">supported_converters</span></code></a>.</p>
+<p>For pipeline conversion, user needs to make sure each component
+is one of our supported items.
+This function converts the specified <em>scikit-learn</em> model into its <em>ONNX</em> counterpart.
+Note that for all conversions, initial types are required.
+<em>ONNX</em> model name can also be specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – A scikit-learn model</li>
+<li><strong>initial_types</strong> – a python list. Each element is a tuple of a variable name 
+and a type defined in data_types.py</li>
+<li><strong>name</strong> – The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)</li>
+<li><strong>doc_string</strong> – A string attached onto the produced ONNX model</li>
+<li><strong>target_opset</strong> – number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.</li>
+<li><strong>targeted_onnx</strong> – A string (for example, ‘1.1.2’ and ‘1.2’) used to specify 
+the targeted ONNX version of the produced model. If ONNXMLTools cannot find 
+a compatible ONNX python package, an error may be thrown.</li>
+<li><strong>custom_conversion_functions</strong> – a dictionary for specifying the user customized conversion function</li>
+<li><strong>custom_shape_calculators</strong> – a dictionary for specifying the user customized shape calculator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example of initial_types:
+Assume that the specified <em>scikit-learn</em> model takes a heterogeneous list as its input.
+If the first 5 elements are floats and the last 10 elements are integers,
+we need to specify initial types as below. The [1] in [1, 5] indicates
+the batch size here is 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="k">import</span> <span class="n">FloatTensorType</span><span class="p">,</span> <span class="n">Int64TensorType</span>
+<span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;float_input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])),</span>
+                <span class="p">(</span><span class="s1">&#39;int64_input&#39;</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">]))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="skl2onnx.supported_converters">
+<code class="descclassname">skl2onnx.</code><code class="descname">supported_converters</code><span class="sig-paren">(</span><em>from_sklearn=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx.html#supported_converters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.supported_converters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of supported converters.
+To find the converter associated to a specific model,
+the library gets the name of the model class,
+adds <code class="docutils literal notranslate"><span class="pre">'Sklearn'</span></code> as a prefix and retrieves
+the associated converter if available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>from_sklearn</strong> – every supported model is mapped to converter
+by a name prefixed with <code class="docutils literal notranslate"><span class="pre">'Sklearn'</span></code>, the prefix is removed
+if this parameter is False but the function only returns converters
+whose name is prefixed by <code class="docutils literal notranslate"><span class="pre">'Sklearn'</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of supported models as string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="utils">
+<h2><a class="toc-backref" href="#id2">Utils</a><a class="headerlink" href="#utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="skl2onnx.common.utils.check_input_and_output_numbers">
+<code class="descclassname">skl2onnx.common.utils.</code><code class="descname">check_input_and_output_numbers</code><span class="sig-paren">(</span><em>operator</em>, <em>input_count_range=None</em>, <em>output_count_range=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/utils.html#check_input_and_output_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the number of input(s)/output(s) is correct</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>operator</strong> – A Operator object</li>
+<li><strong>input_count_range</strong> – A list of two integers or an integer.
+If it’s a list the first/second element is the
+minimal/maximal number of inputs. If it’s an integer, it is equivalent to 
+specify that number twice in a list. For infinite ranges like 5 to infinity,
+you need to use [5, None].</li>
+<li><strong>output_count_range</strong> – A list of two integers or an integer.
+See input_count_range for its format.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="skl2onnx.common.utils.check_input_and_output_types">
+<code class="descclassname">skl2onnx.common.utils.</code><code class="descname">check_input_and_output_types</code><span class="sig-paren">(</span><em>operator</em>, <em>good_input_types=None</em>, <em>good_output_types=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/utils.html#check_input_and_output_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the type(s) of input(s)/output(s) is(are) correct</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>operator</strong> – A Operator object</li>
+<li><strong>good_input_types</strong> – A list of allowed input types (e.g., <code class="docutils literal notranslate"><span class="pre">[FloatTensorType,</span> <span class="pre">Int64TensorType]</span></code>)
+or <code class="docutils literal notranslate"><span class="pre">None</span></code>. <em>None</em> means that we skip the check of the input types.</li>
+<li><strong>good_output_types</strong> – A list of allowed output types. See good_input_types for its format.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+        crossorigin="anonymous"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
+<script src="_static/searchtools.js"></script>
+<script>$('#searchbox').show(0)</script>
+</body>
+</html>
