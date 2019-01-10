@@ -39,12 +39,10 @@ jobs:
       test '$(python.version)' == '3.7' && pip install https://github.com/xadupre/onnx/releases/download/1.3.0/onnx-1.3.0-cp37-cp37m-win_amd64.whl
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
-      test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
 
   - script: |
-      test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pip install -e .
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
