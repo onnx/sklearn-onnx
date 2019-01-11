@@ -8,5 +8,18 @@
 *sklearn-onnx* is designed to convert the [scikit-learn](https://scikit-learn.org/stable/)
 models to [ONNX](https://github.com/onnx/onnx).
 
+# Documentation
+See [sklearn-onnx](http://onnx.ai/sklearn-onnx/).
+
+# Installation
+```
+pip install git+https://github.com/onnx/sklearn-onnx.git
+```
+
+# Report an issue, ask a question
+You may find an answer in the
+[existing issue](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
+or submit a new one.
+
 # License
 [MIT License](LICENSE)
