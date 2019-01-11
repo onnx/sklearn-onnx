@@ -19,6 +19,8 @@ jobs:
         python.version: '3.5'
       Python36:
         python.version: '3.6'
+      Python37:
+        python.version: '3.7'
     maxParallel: 3
 
   steps:
@@ -29,12 +31,21 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
-      conda config --set always_yes yes --set changeps1 no
-      conda install -c conda-forge protobuf
-      conda install -c conda-forge numpy
-      python -m pip install --upgrade pip
+      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
+      conda config --set always_yes yes --set changeps1 no      
+      conda install protobuf numpy
+      python -m pip install --upgrade pip      
+      if [ '$(python.version)' == '3.7' ]
+        then
+          git clone https://github.com/onnx/onnx.git --recursive
+          export ONNX_ML=1
+          cd onnx
+          python setup.py install
+          cd ..
+      fi
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
+      python -c "import onnx"
       test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
