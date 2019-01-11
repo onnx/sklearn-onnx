@@ -1,10 +1,6 @@
 """
 Tests scikit-learn's binarizer converter.
 """
-import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(sys.argv[0]), 'test_utils'))
-
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
@@ -26,8 +22,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         pred = vect.transform(corpus)
         model_onnx = convert_sklearn(vect, 'scikit-learn count vectorizer', [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        # REVIEW: enable the test when the runtime implements the primitives.
-        # dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer")
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer-OneOff",
+                            verbose=True)
 
     def test_model_count_vectorizer13(self):
         corpus = [
@@ -41,8 +37,9 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         pred = vect.transform(corpus)
         model_onnx = convert_sklearn(vect, 'scikit-learn count vectorizer', [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        # REVIEW: enable the test when the runtime implements the primitives.
-        # dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer")
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer-OneOff",
+                            verbose=True)
+        
 
 
 if __name__ == "__main__":
