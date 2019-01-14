@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 """
-Main entry point to the converter from the scikit-learn to onnx.
+Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
 __version__ = "1.4.0"
 __author__ = "Microsoft"
@@ -15,14 +15,30 @@ __domain__ = "onnxml"
 __model_version__ = 0
 
 
-from .convert import convert
-from .common import utils
+from .convert import convert_sklearn
 
 
-def convert_sklearn(model, name=None, initial_types=None, doc_string='',
-                    target_opset=None, custom_conversion_functions=None, custom_shape_calculators=None):
-    if not utils.sklearn_installed():
-        raise RuntimeError('scikit-learn is not installed. Please install scikit-learn to use this feature.')
+def supported_converters(from_sklearn=False):
+    """
+    Returns the list of supported converters.
+    To find the converter associated to a specific model,
+    the library gets the name of the model class,
+    adds ``'Sklearn'`` as a prefix and retrieves
+    the associated converter if available.
 
-    return convert(model, name, initial_types, doc_string, target_opset,
-                   custom_conversion_functions, custom_shape_calculators)
+    :param from_sklearn: every supported model is mapped to converter
+        by a name prefixed with ``'Sklearn'``, the prefix is removed
+        if this parameter is False but the function only returns converters
+        whose name is prefixed by ``'Sklearn'``
+    :return: list of supported models as string
+    """
+    from .common._registration import _converter_pool
+    # The two following lines populates the list of supported converters.
+    from . import shape_calculators
+    from . import operator_converters
+
+    names = sorted(_converter_pool.keys())
+    if from_sklearn:
+        return [_[7:] for _ in names if _.startswith('Sklearn')]
+    else:
+        return list(names)

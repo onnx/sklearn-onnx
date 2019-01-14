@@ -1,9 +1,6 @@
 """
 Tests scikit-learn's binarizer converter.
 """
-import os
-import sys
-
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
@@ -11,38 +8,73 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.tests.utils import dump_data_and_model
 
+
 class TestSklearnCountVectorizer(unittest.TestCase):
 
     def test_model_count_vectorizer11(self):
-        corpus = [
+        corpus = numpy.array([
                 'This is the first document.',
                 'This document is the second document.',
                 'And this is the third one.',
                 'Is this the first document?',
-                ]
+                ]).reshape((4, 1))
         vect = CountVectorizer(ngram_range=(1, 1))
-        vect.fit(corpus)
-        pred = vect.transform(corpus)
-        model_onnx = convert_sklearn(vect, 'scikit-learn count vectorizer', [('input', StringTensorType([1, 1]))])
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        # REVIEW: enable the test when the runtime implements the primitives.
-        # dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer")
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer11-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4')")
 
-    def test_model_count_vectorizer13(self):
-        corpus = [
+    def test_model_count_vectorizer22(self):
+        corpus = numpy.array([
                 'This is the first document.',
                 'This document is the second document.',
                 'And this is the third one.',
                 'Is this the first document?',
-                ]
-        vect = CountVectorizer(ngram_range=(1, 3))
-        vect.fit(corpus)
-        pred = vect.transform(corpus)
-        model_onnx = convert_sklearn(vect, 'scikit-learn count vectorizer', [('input', StringTensorType([1, 1]))])
+                ]).reshape((4, 1))
+        vect = CountVectorizer(ngram_range=(2, 2))
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        # REVIEW: enable the test when the runtime implements the primitives.
-        # dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer")
-
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer22-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4')")
+        
+    def test_model_count_vectorizer12(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = CountVectorizer(ngram_range=(1, 2))
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer12-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4')")
+        
+    def test_model_count_vectorizer13(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = CountVectorizer(ngram_range=(1, 3))
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer13-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4')")
+        
 
 if __name__ == "__main__":
     unittest.main()
