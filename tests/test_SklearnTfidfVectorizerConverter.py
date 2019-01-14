@@ -102,7 +102,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2-OneOff-SklCol")
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4')")
 
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
