@@ -208,6 +208,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             condition_name = scope.get_unique_variable_name('condition')
             cast_values_name = scope.get_unique_variable_name('cast_values')
             zero_tensor_name = scope.get_unique_variable_name('zero_tensor')
+            cast_zero_tensor_name = scope.get_unique_variable_name('cast_zero_tensor')
             binarised_input_name = scope.get_unique_variable_name('binarised_input')
 
             container.add_initializer(threshold_name, onnx_proto.TensorProto.FLOAT,
@@ -217,10 +218,11 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                               condition_name, name=scope.get_unique_operator_name('Greater'), op_version=9)
             apply_cast(scope, condition_name, cast_values_name, container,
                        to=onnx_proto.TensorProto.FLOAT)
-            container.add_node('ConstantLike', operator.inputs[0].full_name, zero_tensor_name,
-                               name=scope.get_unique_operator_name('ConstantLike'),
-                               dtype=onnx_proto.TensorProto.FLOAT, op_version=9)
-            apply_add(scope, [zero_tensor_name, cast_values_name], binarised_input_name, container, broadcast=1)
+            container.add_node('ConstantOfShape', operator.inputs[0].full_name, zero_tensor_name,
+                               name=scope.get_unique_operator_name('ConstantOfShape'), op_version=9)
+            apply_cast(scope, zero_tensor_name, cast_zero_tensor_name, container,
+                       to=onnx_proto.TensorProto.FLOAT)
+            apply_add(scope, [cast_zero_tensor_name, cast_values_name], binarised_input_name, container, broadcast=1)
             input_name = binarised_input_name
 
         apply_exp(scope, feature_log_prob_name, exp_result_name, container)
