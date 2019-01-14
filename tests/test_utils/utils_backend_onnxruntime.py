@@ -95,6 +95,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
             inputs[k] = numpy.array(inputs[k])
     
     OneOff = options.pop('OneOff', False)
+    options.pop('SklCol', False)  # unused here but in dump_data_and_model
     if OneOff:
         if len(inputs) == 1:
             name, values = list(inputs.items())[0]
