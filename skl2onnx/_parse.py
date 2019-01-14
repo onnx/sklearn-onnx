@@ -24,6 +24,7 @@ from sklearn.svm import LinearSVC
 
 # Linear regressors
 from sklearn.linear_model import ElasticNet
+from sklearn.linear_model import Lasso
 from sklearn.linear_model import LassoLars
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
@@ -65,6 +66,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
+from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
 
 # In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
 # one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
@@ -81,14 +84,16 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
                     RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer,
-                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression,
+                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
                     MultinomialNB, BernoulliNB,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
-                    CountVectorizer, TfidfVectorizer]}
+                    CountVectorizer, TfidfVectorizer,
+                    GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
+                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
