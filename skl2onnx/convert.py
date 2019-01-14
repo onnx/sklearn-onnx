@@ -45,8 +45,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     If the first 5 elements are floats and the last 10 elements are integers,
     we need to specify initial types as below. The [1] in [1, 5] indicates
     the batch size here is 1.
-    >>> from .common.data_types import FloatTensorType, Int64TensorType
-    >>> initial_type = [('float_input', FloatTensorType([1, 5])), ('int64_input', Int64TensorType([1, 10]))]
+
+    ::
+
+        from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+        initial_type = [('float_input', FloatTensorType([1, 5])),
+                        ('int64_input', Int64TensorType([1, 10]))]
     '''
     if initial_types is None:
         raise ValueError('Initial types are required. See usage of convert(...) in \

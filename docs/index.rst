@@ -15,7 +15,28 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
 	    
 *sklearn-onnx* enables you to convert models from
 `sklearn-learn <https://scikit-learn.org/stable/>`_
-toolkits into `ONNX <https://onnx.ai>`_. 
+toolkits into `ONNX <https://onnx.ai>`_.
+
+.. toctree::
+    :maxdepth: 1
+    
+    tutorial
+    api_summary
+    auto_examples/index
+
+**Issues, questions**
+
+You should look for `existing issues <https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue>`_
+or submit a new one. Sources are available on
+`onnx/sklearn-onnx <https://github.com/onnx/sklearn-onnx>`_.
+
+**ONNX version**
+
+If you want the converted model is compatible with certain ONNX version,
+please specify the *target_opset* parameter on invoking convert function,
+and the following Keras converter example code shows how it works.
+
+**Backend**
 
 *sklearn-onnx* converts models in ONNX format which
 can be then used to compute predictions with the
@@ -23,6 +44,7 @@ backend of your choice. However, there exists a way
 to automatically check every converter with
 `onnxruntime <https://pypi.org/project/onnxruntime/>`_,
 `onnxruntime-gpu <https://pypi.org/project/onnxruntime-gpu>`_.
+Every converter is tested with this backend.
 
 ::
 
@@ -52,23 +74,26 @@ to automatically check every converter with
     label_name = sess.get_outputs()[0].name
     pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
 
-.. toctree::
-    :maxdepth: 2
-    
-    tutorial
-    api_summary
-    auto_examples/index
-    tests
+**Related converters**
 
-If you want the converted model is compatible with certain ONNX version,
-please specify the *target_opset* parameter on invoking convert function,
-and the following Keras converter example code shows how it works.
+*sklearn-onnx** only converters models from *scikit-learn*.
+It was initially part of `onnxmltools <https://github.com/onnx/onnxmltools>`_
+which can still be used to convert models for *xgboost* and *libsvm*.
+Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
+`torch.onnx <https://pytorch.org/docs/stable/onnx.html>`_,
+`ONNX-MXNet API <https://mxnet.incubator.apache.org/api/python/contrib/onnx.html>`_,
+`Microsoft.ML.Onnx <https://www.nuget.org/packages/Microsoft.ML.Onnx/>`_...
 
-The package was developed by the following engineers and data scientists at 
+**Credits**
+
+The package was started by the following engineers and data scientists at 
 Microsoft starting from winter 2017: Zeeshan Ahmed, Wei-Sheng Chin, Aidan Crook, 
 Xavier Dupré, Costin Eseanu, Tom Finley, Lixin Gong, Scott Inglis, 
 Pei Jiang, Ivan Matantsev, Prabhat Roy, M. Zeeshan Siddiqui, 
 Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
+
+**License**
+
 It is licensed with `MIT License <../LICENSE>`_.
 
 

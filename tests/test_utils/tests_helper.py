@@ -64,13 +64,13 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     * ``-NoProb``: The original models computed probabilites for two classes *size=(N, 2)*
       but the runtime produces a vector of size *N*, the test will compare the second column
       to the column
-    * ``-OneOff``: the ONNX runtime cannot computed the prediction for several inputs,
-      it must be called for each of them
-      and computed output.
+    * ``-OneOff``: the ONNX runtime cannot compute the prediction for several inputs,
+      it must be called for each of them and computed output.
     * ``-Out0``: only compares the first output on both sides
     * ``-Reshape``: merges all outputs into one single vector and resizes it before comparing
     * ``-SkipDim1``: before comparing expected and computed output,
       arrays with a shape like *(2, 1, 2)* becomes *(2, 2)*
+    * ``-SklCol``: *scikit-learn* operator applies on a column and not a matrix      
     
     If the *backend* is not None, the function either raises an exception
     if the comparison between the expected outputs and the backend outputs
@@ -108,8 +108,14 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
             prediction = [model.predict(data)]
             lambda_original = lambda: model.predict(dataone)
     elif hasattr(model, "transform"):
-        prediction = model.transform(data)
-        lambda_original = lambda: model.transform(dataone)
+        options = extract_options(basename)
+        SklCol = options.get('SklCol', False)
+        if SklCol:
+            prediction = model.transform(data.ravel())
+            lambda_original = lambda: model.transform(dataone.ravel())
+        else:
+            prediction = model.transform(data)
+            lambda_original = lambda: model.transform(dataone)
     else:
         raise TypeError("Model has not predict or transform method: {0}".format(type(model)))
         
