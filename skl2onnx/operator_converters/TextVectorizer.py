@@ -29,7 +29,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.strip_accents is not None:
         raise NotImplementedError("Operator StringNormalizer cannot remove accents.")
     
-    msg = "The default regular expression '{0}' splits strings based on anything but a space." + \
+    msg = "The default regular expression '{0}' splits strings based on anything but a space. " + \
           "The current specification splits strings based on the following separators {1}."
     warnings.warn(msg.format(default_pattern, default_separators))
 
