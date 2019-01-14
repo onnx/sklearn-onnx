@@ -32,7 +32,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     :param folder: files are written in this folder,
         it is created if it does not exist, if *folder* is None,
         it looks first in environment variable ``ONNXTESTDUMP``,
-        otherwise, it is placed into ``'tests'``.
+        otherwise, it is placed into ``'tests_dump'``.
     :param inputs: standard type or specific one if specified, only used is
         parameter *onnx* is None
     :param backend: backend used to compare expected output and runtime output.
@@ -79,7 +79,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     runtime_test = dict(model=model, data=data)
     
     if folder is None:
-        folder = os.environ.get('ONNXTESTDUMP', 'tests')
+        folder = os.environ.get('ONNXTESTDUMP', 'tests_dump')
     if dump_issue is None:
         dump_issue = os.environ.get('ONNXTESTDUMPERROR', '0') in ('1', 1, 'True', 'true', True)
     if benchmark is None:

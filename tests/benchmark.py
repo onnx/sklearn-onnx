@@ -17,6 +17,9 @@ import os
 import sys
 import unittest
 import warnings
+import platform
+import cpuinfo
+
 
 
 def run_all_tests(folder=None):
@@ -89,7 +92,11 @@ def run_all_tests(folder=None):
         del cols[ind]
         cols += ['stderr']
         df = df[cols]
+    df["ratio"] = df["onnxrt_time"] / df["original_time"]
+    df["CPU"] = platform.processor()
+    df["CPUI"] = cpuinfo.get_cpu_info()['brand']
     df.to_excel(os.path.join(folder, "report_backend.xlsx"))
+    return df
                     
     
 if __name__ == "__main__":
