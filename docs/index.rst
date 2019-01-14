@@ -23,6 +23,7 @@ toolkits into `ONNX <https://onnx.ai>`_.
     tutorial
     api_summary
     auto_examples/index
+    supported
 
 **Issues, questions**
 

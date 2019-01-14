@@ -11,6 +11,7 @@ import shutil
 import sphinx_gallery.gen_gallery
 import skl2onnx
 import onnxruntime
+import sphinx_skl2onnx_extension
 import sphinx_modern_theme
 
 
@@ -33,6 +34,7 @@ extensions = [
     'sphinx.ext.githubpages',
     "sphinx_gallery.gen_gallery",
     'sphinx.ext.autodoc',
+    'sphinx_skl2onnx_extension',
 ]
 
 templates_path = ['_templates']
