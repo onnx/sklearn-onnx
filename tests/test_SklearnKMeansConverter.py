@@ -22,7 +22,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model.fit(X)
         model_onnx = convert_sklearn(model, 'kmeans', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnKMeans")
+        dump_data_and_model(X.astype(numpy.float32)[40:60], model, model_onnx, basename="SklearnKMeans-Dec4")
 
 
 if __name__ == "__main__":

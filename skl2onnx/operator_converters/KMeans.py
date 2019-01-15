@@ -8,6 +8,7 @@ from ..proto import onnx_proto
 from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_reshape, apply_sub
 from ..common._registration import register_converter
 import numpy as np
+from sklearn.utils.extmath import row_norms
 
 
 def convert_sklearn_kmeans(scope, operator, container):
@@ -41,7 +42,21 @@ def convert_sklearn_kmeans(scope, operator, container):
                                                     Z [l, k] ----------> Add <------------C^2 [k]
                                                                           |
                                                                           v
-                                                  L [l] <--- ArgMin <---  Y [l, k]
+                                                  L [l] <--- ArgMin <---  Y2 [l, k] --> Sqrt --> Y2 [l, k]
+    
+    *scikit-learn* code:
+    
+    ::
+    
+        X = data
+        Y = model.cluster_centers_
+        XX = row_norms(X, squared=True)
+        YY = row_norms(Y, squared=True)
+        distances = safe_sparse_dot(X, Y.T, dense_output=True)
+        distances *= -2
+        distances += XX[:, numpy.newaxis]
+        distances += YY[numpy.newaxis, :]
+        numpy.sqrt(distances, out=distances)
     """
     op = operator.raw_operator
     variable = operator.inputs[0]
@@ -53,16 +68,9 @@ def convert_sklearn_kmeans(scope, operator, container):
     container.add_initializer(nameC, onnx_proto.TensorProto.FLOAT,
                               shapeC, op.cluster_centers_.flatten())    
 
-    #centroids ^2
-    nameC2 = scope.get_unique_variable_name('C2')
-    c2 = (op.cluster_centers_ ** 2).sum(axis=1)
-    shapeC2 = list(c2.shape)
-    container.add_initializer(nameC2, onnx_proto.TensorProto.FLOAT,
-                              [shapeC[0]], c2.flatten())    
-
     nameX2 = scope.get_unique_variable_name('X2')
     nameX = operator.inputs[0].full_name
-    container.add_node('ReduceSumSquare', [nameX], [nameX2],
+    container.add_node('ReduceSumSquare', [nameX], [nameX2], axes=[1], keepdims=1,
                         name=scope.get_unique_operator_name('ReduceSumSquare'))
     
     # Compute -2XC'
@@ -87,15 +95,26 @@ def convert_sklearn_kmeans(scope, operator, container):
 
     # Compute Z = X^2 - 2XC'
     nameZ = scope.get_unique_variable_name("Z")
-    container.add_node("Add", [nameX2, nameXC2], [nameZ], name=scope.get_unique_operator_name('Add'))
+    container.add_node("Add", [nameXC2, nameX2], [nameZ], name=scope.get_unique_operator_name('Add'))
 
-    # Compute Y = Z + C^2
+    #centroids ^2
+    nameC2 = scope.get_unique_variable_name('C2')
+    c2 = row_norms(op.cluster_centers_, squared=True)
+    shapeC2 = list(c2.shape)
+    container.add_initializer(nameC2, onnx_proto.TensorProto.FLOAT,
+                              [1, shapeC[0]], c2.flatten())
+
+    # Compute Y2 = Z + C^2
+    nameY2 = scope.get_unique_variable_name('Y2') 
+    container.add_node("Add", [nameZ, nameC2], [nameY2], name=scope.get_unique_operator_name('Add'))
+    
+    # Compute Y = sqrt(Y2)
     nameY = operator.outputs[1].full_name
-    container.add_node("Add", [nameZ, nameC2], [nameY], name=scope.get_unique_operator_name('Add'))
+    container.add_node("Sqrt", [nameY2], [nameY], name=scope.get_unique_operator_name('Sqrt'))
 
     # Compute the most-matched cluster index, L
     nameL = operator.outputs[0].full_name
-    container.add_node("ArgMin", [nameY], [nameL], name=scope.get_unique_operator_name('ArgMin'),
+    container.add_node("ArgMin", [nameY2], [nameL], name=scope.get_unique_operator_name('ArgMin'),
                        axis=1, keepdims=0)
 
 
