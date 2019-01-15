@@ -6,7 +6,7 @@
 
 import unittest
 import numpy
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.datasets import load_iris
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
@@ -19,6 +19,15 @@ class TestSklearnKMeansModel(unittest.TestCase):
         data = load_iris()
         X = data.data
         model = KMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = convert_sklearn(model, 'kmeans', [('input', FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(X.astype(numpy.float32)[40:60], model, model_onnx, basename="SklearnKMeans-Dec4")
+
+    def test_batchkmeans_clustering(self):
+        data = load_iris()
+        X = data.data
+        model = MiniBatchKMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, 'kmeans', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)

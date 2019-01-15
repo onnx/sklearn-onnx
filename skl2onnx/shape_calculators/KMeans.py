@@ -31,3 +31,4 @@ def calculate_sklearn_kmeans_output_shapes(operator):
 
 
 register_shape_calculator('SklearnKMeans', calculate_sklearn_kmeans_output_shapes)
+register_shape_calculator('SklearnMiniBatchKMeans', calculate_sklearn_kmeans_output_shapes)

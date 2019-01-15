@@ -53,7 +53,7 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
 
 # Clustering
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
 from sklearn.decomposition import PCA 
@@ -82,7 +82,7 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
                            CalibratedClassifierCV]
 
 # Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
-cluster_list = [KMeans]
+cluster_list = [KMeans, MiniBatchKMeans]
 
 # Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
 # are equivalent in terms of conversion.
@@ -95,7 +95,7 @@ def build_sklearn_operator_name_map():
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    MultinomialNB, BernoulliNB, KMeans,
+                    MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,

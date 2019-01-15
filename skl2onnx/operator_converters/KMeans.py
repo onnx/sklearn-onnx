@@ -119,3 +119,4 @@ def convert_sklearn_kmeans(scope, operator, container):
 
 
 register_converter('SklearnKMeans', convert_sklearn_kmeans)
+register_converter('SklearnMiniBatchKMeans', convert_sklearn_kmeans)
