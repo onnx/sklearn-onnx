@@ -5,8 +5,9 @@
 # --------------------------------------------------------------------------
 import inspect
 import re
-import six
 import traceback
+import six
+import sys
 from ..proto import helper
 from .interface import ModelContainer
 from ._apply_operation import __dict__ as dict_apply_operation
@@ -172,9 +173,9 @@ class ModelComponentContainer(ModelContainer):
         Checks that if *op_type* is one of the operator defined in
         :mod:`skl2onnx.common._apply_container`, then it was called
         from a function defined in this sub module by looking
-        into the callstack.
+        into the callstack. The test is enabled for *python >= 3.6*.
         """
-        if op_type in _apply_operation_specific:
+        if op_type in _apply_operation_specific and sys.version_info[:2] >= (3, 6):
             tb = traceback.extract_stack()
             operation = []
             fct = _apply_operation_specific[op_type]
