@@ -13,7 +13,7 @@ from .utils_backend import compare_backend, extract_options, evaluate_condition,
 
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         inputs=None, backend="onnxruntime", context=None,
-                        allow_failure=None):
+                        allow_failure=None, methods=None):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -74,29 +74,36 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     if not os.path.exists(folder):
         os.makedirs(folder)
     
-    if hasattr(model, "predict"):
-        if hasattr(model, "predict_proba"):
-            # Classifier
-            prediction = [model.predict(data), model.predict_proba(data)]
-        elif hasattr(model, "decision_function"):
-            # Classifier without probabilities
-            prediction = [model.predict(data), model.decision_function(data)]
-        elif hasattr(model, "fit_transform") and hasattr(model, "score"):
-            # clustering
-            prediction = [model.predict(data), model.transform(data)]            
-        else:
-            # Regressor
-            prediction = [model.predict(data)]
-    elif hasattr(model, "transform"):
-        options = extract_options(basename)
-        SklCol = options.get('SklCol', False)
-        if SklCol:
-            prediction = model.transform(data.ravel())
-        else:
-            prediction = model.transform(data)
+    if methods is not None:
+        prediction = []
+        for method in methods:
+            call = getattr(model, method)
+            if callable(call):
+                prediction.append(call(data))
     else:
-        raise TypeError("Model has not predict or transform method.")
-        
+        if hasattr(model, "predict"):
+            if hasattr(model, "predict_proba"):
+                # Classifier
+                prediction = [model.predict(data), model.predict_proba(data)]
+            elif hasattr(model, "decision_function"):
+                # Classifier without probabilities
+                prediction = [model.predict(data), model.decision_function(data)]
+            elif hasattr(model, "fit_transform") and hasattr(model, "score"):
+                # clustering
+                prediction = [model.predict(data), model.transform(data)]            
+            else:
+                # Regressor
+                prediction = [model.predict(data)]
+        elif hasattr(model, "transform"):
+            options = extract_options(basename)
+            SklCol = options.get('SklCol', False)
+            if SklCol:
+                prediction = model.transform(data.ravel())
+            else:
+                prediction = model.transform(data)
+        else:
+            raise TypeError("Model does not have predict or transform method.")
+
     runtime_test['expected'] = prediction
     
     names = []
