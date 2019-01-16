@@ -22,19 +22,23 @@ import cpuinfo
 
 
 
-def run_all_tests(folder=None):
+def run_all_tests(folder=None, verbose=True):
     """
     Runs all unit tests or unit tests specific to one library.
     The tests produce a series of files dumped into ``folder``
     which can be later used to tests a backend (or a runtime).
     
     :param folder: where to put the dumped files
+    :param verbose: verbose
     """
     if folder is None:
         folder = 'TESTDUMP'
     os.environ["ONNXTESTDUMP"] = folder
     os.environ["ONNXTESTDUMPERROR"] = "1"
     os.environ["ONNXTESTBENCHMARK"] = "1"
+
+    if verbose:
+        print("[benchmark] look into '{0}'".format(folder))
 
     try:
         import onnxmltools
@@ -72,30 +76,16 @@ def run_all_tests(folder=None):
                     break            
             runner.run(ts)
     
-    from onnxmltools.utils.tests_helper import make_report_backend
-    report = make_report_backend(folder)
-    
-    from pandas import DataFrame, set_option
+    from test_utils.tests_helper import make_report_backend
+    df = make_report_backend(folder, as_df=True)
+
+    from pandas import set_option
     set_option("display.max_columns", None)
     set_option("display.max_rows", None)
-    
-    df = DataFrame(report).sort_values(["_model"])
-    
-    import onnx
-    import onnxruntime
-    print(df)
-    df["onnx-version"] = onnx.__version__
-    df["onnxruntime-version"] = onnxruntime.__version__
-    cols = list(df.columns)
-    if 'stderr' in cols:
-        ind = cols.index('stderr')
-        del cols[ind]
-        cols += ['stderr']
-        df = df[cols]
-    df["ratio"] = df["onnxrt_time"] / df["original_time"]
-    df["CPU"] = platform.processor()
-    df["CPUI"] = cpuinfo.get_cpu_info()['brand']
-    df.to_excel(os.path.join(folder, "report_backend.xlsx"))
+    exfile = os.path.join(folder, "report_backend.xlsx")
+    df.to_excel(exfile)
+    if verbose:
+        print("[benchmark] wrote report in '{0}'".format(exfile))
     return df
                     
     

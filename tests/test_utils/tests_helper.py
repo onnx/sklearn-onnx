@@ -9,10 +9,11 @@ import warnings
 import traceback
 import time
 import sys
+import platform
 import numpy
 import pandas
-from skl2onnx.common.data_types import FloatTensorType
 from .utils_backend import compare_backend, extract_options, evaluate_condition, is_backend_enabled
+from skl2onnx.common.data_types import FloatTensorType
 
 
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
@@ -101,6 +102,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
             call = getattr(model, method)
             if callable(call):
                 prediction.append(call(data))
+                # we only take the last one for benchmark
                 lambda_original = lambda: call(dataone)
             else:
                 raise RuntimeError("Method '{0}' is not callable.".format(method))
@@ -197,6 +199,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         continue
                     else:
                         raise e
+            print(output)
             if output is not None:
                 dest = os.path.join(folder, basename + ".backend.{0}.pkl".format(b))
                 names.append(dest)
@@ -414,12 +417,20 @@ def compute_benchmark(fcts, number=10, repeat=100):
     return obs
 
 
-def make_report_backend(folder):
+def make_report_backend(folder, as_df=False):
     """
     Looks into a folder for dumped files after
     the unit tests.
+    
+    :param folder: dump folder, it should contain files *.bench*
+    :param as_df: returns a dataframe instread of a list of dictionary
+    :return: time execution
     """
+    import onnx
+    import onnxruntime
+    import cpuinfo
     res = {}
+    benched = 0
     files = os.listdir(folder)
     for name in files:
         if name.endswith(".expected.pkl"):
@@ -456,10 +467,48 @@ def make_report_backend(folder):
                 res[model]['{0}_time'.format(name)] = ave
                 res[model]['{0}_std'.format(name)] = std
                 res[model]['input_size'] = size
+                benched += 1
+    
+    if benched == 0:
+        raise RuntimeError("No benchmark files in '{0}', found:\n{1}".format(
+            folder, "\n".join(files)))
 
     def dict_update(d, u):
         d.update(u)
         return d
     
     aslist = [dict_update(dict(_model=k), v) for k, v in res.items()]
-    return aslist
+    
+    if as_df:            
+        from pandas import DataFrame        
+        df = DataFrame(aslist).sort_values(["_model"])
+        df["onnx-version"] = onnx.__version__
+        df["onnxruntime-version"] = onnxruntime.__version__
+        cols = list(df.columns)
+        if 'stderr' in cols:
+            ind = cols.index('stderr')
+            del cols[ind]
+            cols += ['stderr']
+            df = df[cols]
+        for col in ["onnxrt_time", "original_time"]:
+            if col not in df.columns:        
+                raise RuntimeError("Column '{0}' is missing from {1}".format(
+                    col, ', '.join(df.columns)))
+        df["ratio"] = df["onnxrt_time"] / df["original_time"]
+        df["CPU"] = platform.processor()
+        df["CPUI"] = cpuinfo.get_cpu_info()['brand']
+        return df
+    else:
+        cpu = cpuinfo.get_cpu_info()['brand']
+        proc = platform.processor()
+        for row in aslist:
+            try:
+                row["ratio"] = row["onnxrt_time"] / row["original_time"]
+            except KeyError:
+                # execution failed
+                pass
+            row["CPU"] = proc
+            row["CPUI"] = cpu
+            row["onnx-version"] = onnx.__version__
+            row["onnxruntime-version"] = onnxruntime.__version__
+        return aslist
