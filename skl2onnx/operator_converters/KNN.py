@@ -6,6 +6,7 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul, apply_reshape, apply_sub
+from ..common._apply_operation import apply_pow, apply_concat
 from ..common._registration import register_converter
 import numpy as np
 
@@ -140,8 +141,7 @@ def convert_sklearn_knn(scope, operator, container):
 
     apply_sub(scope, [operator.inputs[0].full_name, training_examples_name], sub_results_name, container, broadcast=1)
     apply_abs(scope, sub_results_name, abs_results_name, container)
-    container.add_node('Pow', [abs_results_name, distance_power_name],
-                       distance_name, name=scope.get_unique_operator_name('Pow'))
+    apply_pow(scope, [abs_results_name, distance_power_name], distance_name, container)
     container.add_node('ReduceSum', distance_name,
                        reduced_sum_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
     apply_reshape(scope, reduced_sum_name, reshaped_result_name, container, desired_shape=length)
@@ -194,8 +194,7 @@ def convert_sklearn_knn(scope, operator, container):
             container.add_node('ReduceSum', output_cast_label_name[i],
                                 output_label_reduced_name[i], axes=[1])
 
-        container.add_node('Concat', [s for s in output_label_reduced_name],
-                           concat_labels_name, name=scope.get_unique_operator_name('Concat'), axis=0)
+        apply_concat(scope, [s for s in output_label_reduced_name], concat_labels_name, container, axis=0)
         container.add_node('ArgMax', concat_labels_name, 
                            predicted_label_name, name=scope.get_unique_operator_name('ArgMax'))
         container.add_node('ArrayFeatureExtractor', [classes_name, predicted_label_name], final_label_name,
