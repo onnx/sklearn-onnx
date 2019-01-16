@@ -65,7 +65,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
 from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
 
@@ -91,7 +91,7 @@ def build_sklearn_operator_name_map():
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
                     MultinomialNB, BernoulliNB,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
-                    CountVectorizer, TfidfVectorizer,
+                    CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold]}
     res.update({
