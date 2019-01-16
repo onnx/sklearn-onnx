@@ -17,7 +17,8 @@ from .utils_backend import compare_backend, extract_options, evaluate_condition,
 
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         inputs=None, backend="onnxruntime", context=None,
-                        allow_failure=None, dump_issue=None, benchmark=None, verbose=False):
+                        allow_failure=None, methods=None, dump_issue=None, benchmark=None,
+                        verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -94,31 +95,41 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     else:
         dataone = data
     
-    if hasattr(model, "predict"):
-        if hasattr(model, "predict_proba"):
-            # Classifier
-            prediction = [model.predict(data), model.predict_proba(data)]
-            lambda_original = lambda: model.predict_proba(dataone)
-        elif hasattr(model, "decision_function"):
-            # Classifier without probabilities
-            prediction = [model.predict(data), model.decision_function(data)]
-            lambda_original = lambda: model.decision_function(dataone)
-        else:
-            # Regressor
-            prediction = [model.predict(data)]
-            lambda_original = lambda: model.predict(dataone)
-    elif hasattr(model, "transform"):
-        options = extract_options(basename)
-        SklCol = options.get('SklCol', False)
-        if SklCol:
-            prediction = model.transform(data.ravel())
-            lambda_original = lambda: model.transform(dataone.ravel())
-        else:
-            prediction = model.transform(data)
-            lambda_original = lambda: model.transform(dataone)
+    if methods is not None:
+        prediction = []
+        for method in methods:
+            call = getattr(model, method)
+            if callable(call):
+                prediction.append(call(data))
+                lambda_original = lambda: call(dataone)
+            else:
+                raise RuntimeError("Method '{0}' is not callable.".format(method))
     else:
-        raise TypeError("Model has not predict or transform method: {0}".format(type(model)))
-        
+        if hasattr(model, "predict"):
+            if hasattr(model, "predict_proba"):
+                # Classifier
+                prediction = [model.predict(data), model.predict_proba(data)]
+                lambda_original = lambda: model.predict_proba(dataone)
+            elif hasattr(model, "decision_function"):
+                # Classifier without probabilities
+                prediction = [model.predict(data), model.decision_function(data)]
+                lambda_original = lambda: model.decision_function(dataone)
+            else:
+                # Regressor
+                prediction = [model.predict(data)]
+                lambda_original = lambda: model.predict(dataone)
+        elif hasattr(model, "transform"):
+            options = extract_options(basename)
+            SklCol = options.get('SklCol', False)
+            if SklCol:
+                prediction = model.transform(data.ravel())
+                lambda_original = lambda: model.transform(dataone.ravel())
+            else:
+                prediction = model.transform(data)
+                lambda_original = lambda: model.transform(dataone)
+        else:
+            raise TypeError("Model has not predict or transform method: {0}".format(type(model)))
+
     runtime_test['expected'] = prediction
     
     names = []
