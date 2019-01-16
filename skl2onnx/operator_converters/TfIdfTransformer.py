@@ -22,7 +22,9 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
     if op.sublinear_tf:
         # code scikit-learn
         # np.log(X.data, X.data) --> does not apply on null coefficient
-        # X.data += 1    
+        # X.data += 1
+        raise RuntimeError("ONNX does not support sparse tensors, sublinear_tf must be False")
+            
         logged = scope.get_unique_variable_name('logged')
         apply_log(scope, data, logged, container)
         
