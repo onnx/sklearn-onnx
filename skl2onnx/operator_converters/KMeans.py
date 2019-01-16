@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_reshape, apply_sub
+from ..common._apply_operation import apply_add, apply_gemm, apply_sqrt
 from ..common._registration import register_converter
 import numpy as np
 from sklearn.utils.extmath import row_norms
@@ -77,27 +77,16 @@ def convert_sklearn_kmeans(scope, operator, container):
     zero_name = scope.get_unique_variable_name('zero')
     zeros = np.zeros((N, ))
     container.add_initializer(zero_name, onnx_proto.TensorProto.FLOAT,
-                              list(zeros.shape), zeros)   
-    
-    if container.target_opset < 5:
-        attrs['broadcast'] = 1
-        op_version = 1
-    elif container.target_opset < 7:
-        attrs['broadcast'] = 1
-        op_version = 6
-    else:
-        op_version = 7
-        
+                              list(zeros.shape), zeros)
     nameXC2 = scope.get_unique_variable_name('XC2')
-    container.add_node("Gemm", [nameX, nameC, zero_name], [nameXC2], 
-                       name=scope.get_unique_operator_name('Gemm'),
-                       alpha=-2., transB=1, op_version=op_version)
+    apply_gemm(scope, [nameX, nameC, zero_name], [nameXC2], container, alpha=-2., transB=1)
 
     # Compute Z = X^2 - 2XC'
     nameZ = scope.get_unique_variable_name("Z")
-    container.add_node("Add", [nameXC2, nameX2], [nameZ], name=scope.get_unique_operator_name('Add'))
+    # container.add_node("Add", [nameXC2, nameX2], [nameZ], name=scope.get_unique_operator_name('Add'))
+    apply_add(scope, [nameXC2, nameX2], [nameZ], container)
 
-    #centroids ^2
+    # centroids ^2
     nameC2 = scope.get_unique_variable_name('C2')
     c2 = row_norms(op.cluster_centers_, squared=True)
     shapeC2 = list(c2.shape)
@@ -106,11 +95,11 @@ def convert_sklearn_kmeans(scope, operator, container):
 
     # Compute Y2 = Z + C^2
     nameY2 = scope.get_unique_variable_name('Y2') 
-    container.add_node("Add", [nameZ, nameC2], [nameY2], name=scope.get_unique_operator_name('Add'))
+    apply_add(scope, [nameZ, nameC2], [nameY2], container)
     
     # Compute Y = sqrt(Y2)
     nameY = operator.outputs[1].full_name
-    container.add_node("Sqrt", [nameY2], [nameY], name=scope.get_unique_operator_name('Sqrt'))
+    apply_sqrt(scope, [nameY2], [nameY], container)
 
     # Compute the most-matched cluster index, L
     nameL = operator.outputs[0].full_name
