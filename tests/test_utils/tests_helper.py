@@ -230,7 +230,7 @@ def dump_binary_classification(model, suffix="", folder=None, allow_failure=None
     X = numpy.array(X, dtype=numpy.float32)
     y = ['A', 'B', 'A']
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, 'tree-based binary classifier', [('input', FloatTensorType([1, 2]))])
+    model_onnx, prefix = convert_model(model, 'binary classifier', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Bin" + model.__class__.__name__ + suffix)
 
@@ -254,7 +254,8 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     X = numpy.array(X, dtype=numpy.float32)
     y = [0, 1, 2, 1, 1, 2]
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, 'tree-based multi-output regressor', [('input', FloatTensorType([1, 2]))])
+    model_onnx, prefix = convert_model(model, 'multi-class classifier', [('input', FloatTensorType([1, 2]))])
+    print(model_onnx)
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Mcl" + model.__class__.__name__ + suffix)
 
@@ -279,7 +280,7 @@ def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None):
     X = numpy.array(X, dtype=numpy.float32)
     y = numpy.array([[100, 50], [100, 49], [100, 99]], dtype=numpy.float32)
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, 'tree-based multi-output regressor', [('input', FloatTensorType([1, 2]))])
+    model_onnx, prefix = convert_model(model, 'multi-regressor', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "MRg" + model.__class__.__name__ + suffix)
 
@@ -305,7 +306,7 @@ def dump_single_regression(model, suffix="", folder=None, allow_failure=None):
     X = numpy.array(X, dtype=numpy.float32)
     y = numpy.array([100, -10, 50], dtype=numpy.float32)
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, 'tree-based regressor', [('input', FloatTensorType([1, 2]))])
+    model_onnx, prefix = convert_model(model, 'single regressor', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Reg" + model.__class__.__name__ + suffix)
 

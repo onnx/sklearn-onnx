@@ -13,6 +13,7 @@ from . import LabelEncoder
 from . import LinearClassifier
 from . import LinearRegressor
 from . import OneHotEncoder
+from . import OneVsRestClassifier
 from . import Scaler
 from . import SVM
 from . import SVD
