@@ -17,10 +17,13 @@ jobs:
         python.version: '2.7'
       Python35:
         python.version: '3.5'
+        onnx.version: '==1.1.2'
       Python36:
         python.version: '3.6'
+        onnx.version: '==1.2.3'
       Python37:
         python.version: '3.7'
+        onnx.version: ''
     maxParallel: 3
 
   steps:
@@ -45,6 +48,7 @@ jobs:
       fi
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
+      pip install onnx==$(onnx.version)
       python -c "import onnx"
       test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
