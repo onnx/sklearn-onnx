@@ -1,5 +1,5 @@
 """
-Tests scikit-learn's binarizer converter.
+Tests on functions in _apply_operators.
 """
 
 import unittest
