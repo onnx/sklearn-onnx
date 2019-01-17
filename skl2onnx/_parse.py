@@ -59,6 +59,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
@@ -84,8 +85,8 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer,
-                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer,
+                    LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,

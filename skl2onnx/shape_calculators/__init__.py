@@ -9,6 +9,7 @@ from . import ArrayFeatureExtractor
 from . import Concat
 from . import DictVectorizer
 from . import Imputer
+from . import LabelBinariser
 from . import LabelEncoder
 from . import LinearClassifier
 from . import LinearRegressor
