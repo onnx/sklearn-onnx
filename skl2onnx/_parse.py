@@ -143,6 +143,8 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
     elif type(model) == NearestNeighbors:
+        # For Nearest Neighbours, we have two outputs, one for nearest neighbours' indices
+        # and the other one for distances
         index_variable = scope.declare_local_variable('index', Int64TensorType())
         distance_variable = scope.declare_local_variable('distance', FloatTensorType())
         this_operator.outputs.append(index_variable)
