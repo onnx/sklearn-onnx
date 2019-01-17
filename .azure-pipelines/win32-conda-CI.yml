@@ -43,7 +43,7 @@ jobs:
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install pytest
-      pip install onnx==$(onnx.version)
+      pip install onnx$(onnx.version)
     displayName: 'Install dependencies'
 
   - script: |
