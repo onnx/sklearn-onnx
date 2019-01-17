@@ -4,16 +4,16 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..proto import onnx_proto
 from ..common._apply_operation import apply_concat
 from ..common._topology import FloatTensorType
-from ..common._registration import get_converter, register_converter
+from ..common._registration import register_converter
 from .._parse import sklearn_operator_name_map
-import numpy as np
 
 
 def convert_one_vs_rest_classifier(scope, operator, container):    
-    # Create the converter for the base estimator.
+    """
+    Converts a *OneVsRestClassifier* into ONNX format.
+    """
     
     op = operator.raw_operator
     classes = op.classes_
@@ -39,10 +39,10 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         container.add_node('Slice', prob_name.raw_name, p1,
                            name=scope.get_unique_operator_name('Slice'),
                            axes=[0, 1], starts=[0, 1], ends=[-1, -1])
-        
+
         probs_names.append(p1)
 
-    # concatenate outputs
+    # concatenates outputs
     conc_name = scope.get_unique_variable_name('concatenated')
     apply_concat(scope, probs_names, conc_name, container, axis=1)
     
@@ -50,7 +50,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     container.add_node('ArgMax', conc_name, operator.outputs[0].full_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
     
-    # normalize
+    # normalizes the outputs
     container.add_node('LpNormalization', conc_name, operator.outputs[1].full_name,
                        name=scope.get_unique_operator_name('LpNormalization'), axis=1, p=1)
     

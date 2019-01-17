@@ -255,7 +255,6 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     y = [0, 1, 2, 1, 1, 2]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, 'multi-class classifier', [('input', FloatTensorType([1, 2]))])
-    print(model_onnx)
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Mcl" + model.__class__.__name__ + suffix)
 
