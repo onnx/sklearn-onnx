@@ -47,6 +47,7 @@ from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 # K-nearest neighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
 from sklearn.naive_bayes import BernoulliNB
@@ -89,7 +90,7 @@ def build_sklearn_operator_name_map():
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    MultinomialNB, BernoulliNB,
+                    NearestNeighbors, MultinomialNB, BernoulliNB,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
@@ -140,6 +141,11 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+    elif type(model) == NearestNeighbors:
+        index_variable = scope.declare_local_variable('index', Int64TensorType())
+        distance_variable = scope.declare_local_variable('distance', FloatTensorType())
+        this_operator.outputs.append(index_variable)
+        this_operator.outputs.append(distance_variable)
     else:
         # We assume that all scikit-learn operator can only produce a single float tensor.
         variable = scope.declare_local_variable('variable', FloatTensorType())
