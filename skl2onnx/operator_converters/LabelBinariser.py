@@ -22,7 +22,7 @@ def convert_sklearn_label_binariser(scope, operator, container):
     unit_matrix_name = scope.get_unique_variable_name('unit_matrix')
     classes_tensor_name = scope.get_unique_variable_name('classes_tensor')
     equal_condition_tensor_name = scope.get_unique_variable_name('equal_condition_tensor')
-    zeros_tensor_name = scope.get_unique_variable_name('zeros_tensor')
+    zeros_tensor_name = scope.get_unique_variable_name('zero_tensor')
     unit_tensor_name = scope.get_unique_variable_name('unit_tensor')
 
     class_dtype = onnx_proto.TensorProto.STRING
