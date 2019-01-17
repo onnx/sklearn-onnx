@@ -18,7 +18,7 @@ from skl2onnx.common.data_types import FloatTensorType
 
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         inputs=None, backend="onnxruntime", context=None,
-                        allow_failure=None, methods=None, dump_issue=None, benchmark=None,
+                        allow_failure=None, methods=None, dump_error_log=None, benchmark=None,
                         verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
@@ -46,7 +46,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :param dump_issue: if True, dumps any error message in a file  ``<basename>.err``,
+    :param dump_error_log: if True, dumps any error message in a file  ``<basename>.err``,
         if it is None, it checks the environment variable ``ONNXTESTDUMPERROR``
     :param benchmark: if True, runs a benchmark and stores the results into a file
         ``<basename>.bench``, if None, it checks the environment variable ``ONNXTESTBENCHMARK``
@@ -82,8 +82,8 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     
     if folder is None:
         folder = os.environ.get('ONNXTESTDUMP', 'tests_dump')
-    if dump_issue is None:
-        dump_issue = os.environ.get('ONNXTESTDUMPERROR', '0') in ('1', 1, 'True', 'true', True)
+    if dump_error_log is None:
+        dump_error_log = os.environ.get('ONNXTESTDUMPERROR', '0') in ('1', 1, 'True', 'true', True)
     if benchmark is None:
         benchmark = os.environ.get('ONNXTESTBENCHMARK', '0') in ('1', 1, 'True', 'true', True)
     if not os.path.exists(folder):
@@ -155,7 +155,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
         with open(dest, "wb") as f:
             pickle.dump(model, f)
     
-    if dump_issue:
+    if dump_error_log:
         error_dump = os.path.join(folder, basename + ".err")
         
     if onnx is None:
@@ -190,7 +190,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                     output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
                                                           context=context, verbose=verbose)
                 except AssertionError as e:
-                    if dump_issue:
+                    if dump_error_log:
                         with open(error_dump, "w", encoding="utf-8") as f:
                             f.write(str(e) + "\n--------------\n")
                             traceback.print_exc(file=f)
