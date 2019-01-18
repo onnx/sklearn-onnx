@@ -2,6 +2,7 @@ numpy
 protobuf
 codecov
 pandas
+py-cpuinfo
 pytest
 pytest-cov
 scikit-learn
