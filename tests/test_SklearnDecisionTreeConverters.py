@@ -15,14 +15,20 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
 
     def test_decision_tree_classifier(self):
         model = DecisionTreeClassifier()
-        dump_one_class_classification(model)
-        dump_binary_classification(model)
-        dump_multiple_classification(model)
+        dump_one_class_classification(model,
+                                      # Operator cast-1 is not implemented in onnxruntime
+                                      allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_binary_classification(model,
+                                   allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_multiple_classification(model,
+                                     allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
     def test_decision_tree_regressor(self):
         model = DecisionTreeRegressor()
-        dump_single_regression(model)
-        dump_multiple_regression(model)
+        dump_single_regression(model,
+                               allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_multiple_regression(model,
+                                 allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
 
 if __name__ == "__main__":
