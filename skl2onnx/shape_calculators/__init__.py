@@ -13,6 +13,7 @@ from . import LabelBinariser
 from . import LabelEncoder
 from . import LinearClassifier
 from . import LinearRegressor
+from . import NearestNeighbours
 from . import OneHotEncoder
 from . import Scaler
 from . import SVM
