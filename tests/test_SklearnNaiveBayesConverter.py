@@ -25,6 +25,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X.astype(numpy.float32)
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.2'), 'Need Greater Opset 7')
     def test_model_multinomial_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(MultinomialNB())
         model_onnx = convert_sklearn(model, 'multinomial naive bayes', [('input', FloatTensorType([1, 4]))])

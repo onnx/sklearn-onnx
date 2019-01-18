@@ -42,7 +42,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                         suffix += 'Idf' if use_idf else ''
                         suffix += 'Smooth' if smooth_idf else ''
                         dump_data_and_model(data, model, model_onnx,
-                                            basename="SklearnTfidfTransform" + suffix)
+                                            basename="SklearnTfidfTransform" + suffix,
+                                            # Operator mul is not implemented in onnxruntime
+                                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
 
 if __name__ == "__main__":
