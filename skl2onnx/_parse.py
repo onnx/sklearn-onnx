@@ -47,10 +47,14 @@ from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 # K-nearest neighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
+
+# Clustering
+from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
 from sklearn.decomposition import PCA 
@@ -58,6 +62,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
@@ -78,18 +83,21 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
                            ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
                            CalibratedClassifierCV]
 
+# Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
+cluster_list = [KMeans, MiniBatchKMeans]
+
 # Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
 # are equivalent in terms of conversion.
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer,
-                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer,
+                    LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    MultinomialNB, BernoulliNB,
+                    NearestNeighbors, MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
@@ -140,6 +148,20 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+    elif type(model) in cluster_list:
+        # For clustering, we may have two outputs, one for label and the other one for scores of all classes.
+        # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
+        label_variable = scope.declare_local_variable('label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable('scores', FloatTensorType())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
+    elif type(model) == NearestNeighbors:
+        # For Nearest Neighbours, we have two outputs, one for nearest neighbours' indices
+        # and the other one for distances
+        index_variable = scope.declare_local_variable('index', Int64TensorType())
+        distance_variable = scope.declare_local_variable('distance', FloatTensorType())
+        this_operator.outputs.append(index_variable)
+        this_operator.outputs.append(distance_variable)
     else:
         # We assume that all scikit-learn operator can only produce a single float tensor.
         variable = scope.declare_local_variable('variable', FloatTensorType())
