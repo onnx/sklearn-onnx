@@ -73,6 +73,7 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
 from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
+from sklearn.impute import SimpleImputer
 
 # In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
 # one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
@@ -91,7 +92,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer, SimpleImputer,
                     LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
@@ -233,8 +234,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
                                         column_indices.stop, column_indices.step if column_indices.step
                                         is not None else 1))
         transform_inputs = _fetch_input_slice(scope, inputs, column_indices)
-        transformed_result_names.append(_parse_sklearn_simple_model(scope, model.named_transformers_[name],
-                                                                    transform_inputs)[0])
+        transformed_result_names.append(_parse_sklearn(scope, model.named_transformers_[name],
+                                                       transform_inputs)[0])
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names

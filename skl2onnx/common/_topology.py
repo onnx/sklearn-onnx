@@ -22,8 +22,9 @@ class Variable:
 
     def __init__(self, raw_name, onnx_name, scope, type=None):
         '''
-        :param raw_name: A string indicating the variable's name in the original model. Usually, it's the seed string
-        used to created its ONNX name (i.e., the field onnx_name below).
+        :param raw_name: A string indicating the variable's name in the original model.
+            Usually, it's the seed string used to created its ONNX name (i.e., the 
+            field *onnx_name* below).
         :param onnx_name: A string indicating the variable's name in the converted model
         :param scope: A string. It's the name of the scope where this variable is declared
         :param type: A type object defined in .common.data_types.py; e.g., FloatTensorType
@@ -45,6 +46,9 @@ class Variable:
         '''
         return self.onnx_name
 
+    def __repr__(self):
+        return "Variable(raw_name='{0}', onnx_name='{1}', type='{2}')".format(
+            self.raw_name, self.onnx_name, self.type)
 
 class Operator(OperatorBase):
 

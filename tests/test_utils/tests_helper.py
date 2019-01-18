@@ -208,7 +208,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         continue
                     else:
                         raise e
-            print(output)
+
             if output is not None:
                 dest = os.path.join(folder, basename + ".backend.{0}.pkl".format(b))
                 names.append(dest)

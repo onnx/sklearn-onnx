@@ -75,9 +75,17 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
         container.add_node(extractor_type, [operator.inputs[0].full_name, index_variable_name],
                            extracted_feature_name, op_domain='ai.onnx.ml', **extractor_attrs)
 
-        # Encode the extracted categorical feature as a one-hot vector
+        # string or int
+        all_int = all(map(lambda x: isinstance(x, (int, numpy.int64, numpy.int32, numpy.byte)), cats))
+        if all_int:
+            field = 'cats_int64s'
+        else:
+            field = "cats_strings"
+            cats = [str(c) for c in cats]
+
+        # Encode the extracted categorical feature as a one-hot vector        
         encoder_type = 'OneHotEncoder'
-        encoder_attrs = {'name': scope.get_unique_operator_name(encoder_type), 'cats_int64s': cats}
+        encoder_attrs = {'name': scope.get_unique_operator_name(encoder_type), field: cats}
         encoded_feature_name = scope.get_unique_variable_name('encoded_feature_at_' + str(i))
         container.add_node(encoder_type, extracted_feature_name, encoded_feature_name, op_domain='ai.onnx.ml',
                            **encoder_attrs)
