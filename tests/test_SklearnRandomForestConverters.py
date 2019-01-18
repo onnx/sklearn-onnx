@@ -17,9 +17,12 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     def test_random_forest_classifier(self):
         model = RandomForestClassifier(n_estimators=3)
-        dump_one_class_classification(model)
-        dump_binary_classification(model)
-        dump_multiple_classification(model)
+        dump_one_class_classification(model,
+                                      allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_binary_classification(model,
+                                   allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_multiple_classification(model,
+                                     allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
@@ -28,9 +31,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     def test_extra_trees_classifier(self):
         model = ExtraTreesClassifier(n_estimators=3)
-        dump_one_class_classification(model)
-        dump_binary_classification(model)
-        dump_multiple_classification(model)
+        dump_one_class_classification(model,
+                                      allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_binary_classification(model,
+                                   allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_multiple_classification(model,
+                                     # Operator cast-1 is not implemented in onnxruntime
+                                     allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
     def test_extra_trees_regressor(self):
         model = ExtraTreesRegressor(n_estimators=3)
