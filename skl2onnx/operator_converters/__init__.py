@@ -16,6 +16,7 @@ from . import GradientBoosting
 from . import Imputer
 from . import KMeans
 from . import KNN
+from . import LabelBinariser
 from . import LabelEncoder
 from . import LinearClassifier
 from . import LinearRegressor

@@ -47,6 +47,7 @@ from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 # K-nearest neighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
 from sklearn.naive_bayes import BernoulliNB
@@ -61,6 +62,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
@@ -89,13 +91,13 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer,
-                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer,
+                    LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
+                    NearestNeighbors, MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
@@ -153,6 +155,13 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         score_tensor_variable = scope.declare_local_variable('scores', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+    elif type(model) == NearestNeighbors:
+        # For Nearest Neighbours, we have two outputs, one for nearest neighbours' indices
+        # and the other one for distances
+        index_variable = scope.declare_local_variable('index', Int64TensorType())
+        distance_variable = scope.declare_local_variable('distance', FloatTensorType())
+        this_operator.outputs.append(index_variable)
+        this_operator.outputs.append(distance_variable)
     else:
         # We assume that all scikit-learn operator can only produce a single float tensor.
         variable = scope.declare_local_variable('variable', FloatTensorType())
