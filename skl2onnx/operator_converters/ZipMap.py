@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_cast
+from ..common._apply_operation import apply_cast, apply_identity
 from ..common._registration import register_converter
 
 
@@ -18,7 +18,7 @@ def convert_sklearn_zipmap(scope, operator, container):
         zipmap_attrs['classlabels_strings'] = operator.classlabels_strings
         to_type = onnx_proto.TensorProto.STRING
     if to_type == onnx_proto.TensorProto.STRING:
-        container.add_node('Identity', operator.inputs[0].full_name, operator.outputs[0].full_name)
+        apply_identity(scope, operator.inputs[0].full_name, operator.outputs[0].full_name, container)
     else:
         apply_cast(scope, operator.inputs[0].full_name, operator.outputs[0].full_name, container,
                    to=to_type)
