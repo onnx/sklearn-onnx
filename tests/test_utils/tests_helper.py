@@ -121,6 +121,10 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                 # Classifier without probabilities
                 prediction = [model.predict(data), model.decision_function(data)]
                 lambda_original = lambda: model.decision_function(dataone)
+            elif hasattr(model, "fit_transform") and hasattr(model, "score"):
+                # clustering
+                prediction = [model.predict(data), model.transform(data)]            
+                lambda_original = lambda: model.decision_function(dataone)
             else:
                 # Regressor
                 prediction = [model.predict(data)]

@@ -53,6 +53,9 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
 
+# Clustering
+from sklearn.cluster import KMeans, MiniBatchKMeans
+
 # Operators for preprocessing and feature engineering
 from sklearn.decomposition import PCA 
 from sklearn.decomposition import TruncatedSVD
@@ -80,6 +83,9 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
                            ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
                            CalibratedClassifierCV]
 
+# Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
+cluster_list = [KMeans, MiniBatchKMeans]
+
 # Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
 # are equivalent in terms of conversion.
 
@@ -91,7 +97,7 @@ def build_sklearn_operator_name_map():
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    NearestNeighbors, MultinomialNB, BernoulliNB,
+                    NearestNeighbors, MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
@@ -142,6 +148,13 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+    elif type(model) in cluster_list:
+        # For clustering, we may have two outputs, one for label and the other one for scores of all classes.
+        # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
+        label_variable = scope.declare_local_variable('label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable('scores', FloatTensorType())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
     elif type(model) == NearestNeighbors:
         # For Nearest Neighbours, we have two outputs, one for nearest neighbours' indices
         # and the other one for distances
