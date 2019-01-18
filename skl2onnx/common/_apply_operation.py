@@ -6,8 +6,8 @@
 # This file contains some high-level APIs for applying operations on variables specified by names. We should try our
 # best to use those functions because they can produce ONNX operators according to the ONNX version specified in the
 # `container` argument. Notice that those function behaviors are defined in a way very similar to ONNX-1.2.
-
 from ..proto import onnx_proto
+
 
 def _create_name_or_use_existing_one(scope, op_type, name):
     if name is None:
@@ -221,21 +221,23 @@ def apply_reciprocal(scope, input_name, output_name, container, operator_name=No
 
 
 def apply_reshape(scope, input_name, output_name, container, operator_name=None, desired_shape=None):
-    if len(list(i for i in desired_shape if i < 0)) > 1:
-        raise ValueError('There can only be one -1 in the targeted shape of a Reshape but got %s' % desired_shape)
 
     name = _create_name_or_use_existing_one(scope, 'Reshape', operator_name)
 
     if container.target_opset < 7:
+        if len(list(i for i in desired_shape if i < 0)) > 1:
+            raise ValueError('There can only be one -1 in the targeted shape of a Reshape but got %s' % desired_shape)
         container.add_node('Reshape', input_name, output_name, op_version=1, name=name, shape=desired_shape,
                            consumed_inputs=[0])
-    else:
+    elif desired_shape:
         # The shape attribute of Reshape becomes a tensor input, so we create one tensor to store that attribute.
         desired_shape_name = scope.get_unique_variable_name('shape_tensor')
         container.add_initializer(desired_shape_name, onnx_proto.TensorProto.INT64, [len(desired_shape)], desired_shape)
 
         # Create ONNX Reshape operator
         container.add_node('Reshape', [input_name, desired_shape_name], output_name, op_version=5, name=name)
+    else:
+        container.add_node('Reshape', input_name, output_name, name=name)
 
 
 def apply_sqrt(scope, input_name, output_name, container, operator_name=None):

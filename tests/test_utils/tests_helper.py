@@ -51,6 +51,11 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     :param benchmark: if True, runs a benchmark and stores the results into a file
         ``<basename>.bench``, if None, it checks the environment variable ``ONNXTESTBENCHMARK``
     :param verbose: additional information
+    :param methods: ONNX may produce one or several results, each of them
+        is equivalent to the output of a method from the model class,
+        this parameter defines which methods is equivalent to ONNX outputs.
+        If not specified, it falls back into a default behaviour implemented
+        for classifiers, regressors, clustering.
     :return: the created files
 
     Some convention for the name,
