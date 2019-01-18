@@ -3,10 +3,41 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import inspect
+import re
+import traceback
 import six
+import sys
 from ..proto import helper
 from .interface import ModelContainer
+from ._apply_operation import __dict__ as dict_apply_operation
+
+
+def _get_operation_list():
+    """
+    Investigates this module to extract all ONNX functions
+    which needs to be converted with these functions.
+    """
+    regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', \\[?input_name"),
+            re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name")]
+    res = {}
+    for k, v in dict_apply_operation.items():
+        if k.startswith("apply_") and callable(v):
+            found = None
+            source = inspect.getsource(v)
+            for reg in regs:
+                g = reg.search(source)
+                if g:
+                    found = g.groups()[0]
+                    break
+            if found is None:
+                raise RuntimeError("Unable to find an ONNX name in function '{0}', source=\n{1}".format(
+                    k, source))
+            res[found] = v
+    return res
+
+
+_apply_operation_specific = _get_operation_list()
 
 
 class RawModelContainer(object):
@@ -39,20 +70,6 @@ class RawModelContainer(object):
         raise NotImplementedError()
 
 
-class CoremlModelContainer(RawModelContainer):
-
-    def __init__(self, coreml_model):
-        super(CoremlModelContainer, self).__init__(coreml_model)
-
-    @property
-    def input_names(self):
-        return [str(var.name) for var in self.raw_model.description.input]
-
-    @property
-    def output_names(self):
-        return [str(var.name) for var in self.raw_model.description.output]
-
-
 class CommonSklearnModelContainer(RawModelContainer):
 
     def __init__(self, sklearn_model):
@@ -82,36 +99,6 @@ class CommonSklearnModelContainer(RawModelContainer):
 
 class SklearnModelContainer(CommonSklearnModelContainer):
     pass
-
-
-class LightGbmModelContainer(CommonSklearnModelContainer):
-    pass
-
-
-class KerasModelContainer(RawModelContainer):
-
-    def __init__(self, keras_model):
-        super(KerasModelContainer, self).__init__(keras_model)
-        self._input_raw_names = list()
-        self._output_raw_names = list()
-
-    def add_input_name(self, name):
-        # The order of adding strings matters. The final model's input names are sequentially added as this list
-        if name not in self._input_raw_names:
-            self._input_raw_names.append(name)
-
-    def add_output_name(self, name):
-        # The order of adding strings matters. The final model's output names are sequentially added as this list
-        if name not in self._output_raw_names:
-            self._output_raw_names.append(name)
-
-    @property
-    def input_names(self):
-        return [name for name in self._input_raw_names]
-
-    @property
-    def output_names(self):
-        return [name for name in self._output_raw_names]
 
 
 class ModelComponentContainer(ModelContainer):
@@ -180,6 +167,24 @@ class ModelComponentContainer(ModelContainer):
 
     def add_value_info(self, variable):
         self.value_info.append(self._make_value_info(variable))
+    
+    def _check_operator(self, op_type):
+        """
+        Checks that if *op_type* is one of the operator defined in
+        :mod:`skl2onnx.common._apply_container`, then it was called
+        from a function defined in this sub module by looking
+        into the callstack. The test is enabled for *python >= 3.6*.
+        """
+        if op_type in _apply_operation_specific and sys.version_info[:2] >= (3, 6):
+            tb = traceback.extract_stack()
+            operation = []
+            fct = _apply_operation_specific[op_type]
+            for b in tb:
+                if "_apply_operation" in b.filename and b.name == fct.__name__:
+                    operation.append(b)
+            if len(operation) == 0:
+                raise RuntimeError("Operator '{0}' should be added with function '{1}' in submodule _apply_operation.".format(
+                    op_type, fct.__name__))                
 
     def add_node(self, op_type, inputs, outputs, op_domain='', op_version=1, **attrs):
         '''
@@ -193,6 +198,7 @@ class ModelComponentContainer(ModelContainer):
         :param op_version: The version number (e.g., 0 and 1) of the operator we are trying to add.
         :param attrs: A Python dictionary. Keys and values are attributes' names and attributes' values, respectively.
         '''
+        self._check_operator(op_type)
 
         if isinstance(inputs, (six.string_types, six.text_type)):
             inputs = [inputs]
