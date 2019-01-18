@@ -432,7 +432,7 @@ def apply_gemm(scope, input_name, output_name, container, operator_name=None, **
     else:
         atts['op_version'] = 7
         
-    return container.add_node("Gemm", input_name, output_name, 
+    return container.add_node('Gemm', input_name, output_name, 
                               name=operator_name or scope.get_unique_operator_name('Gemm'),
                               **atts)    
     
