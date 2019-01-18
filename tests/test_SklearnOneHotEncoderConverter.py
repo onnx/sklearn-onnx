@@ -28,7 +28,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
 
     def test_one_hot_encoder_mixed_string_int(self):
         # categorical_features will be removed in 0.22 (this test will fail by then).
-        data = [["c0.4", "c0.2", 3], ["c1.4", "c1.2", 0], ["c0.2", "c2.2", 1]]
+        data = [["c0.4", "c0.2", 3], ["c1.4", "c1.2", 0], ["c0.2", "c2.2", 1],
+                ["c0.2", "c2.2", 1], ["c0.2", "c2.2", 1], ["c0.2", "c2.2", 1]]
         model = OneHotEncoder(categories='auto')        
         model.fit(data)
         inputs = [('input1', StringTensorType([1, 2])), ('input2', Int64TensorType([1, 1]))]
