@@ -130,7 +130,7 @@ class TestSklearnPipeline(unittest.TestCase):
         
         dump_data_and_model(X_train, model, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipeliner",
-                            verbose=True)
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
 
 if __name__ == "__main__":
