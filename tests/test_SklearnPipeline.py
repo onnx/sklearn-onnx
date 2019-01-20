@@ -122,10 +122,12 @@ class TestSklearnPipeline(unittest.TestCase):
         ])
 
         model.fit(X_train, y_train)
-        initial_type = [('numfeat', FloatTensorType([1,3])),
-                        ('strfeat', StringTensorType([1,2]))]
+        initial_type = [('numfeat', FloatTensorType([1, 3])),
+                        ('strfeat', StringTensorType([1, 2]))]
 
-        model_onnx = convert_sklearn(model, initial_types=initial_type)        
+        X_train = X_train[:11]
+        model_onnx = convert_sklearn(model, initial_types=initial_type)
+        
         dump_data_and_model(X_train, model, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipeliner",
                             verbose=True)

@@ -115,18 +115,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
     # input and combine them with the outputs of one-hot encoders.
     passed_indices = [i for i in range(C) if i not in categorical_feature_indices]
     if len(passed_indices) > 0:
-
-        onnx_var = None
-        onnx_is = []
-        for p in passed_indices:
-            ov, onnx_i = get_column_index(p, operator.inputs)
-            onnx_is.append(onnx_i)
-            if onnx_var is None:
-                onnnx_var = ov
-                onnx_var_name = operator.inputs[ov].full_name
-            elif onnx_var != ov:
-                raise NotImplementedError("To be fixed later")
-                
+        onnx_var, onnx_is = get_column_indices(passed_indices, operator.inputs)
         passed_feature_name = scope.get_unique_variable_name('passed_through_features')
         extractor_type = 'ArrayFeatureExtractor'
         extractor_attrs = {'name': scope.get_unique_operator_name(extractor_type)}

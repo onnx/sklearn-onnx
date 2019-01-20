@@ -223,3 +223,21 @@ def get_column_index(i, inputs):
         vi += 1
         pos = end
         end += inputs[vi].type.shape[1]
+
+
+def get_column_indices(indices, inputs):
+    """
+    Returns a tuples (variable index, column indices in that variable).
+    """
+    onnx_var = None
+    onnx_is = []
+    for p in indices:
+        ov, onnx_i = get_column_index(p, inputs)
+        onnx_is.append(onnx_i)
+        if onnx_var is None:
+            onnx_var = ov
+            onnx_var_name = inputs[ov].full_name
+        elif onnx_var != ov:
+            cols = [onnx_var, ov]
+            raise NotImplementedError("sklearn-onnx is not able to merge multiple columns from multiple variables ({0}). You should think about merge initial types.".format(cols))
+    return onnx_var, onnx_is
