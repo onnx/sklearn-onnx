@@ -132,6 +132,15 @@ class TestSklearnPipeline(unittest.TestCase):
                             basename="SklearnPipelineColumnTransformerPipeliner",
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
+        if __name__ == "__main__":
+            from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+            pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TP",
+                                        node_producer=GetOpNodeProducer("docstring"))
+            pydot_graph.write_dot("graph.dot")
+
+            import os
+            os.system('dot -O -Tpng graph.dot')            
+
 
 if __name__ == "__main__":
     unittest.main()
