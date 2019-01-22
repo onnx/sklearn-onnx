@@ -35,6 +35,7 @@ extensions = [
     "sphinx_gallery.gen_gallery",
     'sphinx.ext.autodoc',
     'sphinx_skl2onnx_extension',
+    "sphinxcontrib.blockdiag",
 ]
 
 templates_path = ['_templates']
