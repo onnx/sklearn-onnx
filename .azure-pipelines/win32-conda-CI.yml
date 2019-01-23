@@ -48,6 +48,7 @@ jobs:
 
   - script: |
       pip install -e .
+      python -c "import onnx;print('ONNX version ==', onnx.__version__)"
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
