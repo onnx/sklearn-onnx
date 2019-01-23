@@ -5,6 +5,7 @@ import os
 import glob
 import pickle
 import numpy
+import pandas
 import warnings
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from .utils_backend import load_data_and_model, extract_options, ExpectedAssertionError, OnnxRuntimeAssertionError, compare_outputs
@@ -71,7 +72,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     input = load["data"]
     if isinstance(input, dict):
         inputs = input
-    elif isinstance(input, (list, numpy.ndarray)):
+    elif isinstance(input, (list, numpy.ndarray, pandas.DataFrame)):
         inp = sess.get_inputs()
         if len(inp) == len(input):
             inputs = {i.name: v for i, v in zip(inp, input)}
@@ -82,19 +83,39 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
             if shape == input.shape[1]:
                 inputs = {n.name: input[:, i] for i, n in enumerate(inp)}
             else:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'".format(len(inp), input.shape, onnx))
+                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'".format(len(inp), input.shape, onx))
         elif isinstance(input, list):
             try:
                 array_input = numpy.array(input)
             except Exception as e:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onnx))
+                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
             shape = sum(i.shape[1] for i in inp)
             if shape == array_input.shape[1]:
-                inputs = {n.name: _create_column([row[i] for row in input], n.type) for i, n in enumerate(inp)}
+                inputs = {}
+                c = 0
+                for i, n in enumerate(inp):
+                    d = c + n.shape[1]
+                    inputs[n.name] = _create_column([row[c:d] for row in input], n.type)
+                    c = d
             else:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'*".format(len(inp), array_input.shape, onnx))
+                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'*".format(len(inp), array_input.shape, onx))
+        elif isinstance(input, pandas.DataFrame):
+            try:
+                array_input = numpy.array(input)
+            except Exception as e:
+                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
+            shape = sum(i.shape[1] for i in inp)
+            if shape == array_input.shape[1]:
+                inputs = {}
+                c = 0
+                for i, n in enumerate(inp):
+                    d = c + n.shape[1]
+                    inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
+                    c = d
+            else:
+                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0}={1} columns != original shape {2}, onnx='{3}'*".format(len(inp), shape, array_input.shape, onx))
         else:
-            raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onnx))
+            raise OnnxRuntimeAssertionError("Wrong type of inputs onnx {0}, onnx='{2}'".format(type(input), onx))
     else:
         raise OnnxRuntimeAssertionError("Dict or list is expected, not {0}".format(type(input)))
         
@@ -116,7 +137,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
-                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onnx, e))
+                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
             output = _post_process_output(res)
         else:
@@ -149,9 +170,15 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
             if "-Fail" in onx:
                 raise ExpectedAssertionError("onnxruntime cannot compute the prediction for '{0}'".format(onx))
             else:
-                raise OnnxRuntimeAssertionError("onnxruntime cannot compute the prediction for '{0}' due to {1}".format(onx, e))
+                if verbose:
+                    import onnx
+                    model = onnx.load(onx)
+                    smodel = "\nJSON ONNX\n" + str(model)
+                else:
+                    smodel = ""
+                raise OnnxRuntimeAssertionError("onnxruntime cannot compute the prediction for '{0}' due to {1}{2}".format(onx, e, smodel))
         except Exception as e:
-            raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onnx, e))
+            raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
     
     output0 = output.copy()
 
@@ -220,6 +247,8 @@ def _create_column(values, dtype):
         return numpy.array(values, dtype=numpy.int64)
     elif str(dtype) == "tensor(float)":
         return numpy.array(values, dtype=numpy.float32)
+    elif str(dtype) == "tensor(string)":
+        return numpy.array(values, dtype=numpy.str)
     else:
         raise OnnxRuntimeAssertionError("Unable to create one column from dtype '{0}'".format(dtype))
 

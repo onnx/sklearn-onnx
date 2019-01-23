@@ -5,7 +5,10 @@
 # --------------------------------------------------------------------------
 
 from .common._container import SklearnModelContainer
-from .common._topology import *
+from .common._topology import Topology, Variable, Operator, Scope, convert_topology
+from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
+from .common.data_types import FloatTensorType, StringTensorType, Int64TensorType, SequenceType, DictionaryType
+from .common.utils import get_column_indices
 import numpy as np
 
 # Pipeline
@@ -73,6 +76,7 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
 from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
+from sklearn.impute import SimpleImputer
 
 # In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
 # one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
@@ -91,7 +95,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer, SimpleImputer,
                     LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
@@ -209,6 +213,12 @@ def _parse_sklearn_feature_union(scope, model, inputs):
 
 
 def _fetch_input_slice(scope, inputs, column_indices):
+    if not isinstance(inputs, list):
+        raise TypeError("inputs must be a list of 1 input.")
+    if len(inputs) == 0:
+        raise RuntimeError("Operator ArrayFeatureExtractor requires at least one inputs.")
+    if len(inputs) != 1:
+        raise RuntimeError("Operator ArrayFeatureExtractor does not support multiple input tensors.")
     array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
     array_feature_extractor_operator.inputs = inputs
     array_feature_extractor_operator.column_indices = column_indices
@@ -232,9 +242,10 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             column_indices = list(range(column_indices.start if column_indices.start is not None else 0,
                                         column_indices.stop, column_indices.step if column_indices.step
                                         is not None else 1))
-        transform_inputs = _fetch_input_slice(scope, inputs, column_indices)
-        transformed_result_names.append(_parse_sklearn_simple_model(scope, model.named_transformers_[name],
-                                                                    transform_inputs)[0])
+        onnx_var, onnx_is = get_column_indices(column_indices, inputs)
+        transform_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
+        transformed_result_names.append(_parse_sklearn(scope, model.named_transformers_[name],
+                                                       transform_inputs)[0])
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names

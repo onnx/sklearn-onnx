@@ -51,6 +51,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
         initial_type = [('float_input', FloatTensorType([1, 5])),
                         ('int64_input', Int64TensorType([1, 10]))]
+
+    .. note::
+        
+        If a pipeline includes an instance of 
+        `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_,
+        *scikit-learn* allow the user to specify columns by names. This option is not supported
+        by *sklearn-onnx* as features names could be different in input data and the ONNX graph
+        (defined by parameter *initial_types*), only integers are supported.
     '''
     if initial_types is None:
         raise ValueError('Initial types are required. See usage of convert(...) in \

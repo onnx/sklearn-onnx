@@ -198,13 +198,46 @@ def check_input_and_output_types(operator, good_input_types=None, good_output_ty
     if good_input_types is not None:
         for variable in operator.inputs:
             if type(variable.type) not in good_input_types:
-                raise RuntimeError('Operator %s (type: %s) got an input %s with a wrong type %s. Only %s are allowed' \
+                raise RuntimeError("Operator '%s' (type: %s) got an input '%s' with a wrong type %s. Only %s are allowed" \
                                    % (operator.full_name, operator.type, variable.full_name, type(variable.type),
                                       good_input_types))
 
     if good_output_types is not None:
         for variable in operator.outputs:
             if type(variable.type) not in good_output_types:
-                raise RuntimeError('Operator %s (type: %s) got an output %s with a wrong type %s. Only %s are allowed' \
+                raise RuntimeError("Operator '%s' (type: %s) got an output '%s' with a wrong type %s. Only %s are allowed" \
                                    % (operator.full_name, operator.type, variable.full_name, type(variable.type),
                                       good_output_types))
+
+
+def get_column_index(i, inputs):
+    """
+    Returns a tuples (variable index, column index in that variable).
+    """
+    vi = 0
+    pos = 0
+    end = inputs[0].type.shape[1]
+    while True:
+        if pos <= i < end:
+            return (vi, i - pos)
+        vi += 1
+        pos = end
+        end += inputs[vi].type.shape[1]
+
+
+def get_column_indices(indices, inputs):
+    """
+    Returns a tuples (variable index, column indices in that variable).
+    """
+    onnx_var = None
+    onnx_is = []
+    for p in indices:
+        ov, onnx_i = get_column_index(p, inputs)
+        onnx_is.append(onnx_i)
+        if onnx_var is None:
+            onnx_var = ov
+            onnx_var_name = inputs[ov].full_name
+        elif onnx_var != ov:
+            cols = [onnx_var, ov]
+            raise NotImplementedError("sklearn-onnx is not able to merge multiple columns from multiple variables ({0}). You should think about merge initial types.".format(cols))
+    return onnx_var, onnx_is
