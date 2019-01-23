@@ -3,6 +3,7 @@ protobuf
 codecov
 pandas
 py-cpuinfo
+pybind11
 pytest
 pytest-cov
 scikit-learn
