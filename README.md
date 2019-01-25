@@ -1,29 +1,32 @@
-<p align="center"><img width="80%" src="docs/logo_main.png" /></p>
+<p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
 | Linux | Windows |
 |-------|---------|
 | [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master) | [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master)|
 
-# Introduction 
-*sklearn-onnx* is designed to convert the [scikit-learn](https://scikit-learn.org/stable/)
-models to [ONNX](https://github.com/onnx/onnx).
+## Introduction 
+*sklearn-onnx* converts [scikit-learn](https://scikit-learn.org/stable/) models to [ONNX](https://github.com/onnx/onnx). Once in the ONNX format, you can use tools like [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high performance scoring.
 
-# Documentation
-See [sklearn-onnx](http://onnx.ai/sklearn-onnx/).
+## Documentation
+Full documentation including tutorials is available at [http://onnx.ai/sklearn-onnx/](http://onnx.ai/sklearn-onnx/).
 
-# Installation
+You may also find answers in [existing issues](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
+or submit a new one.
+
+## Installation
+You can install from [PyPi](https://pypi.org/project/skl2onnx/):
 ```
 pip install skl2onnx
 ```
-&nbsp; &nbsp; or install it from the source with latest changes.
+Or you can install from the source with the latest changes.
 ```
 pip install git+https://github.com/onnx/sklearn-onnx.git
 ```
 
-# Report an issue, ask a question
-You may find an answer in the
-[existing issue](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
-or submit a new one.
+If you install *sklearn-onnx* from its source code, you must set the environment variable `ONNX_ML=1` before installing the onnx package.
 
-# License
+## Contribute
+We welcome contributions in the form of feedback, ideas, or code. 
+
+## License
 [MIT License](LICENSE)
