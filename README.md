@@ -15,12 +15,11 @@ or submit a new one.
 
 ## Installation
 
-A pip package will be published to PyPi soon.
-In the meantime, you can currently install sklearn-onnx from source:
+You can install from [PyPi](https://pypi.org/project/skl2onnx/):
 ```
 pip install skl2onnx
 ```
-&nbsp; &nbsp; or install it from the source with latest changes.
+Or you can install from the source with the latest changes.
 ```
 pip install git+https://github.com/onnx/sklearn-onnx.git
 ```
