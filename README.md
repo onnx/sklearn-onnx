@@ -14,7 +14,6 @@ You may also find answers in [existing issues](https://github.com/onnx/sklearn-o
 or submit a new one.
 
 ## Installation
-
 You can install from [PyPi](https://pypi.org/project/skl2onnx/):
 ```
 pip install skl2onnx
