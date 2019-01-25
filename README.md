@@ -13,6 +13,10 @@ See [sklearn-onnx](http://onnx.ai/sklearn-onnx/).
 
 # Installation
 ```
+pip install skl2onnx
+```
+&nbsp; &nbsp; or install it from the source with latest changes.
+```
 pip install git+https://github.com/onnx/sklearn-onnx.git
 ```
 
