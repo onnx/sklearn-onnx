@@ -3,16 +3,19 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import warnings
+import numpy as np
 
 from .common._container import SklearnModelContainer
 from .common._topology import Topology, Variable, Operator, Scope, convert_topology
+from .common._registration import register_converter, register_shape_calculator
 from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
 from .common.data_types import FloatTensorType, StringTensorType, Int64TensorType, SequenceType, DictionaryType
 from .common.utils import get_column_indices
-import numpy as np
 
 # Pipeline
 from sklearn import pipeline
+from sklearn.base import ClassifierMixin, RegressorMixin, ClusterMixin
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
@@ -118,7 +121,41 @@ def build_sklearn_operator_name_map():
     })
     return res
 
+
 sklearn_operator_name_map = build_sklearn_operator_name_map()
+
+
+def update_registered_converter(model, alias, shape_fct, convert_fct, overwrite=True):
+    """
+    Registers or updates a converter for a new model so that
+    it can be converted when inserted in a *scikit-learn* pipeline.
+    
+    :param model: model class
+    :param alias: alias used to register the model
+    :param shape_fct: function which checks or modifies the expected outputs,
+        this function should be fast so that the whole graph can be computed followed
+        by the conversion of each model, parallelized or not
+    :param convert_fct: function which converts a model
+    :param overwrite: False to raise exception if a converter already exists
+
+    The alias is usually the library name followed by the model name.
+    Example:
+
+    ::
+
+        from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
+        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
+        from skl2onnx import update_registered_converter
+        update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
+                                    calculate_linear_classifier_output_shapes,
+                                    convert_sklearn_random_forest_classifier)
+    """    
+    if not overwrite and model in sklearn_operator_name_map and alias != sklearn_operator_name_map[model]:
+        warnings.warn("Model '{0}' was already registered under alias '{1}'.".format(
+            model, sklearn_operator_name_map[model]))
+    sklearn_operator_name_map[model] = alias
+    register_converter(alias, convert_fct, overwrite=overwrite)
+    register_shape_calculator(alias, shape_fct, overwrite=overwrite)
 
 
 def _get_sklearn_operator_name(model_type):
@@ -145,14 +182,14 @@ def _parse_sklearn_simple_model(scope, model, inputs):
     this_operator = scope.declare_local_operator(_get_sklearn_operator_name(type(model)), model)
     this_operator.inputs = inputs
 
-    if type(model) in sklearn_classifier_list:
+    if type(model) in sklearn_classifier_list or isinstance(model, ClassifierMixin):
         # For classifiers, we may have two outputs, one for label and the other one for probabilities of all classes.
         # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
         label_variable = scope.declare_local_variable('label', FloatTensorType())
         probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
-    elif type(model) in cluster_list:
+    elif type(model) in cluster_list or isinstance(model, ClusterMixin):
         # For clustering, we may have two outputs, one for label and the other one for scores of all classes.
         # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
         label_variable = scope.declare_local_variable('label', Int64TensorType())

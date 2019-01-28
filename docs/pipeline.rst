@@ -3,6 +3,12 @@
 Convert pipeline
 ================
 
+.. contents::
+    :local:
+
+Convert complex pipelines
+=========================
+
 *scikit-learn* introduced
 `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_
 useful to build complex pipelines such as the following one:
@@ -78,3 +84,35 @@ It can be represented as a
 
 .. image:: pipeline.png
     :width: 1000
+
+.. _l-register-converter:
+
+New converters in a pipeline
+============================
+
+Many libraries implement *scikit-learn* API and their models can
+be included in *scikit-learn* pipelines. However, *scikit-onnx* cannot
+a pipeline which include a model such as *XGBoost* or *LightGbm*
+if it does not know the corresponding converters: it needs to be registered.
+That's the purpose of function :func:`skl2onnx.update_registered_converter`.
+The following example shows how to register a new converter or
+or update an existing one. Four elements are registered:
+
+* the model class
+* an alias, usually the class name prefixed by the library name
+* a shape extractor which computes the type and shape of the expected outputs
+* a model converter
+
+The following lines shows what these four elements are for a random forest:
+
+::
+
+    from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
+    from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
+    from skl2onnx import update_registered_converter
+    update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
+                                calculate_linear_classifier_output_shapes,
+                                convert_sklearn_random_forest_classifier)
+
+See example :ref:`example-lightgbm` to see a complete example
+with a *LightGbm* model.

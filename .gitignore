@@ -32,8 +32,7 @@ __dump_data/
 junit/
 docs/auto_examples
 docs/examples/graph*.*
-docs/examples/rf_iris.onnx
-docs/examples/logreg_iris.onnx
+docs/examples/*.onnx
 tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
