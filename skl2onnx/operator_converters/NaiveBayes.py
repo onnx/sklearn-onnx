@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_reshape, apply_sub, apply_reshape
+from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_log, apply_sub, apply_reshape
 from ..common._registration import register_converter
 import numpy as np
 
@@ -227,8 +227,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
 
         apply_exp(scope, feature_log_prob_name, exp_result_name, container)
         apply_sub(scope, [constant_name, exp_result_name], sub_result_name, container, broadcast=1)
-        container.add_node('Log', sub_result_name,
-                           neg_prob_name, name=scope.get_unique_operator_name('Log'))
+        apply_log(scope, sub_result_name, neg_prob_name, container)
         container.add_node('ReduceSum', neg_prob_name,
                            sum_neg_prob_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[0])
         apply_sub(scope, [feature_log_prob_name, neg_prob_name], difference_matrix_name, container)
