@@ -29,6 +29,9 @@ with (open(os.path.join(this, 'skl2onnx/__init__.py'), "r")) as f:
 README = os.path.join(os.getcwd(), "README.md")
 with open(README) as f:
     long_description = f.read()
+    start_pos = long_description.find('## Introduction')
+    if start_pos >= 0:
+        long_description = long_description[start_pos:]
 
 setup(
     name='skl2onnx',

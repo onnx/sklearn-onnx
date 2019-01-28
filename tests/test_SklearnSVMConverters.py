@@ -162,13 +162,16 @@ class TestSklearnSVM(unittest.TestCase):
         model, X = self._fit_multi_classification(NuSVC(probability=True))
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnMclNuSVCPT")
+        dump_data_and_model(X, model, model_onnx, basename="SklearnMclNuSVCPT",
+                            # Operator cast-1 is not implemented in onnxruntime
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
     def test_registration_convert_svc_model(self):
         model, X = self._fit_binary_classification(SVC(kernel='linear', probability=True))
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnBinNuSVCPT")
+        dump_data_and_model(X, model, model_onnx, basename="SklearnBinNuSVCPT",
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
 
 
 if __name__ == "__main__":

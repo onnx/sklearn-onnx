@@ -6,6 +6,7 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul, apply_reshape, apply_sub
+from ..common._apply_operation import apply_pow, apply_concat
 from ..common._registration import register_converter
 import numpy as np
 
@@ -109,12 +110,13 @@ def convert_sklearn_knn(scope, operator, container):
 
     knn = operator.raw_operator
     training_examples = knn._fit_X
-    training_labels = knn._y
-    length = [1, len(training_labels)]
     distance_power = knn.p
 
+    if operator.type != 'SklearnNearestNeighbors':
+        training_labels = knn._y
+        training_labels_name = scope.get_unique_variable_name('training_labels')
+
     training_examples_name = scope.get_unique_variable_name('training_examples')
-    training_labels_name = scope.get_unique_variable_name('training_labels')
     sub_results_name = scope.get_unique_variable_name('sub_results')
     abs_results_name = scope.get_unique_variable_name('abs_results')
     distance_name = scope.get_unique_variable_name('distance')
@@ -140,11 +142,10 @@ def convert_sklearn_knn(scope, operator, container):
 
     apply_sub(scope, [operator.inputs[0].full_name, training_examples_name], sub_results_name, container, broadcast=1)
     apply_abs(scope, sub_results_name, abs_results_name, container)
-    container.add_node('Pow', [abs_results_name, distance_power_name],
-                       distance_name, name=scope.get_unique_operator_name('Pow'))
+    apply_pow(scope, [abs_results_name, distance_power_name], distance_name, container)
     container.add_node('ReduceSum', distance_name,
                        reduced_sum_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
-    apply_reshape(scope, reduced_sum_name, reshaped_result_name, container, desired_shape=length)
+    apply_reshape(scope, reduced_sum_name, reshaped_result_name, container, desired_shape=[1, -1])
     apply_mul(scope, [reshaped_result_name, negate_name], negated_reshaped_result_name, container, broadcast=1)
     container.add_node('TopK', negated_reshaped_result_name,
                        [topk_values_name, topk_indices_name], name=scope.get_unique_operator_name('TopK'), k=knn.n_neighbors)
@@ -194,8 +195,7 @@ def convert_sklearn_knn(scope, operator, container):
             container.add_node('ReduceSum', output_cast_label_name[i],
                                 output_label_reduced_name[i], axes=[1])
 
-        container.add_node('Concat', [s for s in output_label_reduced_name],
-                           concat_labels_name, name=scope.get_unique_operator_name('Concat'), axis=0)
+        apply_concat(scope, [s for s in output_label_reduced_name], concat_labels_name, container, axis=0)
         container.add_node('ArgMax', concat_labels_name, 
                            predicted_label_name, name=scope.get_unique_operator_name('ArgMax'))
         container.add_node('ArrayFeatureExtractor', [classes_name, predicted_label_name], final_label_name,
@@ -233,7 +233,12 @@ def convert_sklearn_knn(scope, operator, container):
                            op_domain='ai.onnx.ml')
         container.add_node('ReduceMean', topk_labels_name, 
                            operator.output_full_names, name=scope.get_unique_operator_name('ReduceMean'))
+    elif operator.type == 'SklearnNearestNeighbors':
+        container.add_node('Identity', topk_indices_name, operator.outputs[0].full_name,
+                           name=scope.get_unique_operator_name('Identity'))
+        apply_abs(scope, topk_values_name, operator.outputs[1].full_name, container)
 
 
 register_converter('SklearnKNeighborsClassifier', convert_sklearn_knn)
 register_converter('SklearnKNeighborsRegressor', convert_sklearn_knn)
+register_converter('SklearnNearestNeighbors', convert_sklearn_knn)

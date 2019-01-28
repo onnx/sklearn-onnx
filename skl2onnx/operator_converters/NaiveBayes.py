@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_reshape, apply_sub
+from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_log, apply_sub, apply_reshape
 from ..common._registration import register_converter
 import numpy as np
 
@@ -186,7 +186,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         apply_cast(scope, matmul_result_name, cast_result_name, container,
                    to=onnx_proto.TensorProto.FLOAT)
         container.add_node('Shape', class_log_prior_name, shape_result_name)
-        container.add_node('Reshape', [cast_result_name, shape_result_name], reshape_result_name)
+        apply_reshape(scope, [cast_result_name, shape_result_name], reshape_result_name, container)
         container.add_node('Sum', [reshape_result_name, class_log_prior_name],
                            sum_result_name, name=scope.get_unique_operator_name('Sum'), op_version=sum_op_version)
     else:
@@ -227,8 +227,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
 
         apply_exp(scope, feature_log_prob_name, exp_result_name, container)
         apply_sub(scope, [constant_name, exp_result_name], sub_result_name, container, broadcast=1)
-        container.add_node('Log', sub_result_name,
-                           neg_prob_name, name=scope.get_unique_operator_name('Log'))
+        apply_log(scope, sub_result_name, neg_prob_name, container)
         container.add_node('ReduceSum', neg_prob_name,
                            sum_neg_prob_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[0])
         apply_sub(scope, [feature_log_prob_name, neg_prob_name], difference_matrix_name, container)
@@ -259,11 +258,9 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     # Reshape op does not seem to handle INT64 tensor even though it is listed as one of the
     # supported types in the doc, so Cast was required here.
     if class_type == onnx_proto.TensorProto.INT32: # int labels
-        container.add_node('Cast', array_feature_extractor_result_name, 
-                            cast2_result_name, to=onnx_proto.TensorProto.FLOAT, op_version=7)
-        apply_reshape(scope, cast2_result_name, reshaped_result_name, container, desired_shape=output_shape)
-        container.add_node('Cast', reshaped_result_name, 
-                            operator.outputs[0].full_name, to=onnx_proto.TensorProto.INT64, op_version=7)
+        apply_cast(scope, array_feature_extractor_result_name, cast2_result_name, container, to=onnx_proto.TensorProto.FLOAT)
+        apply_reshape(scope, cast2_result_name, reshaped_result_name, container, desired_shape=output_shape)        
+        apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name, container, to=onnx_proto.TensorProto.INT64)
     else: # string labels
         apply_reshape(scope, array_feature_extractor_result_name, operator.outputs[0].full_name, container,
                       desired_shape=output_shape)

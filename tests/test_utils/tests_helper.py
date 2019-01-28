@@ -3,17 +3,23 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 #--------------------------------------------------------------------------
-import numpy
 import pickle
 import os
 import warnings
-from skl2onnx.common.data_types import FloatTensorType
+import traceback
+import time
+import sys
+import platform
+import numpy
+import pandas
 from .utils_backend import compare_backend, extract_options, evaluate_condition, is_backend_enabled
+from skl2onnx.common.data_types import FloatTensorType
 
 
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         inputs=None, backend="onnxruntime", context=None,
-                        allow_failure=None, methods=None):
+                        allow_failure=None, methods=None, dump_error_log=None, benchmark=None,
+                        verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -28,7 +34,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     :param folder: files are written in this folder,
         it is created if it does not exist, if *folder* is None,
         it looks first in environment variable ``ONNXTESTDUMP``,
-        otherwise, it is placed into ``'tests'``.
+        otherwise, it is placed into ``'tests_dump'``.
     :param inputs: standard type or specific one if specified, only used is
         parameter *onnx* is None
     :param backend: backend used to compare expected output and runtime output.
@@ -40,6 +46,16 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
+    :param dump_error_log: if True, dumps any error message in a file  ``<basename>.err``,
+        if it is None, it checks the environment variable ``ONNXTESTDUMPERROR``
+    :param benchmark: if True, runs a benchmark and stores the results into a file
+        ``<basename>.bench``, if None, it checks the environment variable ``ONNXTESTBENCHMARK``
+    :param verbose: additional information
+    :param methods: ONNX may produce one or several results, each of them
+        is equivalent to the output of a method from the model class,
+        this parameter defines which methods is equivalent to ONNX outputs.
+        If not specified, it falls back into a default behaviour implemented
+        for classifiers, regressors, clustering.
     :return: the created files
 
     Some convention for the name,
@@ -70,9 +86,20 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     runtime_test = dict(model=model, data=data)
     
     if folder is None:
-        folder = os.environ.get('ONNXTESTDUMP', '__dump_data')
+        folder = os.environ.get('ONNXTESTDUMP', 'tests_dump')
+    if dump_error_log is None:
+        dump_error_log = os.environ.get('ONNXTESTDUMPERROR', '0') in ('1', 1, 'True', 'true', True)
+    if benchmark is None:
+        benchmark = os.environ.get('ONNXTESTBENCHMARK', '0') in ('1', 1, 'True', 'true', True)
     if not os.path.exists(folder):
         os.makedirs(folder)
+    
+    lambda_original = None
+    lambda_onnxrt = None
+    if isinstance(data, (numpy.ndarray, pandas.DataFrame)):
+        dataone = data[:1].copy()
+    else:
+        dataone = data
     
     if methods is not None:
         prediction = []
@@ -80,26 +107,39 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
             call = getattr(model, method)
             if callable(call):
                 prediction.append(call(data))
+                # we only take the last one for benchmark
+                lambda_original = lambda: call(dataone)
+            else:
+                raise RuntimeError("Method '{0}' is not callable.".format(method))
     else:
         if hasattr(model, "predict"):
             if hasattr(model, "predict_proba"):
                 # Classifier
                 prediction = [model.predict(data), model.predict_proba(data)]
+                lambda_original = lambda: model.predict_proba(dataone)
             elif hasattr(model, "decision_function"):
                 # Classifier without probabilities
                 prediction = [model.predict(data), model.decision_function(data)]
+                lambda_original = lambda: model.decision_function(dataone)
+            elif hasattr(model, "fit_transform") and hasattr(model, "score"):
+                # clustering
+                prediction = [model.predict(data), model.transform(data)]            
+                lambda_original = lambda: model.transform(dataone)
             else:
                 # Regressor
                 prediction = [model.predict(data)]
+                lambda_original = lambda: model.predict(dataone)
         elif hasattr(model, "transform"):
             options = extract_options(basename)
             SklCol = options.get('SklCol', False)
             if SklCol:
                 prediction = model.transform(data.ravel())
+                lambda_original = lambda: model.transform(dataone.ravel())
             else:
                 prediction = model.transform(data)
+                lambda_original = lambda: model.transform(dataone)
         else:
-            raise TypeError("Model does not have predict or transform method.")
+            raise TypeError("Model has not predict or transform method: {0}".format(type(model)))
 
     runtime_test['expected'] = prediction
     
@@ -123,6 +163,9 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
         names.append(dest)
         with open(dest, "wb") as f:
             pickle.dump(model, f)
+    
+    if dump_error_log:
+        error_dump = os.path.join(folder, basename + ".err")
         
     if onnx is None:
         array = numpy.array(data)
@@ -149,21 +192,35 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
             else:
                 allow = allow_failure
             if allow is None:
-                output = compare_backend(b, runtime_test, options=extract_options(basename), context=context)
+                output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
+                                                      context=context, verbose=verbose)
             else:
                 try:
-                    output = compare_backend(b, runtime_test, options=extract_options(basename), context=context)
+                    output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
+                                                          context=context, verbose=verbose)
                 except AssertionError as e:
+                    if dump_error_log:
+                        with open(error_dump, "w", encoding="utf-8") as f:
+                            f.write(str(e) + "\n--------------\n")
+                            traceback.print_exc(file=f)
                     if isinstance(allow, bool) and allow:
                         warnings.warn("Issue with '{0}' due to {1}".format(basename, e))
                         continue
                     else:
                         raise e
+
             if output is not None:
                 dest = os.path.join(folder, basename + ".backend.{0}.pkl".format(b))
                 names.append(dest)
                 with open(dest, "wb") as f:
                     pickle.dump(output, f)
+                if benchmark and lambda_onnx is not None and lambda_original is not None:
+                    # run a benchmark
+                    obs = compute_benchmark({'onnxrt': lambda_onnx, 'original': lambda_original})
+                    df = pandas.DataFrame(obs)
+                    df["input_size"] = sys.getsizeof(dataone)
+                    dest = os.path.join(folder, basename + ".bench")
+                    df.to_csv(dest, index=False)
         
     return names
 
@@ -310,12 +367,79 @@ def dump_single_regression(model, suffix="", folder=None, allow_failure=None):
                         basename=prefix + "Reg" + model.__class__.__name__ + suffix)
 
 
-def make_report_backend(folder):
+def timeit_repeat(fct, number, repeat):
+    """
+    Returns a series of *repeat* time measures for
+    *number* executions of *code* assuming *fct*
+    is a function.
+    """
+    res = []
+    for r in range(0, repeat):
+        t1 = time.perf_counter()
+        for i in range(0, number):
+            fct()
+        t2 = time.perf_counter()
+        res.append(t2 - t1)
+    return res
+        
+
+def timeexec(fct, number, repeat):
+    """
+    Measures the time for a given expression.
+
+    :param fct: function to measure (as a string)
+    :param number: number of time to run the expression
+        (and then divide by this number to get an average)
+    :param repeat: number of times to repeat the computation
+        of the above average
+    :return: dictionary
+    """
+    rep = timeit_repeat(fct, number=number, repeat=repeat)
+    ave = sum(rep) / (number * repeat)
+    std = (sum((x / number - ave)**2 for x in rep) / repeat)**0.5
+    fir = rep[0] / number
+    fir3 = sum(rep[:3]) / (3 * number)
+    las3 = sum(rep[-3:]) / (3 * number)
+    rep.sort()
+    mini = rep[len(rep) // 20] / number
+    maxi = rep[-len(rep) // 20] / number
+    return dict(average=ave, deviation=std, first=fir, first3=fir3,
+                last3=las3, repeat=repeat, min5=mini, max5=maxi, run=number)
+
+
+def compute_benchmark(fcts, number=10, repeat=100):
+    """
+    Compares the processing time several functions.
+    
+    :param fcts: dictionary ``{'name': fct}``
+    :param number: number of time to run the expression
+        (and then divide by this number to get an average)
+    :param repeat: number of times to repeat the computation
+        of the above average
+    :return: list of [{'name': name, 'time': ...}]
+    """
+    obs = []
+    for name, fct in fcts.items():
+        res = timeexec(fct, number=number, repeat=repeat)
+        res['name'] = name
+        obs.append(res)
+    return obs
+
+
+def make_report_backend(folder, as_df=False):
     """
     Looks into a folder for dumped files after
     the unit tests.
+    
+    :param folder: dump folder, it should contain files *.bench*
+    :param as_df: returns a dataframe instread of a list of dictionary
+    :return: time execution
     """
+    import onnx
+    import onnxruntime
+    import cpuinfo
     res = {}
+    benched = 0
     files = os.listdir(folder)
     for name in files:
         if name.endswith(".expected.pkl"):
@@ -329,10 +453,71 @@ def make_report_backend(folder):
             if model not in res:
                 res[model] = {}
             res[model][bk] = True
+        elif name.endswith(".err"):
+            model = name.split(".")[0]
+            fullname = os.path.join(folder, name)
+            with open(fullname, "r", encoding="utf-8") as f:
+                content = f.read()
+            error = content.split("\n")[0].strip("\n\r ")
+            if model not in res:
+                res[model] = {}
+            res[model]['stderr'] = error
+        elif name.endswith(".bench"):
+            model = name.split(".")[0]
+            fullname = os.path.join(folder, name)
+            df = pandas.read_csv(fullname, sep=',')
+            if model not in res:
+                res[model] = {}
+            for index, row in df.iterrows():
+                name = row['name']
+                ave = row['average']
+                std = row['deviation']
+                size = row['input_size']
+                res[model]['{0}_time'.format(name)] = ave
+                res[model]['{0}_std'.format(name)] = std
+                res[model]['input_size'] = size
+                benched += 1
     
+    if benched == 0:
+        raise RuntimeError("No benchmark files in '{0}', found:\n{1}".format(
+            folder, "\n".join(files)))
+
     def dict_update(d, u):
         d.update(u)
         return d
     
     aslist = [dict_update(dict(_model=k), v) for k, v in res.items()]
-    return aslist
+    
+    if as_df:            
+        from pandas import DataFrame        
+        df = DataFrame(aslist).sort_values(["_model"])
+        df["onnx-version"] = onnx.__version__
+        df["onnxruntime-version"] = onnxruntime.__version__
+        cols = list(df.columns)
+        if 'stderr' in cols:
+            ind = cols.index('stderr')
+            del cols[ind]
+            cols += ['stderr']
+            df = df[cols]
+        for col in ["onnxrt_time", "original_time"]:
+            if col not in df.columns:        
+                raise RuntimeError("Column '{0}' is missing from {1}".format(
+                    col, ', '.join(df.columns)))
+        df["ratio"] = df["onnxrt_time"] / df["original_time"]
+        df["CPU"] = platform.processor()
+        df["CPUI"] = cpuinfo.get_cpu_info()['brand']
+        return df
+    else:
+        cpu = cpuinfo.get_cpu_info()['brand']
+        proc = platform.processor()
+        for row in aslist:
+            try:
+                row["ratio"] = row["onnxrt_time"] / row["original_time"]
+            except KeyError:
+                # execution failed
+                pass
+            row["CPU"] = proc
+            row["CPUI"] = cpu
+            row["onnx-version"] = onnx.__version__
+            row["onnxruntime-version"] = onnxruntime.__version__
+        return aslist

@@ -5,7 +5,10 @@
 # --------------------------------------------------------------------------
 
 from .common._container import SklearnModelContainer
-from .common._topology import *
+from .common._topology import Topology, Variable, Operator, Scope, convert_topology
+from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
+from .common.data_types import FloatTensorType, StringTensorType, Int64TensorType, SequenceType, DictionaryType
+from .common.utils import get_column_indices
 import numpy as np
 
 # Pipeline
@@ -50,10 +53,14 @@ from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 # K-nearest neighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
+
+# Clustering
+from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
 from sklearn.decomposition import PCA 
@@ -61,6 +68,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
@@ -68,9 +76,10 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
 from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
+from sklearn.impute import SimpleImputer
 
 # In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
 # one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
@@ -81,22 +90,26 @@ sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, Nu
                            ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
                            CalibratedClassifierCV, OneVsRestClassifier]
 
+# Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
+cluster_list = [KMeans, MiniBatchKMeans]
+
 # Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
 # are equivalent in terms of conversion.
 
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer,
-                    Imputer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
+                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer, SimpleImputer,
+                    LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
                     LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
                     RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
                     ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
                     CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    MultinomialNB, BernoulliNB, OneVsRestClassifier,
+                    NearestNeighbors, MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
-                    CountVectorizer, TfidfVectorizer,
+                    CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
-                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold]}
+                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
+                    OneVsRestClassifier]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
@@ -143,6 +156,20 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         probability_tensor_variable = scope.declare_local_variable('probabilities', FloatTensorType())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+    elif type(model) in cluster_list:
+        # For clustering, we may have two outputs, one for label and the other one for scores of all classes.
+        # Notice that their types here are not necessarily correct and they will be fixed in shape inference phase
+        label_variable = scope.declare_local_variable('label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable('scores', FloatTensorType())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
+    elif type(model) == NearestNeighbors:
+        # For Nearest Neighbours, we have two outputs, one for nearest neighbours' indices
+        # and the other one for distances
+        index_variable = scope.declare_local_variable('index', Int64TensorType())
+        distance_variable = scope.declare_local_variable('distance', FloatTensorType())
+        this_operator.outputs.append(index_variable)
+        this_operator.outputs.append(distance_variable)
     else:
         # We assume that all scikit-learn operator can only produce a single float tensor.
         variable = scope.declare_local_variable('variable', FloatTensorType())
@@ -190,6 +217,12 @@ def _parse_sklearn_feature_union(scope, model, inputs):
 
 
 def _fetch_input_slice(scope, inputs, column_indices):
+    if not isinstance(inputs, list):
+        raise TypeError("inputs must be a list of 1 input.")
+    if len(inputs) == 0:
+        raise RuntimeError("Operator ArrayFeatureExtractor requires at least one inputs.")
+    if len(inputs) != 1:
+        raise RuntimeError("Operator ArrayFeatureExtractor does not support multiple input tensors.")
     array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
     array_feature_extractor_operator.inputs = inputs
     array_feature_extractor_operator.column_indices = column_indices
@@ -213,9 +246,10 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             column_indices = list(range(column_indices.start if column_indices.start is not None else 0,
                                         column_indices.stop, column_indices.step if column_indices.step
                                         is not None else 1))
-        transform_inputs = _fetch_input_slice(scope, inputs, column_indices)
-        transformed_result_names.append(_parse_sklearn_simple_model(scope, model.named_transformers_[name],
-                                                                    transform_inputs)[0])
+        onnx_var, onnx_is = get_column_indices(column_indices, inputs)
+        transform_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
+        transformed_result_names.append(_parse_sklearn(scope, model.named_transformers_[name],
+                                                       transform_inputs)[0])
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
