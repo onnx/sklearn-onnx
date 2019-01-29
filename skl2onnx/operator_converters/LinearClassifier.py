@@ -87,7 +87,6 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             container.add_node(classifier_type, operator.inputs[0].full_name,
                                [label_name, probability_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
-            normalized_probability_tensor_name = scope.get_unique_variable_name(probability_tensor_name + '_normalized')
             normalizer_type = 'Normalizer'
             normalizer_attrs = {'name': scope.get_unique_operator_name(normalizer_type), 'norm': 'L1'}
             container.add_node(normalizer_type, probability_tensor_name, operator.outputs[1].full_name,

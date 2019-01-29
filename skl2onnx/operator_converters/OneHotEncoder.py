@@ -9,7 +9,7 @@ import collections
 import numpy
 from ..proto import onnx_proto
 from ..common._registration import register_converter
-from ..common.utils import get_column_index
+from ..common.utils import get_column_index, get_column_indices
 
 
 def convert_sklearn_one_hot_encoder(scope, operator, container):

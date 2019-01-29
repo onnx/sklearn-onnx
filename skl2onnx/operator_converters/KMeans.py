@@ -15,9 +15,9 @@ def convert_sklearn_kmeans(scope, operator, container):
     """
     Computation graph of distances to all centriods for a batch of examples. Note that a centriod is just
     the center of a cluster. We use ``[]`` to denote the dimension of a variable; for example, ``X[3, 2]`` means
-    that *X* is a *3-by-2* tensor. In addition, for a matrix *X*, $X'$ denotes its transpose.    
+    that *X* is a *3-by-2* tensor. In addition, for a matrix *X*, $X'$ denotes its transpose.
     Symbols:
-    
+
     * *l*: # of examples.
     * *n*: # of features per input example.
     * *X*: input examples, l-by-n tensor.
@@ -27,9 +27,9 @@ def convert_sklearn_kmeans(scope, operator, container):
       The value at i-th row and k-th column row, ``Y[i,k]``,
       is the distance from example *i* to centroid *k*.
     * *L*: the id of the nearest centroid for each input example, its shape is ``[l]``.
-    
+
     ::
-    
+
         .------------------------------------------------------.
         |                                                      |
         |                                                      v
@@ -43,11 +43,11 @@ def convert_sklearn_kmeans(scope, operator, container):
                                                                           |
                                                                           v
                                                   L [l] <--- ArgMin <---  Y2 [l, k] --> Sqrt --> Y2 [l, k]
-    
+
     *scikit-learn* code:
-    
+
     ::
-    
+
         X = data
         Y = model.cluster_centers_
         XX = row_norms(X, squared=True)
@@ -61,18 +61,18 @@ def convert_sklearn_kmeans(scope, operator, container):
     op = operator.raw_operator
     variable = operator.inputs[0]
     N = variable.type.shape[0]
-    
-    # centroids        
+
+    # centroids
     shapeC = list(op.cluster_centers_.shape)
     nameC = scope.get_unique_variable_name('centroid')
     container.add_initializer(nameC, onnx_proto.TensorProto.FLOAT,
-                              shapeC, op.cluster_centers_.flatten())    
+                              shapeC, op.cluster_centers_.flatten())
 
     nameX2 = scope.get_unique_variable_name('X2')
     nameX = operator.inputs[0].full_name
     container.add_node('ReduceSumSquare', [nameX], [nameX2], axes=[1], keepdims=1,
                         name=scope.get_unique_operator_name('ReduceSumSquare'))
-    
+
     # Compute -2XC'
     zero_name = scope.get_unique_variable_name('zero')
     zeros = np.zeros((N, ))
@@ -89,14 +89,13 @@ def convert_sklearn_kmeans(scope, operator, container):
     # centroids ^2
     nameC2 = scope.get_unique_variable_name('C2')
     c2 = row_norms(op.cluster_centers_, squared=True)
-    shapeC2 = list(c2.shape)
     container.add_initializer(nameC2, onnx_proto.TensorProto.FLOAT,
                               [1, shapeC[0]], c2.flatten())
 
     # Compute Y2 = Z + C^2
-    nameY2 = scope.get_unique_variable_name('Y2') 
+    nameY2 = scope.get_unique_variable_name('Y2')
     apply_add(scope, [nameZ, nameC2], [nameY2], container)
-    
+
     # Compute Y = sqrt(Y2)
     nameY = operator.outputs[1].full_name
     apply_sqrt(scope, [nameY2], [nameY], container)
