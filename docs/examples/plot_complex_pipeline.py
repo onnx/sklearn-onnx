@@ -58,7 +58,7 @@ numeric_transformer = Pipeline(steps=[
 
 categorical_features = ['embarked', 'sex', 'pclass']
 categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer on string is not available for string in ONNX-ML specifications. 
+    # --- SimpleImputer is not available for strings in ONNX-ML specifications. 
     # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
