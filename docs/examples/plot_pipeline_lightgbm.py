@@ -65,17 +65,35 @@ except Exception as e:
 # follows a different design than the current one
 # of *scikit-onnx*. This will change in a short future.
 # See also :ref:`l-register-converter`.
-
-# The converter.
+# First the converter:
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm # the 
 
-# The shape extractor.
-from skl2onnx.common.shape_calculator_deprecated import calculate_linear_classifier_output_shapes
+###########################
+# The shape extractor of onnxmltools must be adapted for our case.
+# This will change in a short future.
+import numbers
+from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
 
+def lightgbm_classifier_shape_extractor(operator):
+    N = operator.inputs[0].type.shape[0]
+
+    class_labels = operator.raw_operator.classes_
+    if all(isinstance(i, numpy.ndarray) for i in class_labels):
+        class_labels = numpy.concatenate(class_labels)
+    if all(isinstance(i, str) for i in class_labels):
+        operator.outputs[0].type = StringTensorType(shape=[N])
+        operator.outputs[1].type = SequenceType(DictionaryType(StringTensorType([]), FloatTensorType([])), N)
+    elif all(isinstance(i, (numbers.Real, bool, numpy.bool_)) for i in class_labels):
+        operator.outputs[0].type = Int64TensorType(shape=[N])
+        operator.outputs[1].type = SequenceType(DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
+    else:
+        raise ValueError('Unsupported or mixed label types')
+
+###########################
 # Let's register the new converter.
 from skl2onnx import update_registered_converter
 update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
-                            calculate_linear_classifier_output_shapes,
+                            lightgbm_classifier_shape_extractor,
                             convert_lightgbm)
 
 ##################################
