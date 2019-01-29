@@ -16,7 +16,6 @@ a *LGBMClassifier*. Let's see how to do it.
 
 .. contents::
     :local:
-    
 
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
@@ -125,3 +124,22 @@ sess = rt.InferenceSession("pipeline_lightgbm.onnx")
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
+
+##################################
+# Displays the ONNX graph
+# +++++++++++++++++++++++
+
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+                            node_producer=GetOpNodeProducer("docstring", color="yellow",
+                                                            fillcolor="yellow", style="filled"))
+pydot_graph.write_dot("pipeline.dot")
+
+import os
+os.system('dot -O -Gdpi=300 -Tpng pipeline.dot')
+
+import matplotlib.pyplot as plt
+image = plt.imread("pipeline.dot.png")
+fig, ax = plt.subplots(figsize=(40, 20))
+ax.imshow(image)
+ax.axis('off')

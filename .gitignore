@@ -33,6 +33,7 @@ junit/
 docs/auto_examples
 docs/examples/graph*.*
 docs/examples/*.onnx
+docs/examples/pipeline.dot*
 tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
