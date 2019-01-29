@@ -9,6 +9,7 @@ This file comes from `onnxmltools <https://github.com/onnx/onnxmltools/blob/mast
 before the design was changed in *scikit-onnx*.
 Main change is output type of classifiers which switched from
 a dictionary ``{class: score}`` to a probability vector.
+this file is needed by example :ref:`example-lightgbm`.
 """
 import numpy as np
 import numbers

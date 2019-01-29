@@ -1,8 +1,6 @@
 numpy
 protobuf
 codecov
-lightgbm
-onnxmltools
 pandas
 py-cpuinfo
 pybind11
