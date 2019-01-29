@@ -141,7 +141,7 @@ class TestSklearnPipeline(unittest.TestCase):
             pydot_graph.write_dot("graph.dot")
 
             import os
-            os.system('dot -O -Tpng graph.dot')            
+            os.system('dot -O -G=300 -Tpng graph.dot')            
 
     def test_pipeline_column_transformer_titanic(self):
         
