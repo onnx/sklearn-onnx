@@ -68,7 +68,7 @@ except Exception as e:
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm # the 
 
 ###########################
-# The shape extractor of onnxmltools must be adapted for our case.
+# The shape calculator of onnxmltools must be adapted for our case.
 # This will change in a short future.
 import numbers
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
@@ -126,8 +126,8 @@ print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
 
 ##################################
-# Displays the ONNX graph
-# +++++++++++++++++++++++
+# Display the ONNX graph
+# ++++++++++++++++++++++
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",

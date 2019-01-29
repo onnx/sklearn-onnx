@@ -8,10 +8,11 @@ import numpy as np
 
 from .common._container import SklearnModelContainer
 from .common._topology import Topology, Variable, Operator, Scope, convert_topology
-from .common._registration import register_converter, register_shape_calculator
+from .common._registration import register_converter, register_shape_calculator, get_shape_calculator
 from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
-from .common.data_types import FloatTensorType, StringTensorType, Int64TensorType, SequenceType, DictionaryType
+from .common.data_types import FloatTensorType, Int64TensorType, SequenceType, DictionaryType
 from .common.utils import get_column_indices
+from .shape_calculators.Concat import calculate_sklearn_concat
 
 # Pipeline
 from sklearn import pipeline
@@ -204,9 +205,18 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
     else:
-        # We assume that all scikit-learn operator can only produce a single float tensor.
+        # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable('variable', FloatTensorType())
         this_operator.outputs.append(variable)
+        
+    # We call the shape calculator.
+    name = sklearn_operator_name_map[model.__class__]
+    shape_calc = get_shape_calculator(name)
+    try:
+        shape_calc(this_operator)
+    except RuntimeError as e:
+        inps = "\n".join(str(v) for v in inputs)
+        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}".format(model.__class__, e, inps))
     return this_operator.outputs
 
 
@@ -245,6 +255,7 @@ def _parse_sklearn_feature_union(scope, model, inputs):
     # Declare output name of scikit-learn FeatureUnion
     union_name = scope.declare_local_variable('union', FloatTensorType())
     concat_operator.outputs.append(union_name)
+    calculate_sklearn_concat(concat_operator)
 
     return concat_operator.outputs
 
@@ -256,6 +267,9 @@ def _fetch_input_slice(scope, inputs, column_indices):
         raise RuntimeError("Operator ArrayFeatureExtractor requires at least one inputs.")
     if len(inputs) != 1:
         raise RuntimeError("Operator ArrayFeatureExtractor does not support multiple input tensors.")
+    if isinstance(inputs[0].type, TensorType) and inputs[0].type.shape[1] == len(column_indices):
+        # No need to extract.
+        return inputs
     array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
     array_feature_extractor_operator.inputs = inputs
     array_feature_extractor_operator.column_indices = column_indices
@@ -279,19 +293,43 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             column_indices = list(range(column_indices.start if column_indices.start is not None else 0,
                                         column_indices.stop, column_indices.step if column_indices.step
                                         is not None else 1))
-        onnx_var, onnx_is = get_column_indices(column_indices, inputs)
-        transform_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
-        transformed_result_names.append(_parse_sklearn(scope, model.named_transformers_[name],
-                                                       transform_inputs)[0])
+        names = get_column_indices(column_indices, inputs, multiple=True)
+        transform_inputs = []
+        for onnx_var, onnx_is in names.items():
+            tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
+            transform_inputs.extend(tr_inputs)
+        
+        if len(transform_inputs) > 1:            
+            # Many ONNX operators expects one input vector,
+            # the default behviour is then to merge columns.
+            nb_cols = sum(inp.type.shape[1] for inp in transform_inputs)
+            ty = transform_inputs[0].type.__class__([1, nb_cols])
+            
+            concop = scope.declare_local_operator('SklearnConcat')
+            concop.inputs = transform_inputs
+            concnames = scope.declare_local_variable('merged_columns', ty)
+            concop.outputs.append(concnames)
+            transform_inputs = [concnames]
+            calculate_sklearn_concat(concop)
+        
+        var_out = _parse_sklearn(scope, model.named_transformers_[name], transform_inputs)[0]
+        transformed_result_names.append(var_out)
+
     # Create a Concat ONNX node
-    concat_operator = scope.declare_local_operator('SklearnConcat')
-    concat_operator.inputs = transformed_result_names
+    if len(transformed_result_names) > 1:
+        nb_cols = sum(inp.type.shape[1] for inp in transformed_result_names)
+        ty = transformed_result_names[0].type.__class__([1, nb_cols])
+        concat_operator = scope.declare_local_operator('SklearnConcat')
+        concat_operator.inputs = transformed_result_names
 
-    # Declare output name of scikit-learn ColumnTransformer
-    transformed_column_name = scope.declare_local_variable('transformed_column', FloatTensorType())
-    concat_operator.outputs.append(transformed_column_name)
+        # Declare output name of scikit-learn ColumnTransformer
+        transformed_column_name = scope.declare_local_variable('transformed_column', ty)
+        concat_operator.outputs.append(transformed_column_name)
+        calculate_sklearn_concat(concat_operator)
 
-    return concat_operator.outputs
+        return concat_operator.outputs
+    else:
+        return transformed_result_names
 
 
 def _parse_sklearn(scope, model, inputs):
@@ -302,13 +340,15 @@ def _parse_sklearn(scope, model, inputs):
     :param model: A scikit-learn object (e.g., OneHotEncoder and LogisticRegression)
     :param inputs: A list of variables
     :return: The output variables produced by the input model
+    
+    TODO: Output should be created in each shape calculator.
     '''
     if isinstance(model, pipeline.Pipeline):
-        return _parse_sklearn_pipeline(scope, model, inputs)
+        outputs = _parse_sklearn_pipeline(scope, model, inputs)
     elif isinstance(model, pipeline.FeatureUnion):
-        return _parse_sklearn_feature_union(scope, model, inputs)
+        outputs = _parse_sklearn_feature_union(scope, model, inputs)
     elif isinstance(model, ColumnTransformer):
-        return _parse_sklearn_column_transformer(scope, model, inputs)
+        outputs = _parse_sklearn_column_transformer(scope, model, inputs)
     elif type(model) in sklearn_classifier_list and type(model) not in [LinearSVC, SVC, NuSVC]:
         probability_tensor = _parse_sklearn_simple_model(scope, model, inputs)
         this_operator = scope.declare_local_operator('SklearnZipMap')
@@ -330,9 +370,16 @@ def _parse_sklearn(scope, model, inputs):
                              SequenceType(DictionaryType(label_type, FloatTensorType())))
         this_operator.outputs.append(output_label)
         this_operator.outputs.append(output_probability)
-        return this_operator.outputs
+        outputs = this_operator.outputs
     else:
-        return _parse_sklearn_simple_model(scope, model, inputs)
+        outputs = _parse_sklearn_simple_model(scope, model, inputs)
+        
+    # scikit-learn does not implements models without unknown output shapes.
+    for i, o in enumerate(outputs):
+        if isinstance(o.type, TensorType) and (o.type.shape is None or \
+                'None' in o.type.shape or None in o.type.shape):
+            raise RuntimeError("No output can have unkown shape.\nOutput {0}={1}\nModel={2}".format(i, o, model))
+    return outputs
 
 
 def parse_sklearn(model, initial_types=None, target_opset=None,

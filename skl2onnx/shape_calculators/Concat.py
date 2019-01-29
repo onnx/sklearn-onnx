@@ -6,12 +6,32 @@
 
 from ..common._registration import register_shape_calculator
 from ..common.utils import check_input_and_output_numbers
+from ..common.data_types import Int64Type, FloatType, StringType, TensorType
 
 
 def calculate_sklearn_concat(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
     N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type.shape = [N, 'None']
+    C = 0
+    seen_types = []
+    for i in operator.inputs:
+        if isinstance(i.type, TensorType):
+            if i.type.shape[1] in ('None', None):
+                C = 'None'
+                break
+            C += i.type.shape[1]
+        elif isinstance(i.type, (Int64Type, FloatType, StringType)):
+            C += 1
+        else:
+            C = 'None'
+            break
+        nt = i.type.__class__.__name__
+        if len(seen_types) == 0:
+            seen_types.append(nt)
+        elif nt != seen_types[0]:
+            inps = "\n".join(str(v) for v in operator.inputs)
+            raise RuntimeError("Columns must have the same type.\nInputs:\n" + inps)
+    operator.outputs[0].type.shape = [N, C]
 
 
 register_shape_calculator('SklearnConcat', calculate_sklearn_concat)

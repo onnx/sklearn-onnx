@@ -6,6 +6,8 @@ Convert pipeline
 .. contents::
     :local:
 
+.. _l-complex-pipeline:
+
 Convert complex pipelines
 =========================
 
@@ -100,7 +102,7 @@ or update an existing one. Four elements are registered:
 
 * the model class
 * an alias, usually the class name prefixed by the library name
-* a shape extractor which computes the type and shape of the expected outputs
+* a shape calculator which computes the type and shape of the expected outputs
 * a model converter
 
 The following lines shows what these four elements are for a random forest:
@@ -116,3 +118,12 @@ The following lines shows what these four elements are for a random forest:
 
 See example :ref:`example-lightgbm` to see a complete example
 with a *LightGbm* model.
+
+Titanic example
+===============
+
+The first example was a simplified pipeline coming from *scikit-learn*'s documentation:
+`Column Transformer with Mixed Types <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
+The full story is available in a runable exemple: :ref:`example-complex-pipeline`
+which also shows up some mistakes that a user could come accross
+when trying to convert his pipeline.
