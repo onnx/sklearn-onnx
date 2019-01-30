@@ -77,6 +77,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import FunctionTransformer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
 from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
@@ -109,7 +110,8 @@ def build_sklearn_operator_name_map():
                     Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
-                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold]}
+                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
+                    FunctionTransformer]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
@@ -216,7 +218,7 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         shape_calc(this_operator)
     except RuntimeError as e:
         inps = "\n".join(str(v) for v in inputs)
-        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}".format(model.__class__, e, inps))
+        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(model.__class__, e, inps, shape_calc))
     return this_operator.outputs
 
 
