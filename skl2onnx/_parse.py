@@ -302,8 +302,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             transform_inputs.extend(tr_inputs)
         
         if len(transform_inputs) > 1:            
-            # Many ONNX operators expects one input vector,
-            # the default behviour is then to merge columns.
+            # Many ONNX operators expect one input vector,
+            # the default behviour is to merge columns.
             nb_cols = sum(inp.type.shape[1] for inp in transform_inputs)
             ty = transform_inputs[0].type.__class__([1, nb_cols])
             
