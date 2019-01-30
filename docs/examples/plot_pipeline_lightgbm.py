@@ -7,12 +7,16 @@
 Convert a pipeline with a LightGbm model
 ========================================
 
-*scikit-onnx* only converts *scikit-learn* models into *ONNX*
+*sklearn-onnx* only converts *scikit-learn* models into *ONNX*
 but many libraries implement *scikit-learn* API so that their models
 can be included in a *scikit-learn* pipeline. This example considers
-a pipeline including a *LightGbm* model. *scikit-onnx* can convert
+a pipeline including a *LightGbm* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *LGBMClassifier*. Let's see how to do it.
+
+A couple of errors might happen while trying to convert
+your own pipeline, some of them are described
+and explained in :ref:`errors-pipeline`.
 
 .. contents::
     :local:
@@ -38,39 +42,23 @@ pipe = Pipeline([('scaler', StandardScaler()),
                  ('lgbm', LGBMClassifier(n_estimators=3))])
 pipe.fit(X, y)
 
-
-##################################
-# First try to convert
-# ++++++++++++++++++++
-#
-# Obviously, it fails because the convert for *LGBMClassifier*
-# is not registered.
-
-from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
-
-try:
-    model_onnx = convert_sklearn(pipe, 'pipeline',
-                                 [('input', FloatTensorType([1, 2]))])
-except Exception as e:
-    print(e)
-
-
 ########################
 # Register the converter for LGBMClassifier
 # +++++++++++++++++++++++++++++++++++++++++
 #
 # The converter is implemented in *onnxmltools* and
 # follows a different design than the current one
-# of *scikit-onnx*. This will change in a short future.
+# of *sklearn-onnx*. This will change in a short future.
 # See also :ref:`l-register-converter`.
-# First the converter:
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm # the 
+# First the converter implemented in
+# `onnxmltools...LightGbm.py <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py>`_.
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
 
 ###########################
-# The shape extractor of onnxmltools must be adapted for our case.
+# The shape calculator of *onnxmltools* must be adapted for our case.
 # This will change in a short future.
 import numbers
+from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
 
 def lightgbm_classifier_shape_extractor(operator):
@@ -126,8 +114,8 @@ print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
 
 ##################################
-# Displays the ONNX graph
-# +++++++++++++++++++++++
+# Display the ONNX graph
+# ++++++++++++++++++++++
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
