@@ -47,7 +47,7 @@ with open(example1, 'rb') as fid:
 ###################################
 # We convert it into a graph.
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(model.graph, name=model.graph.name, rankdir="LR",
+pydot_graph = GetPydotGraph(model.graph, name=model.graph.name, rankdir="TB",
                             node_producer=GetOpNodeProducer("docstring"))
 pydot_graph.write_dot("graph.dot")
 
@@ -61,9 +61,4 @@ os.system('dot -O -Tpng graph.dot')
 import matplotlib.pyplot as plt
 image = plt.imread("graph.dot.png")
 plt.imshow(image)
-
-
-
-
-
-
+plt.axis('off')

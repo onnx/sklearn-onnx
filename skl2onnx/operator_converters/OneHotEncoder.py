@@ -115,17 +115,21 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
     # input and combine them with the outputs of one-hot encoders.
     passed_indices = [i for i in range(C) if i not in categorical_feature_indices]
     if len(passed_indices) > 0:
-        onnx_var, onnx_is = get_column_indices(passed_indices, operator.inputs)
-        passed_feature_name = scope.get_unique_variable_name('passed_through_features')
-        extractor_type = 'ArrayFeatureExtractor'
-        extractor_attrs = {'name': scope.get_unique_operator_name(extractor_type)}
-        passed_indices_name = scope.get_unique_variable_name('passed_feature_indices')
-        container.add_initializer(passed_indices_name, onnx_proto.TensorProto.INT64,
-                                  [len(onnx_is)], onnx_is)
-        container.add_node(extractor_type, [onnx_var_name, passed_indices_name],
-                           passed_feature_name, op_domain='ai.onnx.ml', **extractor_attrs)
-        final_variable_names.append(passed_feature_name)
-        final_variable_lengths.append(1)
+        variables = get_column_indices(passed_indices, operator.inputs, mutiple=True)
+        passed_feature_names = []
+        for name, inds in variables.items():
+            passed_feature_name = scope.get_unique_variable_name('passed_through_features')
+            passed_feature_names.append(passed_feature_name)
+            extractor_type = 'ArrayFeatureExtractor'
+            extractor_attrs = {'name': scope.get_unique_operator_name(extractor_type)}
+            passed_indices_name = scope.get_unique_variable_name('passed_feature_indices')
+            container.add_initializer(passed_indices_name, onnx_proto.TensorProto.INT64,
+                                      [len(onnx_is)], onnx_is)
+            container.add_node(extractor_type, [onnx_var_name, passed_indices_name],
+                               passed_feature_name, op_domain='ai.onnx.ml', **extractor_attrs)      
+        
+        final_variable_names.extend(passed_feature_names)
+        final_variable_lengths.append(len(passed_feature_names))
 
     # Combine encoded features and passed features
     collector_type = 'FeatureVectorizer'

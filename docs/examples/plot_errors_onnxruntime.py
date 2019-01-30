@@ -2,11 +2,12 @@
 # Licensed under the MIT License.
 
 """
-.. _l-example-simple-usage:
+.. _l-errors-onnxruntime:
 
-Common errors with onnxruntime
-==============================
+Errors with onnxruntime
+=======================
 
+Many mistakes might happen with *onnxruntime*.
 This example looks into several common situations
 in which *onnxruntime* does not return the model 
 prediction but raises an exception instead.

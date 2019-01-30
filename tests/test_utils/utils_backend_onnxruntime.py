@@ -70,58 +70,66 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
             raise OnnxRuntimeAssertionError("Unable to load onnx '{0}'\nONNX\n{1}".format(onx, smodel))
     
     input = load["data"]
-    if isinstance(input, dict):
-        inputs = input
-    elif isinstance(input, (list, numpy.ndarray, pandas.DataFrame)):
-        inp = sess.get_inputs()
-        if len(inp) == len(input):
-            inputs = {i.name: v for i, v in zip(inp, input)}
-        elif len(inp) == 1:
-            inputs = {inp[0].name: input}
-        elif isinstance(input, numpy.ndarray):
-            shape = sum(i.shape[1] if len(i.shape) == 2 else i.shape[0] for i in inp)
-            if shape == input.shape[1]:
-                inputs = {n.name: input[:, i] for i, n in enumerate(inp)}
-            else:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'".format(len(inp), input.shape, onx))
-        elif isinstance(input, list):
-            try:
-                array_input = numpy.array(input)
-            except Exception as e:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
-            shape = sum(i.shape[1] for i in inp)
-            if shape == array_input.shape[1]:
-                inputs = {}
-                c = 0
-                for i, n in enumerate(inp):
-                    d = c + n.shape[1]
-                    inputs[n.name] = _create_column([row[c:d] for row in input], n.type)
-                    c = d
-            else:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'*".format(len(inp), array_input.shape, onx))
-        elif isinstance(input, pandas.DataFrame):
-            try:
-                array_input = numpy.array(input)
-            except Exception as e:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
-            shape = sum(i.shape[1] for i in inp)
-            if shape == array_input.shape[1]:
-                inputs = {}
-                c = 0
-                for i, n in enumerate(inp):
-                    d = c + n.shape[1]
-                    inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
-                    c = d
-            else:
-                raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0}={1} columns != original shape {2}, onnx='{3}'*".format(len(inp), shape, array_input.shape, onx))
-        else:
-            raise OnnxRuntimeAssertionError("Wrong type of inputs onnx {0}, onnx='{2}'".format(type(input), onx))
+    DF = options.pop('DF', False)
+    if DF:
+        inputs = {c: input[c].values for c in input.columns}
+        for k in inputs:
+            if inputs[k].dtype == numpy.float64:
+                inputs[k] = inputs[k].astype(numpy.float32)
+            inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
     else:
-        raise OnnxRuntimeAssertionError("Dict or list is expected, not {0}".format(type(input)))
+        if isinstance(input, dict):
+            inputs = input
+        elif isinstance(input, (list, numpy.ndarray, pandas.DataFrame)):
+            inp = sess.get_inputs()
+            if len(inp) == len(input):
+                inputs = {i.name: v for i, v in zip(inp, input)}
+            elif len(inp) == 1:
+                inputs = {inp[0].name: input}
+            elif isinstance(input, numpy.ndarray):
+                shape = sum(i.shape[1] if len(i.shape) == 2 else i.shape[0] for i in inp)
+                if shape == input.shape[1]:
+                    inputs = {n.name: input[:, i] for i, n in enumerate(inp)}
+                else:
+                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'".format(len(inp), input.shape, onx))
+            elif isinstance(input, list):
+                try:
+                    array_input = numpy.array(input)
+                except Exception as e:
+                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
+                shape = sum(i.shape[1] for i in inp)
+                if shape == array_input.shape[1]:
+                    inputs = {}
+                    c = 0
+                    for i, n in enumerate(inp):
+                        d = c + n.shape[1]
+                        inputs[n.name] = _create_column([row[c:d] for row in input], n.type)
+                        c = d
+                else:
+                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'*".format(len(inp), array_input.shape, onx))
+            elif isinstance(input, pandas.DataFrame):
+                try:
+                    array_input = numpy.array(input)
+                except Exception as e:
+                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
+                shape = sum(i.shape[1] for i in inp)
+                if shape == array_input.shape[1]:
+                    inputs = {}
+                    c = 0
+                    for i, n in enumerate(inp):
+                        d = c + n.shape[1]
+                        inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
+                        c = d
+                else:
+                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0}={1} columns != original shape {2}, onnx='{3}'*".format(len(inp), shape, array_input.shape, onx))
+            else:
+                raise OnnxRuntimeAssertionError("Wrong type of inputs onnx {0}, onnx='{2}'".format(type(input), onx))
+        else:
+            raise OnnxRuntimeAssertionError("Dict or list is expected, not {0}".format(type(input)))
         
-    for k in inputs:
-        if isinstance(inputs[k], list):
-            inputs[k] = numpy.array(inputs[k])
+        for k in inputs:
+            if isinstance(inputs[k], list):
+                inputs[k] = numpy.array(inputs[k])
     
     OneOff = options.pop('OneOff', False)
     options.pop('SklCol', False)  # unused here but in dump_data_and_model

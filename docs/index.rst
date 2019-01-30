@@ -78,7 +78,7 @@ Every converter is tested with this backend.
 
 **Related converters**
 
-*sklearn-onnx** only converters models from *scikit-learn*.
+*sklearn-onnx* only converts models from *scikit-learn*.
 It was initially part of `onnxmltools <https://github.com/onnx/onnxmltools>`_
 which can still be used to convert models for *xgboost* and *libsvm*.
 Other converters can be found on `github/onnx <https://github.com/onnx/>`_,

@@ -12,11 +12,13 @@ from ..common._registration import register_converter
 def convert_sklearn_zipmap(scope, operator, container):
     zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
     to_type = onnx_proto.TensorProto.INT64
+
     if hasattr(operator, 'classlabels_int64s'):
         zipmap_attrs['classlabels_int64s'] = operator.classlabels_int64s
     elif hasattr(operator, 'classlabels_strings'):
         zipmap_attrs['classlabels_strings'] = operator.classlabels_strings
         to_type = onnx_proto.TensorProto.STRING
+
     if to_type == onnx_proto.TensorProto.STRING:
         apply_identity(scope, operator.inputs[0].full_name, operator.outputs[0].full_name, container)
     else:

@@ -51,7 +51,7 @@ class Variable:
             raw_name=self.raw_name, onnx_name=self.onnx_name, type=self.type)        
 
     def __repr__(self):
-        return "Variable(raw_name='{0}', onnx_name='{1}', type='{2}')".format(
+        return "Variable(raw_name='{0}', onnx_name='{1}', type={2})".format(
             self.raw_name, self.onnx_name, self.type)
 
 class Operator(OperatorBase):
@@ -712,6 +712,7 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
             container.add_output(other_outputs[name])
 
     # Traverse the graph from roots to leaves
+    # This loop could eventually be parallelized.
     for operator in topology.topological_operator_iterator():
         scope = next(scope for scope in topology.scopes if scope.name == operator.scope)
         if operator.type in topology.custom_conversion_functions:

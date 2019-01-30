@@ -22,9 +22,6 @@ jobs:
       Python36:
         python.version: '3.6'
         onnx.version: '==1.2.3'
-      Python37:
-        python.version: '3.7'
-        onnx.version: ''
     maxParallel: 3
 
   steps:
@@ -48,6 +45,7 @@ jobs:
 
   - script: |
       pip install -e .
+      python -c "import onnx;print('ONNX version ==', onnx.__version__)"
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
