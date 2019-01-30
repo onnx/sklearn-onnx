@@ -37,3 +37,4 @@ docs/examples/pipeline*.dot*
 tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
+docs/examples/tiny_yolov2*
