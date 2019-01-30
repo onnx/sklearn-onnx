@@ -12,6 +12,7 @@ from . import Concat
 from . import DictVectorizer
 from . import DecisionTree
 from . import FeatureSelection 
+from . import FunctionTransformer
 from . import GradientBoosting
 from . import Imputer
 from . import KMeans

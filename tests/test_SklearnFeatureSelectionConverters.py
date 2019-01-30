@@ -118,7 +118,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         X = np.array([[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.float32)
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
-        model_onnx = convert_sklearn(model, 'generic univariate select', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = convert_sklearn(model, 'generic univariate select',
+                                     [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnGenericUnivariateSelect",
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")

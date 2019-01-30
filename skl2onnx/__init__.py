@@ -16,6 +16,7 @@ __model_version__ = 0
 
 
 from .convert import convert_sklearn
+from ._parse import update_registered_converter
 
 
 def supported_converters(from_sklearn=False):

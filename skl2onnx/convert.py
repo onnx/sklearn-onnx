@@ -15,7 +15,8 @@ from . import operator_converters
 
 
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
-                    target_opset=None, custom_conversion_functions=None, custom_shape_calculators=None):
+                    target_opset=None, custom_conversion_functions=None,
+                    custom_shape_calculators=None):
     '''
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function

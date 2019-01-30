@@ -24,7 +24,7 @@ ONNX format and run the first predictions.
 Step 1: Train a model using your favorite framework
 +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-We'll use the famous iris datasets.
+We'll use the famous Iris datasets.
 
 ::
 
