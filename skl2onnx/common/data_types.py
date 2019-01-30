@@ -28,6 +28,9 @@ class Int64Type(DataType):
         s.dim_value = 1
         return onnx_type
 
+    def __repr__(self):
+        return "Int64Type()"
+
 
 class FloatType(DataType):
     def __init__(self, doc_string=''):
@@ -40,6 +43,9 @@ class FloatType(DataType):
         s.dim_value = 1
         return onnx_type
 
+    def __repr__(self):
+        return "FloatType()"
+
 
 class StringType(DataType):
     def __init__(self, doc_string=''):
@@ -51,6 +57,9 @@ class StringType(DataType):
         s = onnx_type.tensor_type.shape.dim.add()
         s.dim_value = 1
         return onnx_type
+
+    def __repr__(self):
+        return "StringType()"
 
 
 class TensorType(DataType):
@@ -90,6 +99,9 @@ class Int64TensorType(TensorType):
     def _get_element_onnx_type(self):
         return onnx_proto.TensorProto.INT64
 
+    def __repr__(self):
+        return "Int64TensorType(shape={0})".format(self.shape)
+
 
 class FloatTensorType(TensorType):
     def __init__(self, shape=None, color_space=None, doc_string='', denotation=None, channel_denotations=None):
@@ -99,6 +111,9 @@ class FloatTensorType(TensorType):
     def _get_element_onnx_type(self):
         return onnx_proto.TensorProto.FLOAT
 
+    def __repr__(self):
+        return "FloatTensorType(shape={0})".format(self.shape)
+
 
 class StringTensorType(TensorType):
     def __init__(self, shape=None, doc_string=''):
@@ -106,6 +121,9 @@ class StringTensorType(TensorType):
 
     def _get_element_onnx_type(self):
         return onnx_proto.TensorProto.STRING
+
+    def __repr__(self):
+        return "StringTensorType(shape={0})".format(self.shape)
 
 
 class DictionaryType(DataType):
@@ -123,6 +141,9 @@ class DictionaryType(DataType):
         onnx_type.map_type.value_type.CopyFrom(self.value_type.to_onnx_type())
         return onnx_type
 
+    def __repr__(self):
+        return "DictionaryType(key_type={0}, value_type={1})".format(self.key_type, self.value_type)
+
 
 class SequenceType(DataType):
     def __init__(self, element_type, shape=None, doc_string=''):
@@ -134,6 +155,9 @@ class SequenceType(DataType):
         onnx_type = onnx_proto.TypeProto()
         onnx_type.sequence_type.elem_type.CopyFrom(self.element_type.to_onnx_type())
         return onnx_type
+
+    def __repr__(self):
+        return "SequenceType(element_type={0})".format(self.element_type)
 
 
 def find_type_conversion(source_type, target_type):

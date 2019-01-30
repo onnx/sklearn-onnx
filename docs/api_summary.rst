@@ -16,6 +16,8 @@ Converters
 
 .. autofunction:: skl2onnx.supported_converters
 
+.. autofunction:: skl2onnx.update_registered_converter
+
 Utils
 =====
 
