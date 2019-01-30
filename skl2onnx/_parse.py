@@ -212,13 +212,13 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         this_operator.outputs.append(variable)
         
     # We call the shape calculator.
-    name = sklearn_operator_name_map[model.__class__]
+    name = sklearn_operator_name_map[type(model)]
     shape_calc = get_shape_calculator(name)
     try:
         shape_calc(this_operator)
     except RuntimeError as e:
         inps = "\n".join(str(v) for v in inputs)
-        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(model.__class__, e, inps, shape_calc))
+        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(type(model), e, inps, shape_calc))
     return this_operator.outputs
 
 
