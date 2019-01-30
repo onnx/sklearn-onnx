@@ -93,7 +93,7 @@ New converters in a pipeline
 ============================
 
 Many libraries implement *scikit-learn* API and their models can
-be included in *scikit-learn* pipelines. However, *scikit-onnx* cannot
+be included in *scikit-learn* pipelines. However, *sklearn-onnx* cannot
 a pipeline which include a model such as *XGBoost* or *LightGbm*
 if it does not know the corresponding converters: it needs to be registered.
 That's the purpose of function :func:`skl2onnx.update_registered_converter`.

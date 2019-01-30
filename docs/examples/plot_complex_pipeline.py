@@ -11,7 +11,7 @@ Convert a pipeline with ColumnTransformer
 `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_
 which lets the user define complex pipeline where each
 column may be preprocessed with a different transformer.
-*scikit-onnx* still works in this case as shown in Section
+*sklearn-onnx* still works in this case as shown in Section
 :ref:`l-complex-pipeline`.
 
 
@@ -78,7 +78,7 @@ clf.fit(X_train, y_train)
 # Define the inputs of the ONNX graph
 # +++++++++++++++++++++++++++++++++++
 #
-# *scikit-onnx* does not know the features used to train the model
+# *sklearn-onnx* does not know the features used to train the model
 # but it needs to know which feature has which name.
 # We simply reuse the dataframe column definition.
 print(X_train.dtypes)
@@ -135,7 +135,7 @@ except Exception as e:
 
 #################################
 # *scikit-learn* does implicit conversions when it can.
-# *scikit-onnx* does not. The ONNX version of *OneHotEncoder*
+# *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 # must be applied on columns of the same type.
 
 X_train['pclass'] = X_train['pclass'].astype(str)
@@ -192,7 +192,7 @@ print("predict_proba", pred_onx[1][:1])
 # Display the ONNX graph
 # ++++++++++++++++++++++
 #
-# Finally, let's see the graph converted with *scikit-onnx*.
+# Finally, let's see the graph converted with *sklearn-onnx*.
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",

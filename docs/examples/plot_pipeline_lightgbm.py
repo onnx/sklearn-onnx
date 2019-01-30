@@ -7,10 +7,10 @@
 Convert a pipeline with a LightGbm model
 ========================================
 
-*scikit-onnx* only converts *scikit-learn* models into *ONNX*
+*sklearn-onnx* only converts *scikit-learn* models into *ONNX*
 but many libraries implement *scikit-learn* API so that their models
 can be included in a *scikit-learn* pipeline. This example considers
-a pipeline including a *LightGbm* model. *scikit-onnx* can convert
+a pipeline including a *LightGbm* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *LGBMClassifier*. Let's see how to do it.
 
@@ -62,7 +62,7 @@ except Exception as e:
 #
 # The converter is implemented in *onnxmltools* and
 # follows a different design than the current one
-# of *scikit-onnx*. This will change in a short future.
+# of *sklearn-onnx*. This will change in a short future.
 # See also :ref:`l-register-converter`.
 # First the converter:
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm # the 
