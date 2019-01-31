@@ -7,6 +7,8 @@
 Convert a pipeline with a LightGbm model
 ========================================
 
+.. index:: LightGbm
+
 *sklearn-onnx* only converts *scikit-learn* models into *ONNX*
 but many libraries implement *scikit-learn* API so that their models
 can be included in a *scikit-learn* pipeline. This example considers
@@ -131,3 +133,16 @@ image = plt.imread("pipeline.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
+
+#################################
+# **Versions used for this example**
+
+import numpy, sklearn
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)
+print("onnxmltools: ", onnxmltools.__version__)
+print("lightgbm: ", lightgbm.__version__)

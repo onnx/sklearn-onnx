@@ -104,3 +104,14 @@ for x in [
         ]:
     r = sess.run([output_name], {input_name: x})
     print("Shape={0} and predicted labels={1}".format(x.shape, r))
+
+#################################
+# **Versions used for this example**
+
+import numpy, sklearn
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)

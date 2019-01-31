@@ -7,6 +7,13 @@
 Transfer learning with ONNX
 ===========================
 
+`Transfer learning <https://en.wikipedia.org/wiki/Transfer_learning>`_
+is usually useful to adapt a deep learning model to some
+new problem for which the number of images is not enough
+to train a deep learning model. The proposed solution
+implies the use of class *OnnxTransformer* which wraps
+*OnnxRuntime* into a *scikit-learn* transformer
+easily pluggable into a pipeline.
 
 .. contents::
     :local:
@@ -55,10 +62,92 @@ ot.fit(X_train, y_train)
 print(ot.transform(X_test[:5]))
 
 ###################################
-# Transfer Learning with an image
-# +++++++++++++++++++++++++++++++
+# .. index:: transfer learning, MobileNet, ImageNet
 #
-# It starts by downloading a model from
+# Transfer Learning with MobileNet
+# ++++++++++++++++++++++++++++++++
+#
+# Deep learning models started to win
+# the `ImageNet <http://www.image-net.org/>`_
+# competition in 2012 and most the winners
+# are available on the web as pre-trained models.
+# Transfer Learning is computed by wrapping
+# a backend into a *scikit-learn*
+# transformers which *onnxruntime* does.
+
+import os
+model_file = "mobilenetv2-1.0.onnx"
+if not os.path.exists(model_file):
+    print("Download '{0}'...".format(model_file))
+    import urllib.request
+    url = "https://s3.amazonaws.com/onnx-model-zoo/mobilenet/mobilenetv2-1.0/mobilenetv2-1.0.onnx"
+    urllib.request.urlretrieve(url, model_file)
+    print("Done.")
+
+class_names = "imagenet_class_index.json"
+if not os.path.exists(class_names):
+    print("Download '{0}'...".format(class_names))
+    import urllib.request
+    url = "https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json"
+    urllib.request.urlretrieve(url, class_names)
+    print("Done.")
+
+import json
+with open(class_names, "r", encoding="utf-8") as f:
+    content_classes = f.read()
+labels = json.loads(content_classes)
+
+#####################################
+# Let's consider one image form *wikipedia*.
+
+from PIL import Image, ImageDraw
+import matplotlib.pyplot as plt
+import numpy
+
+img = Image.open('daisy_wikipedia.jpg')
+plt.imshow(img)
+plt.axis('off')
+
+#####################################
+# Let's create the OnnxTransformer
+# which we apply on that particular image.
+
+with open(model_file, "rb") as f:
+    model_bytes = f.read()
+    
+ot = OnnxTransformer(model_bytes)
+
+img2 = img.resize((224, 224))
+X = numpy.asarray(img2).transpose((2, 0, 1))
+X = X[numpy.newaxis, :, :, :] / 255.0
+print(X.shape, X.min(), X.max())
+
+pred = ot.fit_transform(X)[0, :]
+print(pred.shape)
+
+#############################
+# And the best classes are...
+
+from heapq import nlargest
+results = nlargest(10, range(pred.shape[0]), pred.take)
+print(results)
+
+import pandas
+data=[{"index": i, "label": labels.get(str(i), ('?', '?'))[1], 'score': pred[i]} \
+      for i in results]
+df = pandas.DataFrame(data)
+print(df)
+
+###################################
+# .. index:: Yolo
+# 
+# Transfer Learning with Yolo
+# +++++++++++++++++++++++++++
+#
+# `yolo <https://pjreddie.com/darknet/yolo/>`_
+# is quite popular among the framework
+# which can identity objects in images in real time.
+# One of the models is available in 
 # `ONNX zoo <https://github.com/onnx/models>`_.
 
 import os
@@ -175,4 +264,14 @@ def display_yolo(img, out, threshold):
 img_results = display_yolo(img2, pred[0], 0.038)
 plt.imshow(img_results)
 plt.axis('off')
-plt.show()
+
+#################################
+# **Versions used for this example**
+
+import numpy, sklearn
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)

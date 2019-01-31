@@ -38,3 +38,4 @@ tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
 docs/examples/tiny_yolov2*
+docs/examples/imagenet_class_index.json

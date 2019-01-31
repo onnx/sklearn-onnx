@@ -62,3 +62,14 @@ import matplotlib.pyplot as plt
 image = plt.imread("graph.dot.png")
 plt.imshow(image)
 plt.axis('off')
+
+#################################
+# **Versions used for this example**
+
+import numpy, sklearn
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)
