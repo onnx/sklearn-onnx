@@ -89,7 +89,7 @@ update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(pipe, 'pipeline',
+model_onnx = convert_sklearn(pipe, 'pipeline_lightgbm',
                              [('input', FloatTensorType([1, 2]))])
 
 # And save.

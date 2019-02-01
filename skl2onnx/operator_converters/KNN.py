@@ -109,7 +109,7 @@ def convert_sklearn_knn(scope, operator, container):
     #               output_probability [1, C]  <-  ZipMap 
 
     knn = operator.raw_operator
-    training_examples = knn._fit_X
+    training_examples = knn._fit_X.astype(float)
     distance_power = knn.p
 
     if operator.type != 'SklearnNearestNeighbors':
@@ -136,19 +136,19 @@ def convert_sklearn_knn(scope, operator, container):
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
 
-    if operator.type == 'SklearnKNeighborsRegressor':
-        container.add_initializer(training_labels_name, onnx_proto.TensorProto.FLOAT,
-                                  training_labels.shape, training_labels)
-
-    apply_sub(scope, [operator.inputs[0].full_name, training_examples_name], sub_results_name, container, broadcast=1)
+    apply_sub(scope, [operator.inputs[0].full_name, training_examples_name],
+              sub_results_name, container, broadcast=1)
     apply_abs(scope, sub_results_name, abs_results_name, container)
     apply_pow(scope, [abs_results_name, distance_power_name], distance_name, container)
-    container.add_node('ReduceSum', distance_name,
-                       reduced_sum_name, name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
+    container.add_node('ReduceSum', distance_name, reduced_sum_name,
+                       name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
     apply_reshape(scope, reduced_sum_name, reshaped_result_name, container, desired_shape=[1, -1])
-    apply_mul(scope, [reshaped_result_name, negate_name], negated_reshaped_result_name, container, broadcast=1)
+    apply_mul(scope, [reshaped_result_name, negate_name],
+              negated_reshaped_result_name, container, broadcast=1)
     container.add_node('TopK', negated_reshaped_result_name,
-                       [topk_values_name, topk_indices_name], name=scope.get_unique_operator_name('TopK'), k=knn.n_neighbors)
+                       [topk_values_name, topk_indices_name],
+                       name=scope.get_unique_operator_name('TopK'),
+                       k=knn.n_neighbors)
 
     if operator.type == 'SklearnKNeighborsClassifier':
         classes = knn.classes_
@@ -182,7 +182,7 @@ def convert_sklearn_knn(scope, operator, container):
         container.add_initializer(classes_name, class_type, 
                                   classes.shape, classes)
         container.add_initializer(training_labels_name, onnx_proto.TensorProto.INT32,
-                                  training_labels.shape, training_labels)
+                                  training_labels.shape, training_labels.ravel())
 
         container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name], topk_labels_name,
                            name=scope.get_unique_operator_name('ArrayFeatureExtractor'), op_domain='ai.onnx.ml')
@@ -228,11 +228,13 @@ def convert_sklearn_knn(scope, operator, container):
         container.add_node('ReduceMean', ohe_result_name, operator.outputs[1].full_name,
                            name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
     elif operator.type == 'SklearnKNeighborsRegressor':
+        container.add_initializer(training_labels_name, onnx_proto.TensorProto.FLOAT,
+                                  training_labels.shape, training_labels.ravel().astype(float))
         container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
                            topk_labels_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
                            op_domain='ai.onnx.ml')
-        container.add_node('ReduceMean', topk_labels_name, 
-                           operator.output_full_names, name=scope.get_unique_operator_name('ReduceMean'))
+        container.add_node('ReduceMean', topk_labels_name, operator.output_full_names,
+                            name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
     elif operator.type == 'SklearnNearestNeighbors':
         container.add_node('Identity', topk_indices_name, operator.outputs[0].full_name,
                            name=scope.get_unique_operator_name('Identity'))
