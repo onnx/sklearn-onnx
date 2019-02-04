@@ -4,57 +4,56 @@
 # license information.
 # --------------------------------------------------------------------------
 
-import numbers
 import warnings
 from ..common._registration import register_converter
 
 
 def convert_sklearn_text_vectorizer(scope, operator, container):
-            
+
     op = operator.raw_operator
-    
+
     if op.analyzer != "word":
-        raise NotImpplementedError("CountVectorizer cannot be converted, only tokenizer='word' is supported.")
+        raise NotImplementedError("CountVectorizer cannot be converted, only tokenizer='word' is supported.")
     if op.strip_accents is not None:
-        raise NotImpplementedError("CountVectorizer cannot be converted, only stip_accents=None is supported.")
+        raise NotImplementedError("CountVectorizer cannot be converted, only stip_accents=None is supported.")
 
     default_pattern = '(?u)\\b\\w\\w+\\b'
     default_separators = [' ', '.', '?', ',', ';', ':', '!']
     if op.token_pattern != default_pattern:
-        raise NotImpplementedError("Only the default tokenizer based on default regular expression '{0}' is implemented.".format(default_pattern))
+        raise NotImplementedError("Only the default tokenizer based on default regular expression '{0}' is implemented.".format(default_pattern))
     if op.preprocessor is not None:
         raise NotImplementedError("Custom preprocessor cannot be converted into ONNX.")
     if op.tokenizer is not None:
         raise NotImplementedError("Custom tokenizer cannot be converted into ONNX.")
     if op.strip_accents is not None:
         raise NotImplementedError("Operator StringNormalizer cannot remove accents.")
-    
+
     msg = "The default regular expression '{0}' splits strings based on anything but a space. " + \
           "The current specification splits strings based on the following separators {1}."
     warnings.warn(msg.format(default_pattern, default_separators))
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
-        
+
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
         attrs.update({
-            'casechangeaction': 'LOWER',            
+            'casechangeaction': 'LOWER',
             'is_case_sensitive': not op.lowercase,
         })
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
         normalized = scope.get_unique_variable_name('normalized')
-        container.add_node(op_type, operator.input_full_names, 
+        container.add_node(op_type, operator.input_full_names,
                            normalized, op_domain='com.microsoft', **attrs)
     else:
         normalized = operator.input_full_names
-        
+
     # Tokenizer
     padvalue = "#"
     while padvalue in op.vocabulary_:
         padvalue += "#"
-    
+
     op_type = 'Tokenizer'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs.update({
@@ -72,7 +71,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     C = max(op.vocabulary_.values()) + 1
     words = [None for i in range(C)]
     weights = [0 for i in range(C)]
-    indices = [None for i in range(C)]
     if hasattr(op, "idf_"):
         for k, v in op.vocabulary_.items():
             words[v] = k
@@ -83,7 +81,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             words[v] = k
             weights[v] = 1.
         mode = 'IDF' if hasattr(op, 'use_idf') else 'TF'
-        
+
     # Scikit-learn sorts n-grams by alphabetical order..
     # onnx assumes it is sorted by n.
     split_words = [(w.split(), w) for w in words]
@@ -91,18 +89,18 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     ng_split_words.sort()
     key_indices = [a[2] for a in ng_split_words]
     ngcounts = [0 for i in range(op.ngram_range[0])]
-    
+
     words = list(ng_split_words[0][1])
     for i in range(1, len(ng_split_words)):
         if ng_split_words[i-1][0] != ng_split_words[i][0]:
             ngcounts.append(len(words))
         words.extend(ng_split_words[i][1])
-        
+
     weights_ = [weights[a[2]] for a in ng_split_words]
     weights = list(weights_)
     for i, ind in enumerate(key_indices):
         weights[ind] = weights_[i]
-    
+
     # Create the node.
     op_type = 'Ngram'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
@@ -136,8 +134,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             raise RuntimeError('Invalid norm: %s' % op.norm)
 
         container.add_node(op_type, output, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
-        
+
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
 register_converter('SklearnTfidfVectorizer', convert_sklearn_text_vectorizer)
-

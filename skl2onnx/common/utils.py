@@ -284,7 +284,6 @@ def get_column_indices(indices, inputs, multiple):
             onnx_is.append(onnx_i)
             if onnx_var is None:
                 onnx_var = ov
-                onnx_var_name = inputs[ov].full_name
             elif onnx_var != ov:
                 cols = [onnx_var, ov]
                 raise NotImplementedError("sklearn-onnx is not able to merge multiple columns from multiple variables ({0}). You should think about merging initial types.".format(cols))
