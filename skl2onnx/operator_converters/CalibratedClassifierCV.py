@@ -5,11 +5,12 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_cast, apply_div, apply_exp, apply_mul, apply_reshape
+from ..common._apply_operation import (
+    apply_add, apply_cast, apply_div, apply_exp, apply_mul,
+    apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
-from ..common._registration import get_converter, register_converter
+from ..common._registration import register_converter
 from .._parse import sklearn_operator_name_map
-from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 import numpy as np
 
 
@@ -248,7 +249,6 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
 
-    zero_constant = np.zeros((1, len(op.classes_)))
     clf_length = len(op.calibrated_classifiers_)
     prob_scores_name = []
 
