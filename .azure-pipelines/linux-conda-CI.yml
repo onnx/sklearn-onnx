@@ -57,6 +57,7 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
+      pip install numpy>=1.16   # onnxruntime was compiled with numpy>=1.16
       pip install onnxruntime
     displayName: 'install onnxruntime'
 
