@@ -13,17 +13,17 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python36-ONNX141:
+      Py36-Onnx141:
         python.version: '3.6'
         onnx.version: '==1.4.1'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-      Python35-ONNX130:
+      Py35-Onnx130:
         python.version: '3.5'
         onnx.version: '==1.3.0'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-      Python36-ONNX130-RT014-NPY0154:
+      Py36-Onnx130-Rt014-Npy0154:
         python.version: '3.6'
         onnx.version: '==1.3.0'
         numpy.version: '==1.15.4'
