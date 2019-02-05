@@ -16,15 +16,23 @@ jobs:
       Python37:
         python.version: '3.7'
         onnx.version: '==1.4.1'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
       Python37-ONNX130:
         python.version: '3.7'
         onnx.version: '==1.3.0'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
       Python36-ONNX123:
         python.version: '3.6'
         onnx.version: '==1.2.3'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
       Python35-ONNX112:
         python.version: '3.5'
         onnx.version: '==1.1.2'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
     maxParallel: 3
 
   steps:
@@ -37,7 +45,7 @@ jobs:
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no      
-      conda install -c conda-forge numpy==1.16.1
+      conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
       python -m pip install --upgrade pip      
       if [ '$(python.version)' == '3.7' ]
@@ -54,7 +62,7 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      pip install numpy==1.16.1
+      pip install numpy$(numpy.version)
     displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
   - script: |
@@ -62,7 +70,7 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
-      pip install onnxruntime
+      pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
   - script: |
@@ -90,6 +98,7 @@ jobs:
 
   - script: |
       test '$(python.version)' == '3.7' && python -c "import onnxruntime"
+      pip install openpyxl
       python tests/benchmark.py
     displayName: 'benchmark'
 
