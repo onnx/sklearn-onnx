@@ -18,19 +18,19 @@ jobs:
         onnx.version: '==1.4.1'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-        coverage.do: 'yes'
+        benchmark.do: 'yes'
       Py36-Onnx130:
         python.version: '3.6'
         onnx.version: '==1.3.0'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-        coverage.do: 'no'
-      Py35-Onnx141-Rt014-Npy0154:
+        benchmark.do: 'no'
+      Py35-Onnx141:
         python.version: '3.5'
         onnx.version: '==1.3.0'
-        onnxrt.version: '==0.1.4'
-        numpy.version: '==1.15.4'
-        coverage.do: 'no'
+        onnxrt.version: '==0.2.1'
+        numpy.version: '==1.16.1'
+        benchmark.do: 'no'
     maxParallel: 3
 
   steps:
@@ -86,17 +86,14 @@ jobs:
     displayName: 'pytest'
 
   - script: |
-      test '$(coverage.do)' == 'yes'
-      pip install onnxmltools
+      pip install onnxmltools openpyxl
       coverage run --include=skl2onnx/** tests/benchmark.py
       coverage report -m
       coverage html
     displayName: 'coverage'
 
   - script: |
-      test '$(coverage.do)' == 'yes'
-      pip install openpyxl
-      python tests/benchmark.py
+      test '$(benchmark.do)' == 'yes' && python tests/benchmark.py
     displayName: 'benchmark'
 
   - task: PublishTestResults@2
