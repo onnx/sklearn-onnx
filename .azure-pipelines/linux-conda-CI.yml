@@ -37,8 +37,8 @@ jobs:
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no      
+      conda install numpy>=1.16.1
       conda install protobuf
-      conda install numpy>=1.16
       python -m pip install --upgrade pip      
       if [ '$(python.version)' == '3.7' ]
         then
@@ -54,7 +54,7 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      pip install numpy>=1.16
+      pip install numpy>=1.16.1
     displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
   - script: |
