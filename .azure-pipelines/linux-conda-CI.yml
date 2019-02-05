@@ -50,7 +50,6 @@ jobs:
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install onnx$(onnx.version)
-      python -c "import onnx;print('ONNX version ==', onnx.__version__)"
       test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
@@ -58,11 +57,26 @@ jobs:
   - script: |
       test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pip install -e .
+      pip show onnx onnxruntime
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
+
+  - script: |
+      test '$(python.version)' != '3.7'
+      coverage run --include=skl2onnx/** tests/benchmark.py
+      coverage report -m
+      coverage html
+    displayName: 'coverage'
+
+  - script: |
+      test '$(python.version)' == '3.7' && python -c "import onnxruntime"
+      python tests/benchmark.py
+    displayName: 'benchmark'
 
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'
+      testCoverageFiles: 'htmlcov/**'
+      testBenchmarkFiles: 'TESTDUMP/*.xlsx'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
