@@ -491,6 +491,7 @@ def make_report_backend(folder, as_df=False):
     if as_df:            
         from pandas import DataFrame        
         df = DataFrame(aslist).sort_values(["_model"])
+        df["numpy-version"] = numpy.__version__
         df["onnx-version"] = onnx.__version__
         df["onnxruntime-version"] = onnxruntime.__version__
         cols = list(df.columns)
@@ -518,6 +519,7 @@ def make_report_backend(folder, as_df=False):
                 pass
             row["CPU"] = proc
             row["CPUI"] = cpu
+            row["numpy-version"] = numpy.__version__
             row["onnx-version"] = onnx.__version__
             row["onnxruntime-version"] = onnxruntime.__version__
         return aslist

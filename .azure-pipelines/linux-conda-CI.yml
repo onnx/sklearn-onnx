@@ -82,6 +82,7 @@ jobs:
 
   - script: |
       test '$(python.version)' != '3.7'
+      pip install onnxmltools
       coverage run --include=skl2onnx/** tests/benchmark.py
       coverage report -m
       coverage html
