@@ -1,6 +1,7 @@
 import unittest
 import numpy
 import pandas
+from distutils.version import StrictVersion
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline, Pipeline
