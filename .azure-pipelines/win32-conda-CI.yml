@@ -72,7 +72,7 @@ jobs:
     displayName: 'pytest'
 
   - script: |
-      test '$(coverage.do)' == yes'
+      test '$(coverage.do)' == 'yes'
       pip install onnxmltools
       coverage run --include=skl2onnx/** tests/benchmark.py
       coverage report -m
@@ -80,7 +80,7 @@ jobs:
     displayName: 'coverage'
 
   - script: |
-      test '$(coverage.do)' == yes'
+      test '$(coverage.do)' == 'yes'
       pip install openpyxl
       python tests/benchmark.py
     displayName: 'benchmark'
