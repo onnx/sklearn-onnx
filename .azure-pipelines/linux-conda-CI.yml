@@ -23,16 +23,16 @@ jobs:
         onnx.version: '==1.3.0'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-      Python36-ONNX123:
+      Python36-ONNX130:
         python.version: '3.6'
-        onnx.version: '==1.2.3'
+        onnx.version: '==1.3.0'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-      Python35-ONNX112:
+      Python35-ONNX141-RT014-NPY0154:
         python.version: '3.5'
-        onnx.version: '==1.1.2'
-        numpy.version: '==1.16.1'
-        onnxrt.version: '==0.2.1'
+        onnx.version: '==1.4.1'
+        onnxrt.version: '==0.1.4'
+        numpy.version: '==1.15.4'
     maxParallel: 3
 
   steps:
