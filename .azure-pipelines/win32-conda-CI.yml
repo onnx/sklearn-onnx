@@ -13,12 +13,12 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
-        onnx.version: '==1.3.0'
       Python36:
         python.version: '3.6'
         onnx.version: '==1.4.1'
+      Python35:
+        python.version: '3.5'
+        onnx.version: '==1.3.0'
     maxParallel: 3
 
   steps:
@@ -31,7 +31,7 @@ jobs:
   - script: |
       conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge protobuf
-      conda install -c conda-forge numpy
+      conda install -c conda-forge numpy>=1.16
       python -m pip install --upgrade pip
       test '$(python.version)' == '3.7' && pip install https://github.com/xadupre/onnx/releases/download/1.3.0/onnx-1.3.0-cp37-cp37m-win_amd64.whl
       pip install -r requirements.txt
@@ -40,7 +40,7 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      conda update numpy>=1.16
+      pip install numpy>=1.16
     displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
   - script: |
