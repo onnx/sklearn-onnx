@@ -40,16 +40,23 @@ jobs:
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install pytest
-      pip install onnx$(onnx.version)
     displayName: 'Install dependencies'
+
+  - script: |
+      pip install onnx$(onnx.version)
+    displayName: 'install onnx'
+
+  - script: |
+      pip install onnxruntime
+    displayName: 'install onnxruntime'
 
   - script: |
       pip install -e .
     displayName: 'install'
 
   - script: |
-      pip show onnx
-      pip show onnxruntime
+      python -c "import onnx;print('onnx.__version__')"
+      python -c "import onnxruntime;print('onnxruntime.__version__')"
     displayName: 'version'
 
   - script: |

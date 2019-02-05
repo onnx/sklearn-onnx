@@ -24,7 +24,7 @@ jobs:
         onnx.version: '==1.3.0'
       Python37:
         python.version: '3.7'
-        onnx.version: '==1.4.0'
+        onnx.version: '==1.4.1'
     maxParallel: 3
 
   steps:
@@ -49,10 +49,16 @@ jobs:
       fi
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
-      pip install onnx$(onnx.version)
-      test '$(python.version)' != '2.7' && pip install onnxruntime
       pip install pytest
     displayName: 'Install dependencies'
+
+  - script: |
+      pip install onnx$(onnx.version)
+    displayName: 'install onnx'
+
+  - script: |
+      pip install onnxruntime
+    displayName: 'install onnxruntime'
 
   - script: |
       pip install -e .
