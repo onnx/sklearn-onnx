@@ -53,8 +53,8 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      conda update numpy>=1.16   # onnxruntime was compiled with numpy>=1.16
-    displayName: 'install numpy'
+      conda update numpy>=1.16
+    displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
   - script: |
       pip install onnx$(onnx.version)
