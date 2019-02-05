@@ -45,8 +45,15 @@ jobs:
 
   - script: |
       pip install -e .
-      pip show onnx onnxruntime
-      pytest tests --cov=skl2onnx --doctest-modules --junitxml=junit/test-results.xml
+    displayName: 'install'
+
+  - script: |
+      pip show onnx
+      pip show onnxruntime
+    displayName: 'version'
+
+  - script: |
+      pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - task: PublishTestResults@2

@@ -55,9 +55,16 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pip install -e .
-      pip show onnx onnxruntime
+    displayName: 'install'
+
+  - script: |
+      pip show onnx
+      pip show onnxruntime
+    displayName: 'version'
+
+  - script: |
+      test '$(python.version)' != '2.7' && python -c "import onnxruntime"
       pytest tests --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
