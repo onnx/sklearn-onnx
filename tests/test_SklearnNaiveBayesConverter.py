@@ -33,7 +33,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx, basename="SklearnBinMultinomialNB-OneOff",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.3')")
 
-    @unittest.skip(reason="Type 'tensor(float)' of input parameter (input) of operator (ConstantOfShape) in node (ConstantOfShape) is invalid.")
+    @unittest.skip(reason="Type 'tensor(float)' of input parameter (input) of operator "
+                          "(ConstantOfShape) in node (ConstantOfShape) is invalid.")
     def test_model_bernoulli_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(BernoulliNB())
         model_onnx = convert_sklearn(model, 'bernoulli naive bayes', [('input', FloatTensorType([1, 4]))])
@@ -49,7 +50,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx, basename="SklearnMclMultinomialNB-OneOff",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.3')")
 
-    @unittest.skip(reason="Type 'tensor(float)' of input parameter (input) of operator (ConstantOfShape) in node (ConstantOfShape) is invalid.")
+    @unittest.skip(reason="Type 'tensor(float)' of input parameter (input) of operator (ConstantOfShape) "
+                          "in node (ConstantOfShape) is invalid.")
     def test_model_bernoulli_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(BernoulliNB())
         model_onnx = convert_sklearn(model, 'bernoulli naive bayes', [('input', FloatTensorType([1, 4]))])
