@@ -36,7 +36,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'one-hot encoder mixed-type inputs', inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnOneHotEncoderStringInt64",
-                            verbose=True)
+                            verbose=False)
 
     def test_one_hot_encoder_onecat(self):
         # categorical_features will be removed in 0.22 (this test will fail by then).

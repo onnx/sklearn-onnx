@@ -38,6 +38,9 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import SGDRegressor
 from sklearn.svm import LinearSVR
 
+# Multi-class
+from sklearn.multiclass import OneVsRestClassifier
+
 # Tree-based models
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
@@ -90,7 +93,7 @@ from sklearn.impute import SimpleImputer
 sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
                            GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
                            ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
-                           CalibratedClassifierCV]
+                           CalibratedClassifierCV, OneVsRestClassifier]
 
 # Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
@@ -111,7 +114,7 @@ def build_sklearn_operator_name_map():
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
-                    FunctionTransformer]}
+                    OneVsRestClassifier, FunctionTransformer]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',

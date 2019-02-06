@@ -4,9 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 
-import numpy as np
-import numbers
-import six
 from ..common._registration import register_shape_calculator
 from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 
