@@ -18,13 +18,11 @@ jobs:
         onnx.version: '==1.4.1'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-        benchmark.do: 'yes'
       Py36-Onnx130-Rt014-Npy0154:
         python.version: '3.6'
         onnx.version: '==1.3.0'
         numpy.version: '==1.15.4'
         onnxrt.version: '==0.1.4'
-        benchmark.do: 'no'
     maxParallel: 3
 
   steps:
@@ -79,7 +77,7 @@ jobs:
     displayName: 'coverage'
 
   - script: |
-      test '$(benchmark.do)' == 'yes'  && python tests/benchmark.py
+      python tests/benchmark.py
     displayName: 'benchmark'
 
   - task: PublishTestResults@2
