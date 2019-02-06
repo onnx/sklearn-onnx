@@ -13,18 +13,21 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Python35-ONNX112:
-        python.version: '3.5'
-        onnx.version: '==1.1.2'
-      Python36-ONNX123:
+      Py37-Onnx141:
+        python.version: '3.7'
+        onnx.version: 'git'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
+      Py36-Onnx130:
         python.version: '3.6'
-        onnx.version: '==1.2.3'
-      Python37-ONNX130:
-        python.version: '3.7'
         onnx.version: '==1.3.0'
-      Python37:
-        python.version: '3.7'
-        onnx.version: '==1.4.0'
+        numpy.version: '==1.16.1'
+        onnxrt.version: '==0.2.1'
+      Py35-Onnx141:
+        python.version: '3.5'
+        onnx.version: 'git'
+        onnxrt.version: '==0.2.1'
+        numpy.version: '==1.16.1'
     maxParallel: 3
 
   steps:
@@ -37,32 +40,67 @@ jobs:
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no      
-      conda install protobuf numpy
+      conda install -c conda-forge numpy$(numpy.version)
+      conda install protobuf
       python -m pip install --upgrade pip      
-      if [ '$(python.version)' == '3.7' ]
+    displayName: 'Install environment'
+
+  - script: |
+      pip install numpy$(numpy.version)
+    displayName: 'install numpy'
+
+  - script: |
+      if [ '$(onnx.version)' == 'git' ]
         then
           git clone https://github.com/onnx/onnx.git --recursive
           export ONNX_ML=1
           cd onnx
           python setup.py install
           cd ..
+        else
+          pip install onnx$(onnx.version)
       fi
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-      pip install onnx$(onnx.version)
-      python -c "import onnx;print('ONNX version ==', onnx.__version__)"
-      test '$(python.version)' != '2.7' && pip install onnxruntime
-      pip install pytest
-    displayName: 'Install dependencies'
+    displayName: 'install onnx'
 
   - script: |
-      test '$(python.version)' != '2.7' && python -c "import onnxruntime"
+      pip install onnxruntime$(onnxrt.version)
+    displayName: 'install onnxruntime'
+
+  - script: |
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+      pip install pytest
+    displayName: 'install requirements'
+
+  - script: |
       pip install -e .
-      pytest tests --doctest-modules --junitxml=junit/test-results.xml
+    displayName: 'install'
+
+  - script: |
+      pip show numpy
+      pip show onnx
+      pip show onnxruntime
+    displayName: 'version'
+
+  - script: |
+      pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
+
+  - script: |
+      pip install onnxmltools openpyxl
+      coverage run --include=skl2onnx/** tests/benchmark.py
+      coverage report -m
+      coverage html
+    displayName: 'coverage'
+
+  - script: |
+      python tests/benchmark.py
+    displayName: 'benchmark'
 
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'
+      testCoverageFiles: 'htmlcov/**'
+      testBenchmarkFiles: 'TESTDUMP/*.xlsx'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
