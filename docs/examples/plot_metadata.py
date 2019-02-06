@@ -2,10 +2,10 @@
 # Licensed under the MIT License.
 
 """
-.. index:: metadata
-
 Metadata
 ========
+
+.. index:: metadata
 
 ONNX format contains metadata related to how the
 model was produced. It is useful when the model

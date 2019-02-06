@@ -7,7 +7,7 @@
 Write your own converter for your own model
 ===========================================
 
-It might happens that you implemented your own model
+It might happen that you implemented your own model
 and there is obviously no existing converter for this
 new model. That does not mean the conversion of a pipeline
 which includes it would not work. Let's see how to do it.
@@ -32,15 +32,15 @@ The first section is about the implementation.
 The code is quite generic but basically follows this
 process to fit the model with *X* and *y*:
 
-* t-SNE, :math:`(X, y) \rightarray X_2 \in \mathbb{R}^2`
+* t-SNE, :math:`(X, y) \rightarrow X_2 \in \mathbb{R}^2`
 * k nearest neightbours, :math:`fit(X, X_2)`,
-  which produces function :math:`f(X) \rightarray X_3`
-* final normalization, simple scaling :math:`X_3 \rightarray X_4`
+  which produces function :math:`f(X) \rightarrow X_3`
+* final normalization, simple scaling :math:`X_3 \rightarrow X_4`
 
 And to predict on a test set:
 
-* k nearest neightbours, :math:`f(X') \rightarray X'_3`
-* final normalization, simple scaling :math:`X'_3 \rightarray X'_4`
+* k nearest neightbours, :math:`f(X') \rightarrow X'_3`
+* final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
 """
 
 import inspect
@@ -277,7 +277,7 @@ X_test_tsne2 = ptsne_knn.transform(X_test)
 plot_embedding(X_test_tsne2, y_test, imgs_test,
                "Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor")
 
-###################
+#######################################
 # ONNX - shape_calculator, converter
 # ++++++++++++++++++++++++++++++++++
 #
@@ -390,8 +390,8 @@ pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
 print("transform", pred_onx[0])
 
 ##################################
-# The converter for the nearest neighbour does not
-# allow multiple predictions at a time. Let's call
+# The converter for the nearest neighbours produces an ONNX graph
+# which does not allow multiple predictions at a time. Let's call
 # *onnxruntime* for the second row.
 
 pred_onx = sess.run(None, {"input": X_test[1:2].astype(numpy.float32)})
