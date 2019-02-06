@@ -137,12 +137,13 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 inputs[k] = numpy.array(inputs[k])
     
     OneOff = options.pop('OneOff', False)
+    OneOffArray = options.pop('OneOffArray', False)
     options.pop('SklCol', False)  # unused here but in dump_data_and_model
-    if OneOff:
+    if OneOff or OneOffArray:
         if verbose:
             print("[compare_runtime] OneOff: type(inputs)={} len={}".format(
                 type(input), len(inputs)))
-        if len(inputs) == 1:
+        if len(inputs) == 1 and not OneOffArray:
             name, values = list(inputs.items())[0]
             res = []
             for input in values:
@@ -185,7 +186,11 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
-            output = _post_process_output(res)   
+            output = _post_process_output(res)
+            if OneOffArray:
+                if not isinstance(output, numpy.ndarray):
+                    raise TypeError("output must be an array")
+                output = [output]
     else:
         if verbose:
             print("[compare_runtime] type(inputs)={} len={} names={}".format(

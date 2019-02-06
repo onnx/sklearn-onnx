@@ -37,15 +37,15 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        # dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
-        #                     basename="KNeighborsRegressor")
+        dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
+                             basename="KNeighborsRegressor-OneOffArray")
 
     def test_model_knn_regressor2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2), n_targets=2)
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        # dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
-        #                     basename="KNeighborsRegressor2")
+        dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
+                            basename="KNeighborsRegressor2-OneOffArray")
 
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(KNeighborsClassifier())

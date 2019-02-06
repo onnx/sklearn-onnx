@@ -72,7 +72,8 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
       but the runtime produces a vector of size *N*, the test will compare the second column
       to the column
     * ``-OneOff``: the ONNX runtime cannot compute the prediction for several inputs,
-      it must be called for each of them and computed output.
+      it must be called for each of them.
+    * ``-OneOffArray``: same as ``-OneOff`` but input is still a 2D array with one observation
     * ``-Out0``: only compares the first output on both sides
     * ``-Reshape``: merges all outputs into one single vector and resizes it before comparing
     * ``-SkipDim1``: before comparing expected and computed output,
