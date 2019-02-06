@@ -177,6 +177,8 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
     names.append(dest)
     with open(dest, "wb") as f:
         f.write(onnx.SerializeToString())
+    if verbose:
+        print("[dump_data_and_model] created '{}'.".format(dest))
     
     runtime_test["onnx"] = dest
     
@@ -240,7 +242,7 @@ def convert_model(model, name, input_types):
     return model, prefix
 
     
-def dump_one_class_classification(model, suffix="", folder=None, allow_failure=None):
+def dump_one_class_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
     """
     Trains and dumps a model for a One Class outlier problem.
     The function trains a model and calls
@@ -253,6 +255,7 @@ def dump_one_class_classification(model, suffix="", folder=None, allow_failure=N
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
+    :param verbose: additional information
     :return: output of :func:`dump_data_and_model`
     
     Every created filename will follow the pattern:
@@ -264,10 +267,11 @@ def dump_one_class_classification(model, suffix="", folder=None, allow_failure=N
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, 'one_class', [('input', FloatTensorType([1, 2]))])
     return dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
-                               basename=prefix + "One" + model.__class__.__name__ + suffix)
+                               basename=prefix + "One" + model.__class__.__name__ + suffix,
+                               verbose=verbose)
 
 
-def dump_binary_classification(model, suffix="", folder=None, allow_failure=None):
+def dump_binary_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
     """
     Trains and dumps a model for a binary classification problem.
     
@@ -278,6 +282,7 @@ def dump_binary_classification(model, suffix="", folder=None, allow_failure=None
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
+    :param verbose: additional information
     :return: output of :func:`dump_data_and_model`
     
     Every created filename will follow the pattern:
@@ -289,9 +294,10 @@ def dump_binary_classification(model, suffix="", folder=None, allow_failure=None
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, 'binary classifier', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
-                        basename=prefix + "Bin" + model.__class__.__name__ + suffix)
+                        basename=prefix + "Bin" + model.__class__.__name__ + suffix,
+                        verbose=verbose)
 
-def dump_multiple_classification(model, suffix="", folder=None, allow_failure=None):
+def dump_multiple_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
     """
     Trains and dumps a model for a binary classification problem.
     
@@ -302,6 +308,7 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
+    :param verbose: additional information
     :return: output of :func:`dump_data_and_model`
     
     Every created filename will follow the pattern:
@@ -311,12 +318,17 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     X = numpy.array(X, dtype=numpy.float32)
     y = [0, 1, 2, 1, 1, 2]
     model.fit(X, y)
+    if verbose:
+        print("[dump_multiple_classification] model '{}'".format(model.__class__.__name__))
     model_onnx, prefix = convert_model(model, 'multi-class classifier', [('input', FloatTensorType([1, 2]))])
+    if verbose:
+        print("[dump_multiple_classification] model was converted")
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
-                        basename=prefix + "Mcl" + model.__class__.__name__ + suffix)
+                        basename=prefix + "Mcl" + model.__class__.__name__ + suffix,
+                        verbose=verbose)
 
 
-def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None):
+def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None, verbose=False):
     """
     Trains and dumps a model for a multi regression problem.
     
@@ -327,6 +339,7 @@ def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None):
         for the backends, otherwise a string which is then evaluated to check
         whether or not the test can fail, example:
         ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
+    :param verbose: additional information
     :return: output of :func:`dump_data_and_model`
     
     Every created filename will follow the pattern:
@@ -338,7 +351,8 @@ def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None):
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, 'multi-regressor', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
-                        basename=prefix + "MRg" + model.__class__.__name__ + suffix)
+                        basename=prefix + "MRg" + model.__class__.__name__ + suffix,
+                        verbose=verbose)
 
 
 def dump_single_regression(model, suffix="", folder=None, allow_failure=None):

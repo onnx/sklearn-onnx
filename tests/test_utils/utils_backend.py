@@ -78,7 +78,7 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
             # onnxruntime is not available on Python 2.
             return            
         from .utils_backend_onnxruntime import compare_runtime
-        return compare_runtime(test, decimal, options, verbose)
+        return compare_runtime(test, decimal, options=options, verbose=verbose)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
 

@@ -10,7 +10,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     def test_ova(self):
         model = OneVsRestClassifier(LogisticRegression())
-        dump_multiple_classification(model)
+        dump_multiple_classification(model, verbose=False)
 
 
 if __name__ == "__main__":

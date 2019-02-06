@@ -39,7 +39,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         p1 = scope.get_unique_variable_name('probY_%d' % i)
         container.add_node('Slice', prob_name.raw_name, p1,
                            name=scope.get_unique_operator_name('Slice'),
-                           axes=[0, 1], starts=[0, 1], ends=[-1, -1])
+                           axes=[1], starts=[1], ends=[2])
 
         probs_names.append(p1)
 
@@ -47,13 +47,13 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     conc_name = scope.get_unique_variable_name('concatenated')
     apply_concat(scope, probs_names, conc_name, container, axis=1)
 
-    # extracts the labels
-    container.add_node('ArgMax', conc_name, operator.outputs[0].full_name,
-                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
-
     # normalizes the outputs
     apply_normalization(scope, conc_name, operator.outputs[1].full_name,
                         container, axis=1, p=1)
+
+    # extracts the labels
+    container.add_node('ArgMax', conc_name, operator.outputs[0].full_name,
+                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
 
 
 register_converter('SklearnOneVsRestClassifier', convert_one_vs_rest_classifier)
