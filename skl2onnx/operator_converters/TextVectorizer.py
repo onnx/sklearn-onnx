@@ -67,7 +67,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     container.add_node(op_type, normalized, tokenized,
                        op_domain='com.microsoft', **attrs)
 
-    # Ngram
+    # Ngram - TfIdfVectorizer
     C = max(op.vocabulary_.values()) + 1
     words = [None for i in range(C)]
     weights = [0 for i in range(C)]
@@ -102,7 +102,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         weights[ind] = weights_[i]
 
     # Create the node.
-    op_type = 'Ngram'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs.update({
         'min_gram_length': op.ngram_range[0],
@@ -121,8 +120,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         notnormalized = scope.get_unique_variable_name('notnormalized')
         output = [notnormalized]
 
-    container.add_node(op_type, tokenized, output,
-                       op_domain='com.microsoft', **attrs)
+    if container.target_opset < 9:
+        op_type = 'Ngram'
+        container.add_node(op_type, tokenized, output, op_domain='com.microsoft', **attrs)
+    else:
+        op_type = 'TfIdfVectorizer'
+        container.add_node(op_type, tokenized, output, op_domain='ai.onnx',
+                           op_version=9, **attrs)
 
     if getattr(op, 'norm', None) is not None:
         op_type = 'Normalizer'
