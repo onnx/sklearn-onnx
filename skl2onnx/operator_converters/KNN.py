@@ -6,7 +6,7 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul, apply_reshape, apply_sub
-from ..common._apply_operation import apply_pow, apply_concat
+from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common._registration import register_converter
 import numpy as np
 
@@ -181,11 +181,12 @@ def convert_sklearn_knn(scope, operator, container):
 
         container.add_initializer(classes_name, class_type, 
                                   classes.shape, classes)
+        
         container.add_initializer(training_labels_name, onnx_proto.TensorProto.INT32,
                                   training_labels.shape, training_labels.ravel())
-
         container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name], topk_labels_name,
-                           name=scope.get_unique_operator_name('ArrayFeatureExtractor'), op_domain='ai.onnx.ml')
+                            name=scope.get_unique_operator_name('ArrayFeatureExtractor'), op_domain='ai.onnx.ml')
+
         for i in range(len(classes)):
             container.add_node('Equal', [labels_name[i], topk_labels_name],
                                 output_label_name[i])
@@ -228,13 +229,33 @@ def convert_sklearn_knn(scope, operator, container):
         container.add_node('ReduceMean', ohe_result_name, operator.outputs[1].full_name,
                            name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
     elif operator.type == 'SklearnKNeighborsRegressor':
+        
+        multi_reg = len(training_labels.shape) > 1 and (len(training_labels.shape) > 2 or training_labels.shape[1] > 1)
+        if multi_reg:
+            shape = training_labels.shape            
+            irange = tuple(range(len(shape)))
+            new_shape = (shape[-1],) + shape[:-1]
+            perm = irange[-1:] + irange[:-1]
+            new_training_labels = training_labels.transpose(perm)
+            perm = irange[1:] + (0,)
+            shape = new_shape
+        else:
+            shape = training_labels.shape
+            new_training_labels = training_labels
+
         container.add_initializer(training_labels_name, onnx_proto.TensorProto.FLOAT,
-                                  training_labels.shape, training_labels.ravel().astype(float))
-        container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
-                           topk_labels_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
-                           op_domain='ai.onnx.ml')
-        container.add_node('ReduceMean', topk_labels_name, operator.output_full_names,
-                            name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
+                                  shape, new_training_labels.ravel().astype(float))
+        container.add_node('ArrayFeatureExtractor', [training_labels_name, topk_indices_name], topk_labels_name,
+                            name=scope.get_unique_operator_name('ArrayFeatureExtractor'), op_domain='ai.onnx.ml')
+
+        if multi_reg:
+            means_name = scope.get_unique_variable_name('means')
+            container.add_node('ReduceMean', topk_labels_name, means_name,
+                               name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
+            apply_transpose(scope, means_name, operator.output_full_names, container, perm=perm)            
+        else:
+            container.add_node('ReduceMean', topk_labels_name, operator.output_full_names,
+                               name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
     elif operator.type == 'SklearnNearestNeighbors':
         container.add_node('Identity', topk_indices_name, operator.outputs[0].full_name,
                            name=scope.get_unique_operator_name('Identity'))

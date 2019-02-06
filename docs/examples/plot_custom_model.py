@@ -385,12 +385,17 @@ print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
 import onnxruntime as rt
 import numpy
 sess = rt.InferenceSession("predictable_tsne.onnx")
-try:
-    pred_onx = sess.run(None, {"input": X_test[:2].astype(numpy.float32)})
-    print("transform", pred_onx[1])
-except Exception as e:
-    # Still has to be fixed.
-    print(e)
+
+pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
+print("transform", pred_onx[0])
+
+##################################
+# The converter for the nearest neighbour does not
+# allow multiple predictions at a time. Let's call
+# *onnxruntime* for the second row.
+
+pred_onx = sess.run(None, {"input": X_test[1:2].astype(numpy.float32)})
+print("transform", pred_onx[0])
 
 ##################################
 # Display the ONNX graph

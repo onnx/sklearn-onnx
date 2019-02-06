@@ -141,8 +141,8 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     options.pop('SklCol', False)  # unused here but in dump_data_and_model
     if OneOff or OneOffArray:
         if verbose:
-            print("[compare_runtime] OneOff: type(inputs)={} len={}".format(
-                type(input), len(inputs)))
+            print("[compare_runtime] OneOff: type(inputs)={} len={} OneOffArray={}".format(
+                type(input), len(inputs), OneOffArray))
         if len(inputs) == 1 and not OneOffArray:
             name, values = list(inputs.items())[0]
             res = []
@@ -170,7 +170,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                     return numpy.array([vv], dtype=numpy.float32)
             t = list(inputs.items())[0]
             res = []
-            for i in range(0, len(t[1])):                
+            for i in range(0, len(t[1])):
                 iii = {k: to_array(v[i]) for k, v in inputs.items()}
                 try:
                     one = sess.run(None, iii)
@@ -187,6 +187,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
             output = _post_process_output(res)
+            
             if OneOffArray:
                 if not isinstance(output, numpy.ndarray):
                     raise TypeError("output must be an array")

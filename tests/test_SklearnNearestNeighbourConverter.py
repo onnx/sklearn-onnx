@@ -29,7 +29,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     def _fit_model(self, model, n_targets=1):
-        X, y = datasets.make_regression(n_features=4, random_state=0)
+        X, y = datasets.make_regression(n_features=4, random_state=0, n_targets=n_targets)
         model.fit(X, y)
         return model, X
 
@@ -40,11 +40,18 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
                              basename="KNeighborsRegressor-OneOffArray")
 
-    def test_model_knn_regressor2(self):
+    def test_model_knn_regressor2_1(self):
+        model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1), n_targets=2)
+        model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
+                            basename="KNeighborsRegressor2-OneOffArray")
+
+    def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2), n_targets=2)
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
+        dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
                             basename="KNeighborsRegressor2-OneOffArray")
 
     def test_model_knn_classifier_binary_class(self):

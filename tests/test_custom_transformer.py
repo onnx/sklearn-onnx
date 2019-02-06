@@ -160,7 +160,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
                                      [('input', FloatTensorType([1, Xd.shape[1]]))])
         
         dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
-                            basename="CustomTransformerTSNEkNN-OneOffArray", verbose=True)
+                            basename="CustomTransformerTSNEkNN-OneOffArray")
         
 
 if __name__ == "__main__":
