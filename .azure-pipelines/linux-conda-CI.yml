@@ -43,7 +43,7 @@ jobs:
       conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
       python -m pip install --upgrade pip      
-      if [ '$(python.version)' == '3.7' ]
+      if [ '$(python.version)' == '3.7' || '$(python.version)' == '3.5']
         then
           git clone https://github.com/onnx/onnx.git --recursive
           export ONNX_ML=1
