@@ -1,6 +1,8 @@
 import unittest
 import numpy
 import pandas
+from distutils.version import StrictVersion
+import onnx
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline, Pipeline
@@ -87,6 +89,7 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(data, PipeConcatenateInput(model), model_onnx,
                             basename="SklearnPipelineScalerMixed-OneOff")
     
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.3'), "'TypeProto' object has no attribute 'sequence_type'")
     def test_pipeline_column_transformer(self):
         
         iris = datasets.load_iris()
@@ -132,7 +135,7 @@ class TestSklearnPipeline(unittest.TestCase):
         
         dump_data_and_model(X_train, model, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipeliner",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
 
         if __name__ == "__main__":
             from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
@@ -143,6 +146,7 @@ class TestSklearnPipeline(unittest.TestCase):
             import os
             os.system('dot -O -G=300 -Tpng graph.dot')            
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.3'), "'TypeProto' object has no attribute 'sequence_type'")
     def test_pipeline_column_transformer_titanic(self):
         
         # fit
@@ -207,7 +211,7 @@ class TestSklearnPipeline(unittest.TestCase):
         X_test2 = X_test.drop(to_drop, axis=1)
         dump_data_and_model(X_test2[:5], clf, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipelinerTitanic-DF",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
         
 
 if __name__ == "__main__":
