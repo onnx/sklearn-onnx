@@ -15,7 +15,7 @@ jobs:
     matrix:
       Py37-Onnx141:
         python.version: '3.7'
-        onnx.version: '==1.4.1'
+        onnx.version: 'git'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
       Py36-Onnx130:
@@ -25,7 +25,7 @@ jobs:
         onnxrt.version: '==0.2.1'
       Py35-Onnx141:
         python.version: '3.5'
-        onnx.version: '==1.4.1'
+        onnx.version: 'git'
         onnxrt.version: '==0.2.1'
         numpy.version: '==1.16.1'
     maxParallel: 3
@@ -43,30 +43,34 @@ jobs:
       conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
       python -m pip install --upgrade pip      
-      if [ '$(python.version)' == '3.7' || '$(python.version)' == '3.5']
+    displayName: 'Install environment'
+
+  - script: |
+      pip install numpy$(numpy.version)
+    displayName: 'install numpy'
+
+  - script: |
+      if [ '$(onnx.version)' == 'git' ]
         then
           git clone https://github.com/onnx/onnx.git --recursive
           export ONNX_ML=1
           cd onnx
           python setup.py install
           cd ..
+        else
+          pip install onnx$(onnx.version)
       fi
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-      pip install pytest
-    displayName: 'Install dependencies'
-
-  - script: |
-      pip install numpy$(numpy.version)
-    displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
-
-  - script: |
-      pip install onnx$(onnx.version)
     displayName: 'install onnx'
 
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
+
+  - script: |
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+      pip install pytest
+    displayName: 'install requirements'
 
   - script: |
       pip install -e .
