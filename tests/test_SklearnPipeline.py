@@ -2,6 +2,7 @@ import unittest
 import numpy
 import pandas
 from distutils.version import StrictVersion
+import onnx
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline, Pipeline
@@ -14,7 +15,6 @@ from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
-import onnx
 
 
 class PipeConcatenateInput:
