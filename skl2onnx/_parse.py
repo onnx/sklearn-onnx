@@ -379,11 +379,6 @@ def _parse_sklearn(scope, model, inputs):
     else:
         outputs = _parse_sklearn_simple_model(scope, model, inputs)
         
-    # scikit-learn does not implements models without unknown output shapes.
-    for i, o in enumerate(outputs):
-        if isinstance(o.type, TensorType) and (o.type.shape is None or \
-                'None' in o.type.shape or None in o.type.shape):
-            raise RuntimeError("No output can have unkown shape.\nOutput {0}={1}\nModel={2}".format(i, o, model))
     return outputs
 
 
