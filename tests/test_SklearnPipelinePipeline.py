@@ -21,7 +21,7 @@ from test_utils import dump_data_and_model
 
 class TestSklearnPipeline(unittest.TestCase):
 
-    def _test_pipeline_pca_pipeline_0(self):
+    def test_pipeline_pca_pipeline_0(self):
         
         model = Pipeline(memory=None,
                     steps=[('PCA', PCA(copy=True, iterated_power='auto',
@@ -37,7 +37,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMax")
         
-    def _test_pipeline_pca_pipeline_none_lin(self):
+    def test_pipeline_pca_pipeline_none_lin(self):
         
         model = Pipeline(memory=None,
                     steps=[('PCA', PCA(copy=True, iterated_power='auto',
@@ -71,7 +71,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMaxNB2")
         
-    def _test_pipeline_pca_pipeline_none(self):
+    def test_pipeline_pca_pipeline_none(self):
         
         model = Pipeline(memory=None,
                     steps=[('PCA', PCA(copy=True, iterated_power='auto',
