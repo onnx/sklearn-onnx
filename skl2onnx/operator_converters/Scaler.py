@@ -21,18 +21,13 @@ def convert_sklearn_scaler(scope, operator, container):
     op_type = 'Scaler'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     if isinstance(op, StandardScaler):
-        attrs['scale'] = 1.0 / op.scale_
-        attrs['offset'] = op.mean_
+        C = operator.inputs[0].type.shape[1]
+        attrs['offset'] = op.mean_ if op.with_mean else [0.0] * C
+        attrs['scale'] = 1.0 / op.scale_ if op.with_std else [1.0] * C
     elif isinstance(op, RobustScaler):
         C = operator.inputs[0].type.shape[1]
-        if op.with_centering:
-            attrs['offset'] = op.center_
-        else:
-            attrs['offset'] = [0.] * C
-        if op.with_scaling:
-            attrs['scale'] = 1.0 / op.scale_
-        else:
-            attrs['scale'] = [1.] * C
+        attrs['offset'] = op.center_ if op.with_centering else [0.0] * C
+        attrs['scale'] = 1.0 / op.scale_ if op.with_scaling else [1.0] * C
     elif isinstance(op, MinMaxScaler):
         attrs['scale'] = op.scale_
         attrs['offset'] = -op.min_/(op.scale_ + 1e-8)  # Add 1e-8 to avoid divided by 0
