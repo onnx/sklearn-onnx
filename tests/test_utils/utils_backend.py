@@ -78,7 +78,7 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
             # onnxruntime is not available on Python 2.
             return            
         from .utils_backend_onnxruntime import compare_runtime
-        return compare_runtime(test, decimal, options, verbose)
+        return compare_runtime(test, decimal, options=options, verbose=verbose)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
 
@@ -164,7 +164,7 @@ def extract_options(name):
         res = {}
         for opt in opts[1:]:
             if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3",
-                       'Out0', 'Reshape', 'SklCol', 'DF'):
+                       'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
                 res[opt] = True
             else:
                 raise NameError("Unable to parse option '{}'".format(opts[1:]))

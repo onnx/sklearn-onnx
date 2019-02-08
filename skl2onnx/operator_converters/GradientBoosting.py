@@ -59,7 +59,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
-    attrs['base_values'] = [float(op.init_.mean)]
+    attrs['base_values'] = [float(op.init_.mean)] if op.loss == 'ls' else [float(op.init_.quantile)]
 
     tree_weight = op.learning_rate
     for i in range(op.n_estimators):

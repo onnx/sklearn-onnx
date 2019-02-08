@@ -5,6 +5,8 @@
 Metadata
 ========
 
+.. index:: metadata
+
 ONNX format contains metadata related to how the
 model was produced. It is useful when the model
 is deployed to production to keep track of which
@@ -41,3 +43,14 @@ print("domain={}".format(meta.domain, meta.domain))
 print("graph_name={}".format(meta.graph_name))
 print("producer_name={}".format(meta.producer_name))
 print("version={}".format(meta.version))
+
+#################################
+# **Versions used for this example**
+
+import numpy, sklearn
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)

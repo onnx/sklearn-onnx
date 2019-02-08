@@ -24,6 +24,7 @@ from . import LinearRegressor
 from . import NaiveBayes
 from . import Normalizer
 from . import OneHotEncoder
+from . import OneVsRestClassifier
 from . import PolynomialFeatures 
 from . import RandomForest
 from . import Scaler

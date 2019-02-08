@@ -35,6 +35,8 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     if context is None:
         context = {}
     load = load_data_and_model(test, **context)
+    if verbose:
+        print("[compare_runtime] test '{}' loaded".format(test['onnx']))
 
     onx = test['onnx']
     if options is None:
@@ -52,6 +54,9 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     except ImportError as e:
         warnings.warn("Unable to import onnxruntime.")
         return None
+
+    if verbose:
+        print("[compare_runtime] InferenceSession('{}')".format(onx))
 
     try:
         sess = onnxruntime.InferenceSession(onx)
@@ -132,9 +137,13 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 inputs[k] = numpy.array(inputs[k])
     
     OneOff = options.pop('OneOff', False)
+    OneOffArray = options.pop('OneOffArray', False)
     options.pop('SklCol', False)  # unused here but in dump_data_and_model
-    if OneOff:
-        if len(inputs) == 1:
+    if OneOff or OneOffArray:
+        if verbose:
+            print("[compare_runtime] OneOff: type(inputs)={} len={} OneOffArray={}".format(
+                type(input), len(inputs), OneOffArray))
+        if len(inputs) == 1 and not OneOffArray:
             name, values = list(inputs.items())[0]
             res = []
             for input in values:
@@ -142,11 +151,16 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
                         lambda_onnx = lambda: sess.run(None, {name: input})
+                    if verbose:
+                        import pprint
+                        pprint.pprint(one)
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
                     raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
+            if verbose:
+                print("[compare_runtime] OneOff: _post_process_output1")
             output = _post_process_output(res)
         else:
             def to_array(vv):
@@ -156,22 +170,43 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                     return numpy.array([vv], dtype=numpy.float32)
             t = list(inputs.items())[0]
             res = []
-            for i in range(0, len(t[1])):                
+            for i in range(0, len(t[1])):
                 iii = {k: to_array(v[i]) for k, v in inputs.items()}
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
                         lambda_onnx = lambda: sess.run(None, iii)
+                    if verbose:
+                        import pprint
+                        pprint.pprint(one)
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
                     raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
-            output = _post_process_output(res)   
+            if verbose:
+                print("[compare_runtime] OneOff: _post_process_output2")
+            output = _post_process_output(res)
+            
+            if OneOffArray:
+                if not isinstance(output, numpy.ndarray):
+                    raise TypeError("output must be an array")
+                output = [output]
     else:
+        if verbose:
+            print("[compare_runtime] type(inputs)={} len={} names={}".format(
+                type(input), len(inputs), list(sorted(inputs))))
+        if verbose:
+            run_options = onnxruntime.RunOptions()
+            run_options.run_log_verbosity_level = 5
+        else:
+            run_options = None
         try:
-            output = sess.run(None, inputs)
+            output = sess.run(None, inputs, run_options)
             lambda_onnx = lambda: sess.run(None, inputs)
+            if verbose:
+                import pprint
+                pprint.pprint(output)
         except ExpectedAssertionError as expe:
             raise expe
         except RuntimeError as e:
@@ -187,6 +222,8 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 raise OnnxRuntimeAssertionError("onnxruntime cannot compute the prediction for '{0}' due to {1}{2}".format(onx, e, smodel))
         except Exception as e:
             raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
+        if verbose:
+            print("[compare_runtime] done type={}".format(type(output)))
     
     output0 = output.copy()
 
@@ -329,7 +366,7 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
             tested += 1
         else:
             raise OnnxRuntimeAssertionError("Unexpected type for expected output ({1}) and onnx '{0}'".format(onnx, type(expected)))
-    if tested ==0:
+    if tested == 0:
         raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))        
     
 
