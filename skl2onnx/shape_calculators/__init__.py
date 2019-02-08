@@ -17,6 +17,7 @@ from . import LinearClassifier
 from . import LinearRegressor
 from . import NearestNeighbours
 from . import OneHotEncoder
+from . import PolynomialFeatures 
 from . import Scaler
 from . import SVM
 from . import SVD
