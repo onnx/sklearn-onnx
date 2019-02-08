@@ -172,7 +172,8 @@ def _get_sklearn_operator_name(model_type):
     :return: A string which stands for the type of the input model in our conversion framework
     '''
     if model_type not in sklearn_operator_name_map:
-        raise ValueError("No proper operator name found for '%s'" % model_type)
+        # "No proper operator name found, it means a local operator.
+        return None
     return sklearn_operator_name_map[model_type]
 
 
@@ -181,11 +182,13 @@ def _parse_sklearn_simple_model(scope, model, inputs):
     This function handles all non-pipeline models.
 
     :param scope: Scope object
-    :param model: A scikit-learn object (e.g., OneHotEncoder and LogisticRegression)
+    :param model: A scikit-learn object (e.g., *OneHotEncoder* or *LogisticRegression*)
     :param inputs: A list of variables
     :return: A list of output variables which will be passed to next stage
     '''
-    this_operator = scope.declare_local_operator(_get_sklearn_operator_name(type(model)), model)
+    # alias can be None
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
 
     if type(model) in sklearn_classifier_list or isinstance(model, ClassifierMixin):
@@ -215,13 +218,20 @@ def _parse_sklearn_simple_model(scope, model, inputs):
         this_operator.outputs.append(variable)
         
     # We call the shape calculator.
-    name = sklearn_operator_name_map[type(model)]
-    shape_calc = get_shape_calculator(name)
+    shape_calc = scope.get_shape_calculator(type(model))
+    if shape_calc is None:
+        # Falls back into registered model.
+        try:
+            name = sklearn_operator_name_map[type(model)]
+        except KeyError:
+            raise RuntimeError("No proper shape calculator found for '{}'.".format(type(model)))
+        shape_calc = get_shape_calculator(name)
+
     try:
         shape_calc(this_operator)
     except RuntimeError as e:
         inps = "\n".join(str(v) for v in inputs)
-        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(type(model), e, inps, shape_calc))
+        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(type(model), e, inps, shape_calc)) from e
     return this_operator.outputs
 
 
@@ -237,7 +247,7 @@ def _parse_sklearn_pipeline(scope, model, inputs):
     :return: A list of output variables produced by the input pipeline
     '''
     for step in model.steps:
-        inputs = _parse_sklearn(scope, step[1], inputs)
+        inputs = parse_sklearn(scope, step[1], inputs)
     return inputs
 
 
@@ -337,16 +347,15 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
         return transformed_result_names
 
 
-def _parse_sklearn(scope, model, inputs):
+def parse_sklearn(scope, model, inputs):
     '''
-    This is a delegate function. It doesn't nothing but invoke the correct parsing function according to the input
-    model's type.
+    This is a delegate function. It doesn't nothing but invoke the correct
+    parsing function according to the input model's type.
+
     :param scope: Scope object
     :param model: A scikit-learn object (e.g., OneHotEncoder and LogisticRegression)
     :param inputs: A list of variables
     :return: The output variables produced by the input model
-    
-    TODO: Output should be created in each shape calculator.
     '''
     if isinstance(model, pipeline.Pipeline):
         outputs = _parse_sklearn_pipeline(scope, model, inputs)
@@ -382,35 +391,54 @@ def _parse_sklearn(scope, model, inputs):
     return outputs
 
 
-def parse_sklearn(model, initial_types=None, target_opset=None,
-                  custom_conversion_functions=None, custom_shape_calculators=None):
-    # Put scikit-learn object into an abstract container so that our framework can work seamlessly on models created
-    # with different machine learning tools.
+def parse_sklearn_model(model, initial_types=None, target_opset=None,
+                        custom_conversion_functions=None,
+                        custom_shape_calculators=None):
+    """
+    Put scikit-learn object into an abstract container so that
+    our framework can work seamlessly on models created
+    with different machine learning tools.
     raw_model_container = SklearnModelContainer(model)
 
-    # Declare a computational graph. It will become a representation of the input scikit-learn model after parsing.
+    :param model: A scikit-learn model
+    :param initial_types: a python list. Each element is a tuple of a variable name 
+        and a type defined in data_types.py
+    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
+    :param custom_conversion_functions: a dictionary for specifying the user customized conversion function
+        if not registered
+    :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
+        if not registered
+    :return: :class:`Topology <skl2onnx.common._topology.Topology>`
+    """
+    raw_model_container = SklearnModelContainer(model)
+
+    # Declare a computational graph. It will become a representation of
+    # the input scikit-learn model after parsing.
     topology = Topology(raw_model_container,
                         initial_types=initial_types,
                         target_opset=target_opset,
                         custom_conversion_functions=custom_conversion_functions,
                         custom_shape_calculators=custom_shape_calculators)
 
-    # Declare an object to provide variables' and operators' naming mechanism. In contrast to CoreML, one global scope
+    # Declare an object to provide variables' and operators' naming mechanism.
+    # In contrast to CoreML, one global scope
     # is enough for parsing scikit-learn models.
     scope = topology.declare_scope('__root__')
 
-    # Declare input variables. They should be the inputs of the scikit-learn model you want to convert into ONNX
+    # Declare input variables. They should be the inputs of the scikit-learn
+    # model you want to convert into ONNX.
     inputs = []
     for var_name, initial_type in initial_types:
         inputs.append(scope.declare_local_variable(var_name, initial_type))
 
-    # The object raw_model_container is a part of the topology we're going to return. We use it to store the inputs of
+    # The object raw_model_container is a part of the topology
+    # we're going to return. We use it to store the inputs of
     # the scikit-learn's computational graph.
     for variable in inputs:
         raw_model_container.add_input(variable)
 
     # Parse the input scikit-learn model as a Topology object.
-    outputs = _parse_sklearn(scope, model, inputs)
+    outputs = parse_sklearn(scope, model, inputs)
 
     # THe object raw_model_container is a part of the topology we're going to return. We use it to store the outputs of
     # the scikit-learn's computational graph.

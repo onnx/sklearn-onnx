@@ -7,7 +7,7 @@
 from uuid import uuid4
 from .proto import get_opset_number_from_onnx
 from .common._topology import convert_topology
-from ._parse import parse_sklearn
+from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
 from . import shape_calculators
@@ -34,11 +34,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
     :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
-    :param targeted_onnx: A string (for example, '1.1.2' and '1.2') used to specify 
-        the targeted ONNX version of the produced model. If ONNXMLTools cannot find 
-        a compatible ONNX python package, an error may be thrown.
-    :param custom_conversion_functions: a dictionary for specifying the user customized conversion function
+    :param custom_conversion_functions: a dictionary for specifying the user customized conversion function,
+        it takes precedence over registered converters
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
+        it takes precedence over registered shape calculators.
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of initial_types:
@@ -70,7 +69,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     target_opset = target_opset if target_opset else get_opset_number_from_onnx()
     # Parse scikit-learn model as our internal data structure (i.e., Topology)
-    topology = parse_sklearn(model, initial_types, target_opset, custom_conversion_functions, custom_shape_calculators)
+    topology = parse_sklearn_model(model, initial_types, target_opset,
+                                   custom_conversion_functions, custom_shape_calculators)
 
     # Infer variable shapes
     topology.compile()

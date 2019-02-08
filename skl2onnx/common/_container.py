@@ -179,12 +179,15 @@ class ModelComponentContainer(ModelContainer):
             tb = traceback.extract_stack()
             operation = []
             fct = _apply_operation_specific[op_type]
+            skl2 = False
             for b in tb:
                 if "_apply_operation" in b.filename and b.name == fct.__name__:
                     operation.append(b)
-            if len(operation) == 0:
-                raise RuntimeError("Operator '{0}' should be added with function '{1}' in submodule _apply_operation.".format(
-                    op_type, fct.__name__))                
+                    if not skl2 and "skl2onnx" in b.filename:
+                        skl2 = True
+            if skl2 and len(operation) == 0:
+                raise RuntimeError("Operator '{0}' should be added with function '{1}' in submodule _apply_operation.\n{2}".format(
+                    op_type, fct.__name__, "\n".join(files)))                
 
     def add_node(self, op_type, inputs, outputs, op_domain='', op_version=1, **attrs):
         '''
