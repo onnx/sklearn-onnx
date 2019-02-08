@@ -27,7 +27,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = numpy.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=numpy.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMax")
         
@@ -44,7 +44,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = numpy.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=numpy.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMaxLogReg")
         
@@ -64,7 +64,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = numpy.array([[0, 0, 0], [0, 0, 0.1], [1, 1, 1.1], [1, 1.1, 1]], dtype=numpy.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMaxNB2")
         
@@ -84,7 +84,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = numpy.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=numpy.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline', [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelinePcaPipelineMinMaxNBNone")
         
