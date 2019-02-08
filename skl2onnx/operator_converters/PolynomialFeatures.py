@@ -7,10 +7,7 @@
 import numpy as np
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_concat, apply_cast
-from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
-from itertools import chain, combinations
-from itertools import combinations_with_replacement as combinations_w_r
 
 
 def convert_sklearn_polynomial_features(scope, operator, container):
