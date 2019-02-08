@@ -327,7 +327,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             transform_inputs = [concnames]
             calculate_sklearn_concat(concop)
         
-        var_out = _parse_sklearn(scope, model.named_transformers_[name], transform_inputs)[0]
+        var_out = parse_sklearn(scope, model.named_transformers_[name], transform_inputs)[0]
         transformed_result_names.append(var_out)
 
     # Create a Concat ONNX node
