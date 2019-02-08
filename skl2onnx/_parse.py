@@ -349,7 +349,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
 
 def parse_sklearn(scope, model, inputs):
     '''
-    This is a delegate function. It doesn't nothing but invoke the correct
+    This is a delegate function. It does nothing but invokes the correct
     parsing function according to the input model's type.
 
     :param scope: Scope object

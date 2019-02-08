@@ -49,9 +49,13 @@ pipe.fit(X, y)
 # +++++++++++++++++++++++++++++++++++++++++
 #
 # The converter is implemented in *onnxmltools*:
-# `onnxmltools...LightGbm.py <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py>`_.
+# `onnxmltools...LightGbm.py
+# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# lightgbm/operator_converters/LightGbm.py>`_.
 # and the shape calculator:
-# `onnxmltools...Classifier.py <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/shape_calculators/Classifier.py>`_.
+# `onnxmltools...Classifier.py
+# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# lightgbm/shape_calculators/Classifier.py>`_.
 # The current implementation has duplicated code which we replace
 # by the implementation from *skl2onnx*.
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
@@ -71,7 +75,7 @@ from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_
 # Let's register the new converter.
 from skl2onnx import update_registered_converter
 update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
-                            calculate_linear_classifier_output_shapes, #lightgbm_classifier_shape_extractor,
+                            calculate_linear_classifier_output_shapes,
                             convert_lightgbm)
 
 ##################################
