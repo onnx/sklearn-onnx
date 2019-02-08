@@ -19,6 +19,10 @@ from .interface import OperatorBase
 
 
 class Variable:
+    """
+    Defines a variable which holds any data defined
+    from *ONNX* types.
+    """
 
     def __init__(self, raw_name, onnx_name, scope, type=None):
         '''
@@ -55,6 +59,9 @@ class Variable:
             self.raw_name, self.onnx_name, self.type)
 
 class Operator(OperatorBase):
+    """
+    Defines an operator available in *ONNX*.
+    """
 
     def __init__(self, onnx_name, scope, type, raw_operator, target_opset):
         '''
@@ -113,6 +120,11 @@ class Operator(OperatorBase):
 
 
 class Scope:
+    """
+    Every node of an *ONNX* graph must be unique. This class holds the list
+    of existing name for every node already defined in graph. It also
+    provides functions to create a unique unused name.
+    """
 
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None, custom_shape_calculators=None):
@@ -155,7 +167,8 @@ class Scope:
 
     def get_onnx_variable_name(self, seed):
         '''
-        Retrieve the variable ID of the given seed or create one if it is the first time of seeing this seed
+        Retrieves the variable ID of the given seed or create one
+        if it is the first time of seeing this seed.
         '''
         if seed in self.variable_name_mapping:
             return self.variable_name_mapping[seed][-1]
@@ -164,19 +177,19 @@ class Scope:
 
     def get_unique_variable_name(self, seed):
         '''
-        Create a unique variable ID based on the given seed
+        Creates a unique variable ID based on the given seed.
         '''
         return Topology._generate_unique_name(seed, self.onnx_variable_names)
 
     def get_unique_operator_name(self, seed):
         '''
-        Create a unique operator ID based on the given seed
+        Creates a unique operator ID based on the given seed.
         '''
         return Topology._generate_unique_name(seed, self.onnx_operator_names)
 
     def find_sink_variables(self):
         '''
-        Find sink variables in this scope
+        Finds sink variables in this scope.
         '''
         # First we assume all variables are sinks
         is_sink = {name: True for name in self.variables.keys()}
@@ -188,8 +201,9 @@ class Scope:
 
     def declare_local_variable(self, raw_name, type=None, prepend=False):
         '''
-        This function may create a new variable in this scope. If raw_name has been used to create other variables,
-        the new variable will hide all other variables created using raw_name.
+        This function may create a new variable in this scope.
+        If *raw_name* has been used to create other variables,
+        the new variable will hide all other variables created using *raw_name*.
         '''
         # Get unique ID for the new variable
         onnx_name = self.get_unique_variable_name(raw_name)
@@ -210,8 +224,9 @@ class Scope:
 
     def get_local_variable_or_declare_one(self, raw_name, type=None):
         '''
-        This function will first check if raw_name has been used to create some variables. If yes, the latest one
-        named in self.variable_name_mapping[raw_name] will be returned. Otherwise, a new variable will be created and
+        This function first checks if *raw_name* has been used to create some variables.
+        If yes, the latest one named in ``self.variable_name_mapping[raw_name]``
+        will be returned. Otherwise, a new variable will be created and
         then returned.
         '''
         onnx_name = self.get_onnx_variable_name(raw_name)
@@ -237,7 +252,7 @@ class Scope:
 
     def delete_local_operator(self, onnx_name):
         '''
-        Remove the operator whose onnx_name is the input onnx_name
+        Removes the operator whose onnx_name is the input *onnx_name*.
         '''
         if onnx_name not in self.onnx_operator_names or onnx_name not in self.operators:
             raise RuntimeError('The operator to be removed not found')
@@ -246,7 +261,7 @@ class Scope:
 
     def delete_local_variable(self, onnx_name):
         '''
-        Remove the variable whose onnx_name is the input onnx_name
+        Removes the variable whose *onnx_name* is the input *onnx_name*.
         '''
         if onnx_name not in self.onnx_variable_names or onnx_name not in self.variables:
             raise RuntimeError('The variable to be removed not found')
@@ -257,6 +272,14 @@ class Scope:
 
 
 class Topology:
+    """
+    Holds instances on :class:`Scope <skl2onnx.common._topology.Scope>` and
+    :class:`SklearnModelContainer <skl2onnx.common._container.SklearnModelContainer>`.
+    These are filled by the converters while a pipeline is being converted.
+    When all converters were called, method
+    :meth:`Topology.compile <skl2onnx.common._topology.Topology.compile>`
+    must be called to convert the topological graph into *ONNX* graph.
+    """
 
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None, target_opset=None,
@@ -338,7 +361,10 @@ class Topology:
         return Topology._generate_unique_name(seed, self.scope_names)
 
     def declare_scope(self, seed, parent_scopes=None):
-        
+        """
+        Creates a new :class:`Scope <skl2onnx.common._topology.Scope>` and
+        appends it to the list of existing scopes.
+        """
         scope = Scope(self.get_unique_scope_name(seed), parent_scopes,
                       self.variable_name_set, self.operator_name_set, self.target_opset,
                       custom_shape_calculators=self.custom_shape_calculators)
@@ -357,7 +383,7 @@ class Topology:
 
     def find_root_and_sink_variables(self):
         '''
-        Find root variables of the whole graph
+        Finds root variables of the whole graph.
         '''
         # First we assume all variables are roots
         is_root = {name: True for scope in self.scopes for name in scope.variables.keys()}
@@ -404,14 +430,16 @@ class Topology:
 
     def rename_variable(self, old_name, new_name):
         '''
-        Replace the old ONNX variable name with a new ONNX variable name. There are several fields we need to edit.
-            a. Topology
-                1. scopes (the scope where the specified ONNX variable was declared)
-                2. variable_name_set
-            b. Scope
-                1. onnx_variable_names (a mirror of Topology's variable_name_set)
-                2. variable_name_mapping
-                3. variables
+        Replaces the old ONNX variable name with a new ONNX variable name.
+        There are several fields we need to edit.
+
+        a. Topology
+            1. scopes (the scope where the specified ONNX variable was declared)
+            2. variable_name_set
+        b. Scope
+            1. onnx_variable_names (a mirror of Topology's variable_name_set)
+            2. variable_name_mapping
+            3. variables
 
         :param old_name: a string
         :param new_name: a string

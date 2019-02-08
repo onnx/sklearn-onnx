@@ -6,7 +6,7 @@
 import warnings
 import numpy as np
 
-from .common._container import SklearnModelContainer
+from .common._container import SklearnModelContainerNode
 from .common._topology import Topology, Variable, Operator, Scope, convert_topology
 from .common._registration import register_converter, register_shape_calculator, get_shape_calculator
 from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
@@ -395,10 +395,9 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None):
     """
-    Put scikit-learn object into an abstract container so that
+    Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
     with different machine learning tools.
-    raw_model_container = SklearnModelContainer(model)
 
     :param model: A scikit-learn model
     :param initial_types: a python list. Each element is a tuple of a variable name 
@@ -410,7 +409,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         if not registered
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainer(model)
+    raw_model_container = SklearnModelContainerNode(model)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.
