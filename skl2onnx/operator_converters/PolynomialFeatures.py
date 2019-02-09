@@ -24,7 +24,7 @@ def convert_sklearn_polynomial_features(scope, operator, container):
             array = np.ones((operator.inputs[0].type.shape[0], 1)) 
 
             container.add_initializer(unit_name, onnx_proto.TensorProto.FLOAT,
-                                      array.shape, array)
+                                      array.shape, array.flatten())
 
             transformed_columns[i] = unit_name 
         else:
