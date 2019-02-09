@@ -18,6 +18,8 @@ Converters
 
 .. autofunction:: skl2onnx.update_registered_converter
 
+.. autofunction:: skl2onnx.update_registered_parser
+
 Parsers
 =======
 

@@ -16,7 +16,8 @@ from . import operator_converters
 
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
-                    custom_shape_calculators=None):
+                    custom_shape_calculators=None,
+                    custom_parsers=None):
     '''
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -38,6 +39,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         it takes precedence over registered converters
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
         it takes precedence over registered shape calculators.
+    :param custom_parsers: parsers determines which outputs is expected for which particular task,
+        default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of initial_types:
@@ -70,7 +74,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     target_opset = target_opset if target_opset else get_opset_number_from_onnx()
     # Parse scikit-learn model as our internal data structure (i.e., Topology)
     topology = parse_sklearn_model(model, initial_types, target_opset,
-                                   custom_conversion_functions, custom_shape_calculators)
+                                   custom_conversion_functions, custom_shape_calculators,
+                                   custom_parsers)
 
     # Infer variable shapes
     topology.compile()

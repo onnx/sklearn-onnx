@@ -128,7 +128,14 @@ def build_sklearn_operator_name_map():
     return res
 
 
-sklearn_operator_name_map = build_sklearn_operator_name_map()
+def build_sklearn_parsers_map():
+    map_parser = {pipeline.Pipeline: _parse_sklearn_pipeline,
+                  pipeline.FeatureUnion: _parse_sklearn_feature_union,
+                  ColumnTransformer: _parse_sklearn_column_transformer}
+    for tmodel in sklearn_classifier_list:
+        if tmodel not in [LinearSVC, SVC, NuSVC]:
+            map_parser[tmodel] = _parse_sklearn_classifier
+    return map_parser
 
 
 def update_registered_converter(model, alias, shape_fct, convert_fct, overwrite=True):
@@ -164,6 +171,18 @@ def update_registered_converter(model, alias, shape_fct, convert_fct, overwrite=
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
 
 
+def update_registered_parser(model, parser_fct):
+    """
+    Registers or updates a parser for a new model.
+    A parser returns the expected output of a model.
+    
+    :param model: model class
+    :param parser_fct: parser, signature is the same as
+        :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`
+    """
+    sklearn_parsers_map[model] = parser_fct
+
+
 def _get_sklearn_operator_name(model_type):
     '''
     Get operator name of the input argument
@@ -177,7 +196,25 @@ def _get_sklearn_operator_name(model_type):
     return sklearn_operator_name_map[model_type]
 
 
-def _parse_sklearn_simple_model(scope, model, inputs):
+def _fetch_input_slice(scope, inputs, column_indices):
+    if not isinstance(inputs, list):
+        raise TypeError("inputs must be a list of 1 input.")
+    if len(inputs) == 0:
+        raise RuntimeError("Operator ArrayFeatureExtractor requires at least one inputs.")
+    if len(inputs) != 1:
+        raise RuntimeError("Operator ArrayFeatureExtractor does not support multiple input tensors.")
+    if isinstance(inputs[0].type, TensorType) and inputs[0].type.shape[1] == len(column_indices):
+        # No need to extract.
+        return inputs
+    array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
+    array_feature_extractor_operator.inputs = inputs
+    array_feature_extractor_operator.column_indices = column_indices
+    output_variable_name = scope.declare_local_variable('extracted_feature_columns', inputs[0].type)
+    array_feature_extractor_operator.outputs.append(output_variable_name)
+    return array_feature_extractor_operator.outputs
+
+
+def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     '''
     This function handles all non-pipeline models.
 
@@ -235,7 +272,7 @@ def _parse_sklearn_simple_model(scope, model, inputs):
     return this_operator.outputs
 
 
-def _parse_sklearn_pipeline(scope, model, inputs):
+def _parse_sklearn_pipeline(scope, model, inputs, custom_parsers=None):
     '''
     The basic ideas of scikit-learn parsing:
         1. Sequentially go though all stages defined in the considered scikit-learn pipeline
@@ -247,11 +284,11 @@ def _parse_sklearn_pipeline(scope, model, inputs):
     :return: A list of output variables produced by the input pipeline
     '''
     for step in model.steps:
-        inputs = parse_sklearn(scope, step[1], inputs)
+        inputs = parse_sklearn(scope, step[1], inputs, custom_parsers=custom_parsers)
     return inputs
 
 
-def _parse_sklearn_feature_union(scope, model, inputs):
+def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
     '''
     :param scope: Scope object
     :param model: A scikit-learn FeatureUnion object
@@ -262,7 +299,7 @@ def _parse_sklearn_feature_union(scope, model, inputs):
     transformed_result_names = []
     # Encode each transform as our IR object
     for name, transform in model.transformer_list:
-        transformed_result_names.append(_parse_sklearn_simple_model(scope, transform, inputs)[0])
+        transformed_result_names.append(_parse_sklearn_simple_model(scope, transform, inputs, custom_parsers=custom_parsers)[0])
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
@@ -275,25 +312,7 @@ def _parse_sklearn_feature_union(scope, model, inputs):
     return concat_operator.outputs
 
 
-def _fetch_input_slice(scope, inputs, column_indices):
-    if not isinstance(inputs, list):
-        raise TypeError("inputs must be a list of 1 input.")
-    if len(inputs) == 0:
-        raise RuntimeError("Operator ArrayFeatureExtractor requires at least one inputs.")
-    if len(inputs) != 1:
-        raise RuntimeError("Operator ArrayFeatureExtractor does not support multiple input tensors.")
-    if isinstance(inputs[0].type, TensorType) and inputs[0].type.shape[1] == len(column_indices):
-        # No need to extract.
-        return inputs
-    array_feature_extractor_operator = scope.declare_local_operator('SklearnArrayFeatureExtractor')
-    array_feature_extractor_operator.inputs = inputs
-    array_feature_extractor_operator.column_indices = column_indices
-    output_variable_name = scope.declare_local_variable('extracted_feature_columns', inputs[0].type)
-    array_feature_extractor_operator.outputs.append(output_variable_name)
-    return array_feature_extractor_operator.outputs
-
-
-def _parse_sklearn_column_transformer(scope, model, inputs):
+def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None):
     '''
     :param scope: Scope object
     :param model: A scikit-learn ColumnTransformer object
@@ -327,7 +346,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
             transform_inputs = [concnames]
             calculate_sklearn_concat(concop)
         
-        var_out = parse_sklearn(scope, model.named_transformers_[name], transform_inputs)[0]
+        var_out = parse_sklearn(scope, model.named_transformers_[name], transform_inputs,
+                                custom_parsers=custom_parsers)[0]
         transformed_result_names.append(var_out)
 
     # Create a Concat ONNX node
@@ -347,7 +367,32 @@ def _parse_sklearn_column_transformer(scope, model, inputs):
         return transformed_result_names
 
 
-def parse_sklearn(scope, model, inputs):
+def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):    
+    probability_tensor = _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=custom_parsers)
+    this_operator = scope.declare_local_operator('SklearnZipMap')
+    this_operator.inputs = probability_tensor
+    classes = model.classes_
+    label_type = Int64Type()
+
+    if np.issubdtype(model.classes_.dtype, np.floating):
+        classes = np.array(list(map(lambda x: int(x), classes)))
+        this_operator.classlabels_int64s = classes
+    elif np.issubdtype(model.classes_.dtype, np.signedinteger):
+        this_operator.classlabels_int64s = classes
+    else:
+        classes = np.array([s.encode('utf-8') for s in classes])
+        this_operator.classlabels_strings = classes
+        label_type = StringType()
+
+    output_label = scope.declare_local_variable('output_label', label_type)
+    output_probability = scope.declare_local_variable('output_probability',
+                         SequenceType(DictionaryType(label_type, FloatTensorType())))
+    this_operator.outputs.append(output_label)
+    this_operator.outputs.append(output_probability)
+    return this_operator.outputs
+
+
+def parse_sklearn(scope, model, inputs, custom_parsers=None):
     '''
     This is a delegate function. It does nothing but invokes the correct
     parsing function according to the input model's type.
@@ -355,45 +400,25 @@ def parse_sklearn(scope, model, inputs):
     :param scope: Scope object
     :param model: A scikit-learn object (e.g., OneHotEncoder and LogisticRegression)
     :param inputs: A list of variables
+    :param custom_parsers: parsers determines which outputs is expected for which particular task,
+        default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :return: The output variables produced by the input model
     '''
-    if isinstance(model, pipeline.Pipeline):
-        outputs = _parse_sklearn_pipeline(scope, model, inputs)
-    elif isinstance(model, pipeline.FeatureUnion):
-        outputs = _parse_sklearn_feature_union(scope, model, inputs)
-    elif isinstance(model, ColumnTransformer):
-        outputs = _parse_sklearn_column_transformer(scope, model, inputs)
-    elif type(model) in sklearn_classifier_list and type(model) not in [LinearSVC, SVC, NuSVC]:
-        probability_tensor = _parse_sklearn_simple_model(scope, model, inputs)
-        this_operator = scope.declare_local_operator('SklearnZipMap')
-        this_operator.inputs = probability_tensor
-        classes = model.classes_
-        label_type = Int64Type()
-
-        if np.issubdtype(model.classes_.dtype, np.floating):
-            classes = np.array(list(map(lambda x: int(x), classes)))
-            this_operator.classlabels_int64s = classes
-        elif np.issubdtype(model.classes_.dtype, np.signedinteger):
-            this_operator.classlabels_int64s = classes
-        else:
-            classes = np.array([s.encode('utf-8') for s in classes])
-            this_operator.classlabels_strings = classes
-            label_type = StringType()
-        output_label = scope.declare_local_variable('output_label', label_type)
-        output_probability = scope.declare_local_variable('output_probability',
-                             SequenceType(DictionaryType(label_type, FloatTensorType())))
-        this_operator.outputs.append(output_label)
-        this_operator.outputs.append(output_probability)
-        outputs = this_operator.outputs
+    tmodel = type(model)
+    if custom_parsers is not None and tmodel in custom_parsers:
+        outputs = custom_parsers[tmodel](scope, model, inputs, custom_parsers=custom_parsers)        
+    elif tmodel in sklearn_parsers_map:
+        outputs = sklearn_parsers_map[tmodel](scope, model, inputs, custom_parsers=custom_parsers)
     else:
-        outputs = _parse_sklearn_simple_model(scope, model, inputs)
-        
+        outputs = _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=custom_parsers)
     return outputs
 
 
 def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
-                        custom_shape_calculators=None):
+                        custom_shape_calculators=None,
+                        custom_parsers=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -407,6 +432,9 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         if not registered
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
         if not registered
+    :param custom_parsers: parsers determines which outputs is expected for which particular task,
+        default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
     raw_model_container = SklearnModelContainerNode(model)
@@ -437,7 +465,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         raw_model_container.add_input(variable)
 
     # Parse the input scikit-learn model as a Topology object.
-    outputs = parse_sklearn(scope, model, inputs)
+    outputs = parse_sklearn(scope, model, inputs, custom_parsers=custom_parsers)
 
     # THe object raw_model_container is a part of the topology we're going to return. We use it to store the outputs of
     # the scikit-learn's computational graph.
@@ -445,3 +473,10 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         raw_model_container.add_output(variable)
 
     return topology
+
+
+# registered converters
+sklearn_operator_name_map = build_sklearn_operator_name_map()
+
+# registered parsers
+sklearn_parsers_map = build_sklearn_parsers_map()

@@ -22,7 +22,7 @@ from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
 from skl2onnx.operator_converters.LinearClassifier import convert_sklearn_linear_classifier
 from skl2onnx.common._registration import get_shape_calculator
-from skl2onnx._parse import _get_sklearn_operator_name
+from skl2onnx._parse import _get_sklearn_operator_name, _parse_sklearn_simple_model, update_registered_parser
 
 from test_utils import dump_data_and_model
 
@@ -162,6 +162,26 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
                             basename="CustomTransformerTSNEkNN-OneOffArray")
         
+        trace_line = []
+                                     
+        def my_parser(scope, model, inputs, custom_parsers=None):
+            trace_line.append(model)
+            return _parse_sklearn_simple_model(scope, model, inputs, custom_parsers)
+        
+        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+                                     [('input', FloatTensorType([1, Xd.shape[1]]))],
+                                     custom_parsers={PredictableTSNE: my_parser})
+        assert len(trace_line) == 1
+        
+        dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
+                            basename="CustomTransformerTSNEkNNCustomParser-OneOffArray")
+        
+        update_registered_parser(PredictableTSNE, my_parser)
+        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+                                     [('input', FloatTensorType([1, Xd.shape[1]]))])
+
+        assert len(trace_line) == 2
+
 
 if __name__ == "__main__":
     unittest.main()
