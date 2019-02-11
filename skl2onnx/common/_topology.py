@@ -118,7 +118,8 @@ class Operator(OperatorBase):
         try:
             shape_calc = _registration.get_shape_calculator(self.type)
         except ValueError:
-            raise ValueError("Unable to find a shape calculator for alias '{}' and type '{}'.".format(self.type, type(self.raw_operator)))
+            raise ValueError("Unable to find a shape calculator for alias '{}' and type '{}'.".format(
+                self.type, type(self.raw_operator)))
         shape_calc(self)
 
 
@@ -790,7 +791,8 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
             try:
                 conv = _registration.get_converter(operator.type)
             except ValueError:
-                raise ValueError("Unable to find converter for alias '{}' type '{}'.".format(operator.type, type(operator.raw_model)))
+                raise ValueError("Unable to find converter for alias '{}' type '{}'.".format(
+                    operator.type, type(operator.raw_model)))
         conv(scope, operator, container)
 
     # When calling ModelComponentContainer's add_initializer(...), nothing is added into the input list. However, in
