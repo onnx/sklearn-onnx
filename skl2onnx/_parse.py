@@ -6,194 +6,18 @@
 import warnings
 import numpy as np
 
+from sklearn import pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.base import ClassifierMixin, RegressorMixin, ClusterMixin
+from sklearn.svm import LinearSVC, SVC, NuSVC
+from sklearn.neighbors import NearestNeighbors
+
 from .common._container import SklearnModelContainerNode
-from .common._topology import Topology, Variable, Operator, Scope, convert_topology
-from .common._registration import register_converter, register_shape_calculator, get_shape_calculator
+from .common._topology import Topology, Scope, convert_topology
 from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
 from .common.data_types import FloatTensorType, Int64TensorType, SequenceType, DictionaryType
 from .common.utils import get_column_indices
-from .shape_calculators.Concat import calculate_sklearn_concat
-
-# Pipeline
-from sklearn import pipeline
-from sklearn.base import ClassifierMixin, RegressorMixin, ClusterMixin
-
-# Calibrated classifier CV
-from sklearn.calibration import CalibratedClassifierCV
-
-# Column Transformer
-from sklearn.compose import ColumnTransformer
-
-# Linear classifiers
-from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import SGDClassifier
-from sklearn.svm import LinearSVC
-
-# Linear regressors
-from sklearn.linear_model import ElasticNet
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import LassoLars
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
-from sklearn.linear_model import SGDRegressor
-from sklearn.svm import LinearSVR
-
-# Multi-class
-from sklearn.multiclass import OneVsRestClassifier
-
-# Tree-based models
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
-
-# Support vector machines
-from sklearn.svm import SVC, SVR, NuSVC, NuSVR
-
-# K-nearest neighbors
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neighbors import NearestNeighbors
-
-# Naive Bayes
-from sklearn.naive_bayes import BernoulliNB
-from sklearn.naive_bayes import MultinomialNB
-
-# Clustering
-from sklearn.cluster import KMeans, MiniBatchKMeans
-
-# Operators for preprocessing and feature engineering
-from sklearn.decomposition import PCA 
-from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.preprocessing import Binarizer
-from sklearn.preprocessing import Imputer
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import RobustScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import FunctionTransformer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
-from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel
-from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold
-from sklearn.impute import SimpleImputer
-
-# In most cases, scikit-learn operator produces only one output. However, each classifier has basically two outputs;
-# one is the predicted label and the other one is the probabilities of all possible labels. Here is a list of supported
-# scikit-learn classifiers. In the parsing stage, we produce two outputs for objects included in the following list and
-# one output for everything not in the list.
-sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
-                           GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
-                           ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
-                           CalibratedClassifierCV, OneVsRestClassifier]
-
-# Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
-cluster_list = [KMeans, MiniBatchKMeans]
-
-# Associate scikit-learn types with our operator names. If two scikit-learn models share a single name, it means their
-# are equivalent in terms of conversion.
-
-def build_sklearn_operator_name_map():
-    res = {k: "Sklearn" + k.__name__ for k in [
-                    RobustScaler, LinearSVC, OneHotEncoder, DictVectorizer, Imputer, SimpleImputer,
-                    LabelBinarizer, LabelEncoder, SVC, SVR, LinearSVR, LinearRegression, Lasso,
-                    LassoLars, Ridge, Normalizer, DecisionTreeClassifier, DecisionTreeRegressor,
-                    RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier,
-                    ExtraTreesRegressor, GradientBoostingClassifier, GradientBoostingRegressor,
-                    CalibratedClassifierCV, KNeighborsClassifier, KNeighborsRegressor,
-                    NearestNeighbors, MultinomialNB, BernoulliNB, KMeans, MiniBatchKMeans,
-                    Binarizer, PCA, TruncatedSVD, MinMaxScaler, MaxAbsScaler,
-                    CountVectorizer, TfidfVectorizer, TfidfTransformer,
-                    GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
-                    SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
-                    OneVsRestClassifier, FunctionTransformer]}
-    res.update({
-        ElasticNet: 'SklearnElasticNetRegressor',
-        LinearRegression: 'SklearnLinearRegressor',
-        LogisticRegression: 'SklearnLinearClassifier',
-        NuSVC: 'SklearnSVC',
-        NuSVR: 'SklearnSVR',
-        SGDClassifier: 'SklearnLinearClassifier',
-        SGDRegressor: 'SklearnLinearRegressor',
-        StandardScaler: 'SklearnScaler',
-    })
-    return res
-
-
-def build_sklearn_parsers_map():
-    map_parser = {pipeline.Pipeline: _parse_sklearn_pipeline,
-                  pipeline.FeatureUnion: _parse_sklearn_feature_union,
-                  ColumnTransformer: _parse_sklearn_column_transformer}
-    for tmodel in sklearn_classifier_list:
-        if tmodel not in [LinearSVC, SVC, NuSVC]:
-            map_parser[tmodel] = _parse_sklearn_classifier
-    return map_parser
-
-
-def update_registered_converter(model, alias, shape_fct, convert_fct, overwrite=True):
-    """
-    Registers or updates a converter for a new model so that
-    it can be converted when inserted in a *scikit-learn* pipeline.
-    
-    :param model: model class
-    :param alias: alias used to register the model
-    :param shape_fct: function which checks or modifies the expected outputs,
-        this function should be fast so that the whole graph can be computed followed
-        by the conversion of each model, parallelized or not
-    :param convert_fct: function which converts a model
-    :param overwrite: False to raise exception if a converter already exists
-
-    The alias is usually the library name followed by the model name.
-    Example:
-
-    ::
-
-        from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
-        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
-        from skl2onnx import update_registered_converter
-        update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
-                                    calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier)
-    """    
-    if not overwrite and model in sklearn_operator_name_map and alias != sklearn_operator_name_map[model]:
-        warnings.warn("Model '{0}' was already registered under alias '{1}'.".format(
-            model, sklearn_operator_name_map[model]))
-    sklearn_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite)
-    register_shape_calculator(alias, shape_fct, overwrite=overwrite)
-
-
-def update_registered_parser(model, parser_fct):
-    """
-    Registers or updates a parser for a new model.
-    A parser returns the expected output of a model.
-    
-    :param model: model class
-    :param parser_fct: parser, signature is the same as
-        :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`
-    """
-    sklearn_parsers_map[model] = parser_fct
-
-
-def _get_sklearn_operator_name(model_type):
-    '''
-    Get operator name of the input argument
-
-    :param model_type:  A scikit-learn object (e.g., SGDClassifier and Binarizer)
-    :return: A string which stands for the type of the input model in our conversion framework
-    '''
-    if model_type not in sklearn_operator_name_map:
-        # "No proper operator name found, it means a local operator.
-        return None
-    return sklearn_operator_name_map[model_type]
+from ._supported_operators import sklearn_classifier_list, _get_sklearn_operator_name, cluster_list
 
 
 def _fetch_input_slice(scope, inputs, column_indices):
@@ -254,21 +78,6 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         variable = scope.declare_local_variable('variable', FloatTensorType())
         this_operator.outputs.append(variable)
         
-    # We call the shape calculator.
-    shape_calc = scope.get_shape_calculator(type(model))
-    if shape_calc is None:
-        # Falls back into registered model.
-        try:
-            name = sklearn_operator_name_map[type(model)]
-        except KeyError:
-            raise RuntimeError("No proper shape calculator found for '{}'.".format(type(model)))
-        shape_calc = get_shape_calculator(name)
-
-    try:
-        shape_calc(this_operator)
-    except RuntimeError as e:
-        inps = "\n".join(str(v) for v in inputs)
-        raise RuntimeError("Unable to precise output types for '{0}' due to: {1}.\nInputs:\n{2}\nFunction:{3}".format(type(model), e, inps, shape_calc)) from e
     return this_operator.outputs
 
 
@@ -307,7 +116,6 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
     # Declare output name of scikit-learn FeatureUnion
     union_name = scope.declare_local_variable('union', FloatTensorType())
     concat_operator.outputs.append(union_name)
-    calculate_sklearn_concat(concat_operator)
 
     return concat_operator.outputs
 
@@ -336,15 +144,13 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
         if len(transform_inputs) > 1:            
             # Many ONNX operators expect one input vector,
             # the default behviour is to merge columns.
-            nb_cols = sum(inp.type.shape[1] for inp in transform_inputs)
-            ty = transform_inputs[0].type.__class__([1, nb_cols])
+            ty = transform_inputs[0].type.__class__([1, 'None'])
             
             concop = scope.declare_local_operator('SklearnConcat')
             concop.inputs = transform_inputs
             concnames = scope.declare_local_variable('merged_columns', ty)
             concop.outputs.append(concnames)
             transform_inputs = [concnames]
-            calculate_sklearn_concat(concop)
         
         var_out = parse_sklearn(scope, model.named_transformers_[name], transform_inputs,
                                 custom_parsers=custom_parsers)[0]
@@ -352,15 +158,13 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
 
     # Create a Concat ONNX node
     if len(transformed_result_names) > 1:
-        nb_cols = sum(inp.type.shape[1] for inp in transformed_result_names)
-        ty = transformed_result_names[0].type.__class__([1, nb_cols])
+        ty = transformed_result_names[0].type.__class__([1, 'None'])
         concat_operator = scope.declare_local_operator('SklearnConcat')
         concat_operator.inputs = transformed_result_names
 
         # Declare output name of scikit-learn ColumnTransformer
         transformed_column_name = scope.declare_local_variable('transformed_column', ty)
         concat_operator.outputs.append(transformed_column_name)
-        calculate_sklearn_concat(concat_operator)
 
         return concat_operator.outputs
     else:
@@ -475,8 +279,26 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     return topology
 
 
-# registered converters
-sklearn_operator_name_map = build_sklearn_operator_name_map()
+def build_sklearn_parsers_map():
+    map_parser = {pipeline.Pipeline: _parse_sklearn_pipeline,
+                  pipeline.FeatureUnion: _parse_sklearn_feature_union,
+                  ColumnTransformer: _parse_sklearn_column_transformer}
+    for tmodel in sklearn_classifier_list:
+        if tmodel not in [LinearSVC, SVC, NuSVC]:
+            map_parser[tmodel] = _parse_sklearn_classifier
+    return map_parser
+
+
+def update_registered_parser(model, parser_fct):
+    """
+    Registers or updates a parser for a new model.
+    A parser returns the expected output of a model.
+    
+    :param model: model class
+    :param parser_fct: parser, signature is the same as
+        :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`
+    """
+    sklearn_parsers_map[model] = parser_fct
 
 # registered parsers
 sklearn_parsers_map = build_sklearn_parsers_map()

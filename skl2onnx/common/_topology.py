@@ -113,10 +113,13 @@ class Operator(OperatorBase):
 
     def infer_types(self):
         # Invoke a core inference function
+        if self.type is None:
+            raise RuntimeError("Unable to find a shape calculator for type '{}'.".format(type(self.raw_operator)))
         try:
-            _registration.get_shape_calculator(self.type)(self)
+            shape_calc = _registration.get_shape_calculator(self.type)
         except ValueError:
             raise ValueError("Unable to find a shape calculator for alias '{}' and type '{}'.".format(self.type, type(self.raw_operator)))
+        shape_calc(self)
 
 
 class Scope:

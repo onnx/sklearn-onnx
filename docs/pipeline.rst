@@ -115,7 +115,8 @@ order:
   The parser defines default outputs for standard
   machine learned problems. The shape calculator
   changes the shapes and types for each of them
-  depending on the model.
+  depending on the model and is called after all
+  outputs were defined (topology).
 * **shape_calculator(model):**
   The shape calculator changes the shape and types
   of the outputs created by the parser. Once this function

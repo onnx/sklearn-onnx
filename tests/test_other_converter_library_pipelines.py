@@ -61,7 +61,8 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         try:
             model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
         except RuntimeError as e:
-            if "No proper shape calculator found for" not in str(e):
+            if "No proper shape calculator found for" not in str(e) and \
+               "Unable to find a shape calculator for type" not in str(e):
                 raise e
             
         try:

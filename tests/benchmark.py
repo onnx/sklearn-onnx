@@ -71,9 +71,12 @@ def run_all_tests(folder=None, verbose=True):
         runner = unittest.TextTestRunner()
         for tsi, ts in enumerate(suites):
             for k in ts:
-                for t in k:
-                    print(t.__class__.__name__)
-                    break            
+                try:
+                    for t in k:
+                        print(t.__class__.__name__)
+                        break
+                except TypeError as e:
+                    raise RuntimeError("Unable to run test '{}'.".format(ts)) from e
             runner.run(ts)
     
     from test_utils.tests_helper import make_report_backend
