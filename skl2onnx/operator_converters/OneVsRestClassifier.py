@@ -8,7 +8,7 @@ from ..common._apply_operation import apply_concat
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
-from .._parse import sklearn_operator_name_map
+from .._supported_operators import sklearn_operator_name_map
 
 
 def convert_one_vs_rest_classifier(scope, operator, container):    

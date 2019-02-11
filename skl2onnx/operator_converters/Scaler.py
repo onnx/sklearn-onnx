@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import numpy
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
 from ..common._registration import register_converter
 from .common import concatenate_variables
@@ -38,7 +38,14 @@ def convert_sklearn_scaler(scope, operator, container):
     else:
         raise ValueError('Only scikit-learn StandardScaler and RobustScaler are supported but got %s' % type(op))
 
-    container.add_node(op_type, feature_name, operator.outputs[0].full_name, op_domain='ai.onnx.ml', **attrs)
+    # ONNX does not convert arrays of float32.
+    for k in attrs:
+        v = attrs[k]
+        if isinstance(v, numpy.ndarray) and v.dtype == numpy.float32:
+            attrs[k] = v.astype(numpy.float64)
+
+    container.add_node(op_type, feature_name, operator.outputs[0].full_name,
+                       op_domain='ai.onnx.ml', **attrs)
 
 
 register_converter('SklearnRobustScaler', convert_sklearn_scaler)

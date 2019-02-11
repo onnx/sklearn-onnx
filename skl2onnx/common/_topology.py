@@ -19,6 +19,10 @@ from .interface import OperatorBase
 
 
 class Variable:
+    """
+    Defines a variable which holds any data defined
+    from *ONNX* types.
+    """
 
     def __init__(self, raw_name, onnx_name, scope, type=None):
         '''
@@ -55,6 +59,9 @@ class Variable:
             self.raw_name, self.onnx_name, self.type)
 
 class Operator(OperatorBase):
+    """
+    Defines an operator available in *ONNX*.
+    """
 
     def __init__(self, onnx_name, scope, type, raw_operator, target_opset):
         '''
@@ -106,12 +113,25 @@ class Operator(OperatorBase):
 
     def infer_types(self):
         # Invoke a core inference function
-        _registration.get_shape_calculator(self.type)(self)
+        if self.type is None:
+            raise RuntimeError("Unable to find a shape calculator for type '{}'.".format(type(self.raw_operator)))
+        try:
+            shape_calc = _registration.get_shape_calculator(self.type)
+        except ValueError:
+            raise ValueError("Unable to find a shape calculator for alias '{}' and type '{}'.".format(
+                self.type, type(self.raw_operator)))
+        shape_calc(self)
 
 
 class Scope:
+    """
+    Every node of an *ONNX* graph must be unique. This class holds the list
+    of existing name for every node already defined in graph. It also
+    provides functions to create a unique unused name.
+    """
 
-    def __init__(self, name, parent_scopes=None, variable_name_set=None, operator_name_set=None, target_opset=None):
+    def __init__(self, name, parent_scopes=None, variable_name_set=None,
+                 operator_name_set=None, target_opset=None, custom_shape_calculators=None):
         '''
         :param name:  A string, the unique ID of this scope in a Topology object
         :param parent_scopes: A list of Scope objects. The last element should be the direct parent scope (i.e., where
@@ -119,12 +139,15 @@ class Scope:
         :param variable_name_set: A set of strings serving as the name pool of variables
         :param operator_name_set: A set of strings serving as the name pool of operators
         :param target_opset: The target opset number for the converted model.
+        :param custom_conversion_functions: a dictionary for specifying the user customized conversion function
+        :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
         '''
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
         self.onnx_variable_names = variable_name_set if variable_name_set is not None else set()
         self.onnx_operator_names = operator_name_set if operator_name_set is not None else set()
         self.target_opset = target_opset
+        self.custom_shape_calculators = custom_shape_calculators
 
         # An one-to-many map from raw variable name to ONNX variable names. It looks like
         #   (key, value) = (raw_name, [onnx_name, onnx_name1, onnx_name2, ..., onnx_nameN])
@@ -137,9 +160,19 @@ class Scope:
         # A map of local operators defined in this scope. (key, value) = (onnx_name, operator)
         self.operators = {}
 
+    def get_shape_calculator(self, model_type):
+        """
+        Returns the shape calculator for the given model type.
+        
+        :param model_type: model type such as *LogisticRegression*
+        :return: alias or None if not found
+        """
+        return self.custom_shape_calculators.get(model_type, None)
+
     def get_onnx_variable_name(self, seed):
         '''
-        Retrieve the variable ID of the given seed or create one if it is the first time of seeing this seed
+        Retrieves the variable ID of the given seed or create one
+        if it is the first time of seeing this seed.
         '''
         if seed in self.variable_name_mapping:
             return self.variable_name_mapping[seed][-1]
@@ -148,19 +181,19 @@ class Scope:
 
     def get_unique_variable_name(self, seed):
         '''
-        Create a unique variable ID based on the given seed
+        Creates a unique variable ID based on the given seed.
         '''
         return Topology._generate_unique_name(seed, self.onnx_variable_names)
 
     def get_unique_operator_name(self, seed):
         '''
-        Create a unique operator ID based on the given seed
+        Creates a unique operator ID based on the given seed.
         '''
         return Topology._generate_unique_name(seed, self.onnx_operator_names)
 
     def find_sink_variables(self):
         '''
-        Find sink variables in this scope
+        Finds sink variables in this scope.
         '''
         # First we assume all variables are sinks
         is_sink = {name: True for name in self.variables.keys()}
@@ -172,8 +205,9 @@ class Scope:
 
     def declare_local_variable(self, raw_name, type=None, prepend=False):
         '''
-        This function may create a new variable in this scope. If raw_name has been used to create other variables,
-        the new variable will hide all other variables created using raw_name.
+        This function may create a new variable in this scope.
+        If *raw_name* has been used to create other variables,
+        the new variable will hide all other variables created using *raw_name*.
         '''
         # Get unique ID for the new variable
         onnx_name = self.get_unique_variable_name(raw_name)
@@ -194,8 +228,9 @@ class Scope:
 
     def get_local_variable_or_declare_one(self, raw_name, type=None):
         '''
-        This function will first check if raw_name has been used to create some variables. If yes, the latest one
-        named in self.variable_name_mapping[raw_name] will be returned. Otherwise, a new variable will be created and
+        This function first checks if *raw_name* has been used to create some variables.
+        If yes, the latest one named in ``self.variable_name_mapping[raw_name]``
+        will be returned. Otherwise, a new variable will be created and
         then returned.
         '''
         onnx_name = self.get_onnx_variable_name(raw_name)
@@ -221,7 +256,7 @@ class Scope:
 
     def delete_local_operator(self, onnx_name):
         '''
-        Remove the operator whose onnx_name is the input onnx_name
+        Removes the operator whose onnx_name is the input *onnx_name*.
         '''
         if onnx_name not in self.onnx_operator_names or onnx_name not in self.operators:
             raise RuntimeError('The operator to be removed not found')
@@ -230,7 +265,7 @@ class Scope:
 
     def delete_local_variable(self, onnx_name):
         '''
-        Remove the variable whose onnx_name is the input onnx_name
+        Removes the variable whose *onnx_name* is the input *onnx_name*.
         '''
         if onnx_name not in self.onnx_variable_names or onnx_name not in self.variables:
             raise RuntimeError('The variable to be removed not found')
@@ -241,17 +276,25 @@ class Scope:
 
 
 class Topology:
+    """
+    Holds instances on :class:`Scope <skl2onnx.common._topology.Scope>` and
+    :class:`SklearnModelContainer <skl2onnx.common._container.SklearnModelContainer>`.
+    These are filled by the converters while a pipeline is being converted.
+    When all converters were called, method
+    :meth:`Topology.compile <skl2onnx.common._topology.Topology.compile>`
+    must be called to convert the topological graph into *ONNX* graph.
+    """
 
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None, target_opset=None,
                  custom_conversion_functions=None, custom_shape_calculators=None, metadata_props=None):
         '''
-        Initialize a Topology object, which is an intermediate representation of a computational graph.
+        Initializes a *Topology* object, which is an intermediate representation of a computational graph.
 
         :param model: RawModelContainer object or one of its derived classes. It contains the original model.
         :param default_batch_size: batch_size prepend to scalar and array types from CoreML. It's usually 1 or 'None'.
-        :param initial_types: A list providing some types for some root variables. Each element is a tuple of a variable
-        name and a type defined in data_types.py.
+        :param initial_types: A list providing some types for some root variables.
+            Each element is a tuple of a variable name and a type defined in *data_types.py*.
         :param reserved_variable_names: A set of strings which are not allowed to be used as a variable name
         :param reserved_operator_names: A set of strings which are not allowed to be used as a operator name
         :param custom_conversion_functions: a dictionary for specifying the user customized conversion function
@@ -275,6 +318,20 @@ class Topology:
         # directly affects _initialize_graph_status_for_traversing function and indirectly affects _infer_all_shapes and
         # _prune functions.
         self.root_names = list()
+
+        for k in self.custom_conversion_functions:
+            if not callable(k):
+                raise TypeError("Keys in custom_conversion_functions must be types not strings.")
+        for k in self.custom_shape_calculators:
+            if not callable(k):
+                raise TypeError("Keys in custom_shape_calculators must be types not strings.")
+        
+        # A map of local overwritten model aliases.
+        self.model_aliases = {}
+        all_model_types = set(self.custom_conversion_functions) | set(self.custom_shape_calculators)
+        for mtype in all_model_types:
+            alias = "{}_{}".format(mtype.__name__, id(self))
+            self.model_aliases[mtype] = alias
 
     @staticmethod
     def _generate_unique_name(seed, existing_names):
@@ -308,8 +365,13 @@ class Topology:
         return Topology._generate_unique_name(seed, self.scope_names)
 
     def declare_scope(self, seed, parent_scopes=None):
+        """
+        Creates a new :class:`Scope <skl2onnx.common._topology.Scope>` and
+        appends it to the list of existing scopes.
+        """
         scope = Scope(self.get_unique_scope_name(seed), parent_scopes,
-                      self.variable_name_set, self.operator_name_set, self.target_opset)
+                      self.variable_name_set, self.operator_name_set, self.target_opset,
+                      custom_shape_calculators=self.custom_shape_calculators)
         self.scopes.append(scope)
         return scope
 
@@ -325,7 +387,7 @@ class Topology:
 
     def find_root_and_sink_variables(self):
         '''
-        Find root variables of the whole graph
+        Finds root variables of the whole graph.
         '''
         # First we assume all variables are roots
         is_root = {name: True for scope in self.scopes for name in scope.variables.keys()}
@@ -372,14 +434,16 @@ class Topology:
 
     def rename_variable(self, old_name, new_name):
         '''
-        Replace the old ONNX variable name with a new ONNX variable name. There are several fields we need to edit.
-            a. Topology
-                1. scopes (the scope where the specified ONNX variable was declared)
-                2. variable_name_set
-            b. Scope
-                1. onnx_variable_names (a mirror of Topology's variable_name_set)
-                2. variable_name_mapping
-                3. variables
+        Replaces the old ONNX variable name with a new ONNX variable name.
+        There are several fields we need to edit.
+
+        a. Topology
+            1. scopes (the scope where the specified ONNX variable was declared)
+            2. variable_name_set
+        b. Scope
+            1. onnx_variable_names (a mirror of Topology's variable_name_set)
+            2. variable_name_mapping
+            3. variables
 
         :param old_name: a string
         :param new_name: a string
@@ -499,10 +563,12 @@ class Topology:
 
         # Traverse the graph from roots to leaves
         for operator in self.topological_operator_iterator():
-            if operator.type in self.custom_shape_calculators:
+            mtype = type(operator.raw_operator)
+            if mtype in self.custom_shape_calculators:
+                # overwritten operator.
+                self.custom_shape_calculators[mtype](operator)
+            elif operator.type in self.custom_shape_calculators:
                 self.custom_shape_calculators[operator.type](operator)
-            elif operator.type in self.custom_conversion_functions:
-                pass  # in Keras converter, the shape calculator can be optional.
             else:
                 operator.infer_types()
 
@@ -715,11 +781,19 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
     # This loop could eventually be parallelized.
     for operator in topology.topological_operator_iterator():
         scope = next(scope for scope in topology.scopes if scope.name == operator.scope)
-        if operator.type in topology.custom_conversion_functions:
-            topology.custom_conversion_functions[operator.type](scope, operator, container)
+        mtype = type(operator.raw_operator)
+        if mtype in topology.custom_conversion_functions:
+            conv = topology.custom_conversion_functions[mtype]
+        elif operator.type in topology.custom_conversion_functions:
+            conv = topology.custom_conversion_functions[operator.type]
         else:
             # Convert the selected operator into some ONNX objects and save them into the container
-            _registration.get_converter(operator.type)(scope, operator, container)
+            try:
+                conv = _registration.get_converter(operator.type)
+            except ValueError:
+                raise ValueError("Unable to find converter for alias '{}' type '{}'.".format(
+                    operator.type, type(operator.raw_model)))
+        conv(scope, operator, container)
 
     # When calling ModelComponentContainer's add_initializer(...), nothing is added into the input list. However, in
     # ONNX initializers should also be model's (GraphProto) inputs. Thus, we create ValueInfoProto objects from
