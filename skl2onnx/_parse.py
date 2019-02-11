@@ -14,8 +14,10 @@ from sklearn.neighbors import NearestNeighbors
 
 from .common._container import SklearnModelContainerNode
 from .common._topology import Topology, Scope, convert_topology
-from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType, find_type_conversion
-from .common.data_types import FloatTensorType, Int64TensorType, SequenceType, DictionaryType
+from .common.data_types import DataType, Int64Type, FloatType, StringType, TensorType
+from .common.data_types import find_type_conversion
+from .common.data_types import FloatTensorType, Int64TensorType
+from .common.data_types import SequenceType, DictionaryType
 from .common.utils import get_column_indices
 from ._supported_operators import sklearn_classifier_list, _get_sklearn_operator_name, cluster_list
 
@@ -108,7 +110,10 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
     transformed_result_names = []
     # Encode each transform as our IR object
     for name, transform in model.transformer_list:
-        transformed_result_names.append(_parse_sklearn_simple_model(scope, transform, inputs, custom_parsers=custom_parsers)[0])
+        transformed_result_names.append(
+            _parse_sklearn_simple_model(
+                scope, transform, inputs,
+                custom_parsers=custom_parsers)[0])
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
