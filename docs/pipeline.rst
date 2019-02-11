@@ -116,7 +116,11 @@ order:
   machine learned problems. The shape calculator
   changes the shapes and types for each of them
   depending on the model and is called after all
-  outputs were defined (topology).
+  outputs were defined (topology). This steps defines
+  the number of outputs for every node and sets them to
+  a default type and default shape ``[1, 'None']``
+  which the output node has one row and no known
+  columns yet.
 * **shape_calculator(model):**
   The shape calculator changes the shape and types
   of the outputs created by the parser. Once this function
