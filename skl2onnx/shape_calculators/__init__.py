@@ -23,4 +23,5 @@ from . import SVM
 from . import SVD
 from . import TextVectorizer
 from . import TfidfTransformer
+from . import VotingClassifier
 from . import ZipMap 

@@ -11,7 +11,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from .utils_backend import load_data_and_model, extract_options, ExpectedAssertionError, OnnxRuntimeAssertionError, compare_outputs
 
 
-def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
+def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, comparable_outputs=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -26,6 +26,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     :param context: specifies custom operators
     :param verbose: in case of error, the function may print
         more information on the standard output
+    :param comparable_outputs: compare only these outputs
     :return: tuple (outut, lambda function to run the predictions)
     
     The function does not return anything but raises an error
@@ -182,16 +183,25 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
-                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
+                    if verbose:
+                        import onnx
+                        model = onnx.load(onx)
+                        smodel = "\nJSON ONNX\n" + str(model)
+                    else:
+                        smodel = ""
+                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}{2}".format(onx, e, smodel))
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
             output = _post_process_output(res)
             
             if OneOffArray:
-                if not isinstance(output, numpy.ndarray):
-                    raise TypeError("output must be an array")
-                output = [output]
+                if isinstance(output, list):
+                    pass
+                elif not isinstance(output, numpy.ndarray):
+                    raise TypeError("output must be an array, not {}".format(type(output)))
+                else:
+                    output = [output]
     else:
         if verbose:
             print("[compare_runtime] type(inputs)={} len={} names={}".format(
@@ -227,8 +237,15 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None):
     
     output0 = output.copy()
 
+    if comparable_outputs:
+        cmp_exp = [load["expected"][o] for o in comparable_outputs]
+        cmp_out = [output[o] for o in comparable_outputs]
+    else:
+        cmp_exp = load["expected"]
+        cmp_out = output
+    
     try:
-        _compare_expected(load["expected"], output, sess, onx, decimal=decimal, **options)
+        _compare_expected(cmp_exp, cmp_out, sess, onx, decimal=decimal, **options)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:

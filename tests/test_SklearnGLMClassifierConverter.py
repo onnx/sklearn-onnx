@@ -34,7 +34,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
                             # Operator cast-1 is not implemented in onnxruntime
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
 
-    def test_model_logistic_regression_multi_class(self):
+    def test_model_logistic_regression_binary_class_nointercept(self):
+        model, X = self._fit_model_binary_classification(linear_model.LogisticRegression(fit_intercept=False))
+        model_onnx = convert_sklearn(model, 'logistic regression', [('input', FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnLogitisticRegressionBinaryNoIntercept",
+                            # Operator cast-1 is not implemented in onnxruntime
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+
+    def ztest_model_logistic_regression_multi_class(self):
         model, X = self._fit_model_multiclass_classification(linear_model.LogisticRegression())
         model_onnx = convert_sklearn(model, 'maximum entropy classifier', [('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
