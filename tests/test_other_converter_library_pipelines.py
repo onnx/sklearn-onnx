@@ -50,9 +50,6 @@ def my_custom_converter(scope, operator, container):
 class TestOtherLibrariesInPipeline(unittest.TestCase):
 
     def test_custom_pipeline_scaler(self):
-        update_registered_converter(MyCustomClassifier, 'MyCustomClassifier',                                    
-                                    my_custom_shape_extractor, my_custom_converter)
-        
         data = load_iris()
         X = data.data[:, :2]
         y = data.target
@@ -61,11 +58,35 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         pipe = Pipeline([('scaler', StandardScaler()), ('lgbm', model)])
         pipe.fit(X, y)
 
-        model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        try:
+            model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        except RuntimeError as e:
+            if "No proper shape calculator found for" not in str(e) and \
+               "Unable to find a shape calculator for type" not in str(e):
+                raise e
+            
+        try:
+            model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
+                                         custom_conversion_functions={'MyCustomClassifier': my_custom_converter},
+                                         custom_shape_calculators={'MyCustomClassifier': my_custom_shape_extractor})
+        except TypeError as e:
+            if "Keys in custom_conversion_functions must be types" not in str(e):
+                raise e
+                                     
+        model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
+                                     custom_conversion_functions={MyCustomClassifier: my_custom_converter},
+                                     custom_shape_calculators={MyCustomClassifier: my_custom_shape_extractor})
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(numpy.float32), pipe, model_onnx,
                             basename="SklearnPipelineScalerCustomClassifier")
 
+        update_registered_converter(MyCustomClassifier, 'MyCustomClassifier',                                    
+                                    my_custom_shape_extractor, my_custom_converter)
+        
+        model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X.astype(numpy.float32), pipe, model_onnx,
+                            basename="SklearnPipelineScalerCustomClassifier2")
         
 
 if __name__ == "__main__":

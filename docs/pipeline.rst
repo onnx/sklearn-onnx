@@ -1,10 +1,16 @@
 
-================
-Convert pipeline
-================
+==================
+Convert a pipeline
+==================
 
 .. contents::
     :local:
+
+*skl2onnx* converts any machine learning pipeline into
+*ONNX* pipelines. Every transformer or predictors is converted
+into one or multiple nodes into the *ONNX* graph.
+Any `ONNX backend <https://github.com/onnx/onnx/blob/master/docs/ImplementingAnOnnxBackend.md>`_
+can then use this graph to compute equivalent outputs for the same inputs.
 
 .. _l-complex-pipeline:
 
@@ -86,6 +92,58 @@ It can be represented as a
 
 .. image:: pipeline.png
     :width: 1000
+
+Parser, shape calculator, converter
+===================================
+
+.. index:: parser, shape calculator, converter
+
+Three kinds of functions are involved into the conversion
+of a *scikit-pipeline*. Each of them is called in the following
+order:
+
+* **parser(scope, model, inputs, custom_parser)**:
+  the parser builds the expected outputs of a model,
+  as the resulting graph must contain unique names,
+  *scope* contains all names already given,
+  *model* is the model to convert,
+  *inputs* are the *inputs* the model receives
+  in the *ONNX* graph. It is a list of
+  :class:`Variable <skl2onnx.common._topology.Variable>`.
+  *custom_parsers* contains a map ``{model type: parser}``
+  which extends the default list of parsers.
+  The parser defines default outputs for standard
+  machine learned problems. The shape calculator
+  changes the shapes and types for each of them
+  depending on the model and is called after all
+  outputs were defined (topology). This steps defines
+  the number of outputs for every node and sets them to
+  a default type and default shape ``[1, 'None']``
+  which the output node has one row and no known
+  columns yet.
+* **shape_calculator(model):**
+  The shape calculator changes the shape and types
+  of the outputs created by the parser. Once this function
+  returned its results, the graph structure is fully defined
+  and cannot be changed.
+* **converter(scope, operator, container):**
+  The converter converts the transformers or predictors into
+  *ONNX* nodes. Each node can an *ONNX*
+  `operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
+  `ML operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
+  custom *ONNX* operators.
+  
+As *sklearn-onnx* may convert pipelines with model coming from other libraries,
+the library must handle parsers, shape calculators or converters coming
+from other packages. This can be done is two ways. The first one
+consists in calling function :func:`convert_sklearn <skl2onnx.convert_sklearn>`
+by mapping the model type to a specific parser, a specific shape calculator
+or a specific converter. It is possible to avoid these specifications
+by registering the new parser or shape calculator or converter
+with one of the two functions
+:func:`update_registered_converter <skl2onnx.update_registered_converter>`,
+:func:`update_registered_parser <skl2onnx.update_registered_parser>`.
+One example follows.
 
 .. _l-register-converter:
 

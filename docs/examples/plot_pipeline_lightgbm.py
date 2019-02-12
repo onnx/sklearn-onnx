@@ -44,51 +44,45 @@ pipe = Pipeline([('scaler', StandardScaler()),
                  ('lgbm', LGBMClassifier(n_estimators=3))])
 pipe.fit(X, y)
 
-########################
+######################################
 # Register the converter for LGBMClassifier
 # +++++++++++++++++++++++++++++++++++++++++
 #
-# The converter is implemented in *onnxmltools* and
-# follows a different design than the current one
-# of *sklearn-onnx*. This will change in a short future.
-# See also :ref:`l-register-converter`.
-# First the converter implemented in
-# `onnxmltools...LightGbm.py <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py>`_.
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
-
-###########################
-# The shape calculator of *onnxmltools* must be adapted for our case.
-# This will change in a short future.
-import numbers
-from skl2onnx import convert_sklearn
+# The converter is implemented in *onnxmltools*:
+# `onnxmltools...LightGbm.py
+# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# lightgbm/operator_converters/LightGbm.py>`_.
+# and the shape calculator:
+# `onnxmltools...Classifier.py
+# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# lightgbm/shape_calculators/Classifier.py>`_.
+# The current implementation has duplicated code which we replace
+# by the implementation from *skl2onnx*.
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
+import onnxmltools.convert.common.data_types
+onnxmltools.convert.common.data_types.Int64TensorType = Int64TensorType
+onnxmltools.convert.common.data_types.StringTensorType = StringTensorType
+onnxmltools.convert.common.data_types.FloatTensorType = FloatTensorType
+onnxmltools.convert.common.data_types.DictionaryType = DictionaryType
+onnxmltools.convert.common.data_types.SequenceType = SequenceType
 
-def lightgbm_classifier_shape_extractor(operator):
-    N = operator.inputs[0].type.shape[0]
-
-    class_labels = operator.raw_operator.classes_
-    if all(isinstance(i, numpy.ndarray) for i in class_labels):
-        class_labels = numpy.concatenate(class_labels)
-    if all(isinstance(i, str) for i in class_labels):
-        operator.outputs[0].type = StringTensorType(shape=[N])
-        operator.outputs[1].type = SequenceType(DictionaryType(StringTensorType([]), FloatTensorType([])), N)
-    elif all(isinstance(i, (numbers.Real, bool, numpy.bool_)) for i in class_labels):
-        operator.outputs[0].type = Int64TensorType(shape=[N])
-        operator.outputs[1].type = SequenceType(DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
-    else:
-        raise ValueError('Unsupported or mixed label types')
+##############################################
+# Then we import the converter and shape calculator.
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
+from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes
 
 ###########################
 # Let's register the new converter.
 from skl2onnx import update_registered_converter
 update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
-                            lightgbm_classifier_shape_extractor,
+                            calculate_linear_classifier_output_shapes,
                             convert_lightgbm)
 
 ##################################
 # Convert again
 # +++++++++++++
 
+from skl2onnx import convert_sklearn
 model_onnx = convert_sklearn(pipe, 'pipeline_lightgbm',
                              [('input', FloatTensorType([1, 2]))])
 

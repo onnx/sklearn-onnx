@@ -10,7 +10,7 @@ from ..common._apply_operation import (
     apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
-from .._parse import sklearn_operator_name_map
+from .._supported_operators import sklearn_operator_name_map
 import numpy as np
 
 
