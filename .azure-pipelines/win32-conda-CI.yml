@@ -39,9 +39,9 @@ jobs:
 
   - script: |
       conda config --set always_yes yes
-      conda install -c conda-forge numpy$(numpy.version)
+      conda install numpy$(numpy.version) scipy
       conda install -c conda-forge protobuf
-      conda install mkl
+      conda install mkl icc_rt
       python -m pip install --upgrade pip
       test '$(python.version)' == '3.7' && pip install https://xadupre.github.io/releases/onnx-1.4.1-cp37-cp37m-win_amd64.whl
       pip install -r requirements.txt
@@ -60,6 +60,11 @@ jobs:
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
+    
+  - script: |
+      conda remove icc_rt --force
+      conda remove icc_rt --no-deps
+    displayName: 'install icc_rt'
 
   - script: |
       pip install -e .
