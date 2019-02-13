@@ -167,11 +167,13 @@ class ModelComponentContainer(ModelContainer):
         :param onnx_type: Element types allowed in ONNX tensor, e.g., TensorProto.FLOAT and TensorProto.STRING.
         :param shape: Tensor shape, a list of integers.
         :param content: Flattened tensor values (i.e., a float list or a float array).
+        :return: created tensor
         '''
         if any(d is None for d in shape):
             raise ValueError('Shape of initializer cannot contain None')
         tensor = helper.make_tensor(name, onnx_type, shape, content)
         self.initializers.append(tensor)
+        return tensor
 
     def add_value_info(self, variable):
         self.value_info.append(self._make_value_info(variable))
