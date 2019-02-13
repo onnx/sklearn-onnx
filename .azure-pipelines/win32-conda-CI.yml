@@ -15,10 +15,10 @@ jobs:
     matrix:
       Py37-Onnx141-Rt021:
         python.version: '3.7.0'
-        onnx.version: 'https://xadupre.github.io/releases/onnx-$(onnx.version)-cp37-cp37m-win_amd64.whl'
+        onnx.version: 'https://xadupre.github.io/releases/onnx-1.4.1-cp37-cp37m-win_amd64.whl'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.2.1'
-        scipy.version: 'scipy-1.2.1-cp37-cp37m-win_amd64.whl'
+        scipy.version: 'https://xadupre.github.io/releases/scipy-1.2.1-cp37-cp37m-win_amd64.whl'
       Py36-Onnx141-Rt021:
         python.version: '3.6.7'
         onnx.version: 'onnx==1.4.1'
@@ -46,17 +46,17 @@ jobs:
   - script: |
       conda install -y -c conda-forge protobuf
       python -m pip install --upgrade pip
+      conda install -y -c conda-forge numpy$(numpy.version) --no-deps
       pip install $(scipy.version)
       pip install $(onnx.version)
+    displayName: 'Install numpy, scipy, onnx'
+    
+  - script: |
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install pytest
     displayName: 'Install dependencies'
     
-  - script: |
-      conda install -y -c conda-forge numpy$(numpy.version) --no-deps
-    displayName: 'update numpy'
-
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
