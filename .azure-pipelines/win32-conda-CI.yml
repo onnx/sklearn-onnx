@@ -46,8 +46,7 @@ jobs:
   - script: |
       conda install -y -c conda-forge protobuf
       python -m pip install --upgrade pip
-      conda install -y -c conda-forge numpy$(numpy.version) --no-deps
-      pip install $(scipy.version)
+      conda install -y -c conda-forge numpy$(numpy.version) scipy
       pip install $(onnx.version)
     displayName: 'Install numpy, scipy, onnx'
     
