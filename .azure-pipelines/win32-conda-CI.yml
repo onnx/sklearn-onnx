@@ -17,16 +17,19 @@ jobs:
         python.version: '3.7'
         onnx.version: '==1.4.1'
         numpy.version: '==1.16.1'
+        scipy.version: '==1.2.1'
         onnxrt.version: '==0.2.1'
       Py36-Onnx141-Rt021:
         python.version: '3.6'
         onnx.version: '==1.4.1'
         numpy.version: '==1.16.1'
+        scipy.version: '==1.2.0'
         onnxrt.version: '==0.2.1'
       Py36-Onnx130-Rt014-Npy0154:
         python.version: '3.6'
         onnx.version: '==1.3.0'
         numpy.version: '==1.15.4'
+        scipy.version: '==1.1.0'
         onnxrt.version: '==0.1.4'
     maxParallel: 3
 
@@ -47,6 +50,10 @@ jobs:
       pip install -r requirements-dev.txt
       pip install pytest
     displayName: 'Install dependencies'
+    
+  - script: |
+      dir c:\users\vssadministrator\.conda\envs\py3.7\lib\site-packages\scipy\special\*.*
+    displayName: 'dir scipy/specials'
 
   - script: |
       pip install numpy$(numpy.version)
@@ -61,8 +68,12 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
+      pip install scipy$(scipy.version)
+    displayName: 'install scipy'
+
+  - script: |
       pip install -e .
-    displayName: 'install'
+    displayName: 'install skl2onnx'
 
   - script: |
       python -c "import numpy;print('numpy:',numpy.__version__)"
