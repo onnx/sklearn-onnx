@@ -52,10 +52,6 @@ jobs:
     displayName: 'Install dependencies'
     
   - script: |
-      dir c:\users\vssadministrator\.conda\envs\py3.7\lib\site-packages\scipy\special\*.*
-    displayName: 'dir scipy/specials'
-
-  - script: |
       pip install numpy$(numpy.version)
     displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
