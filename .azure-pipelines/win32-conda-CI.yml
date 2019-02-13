@@ -63,7 +63,7 @@ jobs:
     
   - script: |
       conda remove icc_rt --force
-      conda remove icc_rt --no-deps
+      conda install icc_rt --no-deps
     displayName: 'install icc_rt'
 
   - script: |
