@@ -716,7 +716,6 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
         found = get_opset_number_from_onnx()
         raise RuntimeError("target_opset {} > {} is higher than the number of the installed onnx package.".format(
             target_opset, found))
-        ))
 
     topology._initialize_graph_status_for_traversing()
 
