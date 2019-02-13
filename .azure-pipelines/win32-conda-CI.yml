@@ -37,12 +37,11 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
-      conda config --set always_yes yes
-      conda install -c anaconda numpy$(numpy.version) scikit-learn
+      conda install -y -c anaconda scikit-learn
     displayName: 'Install numpy mkl scipy pandas sklearn'
 
   - script: |
-      conda install -c conda-forge protobuf
+      conda install -y -c conda-forge protobuf
       python -m pip install --upgrade pip
       test '$(python.version)' == '3.7' && pip install https://xadupre.github.io/releases/onnx-1.4.1-cp37-cp37m-win_amd64.whl
       pip install -r requirements.txt
@@ -51,7 +50,7 @@ jobs:
     displayName: 'Install dependencies'
     
   - script: |
-      pip install numpy$(numpy.version)
+      conda install -y -c conda-forge numpy$(numpy.version) --no-deps
     displayName: 'update numpy (onnxruntime 1.4+ was compiled with numpy>=1.16)'
 
   - script: |
