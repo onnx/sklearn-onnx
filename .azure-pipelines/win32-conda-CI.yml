@@ -43,9 +43,9 @@ jobs:
   - script: |
       conda install -y -c conda-forge protobuf
       python -m pip install --upgrade pip
-      if '$(python.version)' == '3.7.0' pip install scipy-1.2.1-cp37-cp37m-win_amd64.whl
-      if '$(python.version)' == '3.7.0' pip install https://xadupre.github.io/releases/onnx-$(onnx.version)-cp37-cp37m-win_amd64.whl
-      if '$(python.version)' == '3.6.7' pip install onnx$(onnx.version)
+      test '$(python.version)' == '3.7.0' && pip install scipy-1.2.1-cp37-cp37m-win_amd64.whl
+      test '$(python.version)' == '3.7.0' && pip install https://xadupre.github.io/releases/onnx-$(onnx.version)-cp37-cp37m-win_amd64.whl
+      test '$(python.version)' == '3.6.7' && pip install onnx$(onnx.version)
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install pytest
