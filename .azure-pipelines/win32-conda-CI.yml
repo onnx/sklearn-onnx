@@ -39,7 +39,7 @@ jobs:
 
   - script: |
       conda config --set always_yes yes
-      conda install mkl icc_rt
+      conda install -c intel mkl icc_rt
       conda install -c conda-forge numpy$(numpy.version) scipy
     displayName: 'Install numpy mkl scipy'
 
