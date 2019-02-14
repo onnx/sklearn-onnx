@@ -2,17 +2,15 @@
 # Licensed under the MIT License.
 
 """
-.. _example-complex-pipeline:
+Walk through intermediate outputs
+=================================
 
-Convert a pipeline with ColumnTransformer
-=========================================
-
-*scikit-learn* recently shipped
-`ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_
-which lets the user define complex pipeline where each
-column may be preprocessed with a different transformer.
-*sklearn-onnx* still works in this case as shown in Section
-:ref:`l-complex-pipeline`.
+We reuse the example :ref:`example-complex-pipeline` and
+walk through intermediates outputs. It is very likely a converted
+model gives different outputs or fails due to a custom
+converter which is not correctly implemented.
+One option is to look into the output of every node of the
+ONNX graph.
 
 
 .. contents::
@@ -122,24 +120,13 @@ except Exception as e:
     print(e)
     
 #################################
-# Predictions are more efficient if the graph is small.
-# That's why the converter checks that there is no unused input.
-# They need to be removed from the graph inputs.
-
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
-inputs = convert_dataframe_schema(X_train, to_drop)
-try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
-except Exception as e:
-    print(e)
-
-#################################
 # *scikit-learn* does implicit conversions when it can.
 # *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 # must be applied on columns of the same type.
 
 X_train['pclass'] = X_train['pclass'].astype(str)
 X_test['pclass'] = X_test['pclass'].astype(str)
+to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
 inputs = convert_dataframe_schema(X_train, to_drop)
 
 model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
@@ -188,25 +175,83 @@ pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:1])
 
+
+####################################
+# Compute intermediate outputs
+# ++++++++++++++++++++++++++++
+#
+# Unfortunately, there is actually no way to ask 
+# *onnxruntime* to retrieve the output of intermediate nodes.
+# We need to modifies the *ONNX* before it is given to *onnxruntime*.
+# Let's see first the list of intermediate output.
+
+from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs, load_onnx_model
+model_onnx = load_onnx_model("pipeline_titanic.onnx")
+for out in enumerate_model_node_outputs(model_onnx):
+    print(out)
+    
+################################
+# Not that easy to tell which one is what as the *ONNX*
+# has more operators than the original *scikit-learn* pipelines.
+# The graph at :ref:`l-plot-complex-pipeline-graph`
+# helps up to find the outputs of both numerical
+# and textual pipeline: *variable1*, *variable2*.
+# Let's look into the numerical pipeline first.
+
+from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs, save_onnx_model
+num_onnx = select_model_inputs_outputs(model_onnx, 'variable1')
+save_onnx_model(num_onnx, "pipeline_titanic_numerical.onnx")
+
+################################
+# Let's compute the numerical features.
+
+sess = rt.InferenceSession("pipeline_titanic_numerical.onnx")
+numX = sess.run(None, inputs)
+print("numerical features", numX[0][:1])
+
+###########################################
+# We do the same for the textual features.
+
+text_onnx = select_model_inputs_outputs(model_onnx, 'variable2')
+save_onnx_model(text_onnx, "pipeline_titanic_textual.onnx")
+sess = rt.InferenceSession("pipeline_titanic_textual.onnx")
+numT = sess.run(None, inputs)
+print("textual features", numT[0][:1])
+
 ##################################
-# .. _l-plot-complex-pipeline-graph:
+# Display the sub-ONNX graph
+# ++++++++++++++++++++++++++
 #
-# Display the ONNX graph
-# ++++++++++++++++++++++
-#
-# Finally, let's see the graph converted with *sklearn-onnx*.
+# Finally, let's see both subgraphs. First, numerical pipeline.
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+pydot_graph = GetPydotGraph(num_onnx.graph, name=num_onnx.graph.name, rankdir="TB",
                             node_producer=GetOpNodeProducer("docstring", color="yellow",
                                                             fillcolor="yellow", style="filled"))
-pydot_graph.write_dot("pipeline_titanic.dot")
+pydot_graph.write_dot("pipeline_titanic_num.dot")
 
 import os
-os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic.dot')
+os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot')
 
 import matplotlib.pyplot as plt
-image = plt.imread("pipeline_titanic.dot.png")
+image = plt.imread("pipeline_titanic_num.dot.png")
+fig, ax = plt.subplots(figsize=(40, 20))
+ax.imshow(image)
+ax.axis('off')
+
+######################################
+# Then textual pipeline.
+
+pydot_graph = GetPydotGraph(text_onnx.graph, name=text_onnx.graph.name, rankdir="TB",
+                            node_producer=GetOpNodeProducer("docstring", color="yellow",
+                                                            fillcolor="yellow", style="filled"))
+pydot_graph.write_dot("pipeline_titanic_text.dot")
+
+import os
+os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot')
+
+import matplotlib.pyplot as plt
+image = plt.imread("pipeline_titanic_text.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
