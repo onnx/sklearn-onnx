@@ -205,7 +205,6 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             num_features = nb.feature_count_.shape[1]
             M = operator.inputs[0].type.shape[0]
 
-
             container.add_initializer(threshold_name, onnx_proto.TensorProto.FLOAT,
                                       [1], [nb.binarize])
             container.add_initializer(zero_tensor_name,
