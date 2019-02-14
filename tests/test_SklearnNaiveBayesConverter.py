@@ -35,7 +35,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx,
                         basename="SklearnBinMultinomialNB",
                         allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "< StrictVersion('0.2.1')")
+                                       "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
                      'Needs greater opset 9')
@@ -48,7 +48,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx,
                         basename="SklearnBinBernoulliNB",
                         allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "< StrictVersion('0.2.1')")
+                                       "<= StrictVersion('0.2.1')")
 
     def test_model_multinomial_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(MultinomialNB(),
@@ -59,7 +59,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx,
                         basename="SklearnMclMultinomialNB",
                         allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "< StrictVersion('0.2.1')")
+                                       "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
                      'Needs greater opset 9')
@@ -72,7 +72,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx,
                         basename="SklearnMclBernoulliNB",
                         allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "< StrictVersion('0.2.1')")
+                                       "<= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
