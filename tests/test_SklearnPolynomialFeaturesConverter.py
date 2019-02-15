@@ -52,7 +52,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                     basename="SklearnPolynomialFeaturesIntDegree3")
 
     def test_model_polynomial_features_float_degree_4(self):
-        X = np.array([[1.2, 3.2], [4.3, 3.2], [3.2, 4.7]])
+        X = np.array([[1.2, 3.2, 3.1, 1.3], [4.3, 3.2, 0.5, 1.3],
+                      [3.2, 4.7, 5.4, 7.1]])
         model = PolynomialFeatures(degree=4).fit(X)
         model_onnx = convert_sklearn(model, 'scikit-learn polynomial features',
                                      [('input', FloatTensorType(X.shape))])
@@ -61,7 +62,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                 basename="SklearnPolynomialFeaturesFloatDegree4")
 
     def test_model_polynomial_features_int_degree_4(self):
-        X = np.array([[1, 3], [4, 1], [3, 7], [3, 5], [1, 0], [5, 4]])
+        X = np.array([[1, 3, 4, 1], [3, 7, 3, 5], [1, 0, 5, 4]])
         model = PolynomialFeatures(degree=4).fit(X)
         model_onnx = convert_sklearn(model, 'scikit-learn polynomial features',
                                      [('input', Int64TensorType(X.shape))])
