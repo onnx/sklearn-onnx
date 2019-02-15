@@ -102,7 +102,7 @@ def build_sklearn_operator_name_map():
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
-                    OneVsRestClassifier, FunctionTransformer,
+                    OneVsRestClassifier, FunctionTransformer, VotingClassifier,
                     PolynomialFeatures]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
