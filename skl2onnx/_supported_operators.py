@@ -62,6 +62,7 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
@@ -100,7 +101,8 @@ def build_sklearn_operator_name_map():
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
-                    OneVsRestClassifier, FunctionTransformer]}
+                    OneVsRestClassifier, FunctionTransformer,
+                    PolynomialFeatures]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
