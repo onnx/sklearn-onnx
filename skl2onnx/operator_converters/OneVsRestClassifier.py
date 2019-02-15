@@ -8,6 +8,7 @@ from ..common._apply_operation import apply_concat
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
+from ..common.utils_classifier import _finalize_converter_classes
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -52,8 +53,12 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                         container, axis=1, p=1)
 
     # extracts the labels
-    container.add_node('ArgMax', conc_name, operator.outputs[0].full_name,
+    label_name = scope.get_unique_variable_name('label_name')
+    container.add_node('ArgMax', conc_name, label_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
+
+    _finalize_converter_classes(scope, label_name, operator.outputs[0].full_name, container,
+                                op.classes_)
 
 
 register_converter('SklearnOneVsRestClassifier', convert_one_vs_rest_classifier)

@@ -24,6 +24,13 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnLinearRegression-Dec4")
 
+    def test_model_linear_regression_nointercept(self):
+        model, X = self._fit_model(linear_model.LinearRegression(fit_intercept=False))
+        model_onnx = convert_sklearn(model, 'linear regression', [('input', FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(X.astype(numpy.float32), model, model_onnx,
+                            basename="SklearnLinearRegressionNoIntercept-Dec4")
+
     def test_model_linear_svr(self):
         model, X = self._fit_model(LinearSVR())
         model_onnx = convert_sklearn(model, 'linear SVR', [('input', FloatTensorType([1, 4]))])

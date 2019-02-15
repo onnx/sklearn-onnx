@@ -51,7 +51,8 @@ def is_backend_enabled(backend):
         raise NotImplementedError("Not implemented for backend '{0}'".format(backend))
 
 
-def compare_backend(backend, test, decimal=5, options=None, verbose=False, context=None):
+def compare_backend(backend, test, decimal=5, options=None, verbose=False, context=None,
+                    comparable_outputs=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -66,6 +67,7 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
     :param decimal: precision of the comparison
     :param options: comparison options
     :param context: specifies custom operators
+    :param comparable_outputs: compare only these outputs
     :param verbose: in case of error, the function may print
         more information on the standard output
     
@@ -78,7 +80,8 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
             # onnxruntime is not available on Python 2.
             return            
         from .utils_backend_onnxruntime import compare_runtime
-        return compare_runtime(test, decimal, options=options, verbose=verbose)
+        return compare_runtime(test, decimal, options=options, verbose=verbose,
+                               comparable_outputs=comparable_outputs)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
 
@@ -225,7 +228,12 @@ def compare_outputs(expected, output, **kwargs):
                 expected_ = expected.ravel()
                 output_ = output.ravel()
                 if len(expected_) == len(output_):
-                    diff = numpy.abs(expected_ - output_).max()
+                    if numpy.issubdtype(expected_.dtype, numpy.floating):
+                        diff = numpy.abs(expected_ - output_).max()
+                    else:
+                        diff = max((1 if ci != cj else 0) for ci, cj in zip(expected_, output_))
+                    if diff == 0:
+                        return None
                 elif Mism:
                     return ExpectedAssertionError("dimension mismatch={0}, {1}\n{2}".format(expected.shape, output.shape, e))
                 else:

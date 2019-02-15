@@ -16,10 +16,28 @@ from .utils_backend import compare_backend, extract_options, evaluate_condition,
 from skl2onnx.common.data_types import FloatTensorType
 
 
+def _has_predict_proba(model):
+    if hasattr(model, 'voting') and model.voting == 'hard':
+        return False
+    return hasattr(model, "predict_proba")
+
+    
+def _has_decision_function(model):
+    if hasattr(model, 'voting'):
+        return False
+    return hasattr(model, "decision_function")
+
+    
+def _has_transform_model(model):
+    if hasattr(model, 'voting'):
+        return False
+    return hasattr(model, "fit_transform") and hasattr(model, "score")
+    
+
 def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                         inputs=None, backend="onnxruntime", context=None,
                         allow_failure=None, methods=None, dump_error_log=None, benchmark=None,
-                        verbose=False):
+                        comparable_outputs=None, verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -56,6 +74,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
         this parameter defines which methods is equivalent to ONNX outputs.
         If not specified, it falls back into a default behaviour implemented
         for classifiers, regressors, clustering.
+    :param comparable_outputs: compares only these outputs
     :return: the created files
 
     Some convention for the name,
@@ -114,20 +133,20 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                 raise RuntimeError("Method '{0}' is not callable.".format(method))
     else:
         if hasattr(model, "predict"):
-            if hasattr(model, "predict_proba"):
+            if _has_predict_proba(model):
                 # Classifier
                 prediction = [model.predict(data), model.predict_proba(data)]
                 lambda_original = lambda: model.predict_proba(dataone)
-            elif hasattr(model, "decision_function"):
+            elif _has_decision_function(model):
                 # Classifier without probabilities
                 prediction = [model.predict(data), model.decision_function(data)]
                 lambda_original = lambda: model.decision_function(dataone)
-            elif hasattr(model, "fit_transform") and hasattr(model, "score"):
+            elif _has_transform_model(model):
                 # clustering
                 prediction = [model.predict(data), model.transform(data)]            
                 lambda_original = lambda: model.transform(dataone)
             else:
-                # Regressor
+                # Regressor or VotingClassifier
                 prediction = [model.predict(data)]
                 lambda_original = lambda: model.predict(dataone)
         elif hasattr(model, "transform"):
@@ -196,7 +215,8 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                 allow = allow_failure
             if allow is None:
                 output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
-                                                      context=context, verbose=verbose)
+                                                      context=context, verbose=verbose,
+                                                      comparable_outputs=comparable_outputs)
             else:
                 try:
                     output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
@@ -243,21 +263,12 @@ def convert_model(model, name, input_types):
     return model, prefix
 
     
-def dump_one_class_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
+def dump_one_class_classification(model, suffix="", folder=None, allow_failure=None,
+                                 comparable_outputs=None, verbose=False):
     """
     Trains and dumps a model for a One Class outlier problem.
     The function trains a model and calls
     :func:`dump_data_and_model`.
-    
-    :param model: any model following *scikit-learn* API
-    :param suffix: added to filenames
-    :param folder: where to save the file
-    :param allow_failure: None to raise an exception if comparison fails
-        for the backends, otherwise a string which is then evaluated to check
-        whether or not the test can fail, example:
-        ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :param verbose: additional information
-    :return: output of :func:`dump_data_and_model`
     
     Every created filename will follow the pattern:
     ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
@@ -269,22 +280,15 @@ def dump_one_class_classification(model, suffix="", folder=None, allow_failure=N
     model_onnx, prefix = convert_model(model, 'one_class', [('input', FloatTensorType([1, 2]))])
     return dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                                basename=prefix + "One" + model.__class__.__name__ + suffix,
-                               verbose=verbose)
+                               verbose=verbose, comparable_outputs=comparable_outputs)
 
 
-def dump_binary_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
+def dump_binary_classification(model, suffix="", folder=None, allow_failure=None,
+                               comparable_outputs=None, verbose=False):
     """
     Trains and dumps a model for a binary classification problem.
-    
-    :param model: any model following *scikit-learn* API
-    :param suffix: added to filenames
-    :param folder: where to save the file
-    :param allow_failure: None to raise an exception if comparison fails
-        for the backends, otherwise a string which is then evaluated to check
-        whether or not the test can fail, example:
-        ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :param verbose: additional information
-    :return: output of :func:`dump_data_and_model`
+    The function trains a model and calls
+    :func:`dump_data_and_model`.
     
     Every created filename will follow the pattern:
     ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
@@ -296,21 +300,15 @@ def dump_binary_classification(model, suffix="", folder=None, allow_failure=None
     model_onnx, prefix = convert_model(model, 'binary classifier', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Bin" + model.__class__.__name__ + suffix,
-                        verbose=verbose)
+                        verbose=verbose, comparable_outputs=comparable_outputs)
 
-def dump_multiple_classification(model, suffix="", folder=None, allow_failure=None, verbose=False):
+def dump_multiple_classification(model, suffix="", folder=None, allow_failure=None,
+                                 verbose=False, label_string=False, first_class=0,
+                                 comparable_outputs=None):
     """
     Trains and dumps a model for a binary classification problem.
-    
-    :param model: any model following *scikit-learn* API
-    :param suffix: added to filenames
-    :param folder: where to save the file
-    :param allow_failure: None to raise an exception if comparison fails
-        for the backends, otherwise a string which is then evaluated to check
-        whether or not the test can fail, example:
-        ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :param verbose: additional information
-    :return: output of :func:`dump_data_and_model`
+    The function trains a model and calls
+    :func:`dump_data_and_model`.
     
     Every created filename will follow the pattern:
     ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
@@ -318,6 +316,9 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     X = [[0, 1], [1, 1], [2, 0], [0.5, 0.5], [1.1, 1.1], [2.1, 0.1]]
     X = numpy.array(X, dtype=numpy.float32)
     y = [0, 1, 2, 1, 1, 2]
+    y = [i + first_class for i in y]
+    if label_string:
+        y = ["l%d" % i for i in y]
     model.fit(X, y)
     if verbose:
         print("[dump_multiple_classification] model '{}'".format(model.__class__.__name__))
@@ -326,22 +327,15 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "Mcl" + model.__class__.__name__ + suffix,
-                        verbose=verbose)
+                        verbose=verbose, comparable_outputs=comparable_outputs)
 
 
-def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None, verbose=False):
+def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None,
+                             comparable_outputs=None, verbose=False):
     """
     Trains and dumps a model for a multi regression problem.
-    
-    :param model: any model following *scikit-learn* API
-    :param suffix: added to filenames
-    :param folder: where to save the file
-    :param allow_failure: None to raise an exception if comparison fails
-        for the backends, otherwise a string which is then evaluated to check
-        whether or not the test can fail, example:
-        ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :param verbose: additional information
-    :return: output of :func:`dump_data_and_model`
+    The function trains a model and calls
+    :func:`dump_data_and_model`.
     
     Every created filename will follow the pattern:
     ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
@@ -353,22 +347,14 @@ def dump_multiple_regression(model, suffix="", folder=None, allow_failure=None, 
     model_onnx, prefix = convert_model(model, 'multi-regressor', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
                         basename=prefix + "MRg" + model.__class__.__name__ + suffix,
-                        verbose=verbose)
+                        verbose=verbose, comparable_outputs=comparable_outputs)
 
 
-def dump_single_regression(model, suffix="", folder=None, allow_failure=None):
+def dump_single_regression(model, suffix="", folder=None, allow_failure=None, comparable_outputs=None):
     """
     Trains and dumps a model for a regression problem.
-    
-    :param model: any model following *scikit-learn* API
-    :param prefix: library name
-    :param suffix: added to filenames
-    :param folder: where to save the file
-    :param allow_failure: None to raise an exception if comparison fails
-        for the backends, otherwise a string which is then evaluated to check
-        whether or not the test can fail, example:
-        ``"StrictVersion(onnx.__version__) < StrictVersion('1.3.0')"``
-    :return: output of :func:`dump_data_and_model`
+    The function trains a model and calls
+    :func:`dump_data_and_model`.
     
     Every created filename will follow the pattern:
     ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
@@ -379,7 +365,8 @@ def dump_single_regression(model, suffix="", folder=None, allow_failure=None):
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, 'single regressor', [('input', FloatTensorType([1, 2]))])
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,
-                        basename=prefix + "Reg" + model.__class__.__name__ + suffix)
+                        basename=prefix + "Reg" + model.__class__.__name__ + suffix,
+                        comparable_outputs=comparable_outputs)
 
 
 def timeit_repeat(fct, number, repeat):

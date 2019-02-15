@@ -34,6 +34,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.ensemble import VotingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 
@@ -80,7 +81,7 @@ from sklearn.impute import SimpleImputer
 sklearn_classifier_list = [LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
                            GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
                            ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
-                           CalibratedClassifierCV, OneVsRestClassifier]
+                           CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier]
 
 # Clustering algorithms: produces two outputs, label and score for each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
@@ -101,7 +102,7 @@ def build_sklearn_operator_name_map():
                     CountVectorizer, TfidfVectorizer, TfidfTransformer,
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
-                    OneVsRestClassifier, FunctionTransformer,
+                    OneVsRestClassifier, FunctionTransformer, VotingClassifier,
                     PolynomialFeatures]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
