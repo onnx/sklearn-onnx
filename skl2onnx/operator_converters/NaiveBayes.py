@@ -177,18 +177,11 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         
     if operator.type == 'SklearnMultinomialNB':
         matmul_result_name = scope.get_unique_variable_name('matmul_result')
-        shape_result_name = scope.get_unique_variable_name('shape_result')
-        reshape_result_name = scope.get_unique_variable_name('reshape_result')
 
         container.add_node('MatMul', [operator.inputs[0].full_name, feature_log_prob_name],
                            matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
-        # Cast is required here as Sum op doesn't work with Float64
-        apply_cast(scope, matmul_result_name, cast_result_name, container,
-                   to=onnx_proto.TensorProto.FLOAT)
-        container.add_node('Shape', class_log_prior_name, shape_result_name)
-        apply_reshape(scope, [cast_result_name, shape_result_name], reshape_result_name, container)
-        container.add_node('Sum', [reshape_result_name, class_log_prior_name],
-                           sum_result_name, name=scope.get_unique_operator_name('Sum'), op_version=sum_op_version)
+        apply_add(scope, [matmul_result_name, class_log_prior_name],
+                  sum_result_name, container, broadcast=1)
     else:
         constant_name = scope.get_unique_variable_name('constant')
         exp_result_name = scope.get_unique_variable_name('exp_result')
@@ -208,21 +201,22 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             condition_name = scope.get_unique_variable_name('condition')
             cast_values_name = scope.get_unique_variable_name('cast_values')
             zero_tensor_name = scope.get_unique_variable_name('zero_tensor')
-            cast_zero_tensor_name = scope.get_unique_variable_name('cast_zero_tensor')
             binarised_input_name = scope.get_unique_variable_name('binarised_input')
+            num_features = nb.feature_count_.shape[1]
+            M = operator.inputs[0].type.shape[0]
 
             container.add_initializer(threshold_name, onnx_proto.TensorProto.FLOAT,
                                       [1], [nb.binarize])
+            container.add_initializer(zero_tensor_name,
+                            onnx_proto.TensorProto.FLOAT, [M, num_features],
+                            np.zeros((M, num_features)).ravel())
         
             container.add_node('Greater', [operator.inputs[0].full_name, threshold_name],
                               condition_name, name=scope.get_unique_operator_name('Greater'), op_version=9)
             apply_cast(scope, condition_name, cast_values_name, container,
                        to=onnx_proto.TensorProto.FLOAT)
-            container.add_node('ConstantOfShape', operator.inputs[0].full_name, zero_tensor_name,
-                               name=scope.get_unique_operator_name('ConstantOfShape'), op_version=9)
-            apply_cast(scope, zero_tensor_name, cast_zero_tensor_name, container,
-                       to=onnx_proto.TensorProto.FLOAT)
-            apply_add(scope, [cast_zero_tensor_name, cast_values_name], binarised_input_name, container, broadcast=1)
+            apply_add(scope, [zero_tensor_name, cast_values_name],
+                      binarised_input_name, container, broadcast=1)
             input_name = binarised_input_name
 
         apply_exp(scope, feature_log_prob_name, exp_result_name, container)
