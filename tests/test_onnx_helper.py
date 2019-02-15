@@ -19,11 +19,10 @@ class TestOnnxHelper(unittest.TestCase):
         except ImportError:
             return None
         
-        from onnxruntime.sklapi import OnnxTransformer
+        from onnxruntime import InferenceSession
         
-        tr = OnnxTransformer(save_onnx_model(model))
-        tr.fit()
-        return tr
+        session = InferenceSession(save_onnx_model(model))
+        return lambda X: session.run(None, {'input': X})[0]
 
     def test_onnx_helper_load_save(self):
         model = make_pipeline(StandardScaler(), Binarizer(threshold=0.5))
@@ -40,8 +39,8 @@ class TestOnnxHelper(unittest.TestCase):
         tr1 = self.get_model(model)
         tr2 = self.get_model(new_model)
         X = X.astype(numpy.float32)
-        X1 = tr1.transform(X)
-        X2 = tr2.transform(X)
+        X1 = tr1(X)
+        X2 = tr2(X)
         assert X1.shape == (2, 2)
         assert X2.shape == (2, 2)
         
@@ -60,8 +59,8 @@ class TestOnnxHelper(unittest.TestCase):
         tr1 = self.get_model(model)
         tr2 = self.get_model(new_model)
         X = X.astype(numpy.float32)
-        X1 = tr1.transform(X)
-        X2 = tr2.transform(X)
+        X1 = tr1(X)
+        X2 = tr2(X)
         assert X1.shape == (4, 2)
         assert X2.shape == (4, 2)
         
