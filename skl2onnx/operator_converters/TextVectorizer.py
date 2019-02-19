@@ -120,9 +120,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         notnormalized = scope.get_unique_variable_name('notnormalized')
         output = [notnormalized]
 
-    import pprint
-    print(op_type, tokenized, output)
-    pprint.pprint(attrs)    
     if container.target_opset < 9:
         op_type = 'Ngram'
         container.add_node(op_type, tokenized, output, op_domain='com.microsoft', **attrs)
