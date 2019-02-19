@@ -4,14 +4,13 @@ import pandas
 from distutils.version import StrictVersion
 import onnx
 from sklearn import datasets
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline, Pipeline, FeatureUnion
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
-from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import TruncatedSVD
-from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline, Pipeline, FeatureUnion
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
@@ -74,11 +73,9 @@ class TestSklearnPipeline(unittest.TestCase):
         from sklearn.pipeline import Pipeline
 
         data = numpy.array([[0., 0.], [0., 0.], [1., 1.], [1., 1.]], dtype=numpy.float32)
-        scaler = StandardScaler()
-        scaler.fit(data)
-        model = Pipeline([('scaler1', scaler),
+        model = Pipeline([('scaler1', StandardScaler()),
                           ('union', FeatureUnion([
-                                        ('scaler2', scaler),
+                                        ('scaler2', StandardScaler()),
                                         ('scaler3', MinMaxScaler())]))])
         model.fit(data)
         model_onnx = convert_sklearn(model, 'pipeline',
