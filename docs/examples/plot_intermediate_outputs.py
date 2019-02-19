@@ -12,7 +12,6 @@ converter which is not correctly implemented.
 One option is to look into the output of every node of the
 ONNX graph.
 
-
 .. contents::
     :local:
 
@@ -27,8 +26,8 @@ There is one change because
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -68,7 +67,6 @@ preprocessor = ColumnTransformer(
 
 clf = Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', LogisticRegression(solver='lbfgs'))])
-
 
 clf.fit(X_train, y_train)
 

@@ -23,7 +23,6 @@ def load_onnx_model(onnx_file_or_bytes):
     else:
         b = BytesIO(onnx_file_or_bytes)
         return onnx.load(b)
-    
 
 
 def save_onnx_model(model, filename=None):
@@ -132,4 +131,3 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     if len(onnx_model.graph.input) != len(model.graph.input):
         raise RuntimeError("Input mismatch {} != {}".format(len(onnx_model.input), len(model.input)))
     return onnx_model
-
