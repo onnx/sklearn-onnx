@@ -5,8 +5,8 @@ from distutils.version import StrictVersion
 import onnx
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline, Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.pipeline import make_pipeline, Pipeline, FeatureUnion
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import TruncatedSVD
@@ -68,6 +68,27 @@ class TestSklearnPipeline(unittest.TestCase):
         data = {'input1': data[:, 0], 'input2': data[:, 1]}
         dump_data_and_model(data, PipeConcatenateInput(model), model_onnx,
                             basename="SklearnPipelineScaler11-OneOff")
+
+    def test_combine_inputs_union_in_pipeline(self):
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.pipeline import Pipeline
+
+        data = numpy.array([[0., 0.], [0., 0.], [1., 1.], [1., 1.]], dtype=numpy.float32)
+        scaler = StandardScaler()
+        scaler.fit(data)
+        model = Pipeline([('scaler1', scaler),
+                          ('union', FeatureUnion([
+                                        ('scaler2', scaler),
+                                        ('scaler3', MinMaxScaler())]))])
+        model.fit(data)
+        model_onnx = convert_sklearn(model, 'pipeline',
+                                     [('input1', FloatTensorType([1, 1])),
+                                      ('input2', FloatTensorType([1, 1]))])
+        self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
+        self.assertTrue(model_onnx is not None)
+        data = {'input1': data[:, 0], 'input2': data[:, 1]}
+        dump_data_and_model(data, PipeConcatenateInput(model), model_onnx,
+                            basename="SklearnPipelineScaler11Union-OneOff")
 
     def test_combine_inputs_floats_ints(self):
         from sklearn.preprocessing import StandardScaler
