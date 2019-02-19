@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Tests scikit-learn's binarizer converter.
 """
@@ -16,12 +17,13 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
     def test_model_tfidf_transform_bug(self):        
         categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
         twenty_train = fetch_20newsgroups(subset='train', categories=categories,
-                                          shuffle=True, random_state=42)
+                                          shuffle=True, random_state=0)
         text_clf = Pipeline([
             ('vect', CountVectorizer()),
             ('tfidf', TfidfTransformer()),
         ])
 
+        twenty_train.data[0] = "bruît " + twenty_train.data[0]
         text_clf.fit(twenty_train.data, twenty_train.target)
         model_onnx = convert_sklearn(text_clf, name='DocClassifierCV-Tfidf',
                                initial_types=[('input', StringTensorType())])

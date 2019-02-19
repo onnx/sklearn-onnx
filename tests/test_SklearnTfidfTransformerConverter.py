@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Tests scikit-learn's binarizer converter.
 """
@@ -18,7 +19,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 'This document is the second document.',
                 'And this is the third one.',
                 'Is this the first document?',
-                ]).reshape((4, 1))
+                "Troisième document en français",
+                ]).reshape((5, 1))
         data = CountVectorizer(ngram_range=(1, 1)).fit_transform(corpus.ravel()).todense()
         data = data.astype(numpy.float32)
         
@@ -45,7 +47,6 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                             basename="SklearnTfidfTransform" + suffix,
                                             # Operator mul is not implemented in onnxruntime
                                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
-
 
 if __name__ == "__main__":
     unittest.main()
