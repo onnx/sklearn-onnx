@@ -12,8 +12,12 @@ from ..proto import onnx_proto
 
 def convert_sklearn_linear_classifier(scope, operator, container):
     op = operator.raw_operator
-    coefficients = op.coef_.flatten().tolist()
-    intercepts = op.intercept_.tolist()
+    coefficients = op.coef_.flatten().astype(float).tolist()
+    if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
+        # fit_intercept = False
+        intercepts = [0.0]
+    else:
+        intercepts = op.intercept_.tolist()
     classes = op.classes_
     if len(classes) == 2:
         coefficients = list(map(lambda x: -1 * x, coefficients)) + coefficients
