@@ -10,6 +10,7 @@ from . import Concat
 from . import DictVectorizer
 from . import FunctionTransformer
 from . import Imputer
+from . import KBinsDiscretiser
 from . import KMeans
 from . import LabelBinariser
 from . import LabelEncoder
