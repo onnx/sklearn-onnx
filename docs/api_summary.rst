@@ -14,6 +14,17 @@ Converters
 
 .. autofunction:: skl2onnx.convert_sklearn
 
+Manipulate ONNX graphs
+======================
+
+.. autofunction:: skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs
+
+.. autofunction:: skl2onnx.helpers.onnx_helper.load_onnx_model
+
+.. autofunction:: skl2onnx.helpers.onnx_helper.select_model_inputs_outputs
+
+.. autofunction:: skl2onnx.helpers.onnx_helper.save_onnx_model
+
 Registered functions
 ====================
 
@@ -31,8 +42,8 @@ Parsers
 .. autofunction:: skl2onnx._parse.parse_sklearn_model
 
 
-Utils
-=====
+Utils for contributors
+======================
 
 .. autofunction:: skl2onnx.common.utils.check_input_and_output_numbers
 
