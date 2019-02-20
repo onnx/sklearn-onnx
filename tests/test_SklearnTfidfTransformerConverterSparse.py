@@ -16,9 +16,9 @@ from test_utils import dump_data_and_model
 
 class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
 
-    unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.4.1'),
-                    # issue with encoding
-                    reason="https://github.com/onnx/onnx/pull/1734")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.4.1'),
+                     # issue with encoding
+                     reason="https://github.com/onnx/onnx/pull/1734")
     def test_model_tfidf_transform_bug(self):        
         categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
         twenty_train = fetch_20newsgroups(subset='train', categories=categories,
