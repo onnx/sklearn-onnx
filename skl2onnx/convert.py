@@ -17,7 +17,7 @@ from . import operator_converters
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
-                    custom_parsers=None):
+                    custom_parsers=None, options=None):
     '''
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -42,6 +42,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param custom_parsers: parsers determines which outputs is expected for which particular task,
         default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
+    :param options: specific options given to converters (see :ref:`l-conv-options`)
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of initial_types:
@@ -63,6 +64,42 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         *scikit-learn* allow the user to specify columns by names. This option is not supported
         by *sklearn-onnx* as features names could be different in input data and the ONNX graph
         (defined by parameter *initial_types*), only integers are supported.
+
+    .. _l-conv-options:
+
+    Converters options
+    ++++++++++++++++++
+
+    Some ONNX operators exposes parameters *sklearn-onnx* cannot
+    guess from the raw model. Some default values are usually suggested
+    but the users may have to manually overwrite them. This need
+    is not obvious to do when a model is included in a pipeline.
+    That's why these options can be given to function *convert_sklearn*
+    as a dictionary ``{model_type: parameters in a dictionary}`` or
+    ``{model_id: parameters in a dictionary}``.
+    Option *sep* is used to specify the delimiters between two words
+    when the ONNX graph needs to tokenize a string.
+    The default value is short and may not include all
+    the necessary values. It can be overwritten as:
+
+    ::
+
+        extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+        model_onnx = convert_sklearn(model, "tfidf",
+                                     initial_types=[("input", StringTensorType([1, 1]))],
+                                     options=extra)
+
+    But if a pipeline contains two model of the same class,
+    it is possible to disintguish between the two with function *id*:
+
+    ::
+
+        extra = {id(model): {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+        model_onnx = convert_sklearn(pipeline, "pipeline-with-2-tfidf",
+                                     initial_types=[("input", StringTensorType([1, 1]))],
+                                     options=extra)
+
+    It used in example :ref:`l-tfidfvecorizer`.
     '''
     if initial_types is None:
         raise ValueError('Initial types are required. See usage of convert(...) in \
@@ -81,6 +118,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology.compile()
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
-    onnx_model = convert_topology(topology, name, doc_string, target_opset)
+    onnx_model = convert_topology(topology, name, doc_string, target_opset,
+                                  options=options)
 
     return onnx_model

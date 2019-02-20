@@ -9,6 +9,16 @@ from ..common._registration import register_converter
 
 
 def convert_sklearn_text_vectorizer(scope, operator, container):
+    """
+    Converters for class *TfidfVectorizer*.
+    
+    Additional options
+    ------------------
+    
+    sep: list of separators
+        These separators are used to split a string into words.
+        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
+    """
 
     op = operator.raw_operator
 
@@ -17,8 +27,11 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.strip_accents is not None:
         raise NotImplementedError("CountVectorizer cannot be converted, only stip_accents=None is supported.")
 
+    options = container.get_options(op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
+    if set(options) != {'sep'}:
+        raise RuntimeError("Unknown option {} for {}".format(set(options) - {'sep'}, type(op)))
     default_pattern = '(?u)\\b\\w\\w+\\b'
-    default_separators = [' ', '.', '?', ',', ';', ':', '!']
+    default_separators = options['sep']
     if op.token_pattern != default_pattern:
         raise NotImplementedError("Only the default tokenizer based on default regular expression '{0}' is implemented.".format(default_pattern))
     if op.preprocessor is not None:
@@ -102,7 +115,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         weights[ind] = weights_[i]
 
     # Create the node.
-    attrs = {'name': scope.get_unique_operator_name(op_type)}
+    attrs = {'name': scope.get_unique_operator_name("TfIdfVectorizer")}
     attrs.update({
         'min_gram_length': op.ngram_range[0],
         'max_gram_length': op.ngram_range[1],

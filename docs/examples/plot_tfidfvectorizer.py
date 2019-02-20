@@ -139,8 +139,47 @@ print(classification_report(y, test.target))
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 
+extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
 model_onnx = convert_sklearn(pipeline, "tfidf",
-                             initial_types=[("input", StringTensorType([1, 2]))])
+                             initial_types=[("input", StringTensorType([1, 2]))],
+                             options=extra)
+
+#################################
+# And save.
+with open("pipeline_tfidf.onnx", "wb") as f:
+    f.write(model_onnx.SerializeToString())
+
+##########################
+# Predictions with onnxruntime.
+
+import onnxruntime as rt
+import numpy
+sess = rt.InferenceSession("pipeline_tfidf.onnx")
+print('---', train_data[0])
+inputs = {'input': train_data[0]}
+pred_onx = sess.run(None, inputs)
+print("predict", pred_onx[0][:5])
+print("predict_proba", pred_onx[1][:1])
 
 
+##################################
+# Display the ONNX graph
+# ++++++++++++++++++++++
+#
+# Finally, let's see the graph converted with *sklearn-onnx*.
+
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+                            node_producer=GetOpNodeProducer("docstring", color="yellow",
+                                                            fillcolor="yellow", style="filled"))
+pydot_graph.write_dot("pipeline_tfidf.dot")
+
+import os
+os.system('dot -O -Gdpi=300 -Tpng pipeline_tfidf.dot')
+
+import matplotlib.pyplot as plt
+image = plt.imread("pipeline_tfidf.dot.png")
+fig, ax = plt.subplots(figsize=(40, 20))
+ax.imshow(image)
+ax.axis('off')
                              

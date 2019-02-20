@@ -140,6 +140,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
             column_indices = list(range(column_indices.start if column_indices.start is not None else 0,
                                         column_indices.stop, column_indices.step if column_indices.step
                                         is not None else 1))
+        elif isinstance(column_indices, (int, str)):
+            column_indices = [column_indices]
         names = get_column_indices(column_indices, inputs, multiple=True)
         transform_inputs = []
         for onnx_var, onnx_is in names.items():
