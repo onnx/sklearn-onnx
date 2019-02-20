@@ -158,6 +158,9 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container, mod
                 container.add_node('Clip', df_col_name,
                                     clipped_df_name, name=scope.get_unique_operator_name('Clip'),
                                     min=model.calibrators_[k].X_min_, max=model.calibrators_[k].X_max_)
+                # Clipped column values need to be interpolated, which needs
+                # Interpolate op to be added to onnx
+                # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2625
                 T = clipped_df_name
 
         prob_name[k] = T
