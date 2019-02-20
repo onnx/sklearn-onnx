@@ -59,6 +59,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
@@ -103,7 +104,7 @@ def build_sklearn_operator_name_map():
                     GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr, SelectFromModel,
                     SelectFwe, SelectKBest, SelectPercentile, VarianceThreshold,
                     OneVsRestClassifier, FunctionTransformer, VotingClassifier,
-                    PolynomialFeatures]}
+                    PolynomialFeatures, KBinsDiscretizer]}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',
