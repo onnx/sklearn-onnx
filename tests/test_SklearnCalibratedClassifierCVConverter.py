@@ -24,7 +24,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                            basename="SklearnCalibratedClassifierCVFloat")
+                        basename="SklearnCalibratedClassifierCVFloat",
+                        allow_failure="StrictVersion(onnxruntime.__version__)"
+                                       "<= StrictVersion('0.1.4')")
 
     def test_model_calibrated_classifier_cv_int(self):
         data = load_digits()
@@ -35,7 +37,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                            basename="SklearnCalibratedClassifierCVInt")
+                        basename="SklearnCalibratedClassifierCVInt",
+                        allow_failure="StrictVersion(onnxruntime.__version__)"
+                                       "<= StrictVersion('0.1.4')")
 
 
 if __name__ == "__main__":
