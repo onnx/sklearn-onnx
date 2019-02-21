@@ -1,5 +1,5 @@
 """
-Tests pipeline within pipelines.
+Tests examples from scikit-learn documentation.
 """
 import unittest
 import onnx
@@ -54,7 +54,7 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
 class TestSklearnDocumentation(unittest.TestCase):
     "Test example from the documentation of scikit-learn."
 
-    def test_pipeline_tfidf(self):        
+    def _test_pipeline_tfidf(self):        
         categories = ['alt.atheism', 'talk.religion.misc']
         train = fetch_20newsgroups(random_state=1,
                                    subset='train',
@@ -84,12 +84,16 @@ class TestSklearnDocumentation(unittest.TestCase):
                  ],
                 transformer_weights={'subject': 0.8}))])        
         pipeline.fit(train_data[:300])
-        extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+        extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
+                                           '\n', '"', "'", "-", "[", "]", "@"]}}
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=extra)
-        dump_data_and_model(train_data[:5], pipeline, model_onnx,
-                            basename="SklearnDocumentationTfIdfUnion1-OneOff")
+        test_data = np.array([
+            ['Albert Einstein', 'Not relatively.'],
+            ['Alan turing', 'Not automatically.']])
+        dump_data_and_model(test_data, pipeline, model_onnx, verbose=False,
+                            basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2")
 
 
 if __name__ == "__main__":

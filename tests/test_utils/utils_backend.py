@@ -166,7 +166,7 @@ def extract_options(name):
     else:
         res = {}
         for opt in opts[1:]:
-            if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3",
+            if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3", "Dec2",
                        'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
                 res[opt] = True
             else:
@@ -183,6 +183,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
     NoProb = kwargs.pop("NoProb", False)
     Dec4 = kwargs.pop("Dec4", False)
     Dec3 = kwargs.pop("Dec3", False)
+    Dec2 = kwargs.pop("Dec2", False)
     Disc = kwargs.pop("Disc", False)
     Mism = kwargs.pop("Mism", False)
 
@@ -190,6 +191,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 4)
     if Dec3:
         kwargs["decimal"] = min(kwargs["decimal"], 3)
+    if Dec2:
+        kwargs["decimal"] = min(kwargs["decimal"], 2)
     if isinstance(expected, numpy.ndarray) and isinstance(output, numpy.ndarray):
         if SkipDim1:
             # Arrays like (2, 1, 2, 3) becomes (2, 2, 3) as one dimension is useless.

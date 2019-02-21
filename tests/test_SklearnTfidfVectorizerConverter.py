@@ -27,6 +27,44 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    def test_model_tfidf_vectorizer11_empty_string(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                '',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer11_out_vocabulary(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        corpus = numpy.array([
+                'AZZ ZZ This is the first document.',
+                'BZZ ZZ This document is the second document.',
+                'ZZZ ZZ And this is the third one.',
+                'WZZ ZZ Is this the first document?',
+                ]).reshape((4, 1))
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
                 'This is the first document.',

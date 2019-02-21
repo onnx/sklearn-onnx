@@ -99,7 +99,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
 
-    It used in example :ref:`l-tfidfvecorizer`.
+    It used in example :ref:`l-example-tfidfvectorizer`.
     '''
     if initial_types is None:
         raise ValueError('Initial types are required. See usage of convert(...) in \

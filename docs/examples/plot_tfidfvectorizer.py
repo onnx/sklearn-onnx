@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 """
-.. _l-tfidfvecorizer:
+.. _l-example-tfidfvectorizer:
 
 TfIdfVectorizer with ONNX
 =========================
@@ -34,7 +34,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 
 
 # limit the list of categories to make running this example faster.
@@ -88,18 +88,6 @@ test_data = SubjectBodyExtractor().fit_transform(test.data)
 # The pipeline is almost the same except
 # we remove the custom features.
 
-# custom part
-# class TextStats(BaseEstimator, TransformerMixin):
-#     """Extract features from each document for DictVectorizer"""
-# 
-#    def fit(self, x, y=None):
-#        return self
-#
-#    def transform(self, posts):
-#        return [{'length': len(text),
-#                 'num_sentences': text.count('.')}
-#                for text in posts]
-
 pipeline = Pipeline([
     ('union', ColumnTransformer(
         [
@@ -110,7 +98,7 @@ pipeline = Pipeline([
                 ('best', TruncatedSVD(n_components=50)),
             ]), 1),
 
-            # Removed as it requires a custom converter.
+            # Removed from the original example as it requires a custom converter.
             # ('body_stats', Pipeline([
             #     ('stats', TextStats()),  # returns a list of dicts
             #     ('vect', DictVectorizer()),  # list of dicts -> feature matrix
@@ -124,25 +112,33 @@ pipeline = Pipeline([
         }
     )),
 
-    # Use a SVC classifier on the combined features
-    ('svc', LinearSVC()),
+    # Use a LogisticRegression classifier on the combined features.
+    # Instead of LinearSVC (not fully ready in onnxruntime).
+    ('logreg', LogisticRegression()),
 ])
 
 pipeline.fit(train_data, train.target)
-y = pipeline.predict(test_data)
-print(classification_report(y, test.target))
+print(classification_report(pipeline.predict(test_data), test.target))
 
 #################################
 # ONNX conversion
 # +++++++++++++++
+#
+# It is difficult to replicate the exact same tokenizer
+# behaviour if the tokeniser comes from space, gensim or nltk.
+# The default one used by *scikit-learn* uses regular expressions
+# and is currently being implementing. The current implementation
+# only considers a list of separators which can is defined
+# in variable *seps*.
 
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 
-extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
+                                   '\n', '"', "'", "-", "[", "]", "@"]}}
 model_onnx = convert_sklearn(pipeline, "tfidf",
                              initial_types=[("input", StringTensorType([1, 2]))],
-                             options=extra)
+                             options=seps)
 
 #################################
 # And save.
@@ -158,9 +154,18 @@ sess = rt.InferenceSession("pipeline_tfidf.onnx")
 print('---', train_data[0])
 inputs = {'input': train_data[0]}
 pred_onx = sess.run(None, inputs)
-print("predict", pred_onx[0][:5])
-print("predict_proba", pred_onx[1][:1])
+print("predict", pred_onx[0])
+print("predict_proba", pred_onx[1])
 
+############################
+# With *scikit-learn*:
+print(pipeline.predict(train_data[0:1]))
+print(pipeline.predict_proba(train_data[0:1]))
+
+###############################
+# There are discrepencies for this model because
+# the tokenization is not exactly the same.
+# This is a work in progress.
 
 ##################################
 # Display the ONNX graph

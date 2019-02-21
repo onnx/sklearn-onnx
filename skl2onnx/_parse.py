@@ -150,7 +150,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
         
         if len(transform_inputs) > 1:            
             # Many ONNX operators expect one input vector,
-            # the default behviour is to merge columns.
+            # the default behaviour is to merge columns.
             ty = transform_inputs[0].type.__class__([1, 'None'])
             
             concop = scope.declare_local_operator('SklearnConcat')
