@@ -33,7 +33,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'rfe', [('input', Int64TensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRFE", methods=['transform'],
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_rfecv_int(self):
         model = RFECV(estimator=SVR(kernel="linear"))
@@ -52,7 +53,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select fdr', [('input', Int64TensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.int64), model, model_onnx, basename="SklearnSelectFdr",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_fpr_int(self):
         model = SelectFpr()
@@ -72,7 +74,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select from model', [('input', Int64TensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnSelectFromModel",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_fwe_int(self):
         model = SelectFwe()
@@ -91,7 +94,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select k best', [('input', Int64TensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnSelectKBest",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_percentile_int(self):
         model = SelectPercentile()
@@ -111,7 +115,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'variance threshold', [('input', Int64TensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnVarianceThreshold",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_generic_univariate_select_float(self):
         model = GenericUnivariateSelect()
@@ -132,7 +137,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'rfe', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRFE", methods=['transform'],
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_rfecv_float(self):
         model = RFECV(estimator=SVR(kernel="linear"))
@@ -151,7 +157,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select fdr', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx, basename="SklearnSelectFdr",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_fpr_float(self):
         model = SelectFpr()
@@ -171,7 +178,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select from model', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnSelectFromModel",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_fwe_float(self):
         model = SelectFwe()
@@ -190,7 +198,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'select k best', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnSelectKBest",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_select_percentile_float(self):
         model = SelectPercentile()
@@ -210,7 +219,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'variance threshold', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx, basename="SklearnVarianceThreshold",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

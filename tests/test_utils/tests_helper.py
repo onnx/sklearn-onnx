@@ -323,6 +323,7 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     if verbose:
         print("[dump_multiple_classification] model '{}'".format(model.__class__.__name__))
     model_onnx, prefix = convert_model(model, 'multi-class classifier', [('input', FloatTensorType([1, 2]))])
+    print(model_onnx)
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,

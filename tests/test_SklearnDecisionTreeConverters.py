@@ -21,7 +21,8 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         dump_binary_classification(model,
                                    allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
         dump_multiple_classification(model,
-                                     allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+                                     allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
+                                                   "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_decision_tree_regressor(self):
         model = DecisionTreeRegressor()

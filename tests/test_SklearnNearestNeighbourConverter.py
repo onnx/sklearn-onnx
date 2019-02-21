@@ -38,14 +38,16 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
-                             basename="SklearnKNeighborsRegressor-OneOffArray")
+                             basename="SklearnKNeighborsRegressor-OneOffArray",
+                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_regressor2_1(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1), n_targets=2)
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
-                            basename="SklearnKNeighborsRegressor2-OneOffArray")
+                            basename="SklearnKNeighborsRegressor2-OneOffArray",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2), n_targets=2)
