@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-Tests scikit-learn's binarizer converter.
+Tests examples from scikit-learn's documentation.
 """
 from distutils.version import StrictVersion
 import unittest
