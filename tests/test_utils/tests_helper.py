@@ -504,9 +504,13 @@ def make_report_backend(folder, as_df=False):
             res[model]['stderr'] = error
         elif name.endswith(".model.pkl"):
             model = name.split(".")[0]
+            if model not in res:
+                res[model] = {}
             res[model].update(stat_model_skl(os.path.join(folder, name)))
         elif name.endswith(".model.onnx"):
             model = name.split(".")[0]
+            if model not in res:
+                res[model] = {}
             res[model].update(stat_model_onnx(os.path.join(folder, name)))
         elif name.endswith(".bench"):
             model = name.split(".")[0]
