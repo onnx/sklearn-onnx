@@ -70,8 +70,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn SGD binary classifier', [('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnSGDClassifierBinary-NoProb-Dec4",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_sgd_multi_class(self):
         model, X = self._fit_model_multiclass_classification(linear_model.SGDClassifier())
@@ -79,8 +79,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
                                      [('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnSGDClassifierMulti-Dec3",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
