@@ -33,5 +33,6 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
                             # Operator mul is not implemented in onnxruntime
                             allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.4.1')")
 
+
 if __name__ == "__main__":
     unittest.main()

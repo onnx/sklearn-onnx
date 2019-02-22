@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-Tests scikit-learn's binarizer converter.
+Tests scikit-learn's TfidfTransformer converter.
 """
 import unittest
 import numpy
@@ -47,6 +47,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                             basename="SklearnTfidfTransform" + suffix,
                                             # Operator mul is not implemented in onnxruntime
                                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+
 
 if __name__ == "__main__":
     unittest.main()
