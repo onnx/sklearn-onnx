@@ -2,8 +2,9 @@
 Tests examples from scikit-learn documentation.
 """
 import unittest
-import onnx
+from distutils.version import StrictVersion
 import numpy as np
+import onnx
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
@@ -54,6 +55,8 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
 class TestSklearnDocumentation(unittest.TestCase):
     "Test example from the documentation of scikit-learn."
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
+                     reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf(self):        
         categories = ['alt.atheism', 'talk.religion.misc']
         train = fetch_20newsgroups(random_state=1,
@@ -72,6 +75,8 @@ class TestSklearnDocumentation(unittest.TestCase):
                             allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.3') or "
                                           "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
+                     reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):        
         categories = ['alt.atheism', 'talk.religion.misc']
         train = fetch_20newsgroups(random_state=1,
