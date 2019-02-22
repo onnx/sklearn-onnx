@@ -32,7 +32,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32), model, model_onnx, basename="SklearnLogitisticRegressionBinary",
                             # Operator cast-1 is not implemented in onnxruntime
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_logistic_regression_binary_class_nointercept(self):
         model, X = self._fit_model_binary_classification(linear_model.LogisticRegression(fit_intercept=False))

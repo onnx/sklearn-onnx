@@ -20,7 +20,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnPolynomialFeaturesFloatDegree2")
+                basename="SklearnPolynomialFeaturesFloatDegree2",
+                allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_polynomial_features_int_degree_2(self):
         X = np.array([[1, 3, 4, 0], [2, 3, 4, 1], [1, -4, 3, 7],
@@ -30,7 +31,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                    basename="SklearnPolynomialFeaturesIntDegree2")
+                    basename="SklearnPolynomialFeaturesIntDegree2",
+                    allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_polynomial_features_float_degree_3(self):
         X = np.array([[1.2, 3.2, 1.2], [4.3, 3.2, 4.5], [3.2, 4.7, 1.1]])
@@ -39,7 +41,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnPolynomialFeaturesFloatDegree3")
+                basename="SklearnPolynomialFeaturesFloatDegree3",
+                allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_polynomial_features_int_degree_3(self):
         X = np.array([[1, 3, 33], [4, 1, -11], [3, 7, -3], [3, 5, 4],

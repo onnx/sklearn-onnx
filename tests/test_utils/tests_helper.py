@@ -228,7 +228,7 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
                             f.write(str(e) + "\n--------------\n")
                             traceback.print_exc(file=f)
                     if isinstance(allow, bool) and allow:
-                        warnings.warn("Issue with '{0}' due to {1}".format(basename, e))
+                        warnings.warn("Issue with '{0}' due to {1}".format(basename, str(e).replace("\n", " -- ")))
                         continue
                     else:
                         raise e
@@ -324,7 +324,6 @@ def dump_multiple_classification(model, suffix="", folder=None, allow_failure=No
     if verbose:
         print("[dump_multiple_classification] model '{}'".format(model.__class__.__name__))
     model_onnx, prefix = convert_model(model, 'multi-class classifier', [('input', FloatTensorType([1, 2]))])
-    print(model_onnx)
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(X, model, model_onnx, folder=folder, allow_failure=allow_failure,

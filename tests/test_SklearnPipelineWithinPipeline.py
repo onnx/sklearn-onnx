@@ -63,7 +63,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                                      [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
-                            basename="SklearnPipelinePcaPipelineMinMaxLogReg")
+                            basename="SklearnPipelinePcaPipelineMinMaxLogReg",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         
     def test_pipeline_pca_pipeline_multinomial(self):
         model = Pipeline(memory=None,
@@ -89,8 +90,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
                         basename="SklearnPipelinePcaPipelineMinMaxNB2",
-                        allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4') or "
-                                      "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                        allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         
     def test_pipeline_pca_pipeline_multinomial_none(self):
         model = Pipeline(memory=None,
@@ -115,8 +115,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
                         basename="SklearnPipelinePcaPipelineMinMaxNBNone",
-                        allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.4') or "
-                                      "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                        allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_pipeline_column_transformer_pipeline_imputer_scaler_lr(self):
         X = np.array([[1, 2], [3, np.nan], [3, 0]], dtype=np.float32)

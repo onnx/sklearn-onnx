@@ -54,7 +54,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
-                            basename="SklearnKNeighborsRegressor2-OneOffArray")
+                            basename="SklearnKNeighborsRegressor2-OneOffArray",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(KNeighborsClassifier())
@@ -63,7 +64,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
                             model, model_onnx,
                             basename="SklearnKNeighborsClassifierBinary",
-                            allow_failure="StrictVersion(onnx.__version__) == StrictVersion('1.1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) == StrictVersion('1.1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_classifier_multi_class(self):
         model, X = self._fit_model_multiclass_classification(KNeighborsClassifier())
@@ -72,7 +74,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
                             model, model_onnx,
                             basename="SklearnKNeighborsClassifierMulti",
-                            allow_failure="StrictVersion(onnx.__version__) == StrictVersion('1.1.2')")
+                            allow_failure="StrictVersion(onnx.__version__) == StrictVersion('1.1.2') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
