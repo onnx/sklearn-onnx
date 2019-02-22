@@ -12,6 +12,7 @@ import sys
 import platform
 import numpy
 import pandas
+from sklearn.base import BaseEstimator
 from .utils_backend import compare_backend, extract_options, evaluate_condition, is_backend_enabled
 from skl2onnx.common.data_types import FloatTensorType
 
@@ -429,6 +430,43 @@ def compute_benchmark(fcts, number=10, repeat=100):
     return obs
 
 
+def get_nb_skl_objects(obj):
+    """
+    Returns the number of *sklearn* objects.
+    """
+    ct = 0
+    if isinstance(obj, BaseEstimator):
+        ct += 1
+    if isinstance(obj, (list, tuple)):
+        for o in obj:
+            ct += get_nb_skl_objects(o)
+    elif isinstance(obj, dict):
+        for o in obj.values():
+            ct += get_nb_skl_objects(o)
+    elif isinstance(obj, BaseEstimator):        
+        for o in obj.__dict__.values():
+            ct += get_nb_skl_objects(o)
+    return ct
+        
+
+def stat_model_skl(model):
+    """
+    Computes statistics on the sklearn model.
+    """
+    with open(model, "rb") as f:
+        obj = pickle.load(f)
+    return {"nb_estimators": get_nb_skl_objects(obj)}
+    
+
+def stat_model_onnx(model):
+    """
+    Computes statistics on the ONNX model.
+    """
+    import onnx
+    gr = onnx.load(model)
+    return {"nb_onnx_nodes": len(gr.graph.node)}
+    
+
 def make_report_backend(folder, as_df=False):
     """
     Looks into a folder for dumped files after
@@ -465,6 +503,12 @@ def make_report_backend(folder, as_df=False):
             if model not in res:
                 res[model] = {}
             res[model]['stderr'] = error
+        elif name.endswith(".model.pkl"):
+            model = name.split(".")[0]
+            res[model].update(stat_model_skl(os.path.join(folder, name)))
+        elif name.endswith(".model.onnx"):
+            model = name.split(".")[0]
+            res[model].update(stat_model_onnx(os.path.join(folder, name)))
         elif name.endswith(".bench"):
             model = name.split(".")[0]
             fullname = os.path.join(folder, name)
@@ -508,6 +552,7 @@ def make_report_backend(folder, as_df=False):
                 raise RuntimeError("Column '{0}' is missing from {1}".format(
                     col, ', '.join(df.columns)))
         df["ratio"] = df["onnxrt_time"] / df["original_time"]
+        df["ratio_nodes"] = df["nb_onnx_nodes"] / df["nb_estimators"]
         df["CPU"] = platform.processor()
         df["CPUI"] = cpuinfo.get_cpu_info()['brand']
         return df
@@ -517,6 +562,11 @@ def make_report_backend(folder, as_df=False):
         for row in aslist:
             try:
                 row["ratio"] = row["onnxrt_time"] / row["original_time"]
+            except KeyError:
+                # execution failed
+                pass
+            try:
+                row["ratio_nodes"] = row["nb_onnx_nodes"] / row["nb_estimators"]
             except KeyError:
                 # execution failed
                 pass

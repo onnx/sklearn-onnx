@@ -132,7 +132,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx,
-                        basename="SklearnPipelineCTPipelineImputerScalerLR"
+                        basename="SklearnPipelineCTPipelineImputerScalerLR",
                         allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
