@@ -29,9 +29,11 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
         container.add_initializer(column_index_name,
                                   onnx_proto.TensorProto.INT64, [], [i])
         container.add_initializer(range_column_name,
-                    onnx_proto.TensorProto.FLOAT, [len(ranges[i])], ranges[i])
+                                  onnx_proto.TensorProto.FLOAT,
+                                  [len(ranges[i])], ranges[i])
 
-        container.add_node('ArrayFeatureExtractor',
+        container.add_node(
+                'ArrayFeatureExtractor',
                 [operator.inputs[0].full_name, column_index_name], column_name,
                 name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
                 op_domain='ai.onnx.ml')
@@ -45,7 +47,8 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
 
         apply_concat(scope, [d for d in digitised_output_name],
                      concat_output_name, container, axis=0)
-        container.add_node('OneHotEncoder', concat_output_name,
+        container.add_node(
+                'OneHotEncoder', concat_output_name,
                 operator.output_full_names,
                 name=scope.get_unique_operator_name('OneHotEncoder'),
                 cats_int64s=list(map(lambda x: len(range(x)), op.n_bins_)),

@@ -12,8 +12,12 @@ def convert_sklearn_binarizer(scope, operator, container):
     feature_name = concatenate_variables(scope, operator.inputs, container)
 
     op_type = 'Binarizer'
-    attrs = {'name': scope.get_unique_operator_name(op_type), 'threshold': float(operator.raw_operator.threshold)}
-    container.add_node(op_type, feature_name, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+    attrs = {
+        'name': scope.get_unique_operator_name(op_type),
+        'threshold': float(operator.raw_operator.threshold)
+    }
+    container.add_node(op_type, feature_name, operator.output_full_names,
+                       op_domain='ai.onnx.ml', **attrs)
 
 
 register_converter('SklearnBinarizer', convert_sklearn_binarizer)

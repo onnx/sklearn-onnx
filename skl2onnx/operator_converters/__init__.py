@@ -4,14 +4,15 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# To register converter for scikit-learn operators, import associated modules here.
+# To register a converter for scikit-learn operators,
+# import associated modules here.
 from . import ArrayFeatureExtractor
 from . import Binarizer
 from . import CalibratedClassifierCV
 from . import Concat
 from . import DictVectorizer
 from . import DecisionTree
-from . import FeatureSelection 
+from . import FeatureSelection
 from . import FunctionTransformer
 from . import GradientBoosting
 from . import Imputer
@@ -26,7 +27,7 @@ from . import NaiveBayes
 from . import Normalizer
 from . import OneHotEncoder
 from . import OneVsRestClassifier
-from . import PolynomialFeatures 
+from . import PolynomialFeatures
 from . import RandomForest
 from . import Scaler
 from . import SVM
@@ -34,4 +35,4 @@ from . import SVD
 from . import TfIdfTransformer
 from . import TextVectorizer
 from . import VotingClassifier
-from . import ZipMap 
+from . import ZipMap

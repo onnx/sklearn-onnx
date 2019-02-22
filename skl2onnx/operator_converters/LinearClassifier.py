@@ -4,8 +4,9 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import numbers
 import numpy as np
-import six, numbers
+import six
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -31,7 +32,9 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             multi_class = 2
 
     classifier_type = 'LinearClassifier'
-    classifier_attrs = {'name': scope.get_unique_operator_name(classifier_type)}
+    classifier_attrs = {
+        'name': scope.get_unique_operator_name(classifier_type)
+    }
 
     # nb = NodeBuilder(context, 'LinearClassifier', op_domain='ai.onnx.ml')
     classifier_attrs['coefficients'] = coefficients
@@ -42,10 +45,12 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     elif op.__class__.__name__ == 'LogisticRegression':
         if multi_class == 2:
             if len(op.classes_) == 2:
-                # See method _predict_proba_lr.
-                # When number if classes is two, the function
-                # is not SOFTMAX.
-                # https://github.com/scikit-learn/scikit-learn/blob/bac89c253b35a8f1a3827389fbee0f5bebcbc985/sklearn/linear_model/base.py#L300
+                """
+                See method _predict_proba_lr.
+                When number if classes is two, the function
+                is not SOFTMAX.
+                https://github.com/scikit-learn/scikit-learn/blob/bac89c253b35a8f1a3827389fbee0f5bebcbc985/sklearn/linear_model/base.py#L300
+                """ # noqa
                 classifier_attrs['post_transform'] = 'LOGISTIC'
             else:
                 classifier_attrs['post_transform'] = 'LOGISTIC'
@@ -69,31 +74,39 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         raise RuntimeError('Label vector must be a string or a integer tensor')
 
     label_name = operator.outputs[0].full_name
-    
-    if op.__class__.__name__ == 'LinearSVC' and op.classes_.shape[0] <= 2:
-        raw_scores_tensor_name = scope.get_unique_variable_name('raw_scores_tensor')
-        positive_class_index_name = scope.get_unique_variable_name('positive_class_index')
 
-        container.add_initializer(positive_class_index_name, onnx_proto.TensorProto.INT64,
-                              [], [1])
+    if op.__class__.__name__ == 'LinearSVC' and op.classes_.shape[0] <= 2:
+        raw_scores_tensor_name = scope.get_unique_variable_name(
+                                                        'raw_scores_tensor')
+        positive_class_index_name = scope.get_unique_variable_name(
+                                                    'positive_class_index')
+
+        container.add_initializer(positive_class_index_name,
+                                  onnx_proto.TensorProto.INT64, [], [1])
 
         container.add_node(classifier_type, operator.inputs[0].full_name,
                            [label_name, raw_scores_tensor_name],
                            op_domain='ai.onnx.ml', **classifier_attrs)
-        container.add_node('ArrayFeatureExtractor', [raw_scores_tensor_name, positive_class_index_name],
-                           operator.outputs[1].full_name, name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
-                           op_domain='ai.onnx.ml')
+        container.add_node(
+            'ArrayFeatureExtractor',
+            [raw_scores_tensor_name, positive_class_index_name],
+            operator.outputs[1].full_name, op_domain='ai.onnx.ml',
+            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     else:
-
         # Make sure the probability sum is 1 over all classes
         if multi_class > 0 and op.__class__.__name__ != 'LinearSVC':
-            probability_tensor_name = scope.get_unique_variable_name('probability_tensor')
+            probability_tensor_name = scope.get_unique_variable_name(
+                                                    'probability_tensor')
             container.add_node(classifier_type, operator.inputs[0].full_name,
                                [label_name, probability_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
             normalizer_type = 'Normalizer'
-            normalizer_attrs = {'name': scope.get_unique_operator_name(normalizer_type), 'norm': 'L1'}
-            container.add_node(normalizer_type, probability_tensor_name, operator.outputs[1].full_name,
+            normalizer_attrs = {
+                'name': scope.get_unique_operator_name(normalizer_type),
+                'norm': 'L1'
+            }
+            container.add_node(normalizer_type, probability_tensor_name,
+                               operator.outputs[1].full_name,
                                op_domain='ai.onnx.ml', **normalizer_attrs)
         else:
             container.add_node(classifier_type, operator.inputs[0].full_name,
@@ -101,5 +114,6 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                                op_domain='ai.onnx.ml', **classifier_attrs)
 
 
-register_converter('SklearnLinearClassifier', convert_sklearn_linear_classifier)
+register_converter('SklearnLinearClassifier',
+                   convert_sklearn_linear_classifier)
 register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier)

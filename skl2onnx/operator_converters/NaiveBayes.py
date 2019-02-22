@@ -4,10 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_cast, apply_exp, apply_log, apply_sub, apply_reshape
-from ..common._registration import register_converter
 import numpy as np
+from ..proto import onnx_proto
+from ..common._apply_operation import apply_add, apply_cast, apply_exp
+from ..common._apply_operation import apply_log, apply_sub, apply_reshape
+from ..common._registration import register_converter
 
 
 def convert_sklearn_naive_bayes(scope, operator, container):
@@ -174,7 +175,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         sum_op_version = 6
     else:
         sum_op_version = 8
-        
+
     if operator.type == 'SklearnMultinomialNB':
         matmul_result_name = scope.get_unique_variable_name('matmul_result')
 
@@ -210,7 +211,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             container.add_initializer(zero_tensor_name,
                             onnx_proto.TensorProto.FLOAT, [M, num_features],
                             np.zeros((M, num_features)).ravel())
-        
+
             container.add_node('Greater', [operator.inputs[0].full_name, threshold_name],
                               condition_name, name=scope.get_unique_operator_name('Greater'), op_version=9)
             apply_cast(scope, condition_name, cast_values_name, container,
@@ -253,11 +254,12 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     # supported types in the doc, so Cast was required here.
     if class_type == onnx_proto.TensorProto.INT32: # int labels
         apply_cast(scope, array_feature_extractor_result_name, cast2_result_name, container, to=onnx_proto.TensorProto.FLOAT)
-        apply_reshape(scope, cast2_result_name, reshaped_result_name, container, desired_shape=output_shape)        
+        apply_reshape(scope, cast2_result_name, reshaped_result_name, container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name, container, to=onnx_proto.TensorProto.INT64)
     else: # string labels
         apply_reshape(scope, array_feature_extractor_result_name, operator.outputs[0].full_name, container,
                       desired_shape=output_shape)
+
 
 register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes)
 register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes)

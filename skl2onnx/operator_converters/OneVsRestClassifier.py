@@ -12,19 +12,13 @@ from ..common.utils_classifier import _finalize_converter_classes
 from .._supported_operators import sklearn_operator_name_map
 
 
-def convert_one_vs_rest_classifier(scope, operator, container):    
+def convert_one_vs_rest_classifier(scope, operator, container):
     """
     Converts a *OneVsRestClassifier* into *ONNX* format.
     """
-
     op = operator.raw_operator
-    classes = op.classes_
-
-    n_classes = len(op.classes_)
-
     probs_names = []
     for i, estimator in enumerate(op.estimators_):
-
         op_type = sklearn_operator_name_map[type(estimator)]
 
         this_operator = scope.declare_local_operator(op_type)
@@ -32,7 +26,8 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % i)
-        prob_name = scope.declare_local_variable('proba_%d' % i, FloatTensorType())
+        prob_name = scope.declare_local_variable('proba_%d' % i,
+                                                 FloatTensorType())
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(prob_name)
 
@@ -57,8 +52,10 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     container.add_node('ArgMax', conc_name, label_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
 
-    _finalize_converter_classes(scope, label_name, operator.outputs[0].full_name, container,
+    _finalize_converter_classes(scope, label_name,
+                                operator.outputs[0].full_name, container,
                                 op.classes_)
 
 
-register_converter('SklearnOneVsRestClassifier', convert_one_vs_rest_classifier)
+register_converter('SklearnOneVsRestClassifier',
+                   convert_one_vs_rest_classifier)

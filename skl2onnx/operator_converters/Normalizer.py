@@ -10,7 +10,8 @@ from .common import concatenate_variables
 
 def convert_sklearn_normalizer(scope, operator, container):
     if len(operator.inputs) > 1:
-        # If there are multiple input tensors, we combine them using a FeatureVectorizer
+        # If there are multiple input tensors,
+        # we combine them using a FeatureVectorizer
         feature_name = concatenate_variables(scope, operator.inputs, container)
     else:
         # No concatenation is needed, we just use the first variable's name
@@ -25,7 +26,8 @@ def convert_sklearn_normalizer(scope, operator, container):
     else:
         raise RuntimeError('Invalid norm: %s' % op.norm)
 
-    container.add_node(op_type, feature_name, operator.outputs[0].full_name, op_domain='ai.onnx.ml', **attrs)
+    container.add_node(op_type, feature_name, operator.outputs[0].full_name,
+                       op_domain='ai.onnx.ml', **attrs)
 
 
 register_converter('SklearnNormalizer', convert_sklearn_normalizer)

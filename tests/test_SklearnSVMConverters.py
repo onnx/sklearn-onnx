@@ -60,8 +60,6 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
-        self.assertEqual(len(nodes), 2)
-
         svc_node = nodes[0]
         self._check_attributes(svc_node, {'coefficients': None,
                                           'kernel_params': None,
@@ -78,8 +76,6 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
-        self.assertEqual(len(nodes), 2)
-
         svc_node = nodes[0]
         self._check_attributes(svc_node, {'coefficients': None,
                                           'kernel_params': None,
@@ -109,8 +105,6 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
-        self.assertEqual(len(nodes), 2)
-
         svc_node = nodes[0]
         self._check_attributes(svc_node, {'coefficients': None,
                                           'kernel_params': None,
@@ -127,7 +121,6 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
-        self.assertEqual(len(nodes), 2)
         svc_node = nodes[0]
         self._check_attributes(svc_node, {'coefficients': None,
                                           'kernel_params': None,
