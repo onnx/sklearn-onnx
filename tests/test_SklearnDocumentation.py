@@ -93,7 +93,8 @@ class TestSklearnDocumentation(unittest.TestCase):
             ['Albert Einstein', 'Not relatively.'],
             ['Alan turing', 'Not automatically.']])
         dump_data_and_model(test_data, pipeline, model_onnx, verbose=False,
-                            basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2")
+                            basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2",
+                            allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.3')")
 
 
 if __name__ == "__main__":
