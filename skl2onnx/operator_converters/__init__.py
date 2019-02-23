@@ -10,8 +10,8 @@ from . import ArrayFeatureExtractor
 from . import Binarizer
 from . import CalibratedClassifierCV
 from . import Concat
-from . import DictVectorizer
 from . import DecisionTree
+from . import DictVectorizer
 from . import FeatureSelection
 from . import FunctionTransformer
 from . import GradientBoosting
@@ -30,9 +30,42 @@ from . import OneVsRestClassifier
 from . import PolynomialFeatures
 from . import RandomForest
 from . import Scaler
-from . import SVM
 from . import SVD
-from . import TfIdfTransformer
+from . import SVM
 from . import TextVectorizer
+from . import TfIdfTransformer
 from . import VotingClassifier
 from . import ZipMap
+
+__all__ = [
+    ArrayFeatureExtractor,
+    Binarizer,
+    CalibratedClassifierCV,
+    Concat,
+    DecisionTree,
+    DictVectorizer,
+    FeatureSelection,
+    FunctionTransformer,
+    GradientBoosting,
+    Imputer,
+    KBinsDiscretiser,
+    KMeans,
+    KNN,
+    LabelBinariser,
+    LabelEncoder,
+    LinearClassifier,
+    LinearRegressor,
+    NaiveBayes,
+    Normalizer,
+    OneHotEncoder,
+    OneVsRestClassifier,
+    PolynomialFeatures,
+    RandomForest,
+    Scaler,
+    SVD,
+    SVM,
+    TextVectorizer,
+    TfIdfTransformer,
+    VotingClassifier,
+    ZipMap,
+]
