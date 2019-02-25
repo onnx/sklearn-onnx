@@ -46,6 +46,7 @@ __all__ = [
     DecisionTree,
     DictVectorizer,
     FeatureSelection,
+    Flatten,
     FunctionTransformer,
     GradientBoosting,
     Imputer,

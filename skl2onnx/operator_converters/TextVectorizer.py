@@ -10,7 +10,7 @@ from ..common._registration import register_converter
 
 def convert_sklearn_text_vectorizer(scope, operator, container):
     """
-    Converters for class 
+    Converters for class
     `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
     The current implementation is a work in progress and the ONNX version
     does not produce the exact same results. The converter lets the user
@@ -24,15 +24,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
 
     Example (from :ref:`l-example-tfidfvectorizer`):
-    
+
     ::
-    
+
         seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
                                            '\\n', '"', "'", "-", "[", "]", "@"]}}
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
-    """
+    """ # noqa
 
     op = operator.raw_operator
 
@@ -45,9 +45,11 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "CountVectorizer cannot be converted, "
             "only stip_accents=None is supported.")
 
-    options = container.get_options(op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
+    options = container.get_options(
+            op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
     if set(options) != {'sep'}:
-        raise RuntimeError("Unknown option {} for {}".format(set(options) - {'sep'}, type(op)))
+        raise RuntimeError("Unknown option {} for {}".format(
+                                set(options) - {'sep'}, type(op)))
     default_pattern = '(?u)\\b\\w\\w+\\b'
     default_separators = options['sep']
     if op.token_pattern != default_pattern:
