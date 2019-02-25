@@ -10,7 +10,7 @@ from ..common._registration import register_converter
 
 def convert_sklearn_text_vectorizer(scope, operator, container):
     """
-    Converters for class 
+    Converters for class
     `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
     The current implementation is a work in progress and the ONNX version
     does not produce the exact same results. The converter lets the user
@@ -24,39 +24,51 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
 
     Example (from :ref:`l-example-tfidfvectorizer`):
-    
+
     ::
-    
+
         seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
                                            '\\n', '"', "'", "-", "[", "]", "@"]}}
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
-    """
+    """ # noqa
 
     op = operator.raw_operator
 
     if op.analyzer != "word":
-        raise NotImplementedError("CountVectorizer cannot be converted, only tokenizer='word' is supported.")
+        raise NotImplementedError(
+            "CountVectorizer cannot be converted, "
+            "only tokenizer='word' is supported.")
     if op.strip_accents is not None:
-        raise NotImplementedError("CountVectorizer cannot be converted, only stip_accents=None is supported.")
+        raise NotImplementedError(
+            "CountVectorizer cannot be converted, "
+            "only stip_accents=None is supported.")
 
-    options = container.get_options(op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
+    options = container.get_options(
+            op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
     if set(options) != {'sep'}:
-        raise RuntimeError("Unknown option {} for {}".format(set(options) - {'sep'}, type(op)))
+        raise RuntimeError("Unknown option {} for {}".format(
+                                set(options) - {'sep'}, type(op)))
     default_pattern = '(?u)\\b\\w\\w+\\b'
     default_separators = options['sep']
     if op.token_pattern != default_pattern:
-        raise NotImplementedError("Only the default tokenizer based on default regular expression '{0}' is implemented.".format(default_pattern))
+        raise NotImplementedError(
+            "Only the default tokenizer based on default regular expression "
+            "'{0}' is implemented.".format(default_pattern))
     if op.preprocessor is not None:
-        raise NotImplementedError("Custom preprocessor cannot be converted into ONNX.")
+        raise NotImplementedError(
+            "Custom preprocessor cannot be converted into ONNX.")
     if op.tokenizer is not None:
-        raise NotImplementedError("Custom tokenizer cannot be converted into ONNX.")
+        raise NotImplementedError(
+            "Custom tokenizer cannot be converted into ONNX.")
     if op.strip_accents is not None:
-        raise NotImplementedError("Operator StringNormalizer cannot remove accents.")
+        raise NotImplementedError(
+            "Operator StringNormalizer cannot remove accents.")
 
-    msg = "The default regular expression '{0}' splits strings based on anything but a space. " + \
-          "The current specification splits strings based on the following separators {1}."
+    msg = ("The default regular expression '{0}' splits strings based on "
+           "anything but a space. The current specification splits strings "
+           "based on the following separators {1}.")
     warnings.warn(msg.format(default_pattern, default_separators))
 
     if op.lowercase or op.stop_words_:
@@ -158,7 +170,8 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     if container.target_opset < 9:
         op_type = 'Ngram'
-        container.add_node(op_type, tokenized, output, op_domain='com.microsoft', **attrs)
+        container.add_node(op_type, tokenized, output,
+                           op_domain='com.microsoft', **attrs)
     else:
         op_type = 'TfIdfVectorizer'
         container.add_node(op_type, tokenized, output, op_domain='ai.onnx',
@@ -173,7 +186,8 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         else:
             raise RuntimeError('Invalid norm: %s' % op.norm)
 
-        container.add_node(op_type, output, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+        container.add_node(op_type, output, operator.output_full_names,
+                           op_domain='ai.onnx.ml', **attrs)
 
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)

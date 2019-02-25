@@ -13,11 +13,16 @@ def convert_sklearn_linear_regressor(scope, operator, container):
     op_type = 'LinearRegressor'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs['coefficients'] = op.coef_.astype(float)
-    attrs['intercepts'] = op.intercept_.astype(float) if isinstance(op.intercept_, collections.Iterable) else [float(op.intercept_)]
-    container.add_node(op_type, operator.input_full_names, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+    attrs['intercepts'] = (op.intercept_.astype(float)
+                           if isinstance(op.intercept_, collections.Iterable)
+                           else [float(op.intercept_)])
+    container.add_node(op_type, operator.input_full_names,
+                       operator.output_full_names, op_domain='ai.onnx.ml',
+                       **attrs)
 
 
-register_converter('SklearnElasticNetRegressor', convert_sklearn_linear_regressor)
+register_converter('SklearnElasticNetRegressor',
+                   convert_sklearn_linear_regressor)
 register_converter('SklearnLasso', convert_sklearn_linear_regressor)
 register_converter('SklearnLassoLars', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)

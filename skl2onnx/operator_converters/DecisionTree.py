@@ -4,10 +4,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import numbers
 import numpy as np
-import numbers, six
+import six
 from ..common._registration import register_converter
-from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs, get_default_tree_regressor_attribute_pairs, add_tree_to_attribute_pairs
+from ..common.tree_ensemble import add_tree_to_attribute_pairs
+from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
+from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
 def convert_sklearn_decision_tree_classifier(scope, operator, container):
@@ -23,7 +26,8 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
         class_labels = [int(i) for i in classes]
         attrs['classlabels_int64s'] = class_labels
-    elif all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
+    elif all(isinstance(i, (six.string_types, six.text_type))
+             for i in classes):
         class_labels = [str(i) for i in classes]
         attrs['classlabels_strings'] = class_labels
     else:
@@ -31,8 +35,10 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
 
     add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True)
 
-    container.add_node(op_type, operator.input_full_names, [operator.outputs[0].full_name,
-                       operator.outputs[1].full_name], op_domain='ai.onnx.ml', **attrs)
+    container.add_node(
+        op_type, operator.input_full_names,
+        [operator.outputs[0].full_name, operator.outputs[1].full_name],
+        op_domain='ai.onnx.ml', **attrs)
 
 
 def convert_sklearn_decision_tree_regressor(scope, operator, container):
@@ -44,8 +50,12 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
     attrs['n_targets'] = int(op.n_outputs_)
     add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False)
 
-    container.add_node(op_type, operator.input_full_names, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+    container.add_node(op_type, operator.input_full_names,
+                       operator.output_full_names, op_domain='ai.onnx.ml',
+                       **attrs)
 
 
-register_converter('SklearnDecisionTreeClassifier', convert_sklearn_decision_tree_classifier)
-register_converter('SklearnDecisionTreeRegressor', convert_sklearn_decision_tree_regressor)
+register_converter('SklearnDecisionTreeClassifier',
+                   convert_sklearn_decision_tree_classifier)
+register_converter('SklearnDecisionTreeRegressor',
+                   convert_sklearn_decision_tree_regressor)
