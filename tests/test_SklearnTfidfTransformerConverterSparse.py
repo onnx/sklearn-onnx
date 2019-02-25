@@ -7,10 +7,10 @@ import unittest
 import numpy
 import onnx
 from sklearn.datasets import fetch_20newsgroups
-from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from skl2onnx import convert_sklearn
+from sklearn.pipeline import Pipeline
 from skl2onnx.common.data_types import StringTensorType
+from skl2onnx import convert_sklearn
 from test_utils import dump_data_and_model
 
 
