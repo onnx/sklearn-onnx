@@ -4,8 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..proto import onnx_proto
-from ..common._apply_operation import apply_cast, apply_concat
 from ..common._registration import register_converter
 
 
