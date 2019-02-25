@@ -5,8 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType, Int64TensorType
-from ..common.utils import check_input_and_output_numbers, check_input_and_output_types
+from ..common.data_types import FloatTensorType
 
 
 def calculate_sklearn_function_transformer_output_shapes(operator):
@@ -15,7 +14,8 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
     Only id function is supported.
     '''
     if operator.raw_operator.func is not None:
-        raise RuntimeError("FunctionTransformer is not supported unless the transform function is None (= identity).")
+        raise RuntimeError("FunctionTransformer is not supported unless the "
+                           "transform function is None (= identity).")
     N = operator.inputs[0].type.shape[0]
     C = 0
     for variable in operator.inputs:
@@ -28,4 +28,5 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
     operator.outputs[0].type = FloatTensorType([N, C])
 
 
-register_shape_calculator('SklearnFunctionTransformer', calculate_sklearn_function_transformer_output_shapes)
+register_shape_calculator('SklearnFunctionTransformer',
+                          calculate_sklearn_function_transformer_output_shapes)

@@ -12,7 +12,8 @@ from ..common.utils import check_input_and_output_types
 
 def calculate_sklearn_k_bins_discretiser(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
-    check_input_and_output_types(operator, good_input_types=[FloatTensorType, Int64TensorType])
+    check_input_and_output_types(operator, good_input_types=[
+                                 FloatTensorType, Int64TensorType])
 
     M = operator.inputs[0].type.shape[0]
     model = operator.raw_operator

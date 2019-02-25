@@ -16,12 +16,15 @@ def calculate_sklearn_text_vectorizer_output_shapes(operator):
 
     C is the total number of allowed keys in the input dictionary.
     '''
-    check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
+    check_input_and_output_numbers(operator, input_count_range=1,
+                                   output_count_range=1)
 
     C = max(operator.raw_operator.vocabulary_.values()) + 1
 
     operator.outputs[0].type = FloatTensorType([1, C])
 
 
-register_shape_calculator('SklearnCountVectorizer', calculate_sklearn_text_vectorizer_output_shapes)
-register_shape_calculator('SklearnTfidfVectorizer', calculate_sklearn_text_vectorizer_output_shapes)
+register_shape_calculator('SklearnCountVectorizer',
+                          calculate_sklearn_text_vectorizer_output_shapes)
+register_shape_calculator('SklearnTfidfVectorizer',
+                          calculate_sklearn_text_vectorizer_output_shapes)
