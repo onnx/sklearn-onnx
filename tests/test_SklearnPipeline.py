@@ -153,7 +153,8 @@ class TestSklearnPipeline(unittest.TestCase):
         
         dump_data_and_model(X_train, model, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipeliner",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
         if __name__ == "__main__":
             from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
@@ -229,7 +230,8 @@ class TestSklearnPipeline(unittest.TestCase):
         X_test2 = X_test.drop(to_drop, axis=1)
         dump_data_and_model(X_test2[:5], clf, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipelinerTitanic-DF",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         
 
 if __name__ == "__main__":

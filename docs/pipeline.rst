@@ -185,3 +185,15 @@ The first example was a simplified pipeline coming from *scikit-learn*'s documen
 The full story is available in a runable exemple: :ref:`example-complex-pipeline`
 which also shows up some mistakes that a user could come accross
 when trying to convert his pipeline.
+
+Parameterize the conversion
+===========================
+
+Most of the converter do not require specific options
+to convert a *scikit-learn* model. It always produces the same
+results. However, in some cases, the conversion cannot produce
+a model which returns the exact same results. The user may want
+to optimize the conversion by giving the converter additional
+information, even if the model to convert is included in a
+pipeline. That why the option mechanism was implemented:
+:ref:`l-conv-options`.

@@ -25,6 +25,7 @@ toolkits into `ONNX <https://onnx.ai>`_.
     auto_examples/index
     supported
     pipeline
+    parameterized
 
 **Issues, questions**
 
