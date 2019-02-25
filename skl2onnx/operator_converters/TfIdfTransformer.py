@@ -45,7 +45,11 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         # X = X * self._idf_diag
         cst = op._idf_diag.astype(np.float32)
         if not isinstance(cst, np.ndarray):
-            cst = np.array(cst.todense())
+            if len(cst.shape) > 1:
+                n = cst.shape[0]
+                cst = np.array([cst[i, i] for i in range(n)])
+            else:
+                cst = np.array(cst.todense())
         if len(cst.shape) > 1:
             cst = np.diag(cst)
         cst = cst.ravel().flatten()

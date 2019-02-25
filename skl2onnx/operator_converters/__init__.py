@@ -13,6 +13,7 @@ from . import Concat
 from . import DecisionTree
 from . import DictVectorizer
 from . import FeatureSelection
+from . import Flatten
 from . import FunctionTransformer
 from . import GradientBoosting
 from . import Imputer

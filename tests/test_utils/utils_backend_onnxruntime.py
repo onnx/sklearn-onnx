@@ -165,7 +165,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
             output = _post_process_output(res)
         else:
             def to_array(vv):
-                if isinstance(vv, (numpy.ndarray, numpy.int64, numpy.float32)):
+                if isinstance(vv, (numpy.ndarray, numpy.int64, numpy.float32, str)):
                     return numpy.array([vv])
                 else:
                     return numpy.array([vv], dtype=numpy.float32)
@@ -245,7 +245,8 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
         cmp_out = output
     
     try:
-        _compare_expected(cmp_exp, cmp_out, sess, onx, decimal=decimal, **options)
+        _compare_expected(cmp_exp, cmp_out, sess, onx, decimal=decimal,
+                          verbose=verbose, **options)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -315,7 +316,7 @@ def _create_column(values, dtype):
         raise OnnxRuntimeAssertionError("Unable to create one column from dtype '{0}'".format(dtype))
 
 
-def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
+def _compare_expected(expected, output, sess, onnx, decimal=5, verbose=False, **kwargs):
     """
     Compares the expected output against the runtime outputs.
     This is specific to *onnxruntime* due to variable *sess*
@@ -336,7 +337,7 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
             if len(expected) != len(output):
                 raise OnnxRuntimeAssertionError("Unexpected number of outputs '{0}', expected={1}, got={2}".format(onnx, len(expected), len(output)))
             for exp, out in zip(expected, output):
-                _compare_expected(exp, out, sess, onnx, decimal=5, **kwargs)
+                _compare_expected(exp, out, sess, onnx, decimal=5, verbose=verbose, **kwargs)
                 tested += 1
         else:
             raise OnnxRuntimeAssertionError("Type mismatch for '{0}', output type is {1}".format(onnx, type(output)))
@@ -346,7 +347,7 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
         for k, v in output.items():
             if k not in expected:
                 continue
-            msg = compare_outputs(expected[k], v, decimal=decimal, **kwargs)
+            msg = compare_outputs(expected[k], v, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
                 raise OnnxRuntimeAssertionError("Unexpected output '{0}' in model '{1}'\n{2}".format(k, onnx, msg))
             tested += 1
@@ -360,13 +361,13 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
         if isinstance(output, (dict, list)):
             if len(output) != 1:
                 ex = str(output)
-                if len(ex) > 70:
-                    ex = ex[:70] + "..."
+                if len(ex) > 170:
+                    ex = ex[:170] + "..."
                 raise OnnxRuntimeAssertionError("More than one output when 1 is expected for onnx '{0}'\n{1}".format(onnx, ex))
             output = output[-1]
         if not isinstance(output, numpy.ndarray):
             raise OnnxRuntimeAssertionError("output must be an array for onnx '{0}' not {1}".format(onnx, type(output)))
-        msg = compare_outputs(expected, output, decimal=decimal, **kwargs)
+        msg = compare_outputs(expected, output, decimal=decimal, verbose=verbose, **kwargs)
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
@@ -377,7 +378,8 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, **kwargs):
         if isinstance(expected, csr_matrix):
             # DictVectorizer
             one_array = numpy.array(output)
-            msg = compare_outputs(expected.todense(), one_array, decimal=decimal, **kwargs)
+            dense = numpy.asarray(expected.todense())
+            msg = compare_outputs(dense, one_array, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
                 raise OnnxRuntimeAssertionError("Unexpected output in model '{0}'\n{1}".format(onnx, msg))
             tested += 1

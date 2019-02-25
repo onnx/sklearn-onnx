@@ -9,6 +9,30 @@ from ..common._registration import register_converter
 
 
 def convert_sklearn_text_vectorizer(scope, operator, container):
+    """
+    Converters for class 
+    `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
+    The current implementation is a work in progress and the ONNX version
+    does not produce the exact same results. The converter lets the user
+    change some of its parameters.
+
+    Additional options
+    ------------------
+
+    sep: list of separators
+        These separators are used to split a string into words.
+        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
+
+    Example (from :ref:`l-example-tfidfvectorizer`):
+    
+    ::
+    
+        seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
+                                           '\\n', '"', "'", "-", "[", "]", "@"]}}
+        model_onnx = convert_sklearn(pipeline, "tfidf",
+                                     initial_types=[("input", StringTensorType([1, 2]))],
+                                     options=seps)
+    """
 
     op = operator.raw_operator
 
@@ -21,8 +45,11 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "CountVectorizer cannot be converted, "
             "only stip_accents=None is supported.")
 
+    options = container.get_options(op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
+    if set(options) != {'sep'}:
+        raise RuntimeError("Unknown option {} for {}".format(set(options) - {'sep'}, type(op)))
     default_pattern = '(?u)\\b\\w\\w+\\b'
-    default_separators = [' ', '.', '?', ',', ';', ':', '!']
+    default_separators = options['sep']
     if op.token_pattern != default_pattern:
         raise NotImplementedError(
             "Only the default tokenizer based on default regular expression "
@@ -77,6 +104,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     container.add_node(op_type, normalized, tokenized,
                        op_domain='com.microsoft', **attrs)
 
+    # Flatten
+    # Tokenizer outputs shape {1, C} or {1, 1, C}.
+    # Second shape is not allowed by TfIdfVectorizer.
+    # We use Flatten which produces {1, C} in both cases.
+    flatt_tokenized = scope.get_unique_variable_name('flatoken')
+    container.add_node("Flatten", tokenized, flatt_tokenized,
+                       name=scope.get_unique_operator_name('Flatten'))
+    tokenized = flatt_tokenized
+
     # Ngram - TfIdfVectorizer
     C = max(op.vocabulary_.values()) + 1
     words = [None for i in range(C)]
@@ -112,7 +148,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         weights[ind] = weights_[i]
 
     # Create the node.
-    attrs = {'name': scope.get_unique_operator_name(op_type)}
+    attrs = {'name': scope.get_unique_operator_name("TfIdfVectorizer")}
     attrs.update({
         'min_gram_length': op.ngram_range[0],
         'max_gram_length': op.ngram_range[1],

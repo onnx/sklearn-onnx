@@ -1,5 +1,6 @@
+# coding: utf-8
 """
-Tests scikit-learn's binarizer converter.
+Tests scikit-learn's TfidfTransformer converter.
 """
 import unittest
 import numpy
@@ -18,7 +19,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 'This document is the second document.',
                 'And this is the third one.',
                 'Is this the first document?',
-                ]).reshape((4, 1))
+                "Troisième document en français",
+                ]).reshape((5, 1))
         data = CountVectorizer(ngram_range=(1, 1)).fit_transform(corpus.ravel()).todense()
         data = data.astype(numpy.float32)
         
