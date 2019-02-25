@@ -48,7 +48,8 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         model_onnx = convert_sklearn(pipe, 'scikit-learn function_transformer', inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data[:5], pipe, model_onnx, basename="SklearnFunctionTransformer-DF",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3')")
+                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

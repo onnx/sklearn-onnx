@@ -698,7 +698,8 @@ class Topology:
         self._check_structure()
 
 
-def convert_topology(topology, model_name, doc_string, target_opset, channel_first_inputs=None):
+def convert_topology(topology, model_name, doc_string, target_opset,
+                     channel_first_inputs=None, options=None):
     '''
     This function is used to convert our Topology object defined in _parser.py into a ONNX model (type: ModelProto).
     :param topology: The Topology object we are going to convert
@@ -706,6 +707,7 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
     assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
     :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
+    :param options: see :ref:`l-conv-options`
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     '''
@@ -720,7 +722,7 @@ def convert_topology(topology, model_name, doc_string, target_opset, channel_fir
 
     topology._initialize_graph_status_for_traversing()
 
-    container = ModelComponentContainer(target_opset)
+    container = ModelComponentContainer(target_opset, options=options)
 
     # Put roots and leaves as ONNX's model into buffers. They will be added into ModelComponentContainer later.
     tensor_inputs = {}

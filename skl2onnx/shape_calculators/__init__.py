@@ -8,6 +8,7 @@
 from . import ArrayFeatureExtractor
 from . import Concat
 from . import DictVectorizer
+from . import Flatten
 from . import FunctionTransformer
 from . import Imputer
 from . import KBinsDiscretiser

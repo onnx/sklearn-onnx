@@ -166,7 +166,7 @@ def extract_options(name):
     else:
         res = {}
         for opt in opts[1:]:
-            if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3",
+            if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3", "Dec2",
                        'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
                 res[opt] = True
             else:
@@ -174,7 +174,7 @@ def extract_options(name):
         return res
 
 
-def compare_outputs(expected, output, **kwargs):
+def compare_outputs(expected, output, verbose=False, **kwargs):
     """
     Compares expected values and output.
     Returns None if no error, an exception message otherwise.
@@ -183,6 +183,7 @@ def compare_outputs(expected, output, **kwargs):
     NoProb = kwargs.pop("NoProb", False)
     Dec4 = kwargs.pop("Dec4", False)
     Dec3 = kwargs.pop("Dec3", False)
+    Dec2 = kwargs.pop("Dec2", False)
     Disc = kwargs.pop("Disc", False)
     Mism = kwargs.pop("Mism", False)
 
@@ -190,6 +191,8 @@ def compare_outputs(expected, output, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 4)
     if Dec3:
         kwargs["decimal"] = min(kwargs["decimal"], 3)
+    if Dec2:
+        kwargs["decimal"] = min(kwargs["decimal"], 2)
     if isinstance(expected, numpy.ndarray) and isinstance(output, numpy.ndarray):
         if SkipDim1:
             # Arrays like (2, 1, 2, 3) becomes (2, 2, 3) as one dimension is useless.
@@ -214,7 +217,7 @@ def compare_outputs(expected, output, **kwargs):
             output = output.reshape(output.shape[1:])
         if expected.dtype in (numpy.str, numpy.dtype("<U1")):
             try:
-                assert_array_equal(expected, output)
+                assert_array_equal(expected, output, verbose=verbose)
             except Exception as e:
                 if Disc:
                     # Bug to be fixed later.
@@ -223,10 +226,11 @@ def compare_outputs(expected, output, **kwargs):
                     return OnnxRuntimeAssertionError(str(e))
         else:
             try:
-                assert_array_almost_equal(expected, output, **kwargs)
+                assert_array_almost_equal(expected, output, verbose=verbose, **kwargs)
             except Exception as e:
-                expected_ = expected.ravel()
-                output_ = output.ravel()
+                longer = "\n--EXPECTED--\n{0}\n--OUTPUT--\n{1}".format(expected, output) if verbose else ""
+                expected_ = numpy.asarray(expected).ravel()
+                output_ = numpy.asarray(output).ravel()
                 if len(expected_) == len(output_):
                     if numpy.issubdtype(expected_.dtype, numpy.floating):
                         diff = numpy.abs(expected_ - output_).max()
@@ -235,14 +239,14 @@ def compare_outputs(expected, output, **kwargs):
                     if diff == 0:
                         return None
                 elif Mism:
-                    return ExpectedAssertionError("dimension mismatch={0}, {1}\n{2}".format(expected.shape, output.shape, e))
+                    return ExpectedAssertionError("dimension mismatch={0}, {1}\n{2}{3}".format(expected.shape, output.shape, e, longer))
                 else:
-                    return OnnxRuntimeAssertionError("dimension mismatch={0}, {1}\n{2}".format(expected.shape, output.shape, e))
+                    return OnnxRuntimeAssertionError("dimension mismatch={0}, {1}\n{2}{3}".format(expected.shape, output.shape, e, longer))
                 if Disc:
                     # Bug to be fixed later.
-                    return ExpectedAssertionError("max diff(expected, output)={0}\n{1}".format(diff, e))
+                    return ExpectedAssertionError("max-diff={0}\n--expected--output--\n{1}{2}".format(diff, e, longer))
                 else:
-                    return OnnxRuntimeAssertionError("max diff(expected, output)={0}\n{1}".format(diff, e))
+                    return OnnxRuntimeAssertionError("max-diff={0}\n--expected--output--\n{1}{2}".format(diff, e, longer))
     else:
         return OnnxRuntimeAssertionError("Unexpected types {0} != {1}".format(type(expected), type(output)))
     return None

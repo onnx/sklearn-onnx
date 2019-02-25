@@ -11,7 +11,7 @@ __version__ = "1.4.2"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
-__domain__ = "onnxml"
+__domain__ = "ai.onnx"
 __model_version__ = 0
 
 
