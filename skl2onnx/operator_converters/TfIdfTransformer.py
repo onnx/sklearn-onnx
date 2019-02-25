@@ -4,9 +4,10 @@
 # license information.
 # --------------------------------------------------------------------------
 
-import numpy
 import numbers
 import warnings
+import numpy
+from scipy.sparse import diags
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_log, apply_add, apply_mul, apply_identity
 from ..proto import onnx_proto
@@ -44,7 +45,11 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         # X = X * self._idf_diag
         cst = op._idf_diag.astype(numpy.float32)
         if not isinstance(cst, numpy.ndarray):
-            cst = numpy.array(cst.todense())
+            if len(cst.shape) > 1:
+                n = cst.shape[0]
+                cst = numpy.array([cst[i, i] for i in range(n)])
+            else:
+                cst = numpy.array(cst.todense())
         if len(cst.shape) > 1:
             cst = numpy.diag(cst)
         cst = cst.ravel().flatten()
