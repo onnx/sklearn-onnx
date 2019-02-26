@@ -10,15 +10,15 @@ from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
-from . import shape_calculators
-from . import operator_converters
+from . import shape_calculators # noqa
+from . import operator_converters # noqa
 
 
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None):
-    '''
+    """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
     :func:`supported_converters <skl2onnx.supported_converters>`.
@@ -30,7 +30,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     *ONNX* model name can also be specified.
 
     :param model: A scikit-learn model
-    :param initial_types: a python list. Each element is a tuple of a variable name 
+    :param initial_types: a python list. Each element is a tuple of a variable name
         and a type defined in data_types.py
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
@@ -58,8 +58,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                         ('int64_input', Int64TensorType([1, 10]))]
 
     .. note::
-        
-        If a pipeline includes an instance of 
+
+        If a pipeline includes an instance of
         `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_,
         *scikit-learn* allow the user to specify columns by names. This option is not supported
         by *sklearn-onnx* as features names could be different in input data and the ONNX graph
@@ -100,19 +100,21 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     It used in example :ref:`l-example-tfidfvectorizer`.
-    '''
+    """ # noqa
     if initial_types is None:
-        raise ValueError('Initial types are required. See usage of convert(...) in \
-                           skl2onnx.convert for details')
+        raise ValueError('Initial types are required. See usage of '
+                         'convert(...) in skl2onnx.convert for details')
 
     if name is None:
         name = str(uuid4().hex)
 
-    target_opset = target_opset if target_opset else get_opset_number_from_onnx()
-    # Parse scikit-learn model as our internal data structure (i.e., Topology)
+    target_opset = (target_opset
+                    if target_opset else get_opset_number_from_onnx())
+    # Parse scikit-learn model as our internal data structure
+    # (i.e., Topology)
     topology = parse_sklearn_model(model, initial_types, target_opset,
-                                   custom_conversion_functions, custom_shape_calculators,
-                                   custom_parsers)
+                                   custom_conversion_functions,
+                                   custom_shape_calculators, custom_parsers)
 
     # Infer variable shapes
     topology.compile()
