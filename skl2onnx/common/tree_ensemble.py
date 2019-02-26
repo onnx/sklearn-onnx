@@ -7,10 +7,6 @@
 Common functions to convert any learner based on trees.
 """
 
-import numpy as np
-import numbers, six
-from ._registration import register_converter
-
 
 def get_default_tree_classifier_attribute_pairs():
     attrs = {}
@@ -51,8 +47,9 @@ def get_default_tree_regressor_attribute_pairs():
     return attrs
 
 
-def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id, feature_id, mode, value, true_child_id,
-             false_child_id, weights, weight_id_bias, leaf_weights_are_counts):
+def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
+             feature_id, mode, value, true_child_id, false_child_id,
+             weights, weight_id_bias, leaf_weights_are_counts):
     attr_pairs['nodes_treeids'].append(tree_id)
     attr_pairs['nodes_nodeids'].append(node_id)
     attr_pairs['nodes_featureids'].append(feature_id)
@@ -67,8 +64,8 @@ def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id, feature_i
     if mode == 'LEAF':
         flattened_weights = weights.flatten()
         factor = tree_weight
-        # If the values stored at leaves are counts of possible classes, we need convert them to probabilities by
-        # doing a normalization.
+        # If the values stored at leaves are counts of possible classes, we
+        # need convert them to probabilities by doing a normalization.
         if leaf_weights_are_counts:
             s = sum(flattened_weights)
             factor /= float(s) if s != 0. else 1.
@@ -76,7 +73,8 @@ def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id, feature_i
         if len(flattened_weights) == 2 and is_classifier:
             flattened_weights = [flattened_weights[1]]
 
-        # Note that attribute names for making prediction are different for classifiers and regressors
+        # Note that attribute names for making prediction are different for
+        # classifiers and regressors
         if is_classifier:
             for i, w in enumerate(flattened_weights):
                 attr_pairs['class_treeids'].append(tree_id)
@@ -91,8 +89,9 @@ def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id, feature_i
                 attr_pairs['target_weights'].append(w)
 
 
-def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id, tree_weight,
-                                weight_id_bias, leaf_weights_are_counts):
+def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id,
+                                tree_weight, weight_id_bias,
+                                leaf_weights_are_counts):
     for i in range(tree.node_count):
         node_id = i
         weight = tree.value[i]
@@ -110,5 +109,6 @@ def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id, tree_w
             left_child_id = 0
             right_child_id = 0
 
-        add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id, feat_id, mode, threshold,
-                 left_child_id, right_child_id, weight, weight_id_bias, leaf_weights_are_counts)
+        add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
+                 feat_id, mode, threshold, left_child_id, right_child_id,
+                 weight, weight_id_bias, leaf_weights_are_counts)

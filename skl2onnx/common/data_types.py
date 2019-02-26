@@ -63,8 +63,10 @@ class StringType(DataType):
 
 
 class TensorType(DataType):
-    def __init__(self, shape=None, doc_string='', denotation=None, channel_denotations=None):
-        super(TensorType, self).__init__([] if not shape else shape, doc_string)
+    def __init__(self, shape=None, doc_string='', denotation=None,
+                 channel_denotations=None):
+        super(TensorType, self).__init__(
+            [] if not shape else shape, doc_string)
         self.denotation = denotation
         self.channel_denotations = channel_denotations
 
@@ -86,7 +88,8 @@ class TensorType(DataType):
             if self.denotation:
                 onnx_type.denotation = self.denotation
             if self.channel_denotations:
-                for d, denotation in zip(onnx_type.tensor_type.shape.dim, self.channel_denotations):
+                for d, denotation in zip(onnx_type.tensor_type.shape.dim,
+                                         self.channel_denotations):
                     if denotation:
                         d.denotation = denotation
         return onnx_type
@@ -104,8 +107,10 @@ class Int64TensorType(TensorType):
 
 
 class FloatTensorType(TensorType):
-    def __init__(self, shape=None, color_space=None, doc_string='', denotation=None, channel_denotations=None):
-        super(FloatTensorType, self).__init__(shape, doc_string, denotation, channel_denotations)
+    def __init__(self, shape=None, color_space=None, doc_string='',
+                 denotation=None, channel_denotations=None):
+        super(FloatTensorType, self).__init__(shape, doc_string, denotation,
+                                              channel_denotations)
         self.color_space = color_space
 
     def _get_element_onnx_type(self):
@@ -142,7 +147,8 @@ class DictionaryType(DataType):
         return onnx_type
 
     def __repr__(self):
-        return "DictionaryType(key_type={0}, value_type={1})".format(self.key_type, self.value_type)
+        return "DictionaryType(key_type={0}, value_type={1})".format(
+                                        self.key_type, self.value_type)
 
 
 class SequenceType(DataType):
@@ -153,7 +159,8 @@ class SequenceType(DataType):
 
     def to_onnx_type(self):
         onnx_type = onnx_proto.TypeProto()
-        onnx_type.sequence_type.elem_type.CopyFrom(self.element_type.to_onnx_type())
+        onnx_type.sequence_type.elem_type.CopyFrom(
+                        self.element_type.to_onnx_type())
         return onnx_type
 
     def __repr__(self):
@@ -161,12 +168,13 @@ class SequenceType(DataType):
 
 
 def find_type_conversion(source_type, target_type):
-    '''
+    """
     Find the operator name for converting source_type into target_type
-    '''
+    """
     if type(source_type) == type(target_type):
         return 'identity'
     elif type(target_type) == FloatTensorType:
         return 'imageToFloatTensor'
     else:
-        raise ValueError('Unsupported type conversion from %s to %s' % (source_type, target_type))
+        raise ValueError('Unsupported type conversion from %s to %s' % (
+                         source_type, target_type))
