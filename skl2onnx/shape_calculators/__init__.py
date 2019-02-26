@@ -4,7 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# To register shape calculators for scikit-learn operators, import associated modules here.
+# To register shape calculators for scikit-learn operators,
+# import associated modules here.
 from . import ArrayFeatureExtractor
 from . import Concat
 from . import DictVectorizer
@@ -20,11 +21,37 @@ from . import LinearRegressor
 from . import NearestNeighbours
 from . import OneHotEncoder
 from . import OneVsRestClassifier
-from . import PolynomialFeatures 
+from . import PolynomialFeatures
 from . import Scaler
-from . import SVM
 from . import SVD
+from . import SVM
 from . import TextVectorizer
 from . import TfidfTransformer
 from . import VotingClassifier
-from . import ZipMap 
+from . import ZipMap
+
+__all__ = [
+    ArrayFeatureExtractor,
+    Concat,
+    DictVectorizer,
+    Flatten,
+    FunctionTransformer,
+    Imputer,
+    KBinsDiscretiser,
+    KMeans,
+    LabelBinariser,
+    LabelEncoder,
+    LinearClassifier,
+    LinearRegressor,
+    NearestNeighbours,
+    OneHotEncoder,
+    OneVsRestClassifier,
+    PolynomialFeatures,
+    Scaler,
+    SVD,
+    SVM,
+    TextVectorizer,
+    TfidfTransformer,
+    VotingClassifier,
+    ZipMap,
+]

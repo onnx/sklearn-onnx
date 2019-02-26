@@ -5,12 +5,13 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
+from ..common.data_types import FloatType, Int64Type, StringType, TensorType
 from ..common.utils import check_input_and_output_numbers
-from ..common.data_types import Int64Type, FloatType, StringType, TensorType
 
 
 def calculate_sklearn_flatten(operator):
-    check_input_and_output_numbers(operator, output_count_range=1, input_count_range=1)
+    check_input_and_output_numbers(operator, output_count_range=1,
+                                   input_count_range=1)
     i = operator.inputs[0]
     N = i.type.shape[0]
     if isinstance(i.type, TensorType):

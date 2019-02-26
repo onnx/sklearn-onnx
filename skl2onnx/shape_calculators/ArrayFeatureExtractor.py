@@ -12,4 +12,5 @@ def calculate_sklearn_array_feature_extractor(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
 
 
-register_shape_calculator('SklearnArrayFeatureExtractor', calculate_sklearn_array_feature_extractor)
+register_shape_calculator('SklearnArrayFeatureExtractor',
+                          calculate_sklearn_array_feature_extractor)
