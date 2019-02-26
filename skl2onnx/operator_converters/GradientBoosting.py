@@ -4,10 +4,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import numbers
 import numpy as np
-import numbers, six
+import six
 from ..common._registration import register_converter
-from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs, get_default_tree_regressor_attribute_pairs, add_tree_to_attribute_pairs
+from ..common.tree_ensemble import add_tree_to_attribute_pairs
+from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
+from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
 def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
@@ -30,7 +33,8 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
         class_labels = [int(i) for i in classes]
         attrs['classlabels_int64s'] = class_labels
-    elif all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
+    elif all(isinstance(i, (six.string_types, six.text_type))
+             for i in classes):
         class_labels = [str(i) for i in classes]
         attrs['classlabels_strings'] = class_labels
     else:
@@ -40,17 +44,20 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     if op.n_classes_ == 2:
         for tree_id in range(op.n_estimators):
             tree = op.estimators_[tree_id][0].tree_
-            add_tree_to_attribute_pairs(attrs, True, tree, tree_id, tree_weight, 0, False)
+            add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
+                                        tree_weight, 0, False)
     else:
         for i in range(op.n_estimators):
             for c in range(op.n_classes_):
                 tree_id = i * op.n_classes_ + c
                 tree = op.estimators_[i][c].tree_
-                add_tree_to_attribute_pairs(attrs, True, tree, tree_id, tree_weight, c, False)
+                add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
+                                            tree_weight, c, False)
 
-    container.add_node(op_type, operator.input_full_names, [operator.outputs[0].full_name,
-                       operator.outputs[1].full_name], op_domain='ai.onnx.ml', **attrs)
-
+    container.add_node(
+            op_type, operator.input_full_names,
+            [operator.outputs[0].full_name, operator.outputs[1].full_name],
+            op_domain='ai.onnx.ml', **attrs)
 
 
 def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
@@ -59,16 +66,22 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
-    attrs['base_values'] = [float(op.init_.mean)] if op.loss == 'ls' else [float(op.init_.quantile)]
+    attrs['base_values'] = ([float(op.init_.mean)] if op.loss == 'ls'
+                            else [float(op.init_.quantile)])
 
     tree_weight = op.learning_rate
     for i in range(op.n_estimators):
         tree = op.estimators_[i][0].tree_
         tree_id = i
-        add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight, 0, False)
+        add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
+                                    0, False)
 
-    container.add_node(op_type, operator.input_full_names, operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+    container.add_node(op_type, operator.input_full_names,
+                       operator.output_full_names, op_domain='ai.onnx.ml',
+                       **attrs)
 
 
-register_converter('SklearnGradientBoostingClassifier', convert_sklearn_gradient_boosting_classifier)
-register_converter('SklearnGradientBoostingRegressor', convert_sklearn_gradient_boosting_regressor)
+register_converter('SklearnGradientBoostingClassifier',
+                   convert_sklearn_gradient_boosting_classifier)
+register_converter('SklearnGradientBoostingRegressor',
+                   convert_sklearn_gradient_boosting_regressor)

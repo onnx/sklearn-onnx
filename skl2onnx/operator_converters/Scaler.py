@@ -3,15 +3,17 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import numpy
-from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
+
+import numpy as np
+from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
+from sklearn.preprocessing import RobustScaler, StandardScaler
 from ..common._registration import register_converter
 from .common import concatenate_variables
 
 
 def convert_sklearn_scaler(scope, operator, container):
-    # If there are multiple input variables, we need to combine them as a whole tensor. Integer(s) would be converted
-    # to float(s).
+    # If there are multiple input variables, we need to combine them as a
+    # whole tensor. Integer(s) would be converted to float(s).
     if len(operator.inputs) > 1:
         feature_name = concatenate_variables(scope, operator.inputs, container)
     else:
@@ -30,19 +32,21 @@ def convert_sklearn_scaler(scope, operator, container):
         attrs['scale'] = 1.0 / op.scale_ if op.with_scaling else [1.0] * C
     elif isinstance(op, MinMaxScaler):
         attrs['scale'] = op.scale_
-        attrs['offset'] = -op.min_/(op.scale_ + 1e-8)  # Add 1e-8 to avoid divided by 0
+        # Add 1e-8 to avoid divided by 0
+        attrs['offset'] = -op.min_/(op.scale_ + 1e-8)
     elif isinstance(op, MaxAbsScaler):
         C = operator.inputs[0].type.shape[1]
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = [0.] * C
     else:
-        raise ValueError('Only scikit-learn StandardScaler and RobustScaler are supported but got %s' % type(op))
+        raise ValueError('Only scikit-learn StandardScaler and RobustScaler '
+                         'are supported but got %s' % type(op))
 
     # ONNX does not convert arrays of float32.
     for k in attrs:
         v = attrs[k]
-        if isinstance(v, numpy.ndarray) and v.dtype == numpy.float32:
-            attrs[k] = v.astype(numpy.float64)
+        if isinstance(v, np.ndarray) and v.dtype == np.float32:
+            attrs[k] = v.astype(np.float64)
 
     container.add_node(op_type, feature_name, operator.outputs[0].full_name,
                        op_domain='ai.onnx.ml', **attrs)

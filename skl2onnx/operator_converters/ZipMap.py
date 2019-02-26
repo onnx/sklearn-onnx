@@ -20,11 +20,13 @@ def convert_sklearn_zipmap(scope, operator, container):
         to_type = onnx_proto.TensorProto.STRING
 
     if to_type == onnx_proto.TensorProto.STRING:
-        apply_identity(scope, operator.inputs[0].full_name, operator.outputs[0].full_name, container)
+        apply_identity(scope, operator.inputs[0].full_name,
+                       operator.outputs[0].full_name, container)
     else:
-        apply_cast(scope, operator.inputs[0].full_name, operator.outputs[0].full_name, container,
-                   to=to_type)
-    container.add_node('ZipMap', operator.inputs[1].full_name, operator.outputs[1].full_name,
+        apply_cast(scope, operator.inputs[0].full_name,
+                   operator.outputs[0].full_name, container, to=to_type)
+    container.add_node('ZipMap', operator.inputs[1].full_name,
+                       operator.outputs[1].full_name,
                        op_domain='ai.onnx.ml', **zipmap_attrs)
 
 

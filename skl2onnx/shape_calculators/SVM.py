@@ -29,31 +29,16 @@ def calculate_sklearn_svm_output_shapes(operator):
     op = operator.raw_operator
 
     N = operator.inputs[0].type.shape[0]
-
     if operator.type in ['SklearnSVC']:
+        number_of_classes = len(op.classes_)
         check_input_and_output_numbers(operator, input_count_range=[1, None], output_count_range=[1, 2])
 
         if all(isinstance(i, (six.string_types, six.text_type)) for i in op.classes_):
             operator.outputs[0].type = StringTensorType([N])
-            if len(operator.outputs) == 2:
-                if operator.target_opset < 7:
-                    # Old ONNX ZipMap produces Map type
-                    operator.outputs[1].type = \
-                        DictionaryType(StringTensorType([1]), FloatTensorType([1]))
-                else:
-                    # New ONNX ZipMap produces Seq<Map> type
-                    operator.outputs[1].type = \
-                        SequenceType(DictionaryType(StringTensorType([]), FloatTensorType([])), N)
+            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
         elif all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in op.classes_):
             operator.outputs[0].type = Int64TensorType([N])
-            if len(operator.outputs) == 2:
-                if operator.target_opset < 7:
-                    # Old ONNX ZipMap produces Map type
-                    operator.outputs[1].type = DictionaryType(Int64TensorType([1]), FloatTensorType([1]))
-                else:
-                    # New ONNX ZipMap produces Seq<Map> type
-                    operator.outputs[1].type = \
-                        SequenceType(DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
+            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
         else:
             raise RuntimeError('Class labels should be either all strings or all integers')
 

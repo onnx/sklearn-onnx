@@ -4,7 +4,7 @@ API Summary
 ===========
 
 Summary of public functions and classes exposed
-in *onnxmltools*.
+in *scikit-onnx*.
 
 .. contents::
     :local:

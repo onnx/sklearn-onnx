@@ -11,6 +11,7 @@ import sys
 from ..proto import helper
 from .interface import ModelContainer
 from ._apply_operation import __dict__ as dict_apply_operation
+from .utils import get_domain
 
 
 def _get_operation_list():
@@ -113,10 +114,11 @@ class ModelComponentContainer(ModelContainer):
     to build an *ONNX* *GraphProto*, which is encapsulated in a *ONNX* *ModelProto*.
     '''
 
-    def __init__(self, target_opset):
+    def __init__(self, target_opset, options=None):
         '''
         :param target_opset: number, for example, 7 for *ONNX 1.2*, and 8 for *ONNX 1.3*.
         :param targeted_onnx: A string, for example, '1.1.2' and '1.2'.
+        :param options: see :ref:`l-conv-options`
         '''
         # Inputs of ONNX graph. They are ValueInfoProto in ONNX.
         self.inputs = []
@@ -132,6 +134,8 @@ class ModelComponentContainer(ModelContainer):
         self.node_domain_version_pair_sets = set()
         # The targeted ONNX operator set (referred to as opset) that matches the ONNX version.
         self.target_opset = target_opset
+        # Additional options given to converters.
+        self.options = options
 
     def _make_value_info(self, variable):
         value_info = helper.ValueInfoProto()
@@ -211,6 +215,8 @@ class ModelComponentContainer(ModelContainer):
         :param op_version: The version number (e.g., 0 and 1) of the operator we are trying to add.
         :param attrs: A Python dictionary. Keys and values are attributes' names and attributes' values, respectively.
         '''
+        if op_domain in ('', None):
+            op_domain = get_domain()
         self._check_operator(op_type)
 
         if isinstance(inputs, (six.string_types, six.text_type)):
@@ -232,3 +238,17 @@ class ModelComponentContainer(ModelContainer):
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
         self.nodes.append(node)
+
+    def get_options(self, model, default_values=None):
+        """
+        Returns additional options for a model.
+        It first looks by class then by id (``id(model)``).
+        :param model: model being converted
+        :param default_values: default options (it is modified by the function)
+        :return: dictionary
+        """
+        opts = {} if default_values is None else default_values
+        if self.options is not None:
+            opts.update(self.options.get(type(model), {}))
+            opts.update(self.options.get(id(model), {}))
+        return opts
