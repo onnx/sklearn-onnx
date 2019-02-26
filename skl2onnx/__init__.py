@@ -15,9 +15,9 @@ __domain__ = "ai.onnx"
 __model_version__ = 0
 
 
-from .convert import convert_sklearn
-from ._supported_operators import update_registered_converter
-from ._parse import update_registered_parser
+from .convert import convert_sklearn # noqa
+from ._supported_operators import update_registered_converter # noqa
+from ._parse import update_registered_parser # noqa
 
 
 def supported_converters(from_sklearn=False):
@@ -34,10 +34,10 @@ def supported_converters(from_sklearn=False):
         whose name is prefixed by ``'Sklearn'``
     :return: list of supported models as string
     """
-    from .common._registration import _converter_pool
+    from .common._registration import _converter_pool # noqa
     # The two following lines populates the list of supported converters.
-    from . import shape_calculators
-    from . import operator_converters
+    from . import shape_calculators # noqa
+    from . import operator_converters # noqa
 
     names = sorted(_converter_pool.keys())
     if from_sklearn:
