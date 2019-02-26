@@ -34,6 +34,7 @@ __all__ = [
     ArrayFeatureExtractor,
     Concat,
     DictVectorizer,
+    Flatten,
     FunctionTransformer,
     Imputer,
     KBinsDiscretiser,
