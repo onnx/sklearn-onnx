@@ -28,6 +28,7 @@ from sklearn.svm import LinearSVR
 from sklearn.multiclass import OneVsRestClassifier
 
 # Tree-based models
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.ensemble import GradientBoostingClassifier
@@ -89,7 +90,8 @@ sklearn_classifier_list = [
     LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
     ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
-    CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier
+    CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
+    AdaBoostClassifier,
 ]
 
 # Clustering algorithms: produces two outputs, label and score for
@@ -102,6 +104,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
+                AdaBoostClassifier, VotingClassifier,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,
@@ -110,7 +113,7 @@ def build_sklearn_operator_name_map():
                 LinearSVC, LinearSVR, SVC, SVR,
                 LinearRegression, Lasso, LassoLars, Ridge,
                 MultinomialNB, BernoulliNB,
-                OneVsRestClassifier, VotingClassifier,
+                OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 KMeans, MiniBatchKMeans, PCA, TruncatedSVD,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,

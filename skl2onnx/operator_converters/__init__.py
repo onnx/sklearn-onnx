@@ -6,6 +6,7 @@
 
 # To register a converter for scikit-learn operators,
 # import associated modules here.
+from . import AdaBoost
 from . import ArrayFeatureExtractor
 from . import Binarizer
 from . import CalibratedClassifierCV
@@ -39,6 +40,7 @@ from . import VotingClassifier
 from . import ZipMap
 
 __all__ = [
+    AdaBoost,
     ArrayFeatureExtractor,
     Binarizer,
     CalibratedClassifierCV,
