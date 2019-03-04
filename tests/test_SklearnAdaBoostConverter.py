@@ -27,7 +27,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                       FloatTensorType(X_test.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
-                            basename="SklearnAdaBoostClassifierSAMMER")
+                            basename="SklearnAdaBoostClassifierSAMMER",
+                            allow_failure="StrictVersion("
+                                          "onnxruntime.__version__)"
+                                          "<= StrictVersion('0.2.1')")
 
     def test_ada_boost_classifier_samme(self):
         data = load_iris()
@@ -41,7 +44,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                       FloatTensorType(X_train.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
-                            basename="SklearnAdaBoostClassifierSAMME")
+                            basename="SklearnAdaBoostClassifierSAMME",
+                            allow_failure="StrictVersion("
+                                          "onnxruntime.__version__)"
+                                          "<= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
