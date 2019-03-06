@@ -63,7 +63,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnPolynomialFeaturesFloatDegree4",
+                basename="SklearnPolynomialFeaturesFloatDegree4-Dec4",
                 allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_polynomial_features_int_degree_4(self):
