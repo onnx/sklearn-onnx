@@ -12,6 +12,8 @@ register_shape_calculator('SklearnLinearClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnLinearSVC',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnAdaBoostClassifier',
+                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnDecisionTreeClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnRandomForestClassifier',
