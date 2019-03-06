@@ -41,6 +41,33 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                         allow_failure="StrictVersion(onnxruntime.__version__)"
                                        "<= StrictVersion('0.2.1')")
 
+    def test_model_calibrated_classifier_cv_isotonic_float(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        clf = LinearSVC(C=0.001).fit(X, y)
+        model = CalibratedClassifierCV(clf, cv=2, method='isotonic').fit(X, y)
+        model_onnx = convert_sklearn(model, 'scikit-learn CalibratedClassifierCV',
+                                     [('input', FloatTensorType(X.shape))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X.astype(np.float32), model, model_onnx,
+                        basename="SklearnCalibratedClassifierCVIsotonicFloat",
+                        allow_failure="StrictVersion(onnxruntime.__version__)"
+                                      "<= StrictVersion('0.2.1')")
+
+    def test_model_calibrated_classifier_cv_isotonic_int(self):
+        data = load_digits()
+        X, y = data.data, data.target
+        clf = LinearSVC(C=0.001).fit(X, y)
+        model = CalibratedClassifierCV(clf, cv=2, method='isotonic').fit(X, y)
+        model_onnx = convert_sklearn(model, 'scikit-learn CalibratedClassifierCV',
+                                     [('input', Int64TensorType(X.shape))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnCalibratedClassifierCVIsotonicInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
+
 
 if __name__ == "__main__":
     unittest.main()

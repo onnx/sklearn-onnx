@@ -6,8 +6,8 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
-    apply_reshape, apply_sub)
+    apply_abs, apply_add, apply_cast, apply_concat, apply_div, apply_exp,
+    apply_mul, apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
@@ -180,6 +180,37 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                 # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2625
                 T = clipped_df_name
 
+            reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
+            calibrator_x_name = scope.get_unique_variable_name('calibrator_x')
+            calibrator_y_name = scope.get_unique_variable_name('calibrator_y')
+            distance_name = scope.get_unique_variable_name('distance')
+            absolute_distance_name = scope.get_unique_variable_name(
+                'absolute_distance')
+            nearest_x_index_name = scope.get_unique_variable_name(
+                'nearest_x_index')
+            nearest_y_name = scope.get_unique_variable_name('nearest_y')
+
+            container.add_initializer(
+                calibrator_x_name, onnx_proto.TensorProto.FLOAT,
+                [len(model.calibrators_[k]._X_)], model.calibrators_[k]._X_)
+            container.add_initializer(
+                calibrator_y_name, onnx_proto.TensorProto.FLOAT,
+                [len(model.calibrators_[k]._y_)], model.calibrators_[k]._y_)
+
+            apply_reshape(scope, T, reshaped_df_name, container,
+                          desired_shape=(-1, 1))
+            apply_sub(scope, [reshaped_df_name, calibrator_x_name],
+                      distance_name, container, broadcast=1)
+            apply_abs(scope, distance_name, absolute_distance_name, container)
+            container.add_node('ArgMin', absolute_distance_name,
+                               nearest_x_index_name, axis=1,
+                               name=scope.get_unique_operator_name('ArgMin'))
+            container.add_node(
+                'ArrayFeatureExtractor',
+                [calibrator_y_name, nearest_x_index_name],
+                nearest_y_name, op_domain='ai.onnx.ml',
+                name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+            T = nearest_y_name
         prob_name[k] = T
 
     apply_concat(scope, [p for p in prob_name], concatenated_prob_name,
