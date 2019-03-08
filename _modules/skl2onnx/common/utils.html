@@ -7,7 +7,7 @@
 
   <title>skl2onnx.common.utils</title>
 
-  <link rel="stylesheet" href="../../../_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="../../../_static/sphinx-modern-theme-modified.css" type="text/css"/>
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
 </head>
@@ -42,7 +42,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_summary.html">API Summary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#concepts">Concepts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><ul>
@@ -50,9 +54,26 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_common_errors.html">Common errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parameterized.html">Converters with options</a></li>
 </ul>
 
         </div>
@@ -65,10 +86,13 @@
 <span class="c1"># license information.</span>
 <span class="c1"># --------------------------------------------------------------------------</span>
 
-<span class="kn">import</span> <span class="nn">numbers</span><span class="o">,</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">distutils.version</span> <span class="k">import</span> <span class="n">LooseVersion</span><span class="p">,</span> <span class="n">StrictVersion</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">.data_types</span> <span class="k">import</span> <span class="n">TensorType</span>
 
 
 <span class="k">def</span> <span class="nf">sklearn_installed</span><span class="p">():</span>
@@ -76,7 +100,7 @@
 <span class="sd">    Checks that *scikit-learn* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">sklearn</span>
+        <span class="kn">import</span> <span class="nn">sklearn</span> <span class="c1"># noqa</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -115,10 +139,7 @@
 
 
 <span class="k">def</span> <span class="nf">is_numeric_type</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">six</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
-        <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
+    <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
     <span class="n">types</span> <span class="o">=</span> <span class="n">numeric_types</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -147,7 +168,6 @@
 
 
 <span class="k">def</span> <span class="nf">convert_to_python_value</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">numbers</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
@@ -155,7 +175,8 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to convert </span><span class="si">{0}</span><span class="s1"> to python type&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">var</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to convert </span><span class="si">{0}</span><span class="s1"> to python &#39;</span>
+                        <span class="s1">&#39;type&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">var</span><span class="p">)))</span>
 
 
 <span class="k">def</span> <span class="nf">convert_to_python_default_value</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
@@ -166,7 +187,8 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to find default python value for type </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">var</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to find default python value for &#39;</span>
+                        <span class="s1">&#39;type </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">var</span><span class="p">)))</span>
 
 
 <span class="k">def</span> <span class="nf">convert_to_list</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
@@ -176,7 +198,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">convert_to_python_value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">flattened</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ele</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ele</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">var</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ele</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span>
+               <span class="nb">len</span><span class="p">(</span><span class="n">ele</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">var</span><span class="p">):</span>
             <span class="n">max_classes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">ele</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">var</span><span class="p">])</span>
             <span class="n">flattened_one</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">var</span><span class="p">:</span>
@@ -184,10 +207,12 @@
                     <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ele</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                         <span class="n">flattened_one</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_python_value</span><span class="p">(</span><span class="n">ele</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">flattened_one</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_python_default_value</span><span class="p">(</span><span class="n">ele</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="n">flattened_one</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">convert_to_python_default_value</span><span class="p">(</span><span class="n">ele</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="n">flattened</span> <span class="o">+=</span> <span class="n">flattened_one</span>
             <span class="k">return</span> <span class="n">flattened</span>
-        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">)</span> <span class="ow">or</span>
+                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">convert_to_python_value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to flatten variable&#39;</span><span class="p">)</span>
@@ -195,19 +220,20 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to flatten variable&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_input_and_output_numbers"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common.utils.check_input_and_output_numbers">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_numbers</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">input_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="check_input_and_output_numbers"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common.utils.check_input_and_output_numbers">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_numbers</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">input_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                   <span class="n">output_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the number of input(s)/output(s) is correct</span>
 
 <span class="sd">    :param operator: A Operator object</span>
 <span class="sd">    :param input_count_range: A list of two integers or an integer.</span>
 <span class="sd">        If it&#39;s a list the first/second element is the</span>
-<span class="sd">        minimal/maximal number of inputs. If it&#39;s an integer, it is equivalent to </span>
-<span class="sd">        specify that number twice in a list. For infinite ranges like 5 to infinity,</span>
-<span class="sd">        you need to use [5, None].</span>
+<span class="sd">        minimal/maximal number of inputs. If it&#39;s an integer, it is</span>
+<span class="sd">        equivalent to specify that number twice in a list. For infinite</span>
+<span class="sd">        ranges like 5 to infinity, you need to use [5, None].</span>
 <span class="sd">    :param output_count_range: A list of two integers or an integer.</span>
 <span class="sd">        See input_count_range for its format.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_count_range</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">min_input_count</span> <span class="o">=</span> <span class="n">input_count_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">max_input_count</span> <span class="o">=</span> <span class="n">input_count_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -228,47 +254,153 @@
 
     <span class="k">if</span> <span class="n">min_input_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_input_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> input(s) is(are) required but we got </span><span class="si">%s</span><span class="s1"> input(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
-            <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_input_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> input(s) is(are) &#39;</span>
+            <span class="s1">&#39;required but we got </span><span class="si">%s</span><span class="s1"> input(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_input_count</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">max_input_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_input_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> input(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
-            <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_input_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> input(s) is(are) &#39;</span>
+            <span class="s1">&#39;supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_input_count</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">min_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_output_count</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">min_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_output_count</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> output(s) is(are) produced but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
-            <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_output_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">))</span>
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> output(s) is(are) &#39;</span>
+            <span class="s1">&#39;produced but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_output_count</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">max_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_output_count</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">max_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_output_count</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> outputs(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
-            <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_output_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs_full_names</span><span class="p">))</span></div>
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> outputs(s) is(are) &#39;</span>
+            <span class="s1">&#39;supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_output_count</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs_full_names</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="check_input_and_output_types"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common.utils.check_input_and_output_types">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_types</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">good_input_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">good_output_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="check_input_and_output_types"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common.utils.check_input_and_output_types">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_types</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">good_input_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">good_output_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the type(s) of input(s)/output(s) is(are) correct</span>
 
 <span class="sd">    :param operator: A Operator object</span>
-<span class="sd">    :param good_input_types: A list of allowed input types (e.g., ``[FloatTensorType, Int64TensorType]``)</span>
+<span class="sd">    :param good_input_types: A list of allowed input types (</span>
+<span class="sd">        e.g., ``[FloatTensorType, Int64TensorType]``)</span>
 <span class="sd">        or ``None``. *None* means that we skip the check of the input types.</span>
-<span class="sd">    :param good_output_types: A list of allowed output types. See good_input_types for its format.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    :param good_output_types: A list of allowed output types. See</span>
+<span class="sd">        good_input_types for its format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">good_input_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_input_types</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an input </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span> \
-                                   <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
-                                      <span class="n">good_input_types</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Operator &#39;</span><span class="si">%s</span><span class="s2">&#39; (type: </span><span class="si">%s</span><span class="s2">) got an input &#39;</span><span class="si">%s</span><span class="s2">&#39; with a wrong &quot;</span>
+                    <span class="s2">&quot;type </span><span class="si">%s</span><span class="s2">. Only </span><span class="si">%s</span><span class="s2"> are allowed&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">good_input_types</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">good_output_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_output_types</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an output </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span> \
-                                   <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
-                                      <span class="n">good_output_types</span><span class="p">))</span></div>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Operator &#39;</span><span class="si">%s</span><span class="s2">&#39; (type: </span><span class="si">%s</span><span class="s2">) got an output &#39;</span><span class="si">%s</span><span class="s2">&#39; with a wrong &quot;</span>
+                    <span class="s2">&quot;type </span><span class="si">%s</span><span class="s2">. Only </span><span class="si">%s</span><span class="s2"> are allowed&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">good_output_types</span><span class="p">))</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_column_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a tuples (variable index, column index in that variable).</span>
+<span class="sd">    The function has two different behaviours, one when *i* (column index)</span>
+<span class="sd">    is an integer, another one when *i* is a string (column name).</span>
+<span class="sd">    If *i* is a string, the function looks for input name with</span>
+<span class="sd">    this name and returns (index, 0).</span>
+<span class="sd">    If *i* is an integer, let&#39;s assume first we have two inputs</span>
+<span class="sd">    *I0 = FloatTensorType([1, 2])* and *I1 = FloatTensorType([1, 3])*,</span>
+<span class="sd">    in this case, here are the results:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        get_column_index(0, inputs) -&gt; (0, 0)</span>
+<span class="sd">        get_column_index(1, inputs) -&gt; (0, 1)</span>
+<span class="sd">        get_column_index(2, inputs) -&gt; (1, 0)</span>
+<span class="sd">        get_column_index(3, inputs) -&gt; (1, 1)</span>
+<span class="sd">        get_column_index(4, inputs) -&gt; (1, 2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Useful shortcut, skips the case when end is None</span>
+            <span class="c1"># (unknown dimension)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">vi</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+               <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot extract a specific column </span><span class="si">{0}</span><span class="s2"> when &quot;</span>
+                               <span class="s2">&quot;one input (&#39;</span><span class="si">{1}</span><span class="s2">&#39;) has unknown &quot;</span>
+                               <span class="s2">&quot;dimension.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="n">pos</span><span class="p">)</span>
+            <span class="n">vi</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">end</span>
+            <span class="n">rel_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">vi</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                       <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">vi</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rel_end</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot extract a specific column </span><span class="si">{0}</span><span class="s2"> when &quot;</span>
+                                   <span class="s2">&quot;one input (&#39;</span><span class="si">{1}</span><span class="s2">&#39;) has unknown &quot;</span>
+                                   <span class="s2">&quot;dimension.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="n">vi</span><span class="p">]))</span>
+            <span class="n">end</span> <span class="o">+=</span> <span class="n">rel_end</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">inp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">onnx_name</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ind</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to find column name &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">get_column_indices</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">multiple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the requested graph inpudes based on their</span>
+<span class="sd">    indices or names. See :func:`get_column_index`.</span>
+
+<span class="sd">    :param indices: variables indices or names</span>
+<span class="sd">    :param inputs: graph inputs</span>
+<span class="sd">    :param multiple: allows column to come from multiple variables</span>
+<span class="sd">    :return: a tuple *(variable name, list of requested indices)* if</span>
+<span class="sd">        *multiple* is False, a dictionary *{ var_index: [ list of</span>
+<span class="sd">        requested indices ] }*</span>
+<span class="sd">        if *multiple* is True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">multiple</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">ov</span><span class="p">,</span> <span class="n">onnx_i</span> <span class="o">=</span> <span class="n">get_column_index</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ov</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">ov</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">ov</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">onnx_i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">onnx_var</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">onnx_is</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">ov</span><span class="p">,</span> <span class="n">onnx_i</span> <span class="o">=</span> <span class="n">get_column_index</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+            <span class="n">onnx_is</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">onnx_i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">onnx_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">onnx_var</span> <span class="o">=</span> <span class="n">ov</span>
+            <span class="k">elif</span> <span class="n">onnx_var</span> <span class="o">!=</span> <span class="n">ov</span><span class="p">:</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">onnx_var</span><span class="p">,</span> <span class="n">ov</span><span class="p">]</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="s2">&quot;sklearn-onnx is not able to merge multiple columns from &quot;</span>
+                    <span class="s2">&quot;multiple variables (</span><span class="si">{0}</span><span class="s2">). You should think about merging &quot;</span>
+                    <span class="s2">&quot;initial types.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">onnx_var</span><span class="p">,</span> <span class="n">onnx_is</span>
 </pre></div>
     </div>
   </div>

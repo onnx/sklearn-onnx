@@ -7,7 +7,7 @@
 
   <title>sklearn-onnx: Convert your scikit-learn model into ONNX</title>
 
-  <link rel="stylesheet" href="_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="_static/sphinx-modern-theme-modified.css" type="text/css"/>
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
 </head>
@@ -42,7 +42,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_summary.html#concepts">Concepts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a><ul>
@@ -50,9 +54,26 @@
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_common_errors.html">Common errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameterized.html">Converters with options</a></li>
 </ul>
 
         </div>
@@ -68,6 +89,9 @@ toolkits into <a class="reference external" href="https://onnx.ai">ONNX</a>.</p>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameterized.html">Converters with options</a></li>
 </ul>
 </div>
 <p><strong>Issues, questions</strong></p>
@@ -114,7 +138,7 @@ Every converter is tested with this backend.</p>
 </pre></div>
 </div>
 <p><strong>Related converters</strong></p>
-<p><em>sklearn-onnx*</em> only converters models from <em>scikit-learn</em>.
+<p><em>sklearn-onnx</em> only converts models from <em>scikit-learn</em>.
 It was initially part of <a class="reference external" href="https://github.com/onnx/onnxmltools">onnxmltools</a>
 which can still be used to convert models for <em>xgboost</em> and <em>libsvm</em>.
 Other converters can be found on <a class="reference external" href="https://github.com/onnx/">github/onnx</a>,

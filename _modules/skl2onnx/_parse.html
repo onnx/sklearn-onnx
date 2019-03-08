@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>skl2onnx._parse</title>
+
+  <link rel="stylesheet" href="../../_static/sphinx-modern-theme-modified.css" type="text/css"/>
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+</head>
+<body>
+<div class="container">
+  <div class="row" style="margin-top: 1rem;">
+    <div id="sidebar" class="col-xs-12 col-sm-3">
+      <a href="../../index.html">
+        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="../../_static/logo_main.png"/>
+      </a>
+      <div id="searchbox" style="display: none" role="search">
+        <form class="form-inline" action="../../search.html" method="get">
+          <div class="form-group">
+            <label class="sr-only" for="searchInput">Search</label>
+            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
+          <input type="hidden" name="check_keywords" value="yes"/>
+          <input type="hidden" name="area" value="default"/>
+        </form>
+      </div>
+
+      <hr>
+
+        <div id="toc">
+        <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_summary.html">API Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#converters">Converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#concepts">Concepts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameterized.html">Converters with options</a></li>
+</ul>
+
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+      <h1>Source code for skl2onnx._parse</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
+<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
+<span class="c1"># license information.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="k">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">SVC</span>
+
+<span class="kn">from</span> <span class="nn">._supported_operators</span> <span class="k">import</span> <span class="n">_get_sklearn_operator_name</span><span class="p">,</span> <span class="n">cluster_list</span>
+<span class="kn">from</span> <span class="nn">._supported_operators</span> <span class="k">import</span> <span class="n">sklearn_classifier_list</span>
+<span class="kn">from</span> <span class="nn">.common._container</span> <span class="k">import</span> <span class="n">SklearnModelContainerNode</span>
+<span class="kn">from</span> <span class="nn">.common._topology</span> <span class="k">import</span> <span class="n">Topology</span>
+<span class="kn">from</span> <span class="nn">.common.data_types</span> <span class="k">import</span> <span class="n">DictionaryType</span><span class="p">,</span> <span class="n">FloatTensorType</span>
+<span class="kn">from</span> <span class="nn">.common.data_types</span> <span class="k">import</span> <span class="n">Int64TensorType</span><span class="p">,</span> <span class="n">SequenceType</span>
+<span class="kn">from</span> <span class="nn">.common.data_types</span> <span class="k">import</span> <span class="n">Int64Type</span><span class="p">,</span> <span class="n">StringType</span><span class="p">,</span> <span class="n">TensorType</span>
+<span class="kn">from</span> <span class="nn">.common.utils</span> <span class="k">import</span> <span class="n">get_column_indices</span>
+
+
+<span class="k">def</span> <span class="nf">_fetch_input_slice</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">column_indices</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;inputs must be a list of 1 input.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Operator ArrayFeatureExtractor requires at &quot;</span>
+                           <span class="s2">&quot;least one inputs.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Operator ArrayFeatureExtractor does not support &quot;</span>
+                           <span class="s2">&quot;multiple input tensors.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_indices</span><span class="p">)):</span>
+        <span class="c1"># No need to extract.</span>
+        <span class="k">return</span> <span class="n">inputs</span>
+    <span class="n">array_feature_extractor_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span>
+                                            <span class="s1">&#39;SklearnArrayFeatureExtractor&#39;</span><span class="p">)</span>
+    <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span>
+    <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">column_indices</span> <span class="o">=</span> <span class="n">column_indices</span>
+    <span class="n">output_variable_name</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+                            <span class="s1">&#39;extracted_feature_columns&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+    <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_variable_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">outputs</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_simple_model</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function handles all non-pipeline models.</span>
+
+<span class="sd">    :param scope: Scope object</span>
+<span class="sd">    :param model: A scikit-learn object (e.g., *OneHotEncoder*</span>
+<span class="sd">        or *LogisticRegression*)</span>
+<span class="sd">    :param inputs: A list of variables</span>
+<span class="sd">    :return: A list of output variables which will be passed to next</span>
+<span class="sd">        stage</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># alias can be None</span>
+    <span class="n">alias</span> <span class="o">=</span> <span class="n">_get_sklearn_operator_name</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+    <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sklearn_classifier_list</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">)):</span>
+        <span class="c1"># For classifiers, we may have two outputs, one for label and</span>
+        <span class="c1"># the other one for probabilities of all classes. Notice that</span>
+        <span class="c1"># their types here are not necessarily correct and they will</span>
+        <span class="c1"># be fixed in shape inference phase</span>
+        <span class="n">label_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span>
+                                                      <span class="n">FloatTensorType</span><span class="p">())</span>
+        <span class="n">probability_tensor_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+                                    <span class="s1">&#39;probabilities&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">())</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_variable</span><span class="p">)</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probability_tensor_variable</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cluster_list</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">):</span>
+        <span class="c1"># For clustering, we may have two outputs, one for label and</span>
+        <span class="c1"># the other one for scores of all classes. Notice that their</span>
+        <span class="c1"># types here are not necessarily correct and they will be fixed</span>
+        <span class="c1"># in shape inference phase</span>
+        <span class="n">label_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span>
+                                                      <span class="n">Int64TensorType</span><span class="p">())</span>
+        <span class="n">score_tensor_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;scores&#39;</span><span class="p">,</span>
+                                                             <span class="n">FloatTensorType</span><span class="p">())</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_variable</span><span class="p">)</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score_tensor_variable</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">NearestNeighbors</span><span class="p">:</span>
+        <span class="c1"># For Nearest Neighbours, we have two outputs, one for nearest</span>
+        <span class="c1"># neighbours&#39; indices and the other one for distances</span>
+        <span class="n">index_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                                                      <span class="n">Int64TensorType</span><span class="p">())</span>
+        <span class="n">distance_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span>
+                                                         <span class="n">FloatTensorType</span><span class="p">())</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_variable</span><span class="p">)</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance_variable</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># We assume that all scikit-learn operator produce a single output.</span>
+        <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">())</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_pipeline</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The basic ideas of scikit-learn parsing:</span>
+<span class="sd">        1. Sequentially go though all stages defined in the considered</span>
+<span class="sd">           scikit-learn pipeline</span>
+<span class="sd">        2. The output variables of one stage will be fed into its next</span>
+<span class="sd">           stage as the inputs.</span>
+
+<span class="sd">    :param scope: Scope object defined in _topology.py</span>
+<span class="sd">    :param model: scikit-learn pipeline object</span>
+<span class="sd">    :param inputs: A list of Variable objects</span>
+<span class="sd">    :return: A list of output variables produced by the input pipeline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">step</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inputs</span><span class="p">,</span>
+                               <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">inputs</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_feature_union</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param scope: Scope object</span>
+<span class="sd">    :param model: A scikit-learn FeatureUnion object</span>
+<span class="sd">    :param inputs: A list of Variable objects</span>
+<span class="sd">    :return: A list of output variables produced by feature union</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Output variable name of each transform. It&#39;s a list of string.</span>
+    <span class="n">transformed_result_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Encode each transform as our IR object</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">transform</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">:</span>
+        <span class="n">transformed_result_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span>
+                <span class="n">scope</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># Create a Concat ONNX node</span>
+    <span class="n">concat_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnConcat&#39;</span><span class="p">)</span>
+    <span class="n">concat_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">transformed_result_names</span>
+
+    <span class="c1"># Declare output name of scikit-learn FeatureUnion</span>
+    <span class="n">union_name</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;union&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">())</span>
+    <span class="n">concat_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">union_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">concat_operator</span><span class="o">.</span><span class="n">outputs</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_column_transformer</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                                      <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param scope: Scope object</span>
+<span class="sd">    :param model: A scikit-learn ColumnTransformer object</span>
+<span class="sd">    :param inputs: A list of Variable objects</span>
+<span class="sd">    :return: A list of output variables produced by column transformer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Output variable name of each transform. It&#39;s a list of string.</span>
+    <span class="n">transformed_result_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Encode each transform as our IR object</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">column_indices</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">transformers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_indices</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">column_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span>
+                <span class="n">column_indices</span><span class="o">.</span><span class="n">start</span>
+                <span class="k">if</span> <span class="n">column_indices</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">column_indices</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">column_indices</span><span class="o">.</span><span class="n">step</span>
+                <span class="k">if</span> <span class="n">column_indices</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_indices</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">column_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_indices</span><span class="p">]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">get_column_indices</span><span class="p">(</span><span class="n">column_indices</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">transform_inputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">onnx_var</span><span class="p">,</span> <span class="n">onnx_is</span> <span class="ow">in</span> <span class="n">names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tr_inputs</span> <span class="o">=</span> <span class="n">_fetch_input_slice</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="p">[</span><span class="n">inputs</span><span class="p">[</span><span class="n">onnx_var</span><span class="p">]],</span> <span class="n">onnx_is</span><span class="p">)</span>
+            <span class="n">transform_inputs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tr_inputs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">transform_inputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Many ONNX operators expect one input vector,</span>
+            <span class="c1"># the default behaviour is to merge columns.</span>
+            <span class="n">ty</span> <span class="o">=</span> <span class="n">transform_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">])</span>
+
+            <span class="n">conc_op</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnConcat&#39;</span><span class="p">)</span>
+            <span class="n">conc_op</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">transform_inputs</span>
+            <span class="n">conc_names</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;merged_columns&#39;</span><span class="p">,</span> <span class="n">ty</span><span class="p">)</span>
+            <span class="n">conc_op</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conc_names</span><span class="p">)</span>
+            <span class="n">transform_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">conc_names</span><span class="p">]</span>
+
+        <span class="n">var_out</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">named_transformers_</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">transform_inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">transformed_result_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var_out</span><span class="p">)</span>
+
+    <span class="c1"># Create a Concat ONNX node</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">transformed_result_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="n">transformed_result_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">])</span>
+        <span class="n">concat_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnConcat&#39;</span><span class="p">)</span>
+        <span class="n">concat_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">transformed_result_names</span>
+
+        <span class="c1"># Declare output name of scikit-learn ColumnTransformer</span>
+        <span class="n">transformed_column_name</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+                                            <span class="s1">&#39;transformed_column&#39;</span><span class="p">,</span> <span class="n">ty</span><span class="p">)</span>
+        <span class="n">concat_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformed_column_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">concat_operator</span><span class="o">.</span><span class="n">outputs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">transformed_result_names</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_classifier</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">probability_tensor</span> <span class="o">=</span> <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+    <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnZipMap&#39;</span><span class="p">)</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">probability_tensor</span>
+    <span class="n">classes</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">classes_</span>
+    <span class="n">label_type</span> <span class="o">=</span> <span class="n">Int64Type</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">classes</span><span class="p">)))</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">classlabels_int64s</span> <span class="o">=</span> <span class="n">classes</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">signedinteger</span><span class="p">):</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">classlabels_int64s</span> <span class="o">=</span> <span class="n">classes</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">])</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">classlabels_strings</span> <span class="o">=</span> <span class="n">classes</span>
+        <span class="n">label_type</span> <span class="o">=</span> <span class="n">StringType</span><span class="p">()</span>
+
+    <span class="n">output_label</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;output_label&#39;</span><span class="p">,</span> <span class="n">label_type</span><span class="p">)</span>
+    <span class="n">output_probability</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+        <span class="s1">&#39;output_probability&#39;</span><span class="p">,</span>
+        <span class="n">SequenceType</span><span class="p">(</span><span class="n">DictionaryType</span><span class="p">(</span><span class="n">label_type</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">())))</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_label</span><span class="p">)</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_probability</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
+
+
+<div class="viewcode-block" id="parse_sklearn"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn">[docs]</a><span class="k">def</span> <span class="nf">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a delegate function. It does nothing but invokes the</span>
+<span class="sd">    correct parsing function according to the input model&#39;s type.</span>
+
+<span class="sd">    :param scope: Scope object</span>
+<span class="sd">    :param model: A scikit-learn object (e.g., OneHotEncoder</span>
+<span class="sd">        and LogisticRegression)</span>
+<span class="sd">    :param inputs: A list of variables</span>
+<span class="sd">    :param custom_parsers: parsers determines which outputs is expected</span>
+<span class="sd">        for which particular task, default parsers are defined for</span>
+<span class="sd">        classifiers, regressors, pipeline but they can be rewritten,</span>
+<span class="sd">        *custom_parsers* is a dictionary ``{ type: fct_parser(scope,</span>
+<span class="sd">        model, inputs, custom_parsers=None) }``</span>
+<span class="sd">    :return: The output variables produced by the input model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tmodel</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">custom_parsers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tmodel</span> <span class="ow">in</span> <span class="n">custom_parsers</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">custom_parsers</span><span class="p">[</span><span class="n">tmodel</span><span class="p">](</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                                         <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">tmodel</span> <span class="ow">in</span> <span class="n">sklearn_parsers_map</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">sklearn_parsers_map</span><span class="p">[</span><span class="n">tmodel</span><span class="p">](</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                                              <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                                              <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputs</span></div>
+
+
+<div class="viewcode-block" id="parse_sklearn_model"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn_model">[docs]</a><span class="k">def</span> <span class="nf">parse_sklearn_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Puts *scikit-learn* object into an abstract container so that</span>
+<span class="sd">    our framework can work seamlessly on models created</span>
+<span class="sd">    with different machine learning tools.</span>
+
+<span class="sd">    :param model: A scikit-learn model</span>
+<span class="sd">    :param initial_types: a python list. Each element is a tuple of a</span>
+<span class="sd">        variable name and a type defined in data_types.py</span>
+<span class="sd">    :param target_opset: number, for example, 7 for ONNX 1.2,</span>
+<span class="sd">        and 8 for ONNX 1.3.</span>
+<span class="sd">    :param custom_conversion_functions: a dictionary for specifying</span>
+<span class="sd">        the user customized conversion function if not registered</span>
+<span class="sd">    :param custom_shape_calculators: a dictionary for specifying the</span>
+<span class="sd">        user customized shape calculator if not registered</span>
+<span class="sd">    :param custom_parsers: parsers determines which outputs is expected</span>
+<span class="sd">        for which particular task, default parsers are defined for</span>
+<span class="sd">        classifiers, regressors, pipeline but they can be rewritten,</span>
+<span class="sd">        *custom_parsers* is a dictionary</span>
+<span class="sd">        ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``</span>
+<span class="sd">    :return: :class:`Topology &lt;skl2onnx.common._topology.Topology&gt;`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_model_container</span> <span class="o">=</span> <span class="n">SklearnModelContainerNode</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Declare a computational graph. It will become a representation of</span>
+    <span class="c1"># the input scikit-learn model after parsing.</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span>
+            <span class="n">raw_model_container</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
+            <span class="n">target_opset</span><span class="o">=</span><span class="n">target_opset</span><span class="p">,</span>
+            <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="n">custom_conversion_functions</span><span class="p">,</span>
+            <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="n">custom_shape_calculators</span><span class="p">)</span>
+
+    <span class="c1"># Declare an object to provide variables&#39; and operators&#39; naming mechanism.</span>
+    <span class="c1"># In contrast to CoreML, one global scope</span>
+    <span class="c1"># is enough for parsing scikit-learn models.</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">declare_scope</span><span class="p">(</span><span class="s1">&#39;__root__&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Declare input variables. They should be the inputs of the scikit-learn</span>
+    <span class="c1"># model you want to convert into ONNX.</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">initial_type</span> <span class="ow">in</span> <span class="n">initial_types</span><span class="p">:</span>
+        <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">initial_type</span><span class="p">))</span>
+
+    <span class="c1"># The object raw_model_container is a part of the topology</span>
+    <span class="c1"># we&#39;re going to return. We use it to store the inputs of</span>
+    <span class="c1"># the scikit-learn&#39;s computational graph.</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="n">raw_model_container</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+    <span class="c1"># Parse the input scikit-learn model as a Topology object.</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                            <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+
+    <span class="c1"># The object raw_model_container is a part of the topology we&#39;re</span>
+    <span class="c1"># going to return. We use it to store the outputs of the</span>
+    <span class="c1"># scikit-learn&#39;s computational graph.</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+        <span class="n">raw_model_container</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">topology</span></div>
+
+
+<span class="k">def</span> <span class="nf">build_sklearn_parsers_map</span><span class="p">():</span>
+    <span class="n">map_parser</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">:</span> <span class="n">_parse_sklearn_pipeline</span><span class="p">,</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">FeatureUnion</span><span class="p">:</span> <span class="n">_parse_sklearn_feature_union</span><span class="p">,</span>
+        <span class="n">ColumnTransformer</span><span class="p">:</span> <span class="n">_parse_sklearn_column_transformer</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">tmodel</span> <span class="ow">in</span> <span class="n">sklearn_classifier_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tmodel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LinearSVC</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">NuSVC</span><span class="p">]:</span>
+            <span class="n">map_parser</span><span class="p">[</span><span class="n">tmodel</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parse_sklearn_classifier</span>
+    <span class="k">return</span> <span class="n">map_parser</span>
+
+
+<div class="viewcode-block" id="update_registered_parser"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.update_registered_parser">[docs]</a><span class="k">def</span> <span class="nf">update_registered_parser</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">parser_fct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers or updates a parser for a new model.</span>
+<span class="sd">    A parser returns the expected output of a model.</span>
+
+<span class="sd">    :param model: model class</span>
+<span class="sd">    :param parser_fct: parser, signature is the same as</span>
+<span class="sd">        :func:`parse_sklearn &lt;skl2onnx._parse.parse_sklearn&gt;`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sklearn_parsers_map</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser_fct</span></div>
+
+
+<span class="c1"># registered parsers</span>
+<span class="n">sklearn_parsers_map</span> <span class="o">=</span> <span class="n">build_sklearn_parsers_map</span><span class="p">()</span>
+</pre></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+        crossorigin="anonymous"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
+<script src="../../_static/searchtools.js"></script>
+<script>$('#searchbox').show(0)</script>
+</body>
+</html>

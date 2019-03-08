@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>skl2onnx._supported_operators</title>
+
+  <link rel="stylesheet" href="../../_static/sphinx-modern-theme-modified.css" type="text/css"/>
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+</head>
+<body>
+<div class="container">
+  <div class="row" style="margin-top: 1rem;">
+    <div id="sidebar" class="col-xs-12 col-sm-3">
+      <a href="../../index.html">
+        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="../../_static/logo_main.png"/>
+      </a>
+      <div id="searchbox" style="display: none" role="search">
+        <form class="form-inline" action="../../search.html" method="get">
+          <div class="form-group">
+            <label class="sr-only" for="searchInput">Search</label>
+            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
+          <input type="hidden" name="check_keywords" value="yes"/>
+          <input type="hidden" name="area" value="default"/>
+        </form>
+      </div>
+
+      <hr>
+
+        <div id="toc">
+        <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_summary.html">API Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#converters">Converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#concepts">Concepts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameterized.html">Converters with options</a></li>
+</ul>
+
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+      <h1>Source code for skl2onnx._supported_operators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
+<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
+<span class="c1"># license information.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">.common._registration</span> <span class="k">import</span> <span class="n">register_converter</span><span class="p">,</span> <span class="n">register_shape_calculator</span>
+
+<span class="c1"># Calibrated classifier CV</span>
+<span class="kn">from</span> <span class="nn">sklearn.calibration</span> <span class="k">import</span> <span class="n">CalibratedClassifierCV</span>
+
+<span class="c1"># Linear classifiers</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">SGDClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">LinearSVC</span>
+
+<span class="c1"># Linear regressors</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">ElasticNet</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">Lasso</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LassoLars</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">SGDRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">LinearSVR</span>
+
+<span class="c1"># Multi-class</span>
+<span class="kn">from</span> <span class="nn">sklearn.multiclass</span> <span class="k">import</span> <span class="n">OneVsRestClassifier</span>
+
+<span class="c1"># Tree-based models</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">AdaBoostClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">ExtraTreesClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">ExtraTreesRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">GradientBoostingClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">GradientBoostingRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">VotingClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="k">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="k">import</span> <span class="n">DecisionTreeRegressor</span>
+
+<span class="c1"># Support vector machines</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">NuSVR</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span>
+
+<span class="c1"># K-nearest neighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">KNeighborsRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">NearestNeighbors</span>
+
+<span class="c1"># Naive Bayes</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="k">import</span> <span class="n">BernoulliNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="k">import</span> <span class="n">MultinomialNB</span>
+
+<span class="c1"># Clustering</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">MiniBatchKMeans</span>
+
+<span class="c1"># Operators for preprocessing and feature engineering</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">TruncatedSVD</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="k">import</span> <span class="n">DictVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="k">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="k">import</span> <span class="n">TfidfVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="k">import</span> <span class="n">GenericUnivariateSelect</span><span class="p">,</span> <span class="n">RFE</span><span class="p">,</span> <span class="n">RFECV</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="k">import</span> <span class="n">SelectFdr</span><span class="p">,</span> <span class="n">SelectFpr</span><span class="p">,</span> <span class="n">SelectFromModel</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="k">import</span> <span class="n">SelectFwe</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">,</span> <span class="n">SelectPercentile</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="k">import</span> <span class="n">VarianceThreshold</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="k">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">Binarizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">Imputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">KBinsDiscretizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">LabelBinarizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">Normalizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">RobustScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">MaxAbsScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">FunctionTransformer</span>
+
+<span class="c1"># In most cases, scikit-learn operator produces only one output.</span>
+<span class="c1"># However, each classifier has basically two outputs; one is the</span>
+<span class="c1"># predicted label and the other one is the probabilities of all</span>
+<span class="c1"># possible labels. Here is a list of supported scikit-learn</span>
+<span class="c1"># classifiers. In the parsing stage, we produce two outputs for objects</span>
+<span class="c1"># included in the following list and one output for everything not in</span>
+<span class="c1"># the list.</span>
+<span class="n">sklearn_classifier_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">SGDClassifier</span><span class="p">,</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">NuSVC</span><span class="p">,</span>
+    <span class="n">GradientBoostingClassifier</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span>
+    <span class="n">ExtraTreesClassifier</span><span class="p">,</span> <span class="n">BernoulliNB</span><span class="p">,</span> <span class="n">MultinomialNB</span><span class="p">,</span> <span class="n">KNeighborsClassifier</span><span class="p">,</span>
+    <span class="n">CalibratedClassifierCV</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">,</span> <span class="n">VotingClassifier</span><span class="p">,</span>
+    <span class="n">AdaBoostClassifier</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Clustering algorithms: produces two outputs, label and score for</span>
+<span class="c1"># each cluster in most cases.</span>
+<span class="n">cluster_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">KMeans</span><span class="p">,</span> <span class="n">MiniBatchKMeans</span><span class="p">]</span>
+
+
+<span class="c1"># Associate scikit-learn types with our operator names. If two</span>
+<span class="c1"># scikit-learn models share a single name, it means their are</span>
+<span class="c1"># equivalent in terms of conversion.</span>
+<span class="k">def</span> <span class="nf">build_sklearn_operator_name_map</span><span class="p">():</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="s2">&quot;Sklearn&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">AdaBoostClassifier</span><span class="p">,</span> <span class="n">VotingClassifier</span><span class="p">,</span>
+                <span class="n">CalibratedClassifierCV</span><span class="p">,</span>
+                <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">,</span>
+                <span class="n">ExtraTreesClassifier</span><span class="p">,</span> <span class="n">ExtraTreesRegressor</span><span class="p">,</span>
+                <span class="n">GradientBoostingClassifier</span><span class="p">,</span> <span class="n">GradientBoostingRegressor</span><span class="p">,</span>
+                <span class="n">KNeighborsClassifier</span><span class="p">,</span> <span class="n">KNeighborsRegressor</span><span class="p">,</span> <span class="n">NearestNeighbors</span><span class="p">,</span>
+                <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">LinearSVR</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span><span class="p">,</span>
+                <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">LassoLars</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">,</span>
+                <span class="n">MultinomialNB</span><span class="p">,</span> <span class="n">BernoulliNB</span><span class="p">,</span>
+                <span class="n">OneVsRestClassifier</span><span class="p">,</span>
+                <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">,</span>
+                <span class="n">KMeans</span><span class="p">,</span> <span class="n">MiniBatchKMeans</span><span class="p">,</span> <span class="n">PCA</span><span class="p">,</span> <span class="n">TruncatedSVD</span><span class="p">,</span>
+                <span class="n">Binarizer</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">MaxAbsScaler</span><span class="p">,</span> <span class="n">Normalizer</span><span class="p">,</span>
+                <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span><span class="p">,</span> <span class="n">TfidfTransformer</span><span class="p">,</span>
+                <span class="n">FunctionTransformer</span><span class="p">,</span> <span class="n">KBinsDiscretizer</span><span class="p">,</span> <span class="n">PolynomialFeatures</span><span class="p">,</span>
+                <span class="n">Imputer</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">,</span> <span class="n">LabelBinarizer</span><span class="p">,</span> <span class="n">LabelEncoder</span><span class="p">,</span>
+                <span class="n">RobustScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">DictVectorizer</span><span class="p">,</span>
+                <span class="n">GenericUnivariateSelect</span><span class="p">,</span> <span class="n">RFE</span><span class="p">,</span> <span class="n">RFECV</span><span class="p">,</span> <span class="n">SelectFdr</span><span class="p">,</span> <span class="n">SelectFpr</span><span class="p">,</span>
+                <span class="n">SelectFromModel</span><span class="p">,</span> <span class="n">SelectFwe</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">,</span> <span class="n">SelectPercentile</span><span class="p">,</span>
+                <span class="n">VarianceThreshold</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="p">}</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="n">ElasticNet</span><span class="p">:</span> <span class="s1">&#39;SklearnElasticNetRegressor&#39;</span><span class="p">,</span>
+        <span class="n">LinearRegression</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
+        <span class="n">LogisticRegression</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
+        <span class="n">NuSVC</span><span class="p">:</span> <span class="s1">&#39;SklearnSVC&#39;</span><span class="p">,</span>
+        <span class="n">NuSVR</span><span class="p">:</span> <span class="s1">&#39;SklearnSVR&#39;</span><span class="p">,</span>
+        <span class="n">SGDClassifier</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
+        <span class="n">SGDRegressor</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
+        <span class="n">StandardScaler</span><span class="p">:</span> <span class="s1">&#39;SklearnScaler&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<div class="viewcode-block" id="update_registered_converter"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.update_registered_converter">[docs]</a><span class="k">def</span> <span class="nf">update_registered_converter</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">alias</span><span class="p">,</span> <span class="n">shape_fct</span><span class="p">,</span> <span class="n">convert_fct</span><span class="p">,</span>
+                                <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers or updates a converter for a new model so that</span>
+<span class="sd">    it can be converted when inserted in a *scikit-learn* pipeline.</span>
+
+<span class="sd">    :param model: model class</span>
+<span class="sd">    :param alias: alias used to register the model</span>
+<span class="sd">    :param shape_fct: function which checks or modifies the expected</span>
+<span class="sd">        outputs, this function should be fast so that the whole graph</span>
+<span class="sd">        can be computed followed by the conversion of each model,</span>
+<span class="sd">        parallelized or not</span>
+<span class="sd">    :param convert_fct: function which converts a model</span>
+<span class="sd">    :param overwrite: False to raise exception if a converter</span>
+<span class="sd">        already exists</span>
+
+<span class="sd">    The alias is usually the library name followed by the model name.</span>
+<span class="sd">    Example:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes</span>
+<span class="sd">        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier</span>
+<span class="sd">        from skl2onnx import update_registered_converter</span>
+<span class="sd">        update_registered_converter(SGDClassifier, &#39;SklearnLinearClassifier&#39;,</span>
+<span class="sd">                                    calculate_linear_classifier_output_shapes,</span>
+<span class="sd">                                    convert_sklearn_random_forest_classifier)</span>
+<span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># noqa</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">sklearn_operator_name_map</span>
+            <span class="ow">and</span> <span class="n">alias</span> <span class="o">!=</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">model</span><span class="p">]):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Model &#39;</span><span class="si">{0}</span><span class="s2">&#39; was already registered under alias &quot;</span>
+                      <span class="s2">&quot;&#39;</span><span class="si">{1}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">model</span><span class="p">]))</span>
+    <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">alias</span>
+    <span class="n">register_converter</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">convert_fct</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+    <span class="n">register_shape_calculator</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">shape_fct</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_sklearn_operator_name</span><span class="p">(</span><span class="n">model_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get operator name of the input argument</span>
+
+<span class="sd">    :param model_type:  A scikit-learn object (e.g., SGDClassifier</span>
+<span class="sd">                        and Binarizer)</span>
+<span class="sd">    :return: A string which stands for the type of the input model in</span>
+<span class="sd">             our conversion framework</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sklearn_operator_name_map</span><span class="p">:</span>
+        <span class="c1"># &quot;No proper operator name found, it means a local operator.</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">model_type</span><span class="p">]</span>
+
+
+<span class="c1"># registered converters</span>
+<span class="n">sklearn_operator_name_map</span> <span class="o">=</span> <span class="n">build_sklearn_operator_name_map</span><span class="p">()</span>
+</pre></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+        crossorigin="anonymous"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
+<script src="../../_static/searchtools.js"></script>
+<script>$('#searchbox').show(0)</script>
+</body>
+</html>

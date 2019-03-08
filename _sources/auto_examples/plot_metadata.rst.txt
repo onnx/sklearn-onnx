@@ -10,6 +10,8 @@
 Metadata
 ========
 
+.. index:: metadata
+
 ONNX format contains metadata related to how the
 model was produced. It is useful when the model
 is deployed to production to keep track of which
@@ -77,6 +79,7 @@ With *ONNX Runtime*:
 
 
 
+
 .. rst-class:: sphx-glr-script-out
 
  Out:
@@ -91,7 +94,38 @@ With *ONNX Runtime*:
     version=0
 
 
-**Total running time of the script:** ( 0 minutes  0.015 seconds)
+**Versions used for this example**
+
+
+
+.. code-block:: python
+
+
+    import numpy, sklearn
+    print("numpy:", numpy.__version__)
+    print("scikit-learn:", sklearn.__version__)
+    import onnx, onnxruntime, skl2onnx
+    print("onnx: ", onnx.__version__)
+    print("onnxruntime: ", onnxruntime.__version__)
+    print("skl2onnx: ", skl2onnx.__version__)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    numpy: 1.16.1
+    scikit-learn: 0.20.2
+    onnx:  1.4.1
+    onnxruntime:  0.2.1
+    skl2onnx:  1.4.2
+
+
+**Total running time of the script:** ( 0 minutes  0.004 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metadata.py:

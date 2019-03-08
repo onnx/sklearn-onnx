@@ -1,0 +1,298 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_pipeline_lightgbm.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_auto_examples_plot_pipeline_lightgbm.py:
+
+
+.. _example-lightgbm:
+
+Convert a pipeline with a LightGbm model
+========================================
+
+.. index:: LightGbm
+
+*sklearn-onnx* only converts *scikit-learn* models into *ONNX*
+but many libraries implement *scikit-learn* API so that their models
+can be included in a *scikit-learn* pipeline. This example considers
+a pipeline including a *LightGbm* model. *sklearn-onnx* can convert
+the whole pipeline as long as it knows the converter associated to
+a *LGBMClassifier*. Let's see how to do it.
+
+A couple of errors might happen while trying to convert
+your own pipeline, some of them are described
+and explained in :ref:`errors-pipeline`.
+
+.. contents::
+    :local:
+
+Train a LightGBM classifier
++++++++++++++++++++++++++++
+
+
+
+.. code-block:: python
+
+    import numpy
+    from sklearn.datasets import load_iris
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from lightgbm import LGBMClassifier
+    data = load_iris()
+    X = data.data[:, :2]
+    y = data.target
+
+    ind = numpy.arange(X.shape[0])
+    numpy.random.shuffle(ind)
+    X = X[ind, :].copy()
+    y = y[ind].copy()
+
+    pipe = Pipeline([('scaler', StandardScaler()),
+                     ('lgbm', LGBMClassifier(n_estimators=3))])
+    pipe.fit(X, y)
+
+
+
+
+
+
+
+Register the converter for LGBMClassifier
++++++++++++++++++++++++++++++++++++++++++
+
+The converter is implemented in *onnxmltools*:
+`onnxmltools...LightGbm.py
+<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+lightgbm/operator_converters/LightGbm.py>`_.
+and the shape calculator:
+`onnxmltools...Classifier.py
+<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+lightgbm/shape_calculators/Classifier.py>`_.
+The current implementation has duplicated code which we replace
+by the implementation from *skl2onnx*.
+
+
+
+.. code-block:: python
+
+    from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
+    import onnxmltools.convert.common.data_types
+    onnxmltools.convert.common.data_types.Int64TensorType = Int64TensorType
+    onnxmltools.convert.common.data_types.StringTensorType = StringTensorType
+    onnxmltools.convert.common.data_types.FloatTensorType = FloatTensorType
+    onnxmltools.convert.common.data_types.DictionaryType = DictionaryType
+    onnxmltools.convert.common.data_types.SequenceType = SequenceType
+
+
+
+
+
+
+
+Then we import the converter and shape calculator.
+
+
+
+.. code-block:: python
+
+    from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
+    from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes
+
+
+
+
+
+
+
+Let's register the new converter.
+
+
+
+.. code-block:: python
+
+    from skl2onnx import update_registered_converter
+    update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
+                                calculate_linear_classifier_output_shapes,
+                                convert_lightgbm)
+
+
+
+
+
+
+
+Convert again
++++++++++++++
+
+
+
+.. code-block:: python
+
+
+    from skl2onnx import convert_sklearn
+    model_onnx = convert_sklearn(pipe, 'pipeline_lightgbm',
+                                 [('input', FloatTensorType([1, 2]))])
+
+    # And save.
+    with open("pipeline_lightgbm.onnx", "wb") as f:
+        f.write(model_onnx.SerializeToString())
+
+
+
+
+
+
+
+Compare the predictions
++++++++++++++++++++++++
+
+Predictions with LightGbm.
+
+
+
+.. code-block:: python
+
+
+    print("predict", pipe.predict(X[:5]))
+    print("predict_proba", pipe.predict_proba(X[:1]))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    predict [2 2 1 0 1]
+    predict_proba [[0.26460413 0.33911561 0.39628026]]
+
+
+Predictions with onnxruntime.
+
+
+
+.. code-block:: python
+
+
+    import onnxruntime as rt
+    import numpy
+    sess = rt.InferenceSession("pipeline_lightgbm.onnx")
+    pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
+    print("predict", pred_onx[0])
+    print("predict_proba", pred_onx[1][:1])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    predict [2 2 1 0 1]
+    predict_proba [{0: 0.2646041512489319, 1: 0.33911561965942383, 2: 0.3962802290916443}]
+
+
+Display the ONNX graph
+++++++++++++++++++++++
+
+
+
+.. code-block:: python
+
+
+    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+                                node_producer=GetOpNodeProducer("docstring", color="yellow",
+                                                                fillcolor="yellow", style="filled"))
+    pydot_graph.write_dot("pipeline.dot")
+
+    import os
+    os.system('dot -O -Gdpi=300 -Tpng pipeline.dot')
+
+    import matplotlib.pyplot as plt
+    image = plt.imread("pipeline.dot.png")
+    fig, ax = plt.subplots(figsize=(40, 20))
+    ax.imshow(image)
+    ax.axis('off')
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_pipeline_lightgbm_001.png
+    :class: sphx-glr-single-img
+
+
+
+
+**Versions used for this example**
+
+
+
+.. code-block:: python
+
+
+    import numpy, sklearn
+    print("numpy:", numpy.__version__)
+    print("scikit-learn:", sklearn.__version__)
+    import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+    print("onnx: ", onnx.__version__)
+    print("onnxruntime: ", onnxruntime.__version__)
+    print("skl2onnx: ", skl2onnx.__version__)
+    print("onnxmltools: ", onnxmltools.__version__)
+    print("lightgbm: ", lightgbm.__version__)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    numpy: 1.16.1
+    scikit-learn: 0.20.2
+    onnx:  1.4.1
+    onnxruntime:  0.2.1
+    skl2onnx:  1.4.2
+    onnxmltools:  1.3.1
+    lightgbm:  2.2.2
+
+
+**Total running time of the script:** ( 0 minutes  1.026 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_pipeline_lightgbm.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: plot_pipeline_lightgbm.py <plot_pipeline_lightgbm.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: plot_pipeline_lightgbm.ipynb <plot_pipeline_lightgbm.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_

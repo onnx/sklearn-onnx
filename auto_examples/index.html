@@ -7,7 +7,7 @@
 
   <title>Gallery of examples</title>
 
-  <link rel="stylesheet" href="../_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="../_static/sphinx-modern-theme-modified.css" type="text/css"/>
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
 </head>
@@ -42,7 +42,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#concepts">Concepts</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Gallery of examples</a><ul>
@@ -50,9 +54,26 @@
 <li class="toctree-l2"><a class="reference internal" href="plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_common_errors.html">Common errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_custom_model.html">Write your own converter for your own model</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parameterized.html">Converters with options</a></li>
 </ul>
 
         </div>
@@ -86,17 +107,59 @@
 </div>
 </div><div class="toctree-wrapper compound">
 </div>
-<div class="sphx-glr-thumbcontainer" tooltip="This example looks into several common situations in which *onnxruntime* does not return the mo..."><div class="figure" id="id5">
-<img alt="../_images/sphx_glr_plot_common_errors_thumb.png" src="../_images/sphx_glr_plot_common_errors_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_common_errors.html#sphx-glr-auto-examples-plot-common-errors-py"><span class="std std-ref">Common errors with onnxruntime</span></a></span></p>
+<div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with *onnxruntime*. This example looks into several common situation..."><div class="figure" id="id5">
+<img alt="../_images/sphx_glr_plot_errors_onnxruntime_thumb.png" src="../_images/sphx_glr_plot_errors_onnxruntime_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_errors_onnxruntime.html#sphx-glr-auto-examples-plot-errors-onnxruntime-py"><span class="std std-ref">Errors with onnxruntime</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="*sklearn-onnx* only converts *scikit-learn* models into *ONNX* but many libraries implement *sc..."><div class="figure" id="id6">
+<img alt="../_images/sphx_glr_plot_pipeline_lightgbm_thumb.png" src="../_images/sphx_glr_plot_pipeline_lightgbm_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="*scikit-learn* recently shipped `ColumnTransformer &lt;https://scikit-learn.org/stable/modules/gen..."><div class="figure" id="id7">
+<img alt="../_images/sphx_glr_plot_complex_pipeline_thumb.png" src="../_images/sphx_glr_plot_complex_pipeline_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: `Column Transformer with Heterogeneous Dat..."><div class="figure" id="id8">
+<img alt="../_images/sphx_glr_plot_tfidfvectorizer_thumb.png" src="../_images/sphx_glr_plot_tfidfvectorizer_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="A pipeline is a patchwork of many different pieces and the probability of the first try to conv..."><div class="figure" id="id9">
+<img alt="../_images/sphx_glr_plot_errors_pipeline_thumb.png" src="../_images/sphx_glr_plot_errors_pipeline_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_errors_pipeline.html#sphx-glr-auto-examples-plot-errors-pipeline-py"><span class="std std-ref">Errors while converting a pipeline</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="We reuse the example :ref:`example-complex-pipeline` and walk through intermediates outputs. It..."><div class="figure" id="id10">
+<img alt="../_images/sphx_glr_plot_intermediate_outputs_thumb.png" src="../_images/sphx_glr_plot_intermediate_outputs_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="`Transfer learning &lt;https://en.wikipedia.org/wiki/Transfer_learning&gt;`_ is usually useful to ada..."><div class="figure" id="id11">
+<img alt="../_images/sphx_glr_plot_transfer_learning_thumb.png" src="../_images/sphx_glr_plot_transfer_learning_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_transfer_learning.html#sphx-glr-auto-examples-plot-transfer-learning-py"><span class="std std-ref">Transfer learning with ONNX</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converte..."><div class="figure" id="id12">
+<img alt="../_images/sphx_glr_plot_custom_model_thumb.png" src="../_images/sphx_glr_plot_custom_model_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a></span></p>
 </div>
 </div><div class="toctree-wrapper compound">
 </div>
 <div style='clear:both'></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/09d5afa2abf49f5b961951c14f95903c/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/c732f7c6e4b0ac079e83209b02453dfc/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/814730099a4d2ab389d66e39043b2c49/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/5267e51df7d6ec3da92ee229406749fd/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

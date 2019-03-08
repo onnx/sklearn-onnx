@@ -7,7 +7,7 @@
 
   <title>Metadata</title>
 
-  <link rel="stylesheet" href="../_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="../_static/sphinx-modern-theme-modified.css" type="text/css"/>
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
 </head>
@@ -42,7 +42,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#registered-functions">Registered functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#parsers">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_summary.html#concepts">Concepts</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Gallery of examples</a><ul class="current">
@@ -50,9 +54,26 @@
 <li class="toctree-l2"><a class="reference internal" href="plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_common_errors.html">Common errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_transfer_learning.html">Transfer learning with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_custom_model.html">Write your own converter for your own model</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../supported.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Convert a pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#titanic-example">Titanic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parameterized.html">Converters with options</a></li>
 </ul>
 
         </div>
@@ -64,7 +85,7 @@
 </div>
 <div class="sphx-glr-example-title section" id="metadata">
 <span id="sphx-glr-auto-examples-plot-metadata-py"></span><h1>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h1>
-<p>ONNX format contains metadata related to how the
+<p id="index-0">ONNX format contains metadata related to how the
 model was produced. It is useful when the model
 is deployed to production to keep track of which
 instance was used at a specific time.
@@ -118,12 +139,30 @@ producer_name=OnnxMLTools
 version=0
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.015 seconds)</p>
+<p><strong>Versions used for this example</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span><span class="o">,</span> <span class="nn">sklearn</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">onnx</span><span class="o">,</span> <span class="nn">onnxruntime</span><span class="o">,</span> <span class="nn">skl2onnx</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numpy: 1.16.1
+scikit-learn: 0.20.2
+onnx:  1.4.1
+onnxruntime:  0.2.1
+skl2onnx:  1.4.2
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.004 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-metadata-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/0ff21b9e2294d639f51ab80b99185748/plot_metadata.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metadata.py</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/dfdcd2287d526e19fe49306ef351476a/plot_metadata.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metadata.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/66178ff9622b2c458744fb55367a7012/plot_metadata.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_metadata.ipynb</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/8110c6f55dc46b2440eb2750945635fc/plot_metadata.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_metadata.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

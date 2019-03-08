@@ -90,13 +90,13 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example looks into several common situations in which *onnxruntime* does not return the mo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with *onnxruntime*. This example looks into several common situation...">
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_common_errors_thumb.png
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_errors_onnxruntime_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_common_errors.py`
+        :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py`
 
 .. raw:: html
 
@@ -106,7 +106,147 @@ Gallery of examples
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_common_errors
+   /auto_examples/plot_errors_onnxruntime
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="*sklearn-onnx* only converts *scikit-learn* models into *ONNX* but many libraries implement *sc...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_lightgbm_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_pipeline_lightgbm
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="*scikit-learn* recently shipped `ColumnTransformer &lt;https://scikit-learn.org/stable/modules/gen...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_complex_pipeline_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_complex_pipeline
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: `Column Transformer with Heterogeneous Dat...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_tfidfvectorizer_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_tfidfvectorizer
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline is a patchwork of many different pieces and the probability of the first try to conv...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_errors_pipeline_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_errors_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_errors_pipeline
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="We reuse the example :ref:`example-complex-pipeline` and walk through intermediates outputs. It...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_intermediate_outputs_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_intermediate_outputs
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="`Transfer learning &lt;https://en.wikipedia.org/wiki/Transfer_learning&gt;`_ is usually useful to ada...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_transfer_learning_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_transfer_learning.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_transfer_learning
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converte...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_custom_model_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_custom_model.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_custom_model
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -121,13 +261,13 @@ Gallery of examples
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip </C:/xadupre/microsoft_xadupre/sklearn-onnx/docs/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </C:/xavierdupre/microsoft_github/sklearn-onnx/docs/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </C:/xadupre/microsoft_xadupre/sklearn-onnx/docs/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </C:/xavierdupre/microsoft_github/sklearn-onnx/docs/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

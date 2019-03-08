@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>scikitonx.convert</title>
+
+  <link rel="stylesheet" href="../../_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+</head>
+<body>
+<div class="container">
+  <div class="row" style="margin-top: 1rem;">
+    <div id="sidebar" class="col-xs-12 col-sm-3">
+      <a href="../../index.html">
+        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="../../_static/logo_main.png"/>
+      </a>
+      <div id="searchbox" style="display: none" role="search">
+        <form class="form-inline" action="../../search.html" method="get">
+          <div class="form-group">
+            <label class="sr-only" for="searchInput">Search</label>
+            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
+          <input type="hidden" name="check_keywords" value="yes"/>
+          <input type="hidden" name="area" value="default"/>
+        </form>
+      </div>
+
+      <hr>
+
+        <div id="toc">
+        <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_summary.html">API Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#converters">Converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api_summary.html#utils">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_common_errors.html">Common errors with onnxruntime</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">Tests, Dependencies, Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests.html#test-all-existing-converters">Test all existing converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tests.html#add-a-new-converter">Add a new converter</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+      <h1>Source code for scikitonx.convert</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
+<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
+<span class="c1"># license information.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
+<span class="kn">from</span> <span class="nn">.proto</span> <span class="k">import</span> <span class="n">get_opset_number_from_onnx</span>
+<span class="kn">from</span> <span class="nn">.common._topology</span> <span class="k">import</span> <span class="n">convert_topology</span>
+<span class="kn">from</span> <span class="nn">._parse</span> <span class="k">import</span> <span class="n">parse_sklearn</span>
+
+<span class="c1"># Invoke the registration of all our converters and shape calculators.</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">shape_calculators</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">operator_converters</span>
+
+
+<div class="viewcode-block" id="convert"><a class="viewcode-back" href="../../api_summary.html#scikitonx.convert">[docs]</a><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">doc_string</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function produces an equivalent ONNX model of the given scikit-learn model. The supported scikit-learn</span>
+<span class="sd">    modules are listed below.</span>
+
+<span class="sd">    * Preprocessings and transformations:</span>
+<span class="sd">      1.  feature_extraction.DictVectorizer</span>
+<span class="sd">      2.  preprocessing.Imputer</span>
+<span class="sd">      3.  preprocessing.LabelEncoder</span>
+<span class="sd">      4.  preprocessing.Normalizer</span>
+<span class="sd">      5.  preprocessing.OneHotEncoder</span>
+<span class="sd">      6.  preprocessing.RobustScale</span>
+<span class="sd">      7.  preprocessing.StandardScaler</span>
+<span class="sd">      8.  decomposition.TruncatedSVD</span>
+<span class="sd">    * Linear classification and regression:</span>
+<span class="sd">      9.  svm.LinearSVC</span>
+<span class="sd">      10. linear_model.LogisticRegression,</span>
+<span class="sd">      11. linear_model.SGDClassifier</span>
+<span class="sd">      12. svm.LinearSVR</span>
+<span class="sd">      13. linear_model.LinearRegression</span>
+<span class="sd">      14. linear_model.Ridge</span>
+<span class="sd">      15. linear_model.SGDRegressor</span>
+<span class="sd">      16. linear_model.ElasticNet</span>
+<span class="sd">    * Support vector machine for classification and regression</span>
+<span class="sd">      17. svm.SVC</span>
+<span class="sd">      18. svm.SVR</span>
+<span class="sd">      19. svm.NuSVC</span>
+<span class="sd">      20. svm.NuSVR</span>
+<span class="sd">    * Tree-based models for classification and regression</span>
+<span class="sd">      21. tree.DecisionTreeClassifier</span>
+<span class="sd">      22. tree.DecisionTreeRegressor</span>
+<span class="sd">      23. ensemble.GradientBoostingClassifier</span>
+<span class="sd">      24. ensemble.GradientBoostingRegressor</span>
+<span class="sd">      25. ensemble.RandomForestClassifier</span>
+<span class="sd">      26. ensemble.RandomForestRegressor</span>
+<span class="sd">      27. ensemble.ExtraTreesClassifier</span>
+<span class="sd">      28. ensemble.ExtraTreesRegressor</span>
+<span class="sd">    * pipeline</span>
+<span class="sd">      29. pipeline.Pipeline</span>
+
+<span class="sd">    For pipeline conversion, user needs to make sure each component is one of our supported items (1)-(24).</span>
+
+<span class="sd">    This function converts the specified scikit-learn model into its ONNX counterpart. Notice that for all conversions,</span>
+<span class="sd">    initial types are required.  ONNX model name can also be specified.</span>
+
+<span class="sd">    :param model: A scikit-learn model</span>
+<span class="sd">    :param initial_types: a python list. Each element is a tuple of a variable name and a type defined in data_types.py</span>
+<span class="sd">    :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)</span>
+<span class="sd">    :param doc_string: A string attached onto the produced ONNX model</span>
+<span class="sd">    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.</span>
+<span class="sd">    :param targeted_onnx: A string (for example, &#39;1.1.2&#39; and &#39;1.2&#39;) used to specify the targeted ONNX version of the</span>
+<span class="sd">    produced model. If ONNXMLTools cannot find a compatible ONNX python package, an error may be thrown.</span>
+<span class="sd">    :param custom_conversion_functions: a dictionary for specifying the user customized conversion function</span>
+<span class="sd">    :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator</span>
+<span class="sd">    :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model</span>
+
+<span class="sd">    Example of initial_types:</span>
+<span class="sd">    Assume that the specified scikit-learn model takes a heterogeneous list as its input. If the first 5 elements are</span>
+<span class="sd">    floats and the last 10 elements are integers, we need to specify initial types as below. The [1] in [1, 5] indicates</span>
+<span class="sd">    the batch size here is 1.</span>
+<span class="sd">    &gt;&gt;&gt; from .common.data_types import FloatTensorType, Int64TensorType</span>
+<span class="sd">    &gt;&gt;&gt; initial_type = [(&#39;float_input&#39;, FloatTensorType([1, 5])), (&#39;int64_input&#39;, Int64TensorType([1, 10]))]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">initial_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Initial types are required. See usage of convert(...) in </span><span class="se">\</span>
+<span class="s1">                         scikitonx.sklearn.convert for details&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">)</span>
+
+    <span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span> <span class="k">if</span> <span class="n">target_opset</span> <span class="k">else</span> <span class="n">get_opset_number_from_onnx</span><span class="p">()</span>
+    <span class="c1"># Parse scikit-learn model as our internal data structure (i.e., Topology)</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_types</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">,</span> <span class="n">custom_conversion_functions</span><span class="p">,</span> <span class="n">custom_shape_calculators</span><span class="p">)</span>
+
+    <span class="c1"># Infer variable shapes</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+
+    <span class="c1"># Convert our Topology object into ONNX. The outcome is an ONNX model.</span>
+    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">convert_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc_string</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">onnx_model</span></div>
+</pre></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+        crossorigin="anonymous"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
+<script src="../../_static/searchtools.js"></script>
+<script>$('#searchbox').show(0)</script>
+</body>
+</html>

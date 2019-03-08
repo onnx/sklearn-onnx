@@ -61,7 +61,7 @@ That's the most simple way.
       initializer {
         dims: 3
         dims: 2
-        data_type: FLOAT
+        data_type: 1
         float_data: 1.0
         float_data: 2.0
         float_data: 3.0
@@ -74,7 +74,7 @@ That's the most simple way.
         name: "X"
         type {
           tensor_type {
-            elem_type: FLOAT
+            elem_type: 1
             shape {
               dim {
                 dim_value: 3
@@ -90,7 +90,7 @@ That's the most simple way.
         name: "Y"
         type {
           tensor_type {
-            elem_type: FLOAT
+            elem_type: 1
             shape {
               dim {
                 dim_value: 3
@@ -141,7 +141,7 @@ We convert it into a graph.
 .. code-block:: python
 
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-    pydot_graph = GetPydotGraph(model.graph, name=model.graph.name, rankdir="LR",
+    pydot_graph = GetPydotGraph(model.graph, name=model.graph.name, rankdir="TB",
                                 node_producer=GetOpNodeProducer("docstring"))
     pydot_graph.write_dot("graph.dot")
 
@@ -175,11 +175,7 @@ Which we display...
     import matplotlib.pyplot as plt
     image = plt.imread("graph.dot.png")
     plt.imshow(image)
-
-
-
-
-
+    plt.axis('off')
 
 
 
@@ -190,7 +186,38 @@ Which we display...
 
 
 
-**Total running time of the script:** ( 0 minutes  0.393 seconds)
+**Versions used for this example**
+
+
+
+.. code-block:: python
+
+
+    import numpy, sklearn
+    print("numpy:", numpy.__version__)
+    print("scikit-learn:", sklearn.__version__)
+    import onnx, onnxruntime, skl2onnx
+    print("onnx: ", onnx.__version__)
+    print("onnxruntime: ", onnxruntime.__version__)
+    print("skl2onnx: ", skl2onnx.__version__)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    numpy: 1.16.1
+    scikit-learn: 0.20.2
+    onnx:  1.4.1
+    onnxruntime:  0.2.1
+    skl2onnx:  1.4.2
+
+
+**Total running time of the script:** ( 0 minutes  0.261 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
