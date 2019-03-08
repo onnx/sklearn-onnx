@@ -6,9 +6,9 @@
 from .onnx_operator import OnnxOperator
 
 
-class Sub(OnnxOperator):
+class Div(OnnxOperator):
     """
-    Performs element-wise binary subtraction (with Numpy-style broadcasting support).
+    Performs element-wise division (with Numpy-style broadcasting support).
     This operator supports **multidirectional (i.e., Numpy-style) broadcasting**;
     for more details please check :epkg:`broadcasting`.
 
@@ -61,23 +61,23 @@ class Sub(OnnxOperator):
         import numpy as np
 
         node = onnx.helper.make_node(
-            'Sub',
+            'Div',
             inputs=['x', 'y'],
             outputs=['z'],
         )
 
         x = np.array([1, 2, 3]).astype(np.float32)
         y = np.array([3, 2, 1]).astype(np.float32)
-        z = x - y  # expected output [-2., 0., 2.]
+        z = x * y
+        print(z)
         expect(node, inputs=[x, y], outputs=[z],
-               name='test_sub_example')
+               name='test_div_example')
 
         x = np.random.randn(3, 4, 5).astype(np.float32)
         y = np.random.randn(3, 4, 5).astype(np.float32)
         z = x - y
-        print(z)
         expect(node, inputs=[x, y], outputs=[z],
-               name='test_sub')
+               name='test_div')
 
     .. runpython::
         :showcode:
@@ -86,16 +86,16 @@ class Sub(OnnxOperator):
         import numpy as np
 
         node = onnx.helper.make_node(
-            'Sub',
+            'Div',
             inputs=['x', 'y'],
             outputs=['z'],
         )
 
         x = np.random.randn(3, 4, 5).astype(np.float32)
         y = np.random.randn(5).astype(np.float32)
-        z = x - y
+        z = x * y
         print(z)
         expect(node, inputs=[x, y], outputs=[z],
-               name='test_sub_bcast')
+               name='test_div_bcast')
     """
     pass

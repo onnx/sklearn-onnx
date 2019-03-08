@@ -44,10 +44,20 @@ class OnnxOperator:
     def __init__(self, *inputs, outputs=None, **kwargs):
         self.state = None
         self.inputs = list(inputs)
-        self.known_outputs = outputs
         self.kwargs = kwargs
+        if outputs is None:
+            # It means intermediate outputs. We suppose there is one.
+            outputs = [None]
+        self.known_outputs = outputs
 
-    def add(self, scope, operator, container):
+    def _check_names(self, scope):
+        for i in range(len(self.known_outputs)):
+            o = self.known_outputs[i]
+            if o is None:
+                self.known_outputs[i] = scope.get_unique_variable_name(
+                    self.__class__.__name__ + '-o')
+
+    def add_to(self, scope, container):
         if self.state is None:
             if self.kwargs.get('op_version', '') is None:
                 kwargs = self.kwargs.copy()
@@ -55,6 +65,7 @@ class OnnxOperator:
             else:
                 kwargs = self.kwargs
 
+            self._check_names(scope)
             self.state = GraphState(self.inputs, self.known_outputs,
                                     self.__class__.__name__,
                                     scope, container, None,

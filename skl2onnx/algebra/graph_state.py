@@ -26,9 +26,10 @@ class GraphState:
             raise TypeError("inputs must be a list or a string or a Variable.")
         elif not isinstance(self.inputs, list):
             self.inputs = [self.inputs]
+        if self.expected_outputs is None:
+            raise ValueError("expected_outputs must be named.")
         if not isinstance(self.expected_outputs, list):
             self.expected_outputs = [self.expected_outputs]
-        self.expected_outputs = [o.full_name for o in self.expected_outputs]
 
     @property
     def outputs(self):
@@ -42,8 +43,17 @@ class GraphState:
             return var.full_name
         elif isinstance(var, np.ndarray):
             return self._add_constant(var)
-        elif var is None:
-            return None
+        elif hasattr(var, 'add_to'):
+            var.add_to(self.scope, self.container)
+            outputs = var.outputs
+            if isinstance(outputs, list):
+                if len(outputs) == 1:
+                    var = outputs[0]
+                    if isinstance(var, Variable):
+                        return var.full_name
+                    elif isinstance(var, str):
+                        return var
+            raise RuntimeError("Unexpected type {}".format(outputs))
         else:
             raise RuntimeError("Unexpected type: {0}".format(type(var)))
 
@@ -64,6 +74,15 @@ class GraphState:
             raise NotImplementedError(
                 "Unable to add a constant of type {}.".format(type(cst)))
 
+    def _get_output_name(self, output):
+        if isinstance(output, Variable):
+            return output.full_name
+        elif isinstance(output, str):
+            return output
+        else:
+            raise NotImplementedError(
+                "Unexpected type {}".format(type(output)))
+
     def run(self):
 
         if self.computed_outputs is None:
@@ -73,6 +92,7 @@ class GraphState:
             inputs = [self._get_var_name(i, False) for i in self.inputs]
             inputs = [i for i in inputs if i is not None]
             name = self.scope.get_unique_operator_name(self.operator_name)
-            self.container.add_node(self.operator_name, inputs, self.expected_outputs,
+            outputs = [self._get_output_name(o) for o in self.expected_outputs]
+            self.container.add_node(self.operator_name, inputs, outputs,
                                     name=name, **self.attrs)
             self.computed_outputs = self.expected_outputs

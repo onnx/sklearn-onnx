@@ -26,6 +26,7 @@ toolkits into `ONNX <https://onnx.ai>`_.
     supported
     pipeline
     parameterized
+    algebra
 
 **Issues, questions**
 

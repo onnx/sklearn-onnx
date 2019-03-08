@@ -99,6 +99,7 @@ class Gemm(OnnxOperator):
         b = np.random.ranf([6, 4]).astype(np.float32)
         c = np.random.ranf([3, 4]).astype(np.float32)
         y = 0.5 * np.dot(a, b) + 0.5 * c
+        print(y)
         expect(node, inputs=[a, b, c], outputs=[y],
                name='test_gemm_nobroadcast')
 
@@ -120,6 +121,7 @@ class Gemm(OnnxOperator):
         b = np.random.ranf([4, 6]).astype(np.float32)
         c = np.random.ranf([1, 1]).astype(np.float32)
         y = 0.5 * np.dot(a.T, b.T) + 0.5 * c
+        print(y)
         expect(node, inputs=[a, b, c], outputs=[y],
                name='test_gemm_broadcast')
     """
