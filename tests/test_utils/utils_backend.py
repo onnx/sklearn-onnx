@@ -6,6 +6,7 @@ import sys
 import glob
 import pickle
 import numpy
+from distutils.version import StrictVersion  # noqa
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 

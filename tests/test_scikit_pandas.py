@@ -42,9 +42,9 @@ class TestOtherLibrariesInPipelineScikitPandas(unittest.TestCase):
             model_onnx = to_onnx(mapper, 'predictable_tsne',
                                  [('input', FloatTensorType([1, df.shape[1]]))],
                                  custom_shape_calculators={DataFrameMapper: dataframe_mapper_shape_calculator})
+            assert model_onnx is not None
         except RuntimeError as e:
             assert "DataFrameMapper has no associated parser." in str(e)
-        assert model_onnx is not None
 
 
 if __name__ == "__main__":

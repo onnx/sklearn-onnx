@@ -21,7 +21,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 1))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'CountVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -38,7 +38,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(2, 2))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'CountVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -55,7 +55,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 2))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'CountVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -72,7 +72,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 3))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'CountVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)

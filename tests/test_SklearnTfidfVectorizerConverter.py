@@ -21,7 +21,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -38,7 +38,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -55,7 +55,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -78,7 +78,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(2, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -93,7 +93,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -127,7 +127,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l1')
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -144,7 +144,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l2')
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -161,7 +161,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 3), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
                              [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
@@ -178,7 +178,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
         extra = {TfidfVectorizer: {
             'sep': [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
         model_onnx = to_onnx(vect, 'TfidfVectorizer',
@@ -200,7 +200,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        assert pred
+        assert pred is not None
 
         extra = {
             id(vect): {"sep2": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
