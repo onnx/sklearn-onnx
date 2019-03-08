@@ -8,19 +8,19 @@ from .onnx_operator import OnnxOperator
 
 class Sub(OnnxOperator):
     """
-    Performs element-wise binary subtraction (with Numpy-style broadcasting support).    
+    Performs element-wise binary subtraction (with Numpy-style broadcasting support).
     This operator supports **multidirectional (i.e., Numpy-style) broadcasting**;
     for more details please check :epkg:`broadcasting`.
 
     Version
     -------
 
-    This version of the operator has been available since version 7 
+    This version of the operator has been available since version 7
     of the default ONNX operator set.
 
     Inputs
     ------
-    
+
     .. html::
 
         <dl>
@@ -53,7 +53,7 @@ class Sub(OnnxOperator):
 
     Examples
     --------
-    
+
     .. runpython::
         :showcode:
 
@@ -83,7 +83,7 @@ class Sub(OnnxOperator):
 
         import onnx.helper
         import numpy as np
-        
+
         node = onnx.helper.make_node(
             'Sub',
             inputs=['x', 'y'],

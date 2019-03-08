@@ -10,11 +10,11 @@ class Gemm(OnnxOperator):
     """
     `General Matrix multiplication
     <https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3>`_::
-      
-      A' = transpose(A) if transA else A          
+
+      A' = transpose(A) if transA else A
       B' = transpose(B) if transB else B
-      
-      
+
+
     Compute *Y = alpha * A' * B' + beta * C*, where input tensor *A* has shape *(M, K)* or *(K, M)*,
     input tensor *B* has shape *(K, N)* or *(N, K)*, input tensor *C* is broadcastable to shape *(M, N)*,
     and output tensor Y has shape *(M, N)*. A will be transposed before doing the
@@ -26,12 +26,12 @@ class Gemm(OnnxOperator):
     Version
     -------
 
-    This version of the operator has been available since version 9 of 
+    This version of the operator has been available since version 9 of
     the default ONNX operator set.
 
     Attributes
     ----------
-    
+
     .. html::
 
         <dl>
@@ -47,7 +47,7 @@ class Gemm(OnnxOperator):
 
     Inputs
     ------
-    
+
     .. html::
 
         <dl>
@@ -61,7 +61,7 @@ class Gemm(OnnxOperator):
 
     Outputs
     -------
-    
+
     .. html::
 
         <dl>
@@ -73,7 +73,7 @@ class Gemm(OnnxOperator):
     ----------------
 
     .. html::
-    
+
         <dl>
         <dt><tt>T</tt> : tensor(float16), tensor(float), tensor(double), tensor(uint32), tensor(uint64), tensor(int32), tensor(int64)</dt>
         <dd>Constrain input and output types to float/int tensors.</dd>
@@ -82,7 +82,7 @@ class Gemm(OnnxOperator):
 
     Examples
     --------
-    
+
     .. runpython::
         :showcode:
 

@@ -29,7 +29,7 @@ class GraphState:
         if not isinstance(self.expected_outputs, list):
             self.expected_outputs = [self.expected_outputs]
         self.expected_outputs = [o.full_name for o in self.expected_outputs]
-        
+
     @property
     def outputs(self):
         self.run()
@@ -50,21 +50,26 @@ class GraphState:
     def _add_constant(self, cst):
         if isinstance(cst, np.ndarray):
             shape = cst.shape
-            name = self.scope.get_unique_variable_name(self.operator_name + 'cst')
+            name = self.scope.get_unique_variable_name(
+                self.operator_name + 'cst')
             if cst.dtype in (np.float32, np.float64):
                 ty = onnx_proto.TensorProto.FLOAT
             else:
-                raise NotImplementedError("Unable to guess ONNX type from type {}.".format(cst.dtype))
-            self.container.add_initializer(name, ty, shape, cst.astype(np.float64).flatten())            
+                raise NotImplementedError(
+                    "Unable to guess ONNX type from type {}.".format(cst.dtype))
+            self.container.add_initializer(
+                name, ty, shape, cst.astype(np.float64).flatten())
             return name
         else:
-            raise NotImplementedError("Unable to add a constant of type {}.".format(type(cst)))
-        
+            raise NotImplementedError(
+                "Unable to add a constant of type {}.".format(type(cst)))
+
     def run(self):
-        
+
         if self.computed_outputs is None:
             if self.expected_outputs is None:
-                self.expected_outputs = [self._get_var_name(o, True) for o in self.expected_outputs]
+                self.expected_outputs = [self._get_var_name(
+                    o, True) for o in self.expected_outputs]
             inputs = [self._get_var_name(i, False) for i in self.inputs]
             inputs = [i for i in inputs if i is not None]
             name = self.scope.get_unique_operator_name(self.operator_name)
