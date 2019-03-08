@@ -131,5 +131,7 @@ def convert_sklearn(*args, **kwargs):
     Calls :func:`to_onnx <skl2onnx.convert.to_onnx>`.
     This function is deprecating, it will be removed in 1.6.
     """
-    warnings.warn("'convert_sklearn' is renamed into 'to_onnx', it will be removed in 1.6", DeprecationWarning)
+    warnings.warn("'convert_sklearn' is renamed into 'to_onnx', "
+                  "it will be removed in 1.6",
+                  DeprecationWarning)
     return to_onnx(*args, **kwargs)
