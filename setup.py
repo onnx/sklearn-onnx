@@ -34,7 +34,7 @@ with open(README) as f:
         long_description = long_description[start_pos:]
 
 setup(
-    name='skl2onnx',
+    name='sklearn-onnx',
     version=version_str,
     description="Convert scikit-learn models to ONNX",
     long_description=long_description,
