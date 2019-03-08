@@ -12,12 +12,13 @@ and there is obviously no existing converter for this
 new model. That does not mean the conversion of a pipeline
 which includes it would not work. Let's see how to do it.
 
-`t-SNE <https://lvdmaaten.github.io/tsne/>`_ is an interesting 
+`t-SNE <https://lvdmaaten.github.io/tsne/>`_ is an interesting
 transform which can only be used to study data as there is no
 way to reproduce the result once it was fitted. That's why
 the class `TSNE <https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html>`_
 does not have any method *transform*, only
-`fit_transform <https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE.fit_transform>`_.
+`fit_transform <https://scikit-learn.org/stable/modules/generated/
+sklearn.manifold.TSNE.html#sklearn.manifold.TSNE.fit_transform>`_.
 This example proposes a way to train a machine learned model
 which approximates the outputs of a *t-SNE* transformer.
 
@@ -32,15 +33,15 @@ The first section is about the implementation.
 The code is quite generic but basically follows this
 process to fit the model with *X* and *y*:
 
-* t-SNE, :math:`(X, y) \rightarrow X_2 \in \mathbb{R}^2`
+* t-SNE, :math:`(X, y) \\rightarrow X_2 \\in \\mathbb{R}^2`
 * k nearest neightbours, :math:`fit(X, X_2)`,
-  which produces function :math:`f(X) \rightarrow X_3`
-* final normalization, simple scaling :math:`X_3 \rightarrow X_4`
+  which produces function :math:`f(X) \\rightarrow X_3`
+* final normalization, simple scaling :math:`X_3 \\rightarrow X_4`
 
 And to predict on a test set:
 
-* k nearest neightbours, :math:`f(X') \rightarrow X'_3`
-* final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
+* k nearest neightbours, :math:`f(X') \\rightarrow X'_3`
+* final normalization, simple scaling :math:`X'_3 \\rightarrow X'_4`
 """
 
 import inspect
@@ -215,13 +216,14 @@ n_samples, n_features = Xd.shape
 n_samples, n_features
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(Xd, yd, imgs)
+X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(
+    Xd, yd, imgs)
 
-from sklearn.manifold import TSNE
 tsne = TSNE(n_components=2, init='pca', random_state=0)
 
 import matplotlib.pyplot as plt
 from matplotlib import offsetbox
+
 
 def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
     x_min, x_max = numpy.min(Xp, 0), numpy.max(Xp, 0)
@@ -254,7 +256,8 @@ def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
 
 
 X_train_tsne = tsne.fit_transform(X_train)
-plot_embedding(X_train_tsne, y_train, imgs_train, "t-SNE embedding of the digits");
+plot_embedding(X_train_tsne, y_train, imgs_train,
+               "t-SNE embedding of the digits")
 
 #######################################
 # Repeatable t-SNE
@@ -290,14 +293,13 @@ from skl2onnx.common.data_types import FloatTensorType
 
 
 def predictable_tsne_shape_calculator(operator):
-    
+
     input = operator.inputs[0]      # inputs in ONNX graph
-    output = operator.outputs[0]    # output in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
-    
-    N = input.type.shape[0]         # number of observations    
+
+    N = input.type.shape[0]         # number of observations
     C = op.estimator_._y.shape[1]   # dimension of outputs
-    
+
     # new output definition
     operator.outputs[0].type = FloatTensorType([N, C])
 
@@ -316,10 +318,8 @@ def predictable_tsne_converter(scope, operator, container):
         *predictable_tsne_shape_calculator*
     :param container: contains the ONNX graph
     """
-    input = operator.inputs[0]      # input in ONNX graph
-    output = operator.outputs[0]    # output in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
-    
+
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
     # operator
@@ -327,18 +327,18 @@ def predictable_tsne_converter(scope, operator, container):
     alias = _get_sklearn_operator_name(type(model))
     knn_op = scope.declare_local_operator(alias, model)
     knn_op.inputs = operator.inputs
-    
+
     # We add an intermediate outputs.
     knn_output = scope.declare_local_variable('knn_output', FloatTensorType())
     knn_op.outputs.append(knn_output)
-    
+
     # We adjust the output of the submodel.
     shape_calc = get_shape_calculator(alias)
     shape_calc(knn_op)
-    
+
     # We add the normalizer which needs a unique node name.
     name = scope.get_unique_operator_name('Scaler')
-    
+
     # The parameter follows the specifications of ONNX
     # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
     attrs = dict(name=name,
@@ -348,17 +348,18 @@ def predictable_tsne_converter(scope, operator, container):
     # Let's finally add the scaler which connects the output
     # of the k-nearest neighbours model to output of the whole model
     # declared in ONNX graph
-    container.add_node('Scaler', [knn_output.onnx_name], [output.full_name],
+    container.add_node('Scaler', [knn_output.onnx_name], [operator.outputs[0].full_name],
                        op_domain='ai.onnx.ml', **attrs)
 
 ##################################
 # We now need to declare the new converter.
 
+
 from skl2onnx import update_registered_converter
-update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',                                    
+update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
                             predictable_tsne_shape_calculator,
                             predictable_tsne_converter)
-                            
+
 ####################################
 # Conversion to ONNX
 # ++++++++++++++++++
@@ -368,12 +369,12 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 
 from skl2onnx import to_onnx
 model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
-                             [('input', FloatTensorType([1, X_test.shape[1]]))])
-                             
+                     [('input', FloatTensorType([1, X_test.shape[1]]))])
+
 # And save.
 with open("predictable_tsne.onnx", "wb") as f:
     f.write(model_onnx.SerializeToString())
-    
+
 ##################################
 # We now compare the prediction.
 
@@ -383,7 +384,6 @@ print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
 # Predictions with onnxruntime.
 
 import onnxruntime as rt
-import numpy
 sess = rt.InferenceSession("predictable_tsne.onnx")
 
 pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
@@ -410,7 +410,6 @@ pydot_graph.write_dot("pipeline_tsne.dot")
 import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_tsne.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_tsne.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
@@ -419,10 +418,13 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

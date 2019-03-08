@@ -74,7 +74,7 @@ from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_
 ###########################
 # Let's register the new converter.
 from skl2onnx import update_registered_converter
-update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
+update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
                             calculate_linear_classifier_output_shapes,
                             convert_lightgbm)
 
@@ -84,7 +84,7 @@ update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
 
 from skl2onnx import to_onnx
 model_onnx = to_onnx(pipe, 'pipeline_lightgbm',
-                             [('input', FloatTensorType([1, 2]))])
+                     [('input', FloatTensorType([1, 2]))])
 
 # And save.
 with open("pipeline_lightgbm.onnx", "wb") as f:
@@ -131,10 +131,15 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
+import onnxmltools  # noqa
+import lightgbm  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

@@ -55,7 +55,7 @@ numeric_transformer = Pipeline(steps=[
 
 categorical_features = ['embarked', 'sex', 'pclass']
 categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer is not available for strings in ONNX-ML specifications. 
+    # --- SimpleImputer is not available for strings in ONNX-ML specifications.
     # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
@@ -63,7 +63,7 @@ preprocessor = ColumnTransformer(
     transformers=[
         ('num', numeric_transformer, numeric_features),
         ('cat', categorical_transformer, categorical_features),
-        ])
+    ])
 
 clf = Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', LogisticRegression(solver='lbfgs'))])
@@ -83,6 +83,7 @@ print(X_train.dtypes)
 # After conversion.
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType, Int64TensorType
 
+
 def convert_dataframe_schema(df, drop=None):
     inputs = []
     for k, v in zip(df.columns, df.dtypes):
@@ -96,14 +97,15 @@ def convert_dataframe_schema(df, drop=None):
             t = StringTensorType([1, 1])
         inputs.append((k, t))
     return inputs
-    
+
+
 inputs = convert_dataframe_schema(X_train)
 
 import pprint
 pprint.pprint(inputs)
 
 #############################
-# Merging single column into vectors is not 
+# Merging single column into vectors is not
 # the most efficient way to compute the prediction.
 # It could be done before converting the pipeline into a graph.
 
@@ -116,7 +118,7 @@ try:
     model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
 except Exception as e:
     print(e)
-    
+
 #################################
 # *scikit-learn* does implicit conversions when it can.
 # *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
@@ -124,7 +126,8 @@ except Exception as e:
 
 X_train['pclass'] = X_train['pclass'].astype(str)
 X_test['pclass'] = X_test['pclass'].astype(str)
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
+to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
+           'name', 'body', 'home.dest', 'boat'}
 inputs = convert_dataframe_schema(X_train, to_drop)
 
 model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
@@ -162,7 +165,7 @@ for c in numeric_features:
     inputs[c] = inputs[c].astype(np.float32)
 for k in inputs:
     inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
-    
+
 ################################
 # We are ready to run *onnxruntime*.
 
@@ -178,7 +181,7 @@ print("predict_proba", pred_onx[1][:1])
 # Compute intermediate outputs
 # ++++++++++++++++++++++++++++
 #
-# Unfortunately, there is actually no way to ask 
+# Unfortunately, there is actually no way to ask
 # *onnxruntime* to retrieve the output of intermediate nodes.
 # We need to modifies the *ONNX* before it is given to *onnxruntime*.
 # Let's see first the list of intermediate output.
@@ -187,7 +190,7 @@ from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs, load_onnx
 model_onnx = load_onnx_model("pipeline_titanic.onnx")
 for out in enumerate_model_node_outputs(model_onnx):
     print(out)
-    
+
 ################################
 # Not that easy to tell which one is what as the *ONNX*
 # has more operators than the original *scikit-learn* pipelines.
@@ -257,10 +260,13 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

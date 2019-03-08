@@ -24,7 +24,8 @@ def skl2onnx_version_role(role, rawtext, text, lineno, inliner, options=None, co
     elif text == 'rt':
         version = 'v' + onnxruntime.__version__
     else:
-        raise RuntimeError("skl2onnx_version_role cannot interpret content '{0}'.".format(text))
+        raise RuntimeError(
+            "skl2onnx_version_role cannot interpret content '{0}'.".format(text))
     node = nodes.Text(version)
     return [node], []
 
@@ -57,4 +58,3 @@ def setup(app):
     app.add_role('skl2onnxversion', skl2onnx_version_role)
     app.add_directive('supported-skl2onnx', SupportedSkl2OnnxDirective)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
-

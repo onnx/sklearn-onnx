@@ -10,7 +10,7 @@ ONNX Runtime Backend for ONNX
 
 .. index:: backend
 
-*ONNX Runtime* extends the 
+*ONNX Runtime* extends the
 `onnx backend API <https://github.com/onnx/onnx/blob/master/docs/ImplementingAnOnnxBackend.md>`_
 to run predictions using this runtime.
 Let's use the API to compute the prediction
@@ -54,10 +54,13 @@ print("probabilities={}".format(proba))
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

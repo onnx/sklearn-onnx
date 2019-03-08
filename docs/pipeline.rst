@@ -25,7 +25,7 @@ useful to build complex pipelines such as the following one:
 
     numeric_features = [0, 1, 2] # ["vA", "vB", "vC"]
     categorical_features = [3, 4] # ["vcat", "vcat2"]
-    
+
     classifier = LogisticRegression(C=0.01, class_weight=dict(zip([False, True], [0.2, 0.8])),
                                     n_jobs=1, max_iter=10, solver='lbfgs', tol=1e-3)
 
@@ -60,13 +60,13 @@ Which we can represents as:
         features -> categorical_features;
         numeric_features -> SimpleImputer -> StandardScaler -> LogisticRegression;
         categorical_features -> OneHotEncoder -> TruncatedSVD -> LogisticRegression;
-    
+
         group {
             numeric_features; SimpleImputer; StandardScaler;
         }
         group {
             categorical_features; OneHotEncoder; TruncatedSVD;
-        }    
+        }
     }
 
 Once fitted, the model is converted into *ONNX*:
@@ -77,7 +77,7 @@ Once fitted, the model is converted into *ONNX*:
                     ('strfeat', StringTensorType([1, 2]))]
     model_onnx = to_onnx(model, initial_types=initial_type)
 
-It can be represented as a 
+It can be represented as a
 `DOT <https://en.wikipedia.org/wiki/DOT_(graph_description_language)>`_ graph:
 
 ::
@@ -132,7 +132,7 @@ order:
   `operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
   `ML operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
   custom *ONNX* operators.
-  
+
 As *sklearn-onnx* may convert pipelines with model coming from other libraries,
 the library must handle parsers, shape calculators or converters coming
 from other packages. This can be done is two ways. The first one

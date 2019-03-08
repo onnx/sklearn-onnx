@@ -8,7 +8,8 @@ TfIdfVectorizer with ONNX
 =========================
 
 This example is inspired from the following example:
-`Column Transformer with Heterogeneous Data Sources <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer.html>`_
+`Column Transformer with Heterogeneous Data Sources
+<https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer.html>`_
 which builds a pipeline to classify text.
 
 .. contents::
@@ -30,7 +31,6 @@ from sklearn.datasets.twenty_newsgroups import strip_newsgroup_footer
 from sklearn.datasets.twenty_newsgroups import strip_newsgroup_quoting
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report
@@ -47,17 +47,19 @@ test = fetch_20newsgroups(random_state=1,
                           subset='test',
                           categories=categories,
                           )
-                          
+
 ##############################
 # The first transform extract two fields from the data.
 # We take it out form the pipeline and assume
 # the data is defined by two text columns.
+
 
 class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
     """Extract the subject & body from a usenet post in a single pass.
     Takes a sequence of strings and produces a dict of sequences. Keys are
     `subject` and `body`.
     """
+
     def fit(self, x, y=None):
         return self
 
@@ -80,7 +82,8 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
             features[i, 0] = sub
 
         return features
-        
+
+
 train_data = SubjectBodyExtractor().fit_transform(train.data)
 test_data = SubjectBodyExtractor().fit_transform(test.data)
 
@@ -135,10 +138,10 @@ from skl2onnx import to_onnx
 from skl2onnx.common.data_types import StringTensorType
 
 seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
-                                   '\n', '"', "'", "-", "[", "]", "@"]}}
+                                  '\n', '"', "'", "-", "[", "]", "@"]}}
 model_onnx = to_onnx(pipeline, "tfidf",
-                             initial_types=[("input", StringTensorType([1, 2]))],
-                             options=seps)
+                     initial_types=[("input", StringTensorType([1, 2]))],
+                     options=seps)
 
 #################################
 # And save.
@@ -187,4 +190,17 @@ image = plt.imread("pipeline_tfidf.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
-                             
+
+#################################
+# **Versions used for this example**
+
+import numpy  # noqa
+import sklearn  # noqa
+print("numpy:", numpy.__version__)
+print("scikit-learn:", sklearn.__version__)
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
+print("onnx: ", onnx.__version__)
+print("onnxruntime: ", onnxruntime.__version__)
+print("skl2onnx: ", skl2onnx.__version__)

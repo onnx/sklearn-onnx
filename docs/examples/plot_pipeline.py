@@ -6,7 +6,7 @@ Draw a pipeline
 ===============
 
 There is no other way to look into one model stored
-in ONNX format than looking into its node with 
+in ONNX format than looking into its node with
 *onnx*. This example demonstrates
 how to draw a model and to retrieve it in *json*
 format.
@@ -26,7 +26,7 @@ example1 = get_example("mul_1.pb")
 import onnx
 model = onnx.load(example1)  # model is a ModelProto protobuf message
 
-print(model) 
+print(model)
 
 
 #################################
@@ -66,10 +66,13 @@ plt.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

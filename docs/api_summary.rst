@@ -41,14 +41,12 @@ Parsers
 
 .. autofunction:: skl2onnx._parse.parse_sklearn_model
 
-
 Utils for contributors
 ======================
 
 .. autofunction:: skl2onnx.common.utils.check_input_and_output_numbers
 
 .. autofunction:: skl2onnx.common.utils.check_input_and_output_types
-
 
 Concepts
 ========
@@ -80,4 +78,3 @@ Topology
 
 .. autoclass:: skl2onnx.common._topology.Topology
     :members: compile
-

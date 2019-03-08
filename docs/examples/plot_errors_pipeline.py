@@ -25,7 +25,8 @@ Converter not registered
 hyperparameters in grid search or to validate the model
 with a cross validation. However, *sklearn-onnx* does not
 implement a converter for an instance of
-`LGBMClassifier <https://lightgbm.readthedocs.io/en/latest/Python-API.html?highlight=LGBMClassifier#lightgbm.LGBMClassifier>`_.
+`LGBMClassifier <https://lightgbm.readthedocs.io/en/latest/Python-API.html
+?highlight=LGBMClassifier#lightgbm.LGBMClassifier>`_.
 Let's see what happens when a simple pipeline is being converted.
 """
 import numpy
@@ -54,14 +55,14 @@ from skl2onnx.common.data_types import FloatTensorType
 
 try:
     model_onnx = to_onnx(pipe, 'pipeline',
-                                 [('input', FloatTensorType([1, 2]))])
+                         [('input', FloatTensorType([1, 2]))])
 except Exception as e:
     print(e)
 
 ###################################
 # *sklearn-onnx* needs to know the appropriate converter
 # for class *LGBMClassifier*, the converter needs to be registered.
-# The converter comes with two pieces: a shape calculator which 
+# The converter comes with two pieces: a shape calculator which
 # computes output shapes based on inputs shapes and the converter
 # itself which extracts the coefficients of the random forest
 # and converts them into *ONNX* format.
@@ -69,7 +70,9 @@ except Exception as e:
 
 import numbers
 from skl2onnx import to_onnx
-from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
+from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
+from skl2onnx.common.data_types import StringTensorType, DictionaryType, SequenceType
+
 
 def lightgbm_classifier_shape_extractor(operator):
     N = operator.inputs[0].type.shape[0]
@@ -79,12 +82,15 @@ def lightgbm_classifier_shape_extractor(operator):
         class_labels = numpy.concatenate(class_labels)
     if all(isinstance(i, str) for i in class_labels):
         operator.outputs[0].type = StringTensorType(shape=[N])
-        operator.outputs[1].type = SequenceType(DictionaryType(StringTensorType([]), FloatTensorType([])), N)
+        operator.outputs[1].type = SequenceType(
+            DictionaryType(StringTensorType([]), FloatTensorType([])), N)
     elif all(isinstance(i, (numbers.Real, bool, numpy.bool_)) for i in class_labels):
         operator.outputs[0].type = Int64TensorType(shape=[N])
-        operator.outputs[1].type = SequenceType(DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
+        operator.outputs[1].type = SequenceType(
+            DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
     else:
         raise ValueError('Unsupported or mixed label types')
+
 
 ###################################
 # Then the converter itself:
@@ -94,7 +100,7 @@ from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_li
 ###################################
 # They are both registered with the following instruction.
 from skl2onnx import update_registered_converter
-update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',                                    
+update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
                             lightgbm_classifier_shape_extractor,
                             convert_lightgbm)
 
@@ -103,7 +109,7 @@ update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
 # Let's convert again.
 
 model_onnx = to_onnx(pipe, 'pipeline',
-                             [('input', FloatTensorType([1, 2]))])
+                     [('input', FloatTensorType([1, 2]))])
 
 print(str(model_onnx)[:300] + "\n...")
 
@@ -120,7 +126,6 @@ print(str(model_onnx)[:300] + "\n...")
 # is called. Let's see what happens without it.
 
 from sklearn.datasets import load_iris
-import pandas
 
 data = load_iris()
 X = data.data[:, :2]
@@ -141,8 +146,6 @@ except Exception as e:
 # Let's write some code to automatically
 # fill that parameter from a dataframe.
 
-from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType
-
 
 def convert_dataframe_schema(df, drop=None):
     inputs = []
@@ -158,9 +161,10 @@ def convert_dataframe_schema(df, drop=None):
         inputs.append((k, t))
     return inputs
 
+
 from pandas import DataFrame
 data = DataFrame(X, columns=["X1", "X2"])
-        
+
 inputs = convert_dataframe_schema(data)
 print(inputs)
 
@@ -182,19 +186,22 @@ print(str(model_onnx)[:300] + "\n...")
 
 ##################################
 # What if now this model is included in a pipeline
-# with a `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_.
+# with a `ColumnTransformer
+# <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_.
 # The following pipeline is a way to concatenate multiple
-# columns into a single one with a 
-# `FunctionTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html>`_
+# columns into a single one with a
+# `FunctionTransformer
+# <https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html>`_
 # with identify function.
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import FunctionTransformer
 
 pipe = Pipeline(steps=[
-            ('select', ColumnTransformer([('id', FunctionTransformer(), ['X1', 'X2'])])),
-            ('logreg', clf)
-                      ])
+    ('select', ColumnTransformer(
+        [('id', FunctionTransformer(), ['X1', 'X2'])])),
+    ('logreg', clf)
+])
 pipe.fit(data[['X1', 'X2']], y)
 
 pipe_onnx = to_onnx(pipe, initial_types=inputs)
@@ -247,10 +254,13 @@ except Exception as e:
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

@@ -5,13 +5,7 @@
 #
 # Configuration file for the Sphinx documentation builder.
 
-import os
-import sys
-import shutil
-import sphinx_gallery.gen_gallery
 import skl2onnx
-import onnxruntime
-import sphinx_skl2onnx_extension
 import sphinx_modern_theme_modified
 
 
@@ -62,14 +56,14 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 # -- Options for Sphinx Gallery ----------------------------------------------
 
 sphinx_gallery_conf = {
-     'examples_dirs': 'examples',
-     'gallery_dirs': 'auto_examples',
+    'examples_dirs': 'examples',
+    'gallery_dirs': 'auto_examples',
 }
 
 # -- Setup actions -----------------------------------------------------------
+
 
 def setup(app):
     # Placeholder to initialize the folder before
     # generating the documentation.
     return app
-

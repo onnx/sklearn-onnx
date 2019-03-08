@@ -58,7 +58,7 @@ numeric_transformer = Pipeline(steps=[
 
 categorical_features = ['embarked', 'sex', 'pclass']
 categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer is not available for strings in ONNX-ML specifications. 
+    # --- SimpleImputer is not available for strings in ONNX-ML specifications.
     # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
@@ -66,7 +66,7 @@ preprocessor = ColumnTransformer(
     transformers=[
         ('num', numeric_transformer, numeric_features),
         ('cat', categorical_transformer, categorical_features),
-        ])
+    ])
 
 clf = Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', LogisticRegression(solver='lbfgs'))])
@@ -87,6 +87,7 @@ print(X_train.dtypes)
 # After conversion.
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType, Int64TensorType
 
+
 def convert_dataframe_schema(df, drop=None):
     inputs = []
     for k, v in zip(df.columns, df.dtypes):
@@ -100,14 +101,15 @@ def convert_dataframe_schema(df, drop=None):
             t = StringTensorType([1, 1])
         inputs.append((k, t))
     return inputs
-    
+
+
 inputs = convert_dataframe_schema(X_train)
 
 import pprint
 pprint.pprint(inputs)
 
 #############################
-# Merging single column into vectors is not 
+# Merging single column into vectors is not
 # the most efficient way to compute the prediction.
 # It could be done before converting the pipeline into a graph.
 
@@ -120,13 +122,14 @@ try:
     model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
 except Exception as e:
     print(e)
-    
+
 #################################
 # Predictions are more efficient if the graph is small.
 # That's why the converter checks that there is no unused input.
 # They need to be removed from the graph inputs.
 
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
+to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
+           'name', 'body', 'home.dest', 'boat'}
 inputs = convert_dataframe_schema(X_train, to_drop)
 try:
     model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
@@ -177,7 +180,7 @@ for c in numeric_features:
     inputs[c] = inputs[c].astype(np.float32)
 for k in inputs:
     inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
-    
+
 ################################
 # We are ready to run *onnxruntime*.
 
@@ -214,10 +217,13 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
+import onnx  # noqa
+import onnxruntime  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
