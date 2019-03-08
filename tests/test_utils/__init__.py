@@ -4,11 +4,14 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .tests_helper import dump_data_and_model
-from .tests_helper import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from .tests_helper import dump_multiple_regression, dump_single_regression
+from .tests_helper import dump_data_and_model  # noqa
+from .tests_helper import dump_one_class_classification  # noqa
+from .tests_helper import dump_binary_classification, dump_multiple_classification  # noqa
+from .tests_helper import dump_multiple_regression, dump_single_regression  # noqa
 
 import numpy as np
+
+
 def create_tensor(N, C, H=None, W=None):
     if H is None and W is None:
         return np.random.rand(N, C).astype(np.float32, copy=False)

@@ -2,7 +2,6 @@
 Tests scikit-imputer converter.
 """
 import unittest
-import numpy as np
 import pandas
 from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
@@ -10,8 +9,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
 from skl2onnx import to_onnx
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
 
 
@@ -37,14 +35,15 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         X = data.data[:, :2]
         y = data.target
         data = pandas.DataFrame(X, columns=["X1", "X2"])
-        
+
         pipe = Pipeline(steps=[
-                    ('select', ColumnTransformer([('id', FunctionTransformer(), ['X1', 'X2'])])),
-                    ('logreg', LogisticRegression())
-                              ])
+            ('select', ColumnTransformer(
+                [('id', FunctionTransformer(), ['X1', 'X2'])])),
+            ('logreg', LogisticRegression())
+        ])
         pipe.fit(data[['X1', 'X2']], y)
-        
-        inputs = convert_dataframe_schema(data)        
+
+        inputs = convert_dataframe_schema(data)
         model_onnx = to_onnx(pipe, 'scikit-learn function_transformer', inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data[:5], pipe, model_onnx, basename="SklearnFunctionTransformer-DF",

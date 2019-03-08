@@ -19,10 +19,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=3, encode='ordinal',
                                  strategy='uniform').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalUniform")
+                            basename="SklearnKBinsDiscretiserOrdinalUniform")
 
     @unittest.skip(reason="Digitize op has not yet been implemented in onnx")
     def test_model_k_bins_discretiser_ordinal_quantile(self):
@@ -31,10 +31,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='ordinal',
                                  strategy='quantile').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalQuantile")
+                            basename="SklearnKBinsDiscretiserOrdinalQuantile")
 
     @unittest.skip(reason="Digitize op has not yet been implemented in onnx")
     def test_model_k_bins_discretiser_ordinal_kmeans(self):
@@ -43,10 +43,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=3, encode='ordinal',
                                  strategy='kmeans').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalKMeans")
+                            basename="SklearnKBinsDiscretiserOrdinalKMeans")
 
     @unittest.skip(reason="Digitize op has not yet been implemented in onnx")
     def test_model_k_bins_discretiser_onehot_dense_uniform(self):
@@ -55,10 +55,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='onehot-dense',
                                  strategy='uniform').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseUniform")
+                            basename="SklearnKBinsDiscretiserOneHotDenseUniform")
 
     @unittest.skip(reason="Digitize op has not yet been implemented in onnx")
     def test_model_k_bins_discretiser_onehot_dense_quantile(self):
@@ -67,10 +67,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='onehot-dense',
                                  strategy='quantile').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseQuantile")
+                            basename="SklearnKBinsDiscretiserOneHotDenseQuantile")
 
     @unittest.skip(reason="Digitize op has not yet been implemented in onnx")
     def test_model_k_bins_discretiser_onehot_dense_kmeans(self):
@@ -79,10 +79,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model = KBinsDiscretizer(nbins=3, encode='onehot-dense',
                                  strategy='kmeans').fit(X)
         model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseKMeans")
+                            basename="SklearnKBinsDiscretiserOneHotDenseKMeans")
 
 
 if __name__ == "__main__":

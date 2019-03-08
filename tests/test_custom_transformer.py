@@ -4,23 +4,15 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy
 import inspect
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.base import BaseEstimator, TransformerMixin, clone
+from sklearn.base import BaseEstimator
+from sklearn.base import TransformerMixin, clone
 from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn import datasets
-from sklearn.model_selection import train_test_split
-from sklearn.manifold import TSNE
 
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx, update_registered_converter
-from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-from skl2onnx.operator_converters.LinearClassifier import to_onnx_linear_classifier
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx._parse import _get_sklearn_operator_name, _parse_sklearn_simple_model, update_registered_parser
 
@@ -109,19 +101,17 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         self.estimator.set_params(**pe)
 
 
-def predictable_tsne_shape_calculator(operator):    
+def predictable_tsne_shape_calculator(operator):
     input = operator.inputs[0]
-    output = operator.outputs[0]
-    op = operator.raw_operator    
+    op = operator.raw_operator
     N = input.type.shape[0]
-    C = op.estimator_._y.shape[1]    
+    C = op.estimator_._y.shape[1]
     operator.outputs[0].type = FloatTensorType([N, C])
-        
-        
+
+
 def predictable_tsne_converter(scope, operator, container):
-    input = operator.inputs[0]
     output = operator.outputs[0]
-    op = operator.raw_operator    
+    op = operator.raw_operator
     model = op.estimator_
     alias = _get_sklearn_operator_name(type(model))
     knn_op = scope.declare_local_operator(alias, model)
@@ -146,39 +136,38 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         digits = datasets.load_digits(n_class=6)
         Xd = digits.data[:20]
         yd = digits.target[:20]
-        imgs = digits.images
         n_samples, n_features = Xd.shape
 
         ptsne_knn = PredictableTSNE()
         ptsne_knn.fit(Xd, yd)
 
-        update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',                                    
+        update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
                                     predictable_tsne_shape_calculator,
                                     predictable_tsne_converter)
 
         model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType([1, Xd.shape[1]]))])
-        
+                             [('input', FloatTensorType([1, Xd.shape[1]]))])
+
         dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
                             basename="CustomTransformerTSNEkNN-OneOffArray")
-        
+
         trace_line = []
-                                     
+
         def my_parser(scope, model, inputs, custom_parsers=None):
             trace_line.append(model)
             return _parse_sklearn_simple_model(scope, model, inputs, custom_parsers)
-        
+
         model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType([1, Xd.shape[1]]))],
-                                     custom_parsers={PredictableTSNE: my_parser})
+                             [('input', FloatTensorType([1, Xd.shape[1]]))],
+                             custom_parsers={PredictableTSNE: my_parser})
         assert len(trace_line) == 1
-        
+
         dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
                             basename="CustomTransformerTSNEkNNCustomParser-OneOffArray")
-        
+
         update_registered_parser(PredictableTSNE, my_parser)
         model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType([1, Xd.shape[1]]))])
+                             [('input', FloatTensorType([1, Xd.shape[1]]))])
 
         assert len(trace_line) == 2
 

@@ -17,22 +17,27 @@ from test_utils import dump_data_and_model
 
 class MyCustomClassifier(BaseEstimator, ClassifierMixin):
     "does a simple logistic regression"
+
     def __init__(self, penalty='l1'):
         BaseEstimator.__init__(self)
         ClassifierMixin.__init__(self)
         self.penalty = penalty
         self.estimator = LogisticRegression(penalty=self.penalty)
+
     def fit(self, X, y, sample_weight=None):
         self.estimator_ = self.estimator.fit(X, y, sample_weight=sample_weight)
         return self
+
     def predict(self, X):
         return self.estimator_.predict(X)
+
     def predict_proba(self, X):
         return self.estimator_.predict_proba(X)
+
     def decision_function(self, X):
         return self.estimator_.decision_function(X)
-        
-        
+
+
 def my_custom_shape_extractor(operator):
     raw = operator.raw_operator
     operator.raw_operator = raw.estimator_
@@ -53,41 +58,45 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         data = load_iris()
         X = data.data[:, :2]
         y = data.target
-        
+
         model = MyCustomClassifier()
         pipe = Pipeline([('scaler', StandardScaler()), ('lgbm', model)])
         pipe.fit(X, y)
 
         try:
-            model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+            model_onnx = to_onnx(pipe, 'pipeline', [
+                                 ('input', FloatTensorType([1, 2]))])
         except RuntimeError as e:
             if "No proper shape calculator found for" not in str(e) and \
                "Unable to find a shape calculator for type" not in str(e):
                 raise e
-            
+
         try:
             model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
-                                         custom_conversion_functions={'MyCustomClassifier': my_custom_converter},
-                                         custom_shape_calculators={'MyCustomClassifier': my_custom_shape_extractor})
+                                 custom_conversion_functions={
+                                     'MyCustomClassifier': my_custom_converter},
+                                 custom_shape_calculators={'MyCustomClassifier': my_custom_shape_extractor})
         except TypeError as e:
             if "Keys in custom_conversion_functions must be types" not in str(e):
                 raise e
-                                     
+
         model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
-                                     custom_conversion_functions={MyCustomClassifier: my_custom_converter},
-                                     custom_shape_calculators={MyCustomClassifier: my_custom_shape_extractor})
+                             custom_conversion_functions={
+                                 MyCustomClassifier: my_custom_converter},
+                             custom_shape_calculators={MyCustomClassifier: my_custom_shape_extractor})
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(numpy.float32), pipe, model_onnx,
                             basename="SklearnPipelineScalerCustomClassifier")
 
-        update_registered_converter(MyCustomClassifier, 'MyCustomClassifier',                                    
+        update_registered_converter(MyCustomClassifier, 'MyCustomClassifier',
                                     my_custom_shape_extractor, my_custom_converter)
-        
-        model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+
+        model_onnx = to_onnx(pipe, 'pipeline', [
+                             ('input', FloatTensorType([1, 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(numpy.float32), pipe, model_onnx,
                             basename="SklearnPipelineScalerCustomClassifier2")
-        
+
 
 if __name__ == "__main__":
     unittest.main()

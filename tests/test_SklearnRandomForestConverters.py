@@ -29,8 +29,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
-        dump_single_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
-        dump_multiple_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+        dump_single_regression(
+            model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+        dump_multiple_regression(
+            model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_extra_trees_classifier(self):
         model = ExtraTreesClassifier(n_estimators=3)
@@ -47,10 +49,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     def test_extra_trees_regressor(self):
         model = ExtraTreesRegressor(n_estimators=3)
-        dump_single_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
-        dump_multiple_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
-
-
+        dump_single_regression(
+            model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+        dump_multiple_regression(
+            model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

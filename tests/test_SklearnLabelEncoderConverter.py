@@ -15,12 +15,12 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         model = LabelEncoder()
         data = ['str3', 'str2', 'str0', 'str1', 'str3']
         model.fit(data)
-        model_onnx = to_onnx(model, 'scikit-learn label encoder', [('input', StringTensorType([1, 1]))])
+        model_onnx = to_onnx(model, 'scikit-learn label encoder',
+                             [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
         dump_data_and_model(numpy.array(data),
                             model, model_onnx, basename="SklearnLabelEncoder")
-
 
 
 if __name__ == "__main__":

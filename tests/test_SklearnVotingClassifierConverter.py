@@ -24,10 +24,10 @@ class CustomTransform(BaseEstimator, TransformerMixin):
         return X * numpy.array([[0.5, 0.1, 10], [0.5, 0.1, 10]]).T
 
 
-def custom_transform_shape_calculator(operator):    
+def custom_transform_shape_calculator(operator):
     operator.outputs[0].type = FloatTensorType([3, 2])
-        
-        
+
+
 def custom_tranform_converter(scope, operator, container):
     input = operator.inputs[0]
     output = operator.outputs[0]
@@ -37,30 +37,31 @@ def custom_tranform_converter(scope, operator, container):
     weights = [0.5, 0.1, 10]
     shape = [len(weights), 1]
     container.add_initializer(weights_name, atype, shape, weights)
-    weighted_concatenated = scope.get_unique_variable_name('weighted_concatenated')
-    apply_mul(scope, [input.full_name, weights_name], output.full_name, container)
+    apply_mul(scope, [input.full_name, weights_name],
+              output.full_name, container)
 
 
 class TestVotingClassifierConverter(unittest.TestCase):
-    
+
     def test_operator_mul(self):
-        
+
         model = CustomTransform()
         Xd = numpy.array([[1, 2], [3, 4], [4, 5]])
-        exp = model.transform(Xd)
-        
+        model.transform(Xd)
+
         model_onnx = to_onnx(model, 'CustomTransform',
-                                     [('input', FloatTensorType([3, Xd.shape[1]]))],
-                                     custom_shape_calculators={CustomTransform: custom_transform_shape_calculator},
-                                     custom_conversion_functions={CustomTransform: custom_tranform_converter})
+                             [('input', FloatTensorType([3, Xd.shape[1]]))],
+                             custom_shape_calculators={
+                                 CustomTransform: custom_transform_shape_calculator},
+                             custom_conversion_functions={CustomTransform: custom_tranform_converter})
         dump_data_and_model(Xd.astype(numpy.float32), model, model_onnx,
                             basename="CustomTransformerMul",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_hard_binary(self):
         model = VotingClassifier(voting='hard', estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression(fit_intercept=False))])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression(fit_intercept=False))])
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(model, suffix='Hard-OneOffArray',
                                    comparable_outputs=[0],
@@ -68,8 +69,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     def test_voting_hard_binary_weights(self):
         model = VotingClassifier(voting='hard', weights=numpy.array([1000, 1]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression(fit_intercept=False))])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression(fit_intercept=False))])
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(model, suffix='WeightsHard-OneOffArray',
                                    comparable_outputs=[0],
@@ -77,24 +78,24 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     def test_voting_soft_binary(self):
         model = VotingClassifier(voting='soft', estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression(fit_intercept=False))])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression(fit_intercept=False))])
         dump_binary_classification(model, suffix='Soft-OneOffArray',
                                    comparable_outputs=[0, 1],
                                    allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_soft_binary_weighted(self):
         model = VotingClassifier(voting='soft', weights=numpy.array([1.8, 0.2]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression(fit_intercept=False))])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression(fit_intercept=False))])
         dump_binary_classification(model, suffix='WeightedSoft-OneOffArray',
                                    allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_hard_multi(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(voting='hard', estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', DecisionTreeClassifier())])
+            ('lr', LogisticRegression()),
+            ('lr2', DecisionTreeClassifier())])
         dump_multiple_classification(model, suffix='Hard-OneOffArray',
                                      comparable_outputs=[0],
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
@@ -102,41 +103,41 @@ class TestVotingClassifierConverter(unittest.TestCase):
     def test_voting_hard_multi_weighted(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(voting='hard', weights=numpy.array([1000, 1]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', DecisionTreeClassifier())])
+            ('lr', LogisticRegression()),
+            ('lr2', DecisionTreeClassifier())])
         dump_multiple_classification(model, suffix='WeightedHard-OneOffArray',
                                      comparable_outputs=[0],
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_soft_multi(self):
         model = VotingClassifier(voting='soft', estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression())])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression())])
         dump_multiple_classification(model, suffix='Soft-OneOffArray',
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_soft_multi_weighted(self):
         model = VotingClassifier(voting='soft', weights=numpy.array([1.8, 0.2]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lr2', LogisticRegression())])
+            ('lr', LogisticRegression()),
+            ('lr2', LogisticRegression())])
         dump_multiple_classification(model, suffix='WeightedSoft-OneOffArray',
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_voting_soft_multi_weighted4(self):
         model = VotingClassifier(voting='soft', weights=numpy.array([2.7, 0.3, 0.5, 0.5]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lra', LogisticRegression()),
-                    ('lrb', LogisticRegression()),
-                    ('lr2', LogisticRegression())])
+            ('lr', LogisticRegression()),
+            ('lra', LogisticRegression()),
+            ('lrb', LogisticRegression()),
+            ('lr2', LogisticRegression())])
         dump_multiple_classification(model, suffix='Weighted4Soft-OneOffArray',
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
-        
+
     def test_voting_soft_multi_weighted42(self):
         model = VotingClassifier(voting='soft', weights=numpy.array([27, 0.3, 0.5, 0.5]), estimators=[
-                    ('lr', LogisticRegression()),
-                    ('lra', LogisticRegression()),
-                    ('lrb', LogisticRegression()),
-                    ('lr2', LogisticRegression())])
+            ('lr', LogisticRegression()),
+            ('lra', LogisticRegression()),
+            ('lrb', LogisticRegression()),
+            ('lr2', LogisticRegression())])
         dump_multiple_classification(model, suffix='Weighted42Soft-OneOffArray',
                                      allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 

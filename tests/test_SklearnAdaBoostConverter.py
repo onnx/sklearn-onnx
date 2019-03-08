@@ -23,8 +23,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model = AdaBoostClassifier(n_estimators=10, algorithm='SAMME.R')
         model.fit(X_train, y_train)
         model_onnx = to_onnx(model, 'AdaBoost classification',
-                                     [('input',
-                                      FloatTensorType(X_test.shape))])
+                             [('input',
+                               FloatTensorType(X_test.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
                             basename="SklearnAdaBoostClassifierSAMMER",
@@ -40,8 +40,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model = AdaBoostClassifier(n_estimators=15, algorithm='SAMME')
         model.fit(X_train, y_train)
         model_onnx = to_onnx(model, 'AdaBoost classification',
-                                     [('input',
-                                      FloatTensorType(X_train.shape))])
+                             [('input',
+                               FloatTensorType(X_train.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
                             basename="SklearnAdaBoostClassifierSAMME",

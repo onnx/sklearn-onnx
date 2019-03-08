@@ -9,6 +9,7 @@ from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
+
 class TestNaiveBayesConverter(unittest.TestCase):
 
     def _fit_model_binary_classification(self, model, data):
@@ -30,12 +31,12 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(MultinomialNB(),
                                                          load_iris())
         model_onnx = to_onnx(model, 'multinomial naive bayes',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
-                        basename="SklearnBinMultinomialNB",
-                        allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "<= StrictVersion('0.2.1')")
+                            basename="SklearnBinMultinomialNB",
+                            allow_failure="StrictVersion(onnxruntime.__version__)"
+                            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
                      'Needs greater opset 9')
@@ -43,23 +44,23 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(BernoulliNB(),
                                                          load_digits())
         model_onnx = to_onnx(model, 'bernoulli naive bayes',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
-                        basename="SklearnBinBernoulliNB",
-                        allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "<= StrictVersion('0.2.1')")
+                            basename="SklearnBinBernoulliNB",
+                            allow_failure="StrictVersion(onnxruntime.__version__)"
+                            "<= StrictVersion('0.2.1')")
 
     def test_model_multinomial_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(MultinomialNB(),
                                                              load_iris())
         model_onnx = to_onnx(model, 'multinomial naive bayes',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
-                        basename="SklearnMclMultinomialNB",
-                        allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "<= StrictVersion('0.2.1')")
+                            basename="SklearnMclMultinomialNB",
+                            allow_failure="StrictVersion(onnxruntime.__version__)"
+                            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
                      'Needs greater opset 9')
@@ -67,12 +68,12 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model, X = self._fit_model_multiclass_classification(BernoulliNB(),
                                                              load_digits())
         model_onnx = to_onnx(model, 'bernoulli naive bayes',
-                                     [('input', FloatTensorType(X.shape))])
+                             [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
-                        basename="SklearnMclBernoulliNB",
-                        allow_failure="StrictVersion(onnxruntime.__version__)"
-                                       "<= StrictVersion('0.2.1')")
+                            basename="SklearnMclBernoulliNB",
+                            allow_failure="StrictVersion(onnxruntime.__version__)"
+                            "<= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

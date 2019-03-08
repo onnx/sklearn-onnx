@@ -4,7 +4,6 @@ Tests GLMRegressor converter.
 import unittest
 import numpy
 from sklearn import datasets
-from sklearn import linear_model
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
@@ -29,37 +28,45 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     def _fit_model(self, model, n_targets=1):
-        X, y = datasets.make_regression(n_features=4, random_state=0, n_targets=n_targets)
+        X, y = datasets.make_regression(
+            n_features=4, random_state=0, n_targets=n_targets)
         model.fit(X, y)
         return model, X
 
     def test_model_knn_regressor(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
-        model_onnx = to_onnx(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
+        model_onnx = to_onnx(model, 'KNN regressor', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:7], model, model_onnx,
-                             basename="SklearnKNeighborsRegressor-OneOffArray",
-                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            basename="SklearnKNeighborsRegressor-OneOffArray",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_regressor2_1(self):
-        model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1), n_targets=2)
-        model_onnx = to_onnx(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_model(
+            KNeighborsRegressor(n_neighbors=1), n_targets=2)
+        model_onnx = to_onnx(model, 'KNN regressor', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
                             basename="SklearnKNeighborsRegressor2-OneOffArray",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_regressor2_2(self):
-        model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2), n_targets=2)
-        model_onnx = to_onnx(model, 'KNN regressor', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_model(
+            KNeighborsRegressor(n_neighbors=2), n_targets=2)
+        model_onnx = to_onnx(model, 'KNN regressor', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X.astype(numpy.float32)[:2], model, model_onnx,
                             basename="SklearnKNeighborsRegressor2-OneOffArray",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_classifier_binary_class(self):
-        model, X = self._fit_model_binary_classification(KNeighborsClassifier())
-        model_onnx = to_onnx(model, 'KNN classifier binary', [('input', FloatTensorType([1, 3]))])
+        model, X = self._fit_model_binary_classification(
+            KNeighborsClassifier())
+        model_onnx = to_onnx(model, 'KNN classifier binary', [
+                             ('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
                             model, model_onnx,
@@ -68,8 +75,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                           "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_knn_classifier_multi_class(self):
-        model, X = self._fit_model_multiclass_classification(KNeighborsClassifier())
-        model_onnx = to_onnx(model, 'KNN classifier multi-class', [('input', FloatTensorType([1, 3]))])
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier())
+        model_onnx = to_onnx(model, 'KNN classifier multi-class',
+                             [('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
                             model, model_onnx,

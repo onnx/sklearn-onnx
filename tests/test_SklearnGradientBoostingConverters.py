@@ -27,28 +27,41 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         return model, X.astype(np.float32)
 
     def test_gradient_boosting_regressor_ls_loss(self):
-        model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='ls'))
-        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_regression_model(
+            GradientBoostingRegressor(n_estimators=3, loss='ls'))
+        model_onnx = to_onnx(model, 'gradient boosting regression', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionLsLoss")
+        dump_data_and_model(X, model, model_onnx,
+                            basename="SklearnGradientBoostingRegressionLsLoss")
 
     def test_gradient_boosting_regressor_lad_loss(self):
-        model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='lad'))
-        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_regression_model(
+            GradientBoostingRegressor(n_estimators=3, loss='lad'))
+        model_onnx = to_onnx(model, 'gradient boosting regression', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionLadLoss")
+        dump_data_and_model(X, model, model_onnx,
+                            basename="SklearnGradientBoostingRegressionLadLoss")
 
     def test_gradient_boosting_regressor_huber_loss(self):
-        model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='huber'))
-        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_regression_model(
+            GradientBoostingRegressor(n_estimators=3, loss='huber'))
+        model_onnx = to_onnx(model, 'gradient boosting regression', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionHuberLoss")
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnGradientBoostingRegressionHuberLoss")
 
     def test_gradient_boosting_regressor_quantile_loss(self):
-        model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='quantile'))
-        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model, X = self._fit_regression_model(
+            GradientBoostingRegressor(n_estimators=3, loss='quantile'))
+        model_onnx = to_onnx(model, 'gradient boosting regression', [
+                             ('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionQuantileLoss")
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnGradientBoostingRegressionQuantileLoss")
+
 
 if __name__ == "__main__":
     unittest.main()
