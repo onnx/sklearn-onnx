@@ -4,8 +4,5 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .onnx_operator import OP
-from .op_div import Div
-from .op_gemm import Gemm
-from .op_mul import Mul
-from .op_sub import Sub
+from .onnx_operator import OP, OnnxOperator
+from .onnx_spec import Div, Gemm, Mul, Sub
