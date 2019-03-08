@@ -48,8 +48,7 @@ def to_onnx_random_forest_classifier(scope, operator, container):
         op_domain='ai.onnx.ml', **attr_pairs)
 
 
-def to_onnx_random_forest_regressor_converter(scope,
-                                                      operator, container):
+def to_onnx_random_forest_regressor_converter(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
