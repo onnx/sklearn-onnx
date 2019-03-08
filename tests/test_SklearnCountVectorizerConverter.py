@@ -4,7 +4,7 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from test_utils import dump_data_and_model
 
@@ -21,7 +21,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 1))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+        model_onnx = to_onnx(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer11-OneOff-SklCol",
@@ -37,7 +37,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(2, 2))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+        model_onnx = to_onnx(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer22-OneOff-SklCol",
@@ -53,7 +53,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 2))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+        model_onnx = to_onnx(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer12-OneOff-SklCol",
@@ -69,7 +69,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 3))
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'CountVectorizer',
+        model_onnx = to_onnx(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer13-OneOff-SklCol",

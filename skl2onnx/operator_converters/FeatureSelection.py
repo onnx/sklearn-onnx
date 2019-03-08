@@ -10,7 +10,7 @@ from ..common._registration import register_converter
 from ..common.data_types import FloatTensorType, FloatType
 
 
-def convert_sklearn_feature_selection(scope, operator, container):
+def to_onnx_feature_selection(scope, operator, container):
     op = operator.raw_operator
     # Get indices of the features selected
     index = op.get_support(indices=True)
@@ -42,15 +42,15 @@ def convert_sklearn_feature_selection(scope, operator, container):
 
 
 register_converter('SklearnGenericUnivariateSelect',
-                   convert_sklearn_feature_selection)
-register_converter('SklearnRFE', convert_sklearn_feature_selection)
-register_converter('SklearnRFECV', convert_sklearn_feature_selection)
-register_converter('SklearnSelectFdr', convert_sklearn_feature_selection)
-register_converter('SklearnSelectFpr', convert_sklearn_feature_selection)
-register_converter('SklearnSelectFromModel', convert_sklearn_feature_selection)
-register_converter('SklearnSelectFwe', convert_sklearn_feature_selection)
-register_converter('SklearnSelectKBest', convert_sklearn_feature_selection)
+                   to_onnx_feature_selection)
+register_converter('SklearnRFE', to_onnx_feature_selection)
+register_converter('SklearnRFECV', to_onnx_feature_selection)
+register_converter('SklearnSelectFdr', to_onnx_feature_selection)
+register_converter('SklearnSelectFpr', to_onnx_feature_selection)
+register_converter('SklearnSelectFromModel', to_onnx_feature_selection)
+register_converter('SklearnSelectFwe', to_onnx_feature_selection)
+register_converter('SklearnSelectKBest', to_onnx_feature_selection)
 register_converter('SklearnSelectPercentile',
-                   convert_sklearn_feature_selection)
+                   to_onnx_feature_selection)
 register_converter('SklearnVarianceThreshold',
-                   convert_sklearn_feature_selection)
+                   to_onnx_feature_selection)

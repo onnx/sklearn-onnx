@@ -50,11 +50,11 @@ to convert other model formats into ONNX. Here we will use
 
 ::
 
-    from skl2onnx import convert_sklearn
+    from skl2onnx import to_onnx
     from skl2onnx.common.data_types import FloatTensorType
 
     initial_type = [('float_input', FloatTensorType([1, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type)
+    onx = to_onnx(clr, initial_types=initial_type)
     with open("logreg_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
 

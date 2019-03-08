@@ -8,7 +8,7 @@ from ..common.data_types import StringTensorType, Int64TensorType
 from ..common._registration import register_converter
 
 
-def convert_sklearn_label_encoder(scope, operator, container):
+def to_onnx_label_encoder(scope, operator, container):
     op = operator.raw_operator
     op_type = 'LabelEncoder'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
@@ -27,4 +27,4 @@ def convert_sklearn_label_encoder(scope, operator, container):
                        **attrs)
 
 
-register_converter('SklearnLabelEncoder', convert_sklearn_label_encoder)
+register_converter('SklearnLabelEncoder', to_onnx_label_encoder)

@@ -9,7 +9,7 @@ from ..common._apply_operation import apply_cast, apply_identity
 from ..common._registration import register_converter
 
 
-def convert_sklearn_zipmap(scope, operator, container):
+def to_onnx_zipmap(scope, operator, container):
     zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
     to_type = onnx_proto.TensorProto.INT64
 
@@ -30,4 +30,4 @@ def convert_sklearn_zipmap(scope, operator, container):
                        op_domain='ai.onnx.ml', **zipmap_attrs)
 
 
-register_converter('SklearnZipMap', convert_sklearn_zipmap)
+register_converter('SklearnZipMap', to_onnx_zipmap)

@@ -5,7 +5,7 @@ import unittest
 import numpy
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -57,7 +57,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svmc_linear_binary(self):
         model, X = self._fit_binary_classification(SVC(kernel='linear', probability=False))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
@@ -73,7 +73,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svmc_linear_multi(self):
         model, X = self._fit_multi_classification(SVC(kernel='linear', probability=False))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
@@ -89,7 +89,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svmr_linear_binary(self):
         model, X = self._fit_binary_classification(SVR(kernel='linear'))
-        model_onnx = convert_sklearn(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         self._check_attributes(nodes[0], {'coefficients': None,
@@ -102,7 +102,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_nusvmc_binary(self):
         model, X = self._fit_binary_classification(NuSVC(probability=False))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
@@ -118,7 +118,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_nusvmc_multi(self):
         model, X = self._fit_multi_classification(NuSVC(probability=False))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
@@ -134,7 +134,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_nusvmr_binary(self):
         model, X = self._fit_binary_classification(NuSVR())
-        model_onnx = convert_sklearn(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
         node = model_onnx.graph.node[0]
         self.assertIsNotNone(node)
         self._check_attributes(node, {'coefficients': None,
@@ -147,13 +147,13 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_registration_convert_nusvr_model(self):
         model, X = self._fit_binary_classification(NuSVR())
-        model_onnx = convert_sklearn(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVR', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRegNuSVR2")
 
     def test_registration_convert_nusvc_model(self):
         model, X = self._fit_multi_classification(NuSVC(probability=True))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnMclNuSVCPT",
                             # Operator cast-1 is not implemented in onnxruntime
@@ -161,7 +161,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_registration_convert_svc_model(self):
         model, X = self._fit_binary_classification(SVC(kernel='linear', probability=True))
-        model_onnx = convert_sklearn(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
+        model_onnx = to_onnx(model, 'SVC', [('input', FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnBinNuSVCPT",
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")

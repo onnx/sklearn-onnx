@@ -13,7 +13,7 @@ from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
-def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
+def to_onnx_gradient_boosting_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
 
@@ -60,7 +60,7 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
             op_domain='ai.onnx.ml', **attrs)
 
 
-def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
+def to_onnx_gradient_boosting_regressor(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
@@ -82,6 +82,6 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
 
 
 register_converter('SklearnGradientBoostingClassifier',
-                   convert_sklearn_gradient_boosting_classifier)
+                   to_onnx_gradient_boosting_classifier)
 register_converter('SklearnGradientBoostingRegressor',
-                   convert_sklearn_gradient_boosting_regressor)
+                   to_onnx_gradient_boosting_regressor)

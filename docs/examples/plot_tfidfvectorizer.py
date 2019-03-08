@@ -131,12 +131,12 @@ print(classification_report(pipeline.predict(test_data), test.target))
 # only considers a list of separators which can is defined
 # in variable *seps*.
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import StringTensorType
 
 seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
                                    '\n', '"', "'", "-", "[", "]", "@"]}}
-model_onnx = convert_sklearn(pipeline, "tfidf",
+model_onnx = to_onnx(pipeline, "tfidf",
                              initial_types=[("input", StringTensorType([1, 2]))],
                              options=seps)
 

@@ -11,7 +11,7 @@ from ..common._registration import register_converter
 from ..proto import onnx_proto
 
 
-def convert_sklearn_linear_classifier(scope, operator, container):
+def to_onnx_linear_classifier(scope, operator, container):
     op = operator.raw_operator
     coefficients = op.coef_.flatten().astype(float).tolist()
     if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
@@ -115,5 +115,5 @@ def convert_sklearn_linear_classifier(scope, operator, container):
 
 
 register_converter('SklearnLinearClassifier',
-                   convert_sklearn_linear_classifier)
-register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier)
+                   to_onnx_linear_classifier)
+register_converter('SklearnLinearSVC', to_onnx_linear_classifier)

@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.datasets import make_regression
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_binary_classification
 from test_utils import dump_data_and_model
@@ -28,25 +28,25 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_regressor_ls_loss(self):
         model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='ls'))
-        model_onnx = convert_sklearn(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionLsLoss")
 
     def test_gradient_boosting_regressor_lad_loss(self):
         model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='lad'))
-        model_onnx = convert_sklearn(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionLadLoss")
 
     def test_gradient_boosting_regressor_huber_loss(self):
         model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='huber'))
-        model_onnx = convert_sklearn(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionHuberLoss")
 
     def test_gradient_boosting_regressor_quantile_loss(self):
         model, X = self._fit_regression_model(GradientBoostingRegressor(n_estimators=3, loss='quantile'))
-        model_onnx = convert_sklearn(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
+        model_onnx = to_onnx(model, 'gradient boosting regression', [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnGradientBoostingRegressionQuantileLoss")
 

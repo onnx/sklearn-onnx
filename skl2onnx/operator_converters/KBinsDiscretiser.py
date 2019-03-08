@@ -9,7 +9,7 @@ from ..common._apply_operation import apply_concat
 from ..common._registration import register_converter
 
 
-def convert_sklearn_k_bins_discretiser(scope, operator, container):
+def to_onnx_k_bins_discretiser(scope, operator, container):
     op = operator.raw_operator
 
     if op.encode == 'ohehot':
@@ -59,4 +59,4 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
 
 
 register_converter('SklearnKBinsDiscretizer',
-                   convert_sklearn_k_bins_discretiser)
+                   to_onnx_k_bins_discretiser)

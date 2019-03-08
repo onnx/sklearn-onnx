@@ -13,7 +13,7 @@ from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.preprocessing import RobustScaler, StandardScaler
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -35,7 +35,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = np.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=np.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline',
+        model_onnx = to_onnx(model, 'pipelinewithinpipeline',
                                 [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
@@ -59,7 +59,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = np.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=np.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline',
+        model_onnx = to_onnx(model, 'pipelinewithinpipeline',
                                      [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
@@ -85,7 +85,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                         dtype=np.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline',
+        model_onnx = to_onnx(model, 'pipelinewithinpipeline',
                                      [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
@@ -110,7 +110,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         data = np.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=np.float32)
         y = [0, 0, 1, 1]
         model.fit(data, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline',
+        model_onnx = to_onnx(model, 'pipelinewithinpipeline',
                                      [('input', FloatTensorType(data.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx,
@@ -127,7 +127,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                                         ('scaler', RobustScaler())]), [1])])),
             ('lr', LogisticRegression(solver='liblinear'))])
         model.fit(X, y)
-        model_onnx = convert_sklearn(model, 'pipelinewithinpipeline',
+        model_onnx = to_onnx(model, 'pipelinewithinpipeline',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, model, model_onnx,

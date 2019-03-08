@@ -113,7 +113,7 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     return operator.outputs[1].full_name
 
 
-def convert_sklearn_ada_boost_classifier(scope, operator, container):
+def to_onnx_ada_boost_classifier(scope, operator, container):
     """
     Converter for AdaBoost classifier.
     This function goes through the list of estimators and uses
@@ -205,4 +205,4 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
 
 
 register_converter('SklearnAdaBoostClassifier',
-                   convert_sklearn_ada_boost_classifier)
+                   to_onnx_ada_boost_classifier)

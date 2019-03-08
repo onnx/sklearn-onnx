@@ -2,7 +2,7 @@ import unittest
 import numpy
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from test_utils import dump_multiple_classification
 
 

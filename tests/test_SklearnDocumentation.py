@@ -18,7 +18,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import StringTensorType
 from test_utils import dump_data_and_model
 
@@ -67,7 +67,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         tdata = train_data[:300, :1]
         tfi.fit(tdata.ravel())
         extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
-        model_onnx = convert_sklearn(tfi, "tfidf",
+        model_onnx = to_onnx(tfi, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
         dump_data_and_model(tdata[:5], tfi, model_onnx,
@@ -92,7 +92,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         pipeline.fit(train_data[:300])
         extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
                                            '\n', '"', "'", "-", "[", "]", "@"]}}
-        model_onnx = convert_sklearn(pipeline, "tfidf",
+        model_onnx = to_onnx(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=extra)
         test_data = np.array([

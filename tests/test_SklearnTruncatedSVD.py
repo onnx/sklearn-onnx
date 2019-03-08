@@ -7,7 +7,7 @@
 import unittest
 import numpy as np
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from test_utils import create_tensor
 from test_utils import dump_data_and_model
 from sklearn.decomposition import TruncatedSVD
@@ -24,7 +24,7 @@ class TestTruncatedSVD(unittest.TestCase):
 
         svd = TruncatedSVD(n_components=K)
         svd.fit(x)
-        model_onnx = convert_sklearn(svd, initial_types=[('input', FloatTensorType(shape=[1, C]))])
+        model_onnx = to_onnx(svd, initial_types=[('input', FloatTensorType(shape=[1, C]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(x, svd, model_onnx, basename="SklearnTruncatedSVD")
 

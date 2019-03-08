@@ -4,7 +4,7 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import StringTensorType
 from test_utils import dump_data_and_model
 
@@ -21,7 +21,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol",
@@ -37,7 +37,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol",
@@ -53,7 +53,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         corpus = numpy.array([
@@ -75,7 +75,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(2, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol",
@@ -89,7 +89,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
@@ -105,7 +105,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol",
@@ -121,7 +121,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l1')
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
@@ -137,7 +137,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l2')
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
@@ -153,7 +153,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 3), norm=None)
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer13-OneOff-SklCol",
@@ -170,7 +170,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         pred = vect.transform(corpus.ravel())
         extra = {TfidfVectorizer: {'sep': [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))],
                                      options=extra)
         self.assertTrue(model_onnx is not None)
@@ -192,14 +192,14 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         
         extra = {id(vect): {"sep2": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
         try:
-            convert_sklearn(vect, 'TfidfVectorizer',
+            to_onnx(vect, 'TfidfVectorizer',
                             [('input', StringTensorType([1, 1]))],
                             options=extra)
         except RuntimeError:
             pass
         
         extra = {id(vect): {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+        model_onnx = to_onnx(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))],
                                      options=extra)
         self.assertTrue(model_onnx is not None)

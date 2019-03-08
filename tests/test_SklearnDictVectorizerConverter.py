@@ -3,7 +3,7 @@ Tests scikit-dictvectorizer converter.
 """
 import unittest
 from sklearn.feature_extraction import DictVectorizer
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import DictionaryType, StringTensorType, FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -14,7 +14,7 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model = DictVectorizer()
         data = [{'amy': 1., 'chin': 200.}, {'nice': 3., 'amy': 1.}]
         model.fit_transform(data)
-        model_onnx = convert_sklearn(model, 'dictionary vectorizer',
+        model_onnx = to_onnx(model, 'dictionary vectorizer',
                                      [('input', DictionaryType(StringTensorType([1]), FloatTensorType([1])))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnDictVectorizer-OneOff-SkipDim1",

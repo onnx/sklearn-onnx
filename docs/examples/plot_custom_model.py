@@ -363,11 +363,11 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 # Conversion to ONNX
 # ++++++++++++++++++
 #
-# We just need to call *convert_sklearn* as any other model
+# We just need to call *to_onnx* as any other model
 # to convert.
 
-from skl2onnx import convert_sklearn
-model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+from skl2onnx import to_onnx
+model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
                              [('input', FloatTensorType([1, X_test.shape[1]]))])
                              
 # And save.

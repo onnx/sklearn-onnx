@@ -8,7 +8,7 @@ from ..proto import onnx_proto
 from ..common._registration import register_converter
 
 
-def convert_sklearn_array_feature_extractor(scope, operator, container):
+def to_onnx_array_feature_extractor(scope, operator, container):
     """
     Extracts a subset of columns. This is used by *ColumnTransformer*.
     """
@@ -36,4 +36,4 @@ def convert_sklearn_array_feature_extractor(scope, operator, container):
 
 
 register_converter('SklearnArrayFeatureExtractor',
-                   convert_sklearn_array_feature_extractor)
+                   to_onnx_array_feature_extractor)

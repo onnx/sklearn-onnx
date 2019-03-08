@@ -11,7 +11,7 @@ from ..common._apply_operation import apply_log, apply_sub, apply_reshape
 from ..common._registration import register_converter
 
 
-def convert_sklearn_naive_bayes(scope, operator, container):
+def to_onnx_naive_bayes(scope, operator, container):
     # Computational graph:
     #
     # Note: In the following graph, variable names are in lower case
@@ -322,5 +322,5 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                       desired_shape=output_shape)
 
 
-register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes)
-register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes)
+register_converter('SklearnMultinomialNB', to_onnx_naive_bayes)
+register_converter('SklearnBernoulliNB', to_onnx_naive_bayes)

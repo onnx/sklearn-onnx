@@ -8,7 +8,7 @@ from ..common._registration import register_converter
 from .common import concatenate_variables
 
 
-def convert_sklearn_binarizer(scope, operator, container):
+def to_onnx_binarizer(scope, operator, container):
     feature_name = concatenate_variables(scope, operator.inputs, container)
 
     op_type = 'Binarizer'
@@ -20,4 +20,4 @@ def convert_sklearn_binarizer(scope, operator, container):
                        op_domain='ai.onnx.ml', **attrs)
 
 
-register_converter('SklearnBinarizer', convert_sklearn_binarizer)
+register_converter('SklearnBinarizer', to_onnx_binarizer)

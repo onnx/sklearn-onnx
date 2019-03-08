@@ -8,7 +8,7 @@ import unittest
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -22,7 +22,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = AdaBoostClassifier(n_estimators=10, algorithm='SAMME.R')
         model.fit(X_train, y_train)
-        model_onnx = convert_sklearn(model, 'AdaBoost classification',
+        model_onnx = to_onnx(model, 'AdaBoost classification',
                                      [('input',
                                       FloatTensorType(X_test.shape))])
         self.assertIsNotNone(model_onnx)
@@ -39,7 +39,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = AdaBoostClassifier(n_estimators=15, algorithm='SAMME')
         model.fit(X_train, y_train)
-        model_onnx = convert_sklearn(model, 'AdaBoost classification',
+        model_onnx = to_onnx(model, 'AdaBoost classification',
                                      [('input',
                                       FloatTensorType(X_train.shape))])
         self.assertIsNotNone(model_onnx)

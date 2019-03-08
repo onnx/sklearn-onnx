@@ -9,9 +9,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-from skl2onnx.operator_converters.LinearClassifier import convert_sklearn_linear_classifier
+from skl2onnx.operator_converters.LinearClassifier import to_onnx_linear_classifier
 from test_utils import dump_data_and_model
 
 
@@ -43,7 +43,7 @@ def my_custom_shape_extractor(operator):
 def my_custom_converter(scope, operator, container):
     raw = operator.raw_operator
     operator.raw_operator = raw.estimator_
-    convert_sklearn_linear_classifier(scope, operator, container)
+    to_onnx_linear_classifier(scope, operator, container)
     operator.raw_operator = raw
 
 
@@ -59,21 +59,21 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         pipe.fit(X, y)
 
         try:
-            model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+            model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
         except RuntimeError as e:
             if "No proper shape calculator found for" not in str(e) and \
                "Unable to find a shape calculator for type" not in str(e):
                 raise e
             
         try:
-            model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
+            model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
                                          custom_conversion_functions={'MyCustomClassifier': my_custom_converter},
                                          custom_shape_calculators={'MyCustomClassifier': my_custom_shape_extractor})
         except TypeError as e:
             if "Keys in custom_conversion_functions must be types" not in str(e):
                 raise e
                                      
-        model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
+        model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))],
                                      custom_conversion_functions={MyCustomClassifier: my_custom_converter},
                                      custom_shape_calculators={MyCustomClassifier: my_custom_shape_extractor})
         self.assertTrue(model_onnx is not None)
@@ -83,7 +83,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         update_registered_converter(MyCustomClassifier, 'MyCustomClassifier',                                    
                                     my_custom_shape_extractor, my_custom_converter)
         
-        model_onnx = convert_sklearn(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = to_onnx(pipe, 'pipeline', [('input', FloatTensorType([1, 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(numpy.float32), pipe, model_onnx,
                             basename="SklearnPipelineScalerCustomClassifier2")

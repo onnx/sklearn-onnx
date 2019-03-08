@@ -10,7 +10,7 @@ from ..common._registration import register_converter
 import numpy as np
 
 
-def convert_sklearn_label_binariser(scope, operator, container):
+def to_onnx_label_binariser(scope, operator, container):
     op = operator.raw_operator
     classes = op.classes_
     zeros_tensor = np.zeros((len(classes))).astype(np.int)
@@ -59,4 +59,4 @@ def convert_sklearn_label_binariser(scope, operator, container):
             name=scope.get_unique_operator_name('where'), op_version=9)
 
 
-register_converter('SklearnLabelBinarizer', convert_sklearn_label_binariser)
+register_converter('SklearnLabelBinarizer', to_onnx_label_binariser)

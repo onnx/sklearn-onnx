@@ -8,7 +8,7 @@ from ..common._registration import register_converter
 from .common import concatenate_variables
 
 
-def convert_sklearn_normalizer(scope, operator, container):
+def to_onnx_normalizer(scope, operator, container):
     if len(operator.inputs) > 1:
         # If there are multiple input tensors,
         # we combine them using a FeatureVectorizer
@@ -30,4 +30,4 @@ def convert_sklearn_normalizer(scope, operator, container):
                        op_domain='ai.onnx.ml', **attrs)
 
 
-register_converter('SklearnNormalizer', convert_sklearn_normalizer)
+register_converter('SklearnNormalizer', to_onnx_normalizer)

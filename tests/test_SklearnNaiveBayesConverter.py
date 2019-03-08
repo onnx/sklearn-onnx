@@ -5,7 +5,7 @@ from distutils.version import StrictVersion
 from sklearn.datasets import load_digits, load_iris
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -29,7 +29,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
     def test_model_multinomial_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(MultinomialNB(),
                                                          load_iris())
-        model_onnx = convert_sklearn(model, 'multinomial naive bayes',
+        model_onnx = to_onnx(model, 'multinomial naive bayes',
                                      [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
@@ -42,7 +42,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
     def test_model_bernoulli_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(BernoulliNB(),
                                                          load_digits())
-        model_onnx = convert_sklearn(model, 'bernoulli naive bayes',
+        model_onnx = to_onnx(model, 'bernoulli naive bayes',
                                      [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
@@ -53,7 +53,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
     def test_model_multinomial_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(MultinomialNB(),
                                                              load_iris())
-        model_onnx = convert_sklearn(model, 'multinomial naive bayes',
+        model_onnx = to_onnx(model, 'multinomial naive bayes',
                                      [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,
@@ -66,7 +66,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
     def test_model_bernoulli_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(BernoulliNB(),
                                                              load_digits())
-        model_onnx = convert_sklearn(model, 'bernoulli naive bayes',
+        model_onnx = to_onnx(model, 'bernoulli naive bayes',
                                      [('input', FloatTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx,

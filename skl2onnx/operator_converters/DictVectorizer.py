@@ -9,7 +9,7 @@ import six
 from ..common._registration import register_converter
 
 
-def convert_sklearn_dict_vectorizer(scope, operator, container):
+def to_onnx_dict_vectorizer(scope, operator, container):
     op_type = 'DictVectorizer'
     op = operator.raw_operator
     attrs = {
@@ -29,4 +29,4 @@ def convert_sklearn_dict_vectorizer(scope, operator, container):
                        **attrs)
 
 
-register_converter('SklearnDictVectorizer', convert_sklearn_dict_vectorizer)
+register_converter('SklearnDictVectorizer', to_onnx_dict_vectorizer)

@@ -11,7 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline, Pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
 from test_utils import dump_data_and_model
 
@@ -43,7 +43,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1',scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline', [('input', FloatTensorType([1, 2]))])
+        model_onnx = to_onnx(model, 'pipeline', [('input', FloatTensorType([1, 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data, model, model_onnx, basename="SklearnPipelineScaler")
 
@@ -53,7 +53,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1', scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline',
+        model_onnx = to_onnx(model, 'pipeline',
                                      [('input1', FloatTensorType([1, 1])),
                                       ('input2', FloatTensorType([1, 1]))])
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -72,7 +72,7 @@ class TestSklearnPipeline(unittest.TestCase):
                                         ('scaler2', StandardScaler()),
                                         ('scaler3', MinMaxScaler())]))])
         model.fit(data)
-        model_onnx = convert_sklearn(model, 'pipeline',
+        model_onnx = to_onnx(model, 'pipeline',
                                      [('input1', FloatTensorType([1, 1])),
                                       ('input2', FloatTensorType([1, 1]))])
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -87,7 +87,7 @@ class TestSklearnPipeline(unittest.TestCase):
         scaler.fit(data)
         model = Pipeline([('scaler1', scaler), ('scaler2', scaler)])
 
-        model_onnx = convert_sklearn(model, 'pipeline',
+        model_onnx = to_onnx(model, 'pipeline',
                                      [('input1', Int64TensorType([1, 1])),
                                       ('input2', FloatTensorType([1, 1]))])
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -140,7 +140,7 @@ class TestSklearnPipeline(unittest.TestCase):
                         ('strfeat', StringTensorType([1, 2]))]
 
         X_train = X_train[:11]
-        model_onnx = convert_sklearn(model, initial_types=initial_type)
+        model_onnx = to_onnx(model, initial_types=initial_type)
         
         dump_data_and_model(X_train, model, model_onnx,
                             basename="SklearnPipelineColumnTransformerPipeliner",
@@ -216,7 +216,7 @@ class TestSklearnPipeline(unittest.TestCase):
         X_train['pclass'] = X_train['pclass'].astype(str)
         X_test['pclass'] = X_test['pclass'].astype(str)
         inputs = convert_dataframe_schema(X_train, to_drop)
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+        model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
         
         X_test2 = X_test.drop(to_drop, axis=1)
         dump_data_and_model(X_test2[:5], clf, model_onnx,

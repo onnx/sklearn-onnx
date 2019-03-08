@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import warnings
 from uuid import uuid4
 from .proto import get_opset_number_from_onnx
 from .common._topology import convert_topology
@@ -14,10 +14,10 @@ from . import shape_calculators # noqa
 from . import operator_converters # noqa
 
 
-def convert_sklearn(model, name=None, initial_types=None, doc_string='',
-                    target_opset=None, custom_conversion_functions=None,
-                    custom_shape_calculators=None,
-                    custom_parsers=None, options=None):
+def to_onnx(model, name=None, initial_types=None, doc_string='',
+            target_opset=None, custom_conversion_functions=None,
+            custom_shape_calculators=None,
+            custom_parsers=None, options=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -74,7 +74,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     guess from the raw model. Some default values are usually suggested
     but the users may have to manually overwrite them. This need
     is not obvious to do when a model is included in a pipeline.
-    That's why these options can be given to function *convert_sklearn*
+    That's why these options can be given to function *to_onnx*
     as a dictionary ``{model_type: parameters in a dictionary}`` or
     ``{model_id: parameters in a dictionary}``.
     Option *sep* is used to specify the delimiters between two words
@@ -85,7 +85,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     ::
 
         extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
-        model_onnx = convert_sklearn(model, "tfidf",
+        model_onnx = to_onnx(model, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
 
@@ -95,7 +95,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     ::
 
         extra = {id(model): {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
-        model_onnx = convert_sklearn(pipeline, "pipeline-with-2-tfidf",
+        model_onnx = to_onnx(pipeline, "pipeline-with-2-tfidf",
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
 
@@ -124,3 +124,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                   options=options)
 
     return onnx_model
+
+
+def convert_sklearn(*args, **kwargs):
+    """
+    Calls :func:`to_onnx <skl2onnx.convert.to_onnx>`.
+    This function is deprecating, it will be removed in 1.6.
+    """
+    warnings.warn("'convert_sklearn' is renamed into 'to_onnx', it will be removed in 1.6", DeprecationWarning)
+    return to_onnx(*args, **kwargs)

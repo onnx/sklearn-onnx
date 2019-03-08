@@ -13,7 +13,7 @@ from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
-def convert_sklearn_decision_tree_classifier(scope, operator, container):
+def to_onnx_decision_tree_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
 
@@ -41,7 +41,7 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
         op_domain='ai.onnx.ml', **attrs)
 
 
-def convert_sklearn_decision_tree_regressor(scope, operator, container):
+def to_onnx_decision_tree_regressor(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleRegressor'
 
@@ -56,6 +56,6 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
 
 
 register_converter('SklearnDecisionTreeClassifier',
-                   convert_sklearn_decision_tree_classifier)
+                   to_onnx_decision_tree_classifier)
 register_converter('SklearnDecisionTreeRegressor',
-                   convert_sklearn_decision_tree_regressor)
+                   to_onnx_decision_tree_regressor)

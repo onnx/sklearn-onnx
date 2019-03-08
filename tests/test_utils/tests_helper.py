@@ -257,8 +257,8 @@ def convert_model(model, name, input_types):
     :return: *onnx* model
     """
     from sklearn.base import BaseEstimator
-    from skl2onnx import convert_sklearn
-    model, prefix = convert_sklearn(model, name, input_types), "Sklearn"
+    from skl2onnx import to_onnx
+    model, prefix = to_onnx(model, name, input_types), "Sklearn"
     if model is None:
         raise RuntimeError("Unable to convert model of type '{0}'.".format(type(model)))
     return model, prefix

@@ -11,7 +11,7 @@ import numpy as np
 from sklearn.utils.extmath import row_norms
 
 
-def convert_sklearn_kmeans(scope, operator, container):
+def to_onnx_kmeans(scope, operator, container):
     """
     Computation graph of distances to all centroids for a batch of examples.
     Note that a centriod is just the center of a cluster. We use ``[]`` to
@@ -112,5 +112,5 @@ X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1) <- C [k, n]
                        axis=1, keepdims=0)
 
 
-register_converter('SklearnKMeans', convert_sklearn_kmeans)
-register_converter('SklearnMiniBatchKMeans', convert_sklearn_kmeans)
+register_converter('SklearnKMeans', to_onnx_kmeans)
+register_converter('SklearnMiniBatchKMeans', to_onnx_kmeans)

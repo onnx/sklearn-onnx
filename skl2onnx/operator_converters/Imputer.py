@@ -9,7 +9,7 @@ from ..common._registration import register_converter
 from .common import concatenate_variables
 
 
-def convert_sklearn_imputer(scope, operator, container):
+def to_onnx_imputer(scope, operator, container):
     op_type = 'Imputer'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     op = operator.raw_operator
@@ -35,5 +35,5 @@ def convert_sklearn_imputer(scope, operator, container):
                        **attrs)
 
 
-register_converter('SklearnImputer', convert_sklearn_imputer)
-register_converter('SklearnSimpleImputer', convert_sklearn_imputer)
+register_converter('SklearnImputer', to_onnx_imputer)
+register_converter('SklearnSimpleImputer', to_onnx_imputer)

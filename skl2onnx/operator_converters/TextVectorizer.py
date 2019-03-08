@@ -8,7 +8,7 @@ import warnings
 from ..common._registration import register_converter
 
 
-def convert_sklearn_text_vectorizer(scope, operator, container):
+def to_onnx_text_vectorizer(scope, operator, container):
     """
     Converters for class
     `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
@@ -29,7 +29,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
         seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
                                            '\\n', '"', "'", "-", "[", "]", "@"]}}
-        model_onnx = convert_sklearn(pipeline, "tfidf",
+        model_onnx = to_onnx(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
     """ # noqa
@@ -190,5 +190,5 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                            op_domain='ai.onnx.ml', **attrs)
 
 
-register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
-register_converter('SklearnTfidfVectorizer', convert_sklearn_text_vectorizer)
+register_converter('SklearnCountVectorizer', to_onnx_text_vectorizer)
+register_converter('SklearnTfidfVectorizer', to_onnx_text_vectorizer)

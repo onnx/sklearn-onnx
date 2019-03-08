@@ -18,9 +18,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.manifold import TSNE
 
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-from skl2onnx.operator_converters.LinearClassifier import convert_sklearn_linear_classifier
+from skl2onnx.operator_converters.LinearClassifier import to_onnx_linear_classifier
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx._parse import _get_sklearn_operator_name, _parse_sklearn_simple_model, update_registered_parser
 
@@ -156,7 +156,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
                                     predictable_tsne_shape_calculator,
                                     predictable_tsne_converter)
 
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+        model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
                                      [('input', FloatTensorType([1, Xd.shape[1]]))])
         
         dump_data_and_model(Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
@@ -168,7 +168,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             trace_line.append(model)
             return _parse_sklearn_simple_model(scope, model, inputs, custom_parsers)
         
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+        model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
                                      [('input', FloatTensorType([1, Xd.shape[1]]))],
                                      custom_parsers={PredictableTSNE: my_parser})
         assert len(trace_line) == 1
@@ -177,7 +177,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
                             basename="CustomTransformerTSNEkNNCustomParser-OneOffArray")
         
         update_registered_parser(PredictableTSNE, my_parser)
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
+        model_onnx = to_onnx(ptsne_knn, 'predictable_tsne',
                                      [('input', FloatTensorType([1, Xd.shape[1]]))])
 
         assert len(trace_line) == 2

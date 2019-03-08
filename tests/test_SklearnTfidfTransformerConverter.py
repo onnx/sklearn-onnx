@@ -6,7 +6,7 @@ import unittest
 import numpy
 from sklearn.pipeline import make_pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -36,7 +36,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                                  sublinear_tf=sublinear_tf)
                         model.fit(data)
                         dt = data.copy()
-                        model_onnx = convert_sklearn(model, 'TfidfTransformer',
+                        model_onnx = to_onnx(model, 'TfidfTransformer',
                                                      [('input', FloatTensorType([1, data.shape[1]]))])
                         self.assertTrue(model_onnx is not None)
                         suffix = norm.upper() if norm else ''

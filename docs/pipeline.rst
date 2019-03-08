@@ -75,7 +75,7 @@ Once fitted, the model is converted into *ONNX*:
 
     initial_type = [('numfeat', FloatTensorType([1, 3])),
                     ('strfeat', StringTensorType([1, 2]))]
-    model_onnx = convert_sklearn(model, initial_types=initial_type)
+    model_onnx = to_onnx(model, initial_types=initial_type)
 
 It can be represented as a 
 `DOT <https://en.wikipedia.org/wiki/DOT_(graph_description_language)>`_ graph:
@@ -136,7 +136,7 @@ order:
 As *sklearn-onnx* may convert pipelines with model coming from other libraries,
 the library must handle parsers, shape calculators or converters coming
 from other packages. This can be done is two ways. The first one
-consists in calling function :func:`convert_sklearn <skl2onnx.convert_sklearn>`
+consists in calling function :func:`to_onnx <skl2onnx.to_onnx>`
 by mapping the model type to a specific parser, a specific shape calculator
 or a specific converter. It is possible to avoid these specifications
 by registering the new parser or shape calculator or converter
@@ -168,11 +168,11 @@ The following lines shows what these four elements are for a random forest:
 ::
 
     from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
-    from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
+    from skl2onnx.operator_converters.RandomForest import to_onnx_random_forest_classifier
     from skl2onnx import update_registered_converter
     update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                 calculate_linear_classifier_output_shapes,
-                                convert_sklearn_random_forest_classifier)
+                                to_onnx_random_forest_classifier)
 
 See example :ref:`example-lightgbm` to see a complete example
 with a *LightGbm* model.

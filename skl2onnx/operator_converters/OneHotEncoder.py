@@ -12,7 +12,7 @@ from ..common._registration import register_converter
 from ..common.utils import get_column_index, get_column_indices
 
 
-def convert_sklearn_one_hot_encoder(scope, operator, container):
+def to_onnx_one_hot_encoder(scope, operator, container):
     op = operator.raw_operator
     C = operator.inputs[0].type.shape[1]
 
@@ -178,4 +178,4 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                        op_domain='ai.onnx.ml', **collector_attrs)
 
 
-register_converter('SklearnOneHotEncoder', convert_sklearn_one_hot_encoder)
+register_converter('SklearnOneHotEncoder', to_onnx_one_hot_encoder)

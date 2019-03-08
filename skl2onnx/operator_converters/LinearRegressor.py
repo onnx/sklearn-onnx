@@ -8,7 +8,7 @@ import collections
 from ..common._registration import register_converter
 
 
-def convert_sklearn_linear_regressor(scope, operator, container):
+def to_onnx_linear_regressor(scope, operator, container):
     op = operator.raw_operator
     op_type = 'LinearRegressor'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
@@ -22,9 +22,9 @@ def convert_sklearn_linear_regressor(scope, operator, container):
 
 
 register_converter('SklearnElasticNetRegressor',
-                   convert_sklearn_linear_regressor)
-register_converter('SklearnLasso', convert_sklearn_linear_regressor)
-register_converter('SklearnLassoLars', convert_sklearn_linear_regressor)
-register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
-register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
-register_converter('SklearnRidge', convert_sklearn_linear_regressor)
+                   to_onnx_linear_regressor)
+register_converter('SklearnLasso', to_onnx_linear_regressor)
+register_converter('SklearnLassoLars', to_onnx_linear_regressor)
+register_converter('SklearnLinearRegressor', to_onnx_linear_regressor)
+register_converter('SklearnLinearSVR', to_onnx_linear_regressor)
+register_converter('SklearnRidge', to_onnx_linear_regressor)

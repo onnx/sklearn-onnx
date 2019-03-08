@@ -12,7 +12,7 @@ in *scikit-onnx*.
 Converters
 ==========
 
-.. autofunction:: skl2onnx.convert_sklearn
+.. autofunction:: skl2onnx.to_onnx
 
 Manipulate ONNX graphs
 ======================

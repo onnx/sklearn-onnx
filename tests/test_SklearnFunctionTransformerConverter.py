@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 
 from test_utils import dump_data_and_model
@@ -45,7 +45,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         pipe.fit(data[['X1', 'X2']], y)
         
         inputs = convert_dataframe_schema(data)        
-        model_onnx = convert_sklearn(pipe, 'scikit-learn function_transformer', inputs)
+        model_onnx = to_onnx(pipe, 'scikit-learn function_transformer', inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data[:5], pipe, model_onnx, basename="SklearnFunctionTransformer-DF",
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "

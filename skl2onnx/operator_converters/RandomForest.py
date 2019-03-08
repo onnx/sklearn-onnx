@@ -13,7 +13,7 @@ from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
-def convert_sklearn_random_forest_classifier(scope, operator, container):
+def to_onnx_random_forest_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
     classes = op.classes_
@@ -48,7 +48,7 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
         op_domain='ai.onnx.ml', **attr_pairs)
 
 
-def convert_sklearn_random_forest_regressor_converter(scope,
+def to_onnx_random_forest_regressor_converter(scope,
                                                       operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleRegressor'
@@ -70,10 +70,10 @@ def convert_sklearn_random_forest_regressor_converter(scope,
 
 
 register_converter('SklearnRandomForestClassifier',
-                   convert_sklearn_random_forest_classifier)
+                   to_onnx_random_forest_classifier)
 register_converter('SklearnRandomForestRegressor',
-                   convert_sklearn_random_forest_regressor_converter)
+                   to_onnx_random_forest_regressor_converter)
 register_converter('SklearnExtraTreesClassifier',
-                   convert_sklearn_random_forest_classifier)
+                   to_onnx_random_forest_classifier)
 register_converter('SklearnExtraTreesRegressor',
-                   convert_sklearn_random_forest_regressor_converter)
+                   to_onnx_random_forest_regressor_converter)

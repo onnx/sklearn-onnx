@@ -8,9 +8,9 @@ import inspect
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-from skl2onnx.operator_converters.LinearClassifier import convert_sklearn_linear_classifier
+from skl2onnx.operator_converters.LinearClassifier import to_onnx_linear_classifier
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx._parse import _get_sklearn_operator_name, _parse_sklearn_simple_model, update_registered_parser
 
@@ -46,7 +46,7 @@ class TestOtherLibrariesInPipelineScikitPandas(unittest.TestCase):
         df2 = mapper.fit_transform(df)
 
         try:
-            model_onnx = convert_sklearn(mapper, 'predictable_tsne',
+            model_onnx = to_onnx(mapper, 'predictable_tsne',
                                          [('input', FloatTensorType([1, df.shape[1]]))],
                                          custom_shape_calculators={DataFrameMapper: dataframe_mapper_shape_calculator})
         except RuntimeError as e:

@@ -11,7 +11,7 @@ from ..common._registration import register_converter
 from .common import concatenate_variables
 
 
-def convert_sklearn_scaler(scope, operator, container):
+def to_onnx_scaler(scope, operator, container):
     # If there are multiple input variables, we need to combine them as a
     # whole tensor. Integer(s) would be converted to float(s).
     if len(operator.inputs) > 1:
@@ -52,7 +52,7 @@ def convert_sklearn_scaler(scope, operator, container):
                        op_domain='ai.onnx.ml', **attrs)
 
 
-register_converter('SklearnRobustScaler', convert_sklearn_scaler)
-register_converter('SklearnScaler', convert_sklearn_scaler)
-register_converter('SklearnMinMaxScaler', convert_sklearn_scaler)
-register_converter('SklearnMaxAbsScaler', convert_sklearn_scaler)
+register_converter('SklearnRobustScaler', to_onnx_scaler)
+register_converter('SklearnScaler', to_onnx_scaler)
+register_converter('SklearnMinMaxScaler', to_onnx_scaler)
+register_converter('SklearnMaxAbsScaler', to_onnx_scaler)

@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import VotingClassifier
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._apply_operation import apply_mul
@@ -49,7 +49,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         Xd = numpy.array([[1, 2], [3, 4], [4, 5]])
         exp = model.transform(Xd)
         
-        model_onnx = convert_sklearn(model, 'CustomTransform',
+        model_onnx = to_onnx(model, 'CustomTransform',
                                      [('input', FloatTensorType([3, Xd.shape[1]]))],
                                      custom_shape_calculators={CustomTransform: custom_transform_shape_calculator},
                                      custom_conversion_functions={CustomTransform: custom_tranform_converter})

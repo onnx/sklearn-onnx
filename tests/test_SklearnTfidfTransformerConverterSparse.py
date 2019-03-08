@@ -10,7 +10,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
 from skl2onnx.common.data_types import StringTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from test_utils import dump_data_and_model
 
 
@@ -26,7 +26,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer())])
         twenty_train.data[0] = "bruît " + twenty_train.data[0]
         text_clf.fit(twenty_train.data, twenty_train.target)
-        model_onnx = convert_sklearn(text_clf, name='DocClassifierCV-Tfidf',
+        model_onnx = to_onnx(text_clf, name='DocClassifierCV-Tfidf',
                                      initial_types=[('input', StringTensorType())])
         dump_data_and_model(twenty_train.data[:10], text_clf, model_onnx,
                             basename="SklearnPipelineTfidfTransformer",

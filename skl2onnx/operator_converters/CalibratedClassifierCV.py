@@ -219,7 +219,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     return class_prob_tensor_name
 
 
-def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
+def to_onnx_calibrated_classifier_cv(scope, operator, container):
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only
@@ -323,4 +323,4 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
 
 register_converter('SklearnCalibratedClassifierCV',
-                   convert_sklearn_calibrated_classifier_cv)
+                   to_onnx_calibrated_classifier_cv)

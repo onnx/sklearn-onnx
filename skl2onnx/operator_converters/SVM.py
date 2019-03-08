@@ -10,7 +10,7 @@ import six
 from ..common._registration import register_converter
 
 
-def convert_sklearn_svm(scope, operator, container):
+def to_onnx_svm(scope, operator, container):
     svm_attrs = {'name': scope.get_unique_operator_name('SVM')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
@@ -80,5 +80,5 @@ def convert_sklearn_svm(scope, operator, container):
         raise ValueError('Unknown support vector machien model type found')
 
 
-register_converter('SklearnSVC', convert_sklearn_svm)
-register_converter('SklearnSVR', convert_sklearn_svm)
+register_converter('SklearnSVC', to_onnx_svm)
+register_converter('SklearnSVR', to_onnx_svm)

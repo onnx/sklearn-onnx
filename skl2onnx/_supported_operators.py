@@ -161,11 +161,11 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     ::
 
         from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
-        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
+        from skl2onnx.operator_converters.RandomForest import to_onnx_random_forest_classifier
         from skl2onnx import update_registered_converter
         update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                     calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier)
+                                    to_onnx_random_forest_classifier)
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
             and alias != sklearn_operator_name_map[model]):

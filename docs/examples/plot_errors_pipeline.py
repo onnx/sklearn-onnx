@@ -49,11 +49,11 @@ pipe.fit(X, y)
 ##################################
 # The conversion happens here and fails.
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 
 try:
-    model_onnx = convert_sklearn(pipe, 'pipeline',
+    model_onnx = to_onnx(pipe, 'pipeline',
                                  [('input', FloatTensorType([1, 2]))])
 except Exception as e:
     print(e)
@@ -68,7 +68,7 @@ except Exception as e:
 # First, the shape calculator:
 
 import numbers
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
 
 def lightgbm_classifier_shape_extractor(operator):
@@ -102,7 +102,7 @@ update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
 #################################
 # Let's convert again.
 
-model_onnx = convert_sklearn(pipe, 'pipeline',
+model_onnx = to_onnx(pipe, 'pipeline',
                              [('input', FloatTensorType([1, 2]))])
 
 print(str(model_onnx)[:300] + "\n...")
@@ -116,7 +116,7 @@ print(str(model_onnx)[:300] + "\n...")
 # *sklearn-onnx* converts a pipeline without knowing the training data,
 # more specifically, it does not know the input variables. This is why
 # it complain when the parameter *initial_type* is not filled
-# when function :func:`skl2onnx.convert_sklearn`
+# when function :func:`skl2onnx.to_onnx`
 # is called. Let's see what happens without it.
 
 from sklearn.datasets import load_iris
@@ -130,9 +130,9 @@ from sklearn.linear_model import LogisticRegression
 clf = LogisticRegression()
 clf.fit(X, y)
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 try:
-    model_onnx = convert_sklearn(clf)
+    model_onnx = to_onnx(clf)
 except Exception as e:
     print(e)
 
@@ -168,7 +168,7 @@ print(inputs)
 # Let's convert again.
 
 try:
-    model_onnx = convert_sklearn(clf, initial_types=inputs)
+    model_onnx = to_onnx(clf, initial_types=inputs)
 except Exception as e:
     print(e)
 
@@ -177,7 +177,7 @@ except Exception as e:
 # with one input vector of dimension 2.
 # Let's try it that way:
 
-model_onnx = convert_sklearn(clf, initial_types=[('X', FloatTensorType([1, 2]))])
+model_onnx = to_onnx(clf, initial_types=[('X', FloatTensorType([1, 2]))])
 print(str(model_onnx)[:300] + "\n...")
 
 ##################################
@@ -197,7 +197,7 @@ pipe = Pipeline(steps=[
                       ])
 pipe.fit(data[['X1', 'X2']], y)
 
-pipe_onnx = convert_sklearn(pipe, initial_types=inputs)
+pipe_onnx = to_onnx(pipe, initial_types=inputs)
 print(str(pipe_onnx)[:300] + "\n...")
 
 #########################################
@@ -240,7 +240,7 @@ print(inputs)
 # The new *initial_types* makes the conversion fail.
 
 try:
-    pipe_onnx = convert_sklearn(pipe, initial_types=inputs)
+    pipe_onnx = to_onnx(pipe, initial_types=inputs)
 except Exception as e:
     print(e)
 

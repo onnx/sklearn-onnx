@@ -11,7 +11,7 @@ from ..common._apply_operation import apply_mul, apply_identity
 from ..proto import onnx_proto
 
 
-def convert_sklearn_tfidf_transformer(scope, operator, container):
+def to_onnx_tfidf_transformer(scope, operator, container):
     # TODO: use sparse containers when available
     op = operator.raw_operator
     data = operator.input_full_names
@@ -81,4 +81,4 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
 
 
 register_converter('SklearnTfidfTransformer',
-                   convert_sklearn_tfidf_transformer)
+                   to_onnx_tfidf_transformer)

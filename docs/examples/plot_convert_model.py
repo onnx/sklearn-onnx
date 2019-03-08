@@ -38,10 +38,10 @@ print(clr)
 # Convert a model into ONNX
 # +++++++++++++++++++++++++
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 initial_type = [('float_input', FloatTensorType([1, 4]))]
-onx = convert_sklearn(clr, initial_types=initial_type)
+onx = to_onnx(clr, initial_types=initial_type)
 
 with open("rf_iris.onnx", "wb") as f:
     f.write(onx.SerializeToString())
@@ -64,7 +64,7 @@ from sklearn.linear_model import LogisticRegression
 clr = LogisticRegression()
 clr.fit(X_train, y_train)
 initial_type = [('float_input', FloatTensorType([1, X_train.shape[1]]))]
-onx = convert_sklearn(clr, initial_types=initial_type)
+onx = to_onnx(clr, initial_types=initial_type)
 with open("logreg_iris.onnx", "wb") as f:
     f.write(onx.SerializeToString())
 

@@ -10,7 +10,7 @@ from ..common._apply_operation import apply_concat, apply_cast
 from ..common._registration import register_converter
 
 
-def convert_sklearn_polynomial_features(scope, operator, container):
+def to_onnx_polynomial_features(scope, operator, container):
     op = operator.raw_operator
     transformed_columns = [None] * (op.n_output_features_)
 
@@ -69,4 +69,4 @@ def convert_sklearn_polynomial_features(scope, operator, container):
 
 
 register_converter('SklearnPolynomialFeatures',
-                   convert_sklearn_polynomial_features)
+                   to_onnx_polynomial_features)

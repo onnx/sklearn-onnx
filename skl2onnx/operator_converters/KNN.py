@@ -12,7 +12,7 @@ from ..common._registration import register_converter
 import numpy as np
 
 
-def convert_sklearn_knn(scope, operator, container):
+def to_onnx_knn(scope, operator, container):
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only
@@ -306,6 +306,6 @@ def convert_sklearn_knn(scope, operator, container):
                   container)
 
 
-register_converter('SklearnKNeighborsClassifier', convert_sklearn_knn)
-register_converter('SklearnKNeighborsRegressor', convert_sklearn_knn)
-register_converter('SklearnNearestNeighbors', convert_sklearn_knn)
+register_converter('SklearnKNeighborsClassifier', to_onnx_knn)
+register_converter('SklearnKNeighborsRegressor', to_onnx_knn)
+register_converter('SklearnNearestNeighbors', to_onnx_knn)

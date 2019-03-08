@@ -111,9 +111,9 @@ pprint.pprint(inputs)
 # Convert the pipeline into ONNX
 # ++++++++++++++++++++++++++++++
 
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+    model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
 except Exception as e:
     print(e)
     
@@ -127,7 +127,7 @@ X_test['pclass'] = X_test['pclass'].astype(str)
 to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
 inputs = convert_dataframe_schema(X_train, to_drop)
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+model_onnx = to_onnx(clf, 'pipeline_titanic', inputs)
 
 
 # And save.

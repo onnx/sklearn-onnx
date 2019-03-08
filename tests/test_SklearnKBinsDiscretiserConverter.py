@@ -5,7 +5,7 @@ Tests scikit-learn's KBinsDiscretiser converter.
 import numpy as np
 import unittest
 from sklearn.preprocessing import KBinsDiscretizer
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
@@ -18,7 +18,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=3, encode='ordinal',
                                  strategy='uniform').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
@@ -30,7 +30,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='ordinal',
                                  strategy='quantile').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
@@ -42,7 +42,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=3, encode='ordinal',
                                  strategy='kmeans').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
@@ -54,7 +54,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='onehot-dense',
                                  strategy='uniform').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
@@ -66,7 +66,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=[3, 2, 3, 4], encode='onehot-dense',
                                  strategy='quantile').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
@@ -78,7 +78,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(nbins=3, encode='onehot-dense',
                                  strategy='kmeans').fit(X)
-        model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
+        model_onnx = to_onnx(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
