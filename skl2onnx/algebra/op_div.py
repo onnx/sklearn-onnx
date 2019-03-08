@@ -12,16 +12,14 @@ class Div(OnnxOperator):
     This operator supports **multidirectional (i.e., Numpy-style) broadcasting**;
     for more details please check :epkg:`broadcasting`.
 
-    Version
-    -------
+    **Version**
 
     This version of the operator has been available since version 7
     of the default ONNX operator set.
 
-    Inputs
-    ------
+    **Inputs**
 
-    .. html::
+    .. raw:: html
 
         <dl>
         <dt><tt>A</tt> : T</dt>
@@ -30,20 +28,18 @@ class Div(OnnxOperator):
         <dd>Second operand.</dd>
         </dl>
 
-    Outputs
-    -------
+    **Outputs**
 
-    .. html::
+    .. raw:: html
 
         <dl>
         <dt><tt>C</tt> : T</dt>
         <dd>Result, has same element type as two inputs</dd>
         </dl>
 
-    Type Constraints
-    ----------------
+    **Type Constraints**
 
-    .. html::
+    .. raw:: html
 
         <dl>
         <dt><tt>T</tt> : tensor(uint32), tensor(uint64), tensor(int32), tensor(int64), tensor(float16), tensor(float), tensor(double)</dt>
@@ -51,8 +47,7 @@ class Div(OnnxOperator):
         </dl>
 
 
-    Examples
-    --------
+    **Examples**
 
     .. runpython::
         :showcode:
@@ -70,14 +65,11 @@ class Div(OnnxOperator):
         y = np.array([3, 2, 1]).astype(np.float32)
         z = x * y
         print(z)
-        expect(node, inputs=[x, y], outputs=[z],
-               name='test_div_example')
 
         x = np.random.randn(3, 4, 5).astype(np.float32)
         y = np.random.randn(3, 4, 5).astype(np.float32)
         z = x - y
-        expect(node, inputs=[x, y], outputs=[z],
-               name='test_div')
+        print(z)
 
     .. runpython::
         :showcode:
@@ -95,7 +87,5 @@ class Div(OnnxOperator):
         y = np.random.randn(5).astype(np.float32)
         z = x * y
         print(z)
-        expect(node, inputs=[x, y], outputs=[z],
-               name='test_div_bcast')
     """
     pass

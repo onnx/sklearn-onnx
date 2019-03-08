@@ -51,7 +51,7 @@ with open("rf_iris.onnx", "wb") as f:
 # Compute ONNX prediction similarly as scikit-learn transformer
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from onnxruntime.sklapi import OnnxTransformer
+from skonnxrt.sklapi import OnnxTransformer
 
 with open("rf_iris.onnx", "rb") as f:
     content = f.read()

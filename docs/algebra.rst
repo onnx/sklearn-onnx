@@ -11,6 +11,9 @@ Implemented *ONNX* operators.
 Tensors
 =======
 
-.. autofunction:: skl2onnx.algebra.Gemm
-
-.. autofunction:: skl2onnx.algebra.Sub
+.. toctree::
+    
+    operators/div
+    operators/gemm
+    operators/mul
+    operators/sub

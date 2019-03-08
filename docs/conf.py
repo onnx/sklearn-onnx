@@ -36,6 +36,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx_skl2onnx_extension',
     "sphinxcontrib.blockdiag",
+    "pyquickhelper.sphinxext.sphinx_runpython_extension",
+    "pyquickhelper.sphinxext.sphinx_epkg_extension",
 ]
 
 templates_path = ['_templates']
@@ -64,6 +66,12 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 sphinx_gallery_conf = {
      'examples_dirs': 'examples',
      'gallery_dirs': 'auto_examples',
+}
+
+# -- epkg -----------
+
+epkg_dictionary = {
+    'broadcasting': 'https://github.com/onnx/onnx/blob/master/docs/Broadcasting.md',
 }
 
 # -- Setup actions -----------------------------------------------------------
