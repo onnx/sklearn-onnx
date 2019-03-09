@@ -6,11 +6,12 @@
 
 import numpy as np
 from ..common._apply_operation import (
-    apply_add, apply_cast, apply_div, apply_exp, apply_mul,
+    apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
     apply_reshape, apply_sub)
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
+from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 from ..proto import onnx_proto
 
 
@@ -66,7 +67,7 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     reduced_exp_result_name = scope.get_unique_variable_name(
         'reduced_exp_result')
     normaliser_name = scope.get_unique_variable_name('normaliser')
-    zero_scaler_name = scope.get_unique_variable_name('zero_scaler')
+    zero_scalar_name = scope.get_unique_variable_name('zero_scalar')
     comparison_result_name = scope.get_unique_variable_name(
         'comparison_result')
     cast_output_name = scope.get_unique_variable_name('cast_output')
@@ -81,7 +82,7 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     container.add_initializer(
         mul_operand_name, onnx_proto.TensorProto.FLOAT,
         [], [1. / (model.n_classes_ - 1)])
-    container.add_initializer(zero_scaler_name,
+    container.add_initializer(zero_scalar_name,
                               onnx_proto.TensorProto.INT32, [], [0])
 
     container.add_node('Sum', proba_names_list,
@@ -100,7 +101,7 @@ def _normalise_probability(scope, container, operator, proba_names_list,
                   desired_shape=(-1, 1))
     apply_cast(scope, normaliser_name, cast_normaliser_name,
                container, to=onnx_proto.TensorProto.INT32)
-    container.add_node('Equal', [cast_normaliser_name, zero_scaler_name],
+    container.add_node('Equal', [cast_normaliser_name, zero_scalar_name],
                        comparison_result_name,
                        name=scope.get_unique_operator_name('Equal'))
     apply_cast(scope, comparison_result_name, cast_output_name,
@@ -204,5 +205,135 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
                       desired_shape=(-1,))
 
 
+def _get_estimators_label(scope, operator, container, model):
+    """
+    This function computes labels for each estimator and returns
+    a tensor produced by concatenating the labels.
+    """
+    op_type = 'TreeEnsembleRegressor'
+
+    concatenated_labels_name = scope.get_unique_variable_name(
+        'concatenated_labels')
+
+    estimators_results_list = []
+    for tree_id in range(len(model.estimators_)):
+        estimator_label_name = scope.get_unique_variable_name(
+            'estimator_label')
+
+        attrs = get_default_tree_regressor_attribute_pairs()
+        attrs['name'] = scope.get_unique_operator_name(op_type)
+        attrs['n_targets'] = int(model.estimators_[tree_id].n_outputs_)
+        add_tree_to_attribute_pairs(attrs, False,
+                                    model.estimators_[tree_id].tree_,
+                                    0, model.learning_rate, 0, False)
+
+        container.add_node(op_type, operator.input_full_names,
+                           estimator_label_name, op_domain='ai.onnx.ml',
+                           **attrs)
+
+        estimators_results_list.append(estimator_label_name)
+    apply_concat(scope, estimators_results_list, concatenated_labels_name,
+                 container, axis=1)
+    return concatenated_labels_name
+
+
+def convert_sklearn_ada_boost_regressor(scope, operator, container):
+    """
+    Converter for AdaBoost regressor.
+    This function first calls _get_estimators_label() which returns a
+    tensor of concatenated labels predicted by each estimator. Then,
+    median is calculated and returned as the final output.
+    """
+    op = operator.raw_operator
+
+    negate_name = scope.get_unique_variable_name('negate')
+    estimators_weights_name = scope.get_unique_variable_name(
+        'estimators_weights')
+    half_scalar_name = scope.get_unique_variable_name('half_scalar')
+    zeroth_index_name = scope.get_unique_variable_name('zeroth_index')
+    last_index_name = scope.get_unique_variable_name('last_index')
+    negated_labels_name = scope.get_unique_variable_name('negated_labels')
+    sorted_values_name = scope.get_unique_variable_name('sorted_values')
+    sorted_indices_name = scope.get_unique_variable_name('sorted_indices')
+    input_shape_result_name = scope.get_unique_variable_name(
+        'input_shape_result')
+    instances_length_name = scope.get_unique_variable_name(
+        'instances_length')
+    weights_matrix_name = scope.get_unique_variable_name('weights_matrix')
+    weights_name = scope.get_unique_variable_name('weights')
+    weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
+    median_value_name = scope.get_unique_variable_name('median_value')
+    comp_value_name = scope.get_unique_variable_name('comp_value')
+    median_or_above_name = scope.get_unique_variable_name('median_or_above')
+    median_idx_name = scope.get_unique_variable_name('median_idx')
+    negated_final_labels_name = scope.get_unique_variable_name(
+        'negated_final_labels')
+
+    container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
+                              [], [-1])
+    container.add_initializer(estimators_weights_name,
+                              onnx_proto.TensorProto.FLOAT,
+                              op.estimator_weights_.shape,
+                              op.estimator_weights_)
+    container.add_initializer(half_scalar_name, onnx_proto.TensorProto.FLOAT,
+                              [], [0.5])
+    container.add_initializer(zeroth_index_name, onnx_proto.TensorProto.INT64,
+                              [], [0])
+    container.add_initializer(last_index_name, onnx_proto.TensorProto.INT64,
+                              [], [-1])
+
+    concatenated_labels = _get_estimators_label(scope, operator,
+                                                container, op)
+    apply_mul(scope, [concatenated_labels, negate_name],
+              negated_labels_name, container, broadcast=1)
+    container.add_node('TopK', negated_labels_name,
+                       [sorted_values_name, sorted_indices_name],
+                       name=scope.get_unique_operator_name('TopK'),
+                       k=len(op.estimators_))
+    container.add_node('Shape', operator.input_full_names,
+                       input_shape_result_name,
+                       name=scope.get_unique_operator_name('Shape'))
+    container.add_node(
+        'ArrayFeatureExtractor', [input_shape_result_name, zeroth_index_name],
+        instances_length_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    container.add_node('Tile',
+                       [estimators_weights_name, instances_length_name],
+                       weights_matrix_name, op_version=6,
+                       name=scope.get_unique_operator_name('Tile'))
+    container.add_node(
+        'ArrayFeatureExtractor', [weights_matrix_name, sorted_indices_name],
+        weights_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    # CumSum op needs to be added to onnx.
+    # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2740
+    container.add_node('CumSum', weights_name,
+                       weights_cdf_name, axis=1,
+                       name=scope.get_unique_operator_name('CumSum'))
+    container.add_node(
+        'ArrayFeatureExtractor', [weights_cdf_name, last_index_name],
+        median_value_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    apply_mul(scope, [median_value_name, half_scalar_name],
+              comp_value_name, container, broadcast=1)
+    container.add_node(
+        'Less', [weights_cdf_name, comp_value_name],
+        median_or_above_name,
+        name=scope.get_unique_operator_name('Less'))
+    # ArgMin op needs to support boolean.
+    # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2755
+    container.add_node('ArgMin', median_or_above_name,
+                       median_idx_name,
+                       name=scope.get_unique_operator_name('ArgMin'), axis=1)
+    container.add_node(
+        'ArrayFeatureExtractor', [sorted_values_name, median_idx_name],
+        negated_final_labels_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    apply_mul(scope, [negated_final_labels_name, negate_name],
+              operator.output_full_names, container, broadcast=1)
+
+
 register_converter('SklearnAdaBoostClassifier',
                    convert_sklearn_ada_boost_classifier)
+register_converter('SklearnAdaBoostRegressor',
+                   convert_sklearn_ada_boost_regressor)
