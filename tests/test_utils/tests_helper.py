@@ -221,7 +221,8 @@ def dump_data_and_model(data, model, onnx=None, basename="model", folder=None,
             else:
                 try:
                     output, lambda_onnx = compare_backend(b, runtime_test, options=extract_options(basename),
-                                                          context=context, verbose=verbose)
+                                                          context=context, verbose=verbose,
+                                                          comparable_outputs=comparable_outputs)
                 except AssertionError as e:
                     if dump_error_log:
                         with open(error_dump, "w", encoding="utf-8") as f:
