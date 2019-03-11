@@ -18,7 +18,7 @@ class AlgebraSymbolic:
         def __getitem__(self, index):
             return AlgebraSymbolic.ArrayPos(self, index)
 
-    class Array:
+    class ArrayPosition:
         def __init__(self, array, position):
             self.array = array
             self.position = position
@@ -27,11 +27,11 @@ class AlgebraSymbolic:
             return AlgebraSymbolic.ArrayPos(self, index)
 
     @property
-    def I(self):
+    def In(self):
         return AlgebraSymbolic.Array("I")
 
     @property
-    def O(self):
+    def Out(self):
         return AlgebraSymbolic.Array("O")
 
 

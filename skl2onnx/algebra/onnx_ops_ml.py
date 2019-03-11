@@ -4,13 +4,15 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .onnx_operator import OP, OnnxOperator
+from .onnx_operator import OnnxOperator
 
 
 class ArrayFeatureExtractor(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `ArrayFeatureExtractor <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.ArrayFeatureExtractor>`_.
+    See `ArrayFeatureExtractor
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.ArrayFeatureExtractor>`_.
     """
     pass
 
@@ -18,7 +20,9 @@ class ArrayFeatureExtractor(OnnxOperator):
 class Binarizer(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `Binarizer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Binarizer>`_.
+    See `Binarizer
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.Binarizer>`_.
     """
     pass
 
@@ -26,7 +30,9 @@ class Binarizer(OnnxOperator):
 class CastMap(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `CastMap <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.CastMap>`_.
+    See `CastMap
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.CastMap>`_.
     """
     pass
 
@@ -34,7 +40,9 @@ class CastMap(OnnxOperator):
 class CategoryMapper(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `CategoryMapper <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.CategoryMapper>`_.
+    See `CategoryMapper
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.CategoryMapper>`_.
     """
     pass
 
@@ -42,7 +50,9 @@ class CategoryMapper(OnnxOperator):
 class DictVectorizer(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `DictVectorizer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.DictVectorizer>`_.
+    See `DictVectorizer
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.DictVectorizer>`_.
     """
     pass
 
@@ -50,7 +60,9 @@ class DictVectorizer(OnnxOperator):
 class FeatureVectorizer(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `FeatureVectorizer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.FeatureVectorizer>`_.
+    See `FeatureVectorizer
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.FeatureVectorizer>`_.
     """
     pass
 
@@ -58,7 +70,9 @@ class FeatureVectorizer(OnnxOperator):
 class Imputer(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `Imputer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer>`_.
+    See `Imputer
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.Imputer>`_.
     """
     pass
 
@@ -66,7 +80,9 @@ class Imputer(OnnxOperator):
 class LabelEncoder(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `LabelEncoder <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.LabelEncoder>`_.
+    See `LabelEncoder
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.LabelEncoder>`_.
     """
     pass
 
@@ -74,7 +90,9 @@ class LabelEncoder(OnnxOperator):
 class LinearClassifier(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `LinearClassifier <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.LinearClassifier>`_.
+    See `LinearClassifier
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.LinearClassifier>`_.
     """
     pass
 
@@ -82,7 +100,9 @@ class LinearClassifier(OnnxOperator):
 class LinearRegressor(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `LinearRegressor <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.LinearRegressor>`_.
+    See `LinearRegressor
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.LinearRegressor>`_.
     """
     pass
 
@@ -90,7 +110,9 @@ class LinearRegressor(OnnxOperator):
 class Normalizer(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `Normalizer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Normalizer>`_.
+    See `Normalizer
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.Normalizer>`_.
     """
     pass
 
@@ -98,7 +120,9 @@ class Normalizer(OnnxOperator):
 class OneHotEncoder(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `OneHotEncoder <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.OneHotEncoder>`_.
+    See `OneHotEncoder
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.OneHotEncoder>`_.
     """
     pass
 
@@ -106,7 +130,9 @@ class OneHotEncoder(OnnxOperator):
 class SVMClassifier(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `SVMClassifier <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.SVMClassifier>`_.
+    See `SVMClassifier
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.SVMClassifier>`_.
     """
     pass
 
@@ -114,7 +140,9 @@ class SVMClassifier(OnnxOperator):
 class SVMRegressor(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `SVMRegressor <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.SVMRegressor>`_.
+    See `SVMRegressor
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.SVMRegressor>`_.
     """
     pass
 
@@ -122,7 +150,9 @@ class SVMRegressor(OnnxOperator):
 class Scaler(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `Scaler <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler>`_.
+    See `Scaler
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.Scaler>`_.
     """
     pass
 
@@ -130,7 +160,9 @@ class Scaler(OnnxOperator):
 class TreeEnsembleClassifier(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `TreeEnsembleClassifier <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.TreeEnsembleClassifier>`_.
+    See `TreeEnsembleClassifier
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.TreeEnsembleClassifier>`_.
     """
     pass
 
@@ -138,7 +170,9 @@ class TreeEnsembleClassifier(OnnxOperator):
 class TreeEnsembleRegressor(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `TreeEnsembleRegressor <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.TreeEnsembleRegressor>`_.
+    See `TreeEnsembleRegressor
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.TreeEnsembleRegressor>`_.
     """
     pass
 
@@ -146,6 +180,8 @@ class TreeEnsembleRegressor(OnnxOperator):
 class ZipMap(OnnxOperator):
     """
     Domain is ``ai.onnx.ml``.
-    See `ZipMap <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.ZipMap>`_.
+    See `ZipMap
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md#ai.onnx.ml.ZipMap>`_.
     """
     pass

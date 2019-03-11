@@ -22,11 +22,13 @@ class TestParseOnnxOperators(unittest.TestCase):
         ops = reg.findall(content)
         assert len(ops) > 0
 
-        template = textwrap.dedent("""
+        template = textwrap.dedent('''
             class {0}(OnnxOperator):
-                "See `{0} <https://github.com/onnx/onnx/blob/master/docs/Operators.md#{0}>`_."
+                """See `{0}
+                <https://github.com/onnx/onnx/blob/master/docs/
+                Operators.md#{0}>`_."""
                 pass
-        """)
+        ''')
         
         rows = []
         for op in ops:
@@ -54,7 +56,9 @@ class TestParseOnnxOperators(unittest.TestCase):
             class {1}(OnnxOperator):
                 """
                 Domain is ``ai.onnx.ml``.
-                See `{1} <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#{0}>`_.
+                See `{1}
+                <https://github.com/onnx/onnx/blob/master/docs/
+                Operators-ml.md#{0}>`_.
                 """
                 pass
         ''')
