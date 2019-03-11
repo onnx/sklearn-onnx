@@ -29,6 +29,7 @@ from sklearn.multiclass import OneVsRestClassifier
 
 # Tree-based models
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.ensemble import GradientBoostingClassifier
@@ -104,7 +105,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                AdaBoostClassifier, VotingClassifier,
+                AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,
