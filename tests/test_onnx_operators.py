@@ -2,10 +2,15 @@ import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_iris
+from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.algebra.onnx_ops import Sub, Div
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.algebra.onnx_ops import ReduceSumSquare, Gemm, Add, ArgMin, Sqrt
+from test_utils import dump_data_and_model
 
 
 class TestOnnxOperators(unittest.TestCase):
@@ -89,6 +94,39 @@ class TestOnnxOperators(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
         assert_almost_equal(z, z2)
+        
+    def test_sub_kmeans(self):
+
+        def conv(scope, operator, container):
+            X = operator.inputs[0]
+            out = operator.outputs
+            op = operator.raw_operator
+
+            C = op.cluster_centers_
+            C2 = row_norms(C, squared=True)
+
+            N = X.type.shape[0]
+            zeros = np.zeros((N, ))
+
+            rs = ReduceSumSquare(X, axes=[1], keepdims=1)
+            z = Add(rs, Gemm(X, C, zeros, alpha=-2., transB=1))
+            y2 = Add(C2, z)
+            l = ArgMin(y2, axis=1, keepdims=0, outputs=out[:1])
+            y2s = Sqrt(y2, outputs=out[1:])
+
+            l.add_to(scope, container)
+            y2s.add_to(scope, container)
+
+        data = load_iris()
+        X = data.data
+        model = KMeans(n_clusters=3)
+        model.fit(X)
+
+        model_onnx = convert_sklearn(model, 'a-kmeans', [('input', FloatTensorType([1, X.shape[1]]))],
+                                     custom_conversion_functions={KMeans: conv})
+
+        dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
+                            basename="SklearnKMeansCustom-Dec4")
 
 
 if __name__ == "__main__":
