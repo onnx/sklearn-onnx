@@ -38,7 +38,8 @@ class GraphState:
 
     def _get_var_name(self, var, output):
         if isinstance(var, str):
-            return self.scope.get_unique_variable_name("{}_o".format(var)) if output else var
+            return self.scope.get_unique_variable_name(
+                "{}_o".format(var)) if output else var
         elif isinstance(var, Variable):
             return var.full_name
         elif isinstance(var, np.ndarray):
@@ -66,7 +67,8 @@ class GraphState:
                 ty = onnx_proto.TensorProto.FLOAT
             else:
                 raise NotImplementedError(
-                    "Unable to guess ONNX type from type {}.".format(cst.dtype))
+                    "Unable to guess ONNX type from type {}.".format(
+                        cst.dtype))
             self.container.add_initializer(
                 name, ty, shape, cst.astype(np.float64).flatten())
             return name
