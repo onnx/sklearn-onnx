@@ -4,7 +4,7 @@ from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.algebra import OP, Sub, Div
+from skl2onnx.algebra.onnx_ops import Sub, Div
 from skl2onnx.common.data_types import FloatTensorType
 
 

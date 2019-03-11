@@ -5,4 +5,3 @@
 # --------------------------------------------------------------------------
 
 from .onnx_operator import OP, OnnxOperator
-from .onnx_spec import Div, Gemm, Mul, Sub
