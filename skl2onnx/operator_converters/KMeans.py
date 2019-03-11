@@ -4,8 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..proto import onnx_proto
-from ..common._apply_operation import apply_add, apply_gemm, apply_sqrt
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import ReduceSumSquare, Gemm, Add, ArgMin, Sqrt
 import numpy as np
@@ -66,20 +64,20 @@ X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1) <- C [k, n]
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
-    
+
     C = op.cluster_centers_
     C2 = row_norms(C, squared=True)
-    
+
     N = X.type.shape[0]
     zeros = np.zeros((N, ))
-    
+
     rs = ReduceSumSquare(X, axes=[1], keepdims=1)
     z = Add(rs, Gemm(X, C, zeros, alpha=-2., transB=1))
     y2 = Add(C2, z)
-    l = ArgMin(y2, axis=1, keepdims=0, outputs=out[:1])
+    ll = ArgMin(y2, axis=1, keepdims=0, outputs=out[:1])
     y2s = Sqrt(y2, outputs=out[1:])
-    
-    l.add_to(scope, container)
+
+    ll.add_to(scope, container)
     y2s.add_to(scope, container)
 
 
