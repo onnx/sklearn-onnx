@@ -53,7 +53,7 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
 
 # Neural Networks
-from sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 
 # Clustering
 from sklearn.cluster import KMeans, MiniBatchKMeans
@@ -116,7 +116,7 @@ def build_sklearn_operator_name_map():
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
                 LinearRegression, Lasso, LassoLars, Ridge,
-                MLPClassifier,
+                MLPClassifier, MLPRegressor,
                 MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,

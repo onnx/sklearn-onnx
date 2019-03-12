@@ -89,6 +89,7 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     """
     mlp_op = operator.raw_operator
     classes = mlp_op.classes_
+
     y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
 
     classes_name = scope.get_unique_variable_name('classes')
@@ -147,5 +148,19 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
                       desired_shape=(-1))
 
 
+def convert_sklearn_mlp_regressor(scope, operator, container):
+    """
+    Converter for MLPRegressor.
+    This function calls _predict() which returns the scores.
+    """
+    mlp_op = operator.raw_operator
+
+    y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
+    apply_identity(scope, y_pred,
+                   operator.output_full_names, container)
+
+
 register_converter('SklearnMLPClassifier',
                    convert_sklearn_mlp_classifier)
+register_converter('SklearnMLPRegressor',
+                   convert_sklearn_mlp_regressor)
