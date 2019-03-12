@@ -5,7 +5,6 @@ Benchmark of onnxruntime on RandomForest.
 # Authors: Xavier Dupré (benchmark)
 # License: MIT
 import matplotlib
-matplotlib.use('Agg')
 
 from io import BytesIO
 from time import perf_counter as time
@@ -18,6 +17,7 @@ from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.utils.testing import ignore_warnings
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
@@ -112,14 +112,14 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
 
                         # measures the baseline
                         st = time()
-                        r = 0
+                        repeated = 0
                         for X in Xs:
                             p1 = fct1(X)
-                            r += 1
+                            repeated += 1
                             if time() - st >= 1:
                                 break  # stops if longer than a second
                         end = time()
-                        obs["time_skl"] = (end - st) / r
+                        obs["time_skl"] = (end - st) / repeated
 
                         # measures the new implementation
                         st = time()
@@ -127,10 +127,10 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
                         for X in Xs:
                             p2 = fct2(X)
                             r2 += 1
-                            if r2 >= r:
+                            if r2 >= repeated:
                                 break
                         end = time()
-                        obs["time_ort"] = (end - st) / r
+                        obs["time_ort"] = (end - st) / repeated
                         res.append(obs)
                         if verbose and (len(res) % 1 == 0 or n >= 10000):
                             print("bench", len(res), ":", obs)
@@ -190,6 +190,7 @@ def plot_results(df, verbose=False):
     plt.suptitle("Benchmark for RandomForest sklearn/onnxruntime", fontsize=16)
 
 
+@ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 100]
     methods = ['predict', 'predict_proba']
@@ -230,4 +231,4 @@ if __name__ == '__main__':
     df = run_bench(verbose=True)
     plt.savefig("bench_plot_onnxruntime_random_forest.png")
     df.to_csv("bench_plot_onnxruntime_random_forest.csv", index=False)
-    # plt.show()
+    plt.show()
