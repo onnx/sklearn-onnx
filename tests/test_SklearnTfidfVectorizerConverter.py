@@ -40,8 +40,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
+        # onnxruntime fails with empty strings
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
@@ -206,7 +207,6 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         dump_data_and_model(corpus, vect, model_onnx,
                             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
-
 
 
 if __name__ == "__main__":
