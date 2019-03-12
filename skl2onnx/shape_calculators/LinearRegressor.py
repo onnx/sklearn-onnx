@@ -8,6 +8,8 @@ from ..common._registration import register_shape_calculator
 from ..common.shape_calculator import calculate_linear_regressor_output_shapes
 
 
+register_shape_calculator('SklearnAdaBoostRegressor',
+                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnElasticNetRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnLinearRegressor',
