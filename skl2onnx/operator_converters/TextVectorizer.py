@@ -77,14 +77,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
         attrs.update({
-            'casechangeaction': 'LOWER',
+            'case_change_action': 'LOWER',
             'is_case_sensitive': not op.lowercase,
         })
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
         normalized = scope.get_unique_variable_name('normalized')
         container.add_node(op_type, operator.input_full_names,
-                           normalized, op_domain='com.microsoft', **attrs)
+                           normalized, op_version=9,
+                           op_domain='ai.onnx', **attrs)
     else:
         normalized = operator.input_full_names
 
