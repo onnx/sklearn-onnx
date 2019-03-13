@@ -1,5 +1,5 @@
 """
-Tests on functions in _apply_operators.
+Tests on functions in common.
 """
 
 import unittest
