@@ -6,10 +6,177 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul
-from ..common._apply_operation import apply_reshape, apply_sub
+from ..common._apply_operation import apply_div, apply_reshape, apply_sub
 from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common._registration import register_converter
 import numpy as np
+
+
+def _get_weights(scope, container, topk_values_name, distance_power):
+    """
+    Get the weights from an array of distances.
+    """
+    unity_name = scope.get_unique_variable_name('unity')
+    weights_name = scope.get_unique_variable_name('weights')
+    root_power_name = scope.get_unique_variable_name('root_power')
+    nearest_distance_name = scope.get_unique_variable_name(
+        'nearest_distance')
+    actual_distance_name = scope.get_unique_variable_name(
+        'actual_distance')
+
+    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+                              [], [1])
+    container.add_initializer(root_power_name,
+                              onnx_proto.TensorProto.FLOAT,
+                              [], [1 / distance_power])
+
+    apply_abs(scope, topk_values_name, nearest_distance_name,
+              container)
+    apply_pow(scope, [nearest_distance_name, root_power_name],
+              actual_distance_name, container)
+    apply_div(scope, [unity_name, actual_distance_name],
+              weights_name, container, broadcast=1)
+    return weights_name
+
+
+def _convert_k_neighbours_classifier(scope, container, operator, classes,
+                                     class_type, training_labels,
+                                     topk_values_name, topk_indices_name):
+    concat_labels_name = scope.get_unique_variable_name('concat_labels')
+    classes_name = scope.get_unique_variable_name('classes')
+    predicted_label_name = scope.get_unique_variable_name(
+        'predicted_label')
+    final_label_name = scope.get_unique_variable_name('final_label')
+    reshaped_final_label_name = scope.get_unique_variable_name(
+        'reshaped_final_label')
+    training_labels_name = scope.get_unique_variable_name(
+        'training_labels')
+    topk_labels_name = scope.get_unique_variable_name('topk_labels')
+
+    labels_name = [None] * len(classes)
+    output_label_name = [None] * len(classes)
+    output_cast_label_name = [None] * len(classes)
+    output_label_reduced_name = [None] * len(classes)
+
+    for i in range(len(classes)):
+        labels_name[i] = scope.get_unique_variable_name(
+            'class_labels_{}'.format(i))
+        container.add_initializer(labels_name[i],
+                                  onnx_proto.TensorProto.INT32, [], [i])
+        output_label_name[i] = scope.get_unique_variable_name(
+            'output_label_{}'.format(i))
+        output_cast_label_name[i] = scope.get_unique_variable_name(
+            'output_cast_label_{}'.format(i))
+        output_label_reduced_name[i] = scope.get_unique_variable_name(
+            'output_label_reduced_{}'.format(i))
+
+    container.add_initializer(classes_name, class_type,
+                              classes.shape, classes)
+
+    container.add_initializer(
+        training_labels_name, onnx_proto.TensorProto.INT32,
+        training_labels.shape, training_labels.ravel())
+    container.add_node(
+        'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
+        topk_labels_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+
+    for i in range(len(classes)):
+        container.add_node('Equal', [labels_name[i], topk_labels_name],
+                           output_label_name[i])
+        apply_cast(scope, output_label_name[i], output_cast_label_name[i],
+                   container, to=onnx_proto.TensorProto.INT32)
+        container.add_node('ReduceSum', output_cast_label_name[i],
+                           output_label_reduced_name[i], axes=[1])
+
+    apply_concat(scope, [s for s in output_label_reduced_name],
+                 concat_labels_name, container, axis=0)
+    container.add_node('ArgMax', concat_labels_name,
+                       predicted_label_name,
+                       name=scope.get_unique_operator_name('ArgMax'))
+    container.add_node(
+        'ArrayFeatureExtractor', [classes_name, predicted_label_name],
+        final_label_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    if class_type == onnx_proto.TensorProto.INT32:
+        apply_reshape(scope, final_label_name, reshaped_final_label_name,
+                      container, desired_shape=(-1,))
+        apply_cast(scope, reshaped_final_label_name,
+                   operator.outputs[0].full_name, container,
+                   to=onnx_proto.TensorProto.INT64)
+    else:
+        apply_reshape(scope, final_label_name,
+                      operator.outputs[0].full_name, container,
+                      desired_shape=(-1,))
+
+    # Calculation of class probability
+    pred_label_shape = [-1]
+
+    cast_pred_label_name = scope.get_unique_variable_name(
+        'cast_pred_label')
+    reshaped_pred_label_name = scope.get_unique_variable_name(
+        'reshaped_pred_label')
+    ohe_result_name = scope.get_unique_variable_name('ohe_result')
+
+    apply_cast(scope, topk_labels_name, cast_pred_label_name, container,
+               to=onnx_proto.TensorProto.INT64)
+    apply_reshape(scope, cast_pred_label_name, reshaped_pred_label_name,
+                  container, desired_shape=pred_label_shape)
+    if class_type == onnx_proto.TensorProto.STRING:
+        container.add_node(
+            'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
+            name=scope.get_unique_operator_name('OneHotEncoder'),
+            cats_strings=classes, op_domain='ai.onnx.ml')
+    else:
+        container.add_node(
+            'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
+            name=scope.get_unique_operator_name('OneHotEncoder'),
+            cats_int64s=classes, op_domain='ai.onnx.ml')
+
+    container.add_node(
+        'ReduceMean', ohe_result_name, operator.outputs[1].full_name,
+        name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
+
+
+def _convert_k_neighbours_regressor(scope, container, new_training_labels,
+                                    new_training_labels_shape,
+                                    topk_values_name, topk_indices_name,
+                                    distance_power, weights):
+    training_labels_name = scope.get_unique_variable_name(
+        'training_labels')
+    topk_labels_name = scope.get_unique_variable_name('topk_labels')
+
+    container.add_initializer(
+        training_labels_name, onnx_proto.TensorProto.FLOAT,
+        new_training_labels_shape,
+        new_training_labels.ravel().astype(float))
+
+    container.add_node(
+        'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
+        topk_labels_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    weighted_labels = topk_labels_name
+    final_op_type = 'ReduceMean'
+    if weights == 'distance':
+        weighted_distance_name = scope.get_unique_variable_name(
+            'weighted_distance')
+        reduced_weights_name = scope.get_unique_variable_name(
+            'reduced_weights')
+        weighted_labels_name = scope.get_unique_variable_name(
+            'weighted_labels')
+
+        weights = _get_weights(
+            scope, container, topk_values_name, distance_power)
+        apply_mul(scope, [topk_labels_name, weights],
+                  weighted_distance_name, container, broadcast=0)
+        container.add_node(
+            'ReduceSum', weights, reduced_weights_name,
+            name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
+        apply_div(scope, [weighted_distance_name, reduced_weights_name],
+                  weighted_labels_name, container, broadcast=1)
+        weighted_labels = weighted_labels_name
+        final_op_type = 'ReduceSum'
+    return final_op_type, weighted_labels
 
 
 def convert_sklearn_knn(scope, operator, container):
@@ -113,15 +280,14 @@ def convert_sklearn_knn(scope, operator, container):
 
     knn = operator.raw_operator
     training_examples = knn._fit_X.astype(float)
-    distance_power = knn.p
+    distance_power = knn.p if knn.metric == 'minkowski' else (
+        2 if knn.metric == 'euclidean' or knn.metric == 'l2' else 1)
 
     if operator.type != 'SklearnNearestNeighbors':
         training_labels = knn._y
-        training_labels_name = scope.get_unique_variable_name(
-                                                'training_labels')
 
     training_examples_name = scope.get_unique_variable_name(
-                                                'training_examples')
+        'training_examples')
     sub_results_name = scope.get_unique_variable_name('sub_results')
     abs_results_name = scope.get_unique_variable_name('abs_results')
     distance_name = scope.get_unique_variable_name('distance')
@@ -129,15 +295,14 @@ def convert_sklearn_knn(scope, operator, container):
     reduced_sum_name = scope.get_unique_variable_name('reduced_sum')
     topk_values_name = scope.get_unique_variable_name('topk_values')
     topk_indices_name = scope.get_unique_variable_name('topk_indices')
-    topk_labels_name = scope.get_unique_variable_name('topk_labels')
     reshaped_result_name = scope.get_unique_variable_name('reshaped_result')
     negate_name = scope.get_unique_variable_name('negate')
     negated_reshaped_result_name = scope.get_unique_variable_name(
-                                                'negated_reshaped_result')
+        'negated_reshaped_result')
 
     container.add_initializer(
-                    training_examples_name, onnx_proto.TensorProto.FLOAT,
-                    training_examples.shape, training_examples.flatten())
+        training_examples_name, onnx_proto.TensorProto.FLOAT,
+        training_examples.shape, training_examples.flatten())
     container.add_initializer(distance_power_name,
                               onnx_proto.TensorProto.FLOAT,
                               [], [distance_power])
@@ -163,19 +328,7 @@ def convert_sklearn_knn(scope, operator, container):
 
     if operator.type == 'SklearnKNeighborsClassifier':
         classes = knn.classes_
-        concat_labels_name = scope.get_unique_variable_name('concat_labels')
-        classes_name = scope.get_unique_variable_name('classes')
-        predicted_label_name = scope.get_unique_variable_name(
-                                                        'predicted_label')
-        final_label_name = scope.get_unique_variable_name('final_label')
-        reshaped_final_label_name = scope.get_unique_variable_name(
-                                                    'reshaped_final_label')
-
         class_type = onnx_proto.TensorProto.STRING
-        labels_name = [None] * len(classes)
-        output_label_name = [None] * len(classes)
-        output_cast_label_name = [None] * len(classes)
-        output_label_reduced_name = [None] * len(classes)
 
         if np.issubdtype(knn.classes_.dtype, np.floating):
             class_type = onnx_proto.TensorProto.INT32
@@ -185,84 +338,9 @@ def convert_sklearn_knn(scope, operator, container):
         else:
             classes = np.array([s.encode('utf-8') for s in classes])
 
-        for i in range(len(classes)):
-            labels_name[i] = scope.get_unique_variable_name(
-                                            'class_labels_{}'.format(i))
-            container.add_initializer(labels_name[i],
-                                      onnx_proto.TensorProto.INT32, [], [i])
-            output_label_name[i] = scope.get_unique_variable_name(
-                                                'output_label_{}'.format(i))
-            output_cast_label_name[i] = scope.get_unique_variable_name(
-                                            'output_cast_label_{}'.format(i))
-            output_label_reduced_name[i] = scope.get_unique_variable_name(
-                                        'output_label_reduced_{}'.format(i))
-
-        container.add_initializer(classes_name, class_type,
-                                  classes.shape, classes)
-
-        container.add_initializer(
-                    training_labels_name, onnx_proto.TensorProto.INT32,
-                    training_labels.shape, training_labels.ravel())
-        container.add_node(
-            'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
-            topk_labels_name, op_domain='ai.onnx.ml',
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-
-        for i in range(len(classes)):
-            container.add_node('Equal', [labels_name[i], topk_labels_name],
-                               output_label_name[i])
-            apply_cast(scope, output_label_name[i], output_cast_label_name[i],
-                       container, to=onnx_proto.TensorProto.INT32)
-            container.add_node('ReduceSum', output_cast_label_name[i],
-                               output_label_reduced_name[i], axes=[1])
-
-        apply_concat(scope, [s for s in output_label_reduced_name],
-                     concat_labels_name, container, axis=0)
-        container.add_node('ArgMax', concat_labels_name,
-                           predicted_label_name,
-                           name=scope.get_unique_operator_name('ArgMax'))
-        container.add_node(
-            'ArrayFeatureExtractor', [classes_name, predicted_label_name],
-            final_label_name, op_domain='ai.onnx.ml',
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-        if class_type == onnx_proto.TensorProto.INT32:
-            apply_reshape(scope, final_label_name, reshaped_final_label_name,
-                          container, desired_shape=(-1,))
-            apply_cast(scope, reshaped_final_label_name,
-                       operator.outputs[0].full_name, container,
-                       to=onnx_proto.TensorProto.INT64)
-        else:
-            apply_reshape(scope, final_label_name,
-                          operator.outputs[0].full_name, container,
-                          desired_shape=(-1,))
-
-        # Calculation of class probability
-        pred_label_shape = [-1]
-
-        cast_pred_label_name = scope.get_unique_variable_name(
-                                                        'cast_pred_label')
-        reshaped_pred_label_name = scope.get_unique_variable_name(
-                                                    'reshaped_pred_label')
-        ohe_result_name = scope.get_unique_variable_name('ohe_result')
-
-        apply_cast(scope, topk_labels_name, cast_pred_label_name, container,
-                   to=onnx_proto.TensorProto.INT64)
-        apply_reshape(scope, cast_pred_label_name, reshaped_pred_label_name,
-                      container, desired_shape=pred_label_shape)
-        if class_type == onnx_proto.TensorProto.STRING:
-            container.add_node(
-                'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
-                name=scope.get_unique_operator_name('OneHotEncoder'),
-                cats_strings=classes, op_domain='ai.onnx.ml')
-        else:
-            container.add_node(
-                'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
-                name=scope.get_unique_operator_name('OneHotEncoder'),
-                cats_int64s=classes, op_domain='ai.onnx.ml')
-
-        container.add_node(
-            'ReduceMean', ohe_result_name, operator.outputs[1].full_name,
-            name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
+        _convert_k_neighbours_classifier(
+            scope, container, operator, classes, class_type, training_labels,
+            topk_values_name, topk_indices_name)
     elif operator.type == 'SklearnKNeighborsRegressor':
         multi_reg = (len(training_labels.shape) > 1 and
                      (len(training_labels.shape) > 2 or
@@ -279,29 +357,24 @@ def convert_sklearn_knn(scope, operator, container):
             shape = training_labels.shape
             new_training_labels = training_labels
 
-        container.add_initializer(
-                training_labels_name, onnx_proto.TensorProto.FLOAT,
-                shape, new_training_labels.ravel().astype(float))
-        container.add_node(
-            'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
-            topk_labels_name, op_domain='ai.onnx.ml',
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-
+        final_op_type, weighted_labels = _convert_k_neighbours_regressor(
+            scope, container, new_training_labels, shape,
+            topk_values_name, topk_indices_name, distance_power, knn.weights)
         if multi_reg:
             means_name = scope.get_unique_variable_name('means')
             container.add_node(
-                'ReduceMean', topk_labels_name, means_name,
-                name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
+                final_op_type, weighted_labels, means_name,
+                name=scope.get_unique_operator_name(final_op_type), axes=[1])
             apply_transpose(scope, means_name, operator.output_full_names,
                             container, perm=perm)
         else:
             container.add_node(
-                'ReduceMean', topk_labels_name, operator.output_full_names,
-                name=scope.get_unique_operator_name('ReduceMean'), axes=[1])
+                final_op_type, weighted_labels, operator.output_full_names,
+                name=scope.get_unique_operator_name(final_op_type), axes=[1])
     elif operator.type == 'SklearnNearestNeighbors':
         container.add_node(
-                'Identity', topk_indices_name, operator.outputs[0].full_name,
-                name=scope.get_unique_operator_name('Identity'))
+            'Identity', topk_indices_name, operator.outputs[0].full_name,
+            name=scope.get_unique_operator_name('Identity'))
         apply_abs(scope, topk_values_name, operator.outputs[1].full_name,
                   container)
 
