@@ -19,9 +19,17 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     Additional options
     ------------------
 
+    regex: string
+        The default will change to true in version 1.6.0.
+        The tokenizer splits into words using this regular
+        expression or the regular expression specified by
+        *scikit-learn* is the value is an empty string.
+        See also note below.
+        Default value: None
     sep: list of separators
         These separators are used to split a string into words.
-        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
+        Options *sep* is ignore if options *regex* is not None.
+        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``.
 
     Example (from :ref:`l-example-tfidfvectorizer`):
 
@@ -32,11 +40,32 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
+
+    The default regular expression of the tokenizer is ``(?u)\\\\b\\\\w\\\\w+\\\\b``
+    (see `re <https://docs.python.org/3/library/re.html>`_).
+    This expression may not supported by the library handling the backend.
+    `onnxruntime <https://github.com/Microsoft/onnxruntime>`_ uses
+    `re2 <https://github.com/google/re2>`_. You may need to switch
+    to a custom tokenizer based on
+    `python wrapper for re2 <https://pypi.org/project/re2/>_`
+    or its sources `pyre2 <https://github.com/facebook/pyre2>`_
+    (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
+    If the regular expression is not specified and if
+    the instance of TfidfVectorizer is using the default
+    pattern ``(?u)\\\\b\\\\w\\\\w+\\\\b``, it is replaced by
+    ``\\\\\\\\b\\\\\\\\w\\\\\\\\w+\\\\\\\\b``. Any other case has to be
+    manually handled.
+
+    Regular expression ``[^\\\\\\\\n]`` is used to split
+    a sentance into character (and not works) if ``analyser=='char'``.
+    The mode ``analyser=='char_wb'`` is not implemented.
+    ````
+    
     """ # noqa
 
     op = operator.raw_operator
 
-    if op.analyzer != "word":
+    if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
             "only tokenizer='word' is supported.")
@@ -46,16 +75,43 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "only stip_accents=None is supported.")
 
     options = container.get_options(
-            op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
-    if set(options) != {'sep'}:
+            op, dict(sep="DEFAULT",
+                     regex=None))
+    if set(options) != {'sep', 'regex'}:
         raise RuntimeError("Unknown option {} for {}".format(
                                 set(options) - {'sep'}, type(op)))
-    default_pattern = '(?u)\\b\\w\\w+\\b'
-    default_separators = options['sep']
-    if op.token_pattern != default_pattern:
-        raise NotImplementedError(
-            "Only the default tokenizer based on default regular expression "
-            "'{0}' is implemented.".format(default_pattern))
+
+    if op.analyzer == 'word':
+        default_pattern = '(?u)\\b\\w\\w+\\b'
+        if options['sep'] == "DEFAULT" and options['regex'] is None:
+            warnings.warn("Converter for TfidfVectorizer will use scikit-learn regular expression by default in 0.16",
+                          DeprecationWarning)
+            default_separators = [' ', '.', '?', ',', ';', ':', '!']
+            regex = None
+            if op.token_pattern != default_pattern:
+                raise NotImplementedError(
+                    "Only the default tokenizer based on default regular expression "
+                    "'{0}' is implemented.".format(default_pattern))
+        elif options['regex'] is not None:
+            if options['regex']:
+                regex = options['regex']
+            else:
+                regex = op.token_pattern
+                if regex == default_pattern:
+                    regex = '\\\\b(\\\\w\\\\w+)\\\\b'
+            default_separators = None
+        else:
+            regex = None
+            default_separators = options['sep']
+    else:
+        if options['sep'] != 'DEFAULT':
+            raise RuntimeError("Option sep has not effect if analyser != 'word'.")
+        if options['regex']:
+            regex = options['regex']
+        else:
+            regex = '[^\\\\n]'
+        default_separators = None
+
     if op.preprocessor is not None:
         raise NotImplementedError(
             "Custom preprocessor cannot be converted into ONNX.")
@@ -65,11 +121,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.strip_accents is not None:
         raise NotImplementedError(
             "Operator StringNormalizer cannot remove accents.")
-
-    msg = ("The default regular expression '{0}' splits strings based on "
-           "anything but a space. The current specification splits strings "
-           "based on the following separators {1}.")
-    warnings.warn(msg.format(default_pattern, default_separators))
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
@@ -98,10 +149,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs.update({
         'pad_value': padvalue,
-        'separators': default_separators,
         'mark': False,
         'mincharnum': 1,
     })
+    if regex is None:
+        attrs['separators'] = default_separators
+    else:
+        attrs['tokenexp'] = regex
 
     tokenized = scope.get_unique_variable_name('tokenized')
     container.add_node(op_type, normalized, tokenized,
