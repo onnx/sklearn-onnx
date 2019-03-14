@@ -6,7 +6,8 @@
 
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul
-from ..common._apply_operation import apply_div, apply_reshape, apply_sub
+from ..common._apply_operation import apply_add, apply_div
+from ..common._apply_operation import apply_reshape, apply_sub
 from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common._registration import register_converter
 import numpy as np
@@ -23,6 +24,15 @@ def _get_weights(scope, container, topk_values_name, distance_power):
         'nearest_distance')
     actual_distance_name = scope.get_unique_variable_name(
         'actual_distance')
+    mask_name = scope.get_unique_variable_name('mask')
+    mask_int_name = scope.get_unique_variable_name('mask_int')
+    mask_sum_name = scope.get_unique_variable_name('mask_sum')
+    bool_mask_sum_name = scope.get_unique_variable_name('bool_mask_sum')
+    mask_complement_name = scope.get_unique_variable_name('mask_complement')
+    mask_complement_float_name = scope.get_unique_variable_name(
+        'mask_complement_float')
+    masked_weights_name = scope.get_unique_variable_name('masked_weights')
+    final_weights_name = scope.get_unique_variable_name('final_weights')
 
     container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
                               [], [1])
@@ -36,7 +46,28 @@ def _get_weights(scope, container, topk_values_name, distance_power):
               actual_distance_name, container)
     apply_div(scope, [unity_name, actual_distance_name],
               weights_name, container, broadcast=1)
-    return weights_name
+
+    # Handle divide by 0 case
+    container.add_node(
+        'IsNaN', weights_name, mask_name,
+        name=scope.get_unique_operator_name('IsNaN'))
+    apply_cast(scope, mask_name, mask_int_name, container,
+               to=onnx_proto.TensorProto.FLOAT)
+    container.add_node('ReduceSum', mask_int_name,
+                       mask_sum_name, axes=[1],
+                       name=scope.get_unique_operator_name('ReduceSum'))
+    apply_cast(scope, mask_sum_name, bool_mask_sum_name, container,
+               to=onnx_proto.TensorProto.BOOL)
+    container.add_node('Not', bool_mask_sum_name,
+                       mask_complement_name,
+                       name=scope.get_unique_operator_name('Not'))
+    apply_cast(scope, mask_complement_name, mask_complement_float_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    apply_mul(scope, [weights_name, mask_complement_float_name],
+              masked_weights_name, container, broadcast=0)
+    apply_add(scope, [masked_weights_name, mask_int_name], final_weights_name,
+              container, broadcast=0)
+    return final_weights_name
 
 
 def _convert_k_neighbours_classifier(scope, container, operator, classes,
