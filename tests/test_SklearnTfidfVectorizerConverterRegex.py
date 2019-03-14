@@ -25,8 +25,15 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         pat = '\\b(\\w\\w+)\\b'
         reg = re2.compile(pat)
         gr = reg.search(text)
-        self.assertIsTrue(gr is not None)
+        self.assertTrue(gr is not None)
         self.assertEqual(gr.groups(), ('This',))
+
+        text = ';;;b'
+        pat = '(\\w)'
+        reg = re2.compile(pat)
+        gr = reg.search(text)
+        self.assertTrue(gr is not None)
+        self.assertEqual(gr.groups(), ('b',))
 
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
@@ -42,9 +49,216 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')",
-                            verbose=True)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer11_word4(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, token_pattern="[a-zA-Z]{1,4}")
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11Regex4-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer11_empty_string(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                '',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        # TfidfVectorizer in onnxruntime fails with empty strings
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyStringRegex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
+
+    def test_model_tfidf_vectorizer11_out_vocabulary(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        corpus = numpy.array([
+                'AZZ ZZ This is the first document.',
+                'BZZ ZZ This document is the second document.',
+                'ZZZ ZZ And this is the third one.',
+                'WZZ ZZ Is this the first document?',
+                ]).reshape((4, 1))
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11OutVocabRegex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer22(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(2, 2), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer12(self):
+        corpus = numpy.array([
+                'AA AA',
+                'AA AA BB',
+                ]).reshape((2, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22SRegex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer12(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer12_normL1(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 2), norm='l1')
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L1Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer12_normL2(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 2), norm='l2')
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer13(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the first document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 3), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer13Regex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_model_tfidf_vectorizer11parenthesis_class(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the (first) document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        extra = {TfidfVectorizer: {'sep': [' ', '.', '?', ',', ';', ':', '!', '(', ')'],
+                                   'regex': None}}
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=extra)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx,
+                            basename="SklearnTfidfVectorizer11ParenthesisClassRegex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.0') or "
+                                          "StrictVersion(onnx.__version__) <= StrictVersion('1.3')")
+
+    def test_model_tfidf_vectorizer11_idparenthesis_id(self):
+        corpus = numpy.array([
+                'This is the first document.',
+                'This document is the second document.',
+                'And this is the third one.',
+                'Is this the (first) document?',
+                ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        pred = vect.transform(corpus.ravel())
+        
+        extra = {id(vect): {"sep2": [' ', '.', '?', ',', ';', ':', '!', '(', ')'],
+                            'regex': None}}
+        try:
+            convert_sklearn(vect, 'TfidfVectorizer',
+                            [('input', StringTensorType([1, 1]))],
+                            options=extra)
+        except RuntimeError:
+            pass
+        
+        extra = {id(vect): {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')'],
+                            "regex": None}}
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1, 1]))],
+                                     options=extra)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(corpus, vect, model_onnx,
+                            basename="SklearnTfidfVectorizer11ParenthesisIdRegex-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

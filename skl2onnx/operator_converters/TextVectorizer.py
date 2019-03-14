@@ -84,21 +84,20 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'
         if options['sep'] == "DEFAULT" and options['regex'] is None:
-            warnings.warn("Converter for TfidfVectorizer will use scikit-learn regular expression by default in 0.16",
+            warnings.warn("Converter for TfidfVectorizer will use scikit-learn regular expression by default in version 1.6.",
                           DeprecationWarning)
             default_separators = [' ', '.', '?', ',', ';', ':', '!']
-            regex = None
-            if op.token_pattern != default_pattern:
-                raise NotImplementedError(
-                    "Only the default tokenizer based on default regular expression "
-                    "'{0}' is implemented.".format(default_pattern))
+            regex = op.token_pattern
+            if regex == default_pattern:
+                regex = '(?U)\\b\\w\\w+\\b'
+            default_separators = None
         elif options['regex'] is not None:
             if options['regex']:
                 regex = options['regex']
             else:
                 regex = op.token_pattern
                 if regex == default_pattern:
-                    regex = '\\\\b(\\\\w\\\\w+)\\\\b'
+                    regex = '(?U)\\b\\w\\w+\\b'
             default_separators = None
         else:
             regex = None
@@ -109,7 +108,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         if options['regex']:
             regex = options['regex']
         else:
-            regex = '[^\\\\n]'
+            regex = '.'
         default_separators = None
 
     if op.preprocessor is not None:
@@ -135,7 +134,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             attrs['stopwords'] = list(sorted(op.stop_words_))
         normalized = scope.get_unique_variable_name('normalized')
         container.add_node(op_type, operator.input_full_names,
-                           normalized, op_version=9,
+                           normalized, op_version=10,
                            op_domain='ai.onnx', **attrs)
     else:
         normalized = operator.input_full_names
@@ -165,7 +164,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     # Tokenizer outputs shape {1, C} or {1, 1, C}.
     # Second shape is not allowed by TfIdfVectorizer.
     # We use Flatten which produces {1, C} in both cases.
-    flatt_tokenized = scope.get_unique_variable_name('flatoken')
+    flatt_tokenized = scope.get_unique_variable_name('flattened')
     container.add_node("Flatten", tokenized, flatt_tokenized,
                        name=scope.get_unique_operator_name('Flatten'))
     tokenized = flatt_tokenized

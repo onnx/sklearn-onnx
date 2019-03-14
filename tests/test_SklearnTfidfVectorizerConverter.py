@@ -45,7 +45,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
-        # onnxruntime fails with empty strings
+
+        # TfidfVectorizer in onnxruntime fails with empty strings
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyStringSep-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
