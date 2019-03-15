@@ -14,7 +14,9 @@ def _intelligent_split(text, op, tokenizer, existing):
     merges tokens with ``' '.join(tokens)``
     to name ngrams. ``'a  b'`` could be ``('a ', 'b')``
     or ``('a', ' b')``.
-    See `ngram sequence <https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L169>`_.
+    See `ngram sequence
+    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    sklearn/feature_extraction/text.py#L169>`_.
     """
     if op.analyzer == 'word':
         if op.ngram_range[0] == op.ngram_range[1] == 1:
@@ -35,17 +37,18 @@ def _intelligent_split(text, op, tokenizer, existing):
             spl = tokenizer(text)
     else:
         spl = list(text)
-        
+
     spl = tuple(spl)
     if spl in existing:
-        raise RuntimeError("The converter cannot guess how to split an expression "
-                           "into tokens.")
+        raise RuntimeError("The converter cannot guess how to "
+                           "split an expression into tokens.")
     if op.ngram_range[0] == 1:
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
-                raise RuntimeError("Unable to split n-grams '{}' into tokens existing in the vocabulary.".format(text))
-
+                raise RuntimeError("Unable to split n-grams '{}' "
+                                   "into tokens existing in the "
+                                   "vocabulary.".format(text))
     existing.add(spl)
     return spl
 
