@@ -209,8 +209,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx,
                             basename="SklearnTfidfVectorizer11ParenthesisClassSep-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.0') or "
-                                          "StrictVersion(onnx.__version__) <= StrictVersion('0.3.0')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0') or "
+                                          "StrictVersion(onnx.__version__) <= StrictVersion('1.4.1')")
 
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
