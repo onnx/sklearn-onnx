@@ -8,6 +8,48 @@ import warnings
 from ..common._registration import register_converter
 
 
+def _intelligent_split(text, op, tokenizer, existing):
+    """
+    Splits text into tokens. *scikit-learn*
+    merges tokens with ``' '.join(tokens)``
+    to name ngrams. ``'a  b'`` could be ``('a ', 'b')``
+    or ``('a', ' b')``.
+    See `ngram sequence <https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L169>`_.
+    """
+    if op.analyzer == 'word':
+        if op.ngram_range[0] == op.ngram_range[1] == 1:
+            spl = [text]
+        elif '  ' not in text:
+            if text.startswith(' '):
+                if text.endswith(' '):
+                    spl = text[1: -1].split()
+                else:
+                    spl = text[1:].split()
+            elif text.endswith(' '):
+                spl = text[: -1].split()
+            else:
+                spl = text.split()
+        else:
+            # We reuse the tokenizer hoping that will clear
+            # ambiguities but this might be slow.
+            spl = tokenizer(text)
+    else:
+        spl = list(text)
+        
+    spl = tuple(spl)
+    if spl in existing:
+        raise RuntimeError("The converter cannot guess how to split an expression "
+                           "into tokens.")
+    if op.ngram_range[0] == 1:
+        # All grams should be existing in the vocabulary.
+        for g in spl:
+            if g not in op.vocabulary_:
+                raise RuntimeError("Unable to split n-grams '{}' into tokens existing in the vocabulary.".format(text))
+
+    existing.add(spl)
+    return spl
+
+
 def convert_sklearn_text_vectorizer(scope, operator, container):
     """
     Converters for class
@@ -189,7 +231,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     # Scikit-learn sorts n-grams by alphabetical order..
     # onnx assumes it is sorted by n.
-    split_words = [(w.split(), w) for w in words]
+    tokenizer = op.build_tokenizer()
+    split_words = []
+    existing = set()
+    for w in words:
+        spl = _intelligent_split(w, op, tokenizer, existing)
+        split_words.append((spl, w))
+
     ng_split_words = [(len(a[0]), a[0], i) for i, a in enumerate(split_words)]
     ng_split_words.sort()
     key_indices = [a[2] for a in ng_split_words]

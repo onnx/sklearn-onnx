@@ -139,7 +139,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22SRegex-OneOff-SklCol",
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer12SRegex-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_tfidf_vectorizer12(self):
@@ -156,7 +156,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer12Regex-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_tfidf_vectorizer12_normL1(self):
@@ -172,7 +172,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L1Regex-OneOff-SklCol",
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer12L1Regex-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_tfidf_vectorizer12_normL2(self):
@@ -189,7 +189,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2Regex-OneOff-SklCol",
+        dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer12L2Regex-OneOff-SklCol",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
     def test_model_tfidf_vectorizer13(self):
