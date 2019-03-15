@@ -41,8 +41,11 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
                                      [('input', FloatTensorType([1, 4]))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X_test.astype(np.float32), model, model_onnx,
-                            basename="SklearnMLPClassifierMultiClass")
+        dump_data_and_model(
+            X_test.astype(np.float32), model, model_onnx,
+            basename="SklearnMLPClassifierMultiClass",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_regressor_default(self):
         data = load_diabetes()
@@ -53,8 +56,11 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
                                      [('input', FloatTensorType([1, 10]))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X_test.astype(np.float32), model, model_onnx,
-                            basename="SklearnMLPRegressor")
+        dump_data_and_model(
+            X_test.astype(np.float32), model, model_onnx,
+            basename="SklearnMLPRegressor",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_classifier_multiclass_identity(self):
         data = load_digits()
@@ -67,20 +73,25 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.int64), model, model_onnx,
-            basename="SklearnMLPClassifierMultiClassIdentityActivation")
+            basename="SklearnMLPClassifierMultiClassIdentityActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_regressor_identity(self):
         data = load_diabetes()
         X, y = data.data, data.target
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42)
-        model = MLPRegressor(activation='identity').fit(X_train, y_train)
+        model = MLPRegressor(activation='identity').fit(
+            X_train.astype(np.int64), y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
-                                     [('input', FloatTensorType([1, 10]))])
+                                     [('input', Int64TensorType([1, 10]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPRegressorIdentityActivation")
+            X_test.astype(np.int64), model, model_onnx,
+            basename="SklearnMLPRegressorIdentityActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_classifier_multiclass_logistic(self):
         data = load_iris()
@@ -93,7 +104,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPClassifierMultiClassLogisticActivation")
+            basename="SklearnMLPClassifierMultiClassLogisticActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_regressor_logistic(self):
         data = load_diabetes()
@@ -106,7 +119,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPRegressorLogisticActivation")
+            basename="SklearnMLPRegressorLogisticActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_classifier_multiclass_tanh(self):
         data = load_iris()
@@ -119,7 +134,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPClassifierMultiClassTanhActivation")
+            basename="SklearnMLPClassifierMultiClassTanhActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
     def test_model_mlp_regressor_tanh(self):
         data = load_diabetes()
@@ -132,7 +149,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPRegressorTanhActivation")
+            basename="SklearnMLPRegressorTanhActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
