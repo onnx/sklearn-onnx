@@ -24,7 +24,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPClassifier().fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
-                                     [('input', FloatTensorType([1, 4]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -39,7 +39,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPClassifier().fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
-                                     [('input', FloatTensorType([1, 4]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -54,7 +54,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPRegressor().fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
-                                     [('input', FloatTensorType([1, 10]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -69,7 +69,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPClassifier(activation='identity').fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
-                                     [('input', Int64TensorType([1, 64]))])
+                                     [('input', Int64TensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.int64), model, model_onnx,
@@ -85,7 +85,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = MLPRegressor(activation='identity').fit(
             X_train.astype(np.int64), y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
-                                     [('input', Int64TensorType([1, 10]))])
+                                     [('input', Int64TensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.int64), model, model_onnx,
@@ -100,7 +100,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPClassifier(activation='logistic').fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
-                                     [('input', FloatTensorType([1, 4]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -115,7 +115,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPRegressor(activation='logistic').fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
-                                     [('input', FloatTensorType([1, 10]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -130,7 +130,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPClassifier(activation='tanh').fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPClassifier',
-                                     [('input', FloatTensorType([1, 4]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
@@ -145,7 +145,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X, y, test_size=0.2, random_state=42)
         model = MLPRegressor(activation='tanh').fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'scikit-learn MLPRegressor',
-                                     [('input', FloatTensorType([1, 10]))])
+                                     [('input', FloatTensorType(X_test.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,

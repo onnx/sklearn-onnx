@@ -72,7 +72,7 @@ def _predict(scope, input_name, container, model):
     This function initialises the input layer, calls _forward_pass()
     and returns the final layer.
     """
-    cast_input_name = scope.get_unique_variable_name('classes_input')
+    cast_input_name = scope.get_unique_variable_name('cast_input')
 
     apply_cast(scope, input_name, cast_input_name,
                container, to=onnx_proto.TensorProto.FLOAT)
