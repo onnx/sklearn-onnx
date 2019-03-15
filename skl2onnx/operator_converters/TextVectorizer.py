@@ -84,7 +84,9 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'
         if options['sep'] == "DEFAULT" and options['regex'] is None:
-            warnings.warn("Converter for TfidfVectorizer will use scikit-learn regular expression by default in version 1.6.",
+            warnings.warn("Converter for TfidfVectorizer will use "
+                          "scikit-learn regular expression by default "
+                          "in version 1.6.",
                           DeprecationWarning)
             default_separators = [' ', '.', '?', ',', ';', ':', '!']
             regex = op.token_pattern
@@ -104,7 +106,8 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             default_separators = options['sep']
     else:
         if options['sep'] != 'DEFAULT':
-            raise RuntimeError("Option sep has not effect if analyser != 'word'.")
+            raise RuntimeError("Option sep has not effect "
+                               "if analyser != 'word'.")
         if options['regex']:
             regex = options['regex']
         else:
