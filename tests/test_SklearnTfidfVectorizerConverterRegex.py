@@ -15,26 +15,6 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     def get_options(self):
         return {TfidfVectorizer: {"regex": ""}}
 
-    def test_re2(self):
-        try:
-            import re2
-        except ImportError:
-            warnings.warning("re2 cannot be tested because not installed.")
-            return
-        text = 'This is the first document.'
-        pat = '\\b(\\w\\w+)\\b'
-        reg = re2.compile(pat)
-        gr = reg.search(text)
-        self.assertTrue(gr is not None)
-        self.assertEqual(gr.groups(), ('This',))
-
-        text = ';;;b'
-        pat = '(\\w)'
-        reg = re2.compile(pat)
-        gr = reg.search(text)
-        self.assertTrue(gr is not None)
-        self.assertEqual(gr.groups(), ('b',))
-
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
                 'This is the first document.',

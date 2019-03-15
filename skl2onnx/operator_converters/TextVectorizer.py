@@ -98,7 +98,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     If the regular expression is not specified and if
     the instance of TfidfVectorizer is using the default
     pattern ``(?u)\\\\b\\\\w\\\\w+\\\\b``, it is replaced by
-    ``\\\\\\\\b\\\\\\\\w\\\\\\\\w+\\\\\\\\b``. Any other case has to be
+    ``[a-zA-Z0-9_]+``. Any other case has to be
     manually handled.
 
     Regular expression ``[^\\\\\\\\n]`` is used to split
@@ -136,7 +136,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             default_separators = [' ', '.', '?', ',', ';', ':', '!']
             regex = op.token_pattern
             if regex == default_pattern:
-                regex = '(?U)\\b\\w\\w+\\b'
+                regex = '[a-zA-Z0-9_]+'
             default_separators = None
         elif options['regex'] is not None:
             if options['regex']:
@@ -144,7 +144,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             else:
                 regex = op.token_pattern
                 if regex == default_pattern:
-                    regex = '(?U)\\b\\w\\w+\\b'
+                    regex = '[a-zA-Z0-9_]+'
             default_separators = None
         else:
             regex = None
