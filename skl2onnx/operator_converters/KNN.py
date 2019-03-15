@@ -4,13 +4,74 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..proto import onnx_proto
+import numpy as np
+
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul
 from ..common._apply_operation import apply_add, apply_div
 from ..common._apply_operation import apply_reshape, apply_sub
 from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common._registration import register_converter
-import numpy as np
+from ..proto import onnx_proto
+
+
+def _calculate_weights(scope, container, unity, distance):
+    """
+    weights = 1 / distance
+    Handle divide by 0.
+    """
+    weights_name = scope.get_unique_variable_name('weights')
+    ceil_result_name = scope.get_unique_variable_name('ceil_result')
+    floor_result_name = scope.get_unique_variable_name('floor_result')
+    mask_sum_name = scope.get_unique_variable_name('mask_sum')
+    bool_mask_sum_name = scope.get_unique_variable_name('bool_mask_sum')
+    ceil_floor_sum_name = scope.get_unique_variable_name('ceil_floor_sum')
+    distance_without_zero_name = scope.get_unique_variable_name(
+        'distance_without_zero')
+    not_ceil_floor_sum_name = scope.get_unique_variable_name(
+        'not_ceil_floor_sum')
+    bool_ceil_floor_sum_name = scope.get_unique_variable_name(
+        'bool_ceil_floor_sum')
+    bool_not_ceil_floor_sum_name = scope.get_unique_variable_name(
+        'bool_not_ceil_floor_sum')
+    mask_sum_complement_name = scope.get_unique_variable_name(
+        'mask_sum_complement')
+    mask_sum_complement_float_name = scope.get_unique_variable_name(
+        'mask_sum_complement_float')
+    masked_weights_name = scope.get_unique_variable_name('masked_weights')
+    final_weights_name = scope.get_unique_variable_name('final_weights')
+
+    container.add_node('Ceil', distance, ceil_result_name,
+                       name=scope.get_unique_operator_name('Ceil'))
+    container.add_node('Floor', distance, floor_result_name,
+                       name=scope.get_unique_operator_name('Floor'))
+    apply_add(scope, [ceil_result_name, floor_result_name],
+              ceil_floor_sum_name, container, broadcast=0)
+    apply_cast(scope, ceil_floor_sum_name, bool_ceil_floor_sum_name, container,
+               to=onnx_proto.TensorProto.BOOL)
+    container.add_node('Not', bool_ceil_floor_sum_name,
+                       bool_not_ceil_floor_sum_name,
+                       name=scope.get_unique_operator_name('Not'))
+    apply_cast(scope, bool_not_ceil_floor_sum_name, not_ceil_floor_sum_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    apply_add(scope, [distance, not_ceil_floor_sum_name],
+              distance_without_zero_name, container, broadcast=0)
+    apply_div(scope, [unity, distance_without_zero_name],
+              weights_name, container, broadcast=1)
+    container.add_node('ReduceSum', not_ceil_floor_sum_name,
+                       mask_sum_name, axes=[1],
+                       name=scope.get_unique_operator_name('ReduceSum'))
+    apply_cast(scope, mask_sum_name, bool_mask_sum_name, container,
+               to=onnx_proto.TensorProto.BOOL)
+    container.add_node('Not', bool_mask_sum_name,
+                       mask_sum_complement_name,
+                       name=scope.get_unique_operator_name('Not'))
+    apply_cast(scope, mask_sum_complement_name, mask_sum_complement_float_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    apply_mul(scope, [weights_name, mask_sum_complement_float_name],
+              masked_weights_name, container, broadcast=1)
+    apply_add(scope, [masked_weights_name, not_ceil_floor_sum_name],
+              final_weights_name, container, broadcast=0)
+    return final_weights_name
 
 
 def _get_weights(scope, container, topk_values_name, distance_power):
@@ -18,21 +79,11 @@ def _get_weights(scope, container, topk_values_name, distance_power):
     Get the weights from an array of distances.
     """
     unity_name = scope.get_unique_variable_name('unity')
-    weights_name = scope.get_unique_variable_name('weights')
     root_power_name = scope.get_unique_variable_name('root_power')
     nearest_distance_name = scope.get_unique_variable_name(
         'nearest_distance')
     actual_distance_name = scope.get_unique_variable_name(
         'actual_distance')
-    mask_name = scope.get_unique_variable_name('mask')
-    mask_int_name = scope.get_unique_variable_name('mask_int')
-    mask_sum_name = scope.get_unique_variable_name('mask_sum')
-    bool_mask_sum_name = scope.get_unique_variable_name('bool_mask_sum')
-    mask_complement_name = scope.get_unique_variable_name('mask_complement')
-    mask_complement_float_name = scope.get_unique_variable_name(
-        'mask_complement_float')
-    masked_weights_name = scope.get_unique_variable_name('masked_weights')
-    final_weights_name = scope.get_unique_variable_name('final_weights')
 
     container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
                               [], [1])
@@ -44,30 +95,9 @@ def _get_weights(scope, container, topk_values_name, distance_power):
               container)
     apply_pow(scope, [nearest_distance_name, root_power_name],
               actual_distance_name, container)
-    apply_div(scope, [unity_name, actual_distance_name],
-              weights_name, container, broadcast=1)
-
-    # Handle divide by 0 case
-    container.add_node(
-        'IsNaN', weights_name, mask_name,
-        name=scope.get_unique_operator_name('IsNaN'))
-    apply_cast(scope, mask_name, mask_int_name, container,
-               to=onnx_proto.TensorProto.FLOAT)
-    container.add_node('ReduceSum', mask_int_name,
-                       mask_sum_name, axes=[1],
-                       name=scope.get_unique_operator_name('ReduceSum'))
-    apply_cast(scope, mask_sum_name, bool_mask_sum_name, container,
-               to=onnx_proto.TensorProto.BOOL)
-    container.add_node('Not', bool_mask_sum_name,
-                       mask_complement_name,
-                       name=scope.get_unique_operator_name('Not'))
-    apply_cast(scope, mask_complement_name, mask_complement_float_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
-    apply_mul(scope, [weights_name, mask_complement_float_name],
-              masked_weights_name, container, broadcast=0)
-    apply_add(scope, [masked_weights_name, mask_int_name], final_weights_name,
-              container, broadcast=0)
-    return final_weights_name
+    weights_name = _calculate_weights(scope, container, unity_name,
+                                      actual_distance_name)
+    return weights_name
 
 
 def _convert_k_neighbours_classifier(scope, container, operator, classes,
@@ -196,12 +226,12 @@ def _convert_k_neighbours_regressor(scope, container, new_training_labels,
         weighted_labels_name = scope.get_unique_variable_name(
             'weighted_labels')
 
-        weights = _get_weights(
+        weights_val = _get_weights(
             scope, container, topk_values_name, distance_power)
-        apply_mul(scope, [topk_labels_name, weights],
+        apply_mul(scope, [topk_labels_name, weights_val],
                   weighted_distance_name, container, broadcast=0)
         container.add_node(
-            'ReduceSum', weights, reduced_weights_name,
+            'ReduceSum', weights_val, reduced_weights_name,
             name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
         apply_div(scope, [weighted_distance_name, reduced_weights_name],
                   weighted_labels_name, container, broadcast=1)
@@ -363,7 +393,7 @@ def convert_sklearn_knn(scope, operator, container):
 
         if np.issubdtype(knn.classes_.dtype, np.floating):
             class_type = onnx_proto.TensorProto.INT32
-            classes = np.array(list(map(lambda x: int(x), classes)))
+            classes = classes.astype(np.int32)
         elif np.issubdtype(knn.classes_.dtype, np.signedinteger):
             class_type = onnx_proto.TensorProto.INT32
         else:
