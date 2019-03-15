@@ -67,14 +67,18 @@ def _forward_pass(scope, container, model, activations):
     return activations
 
 
-def _predict(scope, X, container, model):
+def _predict(scope, input_name, container, model):
     """
     This function initialises the input layer, calls _forward_pass()
     and returns the final layer.
     """
-    activations = [X]
+    cast_input_name = scope.get_unique_variable_name('classes_input')
+
+    apply_cast(scope, input_name, cast_input_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+
     # forward propagate
-    activations = _forward_pass(scope, container, model, activations)
+    activations = _forward_pass(scope, container, model, [cast_input_name])
     return activations[-1]
 
 
@@ -89,15 +93,14 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     """
     mlp_op = operator.raw_operator
     classes = mlp_op.classes_
-
-    y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
+    class_type = onnx_proto.TensorProto.STRING
 
     classes_name = scope.get_unique_variable_name('classes')
     argmax_output_name = scope.get_unique_variable_name('argmax_output')
     array_feature_extractor_result_name = scope.get_unique_variable_name(
         'array_feature_extractor_result')
 
-    class_type = onnx_proto.TensorProto.STRING
+    y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
 
     if np.issubdtype(mlp_op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
@@ -110,9 +113,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type,
                               classes.shape, classes)
 
-    container.add_node('ArgMax', y_pred,
-                       argmax_output_name, axis=1,
-                       name=scope.get_unique_operator_name('ArgMax'))
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, argmax_output_name],
         array_feature_extractor_result_name, op_domain='ai.onnx.ml',
@@ -132,6 +132,10 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     else:
         apply_identity(scope, y_pred,
                        operator.outputs[1].full_name, container)
+
+    container.add_node('ArgMax', operator.outputs[1].full_name,
+                       argmax_output_name, axis=1,
+                       name=scope.get_unique_operator_name('ArgMax'))
 
     if class_type == onnx_proto.TensorProto.INT32:
         reshaped_result_name = scope.get_unique_variable_name(
