@@ -20,7 +20,7 @@ jobs:
         onnxrt.version: '==0.2.1'
       Py36-Onnx141:
         python.version: '3.7'
-        onnx.version: '==1.4.1'
+        onnx.version: 'git'
         numpy.version: '==1.16.1'
         onnxrt.version: '==0.3.0'
       Py36-Onnx130:
