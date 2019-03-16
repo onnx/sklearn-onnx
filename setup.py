@@ -32,6 +32,8 @@ with open(README) as f:
     start_pos = long_description.find('## Introduction')
     if start_pos >= 0:
         long_description = long_description[start_pos:]
+    import pypandoc
+    long_description = pypandoc.convert_text(long_description, 'rst', 'md').replace('\r', '')
 
 setup(
     name='skl2onnx',
