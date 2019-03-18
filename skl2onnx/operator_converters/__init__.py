@@ -25,6 +25,7 @@ from . import LabelBinariser
 from . import LabelEncoder
 from . import LinearClassifier
 from . import LinearRegressor
+from . import multilayer_perceptron
 from . import NaiveBayes
 from . import Normalizer
 from . import OneHotEncoder
@@ -59,6 +60,7 @@ __all__ = [
     LabelEncoder,
     LinearClassifier,
     LinearRegressor,
+    multilayer_perceptron,
     NaiveBayes,
     Normalizer,
     OneHotEncoder,
