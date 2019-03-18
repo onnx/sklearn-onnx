@@ -34,9 +34,11 @@ with open(README) as f:
         long_description = long_description[start_pos:]
     try:
         import pypandoc
-        long_description = pypandoc.convert_text(long_description, 'rst', 'md').replace('\r', '')
-    except ImportError:
+        long_description = pypandoc.convert_text(long_description, 'rst', 'md')
+    except Exception:
+        # ImportError or pandoc not installed.
         pass
+
 setup(
     name='skl2onnx',
     version=version_str,
@@ -57,8 +59,8 @@ setup(
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License'],
 )
