@@ -22,10 +22,20 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
 
     if op.n_classes_ == 2:
         transform = 'LOGISTIC'
-        base_values = [op.init_.prior]
+        # class_prior_ was introduced in scikit-learn 0.21.
+        if hasattr(op.init_, 'class_prior_'):
+            base_values = op.init_.class_prior_
+            assert base_values.shape == (2, )
+        else:
+            base_values = [op.init_.prior]
     else:
         transform = 'SOFTMAX'
-        base_values = op.init_.priors
+        # class_prior_ was introduced in scikit-learn 0.21.
+        if hasattr(op.init_, 'class_prior_'):
+            base_values = op.init_.class_prior_
+        else:
+            base_values = op.init_.priors
+
     attrs['base_values'] = [float(v) for v in base_values]
     attrs['post_transform'] = transform
 
@@ -66,8 +76,15 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
-    attrs['base_values'] = ([float(op.init_.mean)] if op.loss == 'ls'
-                            else [float(op.init_.quantile)])
+
+    # constant_ was introduced in scikit-learn 0.21.
+    if hasattr(op.init_, 'constant_'):
+        cst = [float(x) for x in op.init_.constant_]
+    elif op.loss == 'ls':
+        cst = [op.init_.mean]
+    else:
+        cst = [op.init_.quantile]
+    attrs['base_values'] = cst
 
     tree_weight = op.learning_rate
     for i in range(op.n_estimators):
