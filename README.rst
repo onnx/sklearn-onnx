@@ -27,7 +27,7 @@ or submit a new one.
 Installation
 ++++++++++++
 
-You can install from [PyPi](https://pypi.org/project/skl2onnx/)::
+You can install from `PyPi <https://pypi.org/project/skl2onnx/>`_::
 
     pip install skl2onnx
 
