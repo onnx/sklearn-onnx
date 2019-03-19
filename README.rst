@@ -1,7 +1,7 @@
-.. image:: docs/logo_main.png"
+.. image:: docs/logo_main.png
     :width: 50%
 
-.. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
+.. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master
     :alt: Build Status
     :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
 
@@ -10,7 +10,7 @@ Introduction
 
 *sklearn-onnx* converts 
 `scikit-learn <https://scikit-learn.org/stable/>`_ models 
-to `ONNX <https://github.com/onnx/onnx>`. 
+to `ONNX <https://github.com/onnx/onnx>`_. 
 Once in the ONNX format, you can use tools like
 `ONNX Runtime <https://github.com/Microsoft/onnxruntime>`_
 for high performance scoring.
