@@ -25,7 +25,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model = GradientBoostingClassifier(n_estimators=3)
         dump_multiple_classification(model, verbose=True,
                                      allow_failure="StrictVersion(onnxruntime.__version__)"
-                                                   "<= StrictVersion('0.3.0')"))
+                                                   "<= StrictVersion('0.3.0')")
 
     def _fit_regression_model(self, model):
         X, y = make_regression(n_features=4, random_state=42)
