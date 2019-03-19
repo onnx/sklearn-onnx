@@ -21,7 +21,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalUniform")
+                            basename="SklearnKBinsDiscretiserOrdinalUniform",
+                            allow_failure="StrictVersion("
+                                          "onnxruntime.__version__)"
+                                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_ordinal_quantile(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -32,7 +35,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalQuantile")
+                            basename="SklearnKBinsDiscretiserOrdinalQuantile",
+                            allow_failure="StrictVersion("
+                                          "onnxruntime.__version__)"
+                                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_ordinal_kmeans(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -43,7 +49,10 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalKMeans")
+                            basename="SklearnKBinsDiscretiserOrdinalKMeans",
+                            allow_failure="StrictVersion("
+                                          "onnxruntime.__version__)"
+                                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_uniform(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -53,8 +62,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseUniform")
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseUniform",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_quantile(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -64,19 +76,25 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseQuantile")
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseQuantile",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_kmeans(self):
-        X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
-                      [0, 2, 7, -9]])
+        X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
+                      [0, 3.2, 4.7, -8.9]])
         model = KBinsDiscretizer(n_bins=3, encode='onehot-dense',
                                  strategy='kmeans').fit(X)
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', FloatTensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.float32), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseKMeans")
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseKMeans",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_ordinal_uniform_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -86,8 +104,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalUniformInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalUniformInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_ordinal_quantile_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -97,8 +118,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalQuantileInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalQuantileInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_ordinal_kmeans_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -108,8 +132,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOrdinalKMeansInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalKMeansInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_uniform_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -119,8 +146,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseUniformInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseUniformInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_quantile_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -130,8 +160,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseQuantileInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseQuantileInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
     def test_model_k_bins_discretiser_onehot_dense_kmeans_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
@@ -141,8 +174,11 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'scikit-learn KBinsDiscretiser',
                                      [('input', Int64TensorType(X.shape))])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X.astype(np.int64), model, model_onnx,
-                basename="SklearnKBinsDiscretiserOneHotDenseKMeansInt")
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseKMeansInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          "<= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

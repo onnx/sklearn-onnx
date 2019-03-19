@@ -29,7 +29,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
         last_column_name, onnx_proto.TensorProto.FLOAT,
         [instances, 1], np.ones((instances, 1)))
 
-    for i in range(len(ranges)):
+    for i, item in enumerate(ranges):
         digitised_output_name[i] = (
             scope.get_unique_variable_name('digitised_output_{}'.format(i)))
         column_index_name = scope.get_unique_variable_name('column_index')
@@ -46,13 +46,13 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
                                   onnx_proto.TensorProto.INT64, [], [i])
         container.add_initializer(range_column_name,
                                   onnx_proto.TensorProto.FLOAT,
-                                  [len(ranges[i])], ranges[i])
+                                  [len(item)], item)
 
         container.add_node(
-                'ArrayFeatureExtractor',
-                [operator.inputs[0].full_name, column_index_name], column_name,
-                name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
-                op_domain='ai.onnx.ml')
+            'ArrayFeatureExtractor',
+            [operator.inputs[0].full_name, column_index_name], column_name,
+            name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
+            op_domain='ai.onnx.ml')
         apply_cast(scope, column_name, cast_column_name,
                    container, to=onnx_proto.TensorProto.FLOAT)
         container.add_node(
@@ -71,11 +71,11 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
                 'onehot_result')
 
             container.add_node(
-                    'OneHotEncoder', argmax_output_name,
-                    onehot_result_name,
-                    name=scope.get_unique_operator_name('OneHotEncoder'),
-                    cats_int64s=list(range(op.n_bins_[i])),
-                    op_domain='ai.onnx.ml')
+                'OneHotEncoder', argmax_output_name,
+                onehot_result_name,
+                name=scope.get_unique_operator_name('OneHotEncoder'),
+                cats_int64s=list(range(op.n_bins_[i])),
+                op_domain='ai.onnx.ml')
             apply_reshape(scope, onehot_result_name, digitised_output_name[i],
                           container, desired_shape=(instances, op.n_bins_[i]))
         else:
