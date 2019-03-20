@@ -159,8 +159,13 @@ class SequenceType(DataType):
 
     def to_onnx_type(self):
         onnx_type = onnx_proto.TypeProto()
-        onnx_type.sequence_type.elem_type.CopyFrom(
-                        self.element_type.to_onnx_type())
+        try:
+            onnx_type.sequence_type.elem_type.CopyFrom(
+                            self.element_type.to_onnx_type())
+        except AttributeError as e:
+            msg = "\n".join([onnx.__version__, str(dir(onnx_type))])
+            raise RuntimeError("Cannot create a sequence. You should update ONNX.\n{0}\n{1}".format(
+                msg, str(self.element_type.to_onnx_type()))) from e
         return onnx_type
 
     def __repr__(self):
