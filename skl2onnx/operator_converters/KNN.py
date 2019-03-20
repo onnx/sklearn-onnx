@@ -360,6 +360,7 @@ def convert_sklearn_knn(scope, operator, container):
     negate_name = scope.get_unique_variable_name('negate')
     negated_reshaped_result_name = scope.get_unique_variable_name(
         'negated_reshaped_result')
+    k_value_name = scope.get_unique_variable_name('k_value')
 
     container.add_initializer(
         training_examples_name, onnx_proto.TensorProto.FLOAT,
@@ -369,6 +370,8 @@ def convert_sklearn_knn(scope, operator, container):
                               [], [distance_power])
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
+    container.add_initializer(k_value_name, onnx_proto.TensorProto.INT64,
+                              [1], [knn.n_neighbors])
 
     apply_sub(scope, [operator.inputs[0].full_name, training_examples_name],
               sub_results_name, container, broadcast=1)
@@ -382,10 +385,9 @@ def convert_sklearn_knn(scope, operator, container):
                   desired_shape=[1, -1])
     apply_mul(scope, [reshaped_result_name, negate_name],
               negated_reshaped_result_name, container, broadcast=1)
-    container.add_node('TopK', negated_reshaped_result_name,
+    container.add_node('TopK', [negated_reshaped_result_name, k_value_name],
                        [topk_values_name, topk_indices_name],
-                       name=scope.get_unique_operator_name('TopK'),
-                       k=knn.n_neighbors)
+                       name=scope.get_unique_operator_name('TopK'))
 
     if operator.type == 'SklearnKNeighborsClassifier':
         classes = knn.classes_

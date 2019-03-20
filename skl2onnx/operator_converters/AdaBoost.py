@@ -268,6 +268,7 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     median_idx_name = scope.get_unique_variable_name('median_idx')
     negated_final_labels_name = scope.get_unique_variable_name(
         'negated_final_labels')
+    k_value_name = scope.get_unique_variable_name('k_value')
 
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
@@ -281,15 +282,16 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
                               [], [0])
     container.add_initializer(last_index_name, onnx_proto.TensorProto.INT64,
                               [], [-1])
+    container.add_initializer(k_value_name, onnx_proto.TensorProto.INT64,
+                              [1], [len(op.estimators_)])
 
     concatenated_labels = _get_estimators_label(scope, operator,
                                                 container, op)
     apply_mul(scope, [concatenated_labels, negate_name],
               negated_labels_name, container, broadcast=1)
-    container.add_node('TopK', negated_labels_name,
+    container.add_node('TopK', [negated_labels_name, k_value_name],
                        [sorted_values_name, sorted_indices_name],
-                       name=scope.get_unique_operator_name('TopK'),
-                       k=len(op.estimators_))
+                       name=scope.get_unique_operator_name('TopK'))
     container.add_node('Shape', operator.input_full_names,
                        input_shape_result_name,
                        name=scope.get_unique_operator_name('Shape'))
