@@ -15,24 +15,34 @@ jobs:
     matrix:
       Py37-OnnxGit:
         python.version: '3.7'
-        onnx.version: 'git'
         numpy.version: '==1.16.1'
+        onnx.version: 'git'
         onnxrt.version: '==0.2.1'
+        sklearn.version: '==0.20.3'
       Py36-Onnx141:
         python.version: '3.7'
-        onnx.version: 'git'
         numpy.version: '==1.16.1'
+        onnx.version: '==1.4.1'
         onnxrt.version: '==0.3.0'
+        sklearn.version: '==0.20.3'
       Py36-Onnx130:
         python.version: '3.6'
-        onnx.version: '==1.3.0'
         numpy.version: '==1.16.1'
+        onnx.version: '==1.3.0'
         onnxrt.version: '==0.2.1'
-      Py35-Onnx141:
+        sklearn.version: '==0.20.3'
+      Py35-OnnxGit:
         python.version: '3.5'
+        numpy.version: '==1.16.1'
         onnx.version: 'git'
         onnxrt.version: '==0.2.1'
-        numpy.version: '==1.16.1'
+        sklearn.version: '==0.20.3'
+      Py37-SklGit:
+        python.version: '3.7'
+        onnx.version: 'git'
+        onnxrt.version: '==0.3.0'
+        numpy.version: '==1.16.2'
+        sklearn.version: 'git'
     maxParallel: 3
 
   steps:
@@ -61,6 +71,16 @@ jobs:
   - script: |
       pip install numpy$(numpy.version)
     displayName: 'install numpy'
+
+  - script: |
+      if [ '$(sklearn.version)' == 'git' ]
+        then
+          git clone https://github.com/scikit-learn/scikit-learn.git --recursive
+          python setup.py install
+        else
+          pip install scikit-learn$(sklearn.version)
+      fi
+    displayName: 'install scikit-learn'
 
   - script: |
       if [ '$(onnx.version)' == 'git' ]
