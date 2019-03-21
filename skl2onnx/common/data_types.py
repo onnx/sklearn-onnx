@@ -164,8 +164,7 @@ class SequenceType(DataType):
                             self.element_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "Cannot create a sequence. "
-                  "You should update ONNX.\n{0}\n{1}"
+            msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
             msg = msg.format(msg, str(self.element_type.to_onnx_type()))
             msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
             raise RuntimeError(msg) from e
