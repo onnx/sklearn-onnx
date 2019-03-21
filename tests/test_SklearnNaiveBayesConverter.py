@@ -39,8 +39,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
                         allow_failure="StrictVersion(onnxruntime.__version__)"
                                        "<= StrictVersion('0.2.1')")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
-                     'Needs greater opset 9')
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_bernoulli_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(BernoulliNB(),
                                                          load_digits())
@@ -52,6 +52,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
                         allow_failure="StrictVersion(onnxruntime.__version__)"
                                        "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_multinomial_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(MultinomialNB(),
                                                              load_iris())
@@ -63,8 +65,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
                         allow_failure="StrictVersion(onnxruntime.__version__)"
                                        "<= StrictVersion('0.2.1')")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
-                     'Needs greater opset 9')
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_bernoulli_nb_multiclass(self):
         model, X = self._fit_model_multiclass_classification(BernoulliNB(),
                                                              load_digits())

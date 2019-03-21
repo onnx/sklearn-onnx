@@ -20,6 +20,8 @@ from test_utils import dump_data_and_model
 
 class TestSklearnPipelineWithinPipeline(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_pipeline_pca_pipeline_minmax(self):        
         model = Pipeline(memory=None,
                     steps=[('PCA', PCA(copy=True, iterated_power='auto',
@@ -121,6 +123,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                         basename="SklearnPipelinePcaPipelineMinMaxNBNone",
                         allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer_pipeline_imputer_scaler_lr(self):
         X = np.array([[1, 2], [3, np.nan], [3, 0]], dtype=np.float32)
         y = np.array([1, 0, 1])
