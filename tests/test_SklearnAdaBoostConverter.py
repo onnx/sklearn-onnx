@@ -10,12 +10,14 @@ from sklearn.datasets import make_regression
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_classifier_samme_r(self):
         data = load_digits()
         X, y = data.data, data.target
@@ -33,6 +35,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_classifier_samme(self):
         data = load_iris()
         X, y = data.data, data.target

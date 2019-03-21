@@ -11,12 +11,15 @@ from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 
 from test_utils import dump_data_and_model
 
 
 class TestSklearnFunctionTransformerConverter(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_function_transformer(self):
 
         def convert_dataframe_schema(df, drop=None):

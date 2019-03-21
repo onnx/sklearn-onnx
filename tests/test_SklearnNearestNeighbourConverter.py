@@ -8,6 +8,7 @@ from sklearn import linear_model
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
@@ -79,6 +80,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
                           "StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(KNeighborsClassifier())
         model_onnx = convert_sklearn(model, 'KNN classifier binary', [('input', FloatTensorType([1, 3]))])
@@ -89,6 +92,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                             allow_failure="StrictVersion(onnx.__version__) == StrictVersion('1.1.2') or "
                                           "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_knn_classifier_multi_class(self):
         model, X = self._fit_model_multiclass_classification(KNeighborsClassifier())
         model_onnx = convert_sklearn(model, 'KNN classifier multi-class', [('input', FloatTensorType([1, 3]))])

@@ -148,10 +148,9 @@ class DictionaryType(DataType):
                 self.value_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "Cannot create a dict. Update ONNX.\n{0}\n{1}"
+            msg = "ONNX was not compiles with flag ONNX-ML.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.value_type.to_onnx_type()))
             info = [onnx.__version__, str(onnx_type)]
-            info += list(dir(onnx_type))
             msg += "\n".join(info)
             raise RuntimeError(msg) from e
         return onnx_type
@@ -174,10 +173,9 @@ class SequenceType(DataType):
                             self.element_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
+            msg = "ONNX was not compiles with flag ONNX-ML.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.element_type.to_onnx_type()))
             info = [onnx.__version__, str(onnx_type)]
-            info += list(dir(onnx_type))
             msg += "\n".join(info)
             raise RuntimeError(msg) from e
         return onnx_type
@@ -197,3 +195,15 @@ def find_type_conversion(source_type, target_type):
     else:
         raise ValueError('Unsupported type conversion from %s to %s' % (
                          source_type, target_type))
+
+
+def onnx_built_with_ml():
+    """
+    Tells if ONNX was built with flag ``ONNX-ML``.
+    """
+    seq = SequenceType(FloatTensorType())
+    try:
+        seq.to_onnx_type()
+        return True
+    except RuntimeError:
+        return False

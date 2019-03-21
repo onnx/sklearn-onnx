@@ -11,16 +11,21 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import dump_data_and_model
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier(self):
         model = GradientBoostingClassifier(n_estimators=3)
         dump_binary_classification(model, verbose=True)
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier_multi(self):
         model = GradientBoostingClassifier(n_estimators=3)
         dump_multiple_classification(model, verbose=True,

@@ -4,9 +4,9 @@ import unittest
 from distutils.version import StrictVersion
 from sklearn.datasets import load_digits, load_iris
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
-
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 class TestNaiveBayesConverter(unittest.TestCase):
@@ -26,6 +26,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X.astype(np.float32)
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_multinomial_nb_binary_classification(self):
         model, X = self._fit_model_binary_classification(MultinomialNB(),
                                                          load_iris())

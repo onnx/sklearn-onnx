@@ -8,14 +8,16 @@ import numpy as np
 from sklearn.datasets import load_diabetes, load_digits, load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier, MLPRegressor
-
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -32,6 +34,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_default(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -62,6 +66,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_identity(self):
         data = load_digits()
         X, y = data.data, data.target
@@ -93,6 +99,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_logistic(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -123,6 +131,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_tanh(self):
         data = load_iris()
         X, y = data.data, data.target

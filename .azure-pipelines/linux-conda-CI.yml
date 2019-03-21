@@ -65,10 +65,6 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx
-    displayName: 'flake8'
-
-  - script: |
       pip install numpy$(numpy.version)
     displayName: 'install numpy'
 
