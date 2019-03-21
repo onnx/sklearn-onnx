@@ -417,6 +417,23 @@ def apply_tile(scope, input_name, output_name, container, operator_name=None,
                            output_name, op_version=7, name=name)
 
 
+def apply_topk(scope, input_name, output_names, container, k,
+               operator_name=None):
+    name = _create_name_or_use_existing_one(scope, 'TopK', operator_name)
+
+    if container.target_opset < 10:
+        container.add_node('TopK', input_name, output_names,
+                           name=name, k=k, op_version=1)
+    else:
+        k_value_name = scope.get_unique_variable_name('k_value')
+
+        container.add_initializer(k_value_name, onnx_proto.TensorProto.INT64,
+                                  [1], [k])
+
+        container.add_node('TopK', [input_name, k_value_name],
+                           output_names, name=name, op_version=10)
+
+
 def apply_transpose(scope, input_name, output_name, container,
                     operator_name=None, perm=None):
     name = _create_name_or_use_existing_one(scope, 'Transpose', operator_name)

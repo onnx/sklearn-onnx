@@ -7,7 +7,7 @@
 import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
-    apply_reshape, apply_sub)
+    apply_reshape, apply_sub, apply_topk)
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
@@ -286,10 +286,9 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
                                                 container, op)
     apply_mul(scope, [concatenated_labels, negate_name],
               negated_labels_name, container, broadcast=1)
-    container.add_node('TopK', negated_labels_name,
-                       [sorted_values_name, sorted_indices_name],
-                       name=scope.get_unique_operator_name('TopK'),
-                       k=len(op.estimators_))
+    apply_topk(scope, negated_labels_name,
+               [sorted_values_name, sorted_indices_name],
+               container, k=len(op.estimators_))
     container.add_node('Shape', operator.input_full_names,
                        input_shape_result_name,
                        name=scope.get_unique_operator_name('Shape'))
