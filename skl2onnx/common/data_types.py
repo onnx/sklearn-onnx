@@ -148,7 +148,7 @@ class DictionaryType(DataType):
                 self.value_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "ONNX was not compiles with flag ONNX-ML.\n{0}\n{1}"
+            msg = "ONNX was not compiled with flag ONNX-ML.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.value_type.to_onnx_type()))
             info = [onnx.__version__, str(onnx_type)]
             msg += "\n".join(info)
@@ -173,7 +173,7 @@ class SequenceType(DataType):
                             self.element_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "ONNX was not compiles with flag ONNX-ML.\n{0}\n{1}"
+            msg = "ONNX was not compiled with flag ONNX-ML.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.element_type.to_onnx_type()))
             info = [onnx.__version__, str(onnx_type)]
             msg += "\n".join(info)
