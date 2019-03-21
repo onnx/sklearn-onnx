@@ -44,6 +44,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                             basename="SklearnPipelinePcaPipelineMinMax",
                             allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_pipeline_pca_pipeline_none_lin(self):
         model = Pipeline(memory=None,
                     steps=[('PCA', PCA(copy=True, iterated_power='auto',

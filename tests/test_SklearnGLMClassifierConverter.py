@@ -27,6 +27,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class(self):
         model, X = self._fit_model_binary_classification(linear_model.LogisticRegression())
         model_onnx = convert_sklearn(model, 'logistic regression', [('input', FloatTensorType([1, 3]))])
@@ -36,6 +38,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
                             allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.3') or "
                                           "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_nointercept(self):
         model, X = self._fit_model_binary_classification(linear_model.LogisticRegression(fit_intercept=False))
         model_onnx = convert_sklearn(model, 'logistic regression', [('input', FloatTensorType([1, 3]))])

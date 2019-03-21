@@ -116,6 +116,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_regressor_logistic(self):
         data = load_diabetes()
         X, y = data.data, data.target
