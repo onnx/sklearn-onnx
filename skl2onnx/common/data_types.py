@@ -144,7 +144,8 @@ class DictionaryType(DataType):
                 onnx_type.map_type.key_type = onnx_proto.TensorProto.INT64
             elif type(self.key_type) in [StringType, StringTensorType]:
                 onnx_type.map_type.key_type = onnx_proto.TensorProto.STRING
-            onnx_type.map_type.value_type.CopyFrom(self.value_type.to_onnx_type())
+            onnx_type.map_type.value_type.CopyFrom(
+                self.value_type.to_onnx_type())
         except AttributeError as e:
             import onnx
             msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
