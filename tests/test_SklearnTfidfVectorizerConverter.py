@@ -47,8 +47,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
 
         # TfidfVectorizer in onnxruntime fails with empty strings
-        dump_data_and_model(corpus[3:], vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyStringSepCase1-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
+        dump_data_and_model(corpus[2:], vect, model_onnx, basename="SklearnTfidfVectorizer11EmptyStringSepCase1-OneOff-SklCol",
+                            allow_failure="StrictVersion(onnxruntime.__version__) < StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer11_empty_string_case2(self):
         corpus = numpy.array([
@@ -244,4 +244,5 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestSklearnTfidfVectorizer().test_model_tfidf_vectorizer11_empty_string_case1()
     unittest.main()
