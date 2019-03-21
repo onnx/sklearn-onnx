@@ -148,8 +148,8 @@ class DictionaryType(DataType):
                 self.value_type.to_onnx_type())
         except AttributeError as e:
             import onnx
-            msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
-            msg = msg.format(msg, str(self.element_type.to_onnx_type()))
+            msg = "Cannot create a dict. Update ONNX.\n{0}\n{1}"
+            msg = msg.format(str(self), str(self.value_type.to_onnx_type()))
             msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
             raise RuntimeError(msg) from e
         return onnx_type
@@ -173,7 +173,7 @@ class SequenceType(DataType):
         except AttributeError as e:
             import onnx
             msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
-            msg = msg.format(msg, str(self.element_type.to_onnx_type()))
+            msg = msg.format(str(self), str(self.element_type.to_onnx_type()))
             msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
             raise RuntimeError(msg) from e
         return onnx_type
