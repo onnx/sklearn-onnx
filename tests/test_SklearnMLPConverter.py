@@ -161,7 +161,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPRegressorTanhActivation",
+            basename="SklearnMLPRegressorTanhActivation-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
