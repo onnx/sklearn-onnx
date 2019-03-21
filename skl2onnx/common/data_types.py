@@ -139,11 +139,18 @@ class DictionaryType(DataType):
 
     def to_onnx_type(self):
         onnx_type = onnx_proto.TypeProto()
-        if type(self.key_type) in [Int64Type, Int64TensorType]:
-            onnx_type.map_type.key_type = onnx_proto.TensorProto.INT64
-        elif type(self.key_type) in [StringType, StringTensorType]:
-            onnx_type.map_type.key_type = onnx_proto.TensorProto.STRING
-        onnx_type.map_type.value_type.CopyFrom(self.value_type.to_onnx_type())
+        try:
+            if type(self.key_type) in [Int64Type, Int64TensorType]:
+                onnx_type.map_type.key_type = onnx_proto.TensorProto.INT64
+            elif type(self.key_type) in [StringType, StringTensorType]:
+                onnx_type.map_type.key_type = onnx_proto.TensorProto.STRING
+            onnx_type.map_type.value_type.CopyFrom(self.value_type.to_onnx_type())
+        except AttributeError as e:
+            import onnx
+            msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
+            msg = msg.format(msg, str(self.element_type.to_onnx_type()))
+            msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
+            raise RuntimeError(msg) from e
         return onnx_type
 
     def __repr__(self):
