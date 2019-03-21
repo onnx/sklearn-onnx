@@ -150,7 +150,9 @@ class DictionaryType(DataType):
             import onnx
             msg = "Cannot create a dict. Update ONNX.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.value_type.to_onnx_type()))
-            msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
+            info = [onnx.__version__, str(onnx_type)]
+            info += list(dir(onnx_type))
+            msg += "\n".join(info)
             raise RuntimeError(msg) from e
         return onnx_type
 
@@ -174,7 +176,9 @@ class SequenceType(DataType):
             import onnx
             msg = "Cannot create a sequence. Update ONNX.\n{0}\n{1}"
             msg = msg.format(str(self), str(self.element_type.to_onnx_type()))
-            msg += "\n".join([onnx.__version__, str(dir(onnx_type))])
+            info = [onnx.__version__, str(onnx_type)]
+            info += list(dir(onnx_type))
+            msg += "\n".join(info)
             raise RuntimeError(msg) from e
         return onnx_type
 
