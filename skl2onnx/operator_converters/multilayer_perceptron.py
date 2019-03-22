@@ -149,7 +149,7 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     else:
         apply_reshape(scope, array_feature_extractor_result_name,
                       operator.outputs[0].full_name, container,
-                      desired_shape=(-1))
+                      desired_shape=(-1,))
 
 
 def convert_sklearn_mlp_regressor(scope, operator, container):
@@ -160,8 +160,8 @@ def convert_sklearn_mlp_regressor(scope, operator, container):
     mlp_op = operator.raw_operator
 
     y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
-    apply_identity(scope, y_pred,
-                   operator.output_full_names, container)
+    apply_reshape(scope, y_pred, operator.output_full_names,
+                  container, desired_shape=(-1, 1))
 
 
 register_converter('SklearnMLPClassifier',

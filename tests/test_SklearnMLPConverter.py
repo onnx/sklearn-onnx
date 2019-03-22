@@ -14,7 +14,7 @@ from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
 
 
-class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
+class TestSklearnMLPConverters(unittest.TestCase):
 
     def test_model_mlp_classifier_binary(self):
         data = load_iris()
