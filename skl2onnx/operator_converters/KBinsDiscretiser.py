@@ -19,7 +19,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
                            "ONNX does not support sparse tensors.")
 
     ranges = list(map(lambda e: e[1:-1] if len(e) > 2
-                      else [np.finfo(float).max], op.bin_edges_))
+                      else [np.finfo(np.float32).max], op.bin_edges_))
     digitised_output_name = [None] * len(ranges)
     instances = operator.inputs[0].type.shape[0]
 
