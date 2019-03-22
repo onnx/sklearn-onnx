@@ -14,7 +14,7 @@ from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
-class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
+class TestSklearnMLPConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
