@@ -22,13 +22,13 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier(self):
         model = GradientBoostingClassifier(n_estimators=3)
-        dump_binary_classification(model, verbose=True)
+        dump_binary_classification(model)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier_multi(self):
         model = GradientBoostingClassifier(n_estimators=3)
-        dump_multiple_classification(model, verbose=True,
+        dump_multiple_classification(model,
                                      allow_failure="StrictVersion(onnxruntime.__version__)"
                                                    "<= StrictVersion('0.3.0')")
 

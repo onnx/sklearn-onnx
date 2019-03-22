@@ -4,9 +4,16 @@ Tests pipeline within pipelines.
 
 import numpy as np
 import unittest
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    # not available in 0.19
+    ColumnTransformer = None
+try:
+    from sklearn.impute import SimpleImputer
+except ModuleNotFoundError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.decomposition import PCA
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline, Pipeline
@@ -125,6 +132,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                         basename="SklearnPipelinePcaPipelineMinMaxNBNone",
                         allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer_pipeline_imputer_scaler_lr(self):

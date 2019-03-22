@@ -5,7 +5,11 @@ import unittest
 import numpy as np
 import pandas
 from sklearn.preprocessing import Imputer
-from sklearn.impute import SimpleImputer
+try:
+    from sklearn.impute import SimpleImputer
+except ModuleNotFoundError:
+    # changed in 0.20
+    SimpleImputer = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
@@ -54,6 +58,8 @@ class TestSklearnImputerConverter(unittest.TestCase):
         dump_data_and_model(np.array(data, dtype=np.float32),
                             model, model_onnx, basename="SklearnImputerMeanFloat32")
 
+    @unittest.skipIf(SimpleImputer is None,
+                     reason="SimpleImputer changed in 0.20")
     def test_simple_imputer_float_inputs(self):
         model = SimpleImputer(strategy='mean', fill_value='nan')
         data = [[1, 2], [np.nan, 3], [7, 6]]
