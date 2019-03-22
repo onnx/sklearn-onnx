@@ -27,7 +27,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
 
     container.add_initializer(
         last_column_name, onnx_proto.TensorProto.FLOAT,
-        [instances, 1], np.ones((instances, 1)))
+        [instances, 1], np.ones(instances))
 
     for i, item in enumerate(ranges):
         digitised_output_name[i] = (
