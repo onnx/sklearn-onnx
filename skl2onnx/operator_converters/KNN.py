@@ -8,7 +8,7 @@ import numpy as np
 
 from ..common._apply_operation import apply_abs, apply_cast, apply_mul
 from ..common._apply_operation import apply_add, apply_div
-from ..common._apply_operation import apply_reshape, apply_sub
+from ..common._apply_operation import apply_reshape, apply_sub, apply_topk
 from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common._registration import register_converter
 from ..proto import onnx_proto
@@ -382,10 +382,9 @@ def convert_sklearn_knn(scope, operator, container):
                   desired_shape=[1, -1])
     apply_mul(scope, [reshaped_result_name, negate_name],
               negated_reshaped_result_name, container, broadcast=1)
-    container.add_node('TopK', negated_reshaped_result_name,
-                       [topk_values_name, topk_indices_name],
-                       name=scope.get_unique_operator_name('TopK'),
-                       k=knn.n_neighbors)
+    apply_topk(scope, negated_reshaped_result_name,
+               [topk_values_name, topk_indices_name], container,
+               k=knn.n_neighbors)
 
     if operator.type == 'SklearnKNeighborsClassifier':
         classes = knn.classes_
