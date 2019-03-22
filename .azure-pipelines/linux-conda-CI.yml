@@ -112,9 +112,15 @@ jobs:
     displayName: 'install'
 
   - script: |
+      echo "---------------"
       pip show numpy
+      echo "---------------"
       pip show onnx
+      echo "---------------"
       pip show onnxruntime
+      echo "---------------"
+      pip show scikit-learn
+      echo "---------------"
     displayName: 'version'
 
   - script: |
