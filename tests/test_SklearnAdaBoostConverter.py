@@ -63,8 +63,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
                             basename="SklearnAdaBoostRegressor-OneOffArray",
                             allow_failure="StrictVersion("
-                                          "onnxruntime.__version__)"
-                                          "<= StrictVersion('0.2.1')")
+                            "onnxruntime.__version__) "
+                            "<= StrictVersion('0.2.1') or "
+                            "StrictVersion(onnx.__version__) "
+                            "== StrictVersion('1.4.1')")
 
 
 if __name__ == "__main__":
