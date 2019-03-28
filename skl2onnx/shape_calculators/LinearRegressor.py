@@ -30,5 +30,7 @@ register_shape_calculator('SklearnLasso',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnLassoLars',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnMLPRegressor',
+                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnRidge',
                           calculate_linear_regressor_output_shapes)

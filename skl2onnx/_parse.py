@@ -8,9 +8,13 @@ import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
-from sklearn.compose import ColumnTransformer
 from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import LinearSVC, NuSVC, SVC
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    # ColumnTransformer was introduced in 0.20.
+    ColumnTransformer = None
 
 from ._supported_operators import _get_sklearn_operator_name, cluster_list
 from ._supported_operators import sklearn_classifier_list
@@ -329,8 +333,10 @@ def build_sklearn_parsers_map():
     map_parser = {
         pipeline.Pipeline: _parse_sklearn_pipeline,
         pipeline.FeatureUnion: _parse_sklearn_feature_union,
-        ColumnTransformer: _parse_sklearn_column_transformer,
     }
+    if ColumnTransformer is not None:
+        map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
+
     for tmodel in sklearn_classifier_list:
         if tmodel not in [LinearSVC, SVC, NuSVC]:
             map_parser[tmodel] = _parse_sklearn_classifier

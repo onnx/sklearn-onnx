@@ -9,12 +9,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
 from test_utils import dump_multiple_regression, dump_single_regression
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_random_forest_classifier(self):
         model = RandomForestClassifier(n_estimators=3)
         dump_one_class_classification(model,
@@ -32,6 +35,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         dump_single_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         dump_multiple_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_extra_trees_classifier(self):
         model = ExtraTreesClassifier(n_estimators=3)
         dump_one_class_classification(model,
