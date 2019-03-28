@@ -30,7 +30,7 @@ class TestParseOnnxOperators(unittest.TestCase):
                 pass
         ''')
         
-        rows = []
+        rows = ["from .onnx_operator import OnnxOperator", ""]
         for op in ops:
             rows.append(template.format(op[1]))
         
@@ -63,7 +63,7 @@ class TestParseOnnxOperators(unittest.TestCase):
                 pass
         ''')
         
-        rows = []
+        rows = ["from .onnx_operator import OnnxOperator", ""]
         for op in ops:
             name = op[1].replace("ai.onnx.ml.", "")
             rows.append(template.format(op[1], name))

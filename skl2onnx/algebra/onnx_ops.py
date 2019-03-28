@@ -1,9 +1,3 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
-
 from .onnx_operator import OnnxOperator
 
 
@@ -651,6 +645,13 @@ class Reshape(OnnxOperator):
     pass
 
 
+class Resize(OnnxOperator):
+    """See `Resize
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators.md#Resize>`_."""
+    pass
+
+
 class Scan(OnnxOperator):
     """See `Scan
     <https://github.com/onnx/onnx/blob/master/docs/
@@ -819,6 +820,13 @@ class TfIdfVectorizer(OnnxOperator):
     pass
 
 
+class ThresholdedRelu(OnnxOperator):
+    """See `ThresholdedRelu
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators.md#ThresholdedRelu>`_."""
+    pass
+
+
 class Tile(OnnxOperator):
     """See `Tile
     <https://github.com/onnx/onnx/blob/master/docs/
@@ -875,13 +883,6 @@ class ATen(OnnxOperator):
     pass
 
 
-class DynamicSlice(OnnxOperator):
-    """See `DynamicSlice
-    <https://github.com/onnx/onnx/blob/master/docs/
-    Operators.md#DynamicSlice>`_."""
-    pass
-
-
 class GRUUnit(OnnxOperator):
     """See `GRUUnit
     <https://github.com/onnx/onnx/blob/master/docs/
@@ -903,15 +904,8 @@ class Scale(OnnxOperator):
     pass
 
 
-class ScaledTanh(OnnxOperator):
-    """See `ScaledTanh
+class MeanVarianceNormalization(OnnxOperator):
+    """See `MeanVarianceNormalization
     <https://github.com/onnx/onnx/blob/master/docs/
-    Operators.md#ScaledTanh>`_."""
-    pass
-
-
-class ThresholdedRelu(OnnxOperator):
-    """See `ThresholdedRelu
-    <https://github.com/onnx/onnx/blob/master/docs/
-    Operators.md#ThresholdedRelu>`_."""
+    Operators.md#MeanVarianceNormalization>`_."""
     pass

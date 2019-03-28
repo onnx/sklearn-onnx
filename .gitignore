@@ -45,3 +45,4 @@ tests/temp_onnx_helper_load_save.onnx
 tests/*.new
 benchmarks/*.csv
 benchmarks/*.png
+tests/Operators*.md
