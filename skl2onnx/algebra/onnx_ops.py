@@ -14,6 +14,6 @@ def _update_module():
     this = sys.modules[__name__]
     for k, v in res.items():
         setattr(this, k, v)
-        
+
 
 _update_module()
