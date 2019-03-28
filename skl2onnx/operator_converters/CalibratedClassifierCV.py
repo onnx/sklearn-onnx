@@ -14,6 +14,118 @@ from .._supported_operators import sklearn_operator_name_map
 import numpy as np
 
 
+def _handle_zeros(scope, container, concatenated_prob_name,
+                  reduced_prob_name, n_classes):
+    """
+    This function replaces 0s in concatednated_prob_name with 1s and
+    0s in reduced_prob_name with n_classes.
+    """
+    cast_prob_name = scope.get_unique_variable_name('cast_prob')
+    bool_not_cast_prob_name = scope.get_unique_variable_name(
+        'bool_not_cast_prob')
+    mask_name = scope.get_unique_variable_name('mask')
+    masked_concatenated_prob_name = scope.get_unique_variable_name(
+        'masked_concatenated_prob')
+    n_classes_name = scope.get_unique_variable_name('n_classes')
+    reduced_prob_mask_name = scope.get_unique_variable_name(
+        'reduced_prob_mask')
+    masked_reduced_prob_name = scope.get_unique_variable_name(
+        'masked_reduced_prob')
+
+    container.add_initializer(n_classes_name, onnx_proto.TensorProto.FLOAT,
+                              [], [n_classes])
+
+    apply_cast(scope, reduced_prob_name, cast_prob_name, container,
+               to=onnx_proto.TensorProto.BOOL)
+    container.add_node('Not', cast_prob_name,
+                       bool_not_cast_prob_name,
+                       name=scope.get_unique_operator_name('Not'))
+    apply_cast(scope, bool_not_cast_prob_name, mask_name, container,
+               to=onnx_proto.TensorProto.FLOAT)
+    apply_add(scope, [concatenated_prob_name, mask_name],
+              masked_concatenated_prob_name, container, broadcast=1)
+    apply_mul(scope, [mask_name, n_classes_name], reduced_prob_mask_name,
+              container, broadcast=1)
+    apply_add(scope, [reduced_prob_name, reduced_prob_mask_name],
+              masked_reduced_prob_name, container, broadcast=0)
+    return masked_concatenated_prob_name, masked_reduced_prob_name
+
+
+def _transform_sigmoid(scope, container, model, df_col_name, k):
+    a_name = scope.get_unique_variable_name('a')
+    b_name = scope.get_unique_variable_name('b')
+    a_df_prod_name = scope.get_unique_variable_name('a_df_prod')
+    exp_parameter_name = scope.get_unique_variable_name(
+                                                'exp_parameter')
+    exp_result_name = scope.get_unique_variable_name('exp_result')
+    unity_name = scope.get_unique_variable_name('unity')
+    denominator_name = scope.get_unique_variable_name('denominator')
+    sigmoid_predict_result_name = scope.get_unique_variable_name(
+                                            'sigmoid_predict_result')
+
+    container.add_initializer(a_name, onnx_proto.TensorProto.FLOAT,
+                              [], [model.calibrators_[k].a_])
+    container.add_initializer(b_name, onnx_proto.TensorProto.FLOAT,
+                              [], [model.calibrators_[k].b_])
+    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+                              [], [1])
+
+    apply_mul(scope, [a_name, df_col_name], a_df_prod_name, container,
+              broadcast=0)
+    apply_add(scope, [a_df_prod_name, b_name], exp_parameter_name,
+              container, broadcast=0)
+    apply_exp(scope, exp_parameter_name, exp_result_name, container)
+    apply_add(scope, [unity_name, exp_result_name], denominator_name,
+              container, broadcast=0)
+    apply_div(scope, [unity_name, denominator_name],
+              sigmoid_predict_result_name, container, broadcast=0)
+    return sigmoid_predict_result_name
+
+
+def _transform_isotonic(scope, container, model, T, k):
+    if model.calibrators_[k].out_of_bounds == 'clip':
+        clipped_df_name = scope.get_unique_variable_name('clipped_df')
+
+        container.add_node(
+            'Clip', T, clipped_df_name,
+            name=scope.get_unique_operator_name('Clip'),
+            min=model.calibrators_[k].X_min_,
+            max=model.calibrators_[k].X_max_)
+        T = clipped_df_name
+
+    reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
+    calibrator_x_name = scope.get_unique_variable_name('calibrator_x')
+    calibrator_y_name = scope.get_unique_variable_name('calibrator_y')
+    distance_name = scope.get_unique_variable_name('distance')
+    absolute_distance_name = scope.get_unique_variable_name(
+        'absolute_distance')
+    nearest_x_index_name = scope.get_unique_variable_name(
+        'nearest_x_index')
+    nearest_y_name = scope.get_unique_variable_name('nearest_y')
+
+    container.add_initializer(
+        calibrator_x_name, onnx_proto.TensorProto.FLOAT,
+        [len(model.calibrators_[k]._X_)], model.calibrators_[k]._X_)
+    container.add_initializer(
+        calibrator_y_name, onnx_proto.TensorProto.FLOAT,
+        [len(model.calibrators_[k]._y_)], model.calibrators_[k]._y_)
+
+    apply_reshape(scope, T, reshaped_df_name, container,
+                  desired_shape=(-1, 1))
+    apply_sub(scope, [reshaped_df_name, calibrator_x_name],
+              distance_name, container, broadcast=1)
+    apply_abs(scope, distance_name, absolute_distance_name, container)
+    container.add_node('ArgMin', absolute_distance_name,
+                       nearest_x_index_name, axis=1,
+                       name=scope.get_unique_operator_name('ArgMin'))
+    container.add_node(
+        'ArrayFeatureExtractor',
+        [calibrator_y_name, nearest_x_index_name],
+        nearest_y_name, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+    return nearest_y_name
+
+
 def convert_calibrated_classifier_base_estimator(scope, operator, container,
                                                  model):
     # Computational graph:
@@ -118,133 +230,57 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
 
-    concatenated_prob_name = scope.get_unique_variable_name(
-                                                    'concatenated_prob')
-
     for k in range(n_classes):
+        cur_k = k
         if n_classes == 2:
-            k += 1
-
+            cur_k += 1
         k_name = scope.get_unique_variable_name('k')
         df_col_name = scope.get_unique_variable_name('transposed_df_col')
         prob_name[k] = scope.get_unique_variable_name('prob_{}'.format(k))
 
         container.add_initializer(k_name, onnx_proto.TensorProto.INT64,
-                                  [], [k])
+                                  [], [cur_k])
 
         container.add_node(
             'ArrayFeatureExtractor', [df_name.full_name, k_name], df_col_name,
             name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
             op_domain='ai.onnx.ml')
-        T = df_col_name
-        if model.method == 'sigmoid':
-            a_name = scope.get_unique_variable_name('a')
-            b_name = scope.get_unique_variable_name('b')
-            a_df_prod_name = scope.get_unique_variable_name('a_df_prod')
-            exp_parameter_name = scope.get_unique_variable_name(
-                                                        'exp_parameter')
-            exp_result_name = scope.get_unique_variable_name('exp_result')
-            unity_name = scope.get_unique_variable_name('unity')
-            denominator_name = scope.get_unique_variable_name('denominator')
-            sigmoid_predict_result_name = scope.get_unique_variable_name(
-                                                    'sigmoid_predict_result')
+        T = (_transform_sigmoid(scope, container, model, df_col_name, k)
+             if model.method == 'sigmoid' else
+             _transform_isotonic(scope, container, model, df_col_name, k))
 
-            container.add_initializer(a_name, onnx_proto.TensorProto.FLOAT,
-                                      [], [model.calibrators_[k].a_])
-            container.add_initializer(b_name, onnx_proto.TensorProto.FLOAT,
-                                      [], [model.calibrators_[k].b_])
-            container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
-                                      [], [1])
-
-            apply_mul(scope, [a_name, df_col_name], a_df_prod_name, container,
-                      broadcast=0)
-            apply_add(scope, [a_df_prod_name, b_name], exp_parameter_name,
-                      container, broadcast=0)
-            apply_exp(scope, exp_parameter_name, exp_result_name, container)
-            apply_add(scope, [unity_name, exp_result_name], denominator_name,
-                      container, broadcast=0)
-            apply_div(scope, [unity_name, denominator_name],
-                      sigmoid_predict_result_name, container, broadcast=0)
-            T = sigmoid_predict_result_name
-        else:  # isotonic method
-            if model.calibrators_[k].out_of_bounds == 'clip':
-                clipped_df_name = scope.get_unique_variable_name('clipped_df')
-
-                container.add_node(
-                    'Clip', df_col_name, clipped_df_name,
-                    name=scope.get_unique_operator_name('Clip'),
-                    min=model.calibrators_[k].X_min_,
-                    max=model.calibrators_[k].X_max_)
-                # Clipped column values need to be interpolated, which needs
-                # Interpolate op to be added to onnx.
-                # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2625
-                T = clipped_df_name
-
-            reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
-            calibrator_x_name = scope.get_unique_variable_name('calibrator_x')
-            calibrator_y_name = scope.get_unique_variable_name('calibrator_y')
-            distance_name = scope.get_unique_variable_name('distance')
-            absolute_distance_name = scope.get_unique_variable_name(
-                'absolute_distance')
-            nearest_x_index_name = scope.get_unique_variable_name(
-                'nearest_x_index')
-            nearest_y_name = scope.get_unique_variable_name('nearest_y')
-
-            container.add_initializer(
-                calibrator_x_name, onnx_proto.TensorProto.FLOAT,
-                [len(model.calibrators_[k]._X_)], model.calibrators_[k]._X_)
-            container.add_initializer(
-                calibrator_y_name, onnx_proto.TensorProto.FLOAT,
-                [len(model.calibrators_[k]._y_)], model.calibrators_[k]._y_)
-
-            apply_reshape(scope, T, reshaped_df_name, container,
-                          desired_shape=(-1, 1))
-            apply_sub(scope, [reshaped_df_name, calibrator_x_name],
-                      distance_name, container, broadcast=1)
-            apply_abs(scope, distance_name, absolute_distance_name, container)
-            container.add_node('ArgMin', absolute_distance_name,
-                               nearest_x_index_name, axis=1,
-                               name=scope.get_unique_operator_name('ArgMin'))
-            container.add_node(
-                'ArrayFeatureExtractor',
-                [calibrator_y_name, nearest_x_index_name],
-                nearest_y_name, op_domain='ai.onnx.ml',
-                name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-            T = nearest_y_name
         prob_name[k] = T
+        if n_classes == 2:
+            break
 
-    apply_concat(scope, [p for p in prob_name], concatenated_prob_name,
-                 container, axis=1)
     if n_classes == 2:
-        col_index_name = scope.get_unique_variable_name('col_index')
         zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
-        first_col_name = scope.get_unique_variable_name('first_col')
         merged_prob_name = scope.get_unique_variable_name('merged_prob')
         unit_float_tensor_name = scope.get_unique_variable_name(
                                                     'unit_float_tensor')
 
-        container.add_initializer(col_index_name, onnx_proto.TensorProto.INT32,
-                                  [], [1])
         container.add_initializer(unit_float_tensor_name,
                                   onnx_proto.TensorProto.FLOAT, [], [1.0])
 
-        container.add_node(
-            'ArrayFeatureExtractor', [concatenated_prob_name, col_index_name],
-            first_col_name, op_domain='ai.onnx.ml',
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-        apply_sub(scope, [unit_float_tensor_name, first_col_name],
+        apply_sub(scope, [unit_float_tensor_name, prob_name[0]],
                   zeroth_col_name, container, broadcast=1)
-        apply_concat(scope, [zeroth_col_name, first_col_name],
+        apply_concat(scope, [zeroth_col_name, prob_name[0]],
                      merged_prob_name, container, axis=1)
         class_prob_tensor_name = merged_prob_name
     else:
+        concatenated_prob_name = scope.get_unique_variable_name(
+            'concatenated_prob')
         reduced_prob_name = scope.get_unique_variable_name('reduced_prob')
         calc_prob_name = scope.get_unique_variable_name('calc_prob')
 
+        apply_concat(scope, prob_name, concatenated_prob_name,
+                     container, axis=1)
         container.add_node('ReduceSum', concatenated_prob_name,
                            reduced_prob_name, axes=[1],
                            name=scope.get_unique_operator_name('ReduceSum'))
-        apply_div(scope, [concatenated_prob_name, reduced_prob_name],
+        num, deno = _handle_zeros(scope, container, concatenated_prob_name,
+                                  reduced_prob_name, n_classes)
+        apply_div(scope, [num, deno],
                   calc_prob_name, container, broadcast=1)
         class_prob_tensor_name = calc_prob_name
     return class_prob_tensor_name
