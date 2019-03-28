@@ -11,11 +11,14 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.4.1'),
                      # issue with encoding
                      reason="https://github.com/onnx/onnx/pull/1734")

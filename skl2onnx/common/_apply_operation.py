@@ -138,17 +138,30 @@ def apply_cast(scope, input_name, output_name, container, operator_name=None,
         v.number: k for k, v in d.values_by_name.items()
     }
     if to not in allowed_type_name_and_type_enum_pairs:
-        raise ValueError('Attribute to must be one of %s'
+        raise ValueError('Attribute "to" must be one of %s'
                          % allowed_type_name_and_type_enum_pairs.keys())
 
-    if container.target_opset < 7:
-        # Convert enum to string, for example, TensorProto.INT64 to 'INT64'
-        attrs['to'] = allowed_type_name_and_type_enum_pairs[to]
-        op_version = 1
+    if container.target_opset < 9:
+        if to in [onnx_proto.TensorProto.STRING,
+                  onnx_proto.TensorProto.COMPLEX64,
+                  onnx_proto.TensorProto.COMPLEX128]:
+            raise ValueError('Attribute "to" cannot correspond to a String or '
+                             'Complex TensorProto type.')
+        if container.target_opset < 6:
+            # Convert enum to string, for example, TensorProto.INT64 to 'INT64'
+            attrs['to'] = allowed_type_name_and_type_enum_pairs[to]
+            op_version = 1
+        else:
+            # Enum, for example, TensorProto.INT64
+            attrs['to'] = to
+            op_version = 6
     else:
-        # Enum, for example, TensorProto.INT64
+        if to in [onnx_proto.TensorProto.COMPLEX64,
+                  onnx_proto.TensorProto.COMPLEX128]:
+            raise ValueError('Attribute "to" cannot correspond to a Complex '
+                             'TensorProto type.')
         attrs['to'] = to
-        op_version = 7
+        op_version = 9
 
     container.add_node('Cast', input_name, output_name, op_version=op_version,
                        **attrs)
@@ -402,6 +415,23 @@ def apply_tile(scope, input_name, output_name, container, operator_name=None,
                                   [len(repeats)], repeats)
         container.add_node('Tile', [input_name, repeat_tensor_name],
                            output_name, op_version=7, name=name)
+
+
+def apply_topk(scope, input_name, output_names, container, k,
+               operator_name=None):
+    name = _create_name_or_use_existing_one(scope, 'TopK', operator_name)
+
+    if container.target_opset < 10:
+        container.add_node('TopK', input_name, output_names,
+                           name=name, k=k, op_version=1)
+    else:
+        k_value_name = scope.get_unique_variable_name('k_value')
+
+        container.add_initializer(k_value_name, onnx_proto.TensorProto.INT64,
+                                  [1], [k])
+
+        container.add_node('TopK', [input_name, k_value_name],
+                           output_names, name=name, op_version=10)
 
 
 def apply_transpose(scope, input_name, output_name, container,

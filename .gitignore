@@ -42,3 +42,5 @@ docs/examples/imagenet_class_index.json
 TESTDUMP/*
 htmlcov/*
 tests/temp_onnx_helper_load_save.onnx
+benchmarks/*.csv
+benchmarks/*.png

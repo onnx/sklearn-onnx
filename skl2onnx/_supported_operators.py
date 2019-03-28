@@ -29,6 +29,7 @@ from sklearn.multiclass import OneVsRestClassifier
 
 # Tree-based models
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.ensemble import GradientBoostingClassifier
@@ -51,6 +52,9 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
 
+# Neural Networks
+from sklearn.neural_network import MLPClassifier, MLPRegressor
+
 # Clustering
 from sklearn.cluster import KMeans, MiniBatchKMeans
 
@@ -64,10 +68,20 @@ from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV
 from sklearn.feature_selection import SelectFdr, SelectFpr, SelectFromModel
 from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile
 from sklearn.feature_selection import VarianceThreshold
-from sklearn.impute import SimpleImputer
+try:
+    # 0.20
+    from sklearn.impute import SimpleImputer
+except ModuleNotFoundError:
+    # 0.19
+    from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.preprocessing import Binarizer
 from sklearn.preprocessing import Imputer
-from sklearn.preprocessing import KBinsDiscretizer
+try:
+    from sklearn.preprocessing import KBinsDiscretizer
+except ImportError:
+    # not available in 0.19
+    KBinsDiscretizer = None
+    pass
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
@@ -91,7 +105,7 @@ sklearn_classifier_list = [
     GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
     ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
-    AdaBoostClassifier,
+    AdaBoostClassifier, MLPClassifier
 ]
 
 # Clustering algorithms: produces two outputs, label and score for
@@ -104,7 +118,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                AdaBoostClassifier, VotingClassifier,
+                AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,
@@ -112,6 +126,7 @@ def build_sklearn_operator_name_map():
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
                 LinearRegression, Lasso, LassoLars, Ridge,
+                MLPClassifier, MLPRegressor,
                 MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
@@ -124,8 +139,7 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold,
-    ]
-    }
+    ] if k is not None}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
         LinearRegression: 'SklearnLinearRegressor',

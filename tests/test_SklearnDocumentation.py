@@ -14,7 +14,10 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    ColumnTransformer = None
 from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
 
@@ -75,6 +78,8 @@ class TestSklearnDocumentation(unittest.TestCase):
                             allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.3') or "
                                           "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="ColumnTransformer introduced in 0.20")
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion('1.3'),
                      reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):        
