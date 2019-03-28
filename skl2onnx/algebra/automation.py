@@ -56,7 +56,7 @@ def _get_doc_template():
     **Attributes**
 
     {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
-      if attr.required %}(required){% endif %}: {{attr.description}} {%
+      if attr.required %} (required){% endif %}: {{attr.description}} {%
       if attr.default_value %}Default value is ``{{attr.default_value}}``{% endif %}
     {% endfor %}
     {% endif %}
@@ -82,9 +82,8 @@ def _get_doc_template():
     {% if sch.type_constraints %}
     **Type Constraints**
 
-    {% for type_constraint in sch.type_constraints %}* {{type_constraint.type_param_str}}:{%
-        for allowedType in type_constraint.allowed_type_strs %}{{allowedType}}, {%
-        endfor %}{{type_constraint.description}}
+    {% for ii, type_constraint in enumerate(sch.type_constraints) 
+    %}* {{getconstraint(type_constraint, ii)}}: {{type_constraint.description}}
     {% endfor %}
     {% endif %}
 
@@ -147,6 +146,15 @@ def get_rst_doc(op_name=None):
         else:
             return ""
 
+    def getconstraint(const, ii):
+        if const.type_param_str:
+            name = const.type_param_str
+        else:
+            name = str(ii)
+        if const.allowed_type_strs:
+            name += " " + ", ".join(const.allowed_type_strs)
+        return name
+
     def getname(obj, i):
         name = obj.name
         if len(name) == 0:
@@ -157,6 +165,7 @@ def get_rst_doc(op_name=None):
     return _template_operator.render(schemas=schemas, OpSchema=OpSchema, len=len,
                                      getattr=getattr, sorted=sorted,
                                      format_option=format_option,
+                                     getconstraint=getconstraint,
                                      getname=getname, enumerate=enumerate,
                                      format_name_with_domain=format_name_with_domain)
 
