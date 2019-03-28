@@ -10,11 +10,14 @@ from sklearn.svm import LinearSVC
 
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_calibrated_classifier_cv_float(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -28,6 +31,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                         allow_failure="StrictVersion(onnxruntime.__version__)"
                                        "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_calibrated_classifier_cv_int(self):
         data = load_digits()
         X, y = data.data, data.target

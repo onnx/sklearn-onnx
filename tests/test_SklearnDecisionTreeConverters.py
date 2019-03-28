@@ -7,12 +7,15 @@
 import unittest
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
 from test_utils import dump_multiple_regression, dump_single_regression
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_decision_tree_classifier(self):
         model = DecisionTreeClassifier()
         dump_one_class_classification(model,

@@ -6,6 +6,5 @@ py-cpuinfo
 pybind11
 pytest
 pytest-cov
-scikit-learn
 scipy
 wheel

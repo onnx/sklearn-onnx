@@ -4,7 +4,11 @@ Tests scikit-learn's KBinsDiscretiser converter.
 
 import numpy as np
 import unittest
-from sklearn.preprocessing import KBinsDiscretizer
+try:
+    from sklearn.preprocessing import KBinsDiscretizer
+except ImportError:
+    # available since 0.20
+    KBinsDiscretizer = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
@@ -12,6 +16,8 @@ from test_utils import dump_data_and_model
 
 class TestSklearnKBinsDiscretiser(unittest.TestCase):
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_uniform(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -26,6 +32,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_quantile(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -40,6 +48,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_kmeans(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -54,6 +64,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_uniform(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -68,6 +80,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_quantile(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -82,6 +96,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_kmeans(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
                       [0, 3.2, 4.7, -8.9]])
@@ -96,6 +112,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_uniform_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])
@@ -110,6 +128,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_quantile_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])
@@ -124,6 +144,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_ordinal_kmeans_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])
@@ -138,6 +160,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_uniform_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])
@@ -152,6 +176,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_quantile_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])
@@ -166,6 +192,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_kmeans_int(self):
         X = np.array([[1, 3, 3, -6], [3, -2, 5, 0],
                       [0, 2, 7, -9]])

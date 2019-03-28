@@ -8,14 +8,16 @@ import numpy as np
 from sklearn.datasets import load_diabetes, load_digits, load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier, MLPRegressor
-
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnMLPConverters(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -32,6 +34,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_default(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -62,6 +66,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_identity(self):
         data = load_digits()
         X, y = data.data, data.target
@@ -93,6 +99,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_logistic(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -108,6 +116,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_regressor_logistic(self):
         data = load_diabetes()
         X, y = data.data, data.target
@@ -123,6 +133,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_tanh(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -149,7 +161,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.float32), model, model_onnx,
-            basename="SklearnMLPRegressorTanhActivation",
+            basename="SklearnMLPRegressorTanhActivation-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')")
 
