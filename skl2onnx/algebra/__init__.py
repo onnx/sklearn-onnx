@@ -4,4 +4,5 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from .onnx_operator import OP, OnnxOperator  # noqa
+from .onnx_operator import OnnxOperator  # noqa
+

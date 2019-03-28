@@ -3,11 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
-from ..common._registration import register_converter
-from ..algebra.onnx_ops import ReduceSumSquare, Gemm, Add, ArgMin, Sqrt
 import numpy as np
 from sklearn.utils.extmath import row_norms
+from ..common._registration import register_converter
+from ..algebra.onnx_ops import ReduceSumSquare, Gemm, Add, ArgMin, Sqrt
 
 
 def convert_sklearn_kmeans(scope, operator, container):
@@ -33,19 +32,19 @@ def convert_sklearn_kmeans(scope, operator, container):
 
     ::
 
-     .------------------------------------------------------.
-     |                                                      |
-     |                                                      v
-X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1) <- C [k, n]
-                                 |                  |
-                                 |                  v
-                                 `------> Add <-- -2XC' [l, k]
-                                           |
-                                           v
-             C^2 [k] --------> Add <----- Z [l, k]
-                                |
-                                v
-         L [l] <-- ArgMin <--  Y2 [l, k] --> Sqrt --> Y2 [l, k]
+         .------------------------------------------------------.
+         |                                                      |
+         |                                                      v
+        X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1) <- C [k, n]
+                                         |                  |
+                                         |                  v
+                                         `------> Add <-- -2XC' [l, k]
+                                                   |
+                                                   v
+                     C^2 [k] --------> Add <----- Z [l, k]
+                                        |
+                                        v
+                 L [l] <-- ArgMin <--  Y2 [l, k] --> Sqrt --> Y2 [l, k]
 
     *scikit-learn* code:
 
