@@ -45,7 +45,7 @@ class GraphState:
         elif isinstance(var, np.ndarray):
             return self._add_constant(var)
         elif hasattr(var, 'add_to'):
-            var.add_to(self.scope, self.container)
+            var.add_to(self.scope, None, self.container)
             outputs = var.outputs
             if isinstance(outputs, list):
                 if len(outputs) == 1:
@@ -55,6 +55,8 @@ class GraphState:
                     elif isinstance(var, str):
                         return var
             raise RuntimeError("Unexpected type {}".format(outputs))
+        elif hasattr(var, 'name') and isinstance(var.name, str) and var.name:
+            return var.name
         else:
             raise RuntimeError("Unexpected type: {0}".format(type(var)))
 

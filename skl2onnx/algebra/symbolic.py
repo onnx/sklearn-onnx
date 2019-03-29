@@ -9,29 +9,34 @@ class AlgebraSymbolic:
 
     def __init__(self):
         pass
-
-    class Array:
+        
+    class Symbolic:
         def __init__(self, name):
             self.name = name
+        
+        def __repr__(self):
+            return "%s('%s')" % (self.__class__.__name__, self.name)
 
+    class Array(Symbolic):
         def __getitem__(self, index):
             return AlgebraSymbolic.ArrayPos(self, index)
 
-    class ArrayPosition:
+    class ArrayPosition(Symbolic):
         def __init__(self, array, position):
             self.array = array
             self.position = position
 
         def __getitem__(self, index):
             return AlgebraSymbolic.ArrayPos(self, index)
+            
+        def __repr__(self):
+            return "%s('%s', %d)" % (self.__class__.__name__, self.name, self.position)
 
-    @property
-    def In(self):
-        return AlgebraSymbolic.Array("I")
+    class Input(Symbolic):
+        pass
 
-    @property
-    def Out(self):
-        return AlgebraSymbolic.Array("O")
+    class Output(Symbolic):
+        pass
 
 
-OP = AlgebraSymbolic()
+Symbolic = AlgebraSymbolic()

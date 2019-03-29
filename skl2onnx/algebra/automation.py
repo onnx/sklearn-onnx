@@ -8,7 +8,6 @@ import onnx
 import onnx.defs
 from onnx.defs import OpSchema
 from onnx.backend.test.case import collect_snippets
-from onnx.backend.sample.ops import collect_sample_implementations
 
 
 def _get_doc_template():
@@ -113,7 +112,8 @@ def get_rst_doc(op_name=None):
     :param op_name: operator name of None for all
     :return: string
 
-    The function relies on module *jinja2*.
+    The function relies on module *jinja2* or replaces it
+    with a simple rendering if not present.
     """
     if op_name is None:
         schemas = onnx.defs.get_all_schemas_with_history()
@@ -129,6 +129,7 @@ def get_rst_doc(op_name=None):
         raise ValueError(
             "Unable to find any operator with name '{}'.".format(op_name))
 
+    # from onnx.backend.sample.ops import collect_sample_implementations
     # SNIPPETS = collect_snippets()
     # SAMPLE_IMPLEMENTATIONS = collect_sample_implementations()
     def format_name_with_domain(sch):
@@ -174,15 +175,16 @@ def get_rst_doc(op_name=None):
                                      format_name_with_domain=format_name_with_domain)
 
 
-def ClassFactory(name, input_names, attr_names, doc):
+def ClassFactory(name, inputs, outputs, input_range, output_range, 
+                 attr_names, doc):
     from .onnx_operator import OnnxOperator
 
     def __init__(self, *args, **kwargs):
 
-        if len(args) != len(input_names):
+        if len(args) != len(inputs):
             raise RuntimeError("Unexpected number of inputs, "
                                "got {}, expecting {}.".format(
-                                   len(args), len(input_names)))
+                                   len(args), len(inputs)))
 
         for key in kwargs:
             if key in {'outputs'}:
@@ -192,9 +194,14 @@ def ClassFactory(name, input_names, attr_names, doc):
                                 % (key, self.__class__.__name__))
 
         OnnxOperator.__init__(self, *args, **kwargs)
+        
 
     newclass = type(name, (OnnxOperator,),
-                    {"__init__": __init__, '__doc__': doc})
+                    {"__init__": __init__, '__doc__': doc,
+                     'expected_inputs': inputs,
+                     'expected_outputs': outputs,
+                     'input_range': input_range,
+                     'output_range': output_range})
     return newclass
 
 
@@ -207,15 +214,27 @@ def dynamic_class_creation():
     """
     res = {}
     for schema in onnx.defs.get_all_schemas_with_history():
+        if schema.support_level == schema.SupportType.EXPERIMENTAL:
+            # Skips experimental operators.
+            continue
         # Multiple version can coexist. The last one is kept.
         res[schema.name] = schema
     cls = {}
+    
+    def _c(obj, label, i):
+        name = obj.name or '%s%d' % (label, i)
+        tys = obj.typeStr or ''
+        return (name, tys)
+    
     for name in sorted(res):
         schema = res[name]
         doc = get_rst_doc(schema)
-        inputs = [i.name for i in schema.inputs]
+        inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
+        outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
-        cl = ClassFactory(schema.name, inputs, args,
-                          doc.split('**Summary**')[-1])
+        cl = ClassFactory(schema.name, inputs, outputs,
+                          [schema.min_input, schema.max_input],
+                          [schema.min_output, schema.max_output],
+                          args, doc.split('**Summary**')[-1])        
         cls[schema.name] = cl
     return cls

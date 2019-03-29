@@ -5,3 +5,4 @@
 # --------------------------------------------------------------------------
 
 from .onnx_operator import OnnxOperator  # noqa
+from .symbolic import Symbolic  # noqa
