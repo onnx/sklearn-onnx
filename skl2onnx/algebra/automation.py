@@ -23,71 +23,75 @@ def _get_doc_template():
                 schemas = context['schemas']
                 rows = []
                 for sch in schemas:
-                    rows.extend([sch.name, "=" * len(sch.name),
-                                 "", sch.description, ""])
+                    doc = sch.doc or ''
+                    name = sch.name
+                    if name is None:
+                        raise RuntimeError("An operator must have a name.")
+                    rows.extend([name, "=" * len(name),
+                                 "", doc, ""])
                 return "\n".join(rows)
 
     return Template(textwrap.dedent("""
-    {% for sch in schemas %}
+        {% for sch in schemas %}
 
-    {{format_name_with_domain(sch)}}
-    {{'=' * len(format_name_with_domain(sch))}}
+        {{format_name_with_domain(sch)}}
+        {{'=' * len(format_name_with_domain(sch))}}
 
-    **Summary**
+        **Summary**
 
-    {{sch.doc}}
+        {{sch.doc}}
 
-    **Version**
+        **Version**
 
-    {% if sch.support_level == OpSchema.SupportType.EXPERIMENTAL %}
-    No versioning maintained for experimental ops.
-    {% else %}
-    This version of the operator has been {% if
-    sch.deprecated %}deprecated{% else %}available{% endif %} since
-    version {{sch.since_version}}{% if
-    sch.domaine %} of domain {{sch.domain}}{% endif %}.
-    {% if len(sch.versions) > 1 %}
-    Other versions of this operator:
-    {% for v in sch.version[:-1] %} {{v}} {% endfor %}
-    {% endif %}
-    {% endif %}
+        {% if sch.support_level == OpSchema.SupportType.EXPERIMENTAL %}
+        No versioning maintained for experimental ops.
+        {% else %}
+        This version of the operator has been {% if
+        sch.deprecated %}deprecated{% else %}available{% endif %} since
+        version {{sch.since_version}}{% if
+        sch.domaine %} of domain {{sch.domain}}{% endif %}.
+        {% if len(sch.versions) > 1 %}
+        Other versions of this operator:
+        {% for v in sch.version[:-1] %} {{v}} {% endfor %}
+        {% endif %}
+        {% endif %}
 
-    {% if sch.attributes %}
-    **Attributes**
+        {% if sch.attributes %}
+        **Attributes**
 
-    {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
-      if attr.required %} (required){% endif %}: {{attr.description}} {%
-      if attr.default_value %}Default value is ``{{attr.default_value}}``{% endif %}
-    {% endfor %}
-    {% endif %}
+        {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
+          if attr.required %} (required){% endif %}: {{attr.description}} {%
+          if attr.default_value %}Default value is ``{{attr.default_value}}``{% endif %}
+        {% endfor %}
+        {% endif %}
 
-    {% if sch.inputs %}
-    **Inputs**
+        {% if sch.inputs %}
+        **Inputs**
 
-    {% if sch.min_input != sch.max_input %}Between {{sch.min_input}} and {{sch.max_input}} inputs.
-    {% endif %}
-    {% for ii, inp in enumerate(sch.inputs) %}
-    * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{inp.description}}{% endfor %}
-    {% endif %}
+        {% if sch.min_input != sch.max_input %}Between {{sch.min_input}} and {{sch.max_input}} inputs.
+        {% endif %}
+        {% for ii, inp in enumerate(sch.inputs) %}
+        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{inp.description}}{% endfor %}
+        {% endif %}
 
-    {% if sch.outputs %}
-    **Outputs**
+        {% if sch.outputs %}
+        **Outputs**
 
-    {% if sch.min_output != sch.max_output %}Between {{sch.min_output}} and {{sch.max_output}} outputs.
-    {% endif %}
-    {% for ii, out in enumerate(sch.outputs) %}
-    * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{out.description}}{% endfor %}
-    {% endif %}
+        {% if sch.min_output != sch.max_output %}Between {{sch.min_output}} and {{sch.max_output}} outputs.
+        {% endif %}
+        {% for ii, out in enumerate(sch.outputs) %}
+        * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{out.description}}{% endfor %}
+        {% endif %}
 
-    {% if sch.type_constraints %}
-    **Type Constraints**
+        {% if sch.type_constraints %}
+        **Type Constraints**
 
-    {% for ii, type_constraint in enumerate(sch.type_constraints) 
-    %}* {{getconstraint(type_constraint, ii)}}: {{type_constraint.description}}
-    {% endfor %}
-    {% endif %}
+        {% for ii, type_constraint in enumerate(sch.type_constraints) 
+        %}* {{getconstraint(type_constraint, ii)}}: {{type_constraint.description}}
+        {% endfor %}
+        {% endif %}
 
-    {% endfor %}
+        {% endfor %}
     """))
 
 
