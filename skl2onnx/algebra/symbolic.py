@@ -9,11 +9,11 @@ class AlgebraSymbolic:
 
     def __init__(self):
         pass
-        
+
     class Symbolic:
         def __init__(self, name):
             self.name = name
-        
+
         def __repr__(self):
             return "%s('%s')" % (self.__class__.__name__, self.name)
 
@@ -28,7 +28,7 @@ class AlgebraSymbolic:
 
         def __getitem__(self, index):
             return AlgebraSymbolic.ArrayPos(self, index)
-            
+
         def __repr__(self):
             return "%s('%s', %d)" % (self.__class__.__name__, self.name, self.position)
 

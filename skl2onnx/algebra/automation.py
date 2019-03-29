@@ -85,7 +85,7 @@ def _get_doc_template():
         {% if sch.type_constraints %}
         **Type Constraints**
 
-        {% for ii, type_constraint in enumerate(sch.type_constraints) 
+        {% for ii, type_constraint in enumerate(sch.type_constraints)
         %}* {{getconstraint(type_constraint, ii)}}: {{type_constraint.description}}
         {% endfor %}
         {% endif %}
@@ -175,7 +175,7 @@ def get_rst_doc(op_name=None):
                                      format_name_with_domain=format_name_with_domain)
 
 
-def ClassFactory(name, inputs, outputs, input_range, output_range, 
+def ClassFactory(name, inputs, outputs, input_range, output_range,
                  attr_names, doc):
     from .onnx_operator import OnnxOperator
 
@@ -194,7 +194,6 @@ def ClassFactory(name, inputs, outputs, input_range, output_range,
                                 % (key, self.__class__.__name__))
 
         OnnxOperator.__init__(self, *args, **kwargs)
-        
 
     newclass = type(name, (OnnxOperator,),
                     {"__init__": __init__, '__doc__': doc,
@@ -220,12 +219,12 @@ def dynamic_class_creation():
         # Multiple version can coexist. The last one is kept.
         res[schema.name] = schema
     cls = {}
-    
+
     def _c(obj, label, i):
         name = obj.name or '%s%d' % (label, i)
         tys = obj.typeStr or ''
         return (name, tys)
-    
+
     for name in sorted(res):
         schema = res[name]
         doc = get_rst_doc(schema)
@@ -235,6 +234,6 @@ def dynamic_class_creation():
         cl = ClassFactory(schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
-                          args, doc.split('**Summary**')[-1])        
+                          args, doc.split('**Summary**')[-1])
         cls[schema.name] = cl
     return cls

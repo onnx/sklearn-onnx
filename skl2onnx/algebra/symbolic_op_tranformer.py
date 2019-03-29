@@ -13,13 +13,13 @@ class SymbolicOpTransformer(BaseEstimator, TransformerMixin):
     """
     Implements a bridge between ONNX operators
     and symbolic operators.
-    
+
     :param op: :class:`OnnxOperator <skl2onnx.algebra.OnnxOperator>`
     """
 
-    def __init__(self, op):    
+    def __init__(self, op):
         self.op = op
-    
+
     def __str__(self):
         return "Sym('%s')" % self.op.__class__.__name__
 
@@ -39,7 +39,7 @@ class SymbolicOpTransformer(BaseEstimator, TransformerMixin):
             to_out = operator.outputs[i]
             to_out.type = fr_out.type
             to_out.type.shape = fr_out.type.shape
-        
+
     def parse(self, scope, model, inputs, custom_parsers=None):
         """
         Defines the number of expected inputs.
