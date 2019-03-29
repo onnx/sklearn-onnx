@@ -17,7 +17,7 @@ import numpy as np
 def _handle_zeros(scope, container, concatenated_prob_name,
                   reduced_prob_name, n_classes):
     """
-    This function replaces 0s in concatednated_prob_name with 1s and
+    This function replaces 0s in concatenated_prob_name with 1s and
     0s in reduced_prob_name with n_classes.
     """
     cast_prob_name = scope.get_unique_variable_name('cast_prob')
@@ -52,6 +52,9 @@ def _handle_zeros(scope, container, concatenated_prob_name,
 
 
 def _transform_sigmoid(scope, container, model, df_col_name, k):
+    """
+    Sigmoid Calibration method
+    """
     a_name = scope.get_unique_variable_name('a')
     b_name = scope.get_unique_variable_name('b')
     a_df_prod_name = scope.get_unique_variable_name('a_df_prod')
@@ -83,6 +86,12 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
 
 
 def _transform_isotonic(scope, container, model, T, k):
+    """
+    Isotonic calibration method
+    This function can only handle one instance at a time because
+    ArrayFeatureExtractor can only extract based on the last axis,
+    so we can't fetch different columns for different rows.
+    """
     if model.calibrators_[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
 
