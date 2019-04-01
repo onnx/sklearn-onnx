@@ -61,7 +61,7 @@ class Variable:
     def __repr__(self):
         return ("Variable(raw_name='{0}', onnx_name='{1}', type={2})".format(
                 self.raw_name, self.onnx_name, self.type))
-                            
+
     @staticmethod
     def from_pb(obj):
         """
@@ -70,7 +70,7 @@ class Variable:
         def get_shape(tt):
             return [tt.shape.dim[i].dim_value
                     for i in range(len(tt.shape.dim))]
-            
+
         if hasattr(obj, 'extend'):
             return [Variable.from_pb(o) for o in obj]
         name = obj.name
@@ -94,12 +94,11 @@ class Variable:
                 raise NotImplementedError("Unsupported type '{}' elem_type={}".format(
                     type(obj.type.tensor_type), elem))
         else:
-            raise NotImplementedError("Unsupported type '{}' as a string={}".format(
-                type(obj), obj))        
-            
-        return Variable(name, name, None, ty)
+            raise NotImplementedError("Unsupported type '{}' as "
+                                      "a string={}".format(
+                                        type(obj), obj))
 
-                
+        return Variable(name, name, None, ty)
 
 
 class Operator(OperatorBase):

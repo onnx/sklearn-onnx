@@ -145,8 +145,9 @@ class FloatTensorType(TensorType):
 class DoubleTensorType(TensorType):
     def __init__(self, shape=None, color_space=None, doc_string='',
                  denotation=None, channel_denotations=None):
-        super(DoubleTensorType, self).__init__(shape, doc_string, denotation,
-                                              channel_denotations)
+        super(DoubleTensorType, self).__init__(shape, doc_string,
+                                               denotation,
+                                               channel_denotations)
         self.color_space = color_space
 
     def _get_element_onnx_type(self):

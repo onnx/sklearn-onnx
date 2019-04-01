@@ -30,7 +30,8 @@ class AlgebraSymbolic:
             return AlgebraSymbolic.ArrayPos(self, index)
 
         def __repr__(self):
-            return "%s('%s', %d)" % (self.__class__.__name__, self.name, self.position)
+            return "%s('%s', %d)" % (self.__class__.__name__,
+                                    self.name, self.position)
 
     class Input(Symbolic):
         pass

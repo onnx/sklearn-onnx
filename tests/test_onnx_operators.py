@@ -36,7 +36,7 @@ class TestOnnxOperators(unittest.TestCase):
 
         def conv(scope, operator, container):
             W = operator.raw_operator.W
-            op = Sub(operator.inputs[0], W, outputs=operator.outputs)
+            op = Sub(operator.inputs[0], W, output_names=operator.outputs)
             op.add_to(scope, container)
 
         def shape(operator):
@@ -78,7 +78,7 @@ class TestOnnxOperators(unittest.TestCase):
             S = operator.raw_operator.S
             X = operator.inputs[0]
             out = operator.outputs
-            op = Div(Sub(X, W), S, outputs=out)
+            op = Div(Sub(X, W), S, output_names=out)
             op.add_to(scope, container)
 
         def shape(operator):
@@ -111,8 +111,8 @@ class TestOnnxOperators(unittest.TestCase):
             rs = ReduceSumSquare(X, axes=[1], keepdims=1)
             z = Add(rs, Gemm(X, C, zeros, alpha=-2., transB=1))
             y2 = Add(C2, z)
-            l = ArgMin(y2, axis=1, keepdims=0, outputs=out[:1])
-            y2s = Sqrt(y2, outputs=out[1:])
+            l = ArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
+            y2s = Sqrt(y2, output_names=out[1:])
 
             l.add_to(scope, container)
             y2s.add_to(scope, container)

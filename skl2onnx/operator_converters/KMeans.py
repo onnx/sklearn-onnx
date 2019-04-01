@@ -35,7 +35,8 @@ def convert_sklearn_kmeans(scope, operator, container):
          .------------------------------------------------------.
          |                                                      |
          |                                                      v
-        X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1) <- C [k, n]
+        X [l, n] --> ReduceSumSquare -> X^2 [l]   Gemm (alpha=-2, transB=1)
+                                         |                  |  |- C [k, n]
                                          |                  |
                                          |                  v
                                          `------> Add <-- -2XC' [l, k]

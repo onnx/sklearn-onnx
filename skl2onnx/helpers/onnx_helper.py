@@ -138,15 +138,19 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
 
 
 def infer_outputs(op_type, inputs, outputs, **atts):
-    
+    """
+    Infers outputs type and shapes given an ONNX operator.
+    """
     node = helper.make_node(op_type, [i.onnx_name for i in inputs],
                             [o.onnx_name for o in outputs], **atts)
     onnx_inputs = []
     for input in inputs:
         onnx_type = input.type.to_onnx_type()
         tensor_type = onnx_type.tensor_type
-        shape = [tensor_type.shape.dim[i].dim_value for i in range(len(tensor_type.shape.dim))]
-        inp = helper.make_tensor_value_info(input.onnx_name, tensor_type.elem_type,
+        shape = [tensor_type.shape.dim[i].dim_value
+                 for i in range(len(tensor_type.shape.dim))]
+        inp = helper.make_tensor_value_info(input.onnx_name,
+                                            tensor_type.elem_type,
                                             tuple(shape))
         onnx_inputs.append(inp)
 
@@ -156,4 +160,3 @@ def infer_outputs(op_type, inputs, outputs, **atts):
     original_model = helper.make_model(graph, producer_name='skl2onnx')
     inferred_model = shape_inference.infer_shapes(original_model)
     return Variable.from_pb(inferred_model.graph.value_info)
-    

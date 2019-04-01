@@ -7,7 +7,6 @@ import textwrap
 import onnx
 import onnx.defs
 from onnx.defs import OpSchema
-from onnx.backend.test.case import collect_snippets
 
 
 def _get_doc_template():
@@ -60,33 +59,39 @@ def _get_doc_template():
 
         {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
           if attr.required %} (required){% endif %}: {{attr.description}} {%
-          if attr.default_value %}Default value is ``{{attr.default_value}}``{% endif %}
+          if attr.default_value %}Default value is ``{{attr.default_value
+          }}``{% endif %}
         {% endfor %}
         {% endif %}
 
         {% if sch.inputs %}
         **Inputs**
 
-        {% if sch.min_input != sch.max_input %}Between {{sch.min_input}} and {{sch.max_input}} inputs.
+        {% if sch.min_input != sch.max_input %}Between {{sch.min_input
+        }} and {{sch.max_input}} inputs.
         {% endif %}
         {% for ii, inp in enumerate(sch.inputs) %}
-        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{inp.description}}{% endfor %}
+        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{
+        inp.description}}{% endfor %}
         {% endif %}
 
         {% if sch.outputs %}
         **Outputs**
 
-        {% if sch.min_output != sch.max_output %}Between {{sch.min_output}} and {{sch.max_output}} outputs.
+        {% if sch.min_output != sch.max_output %}Between {{sch.min_output
+        }} and {{sch.max_output}} outputs.
         {% endif %}
         {% for ii, out in enumerate(sch.outputs) %}
-        * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{out.description}}{% endfor %}
+        * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{
+        out.description}}{% endfor %}
         {% endif %}
 
         {% if sch.type_constraints %}
         **Type Constraints**
 
         {% for ii, type_constraint in enumerate(sch.type_constraints)
-        %}* {{getconstraint(type_constraint, ii)}}: {{type_constraint.description}}
+        %}* {{getconstraint(type_constraint, ii)}}: {{
+        type_constraint.description}}
         {% endfor %}
         {% endif %}
 
@@ -130,6 +135,7 @@ def get_rst_doc(op_name=None):
             "Unable to find any operator with name '{}'.".format(op_name))
 
     # from onnx.backend.sample.ops import collect_sample_implementations
+    # from onnx.backend.test.case import collect_snippets
     # SNIPPETS = collect_snippets()
     # SAMPLE_IMPLEMENTATIONS = collect_sample_implementations()
     def format_name_with_domain(sch):
@@ -167,12 +173,14 @@ def get_rst_doc(op_name=None):
         else:
             return name
 
-    return _template_operator.render(schemas=schemas, OpSchema=OpSchema, len=len,
+    return _template_operator.render(schemas=schemas, OpSchema=OpSchema,
+                                     len=len,
                                      getattr=getattr, sorted=sorted,
                                      format_option=format_option,
                                      getconstraint=getconstraint,
                                      getname=getname, enumerate=enumerate,
-                                     format_name_with_domain=format_name_with_domain)
+                                     format_name_with_domain=
+                                        format_name_with_domain)
 
 
 def ClassFactory(name, inputs, outputs, input_range, output_range,
@@ -210,8 +218,11 @@ def dynamic_class_creation():
     """
     Automatically generates classes for each of the operators
     module *onnx* defines and described at
-    `Operators <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ and
-    `Operators <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md>`_.
+    `Operators
+    <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_
+    and `Operators
+    <https://github.com/onnx/onnx/blob/master/docs/
+    Operators-ml.md>`_.
     """
     res = {}
     for schema in onnx.defs.get_all_schemas_with_history():

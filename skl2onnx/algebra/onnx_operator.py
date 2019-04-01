@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 import numpy as np
 import onnx
-from ..common.data_types import FloatTensorType, Int64TensorType, StringTensorType
-from ..common.data_types import Int32TensorType, DoubleTensorType, BoolTensorType
+from ..common.data_types import FloatTensorType, Int64TensorType
+from ..common.data_types import StringTensorType
+from ..common.data_types import Int32TensorType, DoubleTensorType
+from ..common.data_types import BoolTensorType
 from ..common._topology import Variable
 from ..proto import get_opset_number_from_onnx, onnx_proto
 from ..helpers.onnx_helper import infer_outputs
@@ -34,8 +36,10 @@ class OnnxOperator:
         self.inputs = list(inputs)
         self.op_version = op_version or get_opset_number_from_onnx()
         self.kwargs = kwargs
-        if hasattr(output_names, 'outputs') and output_names.outputs is not None:
-            self.output_names = [out.full_name for out in operator.outputs]
+        if hasattr(output_names, 'outputs') and \
+            output_names.outputs is not None:
+            self.output_names = [out.full_name
+                                 for out in operator.outputs]
         else:
             self.output_names = output_names
         if self.output_names:
@@ -54,7 +58,8 @@ class OnnxOperator:
         """
         if hasattr(self, 'output_names_'):
             return self.output_names_[i]
-        if self.output_names and i < len(self.output_names) and self.output_names[i]:
+        if self.output_names and i < len(self.output_names) and \
+            self.output_names[i]:
             return self.output_names[i]
         if i < len(self.__class__.expected_outputs):
             return self.__class__.expected_outputs[i][0]
@@ -138,7 +143,8 @@ class OnnxOperator:
                     len(inputs) > self.input_range[1]:
                 raise RuntimeError("Operator '{}' expects a number of inputs "
                                    "in [{}, {}] not {}".format(
-                                       self.__class__.__name__, *self.input_range,
+                                       self.__class__.__name__,
+                                       *self.input_range,
                                        len(inputs)))
         res = []
         for k, value in inputs.items():
@@ -151,7 +157,8 @@ class OnnxOperator:
                 if len(exp) == 0:
                     raise RuntimeError("Operator has no input '{}', "
                                        "expects a name in {}.".format(
-                                           k, [v[0] for v in self.expected_inputs]))
+                                           k, [v[0] for v in 
+                                               self.expected_inputs]))
                 exp = exp[0]
                 if hasattr(exp[1], 'name') and exp[1].name != exp[0]:
                     raise RuntimeError("Name mismatch '{}' != '{}'".format(
@@ -214,7 +221,8 @@ class OnnxOperator:
             else:
                 raise NotImplementedError(
                     "Unsupported type '{}'".format(given_type.dtype))
-        elif isinstance(given_type, (FloatTensorType, Int64TensorType, StringTensorType)):
+        elif isinstance(given_type, (FloatTensorType, Int64TensorType,
+                                     StringTensorType)):
             return given_type
         elif isinstance(given_type, Variable):
             return given_type.type
@@ -232,7 +240,8 @@ class OnnxOperator:
             elif given_type.data_type == onnx_proto.TensorProto.BOOL:
                 return BoolTensorType(given_type.dims)
             else:
-                raise NotImplementedError("Unsupported type '{}' data_type={}".format(
+                raise NotImplementedError("Unsupported type '{}' "
+                                          "data_type={}".format(
                     type(given_type), given_type.data_type))
         else:
             raise NotImplementedError(
@@ -242,7 +251,8 @@ class OnnxOperator:
         """
         Converts this operator into an ONNX graph.
 
-        :param inputs: specific inputs (as a dictionary) or default inputs if not specified
+        :param inputs: specific inputs (as a dictionary) or
+            default inputs if not specified
         """
         from .. import convert_sklearn
         if inputs:
@@ -252,12 +262,14 @@ class OnnxOperator:
         for name, typ in inputs:
             if typ in (None, ''):
                 raise RuntimeError("Type input '{}' for operator '{}' "
-                                   "is unknown. You should specify input types.".format(
+                                   "is unknown. You should specify "
+                                   "input types.".format(
                                        name, self.__class__.__name__))
         new_cl = type('SymbolicOpTransformer' + self.__class__.__name__,
                       (SymbolicOpTransformer,), {})
         tr = new_cl(self)
-        onx = convert_sklearn(tr, 'onnx-op', inputs, target_opset=self.op_version,
+        onx = convert_sklearn(tr, 'onnx-op', inputs,
+                              target_opset=self.op_version,
                               custom_parsers={new_cl: tr.parse},
                               custom_shape_calculators={new_cl: tr.set_shape},
                               custom_conversion_functions={new_cl: tr.convert})
