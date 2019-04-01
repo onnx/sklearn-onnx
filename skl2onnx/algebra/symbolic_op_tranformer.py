@@ -27,13 +27,14 @@ class SymbolicOpTransformer(BaseEstimator, TransformerMixin):
         """
         Converts the operator into an ONNX graph.
         """
-        self.op.add_to(scope, operator, container)
+        self.op.add_to(scope, container)
 
     def set_shape(self, operator):
         """
         Returns the shapes of the outputs.
         """
-        outputs = self.op.get_expected_outputs(operator.inputs)
+        # Overwrite here to change the shape of expected outputs.
+        outputs = self.op.get_typed_outputs(operator.inputs, operator.outputs)
         for i in range(0, len(outputs)):
             fr_out = outputs[i]
             to_out = operator.outputs[i]
@@ -49,8 +50,11 @@ class SymbolicOpTransformer(BaseEstimator, TransformerMixin):
         name = self.op.__class__.__name__
         this_operator = scope.declare_local_operator(name, model)
         this_operator.inputs = inputs
-        nb_out = len(self.op.get_expected_outputs(var_inputs))
+        # Overwrite here to change the number of expected outputs.
+        nb_out = self.op.get_schema_nb_output(var_inputs)
         for i in range(nb_out):
-            var = scope.declare_local_variable(name + "_o", FloatTensorType())
+            raw_name = self.op.get_output(i)
+            var = scope.declare_local_variable(raw_name, FloatTensorType())
+            self.op.update_name(i, var.onnx_name)
             this_operator.outputs.append(var)
         return this_operator.outputs

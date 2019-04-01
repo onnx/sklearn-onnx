@@ -13,7 +13,7 @@ from test_utils import dump_data_and_model
 def one_hot_encoder_supports_string():
     sig = inspect.signature(OneHotEncoder.__init__)
     keys = list(sig.parameters.keys())
-    return "n_values" not in keys
+    return "n_values" in keys
 
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):

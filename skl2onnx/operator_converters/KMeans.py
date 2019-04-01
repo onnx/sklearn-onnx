@@ -73,8 +73,8 @@ def convert_sklearn_kmeans(scope, operator, container):
     rs = ReduceSumSquare(X, axes=[1], keepdims=1)
     z = Add(rs, Gemm(X, C, zeros, alpha=-2., transB=1))
     y2 = Add(C2, z)
-    ll = ArgMin(y2, axis=1, keepdims=0, outputs=out[:1])
-    y2s = Sqrt(y2, outputs=out[1:])
+    ll = ArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
+    y2s = Sqrt(y2, output_names=out[1:])
 
     ll.add_to(scope, container)
     y2s.add_to(scope, container)

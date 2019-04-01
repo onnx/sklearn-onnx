@@ -15,6 +15,8 @@ from . import utils
 from .data_types import FloatType, Int64Type, StringType, TensorType
 from .data_types import DictionaryType, FloatTensorType # noqa
 from .data_types import Int64TensorType, SequenceType # noqa
+from .data_types import StringTensorType, DoubleTensorType # noqa
+from .data_types import Int32TensorType, BoolTensorType # noqa
 from ._container import ModelComponentContainer
 from .interface import OperatorBase
 
@@ -59,6 +61,45 @@ class Variable:
     def __repr__(self):
         return ("Variable(raw_name='{0}', onnx_name='{1}', type={2})".format(
                 self.raw_name, self.onnx_name, self.type))
+                            
+    @staticmethod
+    def from_pb(obj):
+        """
+        Creates a data type from a protobuf object.
+        """
+        def get_shape(tt):
+            return [tt.shape.dim[i].dim_value
+                    for i in range(len(tt.shape.dim))]
+            
+        if hasattr(obj, 'extend'):
+            return [Variable.from_pb(o) for o in obj]
+        name = obj.name
+        if obj.type.tensor_type:
+            tt = obj.type.tensor_type
+            elem = tt.elem_type
+            shape = get_shape(tt)
+            if elem == onnx_proto.TensorProto.FLOAT:
+                ty = FloatTensorType(shape)
+            elif elem == onnx_proto.TensorProto.BOOL:
+                ty = BoolTensorType(shape)
+            elif elem == onnx_proto.TensorProto.DOUBLE:
+                ty = DoubleTensorType(shape)
+            elif elem == onnx_proto.TensorProto.STRING:
+                ty = StringTensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT64:
+                ty = Int64TensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT32:
+                ty = Int32TensorType(shape)
+            else:
+                raise NotImplementedError("Unsupported type '{}' elem_type={}".format(
+                    type(obj.type.tensor_type), elem))
+        else:
+            raise NotImplementedError("Unsupported type '{}' as a string={}".format(
+                type(obj), obj))        
+            
+        return Variable(name, name, None, ty)
+
+                
 
 
 class Operator(OperatorBase):

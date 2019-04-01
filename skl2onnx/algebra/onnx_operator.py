@@ -6,7 +6,10 @@
 import numpy as np
 import onnx
 from ..common.data_types import FloatTensorType, Int64TensorType, StringTensorType
+from ..common.data_types import Int32TensorType, DoubleTensorType, BoolTensorType
 from ..common._topology import Variable
+from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
 from .symbolic_op_tranformer import SymbolicOpTransformer
 
@@ -21,40 +24,67 @@ class OnnxOperator:
     a graph as a node.
 
     :param inputs: list of inputs expected by the operator
-    :param outputs: empty if this node is not a final node,
-        its outputs are not the graph outputs
+    :param op_version: to select a specific version of the operator
+    :param output_names: used defined names for the outputs
     :param kwargs: additional parameters of the operator
     """
 
-    def __init__(self, *inputs, outputs=None, **kwargs):
+    def __init__(self, *inputs, op_version=None, output_names=None, **kwargs):
         self.state = None
         self.inputs = list(inputs)
+        self.op_version = op_version or get_opset_number_from_onnx()
         self.kwargs = kwargs
-        if outputs is None:
-            # It means intermediate outputs. We suppose there is one.
-            outputs = [None]
-        self.known_outputs = outputs
+        if hasattr(output_names, 'outputs') and output_names.outputs is not None:
+            self.output_names = [out.full_name for out in operator.outputs]
+        else:
+            self.output_names = output_names
+        if self.output_names:
+            for i in range(len(self.output_names)):
+                name = self.output_names[i]
+                if isinstance(name, Variable):
+                    self.output_names[i] = name.onnx_name
+                elif not isinstance(name, str):
+                    raise TypeError("output_names must be a list of strings "
+                                    "and element {} is {}".format(
+                                        i, type(name)))
 
-    def _register_outputs(self, scope):
+    def get_output(self, i):
         """
-        Registers outputs in *scope* if not alreay registered.
-        It should not be directly called but from method *add_to*.
-
-        :param scope: scope
+        Returns the ith output.
         """
-        for i in range(len(self.known_outputs)):
-            o = self.known_outputs[i]
-            if o is None:
-                self.known_outputs[i] = scope.get_unique_variable_name(
-                    self.__class__.__name__ + '-o')
+        if hasattr(self, 'output_names_'):
+            return self.output_names_[i]
+        if self.output_names and i < len(self.output_names) and self.output_names[i]:
+            return self.output_names[i]
+        if i < len(self.__class__.expected_outputs):
+            return self.__class__.expected_outputs[i][0]
+        else:
+            return "O%d" % i
+    
+    def update_name(self, i, name):
+        """
+        Updates the name of a variable after it was scoped.
+        """
+        if hasattr(self, 'output_names_') and i < len(self.output_names_):
+            if self.output_names_[i] != name:
+                raise RuntimeError("Inconsistent, cannot "
+                                   "changed variable name "
+                                   "after it was used: "
+                                   "'{}' != '{}'".format(
+                                       self.output_names_[i],
+                                       name))
+        if self.output_names is None:
+            self.output_names = []
+        while len(self.output_names) <= i:
+            self.output_names.append(None)
+        self.output_names[i] = name
 
-    def add_to(self, scope, operator, container):
+    def add_to(self, scope, container):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
 
         :param scope: scope
-        :param operator: operator
         :param container: container
         """
         if self.state is None:
@@ -64,14 +94,23 @@ class OnnxOperator:
             else:
                 kwargs = self.kwargs
 
-            if operator is not None and len(self.known_outputs) \
-                    == 1 and self.known_outputs[0] is None:
-                self.known_outputs = operator.outputs
-
-            self._register_outputs(scope)
-            self.state = GraphState(self.inputs, self.known_outputs,
+            if hasattr(self, 'output_names_'):
+                outputs = self.output_names_
+            elif self.output_names:
+                outputs = self.output_names
+                self.output_names_ = outputs
+            else:
+                outputs = []
+                for name in self.__class__.expected_outputs:
+                    name = scope.get_unique_variable_name(name[0])
+                    outputs.append(name)
+                self.output_names_ = outputs
+            
+            self.state = GraphState(self.inputs, self.output_names_,
                                     self.__class__.__name__,
                                     scope, container, None,
+                                    op_version=self.op_version,
+                                    op_domain=self.__class__.domain,
                                     **self.kwargs)
             self.state.run()
 
@@ -103,22 +142,39 @@ class OnnxOperator:
                                        len(inputs)))
         res = []
         for k, value in inputs.items():
-            exp = [v for v in self.expected_inputs if v[0] == k]
-            if len(exp) == 0:
-                raise RuntimeError("Operator has not input '{}', "
-                                   "expects a name in {}.".format(
-                                       k, [v[0] for v in self.expected_inputs]))
-            exp = exp[0]
-            if hasattr(exp[1], 'name') and exp[1].name != exp[0]:
-                raise RuntimeError("Name mismatch '{}' != '{}'".format(
-                    exp[1].name, exp[0]))
-            res.append((exp[0], self.guess_type(exp[1], value)))
+            if self.__class__.input_range[1] == 2147483647:
+                # infinity is allowed
+                exp = self.expected_inputs[0]                
+                res.append(('I%d' % len(res), self.guess_type(exp[1], value)))
+            else:
+                exp = [v for v in self.expected_inputs if v[0] == k]
+                if len(exp) == 0:
+                    raise RuntimeError("Operator has no input '{}', "
+                                       "expects a name in {}.".format(
+                                           k, [v[0] for v in self.expected_inputs]))
+                exp = exp[0]
+                if hasattr(exp[1], 'name') and exp[1].name != exp[0]:
+                    raise RuntimeError("Name mismatch '{}' != '{}'".format(
+                        exp[1].name, exp[0]))
+                res.append((exp[0], self.guess_type(exp[1], value)))
         return res
-
-    def get_expected_outputs(self, inputs):
+    
+    def get_schema_nb_output(self, inputs):
         """
         Infers the number of outputs given the inputs.
         """
+        return len(self.__class__.expected_outputs)        
+
+    def get_typed_outputs(self, inputs, outputs):
+        """
+        Infers the output shapes and type given the inputs.
+        """
+        outputs = infer_outputs(self.__class__.__name__, inputs,
+                                outputs, **self.kwargs)
+        return outputs
+        
+    def _guess_typed_outputs(self, inputs):
+        
         if self.output_range[0] == self.output_range[1]:
             nb = self.output_range[0]
         else:
@@ -163,12 +219,18 @@ class OnnxOperator:
         elif isinstance(given_type, Variable):
             return given_type.type
         elif isinstance(given_type, onnx.onnx_ml_pb2.TensorProto):
-            if given_type.data_type == 1:
+            if given_type.data_type == onnx_proto.TensorProto.FLOAT:
                 return FloatTensorType(given_type.dims)
-            elif given_type.data_type == 8:
+            elif given_type.data_type == onnx_proto.TensorProto.DOUBLE:
+                return DoubleTensorType(given_type.dims)
+            elif given_type.data_type == onnx_proto.TensorProto.STRING:
                 return StringTensorType(given_type.dims)
-            elif given_type.data_type == 7:
+            elif given_type.data_type == onnx_proto.TensorProto.INT64:
                 return Int64TensorType(given_type.dims)
+            elif given_type.data_type == onnx_proto.TensorProto.INT32:
+                return Int32TensorType(given_type.dims)
+            elif given_type.data_type == onnx_proto.TensorProto.BOOL:
+                return BoolTensorType(given_type.dims)
             else:
                 raise NotImplementedError("Unsupported type '{}' data_type={}".format(
                     type(given_type), given_type.data_type))
@@ -195,7 +257,7 @@ class OnnxOperator:
         new_cl = type('SymbolicOpTransformer' + self.__class__.__name__,
                       (SymbolicOpTransformer,), {})
         tr = new_cl(self)
-        onx = convert_sklearn(tr, 'onnx-op', inputs,
+        onx = convert_sklearn(tr, 'onnx-op', inputs, target_opset=self.op_version,
                               custom_parsers={new_cl: tr.parse},
                               custom_shape_calculators={new_cl: tr.set_shape},
                               custom_conversion_functions={new_cl: tr.convert})

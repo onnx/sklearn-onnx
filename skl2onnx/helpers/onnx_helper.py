@@ -6,7 +6,8 @@
 
 from io import BytesIO
 import onnx
-from onnx import helper
+from onnx import helper, shape_inference
+from ..common._topology import Variable
 
 
 def load_onnx_model(onnx_file_or_bytes):
@@ -134,3 +135,25 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
         raise RuntimeError("Input mismatch {} != {}".format(
                         len(onnx_model.input), len(model.input)))
     return onnx_model
+
+
+def infer_outputs(op_type, inputs, outputs, **atts):
+    
+    node = helper.make_node(op_type, [i.onnx_name for i in inputs],
+                            [o.onnx_name for o in outputs], **atts)
+    onnx_inputs = []
+    for input in inputs:
+        onnx_type = input.type.to_onnx_type()
+        tensor_type = onnx_type.tensor_type
+        shape = [tensor_type.shape.dim[i].dim_value for i in range(len(tensor_type.shape.dim))]
+        inp = helper.make_tensor_value_info(input.onnx_name, tensor_type.elem_type,
+                                            tuple(shape))
+        onnx_inputs.append(inp)
+
+    graph = helper.make_graph([node], 'infer_shapes',
+                              [], onnx_inputs)
+
+    original_model = helper.make_model(graph, producer_name='skl2onnx')
+    inferred_model = shape_inference.infer_shapes(original_model)
+    return Variable.from_pb(inferred_model.graph.value_info)
+    

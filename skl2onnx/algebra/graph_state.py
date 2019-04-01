@@ -37,15 +37,12 @@ class GraphState:
         return self.computed_outputs
 
     def _get_var_name(self, var, output):
-        if isinstance(var, str):
-            return self.scope.get_unique_variable_name(
-                "{}_o".format(var)) if output else var
-        elif isinstance(var, Variable):
+        if isinstance(var, Variable):
             return var.full_name
         elif isinstance(var, np.ndarray):
             return self._add_constant(var)
         elif hasattr(var, 'add_to'):
-            var.add_to(self.scope, None, self.container)
+            var.add_to(self.scope, self.container)
             outputs = var.outputs
             if isinstance(outputs, list):
                 if len(outputs) == 1:

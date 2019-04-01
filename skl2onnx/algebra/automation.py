@@ -176,18 +176,19 @@ def get_rst_doc(op_name=None):
 
 
 def ClassFactory(name, inputs, outputs, input_range, output_range,
-                 attr_names, doc):
+                 domain, attr_names, doc):
     from .onnx_operator import OnnxOperator
 
     def __init__(self, *args, **kwargs):
 
-        if len(args) != len(inputs):
+        if not (input_range[0] <= len(args) <= input_range[1]):
             raise RuntimeError("Unexpected number of inputs, "
-                               "got {}, expecting {}.".format(
-                                   len(args), len(inputs)))
+                               "got {}, expecting {} for operator "
+                               "'{}'.".format(
+                                   len(args), len(inputs), name))
 
         for key in kwargs:
-            if key in {'outputs'}:
+            if key in {'output_names', 'op_version'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s'"
@@ -200,7 +201,8 @@ def ClassFactory(name, inputs, outputs, input_range, output_range,
                      'expected_inputs': inputs,
                      'expected_outputs': outputs,
                      'input_range': input_range,
-                     'output_range': output_range})
+                     'output_range': output_range,
+                     'domain': domain})
     return newclass
 
 
@@ -234,6 +236,6 @@ def dynamic_class_creation():
         cl = ClassFactory(schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
-                          args, doc.split('**Summary**')[-1])
+                          schema.domain, args, doc.split('**Summary**')[-1])
         cls[schema.name] = cl
     return cls
