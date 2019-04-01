@@ -4,6 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import numpy as np
+
 from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_div, apply_exp,
@@ -11,7 +13,6 @@ from ..common._apply_operation import (
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
-import numpy as np
 
 
 def _handle_zeros(scope, container, concatenated_prob_name,
@@ -59,12 +60,12 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     b_name = scope.get_unique_variable_name('b')
     a_df_prod_name = scope.get_unique_variable_name('a_df_prod')
     exp_parameter_name = scope.get_unique_variable_name(
-                                                'exp_parameter')
+        'exp_parameter')
     exp_result_name = scope.get_unique_variable_name('exp_result')
     unity_name = scope.get_unique_variable_name('unity')
     denominator_name = scope.get_unique_variable_name('denominator')
     sigmoid_predict_result_name = scope.get_unique_variable_name(
-                                            'sigmoid_predict_result')
+        'sigmoid_predict_result')
 
     container.add_initializer(a_name, onnx_proto.TensorProto.FLOAT,
                               [], [model.calibrators_[k].a_])
@@ -238,11 +239,26 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                                            FloatTensorType())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
+    df_inp = df_name.full_name
 
     for k in range(n_classes):
         cur_k = k
         if n_classes == 2:
             cur_k += 1
+            # In case of binary classification, SVMs only return
+            # scores for the positive class. We concat the same
+            # column twice as we just use the second column.
+            if op_type in ('SklearnLinearSVC', 'SklearnSVC'):
+                df_input_name = scope.get_unique_variable_name('df_input')
+                merged_input_name = scope.get_unique_variable_name(
+                    'merged_input')
+
+                apply_reshape(scope, df_inp,
+                              df_input_name, container,
+                              desired_shape=(-1, 1))
+                apply_concat(scope, [df_input_name, df_input_name],
+                             merged_input_name, container, axis=1)
+                df_inp = merged_input_name
         k_name = scope.get_unique_variable_name('k')
         df_col_name = scope.get_unique_variable_name('transposed_df_col')
         prob_name[k] = scope.get_unique_variable_name('prob_{}'.format(k))
@@ -251,7 +267,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                                   [], [cur_k])
 
         container.add_node(
-            'ArrayFeatureExtractor', [df_name.full_name, k_name], df_col_name,
+            'ArrayFeatureExtractor', [df_inp, k_name], df_col_name,
             name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
             op_domain='ai.onnx.ml')
         T = (_transform_sigmoid(scope, container, model, df_col_name, k)
@@ -266,7 +282,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
         merged_prob_name = scope.get_unique_variable_name('merged_prob')
         unit_float_tensor_name = scope.get_unique_variable_name(
-                                                    'unit_float_tensor')
+            'unit_float_tensor')
 
         container.add_initializer(unit_float_tensor_name,
                                   onnx_proto.TensorProto.FLOAT, [], [1.0])
@@ -347,7 +363,7 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
     if np.issubdtype(op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
-        classes = np.array(list(map(lambda x: int(x), classes)))
+        classes = classes.astype(np.int32)
     elif np.issubdtype(op.classes_.dtype, np.signedinteger):
         class_type = onnx_proto.TensorProto.INT32
     else:
@@ -361,7 +377,7 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
     reshaped_result_name = scope.get_unique_variable_name('reshaped_result')
     argmax_output_name = scope.get_unique_variable_name('argmax_output')
     array_feature_extractor_result_name = scope.get_unique_variable_name(
-                                            'array_feature_extractor_result')
+        'array_feature_extractor_result')
     add_result_name = scope.get_unique_variable_name('add_result')
 
     container.add_initializer(classes_name, class_type, classes.shape, classes)
@@ -370,7 +386,7 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
     for clf in op.calibrated_classifiers_:
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
-                                            scope, operator, container, clf))
+            scope, operator, container, clf))
 
     container.add_node('Sum', [s for s in prob_scores_name],
                        add_result_name, op_version=7,
