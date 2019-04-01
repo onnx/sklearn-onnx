@@ -60,7 +60,7 @@ class OnnxOperator:
             return self.__class__.expected_outputs[i][0]
         else:
             return "O%d" % i
-    
+
     def update_name(self, i, name):
         """
         Updates the name of a variable after it was scoped.
@@ -105,7 +105,7 @@ class OnnxOperator:
                     name = scope.get_unique_variable_name(name[0])
                     outputs.append(name)
                 self.output_names_ = outputs
-            
+
             self.state = GraphState(self.inputs, self.output_names_,
                                     self.__class__.__name__,
                                     scope, container, None,
@@ -144,7 +144,7 @@ class OnnxOperator:
         for k, value in inputs.items():
             if self.__class__.input_range[1] == 2147483647:
                 # infinity is allowed
-                exp = self.expected_inputs[0]                
+                exp = self.expected_inputs[0]
                 res.append(('I%d' % len(res), self.guess_type(exp[1], value)))
             else:
                 exp = [v for v in self.expected_inputs if v[0] == k]
@@ -158,12 +158,12 @@ class OnnxOperator:
                         exp[1].name, exp[0]))
                 res.append((exp[0], self.guess_type(exp[1], value)))
         return res
-    
+
     def get_schema_nb_output(self, inputs):
         """
         Infers the number of outputs given the inputs.
         """
-        return len(self.__class__.expected_outputs)        
+        return len(self.__class__.expected_outputs)
 
     def get_typed_outputs(self, inputs, outputs):
         """
@@ -172,9 +172,9 @@ class OnnxOperator:
         outputs = infer_outputs(self.__class__.__name__, inputs,
                                 outputs, **self.kwargs)
         return outputs
-        
+
     def _guess_typed_outputs(self, inputs):
-        
+
         if self.output_range[0] == self.output_range[1]:
             nb = self.output_range[0]
         else:
