@@ -67,7 +67,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnCalibratedClassifierCVIsotonicFloat-OneOffArray",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            "<= StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -103,7 +104,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnCalibratedClassifierCVIsotonicBinary-OneOffArray",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            "<= StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
 
 
 if __name__ == "__main__":
