@@ -33,13 +33,42 @@ class OnnxOperator:
 
     def __init__(self, *inputs, op_version=None, output_names=None, **kwargs):
         self.state = None
-        self.inputs = list(inputs)
         self.op_version = op_version or get_opset_number_from_onnx()
         self.kwargs = kwargs
-        if hasattr(output_names, 'outputs') and \
-            output_names.outputs is not None:
+
+        # check inputs
+        if len(inputs) == 0:
+            if self.input_range[0] == self.input_range[1]:
+                self.inputs = [_[0] for _ in self.__class__.expected_inputs]
+            else:
+                # The number of inputs may vary.
+                self.inputs = None
+        else:
+            self.inputs = []
+            for inp in inputs:
+                if hasattr(inp, 'name'):
+                    self.inputs.append(inp.name)
+                elif isinstance(inp, str):
+                    self.inputs.append(inp)
+                else:
+                    raise TypeError("Unable to interpret the "
+                                    "input name for type {}.".format(
+                                        type(inp)))
+
+        if self.inputs is not None:
+            if len(self.inputs) < self.input_range[0] or \
+                len(self.inputs) > self.input_range[1]:
+                raise RuntimeError("Operator '{}' expects a number of inputs "
+                                   "in [{}, {}] not {}".format(
+                                        self.__class__.__name__,
+                                        *self.input_range,
+                                        len(self.inputs)))
+
+        # check output
+        if hasattr(output_names, 'outputs') \
+            and output_names.outputs is not None:
             self.output_names = [out.full_name
-                                 for out in operator.outputs]
+                                 for out in output_names.outputs]
         else:
             self.output_names = output_names
         if self.output_names:
@@ -58,8 +87,8 @@ class OnnxOperator:
         """
         if hasattr(self, 'output_names_'):
             return self.output_names_[i]
-        if self.output_names and i < len(self.output_names) and \
-            self.output_names[i]:
+        if self.output_names and i < len(self.output_names) \
+            and self.output_names[i]:
             return self.output_names[i]
         if i < len(self.__class__.expected_outputs):
             return self.__class__.expected_outputs[i][0]
@@ -146,42 +175,47 @@ class OnnxOperator:
                                        self.__class__.__name__,
                                        *self.input_range,
                                        len(inputs)))
+        defined_inputs = self.inputs \
+                         if self.inputs is not None \
+                         else [_[0] for _ in self.__class__.expected_inputs]
         res = []
         for k, value in inputs.items():
             if self.__class__.input_range[1] == 2147483647:
                 # infinity is allowed
-                exp = self.expected_inputs[0]
+                exp = self.__class__.expected_inputs[0]
                 res.append(('I%d' % len(res), self.guess_type(exp[1], value)))
             else:
-                exp = [v for v in self.expected_inputs if v[0] == k]
+                exp = [(v, e[1]) for v, e in zip(defined_inputs,
+                        self.__class__.expected_inputs) if v == k]
                 if len(exp) == 0:
                     raise RuntimeError("Operator has no input '{}', "
                                        "expects a name in {}.".format(
-                                           k, [v[0] for v in 
-                                               self.expected_inputs]))
+                                           k, defined_inputs))
                 exp = exp[0]
-                if hasattr(exp[1], 'name') and exp[1].name != exp[0]:
-                    raise RuntimeError("Name mismatch '{}' != '{}'".format(
-                        exp[1].name, exp[0]))
                 res.append((exp[0], self.guess_type(exp[1], value)))
         return res
 
     def get_schema_nb_output(self, inputs):
         """
         Infers the number of outputs given the inputs.
+        Used by the parser.
         """
         return len(self.__class__.expected_outputs)
 
     def get_typed_outputs(self, inputs, outputs):
         """
         Infers the output shapes and type given the inputs.
+        Used by *set_shape*.
         """
         outputs = infer_outputs(self.__class__.__name__, inputs,
                                 outputs, **self.kwargs)
         return outputs
 
     def _guess_typed_outputs(self, inputs):
-
+        """
+        Infers the output shapes and type given the inputs.
+        Used by *set_shape*.
+        """
         if self.output_range[0] == self.output_range[1]:
             nb = self.output_range[0]
         else:
@@ -242,7 +276,8 @@ class OnnxOperator:
             else:
                 raise NotImplementedError("Unsupported type '{}' "
                                           "data_type={}".format(
-                    type(given_type), given_type.data_type))
+                                              type(given_type),
+                                              given_type.data_type))
         else:
             raise NotImplementedError(
                 "Unsupported type '{}'".format(type(given_type)))

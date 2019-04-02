@@ -173,14 +173,14 @@ def get_rst_doc(op_name=None):
         else:
             return name
 
+    fnwd = format_name_with_domain
     return _template_operator.render(schemas=schemas, OpSchema=OpSchema,
                                      len=len,
                                      getattr=getattr, sorted=sorted,
                                      format_option=format_option,
                                      getconstraint=getconstraint,
                                      getname=getname, enumerate=enumerate,
-                                     format_name_with_domain=
-                                        format_name_with_domain)
+                                     format_name_with_domain=fnwd)
 
 
 def ClassFactory(name, inputs, outputs, input_range, output_range,
@@ -241,8 +241,12 @@ def dynamic_class_creation():
     for name in sorted(res):
         schema = res[name]
         doc = get_rst_doc(schema)
-        inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
-        outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
+        if name == "Abs":
+            inputs = [('X', 'FloatTensorType')]
+            outputs = [('Y', 'FloatTensorType')]
+        else:
+            inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
+            outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
         cl = ClassFactory(schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],

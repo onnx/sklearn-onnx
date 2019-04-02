@@ -3,14 +3,14 @@ import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 from skl2onnx.algebra.onnx_ops import Abs, Normalizer, ArgMin
-from skl2onnx.algebra import OnnxOperator, Symbolic
+from skl2onnx.algebra import OnnxOperator
 
 
 class TestAlgebraSymbolic(unittest.TestCase):
     
     def test_algebra_abs(self):
     
-        op = Abs(Symbolic.Input('I0'))
+        op = Abs('I0')
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
         
@@ -28,7 +28,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     def test_algebra_normalizer(self):
     
-        op = Normalizer(Symbolic.Input('I0'), norm='L1', op_version=1)
+        op = Normalizer('I0', norm='L1', op_version=1)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -43,7 +43,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     def test_algebra_argmin(self):
     
-        op = ArgMin(Symbolic.Input('I0'), op_version=1)
+        op = ArgMin('I0', op_version=1)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)

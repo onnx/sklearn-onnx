@@ -54,6 +54,8 @@ class GraphState:
             raise RuntimeError("Unexpected type {}".format(outputs))
         elif hasattr(var, 'name') and isinstance(var.name, str) and var.name:
             return var.name
+        elif isinstance(var, str):
+            return var
         else:
             raise RuntimeError("Unexpected type: {0}".format(type(var)))
 
