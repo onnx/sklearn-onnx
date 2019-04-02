@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_div, apply_sub, apply_sqrt
+from ..common._apply_operation import apply_cast, apply_div
+from ..common._apply_operation import apply_sqrt, apply_sub
 from ..common._registration import register_converter
+from ..common.data_types import Int64TensorType
 
 
 def convert_truncated_svd(scope, operator, container):
@@ -22,10 +24,18 @@ def convert_truncated_svd(scope, operator, container):
         transform_matrix_name, onnx_proto.TensorProto.FLOAT,
         transform_matrix.shape, transform_matrix.flatten())
 
+    input_name = operator.inputs[0].full_name
+    if isinstance(operator.inputs[0].type, Int64TensorType):
+        cast_output_name = scope.get_unique_variable_name('cast_output')
+
+        apply_cast(scope, input_name, cast_output_name, container,
+                   to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_output_name
+
     if operator.type == 'SklearnTruncatedSVD':
         # Create the major operator, a matrix multiplication.
         container.add_node(
-            'MatMul', [operator.inputs[0].full_name, transform_matrix_name],
+            'MatMul', [input_name, transform_matrix_name],
             operator.outputs[0].full_name, name=operator.full_name)
     else:  # PCA
         if svd.mean_ is not None:
@@ -36,17 +46,17 @@ def convert_truncated_svd(scope, operator, container):
                                       svd.mean_.shape, svd.mean_)
 
             # Subtract mean from input tensor
-            apply_sub(scope, [operator.inputs[0].full_name, mean_name],
+            apply_sub(scope, [input_name, mean_name],
                       sub_result_name, container, broadcast=1)
         else:
-            sub_result_name = operator.inputs[0].full_name
+            sub_result_name = input_name
         if svd.whiten:
             explained_variance_name = scope.get_unique_variable_name(
-                                                    'explained_variance')
+                'explained_variance')
             explained_variance_root_name = scope.get_unique_variable_name(
-                                                    'explained_variance_root')
+                'explained_variance_root')
             matmul_result_name = scope.get_unique_variable_name(
-                                                        'matmul_result')
+                'matmul_result')
 
             container.add_initializer(
                 explained_variance_name, onnx_proto.TensorProto.FLOAT,
