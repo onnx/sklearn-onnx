@@ -33,6 +33,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         assert onx is not None
         sonx = str(onx)
         assert "ai.onnx.ml" in sonx
+        assert "version: 1" in sonx
         
         import onnxruntime as ort
         sess = ort.InferenceSession(onx.SerializeToString())
@@ -47,8 +48,6 @@ class TestAlgebraSymbolic(unittest.TestCase):
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
-        if '7' not in sonx:
-            raise TypeError("Wrong output type:\n" + sonx)
         
         import onnxruntime as ort
         sess = ort.InferenceSession(onx.SerializeToString())
@@ -63,8 +62,6 @@ class TestAlgebraSymbolic(unittest.TestCase):
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
-        if '7' not in sonx:
-            raise TypeError("Wrong output type:\n" + sonx)
         
         import onnxruntime as ort
         sess = ort.InferenceSession(onx.SerializeToString())
@@ -79,8 +76,6 @@ class TestAlgebraSymbolic(unittest.TestCase):
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
-        if '7' not in sonx:
-            raise TypeError("Wrong output type:\n" + sonx)
         
         import onnxruntime as ort
         sess = ort.InferenceSession(onx.SerializeToString())
