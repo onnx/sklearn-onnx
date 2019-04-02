@@ -82,6 +82,8 @@ class TensorType(DataType):
                 s.dim_value = d
             elif isinstance(d, str):
                 s.dim_param = 'None'
+            elif hasattr(d, 'dim_value'):
+                s.dim_value = d.dim_value
             else:
                 raise ValueError('Unsupported dimension type: %s' % type(d))
         if getattr(onnx_type, 'denotation', None) is not None:

@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 import numpy as np
 import onnx
-from ..proto import TensorProto
+from ..proto import TensorProto, ValueInfoProto
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
 from ..common.data_types import Int32TensorType, DoubleTensorType
@@ -29,6 +29,7 @@ class OnnxOperator:
     :param inputs: list of inputs expected by the operator
     :param op_version: to select a specific version of the operator
     :param output_names: used defined names for the outputs
+    :param domain: to overwrite the default domain
     :param kwargs: additional parameters of the operator
     """
 
@@ -53,9 +54,11 @@ class OnnxOperator:
         def ConstantValue(self):
             return self.value
 
-    def __init__(self, *inputs, op_version=None, output_names=None, **kwargs):
+    def __init__(self, *inputs, op_version=None, output_names=None,
+                 domain=None, **kwargs):
         self.state = None
         self.op_version = op_version or get_opset_number_from_onnx()
+        self.domain = domain
         self.kwargs = kwargs
 
         # check inputs
@@ -164,11 +167,14 @@ class OnnxOperator:
                     outputs.append(name)
                 self.output_names_ = outputs
 
+            domain = self.domain
+            if domain is None:
+                domain = self.__class__.domain
             self.state = GraphState(self.inputs, self.output_names_,
                                     self.__class__.__name__,
                                     scope, container, None,
                                     op_version=self.op_version,
-                                    op_domain=self.__class__.domain,
+                                    op_domain=domain,
                                     **self.kwargs)
             self.state.run()
 
@@ -211,6 +217,8 @@ class OnnxOperator:
             elif isinstance(value, np.ndarray):
                 res.append((k, self.guess_type(None, value)))
             elif isinstance(value, TensorProto):
+                res.append((k, self.guess_type(None, value)))
+            elif isinstance(value, ValueInfoProto):
                 res.append((k, self.guess_type(None, value)))
             else:
                 raise TypeError("Unexpected input type: {}".format(
@@ -263,6 +271,25 @@ class OnnxOperator:
                     res.append(Variable(exp[0], exp[0]))
         return res
 
+    def guess_type_proto(self, data_type, dims):
+        if data_type == onnx_proto.TensorProto.FLOAT:
+            return FloatTensorType(dims)
+        elif data_type == onnx_proto.TensorProto.DOUBLE:
+            return DoubleTensorType(dims)
+        elif data_type == onnx_proto.TensorProto.STRING:
+            return StringTensorType(dims)
+        elif data_type == onnx_proto.TensorProto.INT64:
+            return Int64TensorType(dims)
+        elif data_type == onnx_proto.TensorProto.INT32:
+            return Int32TensorType(dims)
+        elif data_type == onnx_proto.TensorProto.BOOL:
+            return BoolTensorType(dims)
+        else:
+            raise NotImplementedError("Unsupported type '{}' "
+                                      "data_type={}".format(
+                                          type(data_type),
+                                          dims))
+
     def guess_type(self, expected_type, given_type):
         """
         Returns the proper type of an input.
@@ -282,24 +309,13 @@ class OnnxOperator:
             return given_type
         elif isinstance(given_type, Variable):
             return given_type.type
-        elif isinstance(given_type, onnx.onnx_ml_pb2.TensorProto):
-            if given_type.data_type == onnx_proto.TensorProto.FLOAT:
-                return FloatTensorType(given_type.dims)
-            elif given_type.data_type == onnx_proto.TensorProto.DOUBLE:
-                return DoubleTensorType(given_type.dims)
-            elif given_type.data_type == onnx_proto.TensorProto.STRING:
-                return StringTensorType(given_type.dims)
-            elif given_type.data_type == onnx_proto.TensorProto.INT64:
-                return Int64TensorType(given_type.dims)
-            elif given_type.data_type == onnx_proto.TensorProto.INT32:
-                return Int32TensorType(given_type.dims)
-            elif given_type.data_type == onnx_proto.TensorProto.BOOL:
-                return BoolTensorType(given_type.dims)
-            else:
-                raise NotImplementedError("Unsupported type '{}' "
-                                          "data_type={}".format(
-                                              type(given_type),
-                                              given_type.data_type))
+        elif isinstance(given_type, TensorProto):
+            return self.guess_type_proto(given_type.data_type,
+                                         given_type.dims)
+        elif isinstance(given_type, ValueInfoProto):
+            ttype = given_type.type.tensor_type
+            dims = [ttype.shape.dim[i] for i in range(len(ttype.shape.dim))]
+            return self.guess_type_proto(ttype.elem_type, dims)
         else:
             raise NotImplementedError(
                 "Unsupported type '{}'".format(type(given_type)))

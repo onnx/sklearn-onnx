@@ -189,6 +189,8 @@ def ClassFactory(name, inputs, outputs, input_range, output_range,
 
     def __init__(self, *args, **kwargs):
 
+        if len(args) == 0 and input_range[0] == input_range[1]:
+            args = [_[0] for _ in self.__class__.expected_inputs]
         if not (input_range[0] <= len(args) <= input_range[1]):
             raise RuntimeError("Unexpected number of inputs, "
                                "got {}, expecting {} for operator "
@@ -196,7 +198,7 @@ def ClassFactory(name, inputs, outputs, input_range, output_range,
                                    len(args), len(inputs), name))
 
         for key in kwargs:
-            if key in {'output_names', 'op_version'}:
+            if key in {'output_names', 'op_version', 'domain'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s'"

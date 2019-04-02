@@ -251,7 +251,7 @@ class ModelComponentContainer(ModelContainer):
                       attributes' names and attributes' values,
                       respectively.
         """
-        if op_domain in ('', None):
+        if op_domain is None:
             op_domain = get_domain()
         self._check_operator(op_type)
 
