@@ -157,7 +157,8 @@ def infer_outputs(op_type, inputs, outputs=None, **atts):
     elif hasattr(op_type, 'nodes'):
         node = op_type.nodes
     else:
-        raise RuntimeError("Unable to build ONNX nodes from type {}.".format(type(op_type)))
+        raise RuntimeError("Unable to build ONNX nodes from type {}.".format(
+            type(op_type)))
 
     onnx_inputs = []
     for input in inputs:
@@ -185,11 +186,11 @@ def infer_outputs(op_type, inputs, outputs=None, **atts):
         if i == 0 and len(original_model.opset_import) == 1:
             op_set = original_model.opset_import[0]
         else:
-            op_set = original_model.opset_import.add()        
+            op_set = original_model.opset_import.add()
         op_set.domain = k
         op_set.version = 10
 
-    inferred_model = shape_inference.infer_shapes(original_model)    
+    inferred_model = shape_inference.infer_shapes(original_model)
     shapes = Variable.from_pb(inferred_model.graph.value_info)
     if len(shapes) == 0:
         raise RuntimeError("Shape inference fails.\n"

@@ -97,8 +97,9 @@ class GraphState:
 
         if self.computed_outputs is None:
             if self.expected_outputs is None:
-                self.expected_outputs = [self._get_var_name(o, True,
-                    operator=operator) for o in self.expected_outputs]
+                eoli = [self._get_var_name(o, True, operator=operator)
+                        for o in self.expected_outputs]
+                self.expected_outputs = eoli
             inputs = [self._get_var_name(i, False) for i in self.inputs]
             inputs = [i for i in inputs if i is not None]
             name = self.scope.get_unique_operator_name(self.operator_name)

@@ -1,4 +1,5 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
@@ -12,7 +13,9 @@ class TestOnnxDoc(unittest.TestCase):
     def setUp(self):
         self._algebra = dynamic_class_creation()
 
-    def _test_pad(self):
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_pad(self):
         from skl2onnx.algebra.onnx_ops import Pad        
         
         X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
@@ -34,6 +37,8 @@ class TestOnnxDoc(unittest.TestCase):
         names = [o.name for o in sess.get_outputs()]
         return {name: output for name, output in zip(names, res)}
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
     def test_transpose2(self):
         from skl2onnx.algebra.onnx_ops import Transpose
 

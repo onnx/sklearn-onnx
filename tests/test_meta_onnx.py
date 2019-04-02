@@ -3,6 +3,7 @@ import urllib.request
 import re
 import unittest
 import textwrap
+from distutils.version import StrictVersion
 import warnings
 from io import StringIO
 import contextlib
@@ -31,7 +32,10 @@ class TestMetaOnnx(unittest.TestCase):
         assert Mul.__name__ == 'Mul'
         assert isinstance(Mul('a', 'b'), OnnxOperator)
 
-    #@unittest.skipIf(True, reason="too unstable with older versions")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
+                     reason="too unstable with older versions")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
     def test_onnx_spec(self):
         untested = {'AveragePool',  # issue with ceil_mode                    
                     'Cast',  # unsupported type

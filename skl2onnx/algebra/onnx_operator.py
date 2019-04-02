@@ -210,7 +210,7 @@ class OnnxOperator:
             raise NotImplementedError("Unsupported type '{}' "
                                       "data_type={}".format(
                                           type(data_type),
-                                          dims))        
+                                          dims))
 
     @staticmethod
     def _guess_type(given_type):
@@ -241,7 +241,7 @@ class OnnxOperator:
             return OnnxOperator._guess_type_proto(ttype.elem_type, dims)
         else:
             raise NotImplementedError(
-                "Unsupported type '{}'".format(type(given_type)))        
+                "Unsupported type '{}'".format(type(given_type)))
 
     def to_onnx(self, inputs=None, outputs=None):
         """
@@ -250,7 +250,6 @@ class OnnxOperator:
         :param inputs: specific inputs (as a dictionary) or
             default inputs if not specified
         """
-        from .. import convert_sklearn
         if inputs is None:
             raise NotImplementedError("inputs must be specified.")
         if isinstance(inputs, dict):
@@ -292,7 +291,7 @@ class OnnxOperator:
         # convert the graph
         graph = helper.make_graph(
             container.nodes, model_name, container.inputs,
-            container.outputs, container.initializers)        
+            container.outputs, container.initializers)
         onnx_model = helper.make_model(graph)
 
         # domains
@@ -304,7 +303,7 @@ class OnnxOperator:
             if i == 0 and len(onnx_model.opset_import) == 1:
                 op_set = onnx_model.opset_import[0]
             else:
-                op_set = onnx_model.opset_import.add()        
+                op_set = onnx_model.opset_import.add()
             op_set.domain = k
             op_set.version = 10
 
