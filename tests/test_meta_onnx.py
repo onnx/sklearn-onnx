@@ -31,13 +31,13 @@ class TestMetaOnnx(unittest.TestCase):
         assert Mul.__name__ == 'Mul'
         assert isinstance(Mul('a', 'b'), OnnxOperator)
 
-    @unittest.skipIf(True, reason="too unstable with older versions")
+    #@unittest.skipIf(True, reason="too unstable with older versions")
     def test_onnx_spec(self):
-        untested = {'AveragePool',  # issue with ceil_mode
-                    'BatchNormalization',  # issue with non-tensor type
+        untested = {'AveragePool',  # issue with ceil_mode                    
                     'Cast',  # unsupported type
-                    'Concat',
+                    'Compress',  # shape inference fails
                     'ConvTranspose',  # Input X must be 4-dimensional. X: {1,1,3}
+                    'Expand',  # shape inference fails
                     'MaxPool',  # issue with ceil_mode
                     'Scan',  # Graph attribute inferencing returned type information for 2 outputs. Expected 1
                     'Slice',  # Node () has input size 5 not in range [min=1, max=1].
@@ -74,7 +74,7 @@ class TestMetaOnnx(unittest.TestCase):
                 raise Exception("Unable to handle operator '{}'".format(model)) from e
             if __name__ == "__main__":
                 if not success:
-                    print("-", op_type, " Failure", reason)
+                    print("-", op_type, " Failure", reason.split('\n')[0])
 
     def _load_data(self, name):
         from onnx import ModelProto

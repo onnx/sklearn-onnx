@@ -16,7 +16,7 @@ from onnx import onnx_pb as onnx_proto # noqa
 # (string tensor get assigned twice)
 from onnx import mapping
 from onnx.helper import split_complex_to_pairs
-from onnx.onnx_pb import TensorProto, ValueInfoProto
+from onnx.onnx_pb import TensorProto, ValueInfoProto # noqa
 
 
 def _check_onnx_version():

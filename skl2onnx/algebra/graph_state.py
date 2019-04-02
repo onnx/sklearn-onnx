@@ -36,7 +36,7 @@ class GraphState:
         self.run()
         return self.computed_outputs
 
-    def _get_var_name(self, var, output):
+    def _get_var_name(self, var, output, operator=None):
         if isinstance(var, Variable):
             return var.full_name
         elif isinstance(var, np.ndarray):
@@ -44,7 +44,7 @@ class GraphState:
         elif hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue)
         elif hasattr(var, 'add_to'):
-            var.add_to(self.scope, self.container)
+            var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
             if isinstance(outputs, list):
                 if len(outputs) == 1:
@@ -93,16 +93,17 @@ class GraphState:
             raise NotImplementedError(
                 "Unexpected type {}".format(type(output)))
 
-    def run(self):
+    def run(self, operator=None):
 
         if self.computed_outputs is None:
             if self.expected_outputs is None:
-                self.expected_outputs = [self._get_var_name(
-                    o, True) for o in self.expected_outputs]
+                self.expected_outputs = [self._get_var_name(o, True,
+                    operator=operator) for o in self.expected_outputs]
             inputs = [self._get_var_name(i, False) for i in self.inputs]
             inputs = [i for i in inputs if i is not None]
             name = self.scope.get_unique_operator_name(self.operator_name)
-            outputs = [self._get_output_name(o) for o in self.expected_outputs]
+            outputs = [self._get_output_name(o)
+                       for o in self.expected_outputs]
             self.container.add_node(self.operator_name, inputs, outputs,
                                     name=name, **self.attrs)
             self.computed_outputs = self.expected_outputs

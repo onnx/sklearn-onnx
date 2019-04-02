@@ -77,14 +77,23 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
         attrs.update({
-            'casechangeaction': 'LOWER',
+            'case_change_action': 'LOWER',
             'is_case_sensitive': not op.lowercase,
         })
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
         normalized = scope.get_unique_variable_name('normalized')
+        if container.target_opset <= 9:
+            domain = 'com.microsoft'
+            op_version = container.target_opset
+            attrs['casechangeaction'] = attrs['case_change_action']
+            del attrs['case_change_action']
+        else:
+            domain = ''
+            op_version = 10
         container.add_node(op_type, operator.input_full_names,
-                           normalized, op_domain='com.microsoft', **attrs)
+                           normalized, op_domain=domain,
+                           op_version=op_version, **attrs)
     else:
         normalized = operator.input_full_names
 
@@ -174,7 +183,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                            op_domain='com.microsoft', **attrs)
     else:
         op_type = 'TfIdfVectorizer'
-        container.add_node(op_type, tokenized, output, op_domain='ai.onnx',
+        container.add_node(op_type, tokenized, output, op_domain='',
                            op_version=9, **attrs)
 
     if getattr(op, 'norm', None) is not None:

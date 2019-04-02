@@ -150,8 +150,8 @@ def predict_with_onnxruntime(model_def, *inputs):
     sess = ort.InferenceSession(model_def.SerializeToString())
     names = [i.name for i in sess.get_inputs()]
     input = {name: input for name, input in zip(names, inputs)}
+    res = sess.run(None, input)
     names = [o.name for o in sess.get_outputs()]
-    res = sess.run(None, {'I0': X.astype(numpy.float32)})
     return {name: output for name, output in zip(names, res)}
 
 Y = predict_with_onnxruntime(model_def, X)

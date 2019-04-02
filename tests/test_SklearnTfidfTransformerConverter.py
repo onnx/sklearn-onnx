@@ -11,7 +11,7 @@ from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
 
 
-class TestSklearnTfidfVectorizer(unittest.TestCase):
+class TestSklearnTfidfTransformerConverter(unittest.TestCase):
 
     def test_model_tfidf_transform(self):
         corpus = numpy.array([

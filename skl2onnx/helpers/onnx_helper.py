@@ -137,26 +137,62 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     return onnx_model
 
 
-def infer_outputs(op_type, inputs, outputs, **atts):
+def infer_outputs(op_type, inputs, outputs=None, **atts):
     """
     Infers outputs type and shapes given an ONNX operator.
     """
-    node = helper.make_node(op_type, [i.onnx_name for i in inputs],
-                            [o.onnx_name for o in outputs], **atts)
+    if isinstance(op_type, str):
+        required_outputs = []
+        if outputs:
+            for o in outputs:
+                if hasattr(o, 'onnx_name'):
+                    required_outputs.append(o.onnx_name)
+                elif isinstance(o, str):
+                    required_outputs.append(o)
+                else:
+                    raise TypeError("Unable to require output {}.".format(o))
+        node = helper.make_node(op_type, [i.onnx_name for i in inputs],
+                                required_outputs, **atts)
+        node = [node]
+    elif hasattr(op_type, 'nodes'):
+        node = op_type.nodes
+    else:
+        raise RuntimeError("Unable to build ONNX nodes from type {}.".format(type(op_type)))
+
     onnx_inputs = []
     for input in inputs:
-        onnx_type = input.type.to_onnx_type()
-        tensor_type = onnx_type.tensor_type
-        shape = [tensor_type.shape.dim[i].dim_value
-                 for i in range(len(tensor_type.shape.dim))]
-        inp = helper.make_tensor_value_info(input.onnx_name,
-                                            tensor_type.elem_type,
-                                            tuple(shape))
-        onnx_inputs.append(inp)
+        if isinstance(input, Variable):
+            onnx_type = input.type.to_onnx_type()
+            tensor_type = onnx_type.tensor_type
+            shape = [tensor_type.shape.dim[i].dim_value
+                     for i in range(len(tensor_type.shape.dim))]
+            inp = helper.make_tensor_value_info(input.onnx_name,
+                                                tensor_type.elem_type,
+                                                tuple(shape))
+            onnx_inputs.append(inp)
+        else:
+            onnx_inputs.append(input)
 
-    graph = helper.make_graph([node], 'infer_shapes',
-                              [], onnx_inputs)
-
+    graph = helper.make_graph(node, 'infer_shapes',
+                              onnx_inputs, [])
     original_model = helper.make_model(graph, producer_name='skl2onnx')
-    inferred_model = shape_inference.infer_shapes(original_model)
-    return Variable.from_pb(inferred_model.graph.value_info)
+
+    domains = {}
+    for n in node:
+        domains[n.domain] = max(domains.get(n.domain, 1),
+                                getattr(n, 'op_version', 1))
+    for i, (k, v) in enumerate(domains.items()):
+        if i == 0 and len(original_model.opset_import) == 1:
+            op_set = original_model.opset_import[0]
+        else:
+            op_set = original_model.opset_import.add()        
+        op_set.domain = k
+        op_set.version = 10
+
+    inferred_model = shape_inference.infer_shapes(original_model)    
+    shapes = Variable.from_pb(inferred_model.graph.value_info)
+    if len(shapes) == 0:
+        raise RuntimeError("Shape inference fails.\n"
+                           "*Inputs*\n{}\n*Model*\n{}'".format(
+                            onnx_inputs, original_model))
+    return shapes
