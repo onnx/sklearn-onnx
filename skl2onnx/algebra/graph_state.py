@@ -42,7 +42,7 @@ class GraphState:
             return var.full_name
         elif isinstance(var, np.ndarray):
             return self._add_constant(var)
-        elif hasattr(var, 'ConstantValue'):            
+        elif hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue)
         elif hasattr(var, 'add_to'):
             var.add_to(self.scope, self.container)

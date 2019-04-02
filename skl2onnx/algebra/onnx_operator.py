@@ -32,21 +32,23 @@ class OnnxOperator:
     :param kwargs: additional parameters of the operator
     """
 
-    class UnscopedVariable:    
+    class UnscopedVariable:
         def __init__(self, name):
             self.name = name
+
         def __eq__(self, name):
             if isinstance(name, str):
                 return name == self.name
-            elif isinstance(name, UnscopedVariable):
+            elif isinstance(name, OnnxOperator.UnscopedVariable):
                 return self.name == name.name
             else:
                 raise TypeError('Unsupported type for comparison {}'.format(
                     type(name)))
 
-    class ConstantVariable:    
+    class ConstantVariable:
         def __init__(self, value):
             self.value = value
+
         @property
         def ConstantValue(self):
             return self.value
@@ -79,7 +81,7 @@ class OnnxOperator:
 
         if self.inputs is not None:
             if len(self.inputs) < self.input_range[0] or \
-                len(self.inputs) > self.input_range[1]:
+                    len(self.inputs) > self.input_range[1]:
                 raise RuntimeError("Operator '{}' expects a number of inputs "
                                    "in [{}, {}] not {}".format(
                                         self.__class__.__name__,
@@ -87,8 +89,8 @@ class OnnxOperator:
                                         len(self.inputs)))
 
         # check output
-        if hasattr(output_names, 'outputs') \
-            and output_names.outputs is not None:
+        if hasattr(output_names, 'outputs') and \
+                output_names.outputs is not None:
             self.output_names = [out.full_name
                                  for out in output_names.outputs]
         else:
@@ -109,8 +111,8 @@ class OnnxOperator:
         """
         if hasattr(self, 'output_names_'):
             return self.output_names_[i]
-        if self.output_names and i < len(self.output_names) \
-            and self.output_names[i]:
+        if self.output_names and i < len(self.output_names) and \
+                self.output_names[i]:
             return self.output_names[i]
         if i < len(self.__class__.expected_outputs):
             return self.__class__.expected_outputs[i][0]
@@ -211,7 +213,8 @@ class OnnxOperator:
             elif isinstance(value, TensorProto):
                 res.append((k, self.guess_type(None, value)))
             else:
-                raise TypeError("Unexpected input type: {}".format(type(value)))
+                raise TypeError("Unexpected input type: {}".format(
+                    type(value)))
         return res
 
     def get_schema_nb_output(self, inputs):

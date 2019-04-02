@@ -38,6 +38,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'Concat',
                     'ConvTranspose',  # Input X must be 4-dimensional. X: {1,1,3}
                     'MaxPool',  # issue with ceil_mode
+                    'NonZero',  # runtime not implemented
                     'Scan',  # Graph attribute inferencing returned type information for 2 outputs. Expected 1
                     'Slice',  # Node () has input size 5 not in range [min=1, max=1].
                     }

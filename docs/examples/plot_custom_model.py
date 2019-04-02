@@ -54,21 +54,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
 
     def __init__(self, transformer=None, estimator=None,
                  normalize=True, keep_tsne_outputs=False, **kwargs):
-        """
-        @param      transformer         :epkg:`sklearn:manifold:TSNE`
-                                        by default
-        @param      estimator           :epkg:`sklearn:neural_network:MLPRegressor`
-                                        by default
-        @param      normalize           normalizes the outputs, centers and normalizes
-                                        the output of the *t-SNE* and applies that same
-                                        normalization to he prediction of the estimator
-        @param      keep_tsne_output    if True, keep raw outputs of
-                                        :epkg:`TSNE` is stored in member
-                                        *tsne_outputs_*
-        @param      kwargs              sent to :meth:`set_params
-                                        <mlinsights.mlmodel.tsne_transformer.PredictableTSNE.set_params>`,
-                                        see its documentation to understand how to specify parameters
-        """
         TransformerMixin.__init__(self)
         BaseEstimator.__init__(self)
         if estimator is None:
@@ -163,10 +148,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
     def get_params(self, deep=True):
         """
         Returns the parameters for all the embedded objects.
-        @param      deep        unused here
-        @return                 dict
-        :meth:`set_params <mlinsights.mlmodel.tsne_transformer.PredictableTSNE.set_params>`
-        describes the pattern parameters names follow.
         """
         res = {}
         for k, v in self.transformer.get_params().items():
@@ -181,8 +162,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         Every parameter prefixed by ``'e_'`` is an estimator
         parameter, every parameter prefixed by
         ``t_`` is for a transformer parameter.
-        @param      values      valeurs
-        @return                 dict
         """
         pt, pe, pn = {}, {}, {}
         for k, v in values.items():
