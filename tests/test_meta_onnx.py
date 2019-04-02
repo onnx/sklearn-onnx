@@ -38,10 +38,13 @@ class TestMetaOnnx(unittest.TestCase):
                     'Concat',
                     'ConvTranspose',  # Input X must be 4-dimensional. X: {1,1,3}
                     'MaxPool',  # issue with ceil_mode
-                    'NonZero',  # runtime not implemented
                     'Scan',  # Graph attribute inferencing returned type information for 2 outputs. Expected 1
-                    "Sign",  # runtime not implemented
                     'Slice',  # Node () has input size 5 not in range [min=1, max=1].
+                    # CI
+                    'Gather',
+                    'NonZero',
+                    'TopK',
+                    "Sign",
                     }
         folder = os.path.dirname(onnx.__file__)
         folder = os.path.join(folder, "backend", "test", "data", "node")
