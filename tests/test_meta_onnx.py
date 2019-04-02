@@ -44,6 +44,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'Gather',
                     'NonZero',
                     'TopK',
+                    'Scatter',
                     "Sign",
                     }
         folder = os.path.dirname(onnx.__file__)

@@ -4,8 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from onnx.onnx_ml_pb2 import TensorProto
-from ..proto import onnx_proto
+from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
 
 

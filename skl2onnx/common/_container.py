@@ -9,8 +9,7 @@ import re
 import six
 import sys
 import traceback
-from onnx.onnx_ml_pb2 import TensorProto
-from ..proto import helper
+from ..proto import helper, TensorProto
 from ._apply_operation import __dict__ as dict_apply_operation
 from .interface import ModelContainer
 from .utils import get_domain

@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 import numpy as np
 import onnx
-from onnx.onnx_ml_pb2 import TensorProto
+from ..proto import TensorProto
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
 from ..common.data_types import Int32TensorType, DoubleTensorType
