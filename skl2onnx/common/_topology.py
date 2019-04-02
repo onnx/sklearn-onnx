@@ -248,6 +248,8 @@ class Scope:
         """
         Creates a unique variable ID based on the given seed.
         """
+        if not isinstance(seed, str):
+            raise TypeError("seed must be a string not {}".format(type(seed)))
         return Topology._generate_unique_name(seed, self.onnx_variable_names)
 
     def get_unique_operator_name(self, seed):

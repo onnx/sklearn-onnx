@@ -9,6 +9,7 @@ import re
 import six
 import sys
 import traceback
+from onnx.onnx_ml_pb2 import TensorProto
 from ..proto import helper
 from ._apply_operation import __dict__ as dict_apply_operation
 from .interface import ModelContainer
@@ -190,9 +191,16 @@ class ModelComponentContainer(ModelContainer):
                         or a float array).
         :return: created tensor
         """
-        if any(d is None for d in shape):
-            raise ValueError('Shape of initializer cannot contain None')
-        tensor = helper.make_tensor(name, onnx_type, shape, content)
+        if isinstance(content, TensorProto):
+            tensor = TensorProto()
+            tensor.data_type = content.data_type
+            tensor.name = name
+            tensor.raw_data = content.raw_data
+            tensor.dims.extend(content.dims)
+        else:
+            if any(d is None for d in shape):
+                raise ValueError('Shape of initializer cannot contain None')
+            tensor = helper.make_tensor(name, onnx_type, shape, content)
         self.initializers.append(tensor)
         return tensor
 

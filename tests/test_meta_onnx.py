@@ -40,7 +40,6 @@ class TestMetaOnnx(unittest.TestCase):
                     'MaxPool',  # issue with ceil_mode
                     'Scan',  # Graph attribute inferencing returned type information for 2 outputs. Expected 1
                     'Slice',  # Node () has input size 5 not in range [min=1, max=1].
-                    'Split',  # Issue with multiple inputs
                     }
         folder = os.path.dirname(onnx.__file__)
         folder = os.path.join(folder, "backend", "test", "data", "node")
@@ -175,7 +174,9 @@ class TestMetaOnnx(unittest.TestCase):
         # instantiate the operator
         for i, inp in enumerate(inps):
             inp.name = 'I%d' % i
-        op = op_class(*inps, **atts)
+        op = op_class(*[inp.name for inp in inps],
+                      output_names=[out.name for out in outs],
+                      **atts)
         st = StringIO()        
         with contextlib.redirect_stdout(st):
             with contextlib.redirect_stderr(st):

@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 import numpy as np
 import onnx
+from onnx.onnx_ml_pb2 import TensorProto
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
 from ..common.data_types import Int32TensorType, DoubleTensorType
@@ -31,6 +32,25 @@ class OnnxOperator:
     :param kwargs: additional parameters of the operator
     """
 
+    class UnscopedVariable:    
+        def __init__(self, name):
+            self.name = name
+        def __eq__(self, name):
+            if isinstance(name, str):
+                return name == self.name
+            elif isinstance(name, UnscopedVariable):
+                return self.name == name.name
+            else:
+                raise TypeError('Unsupported type for comparison {}'.format(
+                    type(name)))
+
+    class ConstantVariable:    
+        def __init__(self, value):
+            self.value = value
+        @property
+        def ConstantValue(self):
+            return self.value
+
     def __init__(self, *inputs, op_version=None, output_names=None, **kwargs):
         self.state = None
         self.op_version = op_version or get_opset_number_from_onnx()
@@ -46,10 +66,12 @@ class OnnxOperator:
         else:
             self.inputs = []
             for inp in inputs:
-                if hasattr(inp, 'name'):
-                    self.inputs.append(inp.name)
-                elif isinstance(inp, str):
+                if isinstance(inp, str):
+                    self.inputs.append(OnnxOperator.UnscopedVariable(inp))
+                elif isinstance(inp, (OnnxOperator, Variable)):
                     self.inputs.append(inp)
+                elif isinstance(inp, (np.ndarray, TensorProto)):
+                    self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 else:
                     raise TypeError("Unable to interpret the "
                                     "input name for type {}.".format(
@@ -157,10 +179,10 @@ class OnnxOperator:
             raise RuntimeError("Method add was not called.")
         return self.state.outputs
 
-    def check_inputs(self, inputs):
+    def parse_inputs(self, inputs):
         """
         Checks the given inputs follow the constraints
-        defined by the operator.
+        defined by the operator. Done at parsing time.
         """
         if isinstance(inputs, list):
             inputs = {v.onnx_name: v for v in inputs}
@@ -175,24 +197,21 @@ class OnnxOperator:
                                        self.__class__.__name__,
                                        *self.input_range,
                                        len(inputs)))
-        defined_inputs = self.inputs \
-                         if self.inputs is not None \
-                         else [_[0] for _ in self.__class__.expected_inputs]
+
         res = []
         for k, value in inputs.items():
             if self.__class__.input_range[1] == 2147483647:
                 # infinity is allowed
                 exp = self.__class__.expected_inputs[0]
                 res.append(('I%d' % len(res), self.guess_type(exp[1], value)))
+            elif isinstance(value, (OnnxOperator, Variable, str)):
+                res.append((value, self.guess_type(None, value)))
+            elif isinstance(value, np.ndarray):
+                res.append((k, self.guess_type(None, value)))
+            elif isinstance(value, TensorProto):
+                res.append((k, self.guess_type(None, value)))
             else:
-                exp = [(v, e[1]) for v, e in zip(defined_inputs,
-                        self.__class__.expected_inputs) if v == k]
-                if len(exp) == 0:
-                    raise RuntimeError("Operator has no input '{}', "
-                                       "expects a name in {}.".format(
-                                           k, defined_inputs))
-                exp = exp[0]
-                res.append((exp[0], self.guess_type(exp[1], value)))
+                raise TypeError("Unexpected input type: {}".format(type(value)))
         return res
 
     def get_schema_nb_output(self, inputs):
@@ -291,7 +310,7 @@ class OnnxOperator:
         """
         from .. import convert_sklearn
         if inputs:
-            inputs = self.check_inputs(inputs)
+            inputs = self.parse_inputs(inputs)
         else:
             inputs = self.expected_inputs
         for name, typ in inputs:

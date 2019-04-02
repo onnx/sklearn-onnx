@@ -45,13 +45,16 @@ class SymbolicOpTransformer(BaseEstimator, TransformerMixin):
         """
         Defines the number of expected inputs.
         """
-        var_inputs = self.op.check_inputs(inputs)
+        var_inputs = self.op.parse_inputs(inputs)
         var_inputs = [Variable(n, n, scope, type=t) for n, t in var_inputs]
         name = self.op.__class__.__name__
         this_operator = scope.declare_local_operator(name, model)
         this_operator.inputs = inputs
         # Overwrite here to change the number of expected outputs.
-        nb_out = self.op.get_schema_nb_output(var_inputs)
+        if self.op.output_names:
+            nb_out = len(self.op.output_names)
+        else:
+            nb_out = self.op.get_schema_nb_output(var_inputs)
         for i in range(nb_out):
             raw_name = self.op.get_output(i)
             var = scope.declare_local_variable(raw_name, FloatTensorType())
