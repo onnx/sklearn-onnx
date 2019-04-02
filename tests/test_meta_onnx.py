@@ -46,6 +46,8 @@ class TestMetaOnnx(unittest.TestCase):
                     'TopK',
                     'Scatter',
                     "Sign",
+                    'Split',
+                    'StrNormalizer',
                     }
         folder = os.path.dirname(onnx.__file__)
         folder = os.path.join(folder, "backend", "test", "data", "node")
