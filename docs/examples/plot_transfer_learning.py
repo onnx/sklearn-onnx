@@ -51,6 +51,7 @@ with open("rf_iris.onnx", "wb") as f:
 # Compute ONNX prediction similarly as scikit-learn transformer
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import numpy as np
 from skonnxrt.sklapi import OnnxTransformer
 
 with open("rf_iris.onnx", "rb") as f:
@@ -59,7 +60,7 @@ with open("rf_iris.onnx", "rb") as f:
 ot = OnnxTransformer(content, output_name="output_probability")
 ot.fit(X_train, y_train)
 
-print(ot.transform(X_test[:5]))
+print(ot.transform(X_test[:5].astype(np.float32)))
 
 ###################################
 # .. index:: transfer learning, MobileNet, ImageNet
