@@ -52,17 +52,24 @@ jobs:
   - script: |
       flake8 skl2onnx
     displayName: 'flake8'
-    
+
+  - script: |
+      git clone https://github.com/onnx/onnxmltools.git
+      cd onnxmltools/onnxutils
+      pip install -e .
+      cd ../..
+    displayName: 'install onnxtk'
+
   - script: |
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
       pip install pytest
-    displayName: 'Install dependencies'
-    
+    displayName: 'install requirements'
+
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
-    
+
   - script: |
       pip install -e .
     displayName: 'install skl2onnx'
@@ -71,6 +78,7 @@ jobs:
       python -c "import numpy;print('numpy:',numpy.__version__)"
       python -c "import scipy;print('scipy:',scipy.__version__)"
       python -c "import onnx;print('onnx:',onnx.__version__)"
+      python -c "import onnxtk;print('onnxtk:',onnxtk.__version__)"
       python -c "import onnxruntime;print('onnxruntime:',onnxruntime.__version__)"
     displayName: 'version'
 
