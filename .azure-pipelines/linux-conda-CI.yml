@@ -60,10 +60,10 @@ jobs:
 
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
-      conda config --set always_yes yes --set changeps1 no      
+      conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
-      python -m pip install --upgrade pip      
+      python -m pip install --upgrade pip
     displayName: 'Install environment'
 
   - script: |
@@ -108,6 +108,13 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
+      git clone https://github.com/onnx/onnxmltools.git
+      cd onnxmltools/onnxutils
+      pip install -e .
+      cd ../..
+    displayName: 'install onnxtk'
+
+  - script: |
       pip install -e .
     displayName: 'install'
 
@@ -118,6 +125,8 @@ jobs:
       pip show onnx
       echo "---------------"
       pip show onnxruntime
+      echo "---------------"
+      pip show onnxtk
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
