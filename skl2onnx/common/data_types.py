@@ -10,6 +10,7 @@ from onnxtk.common.data_types import FloatTensorType, StringTensorType
 from onnxtk.common.data_types import DictionaryType, SequenceType
 from onnxtk.common.data_types import find_type_conversion
 
+
 def onnx_built_with_ml():
     """
     Tells if ONNX was built with flag ``ONNX-ML``.
