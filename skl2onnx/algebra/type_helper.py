@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, ValueInfoProto, helper, onnx_proto
+from ..proto import TensorProto, ValueInfoProto, onnx_proto
 from ..common._topology import Variable
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
@@ -54,7 +54,7 @@ def _guess_type(given_type):
         return given_type.type
     elif isinstance(given_type, TensorProto):
         return _guess_type_proto(given_type.data_type,
-                                              given_type.dims)
+                                 given_type.dims)
     elif isinstance(given_type, ValueInfoProto):
         ttype = given_type.type.tensor_type
         dims = [ttype.shape.dim[i] for i in range(len(ttype.shape.dim))]

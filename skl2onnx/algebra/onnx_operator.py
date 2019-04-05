@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, ValueInfoProto
+from ..proto import TensorProto, ValueInfoProto, helper
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
 from ..common import utils
