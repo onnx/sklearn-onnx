@@ -50,7 +50,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx
+      flake8 --ignore F401 skl2onnx
     displayName: 'flake8'
 
   - script: |
@@ -65,7 +65,7 @@ jobs:
       pip install -e .
       cd ../..
     displayName: 'install onnxtk'
-    
+
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
