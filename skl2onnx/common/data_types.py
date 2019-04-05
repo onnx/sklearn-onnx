@@ -4,7 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from onnxtk.common.data_types import *  # noqa
+from onnxtk.common.data_types import DataType, Int64Type, FloatType  # noqa
+from onnxtk.common.data_types import StringType, TensorType, Int64TensorType  # noqa
+from onnxtk.common.data_types import FloatTensorType, StringTensorType  # noqa
+from onnxtk.common.data_types import DictionaryType, SequenceType  # noqa
+from onnxtk.common.data_types import find_type_conversion  # noqa
 
 
 def onnx_built_with_ml():
