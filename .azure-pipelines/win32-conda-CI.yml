@@ -50,7 +50,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 --ignore F401 skl2onnx
+      flake8 skl2onnx
     displayName: 'flake8'
 
   - script: |
