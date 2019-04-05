@@ -40,7 +40,7 @@ def get_converter(operator_name):
     if operator_name not in _converter_pool:
         raise ValueError('Unsupported conversion for operator %s '
                          '(%d registered)' % (operator_name,
-                            len(_converter_pool)))
+                             len(_converter_pool)))
     return _converter_pool[operator_name]
 
 
@@ -66,5 +66,5 @@ def get_shape_calculator(operator_name):
     if operator_name not in _shape_calculator_pool:
         raise ValueError('Unsupported shape calculator for operator %s '
                          '(%d registered)' % (operator_name,
-                            len(_converter_pool)))
+                             len(_converter_pool)))
     return _shape_calculator_pool[operator_name]

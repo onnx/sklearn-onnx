@@ -4,7 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, ValueInfoProto, helper
+from ..proto import TensorProto, ValueInfoProto, helper, onnx_proto
+from ..common._topology import Variable
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
 from ..common.data_types import Int32TensorType, DoubleTensorType
@@ -52,12 +53,12 @@ def _guess_type(given_type):
     elif isinstance(given_type, Variable):
         return given_type.type
     elif isinstance(given_type, TensorProto):
-        return OnnxOperator._guess_type_proto(given_type.data_type,
+        return _guess_type_proto(given_type.data_type,
                                               given_type.dims)
     elif isinstance(given_type, ValueInfoProto):
         ttype = given_type.type.tensor_type
         dims = [ttype.shape.dim[i] for i in range(len(ttype.shape.dim))]
-        return OnnxOperator._guess_type_proto(ttype.elem_type, dims)
+        return _guess_type_proto(ttype.elem_type, dims)
     else:
         raise NotImplementedError(
             "Unsupported type '{}'".format(type(given_type)))

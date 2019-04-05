@@ -98,7 +98,7 @@ class OnnxOperatorMixin:
 
     def get_inputs(self, inputs, i):
         if i >= len(inputs):
-            return OnnxOperatorVariable(i)
+            return OnnxOperator.OnnxOperatorVariable(i)
         else:
             input = inputs[i]
             if isinstance(input, (str, OnnxOperator.UnscopedVariable)):
@@ -142,8 +142,5 @@ class OnnxOperatorMixin:
         def shape_calculator(operator):
             onx = op.to_onnx(operator.inputs, operator.outputs)
             onames = [o.full_name for o in operator.outputs]
-            for node in onx.graph.nodes:
-                print(node)
-                print(dir(node))
-            stop
+            return onames
         return shape_calculator

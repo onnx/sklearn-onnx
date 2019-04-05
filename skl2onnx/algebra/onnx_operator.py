@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, ValueInfoProto, helper
+from ..proto import TensorProto, ValueInfoProto
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
 from ..common import utils
@@ -316,7 +316,8 @@ class OnnxOperator:
         for node in self.enumerate_nodes():
             if self.inputs:
                 for i, input in enumerate(self.inputs):
-                    if isinstance(input, (OnnxOperator.UnscopedVariable, Variable)):
+                    if isinstance(input, (OnnxOperator.UnscopedVariable,
+                                          Variable)):
                         yield (node, i)
 
     def enumerate_initial_types(self):
