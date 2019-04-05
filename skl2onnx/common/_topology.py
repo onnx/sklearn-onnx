@@ -975,8 +975,6 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     for operator in topology.topological_operator_iterator():
         scope = next(scope for scope in topology.scopes
                      if scope.name == operator.scope)
-        if operator.raw_operator is None:
-            raise RuntimeError("operator.raw_operator cannot be None.")
         mtype = type(operator.raw_operator)
         if mtype in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[mtype]

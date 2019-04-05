@@ -140,7 +140,7 @@ class OnnxOperatorMixin:
             return get_shape_calculator(name)
 
         def shape_calculator(operator):
-            onx = op.to_onnx(operator.inputs, operator.outputs)
+            # onx = op.to_onnx(operator.inputs, operator.outputs)
             onames = [o.full_name for o in operator.outputs]
             return onames
         return shape_calculator
