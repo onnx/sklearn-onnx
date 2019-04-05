@@ -717,6 +717,8 @@ class Topology:
                 self.custom_shape_calculators[mtype](operator)
             elif operator.type in self.custom_shape_calculators:
                 self.custom_shape_calculators[operator.type](operator)
+            elif hasattr(operator.raw_operator, "onnx_shape_calculator"):
+                return operator.raw_operator.onnx_shape_calculator()
             else:
                 operator.infer_types()
 
@@ -973,11 +975,15 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     for operator in topology.topological_operator_iterator():
         scope = next(scope for scope in topology.scopes
                      if scope.name == operator.scope)
+        if operator.raw_operator is None:
+            raise RuntimeError("operator.raw_operator cannot be None.")
         mtype = type(operator.raw_operator)
         if mtype in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[mtype]
         elif operator.type in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[operator.type]
+        elif hasattr(operator.raw_operator, "onnx_converter"):
+            conv = operator.raw_operator.onnx_converter()
         else:
             # Convert the selected operator into some ONNX objects and
             # save them into the container

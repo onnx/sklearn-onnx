@@ -65,6 +65,15 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
 
+    if hasattr(model, 'onnx_parser'):
+        parser_names = model.onnx_parser()
+        if parser_names is not None:
+            names = parser_names()
+            for name in names:
+                variable = scope.declare_local_variable(name, FloatTensorType())
+                this_operator.outputs.append(variable)
+            return this_operator.outputs
+        
     if (type(model) in sklearn_classifier_list
             or isinstance(model, ClassifierMixin)):
         # For classifiers, we may have two outputs, one for label and
@@ -101,6 +110,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable('variable', FloatTensorType())
         this_operator.outputs.append(variable)
+        print(type(model))
+        stop
 
     return this_operator.outputs
 

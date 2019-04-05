@@ -36,7 +36,7 @@ class GraphState:
         self.run()
         return self.computed_outputs
 
-    def _get_var_name(self, var, output, operator=None):
+    def _get_var_name(self, var, unused, operator=None):
         if isinstance(var, Variable):
             return var.full_name
         elif isinstance(var, np.ndarray):
@@ -89,9 +89,11 @@ class GraphState:
             return output.full_name
         elif isinstance(output, str):
             return output
+        elif isinstance(output, tuple):
+            return output[0]
         else:
             raise NotImplementedError(
-                "Unexpected type {}".format(type(output)))
+                "Unexpected type {}\n{}".format(type(output), output))
 
     def run(self, operator=None):
 
@@ -100,7 +102,8 @@ class GraphState:
                 eoli = [self._get_var_name(o, True, operator=operator)
                         for o in self.expected_outputs]
                 self.expected_outputs = eoli
-            inputs = [self._get_var_name(i, False) for i in self.inputs]
+            inputs = [self._get_var_name(i, False, operator=operator)
+                      for i in self.inputs]
             inputs = [i for i in inputs if i is not None]
             name = self.scope.get_unique_operator_name(self.operator_name)
             outputs = [self._get_output_name(o)

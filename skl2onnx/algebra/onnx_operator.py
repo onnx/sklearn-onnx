@@ -5,16 +5,13 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from ..proto import TensorProto, ValueInfoProto, helper
-from ..common.data_types import FloatTensorType, Int64TensorType
-from ..common.data_types import StringTensorType
-from ..common.data_types import Int32TensorType, DoubleTensorType
-from ..common.data_types import BoolTensorType
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..proto import get_opset_number_from_onnx, onnx_proto
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
+from .type_helper import _guess_type
 
 
 class OnnxOperator:
@@ -32,6 +29,14 @@ class OnnxOperator:
     :param domain: to overwrite the default domain
     :param kwargs: additional parameters of the operator
     """
+    class OnnxOperatorVariable:
+
+        def __init__(self, index, name=None):
+            self.index = index
+            self.name = name
+
+        def __repr__(self):
+            return "OnnxOperatorVariable('%s')" % self.name
 
     class UnscopedVariable:
         def __init__(self, name):
@@ -80,6 +85,8 @@ class OnnxOperator:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, TensorProto)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
+                elif isinstance(inp, OnnxOperator.OnnxOperatorVariable):
+                    self.inputs.append(inp)
                 else:
                     raise TypeError("Unable to interpret the "
                                     "input name for type {}.".format(
@@ -90,9 +97,9 @@ class OnnxOperator:
                     len(self.inputs) > self.input_range[1]:
                 raise RuntimeError("Operator '{}' expects a number of inputs "
                                    "in [{}, {}] not {}".format(
-                                        self.__class__.__name__,
-                                        *self.input_range,
-                                        len(self.inputs)))
+                                       self.__class__.__name__,
+                                       *self.input_range,
+                                       len(self.inputs)))
 
         # check output
         if hasattr(output_names, 'outputs') and \
@@ -122,8 +129,12 @@ class OnnxOperator:
             return self.output_names[i]
         if i < len(self.__class__.expected_outputs):
             return self.__class__.expected_outputs[i][0]
-        else:
+        elif i < self.__class__.output_range[1]:
+            if i > 1000:
+                raise IndexError("You should redesign your operator.")
             return "O%d" % i
+        else:
+            raise IndexError("Output %d does not exist." % i)
 
     def update_name(self, i, name):
         """
@@ -174,7 +185,27 @@ class OnnxOperator:
             domain = self.domain
             if domain is None:
                 domain = self.__class__.domain
-            inputs = self.inputs
+            inputs = []
+            for input in self.inputs:
+                if isinstance(input, OnnxOperator.OnnxOperatorVariable):
+                    if operator is None:
+                        raise RuntimeError("A placeholder cannot be replaced "
+                                           "as an operator is not specified.")
+                    if len(operator.inputs) == 0:
+                        raise RuntimeError("No input variable in {}.".format(
+                            operator))
+                    # The inputs must be looked into the graph.
+                    for i in operator.inputs:
+                        if i.raw_name == input.name:
+                            inputs.append(i)
+                            break
+                    else:
+                        vars = ', '.join(map(lambda o: "'%s'" % o.raw_name,
+                                             operator.inputs))
+                        raise RuntimeError("Unable to find variable "
+                                           "{} in {}.".format(input, vars))
+                else:
+                    inputs.append(input)
             self.state = GraphState(inputs, self.output_names_,
                                     self.__class__.__name__,
                                     scope, container, None,
@@ -192,69 +223,19 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
-    @staticmethod
-    def _guess_type_proto(data_type, dims):
-        if data_type == onnx_proto.TensorProto.FLOAT:
-            return FloatTensorType(dims)
-        elif data_type == onnx_proto.TensorProto.DOUBLE:
-            return DoubleTensorType(dims)
-        elif data_type == onnx_proto.TensorProto.STRING:
-            return StringTensorType(dims)
-        elif data_type == onnx_proto.TensorProto.INT64:
-            return Int64TensorType(dims)
-        elif data_type == onnx_proto.TensorProto.INT32:
-            return Int32TensorType(dims)
-        elif data_type == onnx_proto.TensorProto.BOOL:
-            return BoolTensorType(dims)
-        else:
-            raise NotImplementedError("Unsupported type '{}' "
-                                      "data_type={}".format(
-                                          type(data_type),
-                                          dims))
-
-    @staticmethod
-    def _guess_type(given_type):
-        """
-        Returns the proper type of an input.
-        """
-        if isinstance(given_type, np.ndarray):
-            if given_type.dtype == np.float32:
-                return FloatTensorType(given_type.shape)
-            elif given_type.dtype == np.int64:
-                return Int64TensorType(given_type.shape)
-            elif given_type.dtype == np.str:
-                return StringTensorType(given_type.shape)
-            else:
-                raise NotImplementedError(
-                    "Unsupported type '{}'".format(given_type.dtype))
-        elif isinstance(given_type, (FloatTensorType, Int64TensorType,
-                                     StringTensorType)):
-            return given_type
-        elif isinstance(given_type, Variable):
-            return given_type.type
-        elif isinstance(given_type, TensorProto):
-            return OnnxOperator._guess_type_proto(given_type.data_type,
-                                                  given_type.dims)
-        elif isinstance(given_type, ValueInfoProto):
-            ttype = given_type.type.tensor_type
-            dims = [ttype.shape.dim[i] for i in range(len(ttype.shape.dim))]
-            return OnnxOperator._guess_type_proto(ttype.elem_type, dims)
-        else:
-            raise NotImplementedError(
-                "Unsupported type '{}'".format(type(given_type)))
-
     def to_onnx(self, inputs=None, outputs=None):
         """
         Converts this operator into an ONNX graph.
 
         :param inputs: specific inputs (as a dictionary) or
             default inputs if not specified
+        :param outputs: specific outputs
         """
         if inputs is None:
             raise NotImplementedError("inputs must be specified.")
         if isinstance(inputs, dict):
             inputs = [(k, v) for k, v in inputs.items()]
-        inputs = [(k, OnnxOperator._guess_type(v)) for k, v in inputs]
+        inputs = [(k, _guess_type(v)) for k, v in inputs]
         for name, typ in inputs:
             if typ in (None, ''):
                 raise RuntimeError("Type input '{}' for operator '{}' "
@@ -315,3 +296,42 @@ class OnnxOperator:
         onnx_model.model_version = utils.get_model_version()
 
         return onnx_model
+
+    def enumerate_nodes(self):
+        """
+        Iterates on all nodes of the graph.
+        """
+        yield self
+        for input in self.inputs:
+            if isinstance(input, OnnxOperator):
+                for i in input:
+                    yield i
+
+    def enumerate_variables(self):
+        """
+        Iterates on all nodes of the graph to find variables.
+        Returns an iterator `(node, i)` which means
+        `node.inputs[i]` is a variable.
+        """
+        for node in self.enumerate_nodes():
+            if self.inputs:
+                for i, input in enumerate(self.inputs):
+                    if isinstance(input, (OnnxOperator.UnscopedVariable, Variable)):
+                        yield (node, i)
+
+    def enumerate_initial_types(self):
+        """
+        Retrieves iniatial types of the implemented functions.
+        It goes through the graph and returns the name and types
+        of all variables not computed by an intemediate node.
+
+        :return: list of `(name, type)`
+        """
+        for node, i in self.enumerate_variables():
+            input = node.inputes[i]
+            if isinstance(input, Variable):
+                yield (input.name, input.type)
+            elif isinstance(input, OnnxOperator.UnscopedVariable):
+                name = input.name
+                typ = node.__class__.expected_inputs[i]
+                yield (name, typ)

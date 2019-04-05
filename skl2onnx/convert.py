@@ -99,11 +99,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
 
-    It used in example :ref:`l-example-tfidfvectorizer`.
+    It is used in example :ref:`l-example-tfidfvectorizer`.
     """ # noqa
     if initial_types is None:
-        raise ValueError('Initial types are required. See usage of '
-                         'convert(...) in skl2onnx.convert for details')
+        if hasattr(model, 'infer_initial_types'):
+            initial_types = model.infer_initial_types()
+        else:
+            raise ValueError('Initial types are required. See usage of '
+                             'convert(...) in skl2onnx.convert for details')
 
     if name is None:
         name = str(uuid4().hex)

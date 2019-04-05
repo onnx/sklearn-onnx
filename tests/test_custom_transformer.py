@@ -131,7 +131,7 @@ def predictable_tsne_converter(scope, operator, container):
                        op_domain='ai.onnx.ml', **attrs)
 
 
-class TestOtherLibrariesInPipeline(unittest.TestCase):
+class TestCustomTransformer(unittest.TestCase):
 
     def test_custom_pipeline_scaler(self):
 
