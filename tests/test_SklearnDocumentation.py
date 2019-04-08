@@ -76,7 +76,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         dump_data_and_model(tdata[:5], tfi, model_onnx,
                             basename="SklearnDocumentationTfIdf-OneOff-SklCol",
                             allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.3') or "
-                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     @unittest.skipIf(ColumnTransformer is None,
                      reason="ColumnTransformer introduced in 0.20")
@@ -106,7 +106,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         dump_data_and_model(test_data, pipeline, model_onnx, verbose=False,
                             basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2",
                             allow_failure="StrictVersion(onnx.__version__) <= StrictVersion('1.3') or "
-                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                                          "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
 
 if __name__ == "__main__":
