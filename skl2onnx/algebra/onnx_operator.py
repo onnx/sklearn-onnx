@@ -239,11 +239,14 @@ class OnnxOperator:
         for obj in inputs:
             if isinstance(obj, Variable):
                 new_inputs.append((obj.onnx_name, obj.type))
+            elif isinstance(obj, tuple) and len(obj) == 2:
+                ty = _guess_type(obj[1])
+                new_inputs.append((obj[0], ty))
             else:
-                new_inputs.append(obj)
+                raise TypeError("Unexpected type {}.".format(type(obj)))
         inputs = new_inputs
         for name, typ in inputs:
-            if typ in (None, ''):
+            if typ is None:
                 raise RuntimeError("Type input '{}' for operator '{}' "
                                    "is unknown. You should specify "
                                    "input types.".format(

@@ -130,7 +130,7 @@ class OnnxOperatorMixin:
 
         def shape_calculator(operator):
             onx = op.to_onnx(operator.inputs, operator.outputs)
-            inferred_model = shape_inference.infer_shapes(onx)            
+            inferred_model = shape_inference.infer_shapes(onx)
             shapes = Variable.from_pb(inferred_model.graph.value_info)
             shapes = {shape.onnx_name: shape for shape in shapes}
             for o in operator.outputs:
@@ -139,8 +139,8 @@ class OnnxOperatorMixin:
                     raise RuntimeError("Shape of output '{}' cannot be "
                                        "infered. onnx_shape_calculator "
                                        "must be overriden.".format(name))
-                o.type = shape.type
-        
+                o.type = shapes[name].type
+
         return shape_calculator
 
     def onnx_converter(self):
@@ -165,4 +165,3 @@ class OnnxOperatorMixin:
             op.add_to(scope, container, operator=operator)
 
         return converter
-
