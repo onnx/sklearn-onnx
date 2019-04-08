@@ -25,7 +25,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer11_empty_string(self):
         corpus = numpy.array([
@@ -64,7 +64,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 'WZZ ZZ Is this the first document?',
                 ]).reshape((4, 1))
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
@@ -80,7 +80,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
@@ -94,7 +94,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
@@ -126,7 +126,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
@@ -142,7 +142,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
@@ -158,7 +158,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnTfidfVectorizer13-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     @unittest.skipIf(True, reason="solved in another PR")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
@@ -207,7 +207,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx,
                             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
 
 if __name__ == "__main__":

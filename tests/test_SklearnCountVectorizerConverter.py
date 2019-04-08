@@ -25,7 +25,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer11-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
 
     def test_model_count_vectorizer22(self):
         corpus = numpy.array([
@@ -41,7 +41,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer22-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
         
     def test_model_count_vectorizer12(self):
         corpus = numpy.array([
@@ -57,7 +57,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer12-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
         
     def test_model_count_vectorizer13(self):
         corpus = numpy.array([
@@ -73,7 +73,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(corpus, vect, model_onnx, basename="SklearnCountVectorizer13-OneOff-SklCol",
-                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+                            allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.3.0')")
         
 
 if __name__ == "__main__":
