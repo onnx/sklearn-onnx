@@ -127,3 +127,33 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                   options=options)
 
     return onnx_model
+
+
+def to_onnx(model, X=None, name=None, initial_types=None):
+    """
+    Calls :func:`convert_sklearn` with simplified parameters.
+
+    :param model: model to convert
+    :param X: training set, can be None, it is used to infered the
+        input types (*initial_types*)
+    :param initial_types: if X is None, then *initial_types* must be
+        defined
+    :param name: name of the model
+    :return: converted model
+
+    This function checks if the model inherits from class
+    :class:`OnnxOperatorMixin`, it calls method *to_onnx*
+    in that case otherwise it calls :func:`convert_sklearn`.
+    """
+    from .algebra.onnx_operator_mixin import OnnxOperatorMixin
+    if isinstance(model, OnnxOperatorMixin):
+        return model.to_onnx(X=X, name=name)
+    if name is None:
+        name = model.__class__.__name__
+    if X is None:
+        raise NotImplementedError("Initial types must be specified.")
+    else:
+        from .algebra.type_helper import _guess_type
+        gt = _guess_type(X)
+        initial_types = [('X', gt)]
+    return convert_sklearn(model, initial_types=initial_types, name=name)

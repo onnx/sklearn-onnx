@@ -235,7 +235,13 @@ class OnnxOperator:
             raise NotImplementedError("inputs must be specified.")
         if isinstance(inputs, dict):
             inputs = [(k, v) for k, v in inputs.items()]
-        inputs = [(k, _guess_type(v)) for k, v in inputs]
+        new_inputs = []
+        for obj in inputs:
+            if isinstance(obj, Variable):
+                new_inputs.append((obj.onnx_name, obj.type))
+            else:
+                new_inputs.append(obj)
+        inputs = new_inputs
         for name, typ in inputs:
             if typ in (None, ''):
                 raise RuntimeError("Type input '{}' for operator '{}' "
@@ -257,7 +263,12 @@ class OnnxOperator:
 
         # infer shapes
         if outputs:
-            shapes = [Variable(o[0], o[0], None, o[1]) for o in outputs]
+            shapes = []
+            for o in outputs:
+                if isinstance(o, Variable):
+                    shapes.append(o)
+                else:
+                    shapes.append(Variable(o[0], o[0], None, o[1]))
         else:
             shapes = infer_outputs(container, container.inputs)
 
@@ -277,6 +288,7 @@ class OnnxOperator:
 
         # domains
         domains = {}
+        version = get_opset_number_from_onnx()
         for n in container.nodes:
             domains[n.domain] = max(domains.get(n.domain, 1),
                                     getattr(n, 'op_version', 1))
@@ -286,7 +298,7 @@ class OnnxOperator:
             else:
                 op_set = onnx_model.opset_import.add()
             op_set.domain = k
-            op_set.version = 10
+            op_set.version = domains.get(k, version)
 
         # metadata
         onnx_model.ir_version = onnx_proto.IR_VERSION

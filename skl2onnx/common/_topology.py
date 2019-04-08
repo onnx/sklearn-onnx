@@ -718,7 +718,8 @@ class Topology:
             elif operator.type in self.custom_shape_calculators:
                 self.custom_shape_calculators[operator.type](operator)
             elif hasattr(operator.raw_operator, "onnx_shape_calculator"):
-                return operator.raw_operator.onnx_shape_calculator()
+                shape_calc = operator.raw_operator.onnx_shape_calculator()                
+                shape_calc(operator)
             else:
                 operator.infer_types()
 

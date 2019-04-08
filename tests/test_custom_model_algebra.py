@@ -7,9 +7,11 @@ import inspect
 import onnx.checker
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn import datasets
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-from skl2onnx.algebra.base import OnnxOperatorMixin
+from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
 from skl2onnx import convert_sklearn
+from skl2onnx.convert import to_onnx
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
 from skl2onnx import operator_converters
 from skl2onnx.algebra.onnx_ops import Div, Sub
@@ -31,7 +33,9 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return (X - self.W_) / self.S_
     
-    def to_onnx_operator(self, inputs=('X', ), outputs=('Y', )):
+    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+        if inputs is None:
+            raise RuntimeError("inputs should contain one name")
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_
@@ -39,9 +43,16 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
                    output_names=outputs)
 
 
+class CustomOpTransformerShape(CustomOpTransformer):
+    def onnx_shape_calculator(self):        
+        def shape_calculator(operator):
+            operator.outputs[0].type = FloatTensorType(shape=operator.inputs[0].type.shape)
+        return shape_calculator
+
+
 class TestCustomModelAlgebra(unittest.TestCase):
 
-    def _test_base_api(self):
+    def test_base_api(self):
         
         class CustomOpScaler(StandardScaler, OnnxOperatorMixin):
             pass
@@ -57,7 +68,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
     def test_custom_scaler(self):
 
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
-        tr = CustomOpTransformer()
+        tr = CustomOpTransformerShape()
         tr.fit(mat)
         z = tr.transform(mat)
 
@@ -70,6 +81,55 @@ class TestCustomModelAlgebra(unittest.TestCase):
         dump_data_and_model(
             mat.astype(np.float32), tr, model_onnx,
             basename="CustomTransformerAlgebra")
+
+    def test_custom_scaler_pipeline_right(self):
+
+        pipe = make_pipeline(StandardScaler(), CustomOpTransformerShape())
+        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+        pipe.fit(mat)
+        z = pipe.transform(mat)
+
+        matf = mat.astype(np.float32)
+        model_onnx = to_onnx(pipe, matf)
+        # Next instructions fails...
+        # Field 'shape' of type is required but missing.
+        # onnx.checker.check_model(model_onnx)
+        
+        dump_data_and_model(
+            mat.astype(np.float32), pipe, model_onnx,
+            basename="CustomTransformerPipelineRightAlgebra")
+
+    def test_custom_scaler_pipeline_left(self):
+
+        pipe = make_pipeline(CustomOpTransformer(), StandardScaler())
+        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+        pipe.fit(mat)
+        z = pipe.transform(mat)
+
+        matf = mat.astype(np.float32)
+        
+        try:
+            model_onnx = to_onnx(pipe, matf)
+        except RuntimeError as e:
+            assert "cannot be infered" in str(e)
+
+        pipe = make_pipeline(CustomOpTransformerShape(), StandardScaler())
+        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+        pipe.fit(mat)
+        z = pipe.transform(mat)
+
+        matf = mat.astype(np.float32)
+        
+        model_onnx = to_onnx(pipe, matf)            
+            
+        # Next instructions fails...
+        # Field 'shape' of type is required but missing.
+        # onnx.checker.check_model(model_onnx)
+        
+        dump_data_and_model(
+            mat.astype(np.float32), pipe, model_onnx,
+            basename="CustomTransformerPipelineLeftAlgebra")
+
 
 
 if __name__ == "__main__":

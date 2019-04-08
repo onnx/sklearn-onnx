@@ -4,7 +4,9 @@
 # license information.
 # --------------------------------------------------------------------------
 from sklearn.base import BaseEstimator
+from onnx import shape_inference
 from ..common._registration import get_converter, get_shape_calculator
+from ..common._topology import Variable
 from .._supported_operators import sklearn_operator_name_map
 from .onnx_operator import OnnxOperator
 from .type_helper import _guess_type
@@ -70,15 +72,17 @@ class OnnxOperatorMixin:
         """
         raise NotImplementedError()
 
-    def onnx_parser(self):
+    def onnx_parser(self, inputs=None):
         """
         Returns a parser for this model.
         If not overloaded, it fetches the parser
         mapped to the first *scikit-learn* parent
         it can find.
         """
+        if inputs:
+            self.parsed_inputs_ = inputs
         try:
-            op = self.to_onnx_operator()
+            op = self.to_onnx_operator(inputs=inputs)
         except NotImplementedError:
             self._find_sklearn_parent()
             return None
@@ -106,6 +110,39 @@ class OnnxOperatorMixin:
             else:
                 return input
 
+    def onnx_shape_calculator(self):
+        """
+        Returns a shape calculator for this model.
+        If not overloaded, it fetches the parser
+        mapped to the first *scikit-learn* parent
+        it can find.
+        """
+        inputs = getattr(self, "parsed_inputs_", None)
+        try:
+            if inputs:
+                op = self.to_onnx_operator(inputs=inputs)
+            else:
+                op = self.to_onnx_operator(inputs=inputs)
+        except NotImplementedError:
+            parent = self._find_sklearn_parent()
+            name = sklearn_operator_name_map[parent]
+            return get_shape_calculator(name)
+
+        def shape_calculator(operator):
+            onx = op.to_onnx(operator.inputs, operator.outputs)
+            inferred_model = shape_inference.infer_shapes(onx)            
+            shapes = Variable.from_pb(inferred_model.graph.value_info)
+            shapes = {shape.onnx_name: shape for shape in shapes}
+            for o in operator.outputs:
+                name = o.onnx_name
+                if name not in shapes:
+                    raise RuntimeError("Shape of output '{}' cannot be "
+                                       "infered. onnx_shape_calculator "
+                                       "must be overriden.".format(name))
+                o.type = shape.type
+        
+        return shape_calculator
+
     def onnx_converter(self):
         """
         Returns a converter for this model.
@@ -113,8 +150,12 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
+        inputs = getattr(self, "parsed_inputs_", None)
         try:
-            op = self.to_onnx_operator()
+            if inputs:
+                op = self.to_onnx_operator(inputs=inputs)
+            else:
+                op = self.to_onnx_operator(inputs=inputs)
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map[parent]
@@ -125,23 +166,3 @@ class OnnxOperatorMixin:
 
         return converter
 
-    def onnx_shape_calculator(self):
-        """
-        Returns a shape calculator for this model.
-        If not overloaded, it fetches the parser
-        mapped to the first *scikit-learn* parent
-        it can find.
-        """
-        try:
-            op = self.to_onnx_operator()
-        except NotImplementedError:
-            parent = self._find_sklearn_parent()
-            name = sklearn_operator_name_map[parent]
-            return get_shape_calculator(name)
-
-        def shape_calculator(operator):
-            onx = op.to_onnx(operator.inputs, operator.outputs)
-            assert onx is not None
-            onames = [o.full_name for o in operator.outputs]
-            return onames
-        return shape_calculator
