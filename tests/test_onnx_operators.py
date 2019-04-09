@@ -7,9 +7,10 @@ from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.algebra.onnx_ops import Sub, Div
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.algebra.onnx_ops import ReduceSumSquare, Gemm, Add, ArgMin, Sqrt
+from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
+from skl2onnx.algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
+from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
 from test_utils import dump_data_and_model
 
 
@@ -36,7 +37,7 @@ class TestOnnxOperators(unittest.TestCase):
 
         def conv(scope, operator, container):
             W = operator.raw_operator.W
-            op = Sub(operator.inputs[0], W, output_names=operator.outputs)
+            op = OnnxSub(operator.inputs[0], W, output_names=operator.outputs)
             op.add_to(scope, container)
 
         def shape(operator):
@@ -78,7 +79,7 @@ class TestOnnxOperators(unittest.TestCase):
             S = operator.raw_operator.S
             X = operator.inputs[0]
             out = operator.outputs
-            op = Div(Sub(X, W), S, output_names=out)
+            op = OnnxDiv(OnnxSub(X, W), S, output_names=out)
             op.add_to(scope, container)
 
         def shape(operator):
@@ -108,11 +109,11 @@ class TestOnnxOperators(unittest.TestCase):
             N = X.type.shape[0]
             zeros = np.zeros((N, ))
 
-            rs = ReduceSumSquare(X, axes=[1], keepdims=1)
-            z = Add(rs, Gemm(X, C, zeros, alpha=-2., transB=1))
-            y2 = Add(C2, z)
-            l = ArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
-            y2s = Sqrt(y2, output_names=out[1:])
+            rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
+            z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
+            y2 = OnnxAdd(C2, z)
+            l = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
+            y2s = OnnxSqrt(y2, output_names=out[1:])
 
             l.add_to(scope, container)
             y2s.add_to(scope, container)

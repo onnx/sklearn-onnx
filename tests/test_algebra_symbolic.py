@@ -7,20 +7,21 @@ from numpy.testing import assert_almost_equal
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra import OnnxOperator
 try:
-    from skl2onnx.algebra.onnx_ops import Abs, Normalizer, ArgMin, Split, Identity
+    from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
+    from skl2onnx.algebra.onnx_ops import OnnxSplit, OnnxIdentity
 except ImportError as e:
     warnings.warn('Unable to test Abs, Normalizer, ArgMin, Split.')
-    Abs = None
+    OnnxAbs = None
 
 
 class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_abs(self):
     
-        op = Abs('I0')
+        op = OnnxAbs('I0')
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
         
@@ -38,7 +39,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(True or Abs is None,
+    @unittest.skipIf(True or OnnxAbs is None,
                      reason="shape inference fails for Normalizer")
     def test_algebra_normalizer(self):
     
@@ -58,10 +59,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_shape(self):
     
-        op = Normalizer('I0', norm='L1', op_version=1, output_names=['O0'])
+        op = OnnxNormalizer('I0', norm='L1', op_version=1, output_names=['O0'])
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)},
                          outputs=[('O0', FloatTensorType((1, 2)))])
         assert onx is not None
@@ -78,10 +79,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_argmin(self):
     
-        op = ArgMin('I0', op_version=1)
+        op = OnnxArgMin('I0', op_version=1)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -95,10 +96,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin_named_output(self):
     
-        op = ArgMin(Normalizer('I0', norm='L1', output_names=['Y']))
+        op = OnnxArgMin(OnnxNormalizer('I0', norm='L1', output_names=['Y']))
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -112,10 +113,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin(self):
     
-        op = ArgMin(Normalizer('I0', norm='L1'))
+        op = OnnxArgMin(OnnxNormalizer('I0', norm='L1'))
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -129,10 +130,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
-    @unittest.skipIf(Abs is None, reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(OnnxAbs is None, reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
     
-        op = Split('I0', axis=0, output_names=['O1', 'O2'])
+        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'])
         onx = op.to_onnx({'I0': numpy.arange(6, dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)

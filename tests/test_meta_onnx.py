@@ -28,12 +28,12 @@ class TestMetaOnnx(unittest.TestCase):
             assert hasattr(cl, '__doc__')
 
     def test_mul(self):
-        from skl2onnx.algebra.onnx_ops import Mul
-        assert Mul.__name__ == 'Mul'
-        assert isinstance(Mul('a', 'b'), OnnxOperator)
+        from skl2onnx.algebra.onnx_ops import OnnxMul
+        assert OnnxMul.operator_name == 'Mul'
+        assert isinstance(OnnxMul('a', 'b'), OnnxOperator)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-                     reason="too unstable with older versions")
+    #@unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
+    #                 reason="too unstable with older versions")
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_onnx_spec(self):
@@ -111,7 +111,7 @@ class TestMetaOnnx(unittest.TestCase):
         
         # get the operator to test
         node = onx.graph.node[0]
-        op_class = self._algebra.get(node.op_type, None)
+        op_class = self._algebra.get("Onnx" + node.op_type, None)
         if op_class is None:
             raise RuntimeError("Unable to find the corresponding operator in the algebra "
                                "'{}'.".format(node.op_type))        

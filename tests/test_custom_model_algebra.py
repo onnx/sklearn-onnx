@@ -14,7 +14,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.convert import to_onnx
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
 from skl2onnx import operator_converters
-from skl2onnx.algebra.onnx_ops import Div, Sub
+from skl2onnx.algebra.onnx_ops import OnnxDiv, OnnxSub
 from test_utils import dump_data_and_model
 
 
@@ -39,8 +39,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_
-        return Div(Sub(i0, W), S,
-                   output_names=outputs)
+        return OnnxDiv(OnnxSub(i0, W), S,
+                       output_names=outputs)
 
 
 class CustomOpTransformerShape(CustomOpTransformer):

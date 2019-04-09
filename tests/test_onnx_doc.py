@@ -16,14 +16,14 @@ class TestOnnxDoc(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_pad(self):
-        from skl2onnx.algebra.onnx_ops import Pad        
+        from skl2onnx.algebra.onnx_ops import OnnxPad        
         
         X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
         Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [1, 4])        
 
-        pad = Pad('X', output_names=['Y'],
-                  mode='constant', value=1.5,
-                  pads=[0, 1, 0, 1])
+        pad = OnnxPad('X', output_names=['Y'],
+                      mode='constant', value=1.5,
+                      pads=[0, 1, 0, 1])
 
         model_def = pad.to_onnx({'X': X})
         onnx.checker.check_model(model_def)
@@ -40,10 +40,10 @@ class TestOnnxDoc(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_transpose2(self):
-        from skl2onnx.algebra.onnx_ops import Transpose
+        from skl2onnx.algebra.onnx_ops import OnnxTranspose
 
-        node = Transpose(Transpose('X', perm=[1, 0, 2]),
-                         perm=[1, 0, 2], output_names=['Y'])
+        node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]),
+                             perm=[1, 0, 2], output_names=['Y'])
         X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
         model_def = node.to_onnx({'X': X})

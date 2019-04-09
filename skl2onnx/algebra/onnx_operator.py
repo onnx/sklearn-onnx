@@ -97,7 +97,7 @@ class OnnxOperator:
                     len(self.inputs) > self.input_range[1]:
                 raise RuntimeError("Operator '{}' expects a number of inputs "
                                    "in [{}, {}] not {}".format(
-                                       self.__class__.__name__,
+                                       self.operator_name,
                                        *self.input_range,
                                        len(self.inputs)))
 
@@ -207,7 +207,7 @@ class OnnxOperator:
                 else:
                     inputs.append(input)
             self.state = GraphState(inputs, self.output_names_,
-                                    self.__class__.__name__,
+                                    self.operator_name,
                                     scope, container, None,
                                     op_version=self.op_version,
                                     op_domain=domain,
@@ -293,8 +293,8 @@ class OnnxOperator:
         domains = {}
         version = get_opset_number_from_onnx()
         for n in container.nodes:
-            domains[n.domain] = max(domains.get(n.domain, 1),
-                                    getattr(n, 'op_version', 1))
+            domains[n.domain] = max(domains.get(n.domain, version),
+                                    getattr(n, 'op_version', version))
         for i, (k, v) in enumerate(domains.items()):
             if i == 0 and len(onnx_model.opset_import) == 1:
                 op_set = onnx_model.opset_import[0]

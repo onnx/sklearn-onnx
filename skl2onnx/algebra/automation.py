@@ -183,7 +183,8 @@ def get_rst_doc(op_name=None):
                                      format_name_with_domain=fnwd)
 
 
-def ClassFactory(name, inputs, outputs, input_range, output_range,
+def ClassFactory(class_name, op_name, inputs, outputs,
+                 input_range, output_range,
                  domain, attr_names, doc):
     from .onnx_operator import OnnxOperator
 
@@ -206,10 +207,11 @@ def ClassFactory(name, inputs, outputs, input_range, output_range,
 
         OnnxOperator.__init__(self, *args, **kwargs)
 
-    newclass = type(name, (OnnxOperator,),
+    newclass = type(class_name, (OnnxOperator,),
                     {"__init__": __init__, '__doc__': doc,
                      'expected_inputs': inputs,
                      'expected_outputs': outputs,
+                     'operator_name': op_name,
                      'input_range': input_range,
                      'output_range': output_range,
                      'domain': domain})
@@ -250,9 +252,10 @@ def dynamic_class_creation():
             inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
             outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
-        cl = ClassFactory(schema.name, inputs, outputs,
+        class_name = "Onnx" + schema.name
+        cl = ClassFactory(class_name, schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
                           schema.domain, args, doc.split('**Summary**')[-1])
-        cls[schema.name] = cl
+        cls[class_name] = cl
     return cls
