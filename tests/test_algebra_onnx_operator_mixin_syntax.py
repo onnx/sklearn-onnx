@@ -156,7 +156,5 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             basename="MixinPipeWay4OnnxMixin2")
 
 
-
-
 if __name__ == "__main__":
     unittest.main()

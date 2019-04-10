@@ -10,8 +10,8 @@ from docutils.statemachine import StringList
 from sphinx.util.nodes import nested_parse_with_titles
 from tabulate import tabulate
 import skl2onnx
-from skl2onnx.algebra.automation import dynamic_class_creation
-from skl2onnx.algebra.automation import dynamic_class_creation_sklearn
+from skl2onnx.algebra.onnx_ops import dynamic_class_creation
+from skl2onnx.algebra.sklearn_ops import dynamic_class_creation_sklearn
 import onnxruntime
 
 

@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from uuid import uuid4
-import numpy as np
 from .proto import get_opset_number_from_onnx
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model

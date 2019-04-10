@@ -9,7 +9,7 @@ from ..common._registration import get_converter, get_shape_calculator
 from ..common._topology import Variable
 from .._supported_operators import sklearn_operator_name_map
 from .onnx_operator import OnnxOperator
-from .type_helper import _guess_type, guess_initial_types
+from .type_helper import guess_initial_types
 
 
 class OnnxOperatorMixin:
@@ -124,7 +124,8 @@ class OnnxOperatorMixin:
                 op = self.to_onnx_operator(inputs=inputs)
         except NotImplementedError:
             parent = self._find_sklearn_parent()
-            name = sklearn_operator_name_map.get(parent, "Sklearn" + parent.__name__)
+            name = sklearn_operator_name_map.get(
+                parent, "Sklearn" + parent.__name__)
             return get_shape_calculator(name)
 
         def shape_calculator(operator):

@@ -187,4 +187,4 @@ image = plt.imread("pipeline_tfidf.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
-                             
+

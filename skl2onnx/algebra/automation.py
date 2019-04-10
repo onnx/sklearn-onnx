@@ -295,6 +295,7 @@ def get_rst_doc_sklearn():
     def format_doc(cl):
         return "\n".join(cl.__doc__.split("\n")[1:])
 
+    from .sklearn_ops import dynamic_class_creation_sklearn
     classes = dynamic_class_creation_sklearn()
     tmpl = _template_operator_sklearn
     values = [(k, v) for k, v in sorted(classes.items())]
