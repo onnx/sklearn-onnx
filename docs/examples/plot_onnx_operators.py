@@ -84,11 +84,11 @@ print('The model is checked!')
 # The list is dynamically created based on the installed
 # onnx package.
 
-from skl2onnx.algebra.onnx_ops import Pad
+from skl2onnx.algebra.onnx_ops import OnnxPad
 
-pad = Pad('X', output_names=['Y'],
-          mode='constant', value=1.5,
-          pads=[0, 1, 0, 1])
+pad = OnnxPad('X', output_names=['Y'],
+              mode='constant', value=1.5,
+              pads=[0, 1, 0, 1])
 
 model_def = pad.to_onnx({'X': X})
 
@@ -99,8 +99,8 @@ print('The model is checked!')
 ####################################
 # Inputs and outputs can also be skipped.
 
-pad = Pad(mode='constant', value=1.5,
-          pads=[0, 1, 0, 1])
+pad = OnnxPad(mode='constant', value=1.5,
+              pads=[0, 1, 0, 1])
 
 model_def = pad.to_onnx({pad.inputs[0].name: X})
 onnx.checker.check_model(model_def)
@@ -132,9 +132,9 @@ onnx.checker.check_model(original_model)
 # Which we translate into:
 
 import numpy as np
-from skl2onnx.algebra.onnx_ops import Transpose
+from skl2onnx.algebra.onnx_ops import OnnxTranspose
 
-node = Transpose(Transpose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
+node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape

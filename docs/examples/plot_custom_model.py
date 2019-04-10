@@ -32,15 +32,15 @@ The first section is about the implementation.
 The code is quite generic but basically follows this
 process to fit the model with *X* and *y*:
 
-* t-SNE, :math:`(X, y) \rightarrow X_2 \in \mathbb{R}^2`
+* t-SNE, :math:`(X, y) \\rightarrow X_2 \in \\mathbb{R}^2`
 * k nearest neightbours, :math:`fit(X, X_2)`,
-  which produces function :math:`f(X) \rightarrow X_3`
-* final normalization, simple scaling :math:`X_3 \rightarrow X_4`
+  which produces function :math:`f(X) \\rightarrow X_3`
+* final normalization, simple scaling :math:`X_3 \\rightarrow X_4`
 
 And to predict on a test set:
 
-* k nearest neightbours, :math:`f(X') \rightarrow X'_3`
-* final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
+* k nearest neightbours, :math:`f(X') \\rightarrow X'_3`
+* final normalization, simple scaling :math:`X'_3 \\rightarrow X'_4`
 """
 
 import inspect

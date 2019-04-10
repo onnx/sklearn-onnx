@@ -10,10 +10,11 @@ import sys
 import shutil
 import sphinx_gallery.gen_gallery
 import skl2onnx
-from skl2onnx.algebra.onnx_ops import Div
+from skl2onnx.algebra.onnx_ops import OnnxDiv
 import onnxruntime
 import sphinx_skl2onnx_extension
 import sphinx_modern_theme_modified
+import tabulate
 
 
 # -- Project information -----------------------------------------------------

@@ -9,5 +9,3 @@ dynamically added and the list depends on the installed
 ONNX package.
 
 .. supported-onnx-ops::
-
- 

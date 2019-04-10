@@ -108,7 +108,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
 
             nb += 1
             for inp in node.input:
-                if mark_var[inp] == 1:
+                if mark_var.get(inp, 0) == 1:
                     continue
                 mark_var[inp] = 1
                 nb += 1

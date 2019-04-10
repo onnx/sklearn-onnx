@@ -34,12 +34,10 @@ def _get_doc_template():
 
         {{format_name_with_domain(sch)}}
         {{'=' * len(format_name_with_domain(sch))}}
-
-        **Summary**
-
-        {{sch.doc}}
-
+        
         **Version**
+
+        *Onnx name: {{sch.name}}*
 
         {% if sch.support_level == OpSchema.SupportType.EXPERIMENTAL %}
         No versioning maintained for experimental ops.
@@ -47,7 +45,7 @@ def _get_doc_template():
         This version of the operator has been {% if
         sch.deprecated %}deprecated{% else %}available{% endif %} since
         version {{sch.since_version}}{% if
-        sch.domaine %} of domain {{sch.domain}}{% endif %}.
+        sch.domain %} of domain {{sch.domain}}{% endif %}.
         {% if len(sch.versions) > 1 %}
         Other versions of this operator:
         {% for v in sch.version[:-1] %} {{v}} {% endfor %}
@@ -94,6 +92,10 @@ def _get_doc_template():
         type_constraint.description}}
         {% endfor %}
         {% endif %}
+
+        **Summary**
+
+        {{sch.doc}}
 
         {% endfor %}
     """))
@@ -196,14 +198,14 @@ def ClassFactory(class_name, op_name, inputs, outputs,
             raise RuntimeError("Unexpected number of inputs, "
                                "got {}, expecting {} for operator "
                                "'{}'.".format(
-                                   len(args), len(inputs), name))
+                                   len(args), len(inputs), op_name))
 
         for key in kwargs:
             if key in {'output_names', 'op_version', 'domain'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s'"
-                                % (key, self.__class__.__name__))
+                                % (key, op_name))
 
         OnnxOperator.__init__(self, *args, **kwargs)
 

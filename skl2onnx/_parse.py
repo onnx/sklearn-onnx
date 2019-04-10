@@ -70,9 +70,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         if parser_names is not None:
             names = parser_names()
             for name in names:
-                variable = scope.declare_local_variable(name,
-                    FloatTensorType())
-                this_operator.outputs.append(variable)
+                var = scope.declare_local_variable(name, FloatTensorType())
+                this_operator.outputs.append(var)
             return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list

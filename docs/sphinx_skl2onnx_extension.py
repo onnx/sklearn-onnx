@@ -8,6 +8,7 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.statemachine import StringList
 from sphinx.util.nodes import nested_parse_with_titles
+from tabulate import tabulate
 import skl2onnx
 from skl2onnx.algebra.automation import dynamic_class_creation
 import onnxruntime
@@ -70,13 +71,36 @@ class SupportedOnnxOpsDirective(Directive):
         rows = []
         sorted_keys = list(sorted(cls))
         main = nodes.container()
-        for name in sorted_keys:
+
+        def make_ref(name):
             cl = cls[name]
-            rows.append('* :ref:`l-onnx-{}`'.format(cl.__name__))
-            node = nodes.container()
+            return ":ref:`l-onnx-{}`".format(cl.__name__)
+
+        table = []
+        cut = len(sorted_keys) // 3 + (1 if len(sorted_keys) % 3 else 0)
+        for i in range(cut):
+            row = []
+            row.append(make_ref(sorted_keys[i]))
+            if i + cut < len(sorted_keys):
+                row.append(make_ref(sorted_keys[i + cut]))
+                if i + cut * 2 < len(sorted_keys):
+                    row.append(make_ref(sorted_keys[i + cut * 2]))
+                else:
+                    row.append('')
+            else:
+                row.append('')
+                row.append('')
+            table.append(row)
+        
+        rst = tabulate(table, tablefmt="rst")
+        print(rst)
+        rows = rst.split("\n")
+
+        node = nodes.container()
         st = StringList(rows)
         nested_parse_with_titles(self.state, st, node)
         main += node
+
             
         rows.append('')
         for name in sorted_keys:            

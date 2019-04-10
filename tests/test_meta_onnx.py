@@ -32,8 +32,8 @@ class TestMetaOnnx(unittest.TestCase):
         assert OnnxMul.operator_name == 'Mul'
         assert isinstance(OnnxMul('a', 'b'), OnnxOperator)
 
-    #@unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-    #                 reason="too unstable with older versions")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
+                     reason="too unstable with older versions")
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_onnx_spec(self):

@@ -210,6 +210,7 @@ print("numerical features", numX[0][:1])
 ###########################################
 # We do the same for the textual features.
 
+print(model_onnx)
 text_onnx = select_model_inputs_outputs(model_onnx, 'variable2')
 save_onnx_model(text_onnx, "pipeline_titanic_textual.onnx")
 sess = rt.InferenceSession("pipeline_titanic_textual.onnx")
