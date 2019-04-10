@@ -37,7 +37,7 @@ def _get_doc_template():
         
         **Version**
 
-        *Onnx name: {{sch.name}}*
+        *Onnx name:* `{{sch.name}} <{{build_doc_url(sch)}}{{sch.name}}>`_
 
         {% if sch.support_level == OpSchema.SupportType.EXPERIMENTAL %}
         No versioning maintained for experimental ops.
@@ -51,6 +51,10 @@ def _get_doc_template():
         {% for v in sch.version[:-1] %} {{v}} {% endfor %}
         {% endif %}
         {% endif %}
+
+        **Summary**
+
+        {{process_documentation(sch.doc)}}
 
         {% if sch.attributes %}
         **Attributes**
@@ -92,10 +96,6 @@ def _get_doc_template():
         type_constraint.description}}
         {% endfor %}
         {% endif %}
-
-        **Summary**
-
-        {{sch.doc}}
 
         {% endfor %}
     """))
@@ -174,15 +174,65 @@ def get_rst_doc(op_name=None):
             return str(i)
         else:
             return name
+    
+    def process_documentation(doc):
+        doc = textwrap.dedent(doc)
+        main_docs_url = "https://github.com/onnx/onnx/blob/master/"
+        rep = {
+            '[the doc](IR.md)': '`ONNX <{0}docs/IR.md>`_',
+            '[the doc](Broadcasting.md)':
+                'Broadcasting in ONNX <docs/Broadcasting.md>`_',
+            '<dl>': '',
+            '</dl>': '',
+            '<dt>': '* ',
+            '<dd>': '  ',
+            '</dt>': '',
+            '</dd>': '',
+            '<tt>': '``',
+            '</tt>': '``',
+            '<br>': '\n',
+        }
+        for k, v in rep.items():
+            doc = doc.replace(k, v.format(main_docs_url))
+        move = 0
+        lines = []
+        for line in doc.split('\n'):
+            if line.startswith("```"):
+                if move > 0:
+                    move -= 4
+                    lines.append("\n")
+                else:
+                    lines.append("::\n")
+                    move += 4
+            elif move > 0:
+                lines.append(" " * move + line)
+            else:
+                lines.append(line)
+        return "\n".join(lines)
+
+    def build_doc_url(sch):
+        doc_url = "https://github.com/onnx/onnx/blob/master/docs/Operators"
+        if "ml" in sch.domain:
+            doc_url += "-ml"
+        doc_url += ".md"
+        doc_url += "#"
+        if sch.domain not in (None, '', 'ai.onnx'):
+            doc_url += sch.domain + "."
+        return doc_url
 
     fnwd = format_name_with_domain
-    return _template_operator.render(schemas=schemas, OpSchema=OpSchema,
-                                     len=len,
-                                     getattr=getattr, sorted=sorted,
-                                     format_option=format_option,
-                                     getconstraint=getconstraint,
-                                     getname=getname, enumerate=enumerate,
-                                     format_name_with_domain=fnwd)
+    tmpl = _template_operator
+    docs = tmpl.render(schemas=schemas, OpSchema=OpSchema,
+                       len=len, getattr=getattr, sorted=sorted,
+                       format_option=format_option,
+                       getconstraint=getconstraint,
+                       getname=getname, enumerate=enumerate,
+                       format_name_with_domain=fnwd,
+                       process_documentation=process_documentation,
+                       build_doc_url=build_doc_url)
+    if "ArgMin" in docs:
+        print(docs)
+    return docs
 
 
 def ClassFactory(class_name, op_name, inputs, outputs,
@@ -258,6 +308,7 @@ def dynamic_class_creation():
         cl = ClassFactory(class_name, schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
-                          schema.domain, args, doc.split('**Summary**')[-1])
+                          schema.domain, args,
+                          "**Version**" + doc.split('**Version**')[-1])
         cls[class_name] = cl
     return cls
