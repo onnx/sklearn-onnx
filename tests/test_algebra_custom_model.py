@@ -4,6 +4,8 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy as np
 import inspect
+from distutils.version import StrictVersion
+import onnx
 import onnx.checker
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn import datasets
@@ -99,6 +101,8 @@ class TestCustomModelAlgebra(unittest.TestCase):
             mat.astype(np.float32), pipe, model_onnx,
             basename="CustomTransformerPipelineRightAlgebra")
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.3.0"),
+                     reason="not available")
     def test_custom_scaler_pipeline_left(self):
 
         pipe = make_pipeline(CustomOpTransformer(), StandardScaler())

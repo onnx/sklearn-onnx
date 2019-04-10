@@ -6,9 +6,10 @@ import onnx
 from onnx import helper
 from onnx import AttributeProto, TensorProto, GraphProto
 from skl2onnx.algebra.automation import dynamic_class_creation
+from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
 
 
-class TestOnnxDoc(unittest.TestCase):
+class TestAlgebraOnnxDoc(unittest.TestCase):
     
     def setUp(self):
         self._algebra = dynamic_class_creation()
@@ -50,6 +51,14 @@ class TestOnnxDoc(unittest.TestCase):
         onnx.checker.check_model(model_def)
         res = self.predict_with_onnxruntime(model_def, X)
         assert_almost_equal(res['Y'], X)
+
+    def test_doc_onnx(self):
+        rst = get_rst_doc()
+        assert "**Summary**" in rst
+
+    def test_doc_sklearn(self):
+        rst = get_rst_doc_sklearn()
+        assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
 
 
 

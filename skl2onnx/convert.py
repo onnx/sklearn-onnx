@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 from uuid import uuid4
+import numpy as np
 from .proto import get_opset_number_from_onnx
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
@@ -146,14 +147,27 @@ def to_onnx(model, X=None, name=None, initial_types=None):
     in that case otherwise it calls :func:`convert_sklearn`.
     """
     from .algebra.onnx_operator_mixin import OnnxOperatorMixin
+    from .algebra.type_helper import guess_initial_types
+
     if isinstance(model, OnnxOperatorMixin):
         return model.to_onnx(X=X, name=name)
     if name is None:
         name = model.__class__.__name__
-    if X is None:
-        raise NotImplementedError("Initial types must be specified.")
-    else:
-        from .algebra.type_helper import _guess_type
-        gt = _guess_type(X)
-        initial_types = [('X', gt)]
+    initial_types = guess_initial_types(X, initial_types)
     return convert_sklearn(model, initial_types=initial_types, name=name)
+
+
+def wrap_as_onnx_mixin(model):
+    """
+    Combines a *scikit-learn* class with :class:`OnnxOperatorMixin`
+    which produces a new object which combines *scikit-learn* API
+    and *OnnxOperatorMixin* API.
+    """
+    from .algebra.sklearn_ops import find_class
+    cl = find_class(model.__class__)
+    if "automation" in str(cl):
+        raise RuntimeError("Wrong class name '{}'.".format(cl))
+    state = model.__getstate__()
+    obj = object.__new__(cl)
+    obj.__setstate__(state)
+    return obj

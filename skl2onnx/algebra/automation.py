@@ -34,7 +34,7 @@ def _get_doc_template():
 
         {{format_name_with_domain(sch)}}
         {{'=' * len(format_name_with_domain(sch))}}
-        
+
         **Version**
 
         *Onnx name:* `{{sch.name}} <{{build_doc_url(sch)}}{{sch.name}}>`_
@@ -115,6 +115,7 @@ def get_domain_list():
 def get_rst_doc(op_name=None):
     """
     Returns a documentation in RST format
+    for all :class:`OnnxOperator`.
 
     :param op_name: operator name of None for all
     :return: string
@@ -174,8 +175,10 @@ def get_rst_doc(op_name=None):
             return str(i)
         else:
             return name
-    
+
     def process_documentation(doc):
+        if doc is None:
+            doc = ''
         doc = textwrap.dedent(doc)
         main_docs_url = "https://github.com/onnx/onnx/blob/master/"
         rep = {
@@ -230,85 +233,71 @@ def get_rst_doc(op_name=None):
                        format_name_with_domain=fnwd,
                        process_documentation=process_documentation,
                        build_doc_url=build_doc_url)
-    if "ArgMin" in docs:
-        print(docs)
     return docs
 
 
-def ClassFactory(class_name, op_name, inputs, outputs,
-                 input_range, output_range,
-                 domain, attr_names, doc):
-    from .onnx_operator import OnnxOperator
+def _get_doc_template_sklearn():
+    try:
+        from jinja2 import Template
+    except ImportError:
+        class Template:
+            def __init__(self, *args):
+                pass
 
-    def __init__(self, *args, **kwargs):
+            def render(self, **context):
+                schemas = context['schemas']
+                rows = []
+                for sch in schemas:
+                    doc = sch.doc or ''
+                    name = sch.name
+                    if name is None:
+                        raise RuntimeError("An operator must have a name.")
+                    rows.extend([name, "=" * len(name),
+                                 "", doc, ""])
+                return "\n".join(rows)
 
-        if len(args) == 0 and input_range[0] == input_range[1]:
-            args = [_[0] for _ in self.__class__.expected_inputs]
-        if not (input_range[0] <= len(args) <= input_range[1]):
-            raise RuntimeError("Unexpected number of inputs, "
-                               "got {}, expecting {} for operator "
-                               "'{}'.".format(
-                                   len(args), len(inputs), op_name))
+    return Template(textwrap.dedent("""
+        {% for cl in classes %}
 
-        for key in kwargs:
-            if key in {'output_names', 'op_version', 'domain'}:
-                continue
-            if key not in attr_names:
-                raise TypeError("Argument '%s' not valid for '%s'"
-                                % (key, op_name))
+        .. _l-sklops-{{cl.__name__}}:
 
-        OnnxOperator.__init__(self, *args, **kwargs)
+        {{cl.__name__}}
+        {{'=' * len(cl.__name__)}}
 
-    newclass = type(class_name, (OnnxOperator,),
-                    {"__init__": __init__, '__doc__': doc,
-                     'expected_inputs': inputs,
-                     'expected_outputs': outputs,
-                     'operator_name': op_name,
-                     'input_range': input_range,
-                     'output_range': output_range,
-                     'domain': domain})
-    return newclass
+        Corresponding :class:`OnnxSubGraphOperatorMixin
+        <skl2onnx.algebra.onnx_subgraph_operator_mixin.
+        OnnxSubGraphOperatorMixin>` for model
+        **{{cl.operator_name}}**.
+
+        * Shape calculator: *{{cl._fct_shape_calc.__name__}}*
+        * Converter: *{{cl._fct_converter.__name__}}*
+
+        {{format_doc(cl)}}
+
+        {% endfor %}
+    """))
 
 
-def dynamic_class_creation():
+_template_operator_sklearn = _get_doc_template_sklearn()
+
+
+def get_rst_doc_sklearn():
     """
-    Automatically generates classes for each of the operators
-    module *onnx* defines and described at
-    `Operators
-    <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_
-    and `Operators
-    <https://github.com/onnx/onnx/blob/master/docs/
-    Operators-ml.md>`_.
+    Returns a documentation in RST format
+    for all :class:`OnnxSubGraphOperatorMixin`.
+
+    :param op_name: operator name of None for all
+    :return: string
+
+    The function relies on module *jinja2* or replaces it
+    with a simple rendering if not present.
     """
-    res = {}
-    for schema in onnx.defs.get_all_schemas_with_history():
-        if schema.support_level == schema.SupportType.EXPERIMENTAL:
-            # Skips experimental operators.
-            continue
-        # Multiple version can coexist. The last one is kept.
-        res[schema.name] = schema
-    cls = {}
+    def format_doc(cl):
+        return "\n".join(cl.__doc__.split("\n")[1:])
 
-    def _c(obj, label, i):
-        name = obj.name or '%s%d' % (label, i)
-        tys = obj.typeStr or ''
-        return (name, tys)
-
-    for name in sorted(res):
-        schema = res[name]
-        doc = get_rst_doc(schema)
-        if name == "Abs":
-            inputs = [('X', 'FloatTensorType')]
-            outputs = [('Y', 'FloatTensorType')]
-        else:
-            inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
-            outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
-        args = [p for p in schema.attributes]
-        class_name = "Onnx" + schema.name
-        cl = ClassFactory(class_name, schema.name, inputs, outputs,
-                          [schema.min_input, schema.max_input],
-                          [schema.min_output, schema.max_output],
-                          schema.domain, args,
-                          "**Version**" + doc.split('**Version**')[-1])
-        cls[class_name] = cl
-    return cls
+    classes = dynamic_class_creation_sklearn()
+    tmpl = _template_operator_sklearn
+    values = [(k, v) for k, v in sorted(classes.items())]
+    values = [_[1] for _ in values]
+    docs = tmpl.render(len=len, classes=values, format_doc=format_doc)
+    return docs

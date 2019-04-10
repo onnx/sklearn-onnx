@@ -9,7 +9,7 @@ from ..common._registration import get_converter, get_shape_calculator
 from ..common._topology import Variable
 from .._supported_operators import sklearn_operator_name_map
 from .onnx_operator import OnnxOperator
-from .type_helper import _guess_type
+from .type_helper import _guess_type, guess_initial_types
 
 
 class OnnxOperatorMixin:
@@ -33,10 +33,9 @@ class OnnxOperatorMixin:
         if name is None:
             name = self.__class__.__name__
         if X is None:
-            initial_types = self.infer_initial_type()
+            initial_types = self.infer_initial_types()
         else:
-            gt = _guess_type(X)
-            initial_types = [('X', gt)]
+            initial_types = guess_initial_types(X, None)
         return convert_sklearn(self, initial_types=initial_types)
 
     def infer_initial_types(self):
@@ -125,7 +124,7 @@ class OnnxOperatorMixin:
                 op = self.to_onnx_operator(inputs=inputs)
         except NotImplementedError:
             parent = self._find_sklearn_parent()
-            name = sklearn_operator_name_map[parent]
+            name = sklearn_operator_name_map.get(parent, "Sklearn" + parent.__name__)
             return get_shape_calculator(name)
 
         def shape_calculator(operator):
@@ -138,7 +137,8 @@ class OnnxOperatorMixin:
                 if name not in shapes:
                     raise RuntimeError("Shape of output '{}' cannot be "
                                        "infered. onnx_shape_calculator "
-                                       "must be overriden.".format(name))
+                                       "must be overriden and return "
+                                       "a shape calculator.".format(name))
                 o.type = shapes[name].type
 
         return shape_calculator

@@ -20,7 +20,7 @@ def convert_voting_classifier(scope, operator, container):
     The operator cannot compute mulitple prediction at a time due
     to reduce operators.
 
-    *predict_proba* is not defined by *scikit-learn* when *``voting='hard'``*.
+    *predict_proba* is not defined by *scikit-learn* when ``voting='hard'``.
     The converted model still defines a probability vector equal to the
     highest probability obtained for each class over all estimators.
 

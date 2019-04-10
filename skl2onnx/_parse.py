@@ -163,7 +163,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
                                       custom_parsers=None):
     """
     :param scope: Scope object
-    :param model: A scikit-learn ColumnTransformer object
+    :param model: A *scikit-learn* *ColumnTransformer* object
     :param inputs: A list of Variable objects
     :return: A list of output variables produced by column transformer
     """
@@ -267,6 +267,9 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None):
     elif tmodel in sklearn_parsers_map:
         outputs = sklearn_parsers_map[tmodel](scope, model, inputs,
                                               custom_parsers=custom_parsers)
+    elif isinstance(model, pipeline.Pipeline):
+        parser = sklearn_parsers_map[pipeline.Pipeline]
+        outputs = parser(scope, model, inputs, custom_parsers=custom_parsers)
     else:
         outputs = _parse_sklearn_simple_model(scope, model, inputs,
                                               custom_parsers=custom_parsers)

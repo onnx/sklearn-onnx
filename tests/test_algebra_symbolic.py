@@ -10,7 +10,7 @@ try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
     from skl2onnx.algebra.onnx_ops import OnnxSplit, OnnxIdentity
 except ImportError as e:
-    warnings.warn('Unable to test Abs, Normalizer, ArgMin, Split.')
+    warnings.warn('Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.')
     OnnxAbs = None
 
 

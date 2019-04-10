@@ -24,7 +24,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     * *n*: # of features per input example.
     * *X*: input examples, l-by-n tensor.
     * *C*: centroids, k-by-n tensor.
-    * $C^2$: 2-norm of all centriod vectors, its shape is ``[k]``.
+    * :math:`C^2`: 2-norm of all centriod vectors, its shape is ``[k]``.
     * *Y*: 2-norm of difference between examples and centroids,
       *l-by-k* tensor. The value at i-th row and k-th column row,
       ``Y[i,k]``,is the distance from example *i* to centroid *k*.

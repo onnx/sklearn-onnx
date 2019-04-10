@@ -62,3 +62,14 @@ def _guess_type(given_type):
     else:
         raise NotImplementedError(
             "Unsupported type '{}'".format(type(given_type)))
+
+
+def guess_initial_types(X, initial_types):
+    if X is None:
+        raise NotImplementedError("Initial types must be specified.")
+    else:
+        if isinstance(X, np.ndarray):
+            X = X[:1]
+        gt = _guess_type(X)
+        initial_types = [('X', gt)]
+    return initial_types
