@@ -13,6 +13,16 @@ from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
+def _num_estimators(op):
+    # don't use op.n_estimators since it may not be the same as len(op.estimators_). At training time n_estimators can
+    # be changed by training code:
+    #    for j in range(10):
+    #       ...
+    #       classifier.fit(X_tmp, y_tmp)
+    #       classifier.n_estimators += 30
+    return len(op.estimators_)
+
+
 def convert_sklearn_random_forest_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
@@ -35,9 +45,10 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.
-    tree_weight = 1. / op.n_estimators
+    estimtator_count = _num_estimators(op)
+    tree_weight = 1. / estimtator_count
 
-    for tree_id in range(op.n_estimators):
+    for tree_id in range(estimtator_count):
         tree = op.estimators_[tree_id].tree_
         add_tree_to_attribute_pairs(attr_pairs, True, tree, tree_id,
                                     tree_weight, 0, True)
@@ -58,8 +69,9 @@ def convert_sklearn_random_forest_regressor_converter(scope,
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.
-    tree_weight = 1. / op.n_estimators
-    for tree_id in range(op.n_estimators):
+    estimtator_count = _num_estimators(op)
+    tree_weight = 1. / estimtator_count
+    for tree_id in range(estimtator_count):
         tree = op.estimators_[tree_id].tree_
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
                                     tree_weight, 0, False)
