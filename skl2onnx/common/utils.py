@@ -5,6 +5,9 @@
 # --------------------------------------------------------------------------
 
 from onnxconverter_common.utils import *  # noqa
+from collections import OrderedDict
+from .data_types import TensorType
+
 
 def get_column_index(i, inputs):
     """
