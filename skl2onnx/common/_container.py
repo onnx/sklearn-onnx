@@ -36,7 +36,7 @@ def _get_operation_list():
                     break
             if found is None:
                 warnings.warn("Unable to find an ONNX name in function "
-                                   "'{0}', source=\n{1}".format(k, source))
+                              "'{0}', source=\n{1}".format(k, source))
             res[found] = v
     return res
 
