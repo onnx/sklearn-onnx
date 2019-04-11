@@ -4,8 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from onnxtk.common.data_types import DataType, Int64Type, FloatType  # noqa
-from onnxtk.common.data_types import StringType, TensorType, Int64TensorType  # noqa
-from onnxtk.common.data_types import FloatTensorType, StringTensorType  # noqa
-from onnxtk.common.data_types import DictionaryType, SequenceType  # noqa
-from onnxtk.common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
+from onnxconverter_common.data_types import DataType, Int64Type, FloatType  # noqa
+from onnxconverter_common.data_types import StringType, TensorType, Int64TensorType  # noqa
+from onnxconverter_common.data_types import FloatTensorType, StringTensorType  # noqa
+from onnxconverter_common.data_types import DictionaryType, SequenceType  # noqa
+from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa

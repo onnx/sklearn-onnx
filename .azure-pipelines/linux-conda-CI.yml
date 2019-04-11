@@ -116,7 +116,7 @@ jobs:
       cd onnxmltools/onnxutils
       pip install -e .
       cd ../..
-    displayName: 'install onnxtk'
+    displayName: 'install onnxconverter_common'
 
   - script: |
       pip install -e .
@@ -130,7 +130,7 @@ jobs:
       echo "---------------"
       pip show onnxruntime
       echo "---------------"
-      pip show onnxtk
+      pip show onnxconverter-common
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
