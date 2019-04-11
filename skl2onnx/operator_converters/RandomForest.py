@@ -14,8 +14,9 @@ from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 
 
 def _num_estimators(op):
-    # don't use op.n_estimators since it may not be the same as len(op.estimators_). At training time n_estimators can
-    # be changed by training code:
+    # don't use op.n_estimators since it may not be the same as
+    # len(op.estimators_). At training time n_estimators can be changed by
+    # training code:
     #    for j in range(10):
     #       ...
     #       classifier.fit(X_tmp, y_tmp)
