@@ -31,6 +31,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                                      allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
                                                    "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_random_forest_classifier_mismatched_estimator_counts(self):
         model = RandomForestClassifier(n_estimators=3)
         X = [[0, 1], [1, 1], [2, 0]]
