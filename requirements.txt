@@ -3,3 +3,4 @@ numpy
 protobuf
 onnx
 scikit-learn>=0.19
+onnxconverter-common

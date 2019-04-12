@@ -60,13 +60,6 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
-      git clone https://github.com/onnx/onnxmltools.git
-      cd onnxmltools/onnxutils
-      pip install -e .
-      cd ../..
-    displayName: 'install onnxconverter-common'
-
-  - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
