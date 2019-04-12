@@ -4,13 +4,13 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed
-from onnxconverter_common.utils import is_numeric_type, is_string_type
-from onnxconverter_common.utils import cast_list, convert_to_python_value
-from onnxconverter_common.utils import convert_to_python_default_value
-from onnxconverter_common.utils import convert_to_list
-from onnxconverter_common.utils import check_input_and_output_numbers
-from onnxconverter_common.utils import check_input_and_output_types
+from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed # noqa
+from onnxconverter_common.utils import is_numeric_type, is_string_type # noqa
+from onnxconverter_common.utils import cast_list, convert_to_python_value # noqa
+from onnxconverter_common.utils import convert_to_python_default_value # noqa
+from onnxconverter_common.utils import convert_to_list # noqa
+from onnxconverter_common.utils import check_input_and_output_numbers # noqa
+from onnxconverter_common.utils import check_input_and_output_types # noqa
 from collections import OrderedDict
 from .data_types import TensorType
 
