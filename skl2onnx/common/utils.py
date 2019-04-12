@@ -46,6 +46,7 @@ def get_model_version():
     from .. import __model_version__
     return __model_version__
 
+
 def get_column_index(i, inputs):
     """
     Returns a tuples (variable index, column index in that variable).
