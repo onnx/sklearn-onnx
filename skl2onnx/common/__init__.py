@@ -4,4 +4,4 @@
 # license information.
 # --------------------------------------------------------------------------
 
-# skl2onnx common code has been refactored into onnxconverter-common. 
+# skl2onnx common code has been refactored into onnxconverter-common.
