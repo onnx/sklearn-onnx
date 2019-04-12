@@ -4,10 +4,47 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from onnxconverter_common.utils import *  # noqa
+from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed
+from onnxconverter_common.utils import is_numeric_type, is_string_type
+from onnxconverter_common.utils import cast_list, convert_to_python_value
+from onnxconverter_common.utils import convert_to_python_default_value
+from onnxconverter_common.utils import convert_to_list
+from onnxconverter_common.utils import check_input_and_output_numbers
+from onnxconverter_common.utils import check_input_and_output_types
 from collections import OrderedDict
 from .data_types import TensorType
 
+
+def get_producer():
+    """
+    Internal helper function to return the producer
+    """
+    from .. import __producer__
+    return __producer__
+
+
+def get_producer_version():
+    """
+    Internal helper function to return the producer version
+    """
+    from .. import __producer_version__
+    return __producer_version__
+
+
+def get_domain():
+    """
+    Internal helper function to return the model domain
+    """
+    from .. import __domain__
+    return __domain__
+
+
+def get_model_version():
+    """
+    Internal helper function to return the model version
+    """
+    from .. import __model_version__
+    return __model_version__
 
 def get_column_index(i, inputs):
     """
