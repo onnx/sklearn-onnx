@@ -7,7 +7,7 @@
 import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
-    apply_reshape, apply_sub, apply_topk)
+    apply_reshape, apply_sub, apply_topk, apply_transpose)
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
@@ -237,12 +237,48 @@ def _get_estimators_label(scope, operator, container, model):
     return concatenated_labels_name
 
 
+def cum_sum(scope, container, rnn_input_name, sequence_length):
+    transposed_input_name = scope.get_unique_variable_name('transposed_input')
+    reshaped_result_name = scope.get_unique_variable_name('reshaped_result')
+    weights_name = scope.get_unique_variable_name('weights')
+    rec_weights_name = scope.get_unique_variable_name('rec_weights')
+    rnn_output_name = scope.get_unique_variable_name('rnn_output')
+    permuted_rnn_y_name = scope.get_unique_variable_name('permuted_rnn_y')
+    weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
+
+    container.add_initializer(weights_name,
+                              onnx_proto.TensorProto.FLOAT, [1, 1, 1], [1])
+    container.add_initializer(rec_weights_name,
+                              onnx_proto.TensorProto.FLOAT, [1, 1, 1], [1])
+
+    apply_transpose(scope, rnn_input_name, transposed_input_name,
+                    container, perm=(1, 0))
+    apply_reshape(scope, transposed_input_name, reshaped_result_name,
+                  container, desired_shape=(sequence_length, -1, 1))
+    container.add_node(
+        'RNN', inputs=[reshaped_result_name, weights_name, rec_weights_name],
+        outputs=[rnn_output_name], activations=['Affine'],
+        name=scope.get_unique_operator_name('RNN'),
+        activation_alpha=[1.0], activation_beta=[0.0], hidden_size=1)
+    apply_transpose(scope, rnn_output_name, permuted_rnn_y_name, container,
+                    perm=(2, 0, 1, 3))
+    apply_reshape(
+        scope, permuted_rnn_y_name, weights_cdf_name, container,
+        desired_shape=(-1, sequence_length))
+    return weights_cdf_name
+
+
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
     """
     Converter for AdaBoost regressor.
     This function first calls _get_estimators_label() which returns a
     tensor of concatenated labels predicted by each estimator. Then,
     median is calculated and returned as the final output.
+
+    Note: This function creates an ONNX model which can predict on only
+    one instance at a time because ArrayFeatureExtractor can only
+    extract based on the last axis, so we can't fetch different columns
+    for different rows.
     """
     op = operator.raw_operator
 
@@ -250,37 +286,31 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     estimators_weights_name = scope.get_unique_variable_name(
         'estimators_weights')
     half_scalar_name = scope.get_unique_variable_name('half_scalar')
-    zeroth_index_name = scope.get_unique_variable_name('zeroth_index')
     last_index_name = scope.get_unique_variable_name('last_index')
     negated_labels_name = scope.get_unique_variable_name('negated_labels')
     sorted_values_name = scope.get_unique_variable_name('sorted_values')
     sorted_indices_name = scope.get_unique_variable_name('sorted_indices')
-    input_shape_result_name = scope.get_unique_variable_name(
-        'input_shape_result')
-    instances_length_name = scope.get_unique_variable_name(
-        'instances_length')
-    weights_matrix_name = scope.get_unique_variable_name('weights_matrix')
-    weights_name = scope.get_unique_variable_name('weights')
-    weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
+    array_feat_extractor_output_name = scope.get_unique_variable_name(
+        'array_feat_extractor_output')
     median_value_name = scope.get_unique_variable_name('median_value')
     comp_value_name = scope.get_unique_variable_name('comp_value')
     median_or_above_name = scope.get_unique_variable_name('median_or_above')
     median_idx_name = scope.get_unique_variable_name('median_idx')
-    negated_final_labels_name = scope.get_unique_variable_name(
-        'negated_final_labels')
+    cast_result_name = scope.get_unique_variable_name('cast_result')
+    reshaped_weights_name = scope.get_unique_variable_name('reshaped_weights')
+    median_estimators_name = scope.get_unique_variable_name(
+        'median_estimators')
 
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
     container.add_initializer(estimators_weights_name,
                               onnx_proto.TensorProto.FLOAT,
-                              op.estimator_weights_.shape,
+                              [len(op.estimator_weights_)],
                               op.estimator_weights_)
     container.add_initializer(half_scalar_name, onnx_proto.TensorProto.FLOAT,
                               [], [0.5])
-    container.add_initializer(zeroth_index_name, onnx_proto.TensorProto.INT64,
-                              [], [0])
     container.add_initializer(last_index_name, onnx_proto.TensorProto.INT64,
-                              [], [-1])
+                              [], [len(op.estimators_) - 1])
 
     concatenated_labels = _get_estimators_label(scope, operator,
                                                 container, op)
@@ -289,26 +319,17 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     apply_topk(scope, negated_labels_name,
                [sorted_values_name, sorted_indices_name],
                container, k=len(op.estimators_))
-    container.add_node('Shape', operator.input_full_names,
-                       input_shape_result_name,
-                       name=scope.get_unique_operator_name('Shape'))
     container.add_node(
-        'ArrayFeatureExtractor', [input_shape_result_name, zeroth_index_name],
-        instances_length_name, op_domain='ai.onnx.ml',
+        'ArrayFeatureExtractor',
+        [estimators_weights_name, sorted_indices_name],
+        array_feat_extractor_output_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    container.add_node('Tile',
-                       [estimators_weights_name, instances_length_name],
-                       weights_matrix_name, op_version=6,
-                       name=scope.get_unique_operator_name('Tile'))
-    container.add_node(
-        'ArrayFeatureExtractor', [weights_matrix_name, sorted_indices_name],
-        weights_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    # CumSum op needs to be added to onnx.
-    # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2740
-    container.add_node('CumSum', weights_name,
-                       weights_cdf_name, axis=1,
-                       name=scope.get_unique_operator_name('CumSum'))
+    apply_reshape(
+        scope, array_feat_extractor_output_name, reshaped_weights_name,
+        container, desired_shape=(-1, len(op.estimators_)))
+    weights_cdf_name = cum_sum(
+        scope, container, reshaped_weights_name,
+        len(op.estimators_))
     container.add_node(
         'ArrayFeatureExtractor', [weights_cdf_name, last_index_name],
         median_value_name, op_domain='ai.onnx.ml',
@@ -319,17 +340,19 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
         'Less', [weights_cdf_name, comp_value_name],
         median_or_above_name,
         name=scope.get_unique_operator_name('Less'))
-    # ArgMin op needs to support boolean.
-    # https://aiinfra.visualstudio.com/Lotus/_workitems/edit/2755
-    container.add_node('ArgMin', median_or_above_name,
+    apply_cast(scope, median_or_above_name, cast_result_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    container.add_node('ArgMin', cast_result_name,
                        median_idx_name,
                        name=scope.get_unique_operator_name('ArgMin'), axis=1)
     container.add_node(
-        'ArrayFeatureExtractor', [sorted_values_name, median_idx_name],
-        negated_final_labels_name, op_domain='ai.onnx.ml',
+        'ArrayFeatureExtractor', [sorted_indices_name, median_idx_name],
+        median_estimators_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    apply_mul(scope, [negated_final_labels_name, negate_name],
-              operator.output_full_names, container, broadcast=1)
+    container.add_node(
+        'ArrayFeatureExtractor', [concatenated_labels, median_estimators_name],
+        operator.output_full_names, op_domain='ai.onnx.ml',
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
 
 register_converter('SklearnAdaBoostClassifier',

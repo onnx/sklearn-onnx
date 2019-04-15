@@ -4,15 +4,23 @@ import pandas
 from distutils.version import StrictVersion
 import onnx
 from sklearn import datasets
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    # not available in 0.19
+    ColumnTransformer = None
 from sklearn.decomposition import TruncatedSVD
-from sklearn.impute import SimpleImputer
+try:
+    from sklearn.impute import SimpleImputer
+except ModuleNotFoundError:
+    from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline, Pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType, StringTensorType
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
@@ -98,7 +106,10 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(data, PipeConcatenateInput(model), model_onnx,
                             basename="SklearnPipelineScalerMixed-OneOff")
     
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.3'), "'TypeProto' object has no attribute 'sequence_type'")
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer(self):
         
         iris = datasets.load_iris()
@@ -156,7 +167,10 @@ class TestSklearnPipeline(unittest.TestCase):
             import os
             os.system('dot -O -G=300 -Tpng graph.dot')            
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.3'), "'TypeProto' object has no attribute 'sequence_type'")
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer_titanic(self):
         
         # fit

@@ -10,12 +10,14 @@ from sklearn.datasets import make_regression
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_classifier_samme_r(self):
         data = load_digits()
         X, y = data.data, data.target
@@ -33,6 +35,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_classifier_samme(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -50,7 +54,6 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                           "onnxruntime.__version__)"
                                           "<= StrictVersion('0.2.1')")
 
-    @unittest.skip(reason="CumSum op has not yet been implemented in onnx")
     def test_ada_boost_regressor(self):
         X, y = make_regression(n_features=4, n_samples=1000, random_state=42)
         X_train, X_test, y_train, y_test = train_test_split(
@@ -59,13 +62,15 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(model, 'AdaBoost regression',
                                      [('input',
-                                      FloatTensorType(X_test.shape))])
+                                      FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X_test.astype('float32'), model, model_onnx,
-                            basename="SklearnAdaBoostRegressor",
+                            basename="SklearnAdaBoostRegressor-OneOffArray",
                             allow_failure="StrictVersion("
-                                          "onnxruntime.__version__)"
-                                          "<= StrictVersion('0.2.1')")
+                            "onnxruntime.__version__) "
+                            "<= StrictVersion('0.2.1') or "
+                            "StrictVersion(onnx.__version__) "
+                            "== StrictVersion('1.4.1')")
 
 
 if __name__ == "__main__":

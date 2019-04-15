@@ -6,17 +6,24 @@ import numpy as np
 import pandas
 from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    ColumnTransformer = None
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
 class TestSklearnFunctionTransformerConverter(unittest.TestCase):
 
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="ColumnTransformer introduced in 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_function_transformer(self):
 
         def convert_dataframe_schema(df, drop=None):
