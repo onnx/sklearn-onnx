@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from ..common._apply_operation import apply_cast, apply_reshape
+from ._apply_operation import apply_cast, apply_reshape
 from ..proto import onnx_proto
 
 

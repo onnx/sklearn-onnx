@@ -44,10 +44,12 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         # n_estimators != len(estimators_). So simulate that here.
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'binary classifier',
-                                           [('input', FloatTensorType([1, 2]))])
+                                           [('input',
+                                             FloatTensorType([1, 2]))])
         dump_data_and_model(X, model, model_onnx,
-                            basename=prefix + "Bin" + model.__class__.__name__ +
-                                     '_mismatched_estimator_counts')
+                            basename=prefix + "Bin" +
+                            model.__class__.__name__ +
+                            '_mismatched_estimator_counts')
 
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
@@ -64,10 +66,12 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         # n_estimators != len(estimators_). So simulate that here.
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'single regressor',
-                                           [('input', FloatTensorType([1, 2]))])
+                                           [('input',
+                                             FloatTensorType([1, 2]))])
         dump_data_and_model(X, model, model_onnx,
-                            basename=prefix + "Reg" + model.__class__.__name__ +
-                                     "_mismatched_estimator_counts")
+                            basename=prefix + "Reg" +
+                            model.__class__.__name__ +
+                            "_mismatched_estimator_counts")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
