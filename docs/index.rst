@@ -67,7 +67,7 @@ Every converter is tested with this backend.
     initial_type = [('float_input', FloatTensorType([1, 4]))]
     onx = convert_sklearn(clr, initial_types=initial_type)
     with open("rf_iris.onnx", "wb") as f:
-    f.write(onx.SerializeToString())
+        f.write(onx.SerializeToString())
 
     # Compute the prediction with ONNX Runtime
     import onnxruntime as rt

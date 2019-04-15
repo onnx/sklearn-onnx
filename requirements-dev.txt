@@ -8,3 +8,13 @@ pytest
 pytest-cov
 scipy
 wheel
+
+# docs
+sphinx
+sphinx_modern_theme_modified
+sphinxcontrib-blockdiag
+
+# docs/examples
+lightgbm
+matplotlib
+onnxruntime
