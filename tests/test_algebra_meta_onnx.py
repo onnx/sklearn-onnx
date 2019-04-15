@@ -11,7 +11,7 @@ import numpy
 from numpy.testing import assert_almost_equal
 import onnx
 from onnx import numpy_helper, helper
-from skl2onnx.algebra.automation import dynamic_class_creation
+from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra import OnnxOperator
 from skl2onnx.proto import onnx_proto
 
