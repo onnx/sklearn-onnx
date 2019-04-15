@@ -6,7 +6,8 @@
 
 from .tests_helper import dump_data_and_model
 from .tests_helper import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from .tests_helper import dump_multiple_regression, dump_single_regression, convert_model
+from .tests_helper import dump_multiple_regression, dump_single_regression,\
+    convert_model
 
 import numpy as np
 def create_tensor(N, C, H=None, W=None):
