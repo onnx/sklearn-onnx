@@ -1,22 +1,29 @@
 """
 Helpers to test runtimes.
 """
-import os
-import glob
-import pickle
 import numpy
 import pandas
 import warnings
-from numpy.testing import assert_array_almost_equal, assert_array_equal
-from .utils_backend import load_data_and_model, extract_options, ExpectedAssertionError, OnnxRuntimeAssertionError, compare_outputs
+from .utils_backend import (
+    load_data_and_model,
+    extract_options,
+    ExpectedAssertionError,
+    OnnxRuntimeAssertionError,
+    compare_outputs,
+)
 
 
-def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, comparable_outputs=None):
+def compare_runtime(test,
+                    decimal=5,
+                    options=None,
+                    verbose=False,
+                    context=None,
+                    comparable_outputs=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
     produced with module *onnxruntime*.
-    
+
     :param test: dictionary with the following keys:
         - *onnx*: onnx model (filename or object)
         - *expected*: expected output (filename pkl or object)
@@ -28,7 +35,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
         more information on the standard output
     :param comparable_outputs: compare only these outputs
     :return: tuple (outut, lambda function to run the predictions)
-    
+
     The function does not return anything but raises an error
     if the comparison failed.
     """
@@ -52,7 +59,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
 
     try:
         import onnxruntime
-    except ImportError as e:
+    except ImportError:
         warnings.warn("Unable to import onnxruntime.")
         return None
 
@@ -65,7 +72,8 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
         raise expe
     except Exception as e:
         if "CannotLoad" in options:
-            raise ExpectedAssertionError("Unable to load onnx '{0}' due to\n{1}".format(onx, e))
+            raise ExpectedAssertionError(
+                "Unable to load onnx '{0}' due to\n{1}".format(onx, e))
         else:
             if verbose:
                 import onnx
@@ -73,8 +81,9 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
                 smodel = "\nJSON ONNX\n" + str(model)
             else:
                 smodel = ""
-            raise OnnxRuntimeAssertionError("Unable to load onnx '{0}'\nONNX\n{1}".format(onx, smodel))
-    
+            raise OnnxRuntimeAssertionError(
+                "Unable to load onnx '{0}'\nONNX\n{1}".format(onx, smodel))
+
     input = load["data"]
     DF = options.pop('DF', False)
     if DF:
@@ -93,57 +102,80 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
             elif len(inp) == 1:
                 inputs = {inp[0].name: input}
             elif isinstance(input, numpy.ndarray):
-                shape = sum(i.shape[1] if len(i.shape) == 2 else i.shape[0] for i in inp)
+                shape = sum(i.shape[1] if len(i.shape) == 2 else i.shape[0]
+                            for i in inp)
                 if shape == input.shape[1]:
                     inputs = {n.name: input[:, i] for i, n in enumerate(inp)}
                 else:
-                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'".format(len(inp), input.shape, onx))
+                    raise OnnxRuntimeAssertionError(
+                        "Wrong number of inputs onnx {0} != "
+                        "original shape {1}, onnx='{2}'"
+                        .format(len(inp), input.shape, onx))
             elif isinstance(input, list):
                 try:
                     array_input = numpy.array(input)
-                except Exception as e:
-                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
+                except Exception:
+                    raise OnnxRuntimeAssertionError(
+                        "Wrong number of inputs onnx {0} != "
+                        "original {1}, onnx='{2}'"
+                        .format(len(inp), len(input), onx))
                 shape = sum(i.shape[1] for i in inp)
                 if shape == array_input.shape[1]:
                     inputs = {}
                     c = 0
                     for i, n in enumerate(inp):
                         d = c + n.shape[1]
-                        inputs[n.name] = _create_column([row[c:d] for row in input], n.type)
+                        inputs[n.name] = _create_column(
+                            [row[c:d] for row in input], n.type)
                         c = d
                 else:
-                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original shape {1}, onnx='{2}'*".format(len(inp), array_input.shape, onx))
+                    raise OnnxRuntimeAssertionError(
+                        "Wrong number of inputs onnx {0} != "
+                        "original shape {1}, onnx='{2}'*"
+                        .format(len(inp), array_input.shape, onx))
             elif isinstance(input, pandas.DataFrame):
                 try:
                     array_input = numpy.array(input)
-                except Exception as e:
-                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(len(inp), len(input), onx))
+                except Exception:
+                    raise OnnxRuntimeAssertionError(
+                        "Wrong number of inputs onnx {0} != "
+                        "original {1}, onnx='{2}'"
+                        .format(len(inp), len(input), onx))
                 shape = sum(i.shape[1] for i in inp)
                 if shape == array_input.shape[1]:
                     inputs = {}
                     c = 0
                     for i, n in enumerate(inp):
                         d = c + n.shape[1]
-                        inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
+                        inputs[n.name] = _create_column(
+                            input.iloc[:, c:d], n.type)
                         c = d
                 else:
-                    raise OnnxRuntimeAssertionError("Wrong number of inputs onnx {0}={1} columns != original shape {2}, onnx='{3}'*".format(len(inp), shape, array_input.shape, onx))
+                    raise OnnxRuntimeAssertionError(
+                        "Wrong number of inputs onnx {0}={1} columns != "
+                        "original shape {2}, onnx='{3}'*"
+                        .format(len(inp), shape, array_input.shape, onx))
             else:
-                raise OnnxRuntimeAssertionError("Wrong type of inputs onnx {0}, onnx='{2}'".format(type(input), onx))
+                raise OnnxRuntimeAssertionError(
+                    "Wrong type of inputs onnx {0}, onnx='{1}'".format(
+                        type(input), onx))
         else:
-            raise OnnxRuntimeAssertionError("Dict or list is expected, not {0}".format(type(input)))
-        
+            raise OnnxRuntimeAssertionError(
+                "Dict or list is expected, not {0}".format(type(input)))
+
         for k in inputs:
             if isinstance(inputs[k], list):
                 inputs[k] = numpy.array(inputs[k])
-    
+
     OneOff = options.pop('OneOff', False)
     OneOffArray = options.pop('OneOffArray', False)
     options.pop('SklCol', False)  # unused here but in dump_data_and_model
     if OneOff or OneOffArray:
         if verbose:
-            print("[compare_runtime] OneOff: type(inputs)={} len={} OneOffArray={}".format(
-                type(input), len(inputs), OneOffArray))
+            print(
+                "[compare_runtime] OneOff: type(inputs)={} "
+                "len={} OneOffArray={}"
+                .format(type(input), len(inputs), OneOffArray))
         if len(inputs) == 1 and not OneOffArray:
             name, values = list(inputs.items())[0]
             res = []
@@ -151,24 +183,28 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
                 try:
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
-                        lambda_onnx = lambda: sess.run(None, {name: input})
+                        lambda_onnx = lambda: sess.run(None, {name: input})  # noqa
                     if verbose:
                         import pprint
                         pprint.pprint(one)
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
-                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
+                    raise OnnxRuntimeAssertionError(
+                        "Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output1")
             output = _post_process_output(res)
         else:
+
             def to_array(vv):
-                if isinstance(vv, (numpy.ndarray, numpy.int64, numpy.float32, str)):
+                if isinstance(
+                        vv, (numpy.ndarray, numpy.int64, numpy.float32, str)):
                     return numpy.array([vv])
                 else:
                     return numpy.array([vv], dtype=numpy.float32)
+
             t = list(inputs.items())[0]
             res = []
             for i in range(0, len(t[1])):
@@ -176,7 +212,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
-                        lambda_onnx = lambda: sess.run(None, iii)
+                        lambda_onnx = lambda: sess.run(None, iii)  # noqa
                     if verbose:
                         import pprint
                         pprint.pprint(one)
@@ -189,17 +225,20 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
                         smodel = "\nJSON ONNX\n" + str(model)
                     else:
                         smodel = ""
-                    raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}{2}".format(onx, e, smodel))
+                    raise OnnxRuntimeAssertionError(
+                        "Unable to run onnx '{0}' due to {1}{2}".format(
+                            onx, e, smodel))
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
             output = _post_process_output(res)
-            
+
             if OneOffArray:
                 if isinstance(output, list):
                     pass
                 elif not isinstance(output, numpy.ndarray):
-                    raise TypeError("output must be an array, not {}".format(type(output)))
+                    raise TypeError("output must be an array, not {}".format(
+                        type(output)))
                 else:
                     output = [output]
     else:
@@ -213,7 +252,7 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
             run_options = None
         try:
             output = sess.run(None, inputs, run_options)
-            lambda_onnx = lambda: sess.run(None, inputs)
+            lambda_onnx = lambda: sess.run(None, inputs)  # noqa
             if verbose:
                 import pprint
                 pprint.pprint(output)
@@ -221,7 +260,9 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
             raise expe
         except RuntimeError as e:
             if "-Fail" in onx:
-                raise ExpectedAssertionError("onnxruntime cannot compute the prediction for '{0}'".format(onx))
+                raise ExpectedAssertionError(
+                    "onnxruntime cannot compute the prediction for '{0}'".
+                    format(onx))
             else:
                 if verbose:
                     import onnx
@@ -229,12 +270,16 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
                     smodel = "\nJSON ONNX\n" + str(model)
                 else:
                     smodel = ""
-                raise OnnxRuntimeAssertionError("onnxruntime cannot compute the prediction for '{0}' due to {1}{2}".format(onx, e, smodel))
+                raise OnnxRuntimeAssertionError(
+                    "onnxruntime cannot compute the prediction"
+                    " for '{0}' due to {1}{2}"
+                    .format(onx, e, smodel))
         except Exception as e:
-            raise OnnxRuntimeAssertionError("Unable to run onnx '{0}' due to {1}".format(onx, e))
+            raise OnnxRuntimeAssertionError(
+                "Unable to run onnx '{0}' due to {1}".format(onx, e))
         if verbose:
             print("[compare_runtime] done type={}".format(type(output)))
-    
+
     output0 = output.copy()
 
     if comparable_outputs:
@@ -243,10 +288,15 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
     else:
         cmp_exp = load["expected"]
         cmp_out = output
-    
+
     try:
-        _compare_expected(cmp_exp, cmp_out, sess, onx, decimal=decimal,
-                          verbose=verbose, **options)
+        _compare_expected(cmp_exp,
+                          cmp_out,
+                          sess,
+                          onx,
+                          decimal=decimal,
+                          verbose=verbose,
+                          **options)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -256,11 +306,13 @@ def compare_runtime(test, decimal=5, options=None, verbose=False, context=None, 
             smodel = "\nJSON ONNX\n" + str(model)
         else:
             smodel = ""
-        raise OnnxRuntimeAssertionError("Model '{0}' has discrepencies.\n{1}: {2}{3}".format(onx, type(e), e, smodel))
-        
+        raise OnnxRuntimeAssertionError(
+            "Model '{0}' has discrepencies.\n{1}: {2}{3}".format(
+                onx, type(e), e, smodel))
+
     return output0, lambda_onnx
-    
-        
+
+
 def _post_process_output(res):
     """
     Applies post processings before running the comparison
@@ -280,7 +332,10 @@ def _post_process_output(res):
             ls = [len(r) for r in res]
             mi = min(ls)
             if mi != max(ls):
-                raise NotImplementedError("Unable to postprocess various number of outputs in [{0}, {1}]".format(min(ls), max(ls)))
+                raise NotImplementedError(
+                    "Unable to postprocess various number of "
+                    "outputs in [{0}, {1}]"
+                    .format(min(ls), max(ls)))
             if mi > 1:
                 output = []
                 for i in range(mi):
@@ -296,13 +351,15 @@ def _post_process_output(res):
                     return res
                 else:
                     if len(res[0]) != 1:
-                        raise NotImplementedError("Not conversion implemented for {0}".format(res))
+                        raise NotImplementedError(
+                            "Not conversion implemented for {0}".format(res))
                     st = [r[0] for r in res]
                     return numpy.vstack(st)
             else:
                 return res
     else:
         return res
+
 
 def _create_column(values, dtype):
     "Creates a column from values with dtype"
@@ -313,10 +370,17 @@ def _create_column(values, dtype):
     elif str(dtype) == "tensor(string)":
         return numpy.array(values, dtype=numpy.str)
     else:
-        raise OnnxRuntimeAssertionError("Unable to create one column from dtype '{0}'".format(dtype))
+        raise OnnxRuntimeAssertionError(
+            "Unable to create one column from dtype '{0}'".format(dtype))
 
 
-def _compare_expected(expected, output, sess, onnx, decimal=5, verbose=False, **kwargs):
+def _compare_expected(expected,
+                      output,
+                      sess,
+                      onnx,
+                      decimal=5,
+                      verbose=False,
+                      **kwargs):
     """
     Compares the expected output against the runtime outputs.
     This is specific to *onnxruntime* due to variable *sess*
@@ -332,28 +396,46 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, verbose=False, **
             if 'Reshape' in kwargs:
                 del kwargs['Reshape']
                 output = numpy.hstack(output).ravel()
-                output = output.reshape((len(expected),
-                                         len(output.ravel()) // len(expected)))
+                output = output.reshape(
+                    (len(expected), len(output.ravel()) // len(expected)))
             if len(expected) != len(output):
-                raise OnnxRuntimeAssertionError("Unexpected number of outputs '{0}', expected={1}, got={2}".format(onnx, len(expected), len(output)))
+                raise OnnxRuntimeAssertionError(
+                    "Unexpected number of outputs '{0}', expected={1}, got={2}"
+                    .format(onnx, len(expected), len(output)))
             for exp, out in zip(expected, output):
-                _compare_expected(exp, out, sess, onnx, decimal=5, verbose=verbose, **kwargs)
+                _compare_expected(exp,
+                                  out,
+                                  sess,
+                                  onnx,
+                                  decimal=5,
+                                  verbose=verbose,
+                                  **kwargs)
                 tested += 1
         else:
-            raise OnnxRuntimeAssertionError("Type mismatch for '{0}', output type is {1}".format(onnx, type(output)))
+            raise OnnxRuntimeAssertionError(
+                "Type mismatch for '{0}', output type is {1}".format(
+                    onnx, type(output)))
     elif isinstance(expected, dict):
         if not isinstance(output, dict):
-            raise OnnxRuntimeAssertionError("Type mismatch for '{0}'".format(onnx))                
+            raise OnnxRuntimeAssertionError(
+                "Type mismatch for '{0}'".format(onnx))
         for k, v in output.items():
             if k not in expected:
                 continue
-            msg = compare_outputs(expected[k], v, decimal=decimal, verbose=verbose, **kwargs)
+            msg = compare_outputs(expected[k],
+                                  v,
+                                  decimal=decimal,
+                                  verbose=verbose,
+                                  **kwargs)
             if msg:
-                raise OnnxRuntimeAssertionError("Unexpected output '{0}' in model '{1}'\n{2}".format(k, onnx, msg))
+                raise OnnxRuntimeAssertionError(
+                    "Unexpected output '{0}' in model '{1}'\n{2}".format(
+                        k, onnx, msg))
             tested += 1
     elif isinstance(expected, numpy.ndarray):
         if isinstance(output, list):
-            if expected.shape[0] == len(output) and isinstance(output[0], dict):
+            if expected.shape[0] == len(output) and isinstance(
+                    output[0], dict):
                 import pandas
                 output = pandas.DataFrame(output)
                 output = output[list(sorted(output.columns))]
@@ -363,15 +445,25 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, verbose=False, **
                 ex = str(output)
                 if len(ex) > 170:
                     ex = ex[:170] + "..."
-                raise OnnxRuntimeAssertionError("More than one output when 1 is expected for onnx '{0}'\n{1}".format(onnx, ex))
+                raise OnnxRuntimeAssertionError(
+                    "More than one output when 1 is expected "
+                    "for onnx '{0}'\n{1}"
+                    .format(onnx, ex))
             output = output[-1]
         if not isinstance(output, numpy.ndarray):
-            raise OnnxRuntimeAssertionError("output must be an array for onnx '{0}' not {1}".format(onnx, type(output)))
-        msg = compare_outputs(expected, output, decimal=decimal, verbose=verbose, **kwargs)
+            raise OnnxRuntimeAssertionError(
+                "output must be an array for onnx '{0}' not {1}".format(
+                    onnx, type(output)))
+        msg = compare_outputs(expected,
+                              output,
+                              decimal=decimal,
+                              verbose=verbose,
+                              **kwargs)
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
-            raise OnnxRuntimeAssertionError("Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+            raise OnnxRuntimeAssertionError(
+                "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
         tested += 1
     else:
         from scipy.sparse.csr import csr_matrix
@@ -379,13 +471,18 @@ def _compare_expected(expected, output, sess, onnx, decimal=5, verbose=False, **
             # DictVectorizer
             one_array = numpy.array(output)
             dense = numpy.asarray(expected.todense())
-            msg = compare_outputs(dense, one_array, decimal=decimal, verbose=verbose, **kwargs)
+            msg = compare_outputs(dense,
+                                  one_array,
+                                  decimal=decimal,
+                                  verbose=verbose,
+                                  **kwargs)
             if msg:
-                raise OnnxRuntimeAssertionError("Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+                raise OnnxRuntimeAssertionError(
+                    "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
             tested += 1
         else:
-            raise OnnxRuntimeAssertionError("Unexpected type for expected output ({1}) and onnx '{0}'".format(onnx, type(expected)))
+            raise OnnxRuntimeAssertionError(
+                "Unexpected type for expected output ({1}) and onnx '{0}'".
+                format(onnx, type(expected)))
     if tested == 0:
-        raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))        
-    
-
+        raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))
