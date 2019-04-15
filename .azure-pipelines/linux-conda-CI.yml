@@ -60,15 +60,11 @@ jobs:
 
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
-      conda config --set always_yes yes --set changeps1 no      
+      conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
-      python -m pip install --upgrade pip      
+      python -m pip install --upgrade pip
     displayName: 'Install environment'
-
-  - script: |
-      pip install flake8
-    displayName: 'install flake8'
 
   - script: |
       pip install numpy$(numpy.version)
@@ -118,6 +114,8 @@ jobs:
       pip show onnx
       echo "---------------"
       pip show onnxruntime
+      echo "---------------"
+      pip show onnxconverter-common
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
