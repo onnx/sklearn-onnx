@@ -5,7 +5,7 @@ from numpy.testing import assert_almost_equal
 import onnx
 from onnx import helper
 from onnx import AttributeProto, TensorProto, GraphProto
-from skl2onnx.algebra.automation import dynamic_class_creation
+from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
 
 
