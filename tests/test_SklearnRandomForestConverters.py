@@ -5,13 +5,15 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import numpy
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import ExtraTreesRegressor
-from skl2onnx.common.data_types import onnx_built_with_ml
+from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
 from test_utils import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from test_utils import dump_multiple_regression, dump_single_regression
+from test_utils import dump_multiple_regression, dump_single_regression,\
+    convert_model, dump_data_and_model
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
@@ -30,10 +32,46 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                                      allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
                                                    "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_random_forest_classifier_mismatched_estimator_counts(self):
+        model = RandomForestClassifier(n_estimators=3)
+        X = [[0, 1], [1, 1], [2, 0]]
+        X = numpy.array(X, dtype=numpy.float32)
+        y = ['A', 'B', 'A']
+        model.fit(X, y)
+        # Training code can manipulate n_estimators causing
+        # n_estimators != len(estimators_). So simulate that here.
+        model.n_estimators += 1
+        model_onnx, prefix = convert_model(model, 'binary classifier',
+                                           [('input',
+                                             FloatTensorType([1, 2]))])
+        dump_data_and_model(X, model, model_onnx,
+                            basename=prefix + "Bin" +
+                            model.__class__.__name__ +
+                            '_mismatched_estimator_counts')
+
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
         dump_single_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
         dump_multiple_regression(model, allow_failure="StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1')")
+
+    def test_random_forest_regressor_mismatched_estimator_counts(self):
+        model = RandomForestRegressor(n_estimators=3)
+        X = [[0, 1], [1, 1], [2, 0]]
+        X = numpy.array(X, dtype=numpy.float32)
+        y = numpy.array([100, -10, 50], dtype=numpy.float32)
+        model.fit(X, y)
+        # Training code can manipulate n_estimators causing
+        # n_estimators != len(estimators_). So simulate that here.
+        model.n_estimators += 1
+        model_onnx, prefix = convert_model(model, 'single regressor',
+                                           [('input',
+                                             FloatTensorType([1, 2]))])
+        dump_data_and_model(X, model, model_onnx,
+                            basename=prefix + "Reg" +
+                            model.__class__.__name__ +
+                            "_mismatched_estimator_counts")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
