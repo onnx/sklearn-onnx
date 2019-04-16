@@ -1,8 +1,8 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
-#--------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common import utils as convert_utils
@@ -56,7 +56,8 @@ def set_model_doc_string(model, doc, override=False):
 
     :param model: instance of an ONNX model
     :param doc: string containing the doc string that describes the model.
-    :param override: bool if true will always override the doc string with the new value
+    :param override: bool if true will always override the doc
+        string with the new value
 
     Example:
 
@@ -70,5 +71,8 @@ def set_model_doc_string(model, doc, override=False):
     if not convert_utils.is_string_type(doc):
         raise ValueError("doc must be a string type")
     if model.doc_string and not doc and override is False:
-        raise ValueError("failing to overwrite the doc string with a blank string, set override to True if intentional")
+        raise ValueError(
+            "failing to overwrite the doc string with a blank string,"
+            " set override to True if intentional"
+        )
     model.doc_string = doc

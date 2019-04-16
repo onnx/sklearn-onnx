@@ -7,12 +7,10 @@
 
 import os
 import sys
-import shutil
-import sphinx_gallery.gen_gallery
 import skl2onnx
-import onnxruntime
-import sphinx_skl2onnx_extension
 import sphinx_modern_theme_modified
+
+sys.path.append(os.path.abspath('exts'))
 
 
 # -- Project information -----------------------------------------------------
