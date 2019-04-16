@@ -129,6 +129,43 @@ class TestOnnxOperators(unittest.TestCase):
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")
 
+    def test_cascade_add(self):
+        
+        def generate_onnx_graph(dim, nbnode, input_name='X1'):
+            i1 = input_name
+            for i in range(nbnode - 1):
+                i2 = (np.ones((1, dim)) * nbnode * 10).astype(np.float32)
+                node = OnnxAdd(i1, i2)
+                i1 = node
+            i2 = (np.ones((1, dim)) * nbnode * 10).astype(np.float32)
+            node = OnnxAdd(i1, i2, output_names=['Y'])
+            onx = node.to_onnx([(input_name, FloatTensorType((1, dim)))],
+                               outputs=[('Y', FloatTensorType())])
+            return onx
+
+        exp = [np.array([[11., 11., 11., 11., 11.]]),
+               np.array([[42., 42., 42., 42., 42.]]),
+               np.array([[93., 93., 93., 93., 93.]])]
+        for nbnode in (1, 2, 3):
+            onx = generate_onnx_graph(5, nbnode)
+            as_string = onx.SerializeToString()
+            ort = InferenceSession(as_string)
+            X = (np.ones((1, 5)) * nbnode).astype(np.float32)
+            res_out = ort.run(None, {'X1': X})
+            assert len(res_out) == 1
+            res = res_out[0]
+            assert_almost_equal(exp[nbnode-1], res)
+
+        dim = 10
+        onx = generate_onnx_graph(dim, 240)
+        as_string = onx.SerializeToString()
+        ort = InferenceSession(as_string)
+        X = (np.ones((1, dim)) * nbnode).astype(np.float32)
+        res_out = ort.run(None, {'X1': X})
+        assert len(res_out) == 1
+        res = res_out[0]
+        assert res.shape[1] == dim
+        
 
 if __name__ == "__main__":
     unittest.main()
