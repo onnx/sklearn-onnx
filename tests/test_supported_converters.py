@@ -7,7 +7,6 @@ from skl2onnx import supported_converters
 
 
 class TestSupportedConverters(unittest.TestCase):
-
     def test_converters_list(self):
         names = supported_converters(False)
         assert "SklearnBernoulliNB" in names

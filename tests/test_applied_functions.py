@@ -7,7 +7,6 @@ from skl2onnx.common._container import _get_operation_list
 
 
 class TestAppliedFunctions(unittest.TestCase):
-
     def test_converters_list(self):
         fcts = _get_operation_list()
         assert "Add" in fcts
