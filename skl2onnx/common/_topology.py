@@ -16,7 +16,7 @@ from .data_types import FloatType, Int64Type, StringType, TensorType
 from .data_types import DictionaryType, FloatTensorType # noqa
 from .data_types import Int64TensorType, SequenceType # noqa
 from .data_types import StringTensorType, DoubleTensorType # noqa
-from .data_types import Int32TensorType, BoolTensorType # noqa
+from .data_types import Int32TensorType, BooleanTensorType # noqa
 from ._container import ModelComponentContainer
 from .interface import OperatorBase
 

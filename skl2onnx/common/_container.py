@@ -11,7 +11,7 @@ import sys
 import traceback
 import warnings
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
-from ..proto import helper
+from ..proto import helper, TensorProto
 from .interface import ModelContainer
 from .utils import get_domain
 

@@ -9,7 +9,7 @@ from ..common._topology import Variable
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
 from ..common.data_types import Int32TensorType, DoubleTensorType
-from ..common.data_types import BoolTensorType
+from ..common.data_types import BooleanTensorType
 
 
 def _guess_type_proto(data_type, dims):
@@ -24,7 +24,7 @@ def _guess_type_proto(data_type, dims):
     elif data_type == onnx_proto.TensorProto.INT32:
         return Int32TensorType(dims)
     elif data_type == onnx_proto.TensorProto.BOOL:
-        return BoolTensorType(dims)
+        return BooleanTensorType(dims)
     else:
         raise NotImplementedError("Unsupported type '{}' "
                                   "data_type={}".format(
