@@ -59,6 +59,8 @@ class Variable:
             shape = self.type.shape
             if isinstance(shape, (list, tuple)):
                 for dim in shape:
+                    if dim == 'None':
+                        continue
                     if not isinstance(dim, (int, np.int32, np.int64)):
                         raise TypeError("shape must contains integers not "
                                         "'{}'.".format(dim))
