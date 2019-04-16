@@ -52,9 +52,9 @@ class Variable:
         self.is_root = None
         self.is_leaf = None
         self.is_abandoned = False
-        if not isinstance(self.type, DataType):
+        if not isinstance(self.type, (None, DataType)):
             raise TypeError("shape must be a DataType not {}.".format(
-                type(self.type)))
+                self.type))
         if isinstance(self.type, TensorType):
             shape = self.type.shape
             if isinstance(shape, (list, tuple)):
