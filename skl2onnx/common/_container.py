@@ -9,8 +9,9 @@ import re
 import six
 import sys
 import traceback
-from ..proto import helper, TensorProto
-from ._apply_operation import __dict__ as dict_apply_operation
+import warnings
+from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
+from ..proto import helper
 from .interface import ModelContainer
 from .utils import get_domain
 
@@ -34,8 +35,8 @@ def _get_operation_list():
                     found = g.groups()[0]
                     break
             if found is None:
-                raise RuntimeError("Unable to find an ONNX name in function "
-                                   "'{0}', source=\n{1}".format(k, source))
+                warnings.warn("Unable to find an ONNX name in function "
+                              "'{0}', source=\n{1}".format(k, source))
             res[found] = v
     return res
 

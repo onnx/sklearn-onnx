@@ -3,12 +3,20 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
-from .tests_helper import dump_data_and_model
-from .tests_helper import dump_one_class_classification, dump_binary_classification, dump_multiple_classification
-from .tests_helper import dump_multiple_regression, dump_single_regression
-
 import numpy as np
+
+from .tests_helper import dump_data_and_model  # noqa
+from .tests_helper import (  # noqa
+    dump_one_class_classification,
+    dump_binary_classification,
+    dump_multiple_classification,
+)
+from .tests_helper import (  # noqa
+    dump_multiple_regression,
+    dump_single_regression,
+)
+
+
 def create_tensor(N, C, H=None, W=None):
     if H is None and W is None:
         return np.random.rand(N, C).astype(np.float32, copy=False)

@@ -5,7 +5,7 @@ import os
 import sys
 import glob
 import pickle
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion  # noqa
 import numpy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
@@ -22,7 +22,7 @@ class OnnxRuntimeAssertionError(AssertionError):
     Expected failure.
     """
     pass
-    
+
 
 def evaluate_condition(backend, condition):
     """
@@ -30,11 +30,12 @@ def evaluate_condition(backend, condition):
     ``StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.3')``
     """
     if backend == "onnxruntime":
-        import onnxruntime
-        import onnx
+        import onnxruntime  # noqa
+        import onnx  # noqa
         return eval(condition)
     else:
-        raise NotImplementedError("Not implemented for backend '{0}'".format(backend))
+        raise NotImplementedError(
+            "Not implemented for backend '{0}'".format(backend))
 
 
 def is_backend_enabled(backend):
@@ -43,21 +44,27 @@ def is_backend_enabled(backend):
     """
     if backend == "onnxruntime":
         try:
-            import onnxruntime
+            import onnxruntime  # noqa
             return True
         except ImportError:
             return False
     else:
-        raise NotImplementedError("Not implemented for backend '{0}'".format(backend))
+        raise NotImplementedError(
+            "Not implemented for backend '{0}'".format(backend))
 
 
-def compare_backend(backend, test, decimal=5, options=None, verbose=False, context=None,
+def compare_backend(backend,
+                    test,
+                    decimal=5,
+                    options=None,
+                    verbose=False,
+                    context=None,
                     comparable_outputs=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
     produced with module *onnxruntime*.
-    
+
     :param backend: backend to use to run the comparison,
         only *onnxruntime* is currently supported
     :param test: dictionary with the following keys:
@@ -70,7 +77,7 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
     :param comparable_outputs: compare only these outputs
     :param verbose: in case of error, the function may print
         more information on the standard output
-    
+
     The function does not return anything but raises an error
     if the comparison failed.
     :return: tuple (output, lambda function to call onnx predictions)
@@ -78,9 +85,12 @@ def compare_backend(backend, test, decimal=5, options=None, verbose=False, conte
     if backend == "onnxruntime":
         if sys.version_info[0] == 2:
             # onnxruntime is not available on Python 2.
-            return            
+            return
         from .utils_backend_onnxruntime import compare_runtime
-        return compare_runtime(test, decimal, options=options, verbose=verbose,
+        return compare_runtime(test,
+                               decimal,
+                               options=options,
+                               verbose=verbose,
                                comparable_outputs=comparable_outputs)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
@@ -93,11 +103,12 @@ def search_converted_models(root=None):
     *dump_data_and_model*.
     """
     if root is None:
-        root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "__dump_data"))
+        root = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "__dump_data"))
         root = os.path.normpath(root)
     if not os.path.exists(root):
         raise FileNotFoundError("Unable to find '{0}'.".format(root))
-    
+
     founds = glob.iglob("{0}/**/*.model.onnx".format(root), recursive=True)
     keep = []
     for found in founds:
@@ -120,7 +131,7 @@ def search_converted_models(root=None):
                 keep.append((basename, res))
     keep.sort()
     return [_[1] for _ in keep]
-    
+
 
 def load_data_and_model(items_as_dict, **context):
     """
@@ -140,7 +151,8 @@ def load_data_and_model(items_as_dict, **context):
                         if '.model.' in v:
                             continue
                         else:
-                            raise ImportError("Unable to load '{0}' due to {1}".format(v, e))
+                            raise ImportError(
+                                "Unable to load '{0}' due to {1}".format(v, e))
                     res[k] = bin
             elif os.path.splitext(v)[-1] == ".keras":
                 import keras.models
@@ -156,7 +168,7 @@ def extract_options(name):
     """
     Extracts comparison option from filename.
     As example, ``Binarizer-SkipDim1`` means
-    options *SkipDim1* is enabled. 
+    options *SkipDim1* is enabled.
     ``(1, 2)`` and ``(2,)`` are considered equal.
     Available options: see :func:`dump_data_and_model`.
     """
@@ -193,27 +205,36 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 3)
     if Dec2:
         kwargs["decimal"] = min(kwargs["decimal"], 2)
-    if isinstance(expected, numpy.ndarray) and isinstance(output, numpy.ndarray):
+    if isinstance(expected, numpy.ndarray) and isinstance(
+            output, numpy.ndarray):
         if SkipDim1:
-            # Arrays like (2, 1, 2, 3) becomes (2, 2, 3) as one dimension is useless.
-            expected = expected.reshape(tuple([d for d in expected.shape if d > 1]))
-            output = output.reshape(tuple([d for d in expected.shape if d > 1]))
+            # Arrays like (2, 1, 2, 3) becomes (2, 2, 3)
+            # as one dimension is useless.
+            expected = expected.reshape(
+                tuple([d for d in expected.shape if d > 1]))
+            output = output.reshape(tuple([d for d in expected.shape
+                                           if d > 1]))
         if NoProb:
             # One vector is (N,) with scores, negative for class 0
             # positive for class 1
             # The other vector is (N, 2) score in two columns.
-            if len(output.shape) == 2 and output.shape[1] == 2 and len(expected.shape) == 1:
+            if len(output.shape) == 2 and output.shape[1] == 2 and len(
+                    expected.shape) == 1:
                 output = output[:, 1]
             elif len(output.shape) == 1 and len(expected.shape) == 1:
                 pass
             elif len(expected.shape) == 1 and len(output.shape) == 2 and \
-                    expected.shape[0] == output.shape[0] and output.shape[1] == 1:
+                    expected.shape[0] == output.shape[0] and \
+                    output.shape[1] == 1:
                 output = output[:, 0]
             elif expected.shape != output.shape:
-                raise NotImplementedError("No good shape: {0} != {1}".format(expected.shape, output.shape))
-        if len(expected.shape) == 1 and len(output.shape) == 2 and output.shape[1] == 1:
+                raise NotImplementedError("No good shape: {0} != {1}".format(
+                    expected.shape, output.shape))
+        if len(expected.shape) == 1 and len(
+                output.shape) == 2 and output.shape[1] == 1:
             output = output.ravel()
-        if len(output.shape) == 3 and output.shape[0] == 1 and len(expected.shape) == 2:
+        if len(output.shape) == 3 and output.shape[0] == 1 and len(
+                expected.shape) == 2:
             output = output.reshape(output.shape[1:])
         if expected.dtype in (numpy.str, numpy.dtype("<U1")):
             try:
@@ -226,27 +247,41 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                     return OnnxRuntimeAssertionError(str(e))
         else:
             try:
-                assert_array_almost_equal(expected, output, verbose=verbose, **kwargs)
+                assert_array_almost_equal(expected,
+                                          output,
+                                          verbose=verbose,
+                                          **kwargs)
             except Exception as e:
-                longer = "\n--EXPECTED--\n{0}\n--OUTPUT--\n{1}".format(expected, output) if verbose else ""
+                longer = "\n--EXPECTED--\n{0}\n--OUTPUT--\n{1}".format(
+                    expected, output) if verbose else ""
                 expected_ = numpy.asarray(expected).ravel()
                 output_ = numpy.asarray(output).ravel()
                 if len(expected_) == len(output_):
                     if numpy.issubdtype(expected_.dtype, numpy.floating):
                         diff = numpy.abs(expected_ - output_).max()
                     else:
-                        diff = max((1 if ci != cj else 0) for ci, cj in zip(expected_, output_))
+                        diff = max((1 if ci != cj else 0)
+                                   for ci, cj in zip(expected_, output_))
                     if diff == 0:
                         return None
                 elif Mism:
-                    return ExpectedAssertionError("dimension mismatch={0}, {1}\n{2}{3}".format(expected.shape, output.shape, e, longer))
+                    return ExpectedAssertionError(
+                        "dimension mismatch={0}, {1}\n{2}{3}".format(
+                            expected.shape, output.shape, e, longer))
                 else:
-                    return OnnxRuntimeAssertionError("dimension mismatch={0}, {1}\n{2}{3}".format(expected.shape, output.shape, e, longer))
+                    return OnnxRuntimeAssertionError(
+                        "dimension mismatch={0}, {1}\n{2}{3}".format(
+                            expected.shape, output.shape, e, longer))
                 if Disc:
                     # Bug to be fixed later.
-                    return ExpectedAssertionError("max-diff={0}\n--expected--output--\n{1}{2}".format(diff, e, longer))
+                    return ExpectedAssertionError(
+                        "max-diff={0}\n--expected--output--\n{1}{2}".format(
+                            diff, e, longer))
                 else:
-                    return OnnxRuntimeAssertionError("max-diff={0}\n--expected--output--\n{1}{2}".format(diff, e, longer))
+                    return OnnxRuntimeAssertionError(
+                        "max-diff={0}\n--expected--output--\n{1}{2}".format(
+                            diff, e, longer))
     else:
-        return OnnxRuntimeAssertionError("Unexpected types {0} != {1}".format(type(expected), type(output)))
+        return OnnxRuntimeAssertionError("Unexpected types {0} != {1}".format(
+            type(expected), type(output)))
     return None
