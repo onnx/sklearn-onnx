@@ -102,9 +102,11 @@ class GraphState:
                 eoli = [self._get_var_name(o, True, operator=operator)
                         for o in self.expected_outputs]
                 self.expected_outputs = eoli
-            inputs = [self._get_var_name(i, False, operator=operator)
-                      for i in self.inputs]
-            inputs = [i for i in inputs if i is not None]
+            inputs = []
+            for i in self.inputs:
+                v = self._get_var_name(i, False, operator=operator)
+                if v is not None:
+                    inputs.append(v)
             name = self.scope.get_unique_operator_name(self.operator_name)
             outputs = [self._get_output_name(o)
                        for o in self.expected_outputs]

@@ -157,7 +157,7 @@ class TestOnnxOperators(unittest.TestCase):
             assert_almost_equal(exp[nbnode-1], res)
 
         dim = 10
-        onx = generate_onnx_graph(dim, 100)
+        onx = generate_onnx_graph(dim, 300)
         as_string = onx.SerializeToString()
         ort = InferenceSession(as_string)
         X = (np.ones((1, dim)) * nbnode).astype(np.float32)
