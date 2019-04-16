@@ -7,7 +7,9 @@
 import re
 import warnings
 from logging import getLogger
+import numpy as np
 from onnx import onnx_pb as onnx_proto
+from onnxconverter_common.data_types import DataType, TensorType
 from ..proto import helper
 from ..proto import get_opset_number_from_onnx
 from . import _registration
@@ -50,6 +52,19 @@ class Variable:
         self.is_root = None
         self.is_leaf = None
         self.is_abandoned = False
+        if not isinstance(self.type, DataType):
+            raise TypeError("shape must be a DataType not {}.".format(
+                type(self.type)))
+        if isinstance(self.type, TensorType):
+            shape = self.type.shape
+            if isinstance(shape, (list, tuple)):
+                for dim in shape:
+                    if not isinstance(dim, (int, np.int32, np.int64)):
+                        raise TypeError("shape must contains integers not "
+                                        "'{}'.".format(dim))
+            else:
+                raise TypeError("shape must be a tuple or a list not "
+                                "{}.".format(type(shape)))
 
     @property
     def full_name(self):

@@ -57,7 +57,7 @@ def _guess_type(given_type):
                                  given_type.dims)
     elif isinstance(given_type, ValueInfoProto):
         ttype = given_type.type.tensor_type
-        dims = [ttype.shape.dim[i] for i in range(len(ttype.shape.dim))]
+        dims = [ttype.shape.dim[i].dim_value for i in range(len(ttype.shape.dim))]
         return _guess_type_proto(ttype.elem_type, dims)
     else:
         raise NotImplementedError(
