@@ -153,7 +153,7 @@ def get_rst_doc(op_name=None):
             opts.append('optional')
         elif OpSchema.FormalParameterOption.Variadic == obj.option:
             opts.append('variadic')
-        if obj.isHomogeneous:
+        if getattr(obj, 'isHomogeneous', False):
             opts.append('heterogeneous')
         if opts:
             return " (%s)" % ", ".join(opts)

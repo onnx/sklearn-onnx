@@ -4,7 +4,11 @@ Place holder for all ONNX operators.
 import sys
 import textwrap
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ModuleNotFoundError:
+    # ColumnTransformer was introduced in 0.20.
+    ColumnTransformer = None
 from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin
 
 
@@ -87,15 +91,17 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     pass
 
 
-class OnnxSklearnColumnTransformer(ColumnTransformer,
-                                   OnnxSubGraphOperatorMixin):
-    """
-    Combines `ColumnTransformer
-    <https://scikit-learn.org/stable/modules/generated/
-    sklearn.compose.ColumnTransformer.html>`_ and
-    :class:`OnnxSubGraphOperatorMixin`.
-    """
-    pass
+if ColumnTransformer is not None:
+
+    class OnnxSklearnColumnTransformer(ColumnTransformer,
+                                       OnnxSubGraphOperatorMixin):
+        """
+        Combines `ColumnTransformer
+        <https://scikit-learn.org/stable/modules/generated/
+        sklearn.compose.ColumnTransformer.html>`_ and
+        :class:`OnnxSubGraphOperatorMixin`.
+        """
+        pass
 
 
 class OnnxSklearnFeatureUnion(FeatureUnion, OnnxSubGraphOperatorMixin):
