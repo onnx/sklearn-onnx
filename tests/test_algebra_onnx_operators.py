@@ -1,6 +1,8 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
@@ -129,6 +131,8 @@ class TestOnnxOperators(unittest.TestCase):
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
     def test_cascade_add(self):
         
         def generate_onnx_graph(dim, nbnode, input_name='X1'):

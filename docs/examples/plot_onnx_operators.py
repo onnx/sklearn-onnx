@@ -33,17 +33,16 @@ ONNX Python API
 
 Let's try the example given by ONNX documentation:
 `PythonAPIOverview.md
-<https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md#creating-an-onnx-model-using-helper-functions>`_.
+<https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md
+#creating-an-onnx-model-using-helper-functions>`_.
+It relies on *protobuf* whose definition can be found 
+on github `onnx.proto
+<https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`_.
 """
 
 import onnx
 from onnx import helper
 from onnx import AttributeProto, TensorProto, GraphProto
-
-
-# The protobuf definition can be found here:
-# https://github.com/onnx/onnx/blob/master/onnx/onnx.proto
-
 
 # Create one input (ValueInfoProto)
 X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
