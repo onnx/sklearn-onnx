@@ -17,7 +17,7 @@ from skl2onnx.helpers.onnx_helper import (
 class TestOnnxHelper(unittest.TestCase):
     def get_model(self, model):
         try:
-            import onnxruntime  # NOQA
+            import onnxruntime  # noqa
         except ImportError:
             return None
 

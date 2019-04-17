@@ -38,7 +38,7 @@ def run_all_tests(folder=None, verbose=True):
         print("[benchmark] look into '{0}'".format(folder))
 
     try:
-        import onnxmltools  # NOQA
+        import onnxmltools  # noqa
     except ImportError:
         warnings.warn("Cannot import onnxmltools. Some tests won't work.")
 
