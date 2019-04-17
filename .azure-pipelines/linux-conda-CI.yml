@@ -100,7 +100,7 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
-      if [ '$(onnx.version)' == 'nightly' ]
+      if [ '$(onnxrt.version)' == 'nightly' ]
       then
         pip install -i https://test.pypi.org/simple/ ort-nightly
       else
