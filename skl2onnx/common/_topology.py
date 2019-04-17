@@ -14,7 +14,7 @@ from ..proto import helper
 from ..proto import get_opset_number_from_onnx
 from . import _registration
 from . import utils
-from .data_types import FloatType, Int64Type, StringType, TensorType
+from .data_types import FloatType, Int64Type, StringType
 from .data_types import DictionaryType, FloatTensorType # noqa
 from .data_types import Int64TensorType, SequenceType # noqa
 from .data_types import StringTensorType, DoubleTensorType # noqa
@@ -98,7 +98,7 @@ class Variable:
             if elem == onnx_proto.TensorProto.FLOAT:
                 ty = FloatTensorType(shape)
             elif elem == onnx_proto.TensorProto.BOOL:
-                ty = BoolTensorType(shape)
+                ty = BooleanTensorType(shape)
             elif elem == onnx_proto.TensorProto.DOUBLE:
                 ty = DoubleTensorType(shape)
             elif elem == onnx_proto.TensorProto.STRING:

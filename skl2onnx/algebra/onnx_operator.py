@@ -273,7 +273,8 @@ class OnnxOperator:
                 elif isinstance(o, tuple):
                     shapes.append(Variable(o[0], o[0], None, o[1]))
                 else:
-                    raise TypeError("Outputs must be Variable or tuple(name, type).")
+                    raise TypeError("Outputs must be Variable or "
+                                    "tuple(name, type).")
         else:
             shapes = infer_outputs(container, container.inputs)
 
