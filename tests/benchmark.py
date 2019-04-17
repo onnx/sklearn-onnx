@@ -1,8 +1,8 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 """
 You can run this file with to get a report on every tested model conversion.
 
@@ -17,9 +17,6 @@ import os
 import sys
 import unittest
 import warnings
-import platform
-import cpuinfo
-
 
 
 def run_all_tests(folder=None, verbose=True):
@@ -27,12 +24,12 @@ def run_all_tests(folder=None, verbose=True):
     Runs all unit tests or unit tests specific to one library.
     The tests produce a series of files dumped into ``folder``
     which can be later used to tests a backend (or a runtime).
-    
+
     :param folder: where to put the dumped files
     :param verbose: verbose
     """
     if folder is None:
-        folder = 'TESTDUMP'
+        folder = "TESTDUMP"
     os.environ["ONNXTESTDUMP"] = folder
     os.environ["ONNXTESTDUMPERROR"] = "1"
     os.environ["ONNXTESTBENCHMARK"] = "1"
@@ -41,20 +38,20 @@ def run_all_tests(folder=None, verbose=True):
         print("[benchmark] look into '{0}'".format(folder))
 
     try:
-        import onnxmltools
+        import onnxmltools  # noqa
     except ImportError:
         warnings.warn("Cannot import onnxmltools. Some tests won't work.")
-    
+
     this = os.path.abspath(os.path.dirname(__file__))
     subs = [this]
     loader = unittest.TestLoader()
     suites = []
-    
+
     for sub in subs:
         fold = os.path.join(this, sub)
         if not os.path.exists(fold):
             raise FileNotFoundError("Unable to find '{0}'".format(fold))
-        
+
         # ts = loader.discover(fold)
         sys.path.append(fold)
         names = [_ for _ in os.listdir(fold) if _.startswith("test")]
@@ -64,7 +61,7 @@ def run_all_tests(folder=None, verbose=True):
             suites.append(ts)
         index = sys.path.index(fold)
         del sys.path[index]
-    
+
     with warnings.catch_warnings():
         warnings.filterwarnings(category=DeprecationWarning, action="ignore")
         warnings.filterwarnings(category=FutureWarning, action="ignore")
@@ -76,13 +73,16 @@ def run_all_tests(folder=None, verbose=True):
                         print(t.__class__.__name__)
                         break
                 except TypeError as e:
-                    raise RuntimeError("Unable to run test '{}'.".format(ts)) from e
+                    raise RuntimeError(
+                        "Unable to run test '{}'.".format(ts)) from e
             runner.run(ts)
-    
+
     from test_utils.tests_helper import make_report_backend
+
     df = make_report_backend(folder, as_df=True)
 
     from pandas import set_option
+
     set_option("display.max_columns", None)
     set_option("display.max_rows", None)
     exfile = os.path.join(folder, "report_backend.xlsx")
@@ -90,8 +90,8 @@ def run_all_tests(folder=None, verbose=True):
     if verbose:
         print("[benchmark] wrote report in '{0}'".format(exfile))
     return df
-                    
-    
+
+
 if __name__ == "__main__":
     folder = None if len(sys.argv) < 2 else sys.argv[1]
     run_all_tests(folder=folder)
