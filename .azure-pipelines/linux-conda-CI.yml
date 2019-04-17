@@ -19,6 +19,12 @@ jobs:
         onnx.version: 'git'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
+      Py37-OnnxGit-Nightly:
+        python.version: '3.7'
+        numpy.version: '==1.16.2'
+        onnx.version: 'git'
+        onnxrt.version: 'nightly'
+        sklearn.version: '==0.20.3'
       Py36-Onnx141:
         python.version: '3.7'
         numpy.version: '==1.16.2'
@@ -94,7 +100,11 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
-      pip install onnxruntime$(onnxrt.version)
+      if [ '$(onnx.version)' == 'nightly' ]
+        pip install -i https://test.pypi.org/simple/ ort-nightly
+      else
+        pip install onnxruntime$(onnxrt.version)
+      fi
     displayName: 'install onnxruntime'
 
   - script: |
