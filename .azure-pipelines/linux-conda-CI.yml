@@ -101,6 +101,7 @@ jobs:
 
   - script: |
       if [ '$(onnx.version)' == 'nightly' ]
+      then
         pip install -i https://test.pypi.org/simple/ ort-nightly
       else
         pip install onnxruntime$(onnxrt.version)
