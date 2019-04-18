@@ -20,9 +20,12 @@ from test_utils import dump_data_and_model
 
 
 class PredictableTSNE(BaseEstimator, TransformerMixin):
-
-    def __init__(self, transformer=None, estimator=None,
-                 normalize=True, keep_tsne_outputs=False, **kwargs):
+    def __init__(self,
+                 transformer=None,
+                 estimator=None,
+                 normalize=True,
+                 keep_tsne_outputs=False,
+                 **kwargs):
         TransformerMixin.__init__(self)
         BaseEstimator.__init__(self)
         if estimator is None:
@@ -37,9 +40,8 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
                 "transformer {} does not have a 'fit_transform' "
                 "method.".format(type(transformer)))
         if not hasattr(estimator, "predict"):
-            raise AttributeError(
-                "estimator {} does not have a 'predict' "
-                "method.".format(type(estimator)))
+            raise AttributeError("estimator {} does not have a 'predict' "
+                                 "method.".format(type(estimator)))
         self.normalize = normalize
         if kwargs:
             self.set_params(**kwargs)
@@ -51,13 +53,13 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
 
         sig = inspect.signature(self.transformer.fit_transform)
         pars = {}
-        for p in ['sample_weight', 'y']:
+        for p in ["sample_weight", "y"]:
             if p in sig.parameters and p in params:
                 pars[p] = params[p]
         target = self.transformer_.fit_transform(X, **pars)
 
         sig = inspect.signature(self.estimator.fit)
-        if 'sample_weight' in sig.parameters:
+        if "sample_weight" in sig.parameters:
             self.estimator_ = clone(self.estimator).fit(
                 X, target, sample_weight=sample_weight)
         else:
@@ -65,7 +67,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         mean = target.mean(axis=0)
         var = target.std(axis=0)
         self.mean_ = mean
-        self.inv_std_ = 1. / var
+        self.inv_std_ = 1.0 / var
         exp = (target - mean) * self.inv_std_
         got = (self.estimator_.predict(X) - mean) * self.inv_std_
         self.loss_ = mean_squared_error(exp, got)
@@ -91,11 +93,11 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
     def set_params(self, **values):
         pt, pe, pn = {}, {}, {}
         for k, v in values.items():
-            if k.startswith('e_'):
+            if k.startswith("e_"):
                 pe[k[2:]] = v
-            elif k.startswith('t_'):
+            elif k.startswith("t_"):
                 pt[k[2:]] = v
-            elif k.startswith('n_'):
+            elif k.startswith("n_"):
                 pn[k[2:]] = v
             else:
                 raise ValueError("Unexpected parameter name '{0}'".format(k))
@@ -118,21 +120,23 @@ def predictable_tsne_converter(scope, operator, container):
     alias = _get_sklearn_operator_name(type(model))
     knn_op = scope.declare_local_operator(alias, model)
     knn_op.inputs = operator.inputs
-    knn_output = scope.declare_local_variable('knn_output', FloatTensorType())
+    knn_output = scope.declare_local_variable("knn_output", FloatTensorType())
     knn_op.outputs.append(knn_output)
     shape_calc = get_shape_calculator(alias)
     shape_calc(knn_op)
-    name = scope.get_unique_operator_name('Scaler')
-    attrs = dict(name=name,
-                 scale=op.inv_std_.ravel().astype(float),
-                 offset=op.mean_.ravel().astype(float))
+    name = scope.get_unique_operator_name("Scaler")
+    attrs = dict(
+        name=name,
+        scale=op.inv_std_.ravel().astype(float),
+        offset=op.mean_.ravel().astype(float),
+    )
 
-    container.add_node('Scaler', [knn_output.onnx_name], [output.full_name],
-                       op_domain='ai.onnx.ml', **attrs)
+    container.add_node("Scaler", [knn_output.onnx_name], [output.full_name],
+                       op_domain="ai.onnx.ml",
+                       **attrs)
 
 
 class TestOtherLibrariesInPipeline(unittest.TestCase):
-
     def test_custom_pipeline_scaler(self):
 
         digits = datasets.load_digits(n_class=6)
@@ -143,19 +147,27 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         ptsne_knn = PredictableTSNE()
         ptsne_knn.fit(Xd, yd)
 
-        update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
-                                    predictable_tsne_shape_calculator,
-                                    predictable_tsne_converter)
+        update_registered_converter(
+            PredictableTSNE,
+            "CustomPredictableTSNE",
+            predictable_tsne_shape_calculator,
+            predictable_tsne_converter,
+        )
 
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType(
-                                         [1, Xd.shape[1]]))])
+        model_onnx = convert_sklearn(
+            ptsne_knn,
+            "predictable_tsne",
+            [("input", FloatTensorType([1, Xd.shape[1]]))],
+        )
 
         dump_data_and_model(
-            Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
+            Xd.astype(numpy.float32)[:7],
+            ptsne_knn,
+            model_onnx,
             basename="CustomTransformerTSNEkNN-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')")
+                          "== StrictVersion('1.4.1')",
+        )
 
         trace_line = []
 
@@ -164,23 +176,29 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             return _parse_sklearn_simple_model(scope, model, inputs,
                                                custom_parsers)
 
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType(
-                                         [1, Xd.shape[1]]))],
-                                     custom_parsers={PredictableTSNE:
-                                                     my_parser})
+        model_onnx = convert_sklearn(
+            ptsne_knn,
+            "predictable_tsne",
+            [("input", FloatTensorType([1, Xd.shape[1]]))],
+            custom_parsers={PredictableTSNE: my_parser},
+        )
         assert len(trace_line) == 1
 
         dump_data_and_model(
-            Xd.astype(numpy.float32)[:7], ptsne_knn, model_onnx,
+            Xd.astype(numpy.float32)[:7],
+            ptsne_knn,
+            model_onnx,
             basename="CustomTransformerTSNEkNNCustomParser-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')")
+            "== StrictVersion('1.4.1')",
+        )
 
         update_registered_parser(PredictableTSNE, my_parser)
-        model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                                     [('input', FloatTensorType(
-                                         [1, Xd.shape[1]]))])
+        model_onnx = convert_sklearn(
+            ptsne_knn,
+            "predictable_tsne",
+            [("input", FloatTensorType([1, Xd.shape[1]]))],
+        )
 
         assert len(trace_line) == 2
 
