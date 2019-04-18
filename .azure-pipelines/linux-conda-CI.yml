@@ -119,6 +119,15 @@ jobs:
     displayName: 'install'
 
   - script: |
+      if [ '$(onnxrt.version)' == 'nightly' ]
+      then
+        pip install -i https://test.pypi.org/simple/ ort-nightly
+      else
+        pip install onnxruntime$(onnxrt.version)
+      fi
+    displayName: 'install onnxruntime again (previous step might remove it)'
+
+  - script: |
       echo "---------------"
       pip show numpy
       echo "---------------"
