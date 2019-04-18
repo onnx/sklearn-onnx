@@ -50,7 +50,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx
+      flake8 skl2onnx tests
     displayName: 'flake8'
 
   - script: |
