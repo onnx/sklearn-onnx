@@ -164,7 +164,7 @@ def dump_data_and_model(
             if callable(call):
                 prediction.append(call(data))
                 # we only take the last one for benchmark
-                lambda_original = lambda: call(dataone)  # NOQA
+                lambda_original = lambda: call(dataone)  # noqa
             else:
                 raise RuntimeError(
                     "Method '{0}' is not callable.".format(method))
@@ -173,7 +173,7 @@ def dump_data_and_model(
             if _has_predict_proba(model):
                 # Classifier
                 prediction = [model.predict(data), model.predict_proba(data)]
-                lambda_original = lambda: model.predict_proba(dataone)  # NOQA
+                lambda_original = lambda: model.predict_proba(dataone)  # noqa
             elif _has_decision_function(model):
                 # Classifier without probabilities
                 prediction = [
@@ -181,25 +181,25 @@ def dump_data_and_model(
                     model.decision_function(data),
                 ]
                 lambda_original = (
-                    lambda: model.decision_function(dataone))  # NOQA
+                    lambda: model.decision_function(dataone))  # noqa
             elif _has_transform_model(model):
                 # clustering
                 prediction = [model.predict(data), model.transform(data)]
-                lambda_original = lambda: model.transform(dataone)  # NOQA
+                lambda_original = lambda: model.transform(dataone)  # noqa
             else:
                 # Regressor or VotingClassifier
                 prediction = [model.predict(data)]
-                lambda_original = lambda: model.predict(dataone)  # NOQA
+                lambda_original = lambda: model.predict(dataone)  # noqa
 
         elif hasattr(model, "transform"):
             options = extract_options(basename)
             SklCol = options.get("SklCol", False)
             if SklCol:
                 prediction = model.transform(data.ravel())
-                lambda_original = lambda: model.transform(dataone.ravel())  # NOQA
+                lambda_original = lambda: model.transform(dataone.ravel())  # noqa
             else:
                 prediction = model.transform(data)
-                lambda_original = lambda: model.transform(dataone)  # NOQA
+                lambda_original = lambda: model.transform(dataone)  # noqa
         else:
             raise TypeError(
                 "Model has not predict or transform method: {0}".format(
