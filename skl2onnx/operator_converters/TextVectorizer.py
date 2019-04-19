@@ -21,16 +21,26 @@ def _intelligent_split(text, op, tokenizer, existing):
     if op.analyzer == 'word':
         if op.ngram_range[0] == op.ngram_range[1] == 1:
             spl = [text]
-        elif '  ' not in text:
-            if text.startswith(' '):
-                if text.endswith(' '):
-                    spl = text[1: -1].split()
-                else:
-                    spl = text[1:].split()
-            elif text.endswith(' '):
-                spl = text[: -1].split()
+        elif op.ngram_range[0] == 1 and len(text) >= 2:
+            # Every element is in the vocabulary.
+            # Naive method
+            p1 = len(text) - len(text.lstrip())
+            p2 = len(text) - len(text.rstrip())
+            if p2 == 0:
+                p2 = len(text)
+            spl = text[p1:-p2].split()
+            if len(spl) == 0:
+                spl = [text]
             else:
-                spl = text.split()
+                spl[0] = " " * p1 + spl[0]
+                spl[-1] = spl[-1] + " " * p2
+            if any(map(lambda g: g not in op.vocabulary_, spl)):
+                # TODO: handle this case with an algorithm
+                # which is able to break a string into
+                # known substrings.
+                raise RuntimeError("Unable to split n-grams '{}' "
+                                   "into tokens existing in the "
+                                   "vocabulary.".format(text))
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -46,9 +56,15 @@ def _intelligent_split(text, op, tokenizer, existing):
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
+                nos = g.replace(" ", "")
+                couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
+                possible = ['{}'.format(w[0])
+                            for w in couples if w[1] == nos]
                 raise RuntimeError("Unable to split n-grams '{}' "
+                                   "due to '{}' "
                                    "into tokens existing in the "
-                                   "vocabulary.".format(text))
+                                   "vocabulary. Found:\n{}".format(
+                                   text, g, possible))
     existing.add(spl)
     return spl
 
