@@ -169,10 +169,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         if options['sep'] != 'DEFAULT':
             raise RuntimeError("Option sep has not effect "
                                "if analyser != 'word'.")
-        if options['regex']:
-            regex = options['regex']
-        else:
-            regex = '.'
+        regex = options['regex'] if options['regex'] else '.'
         default_separators = None
 
     if op.preprocessor is not None:
