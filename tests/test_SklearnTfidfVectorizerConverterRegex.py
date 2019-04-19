@@ -1,7 +1,8 @@
 """
-Tests scikit-learn's binarizer converter.
+Tests scikit-learn's tfidf converter.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
