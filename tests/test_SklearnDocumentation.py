@@ -57,9 +57,8 @@ class TestSklearnDocumentation(unittest.TestCase):
     "Test example from the documentation of scikit-learn."
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.3"),
-        reason="Encoding issue fixed in a later version",
-    )
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         train = fetch_20newsgroups(random_state=1,
@@ -85,10 +84,8 @@ class TestSklearnDocumentation(unittest.TestCase):
             tfi,
             model_onnx,
             basename="SklearnDocumentationTfIdf-OneOff-SklCol",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " <= StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
         )
 
     @unittest.skipIf(
@@ -96,9 +93,8 @@ class TestSklearnDocumentation(unittest.TestCase):
         reason="ColumnTransformer introduced in 0.20",
     )
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.3"),
-        reason="Encoding issue fixed in a later version",
-    )
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         train = fetch_20newsgroups(random_state=1,
@@ -154,10 +150,8 @@ class TestSklearnDocumentation(unittest.TestCase):
             model_onnx,
             verbose=False,
             basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " <= StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
         )
 
 
