@@ -109,35 +109,14 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
+      pip install -r requirements.txt --pre
+      pip install -r requirements-dev.txt --pre
       pip install pytest
     displayName: 'install requirements'
 
   - script: |
       pip install -e .
     displayName: 'install'
-
-  - script: |
-      if [ '$(onnxrt.version)' == 'nightly' ]
-      then
-        pip install -i https://test.pypi.org/simple/ ort-nightly --upgrade
-      fi
-    displayName: 'install onnxruntime again for nightly (previous step might remove it)'
-
-  - script: |
-      echo "---------------"
-      pip show numpy
-      echo "---------------"
-      pip show onnx
-      echo "---------------"
-      pip show onnxruntime
-      echo "---------------"
-      pip show onnxconverter-common
-      echo "---------------"
-      pip show scikit-learn
-      echo "---------------"
-    displayName: 'version setup'
 
   - script: |
       python -c "import numpy;print('numpy:',numpy.__version__)"

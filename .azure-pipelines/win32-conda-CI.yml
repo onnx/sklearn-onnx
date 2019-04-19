@@ -74,7 +74,7 @@ jobs:
       python -c "import onnx;print('onnx:',onnx.__version__)"
       python -c "import onnxconverter_common;print('onnxconverter-common:',onnxconverter_common.__version__)"
       python -c "import onnxruntime;print('onnxruntime:',onnxruntime.__version__)"
-    displayName: 'version'
+    displayName: 'version __init__.py'
 
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
