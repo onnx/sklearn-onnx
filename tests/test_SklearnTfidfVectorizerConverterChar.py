@@ -27,7 +27,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11CharW2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.2.1')",
+                          "StrictVersion('0.4.0')",
             verbose=False)
 
     def test_model_tfidf_vectorizer22_short_word(self):
@@ -60,7 +60,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.2.1')",
+                          "StrictVersion('0.4.0')",
             verbose=False)
 
     def test_model_tfidf_vectorizer12_char(self):
@@ -79,7 +79,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.2.1')",
+                          "StrictVersion('0.4.0')",
             verbose=False)
 
     def test_model_tfidf_vectorizer12_normL1_char(self):
@@ -98,7 +98,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12L1Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.2.1')")
+                          "StrictVersion('0.4.0')")
 
 
 if __name__ == "__main__":

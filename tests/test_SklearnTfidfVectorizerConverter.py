@@ -33,7 +33,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
@@ -106,7 +106,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer22(self):
@@ -128,7 +128,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer21(self):
@@ -145,7 +145,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer12(self):
@@ -167,7 +167,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer12_normL1(self):
@@ -188,7 +188,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer12_normL2(self):
@@ -210,7 +210,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer13(self):
@@ -232,7 +232,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer13-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
     def test_model_tfidf_vectorizer11parenthesis_class(self):
@@ -310,7 +310,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
 
