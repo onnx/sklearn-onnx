@@ -1,5 +1,5 @@
 """
-Tests scikit-learn's binarizer converter.
+Tests scikit-learn's tfidf converter.
 """
 import unittest
 from distutils.version import StrictVersion
