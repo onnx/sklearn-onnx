@@ -137,7 +137,16 @@ jobs:
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
-    displayName: 'version'
+    displayName: 'version setup'
+
+  - script: |
+      python -c "import numpy;print('numpy:',numpy.__version__)"
+      python -c "import scipy;print('scipy:',scipy.__version__)"
+      python -c "import sklearn;print('sklearn:',sklearn.__version__)"
+      python -c "import onnx;print('onnx:',onnx.__version__)"
+      python -c "import onnxconverter_common;print('onnxconverter-common:',onnxconverter_common.__version__)"
+      python -c "import onnxruntime;print('onnxruntime:',onnxruntime.__version__)"
+    displayName: 'version __init__.py'
 
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
