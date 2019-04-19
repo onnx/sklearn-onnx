@@ -121,11 +121,9 @@ jobs:
   - script: |
       if [ '$(onnxrt.version)' == 'nightly' ]
       then
-        pip install -i https://test.pypi.org/simple/ ort-nightly
-      else
-        pip install onnxruntime$(onnxrt.version) --upgrade
+        pip install -i https://test.pypi.org/simple/ ort-nightly --upgrade
       fi
-    displayName: 'install onnxruntime again (previous step might remove it)'
+    displayName: 'install onnxruntime again for nightly (previous step might remove it)'
 
   - script: |
       echo "---------------"
