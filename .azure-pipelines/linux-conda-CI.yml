@@ -123,7 +123,7 @@ jobs:
       then
         pip install -i https://test.pypi.org/simple/ ort-nightly
       else
-        pip install onnxruntime$(onnxrt.version)
+        pip install onnxruntime$(onnxrt.version) --upgrade
       fi
     displayName: 'install onnxruntime again (previous step might remove it)'
 
