@@ -6,11 +6,15 @@ import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
+import onnx
 from test_utils import dump_data_and_model
 
 
 class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_short_word(self):
         corpus = numpy.array([
                 'This is the first document.',
@@ -30,6 +34,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                           "StrictVersion('0.4.0')",
             verbose=False)
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer22_short_word(self):
         corpus = numpy.array([
                 'This is the first document.',
@@ -44,6 +51,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         except RuntimeError as e:
             assert "Unable to split n-grams ' seco' into tokens" in str(e)
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_char(self):
         corpus = numpy.array([
                 'This is the first document.',
@@ -63,6 +73,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                           "StrictVersion('0.4.0')",
             verbose=False)
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_char(self):
         corpus = numpy.array([
                 'This is the first document.',
@@ -82,6 +95,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                           "StrictVersion('0.4.0')",
             verbose=False)
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL1_char(self):
         corpus = numpy.array([
                 'This is the first document.',

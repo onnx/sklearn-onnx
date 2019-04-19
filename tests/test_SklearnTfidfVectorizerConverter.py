@@ -6,6 +6,7 @@ import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
+import onnx
 from test_utils import dump_data_and_model
 
 
@@ -14,6 +15,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
     def get_options(self):
         return {TfidfVectorizer: {"regex": None}}
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -36,6 +40,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
         corpus = numpy.array([
                 'This is the first document.',
@@ -58,6 +65,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__) < "
                           "StrictVersion('0.3.0')")
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case2(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -81,6 +91,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -109,6 +122,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -131,6 +147,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer21(self):
         corpus = numpy.array(["AA AA", "AA AA BB"]).reshape((2, 1))
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
@@ -148,6 +167,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -170,6 +192,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -191,6 +216,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -213,6 +241,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -235,6 +266,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -267,6 +301,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('1.3')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
             "This is the first document.",
