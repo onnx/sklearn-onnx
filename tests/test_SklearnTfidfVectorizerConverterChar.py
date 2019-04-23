@@ -50,7 +50,8 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             convert_sklearn(vect, 'TfidfVectorizer',
                             [('input', StringTensorType([1, 1]))])
         except RuntimeError as e:
-            assert "Unable to split n-grams ' seco nd do' into tokens" in str(e)
+            assert ("Unable to split n-grams ' seco nd do' "
+                    "into tokens") in str(e)
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),

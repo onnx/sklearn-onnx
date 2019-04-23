@@ -64,7 +64,7 @@ def _intelligent_split(text, op, tokenizer, existing):
                                    "due to '{}' "
                                    "into tokens existing in the "
                                    "vocabulary. Found:\n{}".format(
-                                   text, g, possible))
+                                       text, g, possible))
     existing.add(spl)
     return spl
 
