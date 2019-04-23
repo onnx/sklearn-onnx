@@ -8,6 +8,67 @@ import warnings
 from ..common._registration import register_converter
 
 
+def _intelligent_split(text, op, tokenizer, existing):
+    """
+    Splits text into tokens. *scikit-learn*
+    merges tokens with ``' '.join(tokens)``
+    to name ngrams. ``'a  b'`` could be ``('a ', 'b')``
+    or ``('a', ' b')``.
+    See `ngram sequence
+    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    sklearn/feature_extraction/text.py#L169>`_.
+    """
+    if op.analyzer == 'word':
+        if op.ngram_range[0] == op.ngram_range[1] == 1:
+            spl = [text]
+        elif op.ngram_range[0] == 1 and len(text) >= 2:
+            # Every element is in the vocabulary.
+            # Naive method
+            p1 = len(text) - len(text.lstrip())
+            p2 = len(text) - len(text.rstrip())
+            if p2 == 0:
+                p2 = len(text)
+            spl = text[p1:-p2].split()
+            if len(spl) == 0:
+                spl = [text]
+            else:
+                spl[0] = " " * p1 + spl[0]
+                spl[-1] = spl[-1] + " " * p2
+            if any(map(lambda g: g not in op.vocabulary_, spl)):
+                # TODO: handle this case with an algorithm
+                # which is able to break a string into
+                # known substrings.
+                raise RuntimeError("Unable to split n-grams '{}' "
+                                   "into tokens existing in the "
+                                   "vocabulary.".format(text))
+        else:
+            # We reuse the tokenizer hoping that will clear
+            # ambiguities but this might be slow.
+            spl = tokenizer(text)
+    else:
+        spl = list(text)
+
+    spl = tuple(spl)
+    if spl in existing:
+        raise RuntimeError("The converter cannot guess how to "
+                           "split an expression into tokens.")
+    if op.ngram_range[0] == 1:
+        # All grams should be existing in the vocabulary.
+        for g in spl:
+            if g not in op.vocabulary_:
+                nos = g.replace(" ", "")
+                couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
+                possible = ['{}'.format(w[0])
+                            for w in couples if w[1] == nos]
+                raise RuntimeError("Unable to split n-grams '{}' "
+                                   "due to '{}' "
+                                   "into tokens existing in the "
+                                   "vocabulary. Found:\n{}".format(
+                                       text, g, possible))
+    existing.add(spl)
+    return spl
+
+
 def convert_sklearn_text_vectorizer(scope, operator, container):
     """
     Converters for class
@@ -19,9 +80,17 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     Additional options
     ------------------
 
+    regex: string
+        The default will change to true in version 1.6.0.
+        The tokenizer splits into words using this regular
+        expression or the regular expression specified by
+        *scikit-learn* is the value is an empty string.
+        See also note below.
+        Default value: None
     sep: list of separators
         These separators are used to split a string into words.
-        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``
+        Options *sep* is ignore if options *regex* is not None.
+        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``.
 
     Example (from :ref:`l-example-tfidfvectorizer`):
 
@@ -32,11 +101,32 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
+
+    The default regular expression of the tokenizer is ``(?u)\\\\b\\\\w\\\\w+\\\\b``
+    (see `re <https://docs.python.org/3/library/re.html>`_).
+    This expression may not supported by the library handling the backend.
+    `onnxruntime <https://github.com/Microsoft/onnxruntime>`_ uses
+    `re2 <https://github.com/google/re2>`_. You may need to switch
+    to a custom tokenizer based on
+    `python wrapper for re2 <https://pypi.org/project/re2/>_`
+    or its sources `pyre2 <https://github.com/facebook/pyre2>`_
+    (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
+    If the regular expression is not specified and if
+    the instance of TfidfVectorizer is using the default
+    pattern ``(?u)\\\\b\\\\w\\\\w+\\\\b``, it is replaced by
+    ``[a-zA-Z0-9_]+``. Any other case has to be
+    manually handled.
+
+    Regular expression ``[^\\\\\\\\n]`` is used to split
+    a sentance into character (and not works) if ``analyser=='char'``.
+    The mode ``analyser=='char_wb'`` is not implemented.
+    ````
+    
     """ # noqa
 
     op = operator.raw_operator
 
-    if op.analyzer != "word":
+    if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
             "only tokenizer='word' is supported.")
@@ -46,16 +136,42 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "only stip_accents=None is supported.")
 
     options = container.get_options(
-            op, dict(sep=[' ', '.', '?', ',', ';', ':', '!']))
-    if set(options) != {'sep'}:
+            op, dict(sep="DEFAULT",
+                     regex=None))
+    if set(options) != {'sep', 'regex'}:
         raise RuntimeError("Unknown option {} for {}".format(
                                 set(options) - {'sep'}, type(op)))
-    default_pattern = '(?u)\\b\\w\\w+\\b'
-    default_separators = options['sep']
-    if op.token_pattern != default_pattern:
-        raise NotImplementedError(
-            "Only the default tokenizer based on default regular expression "
-            "'{0}' is implemented.".format(default_pattern))
+
+    if op.analyzer == 'word':
+        default_pattern = '(?u)\\b\\w\\w+\\b'
+        if options['sep'] == "DEFAULT" and options['regex'] is None:
+            warnings.warn("Converter for TfidfVectorizer will use "
+                          "scikit-learn regular expression by default "
+                          "in version 1.6.",
+                          DeprecationWarning)
+            default_separators = [' ', '.', '?', ',', ';', ':', '!']
+            regex = op.token_pattern
+            if regex == default_pattern:
+                regex = '[a-zA-Z0-9_]+'
+            default_separators = None
+        elif options['regex'] is not None:
+            if options['regex']:
+                regex = options['regex']
+            else:
+                regex = op.token_pattern
+                if regex == default_pattern:
+                    regex = '[a-zA-Z0-9_]+'
+            default_separators = None
+        else:
+            regex = None
+            default_separators = options['sep']
+    else:
+        if options['sep'] != 'DEFAULT':
+            raise RuntimeError("Option sep has not effect "
+                               "if analyser != 'word'.")
+        regex = options['regex'] if options['regex'] else '.'
+        default_separators = None
+
     if op.preprocessor is not None:
         raise NotImplementedError(
             "Custom preprocessor cannot be converted into ONNX.")
@@ -65,11 +181,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.strip_accents is not None:
         raise NotImplementedError(
             "Operator StringNormalizer cannot remove accents.")
-
-    msg = ("The default regular expression '{0}' splits strings based on "
-           "anything but a space. The current specification splits strings "
-           "based on the following separators {1}.")
-    warnings.warn(msg.format(default_pattern, default_separators))
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
@@ -106,10 +217,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs.update({
         'pad_value': padvalue,
-        'separators': default_separators,
         'mark': False,
         'mincharnum': 1,
     })
+    if regex is None:
+        attrs['separators'] = default_separators
+    else:
+        attrs['tokenexp'] = regex
 
     tokenized = scope.get_unique_variable_name('tokenized')
     container.add_node(op_type, normalized, tokenized,
@@ -119,7 +233,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     # Tokenizer outputs shape {1, C} or {1, 1, C}.
     # Second shape is not allowed by TfIdfVectorizer.
     # We use Flatten which produces {1, C} in both cases.
-    flatt_tokenized = scope.get_unique_variable_name('flatoken')
+    flatt_tokenized = scope.get_unique_variable_name('flattened')
     container.add_node("Flatten", tokenized, flatt_tokenized,
                        name=scope.get_unique_operator_name('Flatten'))
     tokenized = flatt_tokenized
@@ -141,7 +255,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     # Scikit-learn sorts n-grams by alphabetical order..
     # onnx assumes it is sorted by n.
-    split_words = [(w.split(), w) for w in words]
+    tokenizer = op.build_tokenizer()
+    split_words = []
+    existing = set()
+    for w in words:
+        spl = _intelligent_split(w, op, tokenizer, existing)
+        split_words.append((spl, w))
+
     ng_split_words = [(len(a[0]), a[0], i) for i, a in enumerate(split_words)]
     ng_split_words.sort()
     key_indices = [a[2] for a in ng_split_words]
