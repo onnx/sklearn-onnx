@@ -52,7 +52,7 @@ def _intelligent_split(text, op, tokenizer, existing):
     if spl in existing:
         raise RuntimeError("The converter cannot guess how to "
                            "split an expression into tokens.")
-    if op.ngram_range[0] == 1:
+    if op.ngram_range[0] == 1 and op.ngram_range[1] > 1:
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
@@ -184,19 +184,29 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
-
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
-        attrs.update({
-            'case_change_action': 'LOWER',
-            'is_case_sensitive': not op.lowercase,
-        })
+        normalized = scope.get_unique_variable_name('normalized')
+        if container.target_opset >= 10:
+            attrs.update({
+                'case_change_action': 'LOWER',
+                'is_case_sensitive': not op.lowercase,
+            })
+            op_version = 10
+            domain = 'ai.onnx'
+        else:
+            attrs.update({
+                'casechangeaction': 'LOWER',
+                'is_case_sensitive': not op.lowercase,
+            })
+            op_version = 9
+            domain = 'com.microsoft'
+
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
-        normalized = scope.get_unique_variable_name('normalized')
         container.add_node(op_type, operator.input_full_names,
-                           normalized, op_version=10,
-                           op_domain='ai.onnx', **attrs)
+                           normalized, op_version=op_version,
+                           op_domain=domain, **attrs)
     else:
         normalized = operator.input_full_names
 
