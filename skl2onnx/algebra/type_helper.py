@@ -46,7 +46,7 @@ def _guess_type(given_type):
         else:
             raise NotImplementedError(
                 "Unsupported type '{}'. Double should "
-                "be converted into floats.".format(given_type.dtype))
+                "be converted into single floats.".format(given_type.dtype))
     elif isinstance(given_type, (FloatTensorType, Int64TensorType,
                                  StringTensorType)):
         return given_type

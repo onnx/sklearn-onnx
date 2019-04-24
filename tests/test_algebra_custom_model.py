@@ -41,6 +41,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_
+        # case if there are multiple output nodes
+        
         return OnnxDiv(OnnxSub(i0, W), S,
                        output_names=outputs)
 
@@ -97,6 +99,8 @@ class TestCustomModelAlgebra(unittest.TestCase):
         # Field 'shape' of type is required but missing.
         # onnx.checker.check_model(model_onnx)
         
+        # use assert_consistent_outputs
+        # calls dump_data_and_model
         dump_data_and_model(
             mat.astype(np.float32), pipe, model_onnx,
             basename="CustomTransformerPipelineRightAlgebra")
