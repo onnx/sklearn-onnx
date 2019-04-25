@@ -17,7 +17,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         return {TfidfVectorizer: {"regex": None}}
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
@@ -38,11 +38,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
         corpus = numpy.array([
@@ -67,7 +67,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case2(self):
         corpus = numpy.array([
@@ -93,7 +93,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
@@ -120,11 +120,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
@@ -145,11 +145,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer21(self):
         corpus = numpy.array(["AA AA", "AA AA BB"]).reshape((2, 1))
@@ -165,11 +165,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
@@ -190,11 +190,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
@@ -214,11 +214,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
@@ -239,11 +239,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
@@ -264,11 +264,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer13-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
         corpus = numpy.array([
@@ -297,13 +297,13 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClass-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0') or "
+                          " <= StrictVersion('0.3.1') or "
                           "StrictVersion(onnx.__version__)"
                           " <= StrictVersion('1.3')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
@@ -348,7 +348,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.1')",
         )
 
 
