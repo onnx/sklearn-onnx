@@ -38,7 +38,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -120,7 +120,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -145,7 +145,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -165,7 +165,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -190,7 +190,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -214,7 +214,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -239,7 +239,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -264,7 +264,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer13-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -297,9 +297,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClass-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1') or "
-                          "StrictVersion(onnx.__version__)"
-                          " <= StrictVersion('1.3')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -348,7 +346,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
 

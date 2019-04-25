@@ -34,7 +34,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer11-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -58,7 +58,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -82,7 +82,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer12-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
@@ -106,7 +106,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer13-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
 

@@ -25,15 +25,17 @@ def _intelligent_split(text, op, tokenizer, existing):
             # Every element is in the vocabulary.
             # Naive method
             p1 = len(text) - len(text.lstrip())
-            p2 = len(text) - len(text.rstrip())
-            if p2 == 0:
+            p2_ = len(text) - len(text.rstrip())
+            if p2_ == 0:
                 p2 = len(text)
-            spl = text[p1:-p2].split()
-            if len(spl) == 0:
+            else:
+                p2 = -p2_
+            spl = text[p1:p2].split()
+            if len(spl) <= 1:
                 spl = [text]
             else:
                 spl[0] = " " * p1 + spl[0]
-                spl[-1] = spl[-1] + " " * p2
+                spl[-1] = spl[-1] + " " * p2_
             if any(map(lambda g: g not in op.vocabulary_, spl)):
                 # TODO: handle this case with an algorithm
                 # which is able to break a string into

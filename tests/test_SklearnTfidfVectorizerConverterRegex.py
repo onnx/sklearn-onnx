@@ -36,7 +36,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -59,7 +59,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11Regex4-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11OutVocabRegex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -132,7 +132,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -152,7 +152,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12SRegex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -174,7 +174,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -195,7 +195,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12L1Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -217,7 +217,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12L2Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -239,7 +239,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer13Regex-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -265,9 +265,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             basename="SklearnTfidfVectorizer11ParenthesisClassRegex-"
                      "OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.0') or "
-                          "StrictVersion(onnx.__version__) <= "
-                          "StrictVersion('1.4.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -304,7 +302,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             basename="SklearnTfidfVectorizer11ParenthesisIdRegex-"
                      "OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
 
 if __name__ == "__main__":

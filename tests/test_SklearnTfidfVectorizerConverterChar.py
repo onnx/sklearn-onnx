@@ -32,7 +32,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11CharW2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')",
+                          "StrictVersion('0.3.0')",
             verbose=False)
 
     @unittest.skipIf(
@@ -72,7 +72,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')",
+                          "StrictVersion('0.3.0')",
             verbose=False)
 
     @unittest.skipIf(
@@ -94,7 +94,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')",
+                          "StrictVersion('0.3.0')",
             verbose=False)
 
     @unittest.skipIf(
@@ -116,7 +116,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12L1Char-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')")
+                          "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -134,7 +134,8 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                          [('input', StringTensorType([1, 1]))])
             self.assertTrue(model_onnx is not None)
         except RuntimeError as e:
-            assert "Unable to split n-grams 's i s  '" in str(e)
+            if "Unable to split n-grams 'he  sec'" not in str(e):
+                raise e
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -155,7 +156,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11CharW2-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.1')",
+                          "StrictVersion('0.3.0')",
             verbose=False)
 
 

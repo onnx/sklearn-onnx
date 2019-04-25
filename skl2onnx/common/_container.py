@@ -23,7 +23,12 @@ def _get_operation_list():
     """
     regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
                        "\\[?input_name"),
-            re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name")]
+            re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
+                       "\\[\\]"),
+            re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
+                       "inputs"),
+            re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name"),
+            re.compile("op_type = '([A-Z][a-zA-Z0-9]*)'")]
     res = {}
     for k, v in dict_apply_operation.items():
         if k.startswith("apply_") and callable(v):
