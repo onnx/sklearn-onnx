@@ -100,20 +100,15 @@ def _get_weights(scope, container, topk_values_name, distance_power):
     return weights_name
 
 
-def _convert_k_neighbours_classifier(scope, container, operator, classes,
-                                     class_type, training_labels,
-                                     topk_values_name, topk_indices_name):
-    concat_labels_name = scope.get_unique_variable_name('concat_labels')
-    classes_name = scope.get_unique_variable_name('classes')
-    predicted_label_name = scope.get_unique_variable_name(
-        'predicted_label')
-    final_label_name = scope.get_unique_variable_name('final_label')
-    reshaped_final_label_name = scope.get_unique_variable_name(
-        'reshaped_final_label')
-    training_labels_name = scope.get_unique_variable_name(
-        'training_labels')
-    topk_labels_name = scope.get_unique_variable_name('topk_labels')
-
+def _get_probability_score(scope, container, operator,
+                           weights,
+                           topk_values_name, distance_power, topk_labels_name,
+                           classes):
+    """
+    Calculate the class probability scores, update the second output of
+    KNeighboursClassifier converter with the probability scores and
+    return it.
+    """
     labels_name = [None] * len(classes)
     output_label_name = [None] * len(classes)
     output_cast_label_name = [None] * len(classes)
@@ -130,6 +125,61 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
             'output_cast_label_{}'.format(i))
         output_label_reduced_name[i] = scope.get_unique_variable_name(
             'output_label_reduced_{}'.format(i))
+    if weights == 'distance':
+        weights_val = _get_weights(
+            scope, container, topk_values_name, distance_power)
+        for i in range(len(classes)):
+            weighted_distance_name = scope.get_unique_variable_name(
+                'weighted_distance')
+
+            container.add_node('Equal', [labels_name[i], topk_labels_name],
+                               output_label_name[i])
+            apply_cast(scope, output_label_name[i], output_cast_label_name[i],
+                       container, to=onnx_proto.TensorProto.FLOAT)
+            apply_mul(scope, [output_cast_label_name[i], weights_val],
+                      weighted_distance_name, container, broadcast=0)
+            container.add_node('ReduceSum', weighted_distance_name,
+                               output_label_reduced_name[i], axes=[1])
+    else:
+        for i in range(len(classes)):
+            container.add_node('Equal', [labels_name[i], topk_labels_name],
+                               output_label_name[i])
+            apply_cast(scope, output_label_name[i], output_cast_label_name[i],
+                       container, to=onnx_proto.TensorProto.INT32)
+            container.add_node('ReduceSum', output_cast_label_name[i],
+                               output_label_reduced_name[i], axes=[1])
+
+    concat_labels_name = scope.get_unique_variable_name('concat_labels')
+    cast_concat_labels_name = scope.get_unique_variable_name(
+        'cast_concat_labels')
+    normaliser_name = scope.get_unique_variable_name('normaliser')
+
+    apply_concat(scope, output_label_reduced_name,
+                 concat_labels_name, container, axis=1)
+    apply_cast(scope, concat_labels_name, cast_concat_labels_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    container.add_node('ReduceSum', cast_concat_labels_name,
+                       normaliser_name, axes=[1],
+                       name=scope.get_unique_operator_name('ReduceSum'))
+    apply_div(scope, [cast_concat_labels_name, normaliser_name],
+              operator.outputs[1].full_name, container, broadcast=1)
+    return operator.outputs[1].full_name
+
+
+def _convert_k_neighbours_classifier(scope, container, operator, classes,
+                                     class_type, training_labels,
+                                     topk_values_name, topk_indices_name,
+                                     distance_power, weights):
+    classes_name = scope.get_unique_variable_name('classes')
+    predicted_label_name = scope.get_unique_variable_name(
+        'predicted_label')
+    final_label_name = scope.get_unique_variable_name('final_label')
+    reshaped_final_label_name = scope.get_unique_variable_name(
+        'reshaped_final_label')
+    training_labels_name = scope.get_unique_variable_name(
+        'training_labels')
+    topk_labels_name = scope.get_unique_variable_name('topk_labels')
+
 
     container.add_initializer(classes_name, class_type,
                               classes.shape, classes)
@@ -142,17 +192,11 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
         topk_labels_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
-    for i in range(len(classes)):
-        container.add_node('Equal', [labels_name[i], topk_labels_name],
-                           output_label_name[i])
-        apply_cast(scope, output_label_name[i], output_cast_label_name[i],
-                   container, to=onnx_proto.TensorProto.INT32)
-        container.add_node('ReduceSum', output_cast_label_name[i],
-                           output_label_reduced_name[i], axes=[1])
 
-    apply_concat(scope, [s for s in output_label_reduced_name],
-                 concat_labels_name, container, axis=0)
-    container.add_node('ArgMax', concat_labels_name,
+    proba = _get_probability_score(scope, container, operator,
+                                   weights, topk_values_name, distance_power,
+                                   topk_labels_name, classes)
+    container.add_node('ArgMax', proba,
                        predicted_label_name,
                        name=scope.get_unique_operator_name('ArgMax'))
     container.add_node(
@@ -169,34 +213,6 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
         apply_reshape(scope, final_label_name,
                       operator.outputs[0].full_name, container,
                       desired_shape=(-1,))
-
-    # Calculation of class probability
-    pred_label_shape = [-1]
-
-    cast_pred_label_name = scope.get_unique_variable_name(
-        'cast_pred_label')
-    reshaped_pred_label_name = scope.get_unique_variable_name(
-        'reshaped_pred_label')
-    ohe_result_name = scope.get_unique_variable_name('ohe_result')
-
-    apply_cast(scope, topk_labels_name, cast_pred_label_name, container,
-               to=onnx_proto.TensorProto.INT64)
-    apply_reshape(scope, cast_pred_label_name, reshaped_pred_label_name,
-                  container, desired_shape=pred_label_shape)
-    if class_type == onnx_proto.TensorProto.STRING:
-        container.add_node(
-            'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
-            name=scope.get_unique_operator_name('OneHotEncoder'),
-            cats_strings=classes, op_domain='ai.onnx.ml')
-    else:
-        container.add_node(
-            'OneHotEncoder', reshaped_pred_label_name, ohe_result_name,
-            name=scope.get_unique_operator_name('OneHotEncoder'),
-            cats_int64s=classes, op_domain='ai.onnx.ml')
-
-    container.add_node(
-        'ReduceMean', ohe_result_name, operator.outputs[1].full_name,
-        name=scope.get_unique_operator_name('ReduceMean'), axes=[0])
 
 
 def _convert_k_neighbours_regressor(scope, container, new_training_labels,
@@ -400,7 +416,8 @@ def convert_sklearn_knn(scope, operator, container):
 
         _convert_k_neighbours_classifier(
             scope, container, operator, classes, class_type, training_labels,
-            topk_values_name, topk_indices_name)
+            topk_values_name, topk_indices_name, distance_power,
+            knn.weights)
     elif operator.type == 'SklearnKNeighborsRegressor':
         multi_reg = (len(training_labels.shape) > 1 and
                      (len(training_labels.shape) > 2 or
