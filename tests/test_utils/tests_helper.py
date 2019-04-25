@@ -599,7 +599,7 @@ def stat_model_skl(model):
     Computes statistics on the sklearn model.
     """
     try:
-        with open(model, "rb") as f:        
+        with open(model, "rb") as f:
             obj = pickle.load(f)
     except EOFError:
         return {"nb_estimators": 0}
