@@ -226,7 +226,11 @@ def dump_data_and_model(
         dest = os.path.join(folder, basename + ".model.pkl")
         names.append(dest)
         with open(dest, "wb") as f:
-            pickle.dump(model, f)
+            try:
+                pickle.dump(model, f)
+            except AttributeError as e:
+                print("[dump_data_and_model] cannot pickle model "
+                      "'{}' due to {}.".format(dest, e))
 
     if dump_error_log:
         error_dump = os.path.join(folder, basename + ".err")
@@ -594,8 +598,11 @@ def stat_model_skl(model):
     """
     Computes statistics on the sklearn model.
     """
-    with open(model, "rb") as f:
-        obj = pickle.load(f)
+    try:
+        with open(model, "rb") as f:
+            obj = pickle.load(f)
+    except EOFError:
+        return {"nb_estimators": 0}
     return {"nb_estimators": get_nb_skl_objects(obj)}
 
 
