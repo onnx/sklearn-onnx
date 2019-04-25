@@ -1,5 +1,5 @@
 """
-Tests scikit-learn's tfidf converter.
+Tests scikit-learn's count vectorizer converter.
 """
 import unittest
 from distutils.version import StrictVersion
