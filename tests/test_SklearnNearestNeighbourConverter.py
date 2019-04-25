@@ -49,8 +49,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor2_1(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
-        model_onnx = convert_sklearn(model, 'KNN regressor', [('input',
-                                     FloatTensorType([1, 4]))])
+        model_onnx = convert_sklearn(model, 'KNN regressor',
+                                     [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2], model, model_onnx,
@@ -62,8 +62,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2),
                                    n_targets=2)
-        model_onnx = convert_sklearn(model, 'KNN regressor', [('input',
-                                     FloatTensorType([1, 4]))])
+        model_onnx = convert_sklearn(model, 'KNN regressor',
+                                     [('input', FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2], model, model_onnx,
@@ -101,8 +101,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(
             KNeighborsClassifier())
-        model_onnx = convert_sklearn(model, 'KNN classifier binary', [('input',
-                                     FloatTensorType([1, 3]))])
+        model_onnx = convert_sklearn(model, 'KNN classifier binary',
+                                     [('input', FloatTensorType([1, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
@@ -129,6 +129,32 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             "== StrictVersion('1.1.2') or "
             "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
             "or StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+
+    def test_model_knn_classifier_weights_distance(self):
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier(weights='distance'))
+        model_onnx = convert_sklearn(
+            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7], model, model_onnx,
+            basename="SklearnKNeighborsClassifierWeightsDistance-OneOffArray",
+            allow_failure="StrictVersion(onnxruntime.__version__) <= "
+            "StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+
+    def test_model_knn_classifier_metric_cityblock(self):
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier(metric='cityblock'))
+        model_onnx = convert_sklearn(
+            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7], model, model_onnx,
+            basename="SklearnKNeighborsClassifierMetricCityblock-OneOffArray",
+            allow_failure="StrictVersion(onnxruntime.__version__) <= "
+            "StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
 
 
 if __name__ == "__main__":

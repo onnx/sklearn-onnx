@@ -100,8 +100,7 @@ def _get_weights(scope, container, topk_values_name, distance_power):
     return weights_name
 
 
-def _get_probability_score(scope, container, operator,
-                           weights,
+def _get_probability_score(scope, container, operator, weights,
                            topk_values_name, distance_power, topk_labels_name,
                            classes):
     """
@@ -170,6 +169,9 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
                                      class_type, training_labels,
                                      topk_values_name, topk_indices_name,
                                      distance_power, weights):
+    """
+    Convert KNeighboursClassifier model to onnx format.
+    """
     classes_name = scope.get_unique_variable_name('classes')
     predicted_label_name = scope.get_unique_variable_name(
         'predicted_label')
@@ -180,13 +182,12 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
         'training_labels')
     topk_labels_name = scope.get_unique_variable_name('topk_labels')
 
-
     container.add_initializer(classes_name, class_type,
                               classes.shape, classes)
-
     container.add_initializer(
         training_labels_name, onnx_proto.TensorProto.INT32,
         training_labels.shape, training_labels.ravel())
+
     container.add_node(
         'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
         topk_labels_name, op_domain='ai.onnx.ml',
@@ -219,6 +220,9 @@ def _convert_k_neighbours_regressor(scope, container, new_training_labels,
                                     new_training_labels_shape,
                                     topk_values_name, topk_indices_name,
                                     distance_power, weights):
+    """
+    Convert KNeighboursRegressor model to onnx format.
+    """
     training_labels_name = scope.get_unique_variable_name(
         'training_labels')
     topk_labels_name = scope.get_unique_variable_name('topk_labels')
@@ -257,6 +261,9 @@ def _convert_k_neighbours_regressor(scope, container, new_training_labels,
 
 
 def convert_sklearn_knn(scope, operator, container):
+    """
+    Converter for KNN models to onnx format.
+    """
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only
