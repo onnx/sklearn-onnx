@@ -14,7 +14,7 @@ from test_utils import dump_data_and_model
 class TestSklearnCountVectorizerBug(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer_custom(self):
         corpus = numpy.array([
@@ -24,7 +24,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
             '1 2 3 4',
             '1 2 3 4+',
         ]).reshape((5, 1))
-        vect = CountVectorizer(ngram_range=(1, 1), tokenizer = lambda s: [s])
+        vect = CountVectorizer(ngram_range=(1, 1),
+                               tokenizer=lambda s: [s])
         vect.fit(corpus.ravel())
 
         extra = {
