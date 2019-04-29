@@ -192,8 +192,6 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
         'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
         topk_labels_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-
-
     proba = _get_probability_score(scope, container, operator,
                                    weights, topk_values_name, distance_power,
                                    topk_labels_name, classes)
