@@ -1,0 +1,99 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+
+jobs:
+
+- job: 'Test'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Py36-Onnx141:
+        python.version: '3.6'
+        numpy.version: '==1.16.2'
+        onnx.version: '==1.4.1'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.20.3'
+    maxParallel: 3
+
+  steps:
+  - task: CondaEnvironment@1
+    inputs:
+      createCustomEnvironment: true
+      environmentName: 'py$(python.version)'
+      packageSpecs: 'python=$(python.version)'
+
+  - script: |
+      conda config --set always_yes yes --set changeps1 no
+      conda install -c conda-forge numpy$(numpy.version)
+      conda install protobuf
+      python -m pip install --upgrade pip
+    displayName: 'Install environment'
+
+  - script: |
+      pip install numpy$(numpy.version)
+    displayName: 'install numpy'
+
+  - script: |
+      pip install scikit-learn$(sklearn.version)
+    displayName: 'install scikit-learn'
+
+  - script: |
+      pip install onnx$(onnx.version)
+    displayName: 'install onnx'
+
+  - script: |
+      pip install $(onnxrt.version)
+    displayName: 'install onnxruntime'
+
+  - script: |
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+      pip install pytest
+    displayName: 'install requirements'
+
+  - script: |
+      pip install -e .
+    displayName: 'install'
+
+  - script: |
+      echo "---------------"
+      pip show numpy
+      echo "---------------"
+      pip show onnx
+      echo "---------------"
+      pip show onnxruntime
+      echo "---------------"
+      pip show onnxconverter-common
+      echo "---------------"
+      pip show scikit-learn
+      echo "---------------"
+    displayName: 'version'
+
+  - script: |
+      pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+    displayName: 'pytest'
+
+  - script: |
+      pip install onnxmltools openpyxl
+      coverage run --include=skl2onnx/** tests/benchmark.py
+      coverage report -m
+      coverage html
+    displayName: 'coverage'
+
+  - script: |
+      python tests/benchmark.py
+    displayName: 'benchmark'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testCoverageFiles: 'htmlcov/**'
+      testBenchmarkFiles: 'TESTDUMP/*.xlsx'
+      testRunTitle: 'Python $(python.version)'
+    condition: succeededOrFailed()
