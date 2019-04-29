@@ -96,6 +96,14 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
+      pip install flake8
+    displayName: 'install flake8'
+
+  - script: |
+      flake8 skl2onnx tests
+    displayName: 'flake8'
+
+  - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
