@@ -199,7 +199,7 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
                                    topk_labels_name, classes)
     container.add_node('ArgMax', proba,
                        predicted_label_name,
-                       name=scope.get_unique_operator_name('ArgMax'))
+                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, predicted_label_name],
         final_label_name, op_domain='ai.onnx.ml',
