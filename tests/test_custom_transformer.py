@@ -166,7 +166,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             model_onnx,
             basename="CustomTransformerTSNEkNN-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
-                          "== StrictVersion('1.4.1')",
+                          "<= StrictVersion('1.5')",
         )
 
         trace_line = []
