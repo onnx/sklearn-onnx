@@ -9,8 +9,9 @@ import re
 import six
 import sys
 import traceback
+import warnings
+from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import helper
-from ._apply_operation import __dict__ as dict_apply_operation
 from .interface import ModelContainer
 from .utils import get_domain
 
@@ -22,7 +23,12 @@ def _get_operation_list():
     """
     regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
                        "\\[?input_name"),
-            re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name")]
+            re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
+                       "\\[\\]"),
+            re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
+                       "inputs"),
+            re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name"),
+            re.compile("op_type = '([A-Z][a-zA-Z0-9]*)'")]
     res = {}
     for k, v in dict_apply_operation.items():
         if k.startswith("apply_") and callable(v):
@@ -34,8 +40,8 @@ def _get_operation_list():
                     found = g.groups()[0]
                     break
             if found is None:
-                raise RuntimeError("Unable to find an ONNX name in function "
-                                   "'{0}', source=\n{1}".format(k, source))
+                warnings.warn("Unable to find an ONNX name in function "
+                              "'{0}', source=\n{1}".format(k, source))
             res[found] = v
     return res
 

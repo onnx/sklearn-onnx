@@ -2,6 +2,20 @@
 # Create and test a Python package on multiple Python versions.
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# Python 3.7 test was disabled.
+#      Py37-SklGit:
+#        python.version: '3.7'
+#        onnx.version: 'git'
+#        onnxrt.version: '==0.3.0'
+#        numpy.version: '==1.16.2'
+#        sklearn.version: 'git'
+#      Py37-Skl0192:
+#        python.version: '3.7'
+#        onnx.version: 'git'
+#        onnxrt.version: '==0.3.0'
+#        numpy.version: '==1.16.2'
+#        sklearn.version: '==0.19.2'
+
 
 trigger:
 - master
@@ -20,7 +34,7 @@ jobs:
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
       Py36-Onnx141:
-        python.version: '3.7'
+        python.version: '3.6'
         numpy.version: '==1.16.2'
         onnx.version: '==1.4.1'
         onnxrt.version: '==0.3.0'
@@ -37,18 +51,6 @@ jobs:
         onnx.version: 'git'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
-      Py37-SklGit:
-        python.version: '3.7'
-        onnx.version: 'git'
-        onnxrt.version: '==0.3.0'
-        numpy.version: '==1.16.2'
-        sklearn.version: 'git'
-      Py37-Skl0192:
-        python.version: '3.7'
-        onnx.version: 'git'
-        onnxrt.version: '==0.3.0'
-        numpy.version: '==1.16.2'
-        sklearn.version: '==0.19.2'
     maxParallel: 3
 
   steps:
@@ -60,15 +62,11 @@ jobs:
 
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
-      conda config --set always_yes yes --set changeps1 no      
+      conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge numpy$(numpy.version)
       conda install protobuf
-      python -m pip install --upgrade pip      
+      python -m pip install --upgrade pip
     displayName: 'Install environment'
-
-  - script: |
-      pip install flake8
-    displayName: 'install flake8'
 
   - script: |
       pip install numpy$(numpy.version)
@@ -118,6 +116,8 @@ jobs:
       pip show onnx
       echo "---------------"
       pip show onnxruntime
+      echo "---------------"
+      pip show onnxconverter-common
       echo "---------------"
       pip show scikit-learn
       echo "---------------"

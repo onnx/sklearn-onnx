@@ -14,27 +14,40 @@ from test_utils import dump_data_and_model
 
 
 class TestSklearnKMeansModel(unittest.TestCase):
-
     def test_kmeans_clustering(self):
         data = load_iris()
         X = data.data
         model = KMeans(n_clusters=3)
         model.fit(X)
-        model_onnx = convert_sklearn(model, 'kmeans', [('input', FloatTensorType([1, 4]))])
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X.astype(numpy.float32)[40:60], model, model_onnx, basename="SklearnKMeans-Dec4",
-                            # Operator gemm is not implemented in onnxruntime
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_data_and_model(
+            X.astype(numpy.float32)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnKMeans-Dec4",
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
 
     def test_batchkmeans_clustering(self):
         data = load_iris()
         X = data.data
         model = MiniBatchKMeans(n_clusters=3)
         model.fit(X)
-        model_onnx = convert_sklearn(model, 'kmeans', [('input', FloatTensorType([1, 4]))])
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", FloatTensorType([1, 4]))])
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(X.astype(numpy.float32)[40:60], model, model_onnx, basename="SklearnKMeans-Dec4",
-                            allow_failure="StrictVersion(onnx.__version__) < StrictVersion('1.2')")
+        dump_data_and_model(
+            X.astype(numpy.float32)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnKMeans-Dec4",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
 
 
 if __name__ == "__main__":
