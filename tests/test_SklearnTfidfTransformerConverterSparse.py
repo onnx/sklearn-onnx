@@ -48,7 +48,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
             basename="SklearnPipelineTfidfTransformer",
             # Operator mul is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
-                          " <= StrictVersion('1.4.1')",
+                          " <= StrictVersion('1.5')",
         )
 
 
