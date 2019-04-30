@@ -155,6 +155,32 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             "or StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
         )
 
+    def test_model_knn_classifier_weights_distance(self):
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier(weights='distance'))
+        model_onnx = convert_sklearn(
+            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7], model, model_onnx,
+            basename="SklearnKNeighborsClassifierWeightsDistance-OneOffArray",
+            allow_failure="StrictVersion(onnxruntime.__version__) <= "
+            "StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+
+    def test_model_knn_classifier_metric_cityblock(self):
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier(metric='cityblock'))
+        model_onnx = convert_sklearn(
+            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7], model, model_onnx,
+            basename="SklearnKNeighborsClassifierMetricCityblock-OneOffArray",
+            allow_failure="StrictVersion(onnxruntime.__version__) <= "
+            "StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+
 
 if __name__ == "__main__":
     unittest.main()
