@@ -34,7 +34,8 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         # gets the probability for the class 1
         p1 = scope.get_unique_variable_name('probY_%d' % i)
         apply_slice(scope, prob_name.raw_name, p1, container, starts=[1],
-                    ends=[2], axes=[1])
+                    ends=[2], axes=[1],
+                    operator_name=scope.get_unique_operator_name('Slice'))
 
         probs_names.append(p1)
 
