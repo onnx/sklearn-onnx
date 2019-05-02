@@ -196,7 +196,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                 'is_case_sensitive': not op.lowercase,
             })
             op_version = 10
-            domain = 'ai.onnx'
+            domain = ''
         else:
             attrs.update({
                 'casechangeaction': 'LOWER',
