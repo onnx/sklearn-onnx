@@ -100,10 +100,6 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx tests
-    displayName: 'flake8'
-
-  - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
@@ -134,6 +130,12 @@ jobs:
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
+
+  # Check flake8 after the tests to get more feedback.
+  # It is checked before the tests on the windows build.
+  - script: |
+      flake8 skl2onnx tests
+    displayName: 'flake8'
 
   - script: |
       pip install onnxmltools openpyxl
