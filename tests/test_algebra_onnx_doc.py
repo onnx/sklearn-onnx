@@ -4,23 +4,22 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 from onnx import helper
-from onnx import AttributeProto, TensorProto, GraphProto
+from onnx import TensorProto
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
 
 
 class TestAlgebraOnnxDoc(unittest.TestCase):
-    
+
     def setUp(self):
         self._algebra = dynamic_class_creation()
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_pad(self):
-        from skl2onnx.algebra.onnx_ops import OnnxPad        
-        
+        from skl2onnx.algebra.onnx_ops import OnnxPad
+
         X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
-        Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [1, 4])        
 
         pad = OnnxPad('X', output_names=['Y'],
                       mode='constant', value=1.5,
@@ -59,7 +58,6 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     def test_doc_sklearn(self):
         rst = get_rst_doc_sklearn()
         assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
-
 
 
 if __name__ == "__main__":
