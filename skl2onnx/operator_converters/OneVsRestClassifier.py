@@ -7,7 +7,7 @@
 from ..common._apply_operation import apply_concat
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
-from ..common._apply_operation import apply_normalization
+from ..common._apply_operation import apply_normalization, apply_slice
 from ..common.utils_classifier import _finalize_converter_classes
 from .._supported_operators import sklearn_operator_name_map
 
@@ -33,9 +33,9 @@ def convert_one_vs_rest_classifier(scope, operator, container):
 
         # gets the probability for the class 1
         p1 = scope.get_unique_variable_name('probY_%d' % i)
-        container.add_node('Slice', prob_name.raw_name, p1,
-                           name=scope.get_unique_operator_name('Slice'),
-                           axes=[1], starts=[1], ends=[2])
+        apply_slice(scope, prob_name.raw_name, p1, container, starts=[1],
+                    ends=[2], axes=[1],
+                    operator_name=scope.get_unique_operator_name('Slice'))
 
         probs_names.append(p1)
 
