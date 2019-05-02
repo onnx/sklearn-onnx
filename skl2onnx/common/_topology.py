@@ -14,13 +14,14 @@ from ..proto import helper
 from ..proto import get_opset_number_from_onnx
 from . import _registration
 from . import utils
-from .data_types import FloatType, Int64Type, StringType
-from .data_types import DictionaryType, FloatTensorType # noqa
-from .data_types import Int64TensorType, SequenceType # noqa
-from .data_types import StringTensorType, DoubleTensorType # noqa
-from .data_types import Int32TensorType, BooleanTensorType # noqa
+from onnxconverter_common.data_types import FloatType, Int64Type, StringType
+from onnxconverter_common.data_types import DictionaryType, FloatTensorType # noqa
+from onnxconverter_common.data_types import Int64TensorType, SequenceType # noqa
+from onnxconverter_common.data_types import StringTensorType, DoubleTensorType # noqa
+from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType # noqa
 from ._container import ModelComponentContainer
 from .interface import OperatorBase
+type_fct = type
 
 
 class Variable:
@@ -57,16 +58,18 @@ class Variable:
                 self.type))
         if isinstance(self.type, TensorType):
             shape = self.type.shape
-            if isinstance(shape, (list, tuple)):
-                for dim in shape:
-                    if dim == 'None':
-                        continue
-                    if not isinstance(dim, (int, np.int32, np.int64)):
-                        raise TypeError("shape must contains integers not "
-                                        "'{}'.".format(dim))
-            else:
-                raise TypeError("shape must be a tuple or a list not "
-                                "{}.".format(type(shape)))
+            if not isinstance(shape, (list, tuple)):
+                try:
+                    shape = list(shape)
+                except TypeError as e:
+                    raise TypeError("shape must be a tuple or a list not "
+                                    "{}.".format(type_fct(shape)))
+            for dim in shape:
+                if dim == 'None':
+                    continue
+                if not isinstance(dim, (int, np.int32, np.int64)):
+                    raise TypeError("shape must contains integers not "
+                                    "'{}'.".format(dim))
 
     @property
     def full_name(self):

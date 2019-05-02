@@ -261,7 +261,8 @@ class OnnxOperator:
         scope = Scope(model_name, target_opset=target_opset,
                       variable_name_set=set(_[0] for _ in inputs))
         for inp in inputs:
-            container.add_input(Variable(inp[0], inp[0], scope, inp[1]))
+            container.add_input(Variable(inp[0], inp[0],
+                                         scope=scope, type=inp[1]))
         self.add_to(scope, container)
 
         # infer shapes

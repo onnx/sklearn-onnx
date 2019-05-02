@@ -37,13 +37,20 @@ class TestMetaOnnx(unittest.TestCase):
                     'Cast',  # unsupported type
                     'Compress',  # shape inference fails
                     # Input X must be 4-dimensional. X: {1,1,3}
+                    'ConvInteger',
                     'ConvTranspose',
+                    'DequantizeLinear',
                     'Expand',  # shape inference fails
+                    'MatMulInteger',
                     'MaxPool',  # issue with ceil_mode
+                    'Mod',
+                    'QLinearConv',
+                    'QLinearMatMul',
+                    "QuantizeLinear",
                     'Scan',  # Graph attribute inferencing returned type
                     # information for 2 outputs. Expected 1
                     # Node () has input size 5 not in range [min=1, max=1].
-                    'Slice',
+                    "Upsample",
                     }
         folder = os.path.dirname(onnx.__file__)
         folder = os.path.join(folder, "backend", "test", "data", "node")
@@ -144,15 +151,21 @@ class TestMetaOnnx(unittest.TestCase):
             # not supported
             return (node.op_type, False,
                     "Unsupported type {}".format(inps[0].data_type))
-        if inps[0].data_type not in (onnx_proto.TensorProto.INT32,
-                                     onnx_proto.TensorProto.INT64,
-                                     onnx_proto.TensorProto.FLOAT,
-                                     onnx_proto.TensorProto.DOUBLE,
-                                     onnx_proto.TensorProto.BOOL,
-                                     onnx_proto.TensorProto.STRING):
+        expected_data_type = (onnx_proto.TensorProto.UINT8,
+                              onnx_proto.TensorProto.INT32,
+                              onnx_proto.TensorProto.INT64,
+                              onnx_proto.TensorProto.FLOAT,
+                              onnx_proto.TensorProto.DOUBLE,
+                              onnx_proto.TensorProto.BOOL,
+                              onnx_proto.TensorProto.STRING)
+        if inps[0].data_type not in expected_data_type:
+            if node.op_type in untested:
+                return (node.op_type, False,
+                        "unexpected data_type {} not in {}".format(
+                            inps[0].data_type, expected_data_type))
             raise NotImplementedError(
-                "Unexpected data_type {}\n{}".format(
-                    inps[0].data_type, inps[0]))
+                "Unexpected data_type {}: {}\n---\n{}\n---".format(
+                    inps[0].data_type, node.op_type, inps[0]))
 
         # prepare the inputs
         inp_arrays = [numpy_helper.to_array(inp) for inp in inps]
@@ -205,7 +218,7 @@ class TestMetaOnnx(unittest.TestCase):
                 ort_inputs = {'I%d' % i: inp for i, inp in enumerate(inps)}
                 try:
                     onx2 = op.to_onnx(ort_inputs)
-                except (RuntimeError, NotImplementedError) as e:
+                except (RuntimeError, NotImplementedError, TypeError) as e:
                     if node.op_type in untested:
                         return (node.op_type, False,
                                 "cannot load skl2onnx model {}".format(e))
