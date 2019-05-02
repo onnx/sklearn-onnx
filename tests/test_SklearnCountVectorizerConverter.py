@@ -34,11 +34,11 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer11-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.1')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer22(self):
         corpus = numpy.array([
@@ -58,11 +58,11 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer22-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer12(self):
         corpus = numpy.array([
@@ -82,11 +82,11 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer12-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.0')",
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer13(self):
         corpus = numpy.array([
@@ -106,7 +106,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnCountVectorizer13-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
+                          " <= StrictVersion('0.3.0')",
         )
 
 

@@ -25,15 +25,17 @@ def _intelligent_split(text, op, tokenizer, existing):
             # Every element is in the vocabulary.
             # Naive method
             p1 = len(text) - len(text.lstrip())
-            p2 = len(text) - len(text.rstrip())
-            if p2 == 0:
+            p2_ = len(text) - len(text.rstrip())
+            if p2_ == 0:
                 p2 = len(text)
-            spl = text[p1:-p2].split()
-            if len(spl) == 0:
+            else:
+                p2 = -p2_
+            spl = text[p1:p2].split()
+            if len(spl) <= 1:
                 spl = [text]
             else:
                 spl[0] = " " * p1 + spl[0]
-                spl[-1] = spl[-1] + " " * p2
+                spl[-1] = spl[-1] + " " * p2_
             if any(map(lambda g: g not in op.vocabulary_, spl)):
                 # TODO: handle this case with an algorithm
                 # which is able to break a string into
@@ -52,7 +54,8 @@ def _intelligent_split(text, op, tokenizer, existing):
     if spl in existing:
         raise RuntimeError("The converter cannot guess how to "
                            "split an expression into tokens.")
-    if op.ngram_range[0] == 1:
+    if op.ngram_range[0] == 1 and \
+            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
@@ -184,27 +187,29 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
-
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
-        attrs.update({
-            'case_change_action': 'LOWER',
-            'is_case_sensitive': not op.lowercase,
-        })
+        normalized = scope.get_unique_variable_name('normalized')
+        if container.target_opset >= 10:
+            attrs.update({
+                'case_change_action': 'LOWER',
+                'is_case_sensitive': not op.lowercase,
+            })
+            op_version = 10
+            domain = 'ai.onnx'
+        else:
+            attrs.update({
+                'casechangeaction': 'LOWER',
+                'is_case_sensitive': not op.lowercase,
+            })
+            op_version = 9
+            domain = 'com.microsoft'
+
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
-        normalized = scope.get_unique_variable_name('normalized')
-        if container.target_opset <= 9:
-            domain = 'com.microsoft'
-            op_version = container.target_opset
-            attrs['casechangeaction'] = attrs['case_change_action']
-            del attrs['case_change_action']
-        else:
-            domain = ''
-            op_version = 10
         container.add_node(op_type, operator.input_full_names,
-                           normalized, op_domain=domain,
-                           op_version=op_version, **attrs)
+                           normalized, op_version=op_version,
+                           op_domain=domain, **attrs)
     else:
         normalized = operator.input_full_names
 

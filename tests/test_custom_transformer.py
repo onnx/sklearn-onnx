@@ -167,7 +167,7 @@ class TestCustomTransformer(unittest.TestCase):
             model_onnx,
             basename="CustomTransformerTSNEkNN-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
-                          "== StrictVersion('1.4.1')",
+                          "<= StrictVersion('1.5')",
         )
 
         trace_line = []
@@ -191,7 +191,7 @@ class TestCustomTransformer(unittest.TestCase):
             model_onnx,
             basename="CustomTransformerTSNEkNNCustomParser-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
+            "<= StrictVersion('1.5')",
         )
 
         update_registered_parser(PredictableTSNE, my_parser)
