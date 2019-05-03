@@ -10,6 +10,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn
+from onnxruntime import InferenceSession
 from test_utils import dump_data_and_model
 
 
@@ -249,7 +250,10 @@ class TestSklearnSVM(unittest.TestCase):
                           " < StrictVersion('1.2')",
         )
 
-    def testlinear_svc_iris(self):        
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.2.1"),
+        reason="Requires onnxruntime 0.3.0")
+    def testlinear_svc_iris(self):
         data = load_iris()
         X = data.data
         y = data.target
@@ -263,7 +267,6 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(model, 'cccv',
                                      [('input',
                                        FloatTensorType(X_test.shape))])
-        from onnxruntime import InferenceSession
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X_test.astype(numpy.float32)})
         numpy.mean(numpy.isclose(list(map(lambda x: [x[0], x[1],
