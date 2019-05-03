@@ -13,10 +13,10 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py36-Onnx141-nightlyRT-Npy1154:
-        python.version: '3.6.7'
-        onnx.version: 'onnx==1.4.1'
-        numpy.version: 'numpy==1.16.2'
+      Py37-Onnx150-nightlyRT-Npy1154:
+        python.version: '3.7.3'
+        onnx.version: 'onnx==1.5.0'
+        numpy.version: 'numpy==1.16.3'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
     maxParallel: 3

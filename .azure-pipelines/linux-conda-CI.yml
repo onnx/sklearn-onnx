@@ -27,11 +27,11 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-OnnxGit:
+      Py37-OnnxGit-Rt040:
         python.version: '3.7'
         numpy.version: '==1.16.2'
         onnx.version: 'git'
-        onnxrt.version: '==0.2.1'
+        onnxrt.version: '==0.4.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx141:
         python.version: '3.6'
@@ -100,10 +100,6 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx tests
-    displayName: 'flake8'
-
-  - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
@@ -134,6 +130,12 @@ jobs:
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
+
+  # Check flake8 after the tests to get more feedback.
+  # It is checked before the tests on the windows build.
+  - script: |
+      flake8 skl2onnx tests
+    displayName: 'flake8'
 
   - script: |
       pip install onnxmltools openpyxl
