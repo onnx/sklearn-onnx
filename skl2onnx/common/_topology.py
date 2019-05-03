@@ -61,7 +61,7 @@ class Variable:
             if not isinstance(shape, (list, tuple)):
                 try:
                     shape = list(shape)
-                except TypeError as e:
+                except TypeError:
                     raise TypeError("shape must be a tuple or a list not "
                                     "{}.".format(type_fct(shape)))
             for dim in shape:
