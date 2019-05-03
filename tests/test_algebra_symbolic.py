@@ -3,11 +3,12 @@ import warnings
 from distutils.version import StrictVersion
 import onnx
 import numpy
+from numpy.random import rand
 from numpy.testing import assert_almost_equal
 from skl2onnx.common.data_types import FloatTensorType
 try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
-    from skl2onnx.algebra.onnx_ops import OnnxSplit
+    from skl2onnx.algebra.onnx_ops import OnnxSplit, OnnxScaler
 except ImportError:
     warnings.warn(
         'Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.')
@@ -155,6 +156,43 @@ class TestAlgebraSymbolic(unittest.TestCase):
         assert len(Y) == len(exp)
         assert_almost_equal(exp[0], Y[0])
         assert_almost_equal(exp[1], Y[1])
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    @unittest.skipIf(OnnxAbs is None,
+                     reason="Cannot infer operators with current ONNX")
+    def test_cascade_scaler(self):
+
+        def generate_onnx_graph(dim, nbnode, input_name='X1'):
+            matrices = []
+            scale = list(numpy.ones((1, dim)).ravel())
+            i1 = input_name
+            for i in range(nbnode - 1):
+                i2 = list(rand(1, dim).ravel())
+                matrices.append(i2)
+                node = OnnxScaler(i1, offset=i2, scale=scale)
+                i1 = node
+            i2 = list(rand(1, dim).ravel())
+            matrices.append(i2)
+            node = OnnxScaler(i1, offset=i2, scale=scale, output_names=['Y'])
+            onx = node.to_onnx([(input_name, FloatTensorType((1, dim)))],
+                               outputs=[('Y', FloatTensorType((1, dim)))])
+            return onx, matrices
+
+        import onnxruntime as ort
+        dim = 5
+        for nbnode in range(1, 4):
+            onx = generate_onnx_graph(dim, nbnode)[0]
+            X = rand(1, dim)
+            try:
+                sess = ort.InferenceSession(onx.SerializeToString())
+            except RuntimeError as e:
+                raise RuntimeError("Loading error:\n{}\n{}".format(e, onx))
+            try:
+                Y = sess.run(None, {'X1': X.astype(numpy.float32)})[0]
+            except RuntimeError as e:
+                raise RuntimeError("Run error:\n{}\n{}".format(e, onx))
+            assert X.shape == Y.shape
 
 
 if __name__ == "__main__":
