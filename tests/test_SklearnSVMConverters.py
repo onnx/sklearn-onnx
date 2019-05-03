@@ -4,9 +4,12 @@ Tests scikit-linear converter.
 import unittest
 import numpy
 from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import SGDClassifier
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
-from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
 from test_utils import dump_data_and_model
 
 
@@ -241,6 +244,27 @@ class TestSklearnSVM(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+
+    def testlinear_svc_iris(self):        
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.5, random_state=42)
+
+        clf = SGDClassifier().fit(X_train, y_train)
+        model = CalibratedClassifierCV(clf, cv='prefit').fit(
+            X_train, y_train)
+
+        model_onnx = convert_sklearn(model, 'cccv',
+                                     [('input',
+                                       FloatTensorType(X_test.shape))])
+        from onnxruntime import InferenceSession
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X_test.astype(numpy.float32)})
+        numpy.mean(numpy.isclose(list(map(lambda x: [x[0], x[1],
+                                                     x[2]], res[1])),
+                                 model.predict_proba(X_test)))
 
 
 if __name__ == "__main__":

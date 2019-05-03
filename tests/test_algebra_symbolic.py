@@ -38,7 +38,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, numpy.abs(X))
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
                      reason="not available")
     @unittest.skipIf(True or OnnxAbs is None,
                      reason="shape inference fails for Normalizer")

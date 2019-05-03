@@ -6,6 +6,7 @@ import contextlib
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
+import onnxruntime
 from onnx import numpy_helper, helper
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra import OnnxOperator
@@ -30,8 +31,8 @@ class TestMetaOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
                      reason="too unstable with older versions")
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(StrictVersion(onnxruntime.__version__) < StrictVersion("0.4.0"),
+                     reason="too unstable with older versions")
     def test_onnx_spec(self):
         untested = {'AveragePool',  # issue with ceil_mode
                     'Cast',  # unsupported type
