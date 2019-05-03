@@ -3,6 +3,7 @@ Tests scikit-linear converter.
 """
 import unittest
 import numpy
+from distutils.version import StrictVersion
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import SGDClassifier
@@ -10,6 +11,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn
+import onnxruntime
 from onnxruntime import InferenceSession
 from test_utils import dump_data_and_model
 
