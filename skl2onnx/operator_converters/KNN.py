@@ -176,8 +176,6 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
     predicted_label_name = scope.get_unique_variable_name(
         'predicted_label')
     final_label_name = scope.get_unique_variable_name('final_label')
-    reshaped_final_label_name = scope.get_unique_variable_name(
-        'reshaped_final_label')
     training_labels_name = scope.get_unique_variable_name(
         'training_labels')
     topk_labels_name = scope.get_unique_variable_name('topk_labels')
@@ -203,6 +201,9 @@ def _convert_k_neighbours_classifier(scope, container, operator, classes,
         final_label_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     if class_type == onnx_proto.TensorProto.INT32:
+        reshaped_final_label_name = scope.get_unique_variable_name(
+            'reshaped_final_label')
+
         apply_reshape(scope, final_label_name, reshaped_final_label_name,
                       container, desired_shape=(-1,))
         apply_cast(scope, reshaped_final_label_name,

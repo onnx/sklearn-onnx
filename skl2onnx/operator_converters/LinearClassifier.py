@@ -56,7 +56,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                 classifier_attrs['post_transform'] = 'LOGISTIC'
         else:
             classifier_attrs['post_transform'] = 'LOGISTIC'
-    elif op.__class__.__name__ in ('SGDClassifier', 'LinearSVC'):
+    elif op.__class__.__name__ in ('LinearSVC'):
         classifier_attrs['post_transform'] = 'NONE'
     else:
         if multi_class == 2:
