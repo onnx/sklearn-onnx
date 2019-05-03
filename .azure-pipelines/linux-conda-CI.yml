@@ -29,25 +29,25 @@ jobs:
     matrix:
       Py37-OnnxGit-Rt040:
         python.version: '3.7'
-        numpy.version: '==1.16.2'
+        numpy.version: '==1.16.3'
         onnx.version: 'git'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx141:
         python.version: '3.6'
-        numpy.version: '==1.16.2'
+        numpy.version: '==1.16.3'
         onnx.version: '==1.4.1'
         onnxrt.version: '==0.3.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx130:
         python.version: '3.6'
-        numpy.version: '==1.16.2'
+        numpy.version: '==1.16.3'
         onnx.version: '==1.3.0'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
       Py35-OnnxGit:
         python.version: '3.5'
-        numpy.version: '==1.16.2'
+        numpy.version: '==1.16.3'
         onnx.version: 'git'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'

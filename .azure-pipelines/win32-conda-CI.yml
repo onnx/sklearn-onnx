@@ -22,7 +22,7 @@ jobs:
       Py36-Onnx130-Rt014-Npy1154:
         python.version: '3.6.7'
         onnx.version: 'onnx==1.3.0'
-        numpy.version: 'numpy==1.16.2'
+        numpy.version: 'numpy==1.16.3'
         scipy.version: 'scipy'
         onnxrt.version: '==0.2.1'
     maxParallel: 3
