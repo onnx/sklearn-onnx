@@ -57,7 +57,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
                      reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
