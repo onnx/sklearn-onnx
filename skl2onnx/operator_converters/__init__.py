@@ -33,6 +33,7 @@ from . import OneVsRestClassifier
 from . import PolynomialFeatures
 from . import RandomForest
 from . import Scaler
+from . import sgd_classifier
 from . import SVD
 from . import SVM
 from . import TextVectorizer
@@ -68,6 +69,7 @@ __all__ = [
     PolynomialFeatures,
     RandomForest,
     Scaler,
+    sgd_classifier,
     SVD,
     SVM,
     TextVectorizer,
