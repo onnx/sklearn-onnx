@@ -46,7 +46,6 @@ def _normalise_proba(scope, operator, container, proba, is_binary,
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
 
-
     if is_binary:
         apply_sub(scope, [unity_name, proba],
                   sub_result_name, container, broadcast=1)
@@ -65,7 +64,7 @@ def _predict_proba_log(scope, operator, container, scores, is_binary):
     """Probability estimation for SGDClassifier with loss=log and
     Logistic Regression.
     Positive class probabilities are computed as
-        1. / (1. + np.exp(-decision_function(X)));
+        1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
     """
     negate_name = scope.get_unique_variable_name('negate')
@@ -90,13 +89,14 @@ def _predict_proba_log(scope, operator, container, scores, is_binary):
                             unity_name)
 
 
-def _predict_proba_modified_huber(scope, operator, container, scores, is_binary):
+def _predict_proba_modified_huber(scope, operator, container,
+                                  scores, is_binary):
     """Probability estimation for SGDClassifier with
-        loss=modified_huber.
-        Multiclass probability estimates are derived from binary
-        estimates by normalisation.
-        Binary probability estimates are given by
-        (clip(decision_function(X), -1, 1) + 1) / 2.
+    loss=modified_huber.
+    Multiclass probability estimates are derived from binary
+    estimates by normalisation.
+    Binary probability estimates are given by
+    (clip(scores, -1, 1) + 1) / 2.
     """
     unity_name = scope.get_unique_variable_name('unity')
     constant_name = scope.get_unique_variable_name('constant')
@@ -152,8 +152,8 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
             negated_scores_name = scope.get_unique_variable_name(
                 'negated_scores')
 
-            container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
-                                      [], [-1])
+            container.add_initializer(
+                negate_name, onnx_proto.TensorProto.FLOAT, [], [-1])
 
             apply_mul(scope, [scores, negate_name],
                       negated_scores_name, container, broadcast=1)
