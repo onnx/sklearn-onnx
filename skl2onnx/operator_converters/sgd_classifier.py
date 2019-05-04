@@ -37,7 +37,45 @@ def _decision_function(scope, operator, container, model):
     return score_name
 
 
-def _normalise_proba(scope, operator, container, proba, is_binary,
+def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
+    """Handle cases where reduced_proba values are zeros to avoid NaNs in
+    class probability scores because of divide by 0 when we calculate
+    proba / reduced_proba in _normalise_proba().
+    This is done by replacing reduced_proba values of 0s with
+    num_classes and corresponding proba values with 1.
+    """
+    num_classes_name = scope.get_unique_variable_name('num_classes')
+    bool_reduced_proba_name = scope.get_unique_variable_name(
+        'bool_reduced_proba')
+    bool_not_reduced_proba_name = scope.get_unique_variable_name(
+        'bool_not_reduced_proba')
+    not_reduced_proba_name = scope.get_unique_variable_name(
+        'not_reduced_proba')
+    proba_updated_name = scope.get_unique_variable_name('proba_updated')
+    mask_name = scope.get_unique_variable_name('mask')
+    reduced_proba_updated_name = scope.get_unique_variable_name(
+        'reduced_proba_updated')
+
+    container.add_initializer(num_classes_name, onnx_proto.TensorProto.FLOAT,
+                              [], [num_classes])
+
+    apply_cast(scope, reduced_proba, bool_reduced_proba_name, container,
+               to=onnx_proto.TensorProto.BOOL)
+    container.add_node('Not', bool_reduced_proba_name,
+                       bool_not_reduced_proba_name,
+                       name=scope.get_unique_operator_name('Not'))
+    apply_cast(scope, bool_not_reduced_proba_name, not_reduced_proba_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    apply_add(scope, [proba, not_reduced_proba_name],
+              proba_updated_name, container, broadcast=1)
+    apply_mul(scope, [not_reduced_proba_name, num_classes_name],
+              mask_name, container, broadcast=1)
+    apply_add(scope, [reduced_proba, mask_name],
+              reduced_proba_updated_name, container, broadcast=0)
+    return proba_updated_name, reduced_proba_updated_name
+
+
+def _normalise_proba(scope, operator, container, proba, num_classes,
                      unity_name=None):
     if not unity_name:
         unity_name = scope.get_unique_variable_name('unity')
@@ -46,7 +84,7 @@ def _normalise_proba(scope, operator, container, proba, is_binary,
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
 
-    if is_binary:
+    if num_classes == 2:
         apply_sub(scope, [unity_name, proba],
                   sub_result_name, container, broadcast=1)
         apply_concat(scope, [sub_result_name, proba],
@@ -55,12 +93,14 @@ def _normalise_proba(scope, operator, container, proba, is_binary,
         container.add_node('ReduceSum', proba,
                            reduced_proba_name, axes=[1],
                            name=scope.get_unique_operator_name('ReduceSum'))
-        apply_div(scope, [proba, reduced_proba_name],
+        proba_updated, reduced_proba_updated = _handle_zeros(
+            scope, container, proba, reduced_proba_name, num_classes)
+        apply_div(scope, [proba_updated, reduced_proba_updated],
                   operator.outputs[1].full_name, container, broadcast=1)
     return operator.outputs[1].full_name
 
 
-def _predict_proba_log(scope, operator, container, scores, is_binary):
+def _predict_proba_log(scope, operator, container, scores, num_classes):
     """Probability estimation for SGDClassifier with loss=log and
     Logistic Regression.
     Positive class probabilities are computed as
@@ -85,12 +125,12 @@ def _predict_proba_log(scope, operator, container, scores, is_binary):
     apply_add(scope, [exp_result_name, unity_name],
               add_result_name, container, broadcast=1)
     apply_reciprocal(scope, add_result_name, proba_name, container)
-    return _normalise_proba(scope, operator, container, proba_name, is_binary,
-                            unity_name)
+    return _normalise_proba(scope, operator, container, proba_name,
+                            num_classes, unity_name)
 
 
 def _predict_proba_modified_huber(scope, operator, container,
-                                  scores, is_binary):
+                                  scores, num_classes):
     """Probability estimation for SGDClassifier with
     loss=modified_huber.
     Multiclass probability estimates are derived from binary
@@ -114,7 +154,8 @@ def _predict_proba_modified_huber(scope, operator, container,
               add_result_name, container, broadcast=1)
     apply_div(scope, [add_result_name, constant_name],
               proba_name, container, broadcast=1)
-    return _normalise_proba(scope, operator, container, proba_name, is_binary)
+    return _normalise_proba(scope, operator, container, proba_name,
+                            num_classes)
 
 
 def convert_sklearn_sgd_classifier(scope, operator, container):
@@ -142,10 +183,10 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
     scores = _decision_function(scope, operator, container, sgd_op)
     if sgd_op.loss == 'log':
         proba = _predict_proba_log(scope, operator, container, scores,
-                                   len(classes) == 2)
+                                   len(classes))
     elif sgd_op.loss == 'modified_huber':
         proba = _predict_proba_modified_huber(
-            scope, operator, container, scores, len(classes) == 2)
+            scope, operator, container, scores, len(classes))
     else:
         if len(classes) == 2:
             negate_name = scope.get_unique_variable_name('negate')
