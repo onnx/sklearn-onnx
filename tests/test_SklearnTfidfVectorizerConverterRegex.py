@@ -260,12 +260,14 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=extra)
         self.assertTrue(model_onnx is not None)
+        # This test depends on this issue:
+        # https://github.com/Microsoft/onnxruntime/issues/957.
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClassRegex-"
                      "OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.0')")
+                          "StrictVersion('0.4.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
@@ -297,12 +299,14 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                      [('input', StringTensorType([1, 1]))],
                                      options=extra)
         self.assertTrue(model_onnx is not None)
+        # This test depends on this issue:
+        # https://github.com/Microsoft/onnxruntime/issues/957.
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisIdRegex-"
                      "OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.0')")
+                          "StrictVersion('0.4.0')")
 
 
 if __name__ == "__main__":
