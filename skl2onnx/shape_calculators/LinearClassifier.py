@@ -32,3 +32,5 @@ register_shape_calculator('SklearnCalibratedClassifierCV',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnMLPClassifier',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnSGDClassifier',
+                          calculate_linear_classifier_output_shapes)

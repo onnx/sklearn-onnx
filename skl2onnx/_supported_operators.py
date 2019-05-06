@@ -130,6 +130,7 @@ def build_sklearn_operator_name_map():
                 MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
+                SGDClassifier,
                 KMeans, MiniBatchKMeans, PCA, TruncatedSVD,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
@@ -146,7 +147,6 @@ def build_sklearn_operator_name_map():
         LogisticRegression: 'SklearnLinearClassifier',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
-        SGDClassifier: 'SklearnLinearClassifier',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
     })
