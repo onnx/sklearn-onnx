@@ -11,12 +11,8 @@ models and easily find errors at every step of the pipeline.
 .. contents::
     :local:
 
-
-.. contents::
-    :local:
-
-Create and train a complex pipeline
-+++++++++++++++++++++++++++++++++++
+Create a pipeline
++++++++++++++++++
 
 We reuse the pipeline implemented in example
 `Pipelining: chaining a PCA and a logistic regression
