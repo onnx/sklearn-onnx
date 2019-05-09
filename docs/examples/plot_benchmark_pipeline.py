@@ -2,11 +2,11 @@
 # Licensed under the MIT License.
 
 """
-Investigate a pipeline
-======================
+Benchmark a pipeline
+====================
 
-The following example shows how to look into a converted
-models and easily find errors at every step of the pipeline.
+The following example checks up on every step in a pipeline,
+compares and benchmarks the predictions.
 
 .. contents::
     :local:
@@ -62,6 +62,26 @@ print("onnx predict_proba")
 print(df.values)
 
 ###############################################
+# Comparing outputs
+# +++++++++++++++++
+
+from skl2onnx.helpers import compare_objects
+compare_objects(pipe.predict_proba(X_digits[:2]), onx_pred)
+# No exception so they are the same.
+
+###############################################
+# Benchmarks
+# ++++++++++
+
+from timeit import timeit
+print("scikit-learn")
+print(timeit("pipe.predict_proba(X_digits[:1])",
+             number=10000, globals=globals()))
+print("onnxruntime")
+print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
+             number=10000, globals=globals()))
+
+###############################################
 # Intermediate steps
 # ++++++++++++++++++
 #
@@ -83,40 +103,23 @@ pipe.predict_proba(X_digits[:2])
 for i, step in enumerate(steps):
     short_onnx = step['short_onnx']
     sess = rt.InferenceSession(short_onnx.SerializeToString())
-    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})    
+    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
     skl_outputs = step['model']._debug.outputs
-    print("step 1", type(step['model']))
-    print("skl outputs")
-    print(skl_outputs)
-    print("onnx outputs")
-    print(onnx_outputs)
-
-########################################
-# Pickle
-# ++++++
-#
-# Each steps is a separate model in the pipeline.
-# It can be pickle independetly from the others.
-# Attribute *_debug* contains all the information
-# needed to *replay* the prediction of the model.
-
-to_save = {
-    'model': steps[1]['model'],
-    'data_input': steps[1]['model']._debug.inputs,
-    'data_output': steps[1]['model']._debug.outputs,
-    'inputs': steps[1]['inputs'],
-    'outputs': steps[1]['outputs'],
-}
-del steps[1]['model']._debug
-
-import pickle
-with open('classifier.pkl', 'wb') as f:
-    pickle.dump(to_save, f)
-    
-with open('classifier.pkl', 'rb') as f:
-    restored = pickle.load(f)
-
-print(restored['model'].predict_proba(restored['data_input']['predict_proba']))
+    if 'transform' in skl_outputs:
+        compare_objects(skl_outputs['transform'], onnx_outputs[0])
+        print("benchmark", step['model'].__class__)
+        print("scikit-learn")
+        print(timeit("step['model'].transform(X_digits[:1])",
+                     number=10000, globals=globals()))
+    else:
+        compare_objects(skl_outputs['predict_proba'], onnx_outputs[1])
+        print("benchmark", step['model'].__class__)
+        print("scikit-learn")
+        print(timeit("step['model'].predict_proba(X_digits[:1])",
+                     number=10000, globals=globals()))
+    print("onnxruntime")
+    print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})",
+                 number=10000, globals=globals()))
 
 #################################
 # **Versions used for this example**

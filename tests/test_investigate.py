@@ -4,7 +4,8 @@ from numpy.testing import assert_almost_equal
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import onnxruntime
-from skl2onnx.helpers.intermediate import collect_intermediate_steps
+from skl2onnx.helpers import collect_intermediate_steps, compare_objects
+from skl2onnx.helpers import enumerate_pipeline_models
 from skl2onnx.common.data_types import (
     FloatTensorType,
 )
@@ -18,12 +19,14 @@ class TestInvestigate(unittest.TestCase):
         model = Pipeline([("scaler1", StandardScaler()),
                           ("scaler2", StandardScaler())])
         model.fit(data)
+        all_models = list(enumerate_pipeline_models(model))
 
         steps = collect_intermediate_steps(model, "pipeline",
                                            [("input",
                                              FloatTensorType([1, 2]))])
 
         assert len(steps) == 2
+        assert len(all_models) == 3
 
         model.transform(data)
         for step in steps:
@@ -33,6 +36,7 @@ class TestInvestigate(unittest.TestCase):
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
             assert_almost_equal(onnx_output, skl_outputs)
+            compare_objects(onnx_output, skl_outputs)
 
 
 if __name__ == "__main__":

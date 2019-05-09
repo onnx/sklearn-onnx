@@ -56,15 +56,9 @@ pipe.fit(X, y)
 # `onnxmltools...Classifier.py
 # <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 # lightgbm/shape_calculators/Classifier.py>`_.
-# The current implementation has duplicated code which we replace
-# by the implementation from *skl2onnx*.
-from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType, DictionaryType, SequenceType
+from skl2onnx.common.data_types import Int64TensorType, FloatTensorType, StringTensorType
+from skl2onnx.common.data_types import DictionaryType, SequenceType
 import onnxmltools.convert.common.data_types
-onnxmltools.convert.common.data_types.Int64TensorType = Int64TensorType
-onnxmltools.convert.common.data_types.StringTensorType = StringTensorType
-onnxmltools.convert.common.data_types.FloatTensorType = FloatTensorType
-onnxmltools.convert.common.data_types.DictionaryType = DictionaryType
-onnxmltools.convert.common.data_types.SequenceType = SequenceType
 
 ##############################################
 # Then we import the converter and shape calculator.
