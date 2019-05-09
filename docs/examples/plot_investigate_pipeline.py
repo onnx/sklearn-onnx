@@ -16,25 +16,35 @@ Create a pipeline
 
 We reuse the pipeline implemented in example
 `Pipelining: chaining a PCA and a logistic regression
-<https://scikit-learn.org/stable/auto_examples/compose/plot_digits_pipe.html>`_.
+<https://scikit-learn.org/stable/auto_examples/
+compose/plot_digits_pipe.html>`_.
 There is one change because
-`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
+`ONNX-ML Imputer
+<https://github.com/onnx/onnx/blob/master/docs/
+Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
+import numpy
+import pickle
+from skl2onnx.helpers import collect_intermediate_steps
+import onnxruntime as rt
+from onnxconverter_common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 from sklearn import datasets
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GridSearchCV
 
-logistic = LogisticRegression()
-pca = PCA()
-pipe = Pipeline(steps=[('pca', pca), ('logistic', logistic)])
+pipe = Pipeline(steps=[('pca', PCA()),
+                       ('logistic', LogisticRegression())])
 
 digits = datasets.load_digits()
 X_digits = digits.data[:1000]
@@ -46,13 +56,10 @@ pipe.fit(X_digits, y_digits)
 # Conversion to ONNX
 # ++++++++++++++++++
 
-from skl2onnx import convert_sklearn
-from onnxconverter_common.data_types import FloatTensorType
 
 initial_types = [('input', FloatTensorType((1, X_digits.shape[1])))]
 model_onnx = convert_sklearn(pipe, initial_types=initial_types)
 
-import onnxruntime as rt
 sess = rt.InferenceSession(model_onnx.SerializeToString())
 print("skl predict_proba")
 print(pipe.predict_proba(X_digits[:2]))
@@ -71,7 +78,6 @@ print(df.values)
 # pipeline to steal the intermediate outputs and produces
 # an smaller ONNX graph for every operator.
 
-from skl2onnx.helpers import collect_intermediate_steps
 
 steps = collect_intermediate_steps(pipe, "pipeline",
                                    initial_types)
@@ -83,7 +89,7 @@ pipe.predict_proba(X_digits[:2])
 for i, step in enumerate(steps):
     short_onnx = step['short_onnx']
     sess = rt.InferenceSession(short_onnx.SerializeToString())
-    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})    
+    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
     skl_outputs = step['model']._debug.outputs
     print("step 1", type(step['model']))
     print("skl outputs")
@@ -109,10 +115,9 @@ to_save = {
 }
 del steps[1]['model']._debug
 
-import pickle
 with open('classifier.pkl', 'wb') as f:
     pickle.dump(to_save, f)
-    
+
 with open('classifier.pkl', 'rb') as f:
     restored = pickle.load(f)
 
@@ -121,12 +126,8 @@ print(restored['model'].predict_proba(restored['data_input']['predict_proba']))
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
-
-

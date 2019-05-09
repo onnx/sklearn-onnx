@@ -18,19 +18,29 @@ We reuse the pipeline implemented in example
 `Pipelining: chaining a PCA and a logistic regression
 <https://scikit-learn.org/stable/auto_examples/compose/plot_digits_pipe.html>`_.
 There is one change because
-`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
+`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/
+docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
+import numpy
+from skl2onnx.helpers import collect_intermediate_steps
+from timeit import timeit
+from skl2onnx.helpers import compare_objects
+import onnxruntime as rt
+from onnxconverter_common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 from sklearn import datasets
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GridSearchCV
 
 logistic = LogisticRegression()
 pca = PCA()
@@ -46,13 +56,10 @@ pipe.fit(X_digits, y_digits)
 # Conversion to ONNX
 # ++++++++++++++++++
 
-from skl2onnx import convert_sklearn
-from onnxconverter_common.data_types import FloatTensorType
 
 initial_types = [('input', FloatTensorType((1, X_digits.shape[1])))]
 model_onnx = convert_sklearn(pipe, initial_types=initial_types)
 
-import onnxruntime as rt
 sess = rt.InferenceSession(model_onnx.SerializeToString())
 print("skl predict_proba")
 print(pipe.predict_proba(X_digits[:2]))
@@ -65,7 +72,6 @@ print(df.values)
 # Comparing outputs
 # +++++++++++++++++
 
-from skl2onnx.helpers import compare_objects
 compare_objects(pipe.predict_proba(X_digits[:2]), onx_pred)
 # No exception so they are the same.
 
@@ -73,7 +79,6 @@ compare_objects(pipe.predict_proba(X_digits[:2]), onx_pred)
 # Benchmarks
 # ++++++++++
 
-from timeit import timeit
 print("scikit-learn")
 print(timeit("pipe.predict_proba(X_digits[:1])",
              number=10000, globals=globals()))
@@ -91,7 +96,6 @@ print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
 # pipeline to steal the intermediate outputs and produces
 # an smaller ONNX graph for every operator.
 
-from skl2onnx.helpers import collect_intermediate_steps
 
 steps = collect_intermediate_steps(pipe, "pipeline",
                                    initial_types)
@@ -124,12 +128,8 @@ for i, step in enumerate(steps):
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
-
-

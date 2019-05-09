@@ -24,6 +24,15 @@ A very basic example using random forest and
 the iris dataset.
 """
 
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
+from sklearn.linear_model import LogisticRegression
+import numpy
+import onnxruntime as rt
+from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -38,8 +47,6 @@ print(clr)
 # Convert a model into ONNX
 # +++++++++++++++++++++++++
 
-from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
 initial_type = [('float_input', FloatTensorType([1, 4]))]
 onx = convert_sklearn(clr, initial_types=initial_type)
 
@@ -49,18 +56,16 @@ with open("rf_iris.onnx", "wb") as f:
 ###################################
 # Compute the prediction with ONNX Runtime
 # ++++++++++++++++++++++++++++++++++++++++
-import onnxruntime as rt
-import numpy
 sess = rt.InferenceSession("rf_iris.onnx")
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
-pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+pred_onx = sess.run(
+    [label_name], {input_name: X_test.astype(numpy.float32)})[0]
 print(pred_onx)
 
 #######################################
 # Full example with a logistic regression
 
-from sklearn.linear_model import LogisticRegression
 clr = LogisticRegression()
 clr.fit(X_train, y_train)
 initial_type = [('float_input', FloatTensorType([1, X_train.shape[1]]))]
@@ -71,17 +76,16 @@ with open("logreg_iris.onnx", "wb") as f:
 sess = rt.InferenceSession("logreg_iris.onnx")
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
-pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+pred_onx = sess.run([label_name],
+                    {input_name: X_test.astype(numpy.float32)})[0]
 print(pred_onx)
 
 
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
