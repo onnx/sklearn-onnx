@@ -44,3 +44,4 @@ htmlcov/*
 tests/temp_onnx_helper_load_save.onnx
 benchmarks/*.csv
 benchmarks/*.png
+docs/examples/classifier.pkl

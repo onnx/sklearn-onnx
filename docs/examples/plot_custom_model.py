@@ -12,12 +12,14 @@ and there is obviously no existing converter for this
 new model. That does not mean the conversion of a pipeline
 which includes it would not work. Let's see how to do it.
 
-`t-SNE <https://lvdmaaten.github.io/tsne/>`_ is an interesting 
+`t-SNE <https://lvdmaaten.github.io/tsne/>`_ is an interesting
 transform which can only be used to study data as there is no
 way to reproduce the result once it was fitted. That's why
-the class `TSNE <https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html>`_
+the class `TSNE <https://scikit-learn.org/stable/modules/
+generated/sklearn.manifold.TSNE.html>`_
 does not have any method *transform*, only
-`fit_transform <https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE.fit_transform>`_.
+`fit_transform <https://scikit-learn.org/stable/modules/
+generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE.fit_transform>`_.
 This example proposes a way to train a machine learned model
 which approximates the outputs of a *t-SNE* transformer.
 
@@ -32,17 +34,34 @@ The first section is about the implementation.
 The code is quite generic but basically follows this
 process to fit the model with *X* and *y*:
 
-* t-SNE, :math:`(X, y) \rightarrow X_2 \in \mathbb{R}^2`
+* t-SNE, :math:`(X, y) \\rightarrow X_2 \\in \\mathbb{R}^2`
 * k nearest neightbours, :math:`fit(X, X_2)`,
-  which produces function :math:`f(X) \rightarrow X_3`
-* final normalization, simple scaling :math:`X_3 \rightarrow X_4`
+  which produces function :math:`f(X) \\rightarrow X_3`
+* final normalization, simple scaling :math:`X_3 \\rightarrow X_4`
 
 And to predict on a test set:
 
-* k nearest neightbours, :math:`f(X') \rightarrow X'_3`
-* final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
+* k nearest neightbours, :math:`f(X') \\rightarrow X'_3`
+* final normalization, simple scaling :math:`X'_3 \\rightarrow X'_4`
 """
 
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
+from skl2onnx import update_registered_converter
+import os
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+import onnxruntime as rt
+from skl2onnx import convert_sklearn
+from skl2onnx._parse import _get_sklearn_operator_name
+from skl2onnx.common._registration import get_shape_calculator
+from skl2onnx.common.data_types import FloatTensorType
+from matplotlib import offsetbox
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+import numpy
 import inspect
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.manifold import TSNE
@@ -55,19 +74,16 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
     def __init__(self, transformer=None, estimator=None,
                  normalize=True, keep_tsne_outputs=False, **kwargs):
         """
-        @param      transformer         :epkg:`sklearn:manifold:TSNE`
-                                        by default
-        @param      estimator           :epkg:`sklearn:neural_network:MLPRegressor`
-                                        by default
-        @param      normalize           normalizes the outputs, centers and normalizes
-                                        the output of the *t-SNE* and applies that same
-                                        normalization to he prediction of the estimator
-        @param      keep_tsne_output    if True, keep raw outputs of
-                                        :epkg:`TSNE` is stored in member
-                                        *tsne_outputs_*
-        @param      kwargs              sent to :meth:`set_params
-                                        <mlinsights.mlmodel.tsne_transformer.PredictableTSNE.set_params>`,
-                                        see its documentation to understand how to specify parameters
+        :param transformer: `TSNE` by default
+        :param estimator: `MLPRegressor` by default
+        :param normalize: normalizes the outputs, centers and normalizes
+            the output of the *t-SNE* and applies that same
+            normalization to he prediction of the estimator
+        :param keep_tsne_output: if True, keep raw outputs of
+            :epkg:`TSNE` is stored in member *tsne_outputs_*
+        :param kwargs: sent to :meth:`set_params <mlinsights.mlmodel.
+            tsne_transformer.PredictableTSNE.set_params>`, see its
+            documentation to understand how to specify parameters
         """
         TransformerMixin.__init__(self)
         BaseEstimator.__init__(self)
@@ -80,10 +96,12 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         self.keep_tsne_outputs = keep_tsne_outputs
         if not hasattr(transformer, "fit_transform"):
             raise AttributeError(
-                "transformer {} does not have a 'fit_transform' method.".format(type(transformer)))
+                "transformer {} does not have a 'fit_transform' "
+                "method.".format(type(transformer)))
         if not hasattr(estimator, "predict"):
             raise AttributeError(
-                "estimator {} does not have a 'predict' method.".format(type(estimator)))
+                "estimator {} does not have a 'predict' method.".format(
+                    type(estimator)))
         self.normalize = normalize
         if kwargs:
             self.set_params(**kwargs)
@@ -112,8 +130,8 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         mean_: average of the *t-SNE* output on each dimension
         inv_std_: inverse of the standard deviation of the *t-SNE*
             output on each dimension
-        loss_: loss (:epkg:`sklearn:metrics:mean_squared_error`) between the predictions
-            and the outputs of t-SNE
+        loss_: loss (:epkg:`sklearn:metrics:mean_squared_error`)
+        between the predictions and the outputs of t-SNE
         """
         params = dict(y=y, sample_weight=sample_weight)
 
@@ -165,7 +183,8 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         Returns the parameters for all the embedded objects.
         @param      deep        unused here
         @return                 dict
-        :meth:`set_params <mlinsights.mlmodel.tsne_transformer.PredictableTSNE.set_params>`
+        :meth:`set_params <mlinsights.mlmodel.tsne_transformer.
+        PredictableTSNE.set_params>`
         describes the pattern parameters names follow.
         """
         res = {}
@@ -204,8 +223,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
 #
 # Let's fit t-SNE...
 
-import numpy
-from sklearn import datasets
 
 digits = datasets.load_digits(n_class=6)
 Xd = digits.data
@@ -214,14 +231,11 @@ imgs = digits.images
 n_samples, n_features = Xd.shape
 n_samples, n_features
 
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(Xd, yd, imgs)
+X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(
+    Xd, yd, imgs)
 
-from sklearn.manifold import TSNE
 tsne = TSNE(n_components=2, init='pca', random_state=0)
 
-import matplotlib.pyplot as plt
-from matplotlib import offsetbox
 
 def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
     x_min, x_max = numpy.min(Xp, 0), numpy.max(Xp, 0)
@@ -254,7 +268,8 @@ def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
 
 
 X_train_tsne = tsne.fit_transform(X_train)
-plot_embedding(X_train_tsne, y_train, imgs_train, "t-SNE embedding of the digits");
+plot_embedding(X_train_tsne, y_train, imgs_train,
+               "t-SNE embedding of the digits")
 
 #######################################
 # Repeatable t-SNE
@@ -267,7 +282,8 @@ ptsne_knn.fit(X_train, y_train)
 
 X_train_tsne2 = ptsne_knn.transform(X_train)
 plot_embedding(X_train_tsne2, y_train, imgs_train,
-               "Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor")
+               "Predictable t-SNE of the digits\n"
+               "StandardScaler+KNeighborsRegressor")
 
 ################################
 # We check on test set.
@@ -275,7 +291,8 @@ plot_embedding(X_train_tsne2, y_train, imgs_train,
 
 X_test_tsne2 = ptsne_knn.transform(X_test)
 plot_embedding(X_test_tsne2, y_test, imgs_test,
-               "Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor")
+               "Predictable t-SNE of the digits\n"
+               "StandardScaler+KNeighborsRegressor")
 
 #######################################
 # ONNX - shape_calculator, converter
@@ -286,18 +303,17 @@ plot_embedding(X_test_tsne2, y_test, imgs_test,
 # one to calculate the shape of the outputs based
 # on the inputs, the other one to do the actual
 # conversion of the model.
-from skl2onnx.common.data_types import FloatTensorType
 
 
 def predictable_tsne_shape_calculator(operator):
-    
+
     input = operator.inputs[0]      # inputs in ONNX graph
-    output = operator.outputs[0]    # output in ONNX graph
+    # output = operator.outputs[0]    # output in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
-    
-    N = input.type.shape[0]         # number of observations    
+
+    N = input.type.shape[0]         # number of observations
     C = op.estimator_._y.shape[1]   # dimension of outputs
-    
+
     # new output definition
     operator.outputs[0].type = FloatTensorType([N, C])
 
@@ -305,8 +321,6 @@ def predictable_tsne_shape_calculator(operator):
 ##################################
 # Then the converter model. We
 # reuse existing converter.
-from skl2onnx.common._registration import get_shape_calculator
-from skl2onnx._parse import _get_sklearn_operator_name
 
 
 def predictable_tsne_converter(scope, operator, container):
@@ -316,10 +330,10 @@ def predictable_tsne_converter(scope, operator, container):
         *predictable_tsne_shape_calculator*
     :param container: contains the ONNX graph
     """
-    input = operator.inputs[0]      # input in ONNX graph
+    # input = operator.inputs[0]      # input in ONNX graph
     output = operator.outputs[0]    # output in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
-    
+
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
     # operator
@@ -327,18 +341,18 @@ def predictable_tsne_converter(scope, operator, container):
     alias = _get_sklearn_operator_name(type(model))
     knn_op = scope.declare_local_operator(alias, model)
     knn_op.inputs = operator.inputs
-    
+
     # We add an intermediate outputs.
     knn_output = scope.declare_local_variable('knn_output', FloatTensorType())
     knn_op.outputs.append(knn_output)
-    
+
     # We adjust the output of the submodel.
     shape_calc = get_shape_calculator(alias)
     shape_calc(knn_op)
-    
+
     # We add the normalizer which needs a unique node name.
     name = scope.get_unique_operator_name('Scaler')
-    
+
     # The parameter follows the specifications of ONNX
     # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
     attrs = dict(name=name,
@@ -354,11 +368,11 @@ def predictable_tsne_converter(scope, operator, container):
 ##################################
 # We now need to declare the new converter.
 
-from skl2onnx import update_registered_converter
-update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',                                    
+
+update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
                             predictable_tsne_shape_calculator,
                             predictable_tsne_converter)
-                            
+
 ####################################
 # Conversion to ONNX
 # ++++++++++++++++++
@@ -366,14 +380,14 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 # We just need to call *convert_sklearn* as any other model
 # to convert.
 
-from skl2onnx import convert_sklearn
 model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                             [('input', FloatTensorType([1, X_test.shape[1]]))])
-                             
+                             [('input', FloatTensorType([1,
+                                                         X_test.shape[1]]))])
+
 # And save.
 with open("predictable_tsne.onnx", "wb") as f:
     f.write(model_onnx.SerializeToString())
-    
+
 ##################################
 # We now compare the prediction.
 
@@ -382,8 +396,6 @@ print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
 ##########################
 # Predictions with onnxruntime.
 
-import onnxruntime as rt
-import numpy
 sess = rt.InferenceSession("predictable_tsne.onnx")
 
 pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
@@ -401,16 +413,14 @@ print("transform", pred_onx[0])
 # Display the ONNX graph
 # ++++++++++++++++++++++
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+pydot_graph = GetPydotGraph(
+    model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"))
 pydot_graph.write_dot("pipeline_tsne.dot")
 
-import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_tsne.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_tsne.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
@@ -419,10 +429,8 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
