@@ -2,20 +2,6 @@
 # Create and test a Python package on multiple Python versions.
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
-# Python 3.7 test was disabled.
-#      Py37-SklGit:
-#        python.version: '3.7'
-#        onnx.version: 'git'
-#        onnxrt.version: '==0.3.0'
-#        numpy.version: '==1.16.2'
-#        sklearn.version: 'git'
-#      Py37-Skl0192:
-#        python.version: '3.7'
-#        onnx.version: 'git'
-#        onnxrt.version: '==0.3.0'
-#        numpy.version: '==1.16.2'
-#        sklearn.version: '==0.19.2'
-
 
 trigger:
 - master
