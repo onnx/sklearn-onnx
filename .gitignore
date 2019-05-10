@@ -46,4 +46,4 @@ tests/*.new
 benchmarks/*.csv
 benchmarks/*.png
 tests/Operators*.md
-docs/examples/classifier.pkl
+docs/examples/*.pkl

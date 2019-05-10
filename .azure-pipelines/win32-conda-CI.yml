@@ -13,13 +13,13 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      #Py37-Onnx141-Rt021-Npy1161:
-      #  python.version: '3.7.0'
-      #  onnx.version: 'https://xadupre.github.io/releases/onnx-1.4.1-cp37-cp37m-win_amd64.whl'
-      #  numpy.version: 'http://???????/numpy-1.16.1+mkl-cp37-cp37m-win_amd64.whl'
-      #  scipy.version: 'https://xadupre.github.io/releases/scipy-1.2.1-cp37-cp37m-win_amd64.whl'
-      #  onnxrt.version: '==0.2.1'
-      Py36-Onnx130-Rt014-Npy1154:
+      Py37-Onnx150-Rt040-Npy1162:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.5.0'
+        numpy.version: 'numpy==1.16.2'
+        scipy.version: 'scipy'
+        onnxrt.version: '==0.4.0'
+      Py36-Onnx130-Rt021-Npy1162:
         python.version: '3.6.7'
         onnx.version: 'onnx==1.3.0'
         numpy.version: 'numpy==1.16.3'
@@ -32,10 +32,6 @@ jobs:
     inputs:
       createCustomEnvironment: false
       packageSpecs: 'python=$(python.version)'
-
-  - script: |
-      conda install -y -c anaconda scikit-learn
-    displayName: 'Install numpy mkl scipy pandas sklearn'
 
   - script: |
       conda install -y -c conda-forge protobuf

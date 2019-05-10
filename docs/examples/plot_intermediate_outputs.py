@@ -22,10 +22,29 @@ We reuse the pipeline implemented in example
 `Column Transformer with Mixed Types
 <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
 There is one change because
-`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
+`ONNX-ML Imputer
+<https://github.com/onnx/onnx/blob/master/docs/
+Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
+import matplotlib.pyplot as plt
+import os
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs
+from skl2onnx.helpers.onnx_helper import save_onnx_model
+from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
+from skl2onnx.helpers.onnx_helper import load_onnx_model
+import numpy
+import onnxruntime as rt
+from skl2onnx import convert_sklearn
+import pprint
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
+from skl2onnx.common.data_types import Int64TensorType
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -41,7 +60,8 @@ data = pd.read_csv(titanic_url)
 X = data.drop('survived', axis=1)
 y = data['survived']
 
-# SimpleImputer on string is not available for string in ONNX-ML specifications.
+# SimpleImputer on string is not available
+# for string in ONNX-ML specifications.
 # So we do it beforehand.
 for cat in ['embarked', 'sex', 'pclass']:
     X[cat].fillna('missing', inplace=True)
@@ -55,7 +75,7 @@ numeric_transformer = Pipeline(steps=[
 
 categorical_features = ['embarked', 'sex', 'pclass']
 categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer is not available for strings in ONNX-ML specifications. 
+    # --- SimpleImputer is not available for strings in ONNX-ML specifications.
     # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
@@ -63,7 +83,7 @@ preprocessor = ColumnTransformer(
     transformers=[
         ('num', numeric_transformer, numeric_features),
         ('cat', categorical_transformer, categorical_features),
-        ])
+    ])
 
 clf = Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', LogisticRegression(solver='lbfgs'))])
@@ -81,7 +101,7 @@ print(X_train.dtypes)
 
 #########################
 # After conversion.
-from skl2onnx.common.data_types import FloatTensorType, StringTensorType, Int64TensorType
+
 
 def convert_dataframe_schema(df, drop=None):
     inputs = []
@@ -96,14 +116,14 @@ def convert_dataframe_schema(df, drop=None):
             t = StringTensorType([1, 1])
         inputs.append((k, t))
     return inputs
-    
+
+
 inputs = convert_dataframe_schema(X_train)
 
-import pprint
 pprint.pprint(inputs)
 
 #############################
-# Merging single column into vectors is not 
+# Merging single column into vectors is not
 # the most efficient way to compute the prediction.
 # It could be done before converting the pipeline into a graph.
 
@@ -111,12 +131,11 @@ pprint.pprint(inputs)
 # Convert the pipeline into ONNX
 # ++++++++++++++++++++++++++++++
 
-from skl2onnx import convert_sklearn
 try:
     model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
 except Exception as e:
     print(e)
-    
+
 #################################
 # *scikit-learn* does implicit conversions when it can.
 # *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
@@ -124,7 +143,8 @@ except Exception as e:
 
 X_train['pclass'] = X_train['pclass'].astype(str)
 X_test['pclass'] = X_test['pclass'].astype(str)
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
+to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
+           'name', 'body', 'home.dest', 'boat'}
 inputs = convert_dataframe_schema(X_train, to_drop)
 
 model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
@@ -162,12 +182,10 @@ for c in numeric_features:
     inputs[c] = inputs[c].astype(np.float32)
 for k in inputs:
     inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
-    
+
 ################################
 # We are ready to run *onnxruntime*.
 
-import onnxruntime as rt
-import numpy
 sess = rt.InferenceSession("pipeline_titanic.onnx")
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
@@ -178,16 +196,15 @@ print("predict_proba", pred_onx[1][:1])
 # Compute intermediate outputs
 # ++++++++++++++++++++++++++++
 #
-# Unfortunately, there is actually no way to ask 
+# Unfortunately, there is actually no way to ask
 # *onnxruntime* to retrieve the output of intermediate nodes.
 # We need to modifies the *ONNX* before it is given to *onnxruntime*.
 # Let's see first the list of intermediate output.
 
-from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs, load_onnx_model
 model_onnx = load_onnx_model("pipeline_titanic.onnx")
 for out in enumerate_model_node_outputs(model_onnx):
     print(out)
-    
+
 ################################
 # Not that easy to tell which one is what as the *ONNX*
 # has more operators than the original *scikit-learn* pipelines.
@@ -196,7 +213,6 @@ for out in enumerate_model_node_outputs(model_onnx):
 # and textual pipeline: *variable1*, *variable2*.
 # Let's look into the numerical pipeline first.
 
-from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs, save_onnx_model
 num_onnx = select_model_inputs_outputs(model_onnx, 'variable1')
 save_onnx_model(num_onnx, "pipeline_titanic_numerical.onnx")
 
@@ -223,16 +239,14 @@ print("textual features", numT[0][:1])
 #
 # Finally, let's see both subgraphs. First, numerical pipeline.
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(num_onnx.graph, name=num_onnx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+pydot_graph = GetPydotGraph(
+    num_onnx.graph, name=num_onnx.graph.name, rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"))
 pydot_graph.write_dot("pipeline_titanic_num.dot")
 
-import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_titanic_num.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
@@ -241,15 +255,14 @@ ax.axis('off')
 ######################################
 # Then textual pipeline.
 
-pydot_graph = GetPydotGraph(text_onnx.graph, name=text_onnx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+pydot_graph = GetPydotGraph(
+    text_onnx.graph, name=text_onnx.graph.name, rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"))
 pydot_graph.write_dot("pipeline_titanic_text.dot")
 
-import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_titanic_text.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
@@ -258,10 +271,8 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

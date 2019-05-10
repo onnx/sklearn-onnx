@@ -17,7 +17,8 @@ from . import operator_converters # noqa
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
-                    custom_parsers=None, options=None):
+                    custom_parsers=None, options=None,
+                    intermediate=False):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -43,6 +44,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :param options: specific options given to converters (see :ref:`l-conv-options`)
+    :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
+        it returns the converted model otherwise
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of initial_types:
@@ -126,7 +129,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
                                   options=options)
 
-    return onnx_model
+    return (onnx_model, topology) if intermediate else onnx_model
 
 
 def to_onnx(model, X=None, name=None, initial_types=None):
