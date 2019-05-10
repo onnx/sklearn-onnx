@@ -84,7 +84,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
         cst = [op.init_.mean]
     else:
         cst = [op.init_.quantile]
-    attrs['base_values'] = cst
+    attrs['base_values'] = [float(x) for x in cst]
 
     tree_weight = op.learning_rate
     for i in range(op.n_estimators):

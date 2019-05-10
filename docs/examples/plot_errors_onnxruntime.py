@@ -9,7 +9,7 @@ Errors with onnxruntime
 
 Many mistakes might happen with *onnxruntime*.
 This example looks into several common situations
-in which *onnxruntime* does not return the model 
+in which *onnxruntime* does not return the model
 prediction but raises an exception instead.
 It starts by loading a model
 (see :ref:`l-rf-iris-example`).
@@ -17,6 +17,10 @@ which produces a logistic regression
 trained on *Iris* datasets. The model takes
 a vector of dimension 2 and returns a class among three.
 """
+import skl2onnx
+import onnxruntime
+import onnx
+import sklearn
 import onnxruntime as rt
 import numpy
 from onnxruntime.datasets import get_example
@@ -38,7 +42,7 @@ try:
 except Exception as e:
     print("Unexpected type")
     print("{0}: {1}".format(type(e), e))
-    
+
 #########################
 # The model fails to return an output if the name
 # is misspelled.
@@ -79,7 +83,7 @@ for x in [
         numpy.array([[1.0, 2.0], [3.0, 4.0]], dtype=numpy.float32),
         numpy.array([1.0, 2.0, 3.0], dtype=numpy.float32),
         numpy.array([[1.0, 2.0, 3.0]], dtype=numpy.float32),
-        ]:
+]:
     r = sess.run([output_name], {input_name: x})
     print("Shape={0} and predicted labels={1}".format(x.shape, r))
 
@@ -89,7 +93,7 @@ for x in [
         numpy.array([[1.0, 2.0], [3.0, 4.0]], dtype=numpy.float32),
         numpy.array([1.0, 2.0, 3.0], dtype=numpy.float32),
         numpy.array([[1.0, 2.0, 3.0]], dtype=numpy.float32),
-        ]:
+]:
     r = sess.run(None, {input_name: x})
     print("Shape={0} and predicted probabilities={1}".format(x.shape, r[1]))
 
@@ -101,17 +105,15 @@ for x in [
         numpy.array([[[1.0, 2.0], [3.0, 4.0]]], dtype=numpy.float32),
         numpy.array([[[1.0, 2.0, 3.0]]], dtype=numpy.float32),
         numpy.array([[[1.0, 2.0]], [[3.0, 4.0]]], dtype=numpy.float32),
-        ]:
+]:
     r = sess.run([output_name], {input_name: x})
     print("Shape={0} and predicted labels={1}".format(x.shape, r))
 
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

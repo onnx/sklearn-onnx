@@ -8,7 +8,9 @@ TfIdfVectorizer with ONNX
 =========================
 
 This example is inspired from the following example:
-`Column Transformer with Heterogeneous Data Sources <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer.html>`_
+`Column Transformer with Heterogeneous Data Sources
+<https://scikit-learn.org/stable/auto_examples/
+compose/plot_column_transformer.html>`_
 which builds a pipeline to classify text.
 
 .. contents::
@@ -22,6 +24,13 @@ but reduces it to the part ONNX actually supports without implementing
 a custom converter. Let's get the data.
 """
 
+import matplotlib.pyplot as plt
+import os
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+import numpy
+import onnxruntime as rt
+from skl2onnx.common.data_types import StringTensorType
+from skl2onnx import convert_sklearn
 import numpy as np
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -30,7 +39,6 @@ from sklearn.datasets.twenty_newsgroups import strip_newsgroup_footer
 from sklearn.datasets.twenty_newsgroups import strip_newsgroup_quoting
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report
@@ -47,17 +55,19 @@ test = fetch_20newsgroups(random_state=1,
                           subset='test',
                           categories=categories,
                           )
-                          
+
 ##############################
 # The first transform extract two fields from the data.
 # We take it out form the pipeline and assume
 # the data is defined by two text columns.
+
 
 class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
     """Extract the subject & body from a usenet post in a single pass.
     Takes a sequence of strings and produces a dict of sequences. Keys are
     `subject` and `body`.
     """
+
     def fit(self, x, y=None):
         return self
 
@@ -80,7 +90,8 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
             features[i, 0] = sub
 
         return features
-        
+
+
 train_data = SubjectBodyExtractor().fit_transform(train.data)
 test_data = SubjectBodyExtractor().fit_transform(test.data)
 
@@ -98,10 +109,11 @@ pipeline = Pipeline([
                 ('best', TruncatedSVD(n_components=50)),
             ]), 1),
 
-            # Removed from the original example as it requires a custom converter.
+            # Removed from the original example as
+            # it requires a custom converter.
             # ('body_stats', Pipeline([
-            #     ('stats', TextStats()),  # returns a list of dicts
-            #     ('vect', DictVectorizer()),  # list of dicts -> feature matrix
+            #   ('stats', TextStats()),  # returns a list of dicts
+            #   ('vect', DictVectorizer()),  # list of dicts -> feature matrix
             # ]), 1),
         ],
 
@@ -131,13 +143,12 @@ print(classification_report(pipeline.predict(test_data), test.target))
 # only considers a list of separators which can is defined
 # in variable *seps*.
 
-from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import StringTensorType
 
 seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
-                                   '\n', '"', "'", "-", "[", "]", "@"]}}
+                                  '\n', '"', "'", "-", "[", "]", "@"]}}
 model_onnx = convert_sklearn(pipeline, "tfidf",
-                             initial_types=[("input", StringTensorType([1, 2]))],
+                             initial_types=[
+                                 ("input", StringTensorType([1, 2]))],
                              options=seps)
 
 #################################
@@ -148,8 +159,6 @@ with open("pipeline_tfidf.onnx", "wb") as f:
 ##########################
 # Predictions with onnxruntime.
 
-import onnxruntime as rt
-import numpy
 sess = rt.InferenceSession("pipeline_tfidf.onnx")
 print('---', train_data[0])
 inputs = {'input': train_data[0]}
@@ -173,18 +182,17 @@ print(pipeline.predict_proba(train_data[0:1]))
 #
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+pydot_graph = GetPydotGraph(
+    model_onnx.graph, name=model_onnx.graph.name,
+    rankdir="TB", node_producer=GetOpNodeProducer("docstring",
+                                                  color="yellow",
+                                                  fillcolor="yellow",
+                                                  style="filled"))
 pydot_graph.write_dot("pipeline_tfidf.dot")
 
-import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_tfidf.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_tfidf.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
-                             

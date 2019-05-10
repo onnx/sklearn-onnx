@@ -11,15 +11,20 @@ ONNX format contains metadata related to how the
 model was produced. It is useful when the model
 is deployed to production to keep track of which
 instance was used at a specific time.
-Let's see how to do that with a simple 
+Let's see how to do that with a simple
 logistic regression model trained with
 *scikit-learn* and converted with *onnxmltools*.
 """
 
+import skl2onnx
+import onnxruntime
+import sklearn
+import numpy
+from onnxruntime import InferenceSession
+import onnx
 from onnxruntime.datasets import get_example
 example = get_example("logreg_iris.onnx")
 
-import onnx
 model = onnx.load(example)
 
 print("doc_string={}".format(model.doc_string))
@@ -33,7 +38,6 @@ print("producer_version={}".format(model.producer_version))
 #############################
 # With *ONNX Runtime*:
 
-from onnxruntime import InferenceSession
 sess = InferenceSession(example)
 meta = sess.get_modelmeta()
 
@@ -47,10 +51,8 @@ print("version={}".format(meta.version))
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

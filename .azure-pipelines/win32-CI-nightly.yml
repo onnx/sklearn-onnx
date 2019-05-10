@@ -14,7 +14,7 @@ jobs:
   strategy:
     matrix:
       Py37-Onnx150-nightlyRT-Npy1154:
-        python.version: '3.7.3'
+        python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
         numpy.version: 'numpy==1.16.3'
         scipy.version: 'scipy'
@@ -26,10 +26,6 @@ jobs:
     inputs:
       createCustomEnvironment: false
       packageSpecs: 'python=$(python.version)'
-
-  - script: |
-      conda install -y -c anaconda scikit-learn
-    displayName: 'Install numpy mkl scipy pandas sklearn'
 
   - script: |
       conda install -y -c conda-forge protobuf
