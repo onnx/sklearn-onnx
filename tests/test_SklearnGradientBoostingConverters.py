@@ -6,7 +6,8 @@
 
 import unittest
 import numpy as np
-from sklearn.datasets import make_regression
+from pandas import DataFrame
+from sklearn.datasets import make_regression, make_classification
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 from skl2onnx import convert_sklearn
@@ -14,13 +15,24 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import dump_data_and_model
+from onnxruntime import InferenceSession
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier1(self):
-        model = GradientBoostingClassifier(n_estimators=1)
+        model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((1, X.shape[1])))]
+        model_onnx = convert_sklearn(model, initial_types=initial_types)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict_proba(X)
+        if res[1][0] != pred[0, 0]:
+            raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
         dump_binary_classification(model, suffix="1")
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -110,4 +122,5 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestSklearnGradientBoostingModels().test_gradient_boosting_classifier1()
     unittest.main()
