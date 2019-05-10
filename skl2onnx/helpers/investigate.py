@@ -14,8 +14,6 @@ from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.base import RegressorMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
-from .. import convert_sklearn
-from ..helpers.onnx_helper import select_model_inputs_outputs
 
 
 def enumerate_pipeline_models(pipe, coor=None, vs=None):
@@ -227,6 +225,8 @@ def collect_intermediate_steps(model, *args, **kwargs):
             raise ValueError("Parameter intermediate must be true.")
         del kwargs['intermediate']
 
+    from .. import convert_sklearn
+    from ..helpers.onnx_helper import select_model_inputs_outputs
     model_onnx, topology = convert_sklearn(model, *args, intermediate=True,
                                            **kwargs)
 
