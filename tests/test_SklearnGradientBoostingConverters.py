@@ -21,19 +21,28 @@ from onnxruntime import InferenceSession
 class TestSklearnGradientBoostingModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_gradient_boosting_classifier1(self):
+    def test_gradient_boosting_classifier1Deviance(self):
         model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((1, X.shape[1])))]
-        model_onnx = convert_sklearn(model, initial_types=initial_types)
-        sess = InferenceSession(model_onnx.SerializeToString())
-        res = sess.run(None, {'input': X.astype(np.float32)})
-        pred = model.predict_proba(X)
-        if res[1][0] != pred[0, 0]:
-            raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
-        dump_binary_classification(model, suffix="1")
+
+        for cl in [1e-6, 0.9, 0.5, 0., 1e-5]:
+            model.init_.class_prior_ = np.array([cl, cl])
+            initial_types = [('input', FloatTensorType((1, X.shape[1])))]
+            model_onnx = convert_sklearn(model, initial_types=initial_types)
+            if "Regressor" in str(model_onnx):
+                raise AssertionError(str(model_onnx))
+            sess = InferenceSession(model_onnx.SerializeToString())
+            res = sess.run(None, {'input': X.astype(np.float32)})
+            pred = model.predict_proba(X)
+            if res[1][0][0] != pred[0, 0]:
+                rows = ["base_values_", str(model.init_.class_prior_),
+                        "expected", str(pred),
+                        "onnxruntime", str(DataFrame(res[1])),
+                        "model", str(model_onnx)]
+                raise AssertionError("\n---\n".join(rows))
+        dump_binary_classification(model, suffix="1Deviance")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -122,5 +131,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnGradientBoostingModels().test_gradient_boosting_classifier1()
+    cl = TestSklearnGradientBoostingModels()
+    cl.test_gradient_boosting_classifier1Deviance()
     unittest.main()

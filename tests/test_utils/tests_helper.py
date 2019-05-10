@@ -12,6 +12,7 @@ import sys
 import platform
 import numpy
 import pandas
+from sklearn.datasets import make_classification
 from sklearn.base import BaseEstimator
 from .utils_backend import (
     compare_backend,
@@ -54,8 +55,7 @@ def dump_data_and_model(
         dump_error_log=None,
         benchmark=None,
         comparable_outputs=None,
-        verbose=False,
-):
+        verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -337,8 +337,7 @@ def dump_one_class_classification(
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False,
-):
+        verbose=False):
     """
     Trains and dumps a model for a One Class outlier problem.
     The function trains a model and calls
@@ -353,7 +352,7 @@ def dump_one_class_classification(
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "one_class",
                                        [("input", FloatTensorType([1, 2]))])
-    return dump_data_and_model(
+    dump_data_and_model(
         X,
         model,
         model_onnx,
@@ -371,8 +370,7 @@ def dump_binary_classification(
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False,
-):
+        verbose=False):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -398,6 +396,22 @@ def dump_binary_classification(
         comparable_outputs=comparable_outputs,
     )
 
+    X, y = make_classification(10, n_features=4, random_state=42)
+    X = X[:, :2]
+    model.fit(X, y)
+    model_onnx, prefix = convert_model(model, "binary classifier",
+                                       [("input", FloatTensorType([1, 2]))])
+    dump_data_and_model(
+        X.astype(numpy.float32),
+        model,
+        model_onnx,
+        folder=folder,
+        allow_failure=allow_failure,
+        basename=prefix + "Bin" + model.__class__.__name__ + suffix + 'Rnd',
+        verbose=verbose,
+        comparable_outputs=comparable_outputs,
+    )
+
 
 def dump_multiple_classification(
         model,
@@ -407,8 +421,7 @@ def dump_multiple_classification(
         verbose=False,
         label_string=False,
         first_class=0,
-        comparable_outputs=None,
-):
+        comparable_outputs=None):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -432,12 +445,34 @@ def dump_multiple_classification(
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
-        X,
+        X.astype(numpy.float32),
         model,
         model_onnx,
         folder=folder,
         allow_failure=allow_failure,
         basename=prefix + "Mcl" + model.__class__.__name__ + suffix,
+        verbose=verbose,
+        comparable_outputs=comparable_outputs,
+    )
+
+    X, y = make_classification(40, n_features=4, random_state=42,
+                               n_classes=3, n_clusters_per_class=1)
+    X = X[:, :2]
+    model.fit(X, y)
+    if verbose:
+        print("[dump_multiple_classification] model '{}'".format(
+            model.__class__.__name__))
+    model_onnx, prefix = convert_model(model, "multi-class classifier",
+                                       [("input", FloatTensorType([1, 2]))])
+    if verbose:
+        print("[dump_multiple_classification] model was converted")
+    dump_data_and_model(
+        X.astype(numpy.float32),
+        model,
+        model_onnx,
+        folder=folder,
+        allow_failure=allow_failure,
+        basename=prefix + "Mcl" + model.__class__.__name__ + suffix + 'Rnd',
         verbose=verbose,
         comparable_outputs=comparable_outputs,
     )

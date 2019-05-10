@@ -16,6 +16,8 @@ from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
+    if op.loss != 'deviance':
+        raise RuntimeError("loss '{}' not supported.".format(op.loss))
 
     attrs = get_default_tree_classifier_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)

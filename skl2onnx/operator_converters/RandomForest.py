@@ -17,10 +17,10 @@ def _num_estimators(op):
     # don't use op.n_estimators since it may not be the same as
     # len(op.estimators_). At training time n_estimators can be changed by
     # training code:
-    #    for j in range(10):
+    #   for j in range(10):
     #       ...
-    #       classifier.fit(X_tmp, y_tmp)
-    #       classifier.n_estimators += 30
+    #       classifier.fit(X_tmp, y_tmp)
+    #       classifier.n_estimators += 30
     return len(op.estimators_)
 
 
