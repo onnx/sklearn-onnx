@@ -61,19 +61,15 @@ def dynamic_class_creation():
     cls = {}
 
     def _c(obj, label, i):
-        name = obj.name or '%s%d' % (label, i)
+        name = '%s%d' % (obj.name or label, i)
         tys = obj.typeStr or ''
         return (name, tys)
 
     for name in sorted(res):
         schema = res[name]
         doc = get_rst_doc(schema)
-        if name == "Abs":
-            inputs = [('X', 'FloatTensorType')]
-            outputs = [('Y', 'FloatTensorType')]
-        else:
-            inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
-            outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
+        inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
+        outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
         class_name = "Onnx" + schema.name
         cl = ClassFactory(class_name, schema.name, inputs, outputs,
