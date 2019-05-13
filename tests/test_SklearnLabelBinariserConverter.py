@@ -25,6 +25,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelBinariserDefault",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_label_binariser_neg_label(self):
@@ -41,6 +44,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelBinariserNegLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_label_binariser_pos_label(self):
@@ -57,6 +63,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelBinariserPosLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_label_binariser_neg_pos_label(self):
@@ -73,6 +82,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelBinariserNegPosLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 
