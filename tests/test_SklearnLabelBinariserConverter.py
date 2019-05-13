@@ -10,7 +10,7 @@ from skl2onnx.common.data_types import Int64TensorType
 from test_utils import dump_data_and_model
 
 
-class TestSklearnBinarizer(unittest.TestCase):
+class TestSklearnLabelBinariser(unittest.TestCase):
     def test_model_label_binariser_default(self):
         X = np.array([1, 2, 6, 4, 2])
         model = LabelBinarizer().fit(X)
