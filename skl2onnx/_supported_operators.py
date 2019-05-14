@@ -75,7 +75,11 @@ except ModuleNotFoundError:
     # 0.19
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.preprocessing import Binarizer
-from sklearn.preprocessing import Imputer
+try:
+    from sklearn.preprocessing import Imputer
+except ImportError:
+    # removed in 0.21
+    Imputer = None
 try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
