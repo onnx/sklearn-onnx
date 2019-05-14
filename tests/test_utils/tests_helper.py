@@ -407,7 +407,7 @@ def dump_binary_classification(
         model_onnx,
         folder=folder,
         allow_failure=allow_failure,
-        basename=prefix + "Bin" + model.__class__.__name__ + suffix + 'Rnd',
+        basename=prefix + "RndBin" + model.__class__.__name__ + suffix,
         verbose=verbose,
         comparable_outputs=comparable_outputs,
     )
@@ -467,12 +467,12 @@ def dump_multiple_classification(
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
-        X.astype(numpy.float32),
+        X[:10].astype(numpy.float32),
         model,
         model_onnx,
         folder=folder,
         allow_failure=allow_failure,
-        basename=prefix + "Mcl" + model.__class__.__name__ + suffix + 'Rnd',
+        basename=prefix + "RndMcl" + model.__class__.__name__ + suffix,
         verbose=verbose,
         comparable_outputs=comparable_outputs,
     )
