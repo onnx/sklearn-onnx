@@ -3,7 +3,10 @@ Tests scikit-imputer converter.
 """
 import unittest
 import numpy as np
-from sklearn.preprocessing import Imputer
+try:
+    from sklearn.preprocessing import Imputer
+except ImportError:
+    Imputer = None
 
 try:
     from sklearn.impute import SimpleImputer
@@ -16,6 +19,8 @@ from test_utils import dump_data_and_model
 
 
 class TestSklearnImputerConverter(unittest.TestCase):
+    @unittest.skipIf(Imputer is None,
+                     reason="Imputer removed in 0.21")
     def test_model_imputer(self):
         model = Imputer(missing_values="NaN", strategy="mean", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]
@@ -28,6 +33,8 @@ class TestSklearnImputerConverter(unittest.TestCase):
                                      [("input", Int64TensorType([1, 2]))])
         self.assertTrue(model_onnx is not None)
 
+    @unittest.skipIf(Imputer is None,
+                     reason="Imputer removed in 0.21")
     def test_imputer_int_inputs(self):
         model = Imputer(missing_values="NaN", strategy="mean", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]
@@ -42,6 +49,8 @@ class TestSklearnImputerConverter(unittest.TestCase):
         self.assertEqual(outputs[0].type.tensor_type.shape.dim[-1].dim_value,
                          2)
 
+    @unittest.skipIf(Imputer is None,
+                     reason="Imputer removed in 0.21")
     def test_imputer_float_inputs(self):
         model = Imputer(missing_values="NaN", strategy="mean", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]

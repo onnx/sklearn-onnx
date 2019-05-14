@@ -13,7 +13,12 @@ from scipy.sparse.csr import csr_matrix
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.base import RegressorMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+try:
+    from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+except ImportError:
+    # not avaiable in 0.19
+    ColumnTransformer = None
+    TransformedTargetRegressor = None
 from .. import convert_sklearn
 from ..helpers.onnx_helper import select_model_inputs_outputs
 

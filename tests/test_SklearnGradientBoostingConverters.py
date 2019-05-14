@@ -42,13 +42,19 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                         "onnxruntime", str(DataFrame(res[1])),
                         "model", str(model_onnx)]
                 raise AssertionError("\n---\n".join(rows))
-        dump_binary_classification(model, suffix="1Deviance")
+        dump_binary_classification(
+            model, suffix="1Deviance",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.5.0')")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier3(self):
         model = GradientBoostingClassifier(n_estimators=3)
-        dump_binary_classification(model, suffix="3")
+        dump_binary_classification(
+            model, suffix="3",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.5.0')")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -57,7 +63,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         dump_multiple_classification(
             model,
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.3.0')",
+            "<= StrictVersion('0.5.0')",
         )
 
     def _fit_regression_model(self, model):
@@ -79,6 +85,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionLsLoss",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.5.0')"
         )
 
     def test_gradient_boosting_regressor_lad_loss(self):
