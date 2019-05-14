@@ -6,6 +6,7 @@
 
 import unittest
 import numpy as np
+from distutils.version import StrictVersion
 from pandas import DataFrame
 from sklearn.datasets import make_regression, make_classification
 from sklearn.ensemble import GradientBoostingClassifier
@@ -15,20 +16,24 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import dump_data_and_model
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(__version__) <= StrictVersion("0.5.0"),
+        reason="Depends on PR #1015 onnxruntime.")
     def test_gradient_boosting_classifier1Deviance(self):
         model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
 
-        for cl in [1e-6, 0.9, 0.5, 0., 1e-5]:
-            model.init_.class_prior_ = np.array([cl, cl])
+        for cl in [None, 0.231, 1e-6, 0.9]:
+            if cl is not None:
+                model.init_.class_prior_ = np.array([cl, cl])
             initial_types = [('input', FloatTensorType((1, X.shape[1])))]
             model_onnx = convert_sklearn(model, initial_types=initial_types)
             if "Regressor" in str(model_onnx):
@@ -37,7 +42,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             res = sess.run(None, {'input': X.astype(np.float32)})
             pred = model.predict_proba(X)
             if res[1][0][0] != pred[0, 0]:
-                rows = ["base_values_", str(model.init_.class_prior_),
+                rows = ["X", str(X),
+                        "base_values_", str(model.init_.class_prior_),
+                        "predicted_label", str(model.predict(X)),
                         "expected", str(pred),
                         "onnxruntime", str(DataFrame(res[1])),
                         "model", str(model_onnx)]
@@ -139,6 +146,4 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    cl = TestSklearnGradientBoostingModels()
-    cl.test_gradient_boosting_classifier1Deviance()
     unittest.main()

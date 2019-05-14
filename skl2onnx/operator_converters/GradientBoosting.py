@@ -30,6 +30,14 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
             assert base_values.shape == (2, )
         else:
             base_values = [op.init_.prior]
+        if op.loss == 'deviance':
+            # See https://github.com/scikit-learn/scikit-learn/blob/
+            # master/sklearn/ensemble/_gb_losses.py#L666.
+            eps = np.finfo(np.float32).eps
+            base_values = np.clip(base_values, eps, 1 - eps)
+            base_values = np.log(base_values / (1 - base_values))
+        else:
+            raise NotImplementedError("Other losses are not yet converted.")
     else:
         transform = 'SOFTMAX'
         # class_prior_ was introduced in scikit-learn 0.21.
