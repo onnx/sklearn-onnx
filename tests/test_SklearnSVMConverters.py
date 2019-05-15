@@ -119,6 +119,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinSVCLinearPF-NoProbOpp",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.5.0')"
         )
 
     def test_convert_svc_binary_linear_ptrue(self):
@@ -252,6 +254,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinNuSVCPF-NoProbOpp",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.5.0')"
         )
 
     def test_convert_nusvc_binary_ptrue(self):

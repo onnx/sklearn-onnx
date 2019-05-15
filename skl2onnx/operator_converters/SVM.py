@@ -12,6 +12,25 @@ from sklearn.svm import SVC, NuSVC, SVR, NuSVR
 
 
 def convert_sklearn_svm(scope, operator, container):
+    """
+    Converter for model
+    `SVC <https://scikit-learn.org/stable/modules/
+    generated/sklearn.svm.SVC.html>`_,
+    `SVR <https://scikit-learn.org/stable/modules/
+    generated/sklearn.svm.SVR.html>`_,
+    `NuSVC <https://scikit-learn.org/stable/modules/
+    generated/sklearn.svm.NuSVC.html>`_,
+    `NuSVR <https://scikit-learn.org/stable/modules/
+    generated/sklearn.svm.NuSVR.html>`_.
+    The converted model in ONNX produces the same results as the
+    original model except when probability=False:
+    *onnxruntime* and *scikit-learn* do not return the same raw
+    scores. *scikit-learn* returns aggregated scores
+    as a *matrix[N, C]* coming from `_ovr_decision_function
+    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    sklearn/utils/multiclass.py#L402>`_. *onnxruntime* returns
+    the raw score from *svm* algorithm as a *matrix[N, (C(C-1)/2]*.
+    """
     svm_attrs = {'name': scope.get_unique_operator_name('SVM')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
