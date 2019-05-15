@@ -462,6 +462,11 @@ def _compare_expected(expected,
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
+            print('----')
+            print(expected)
+            print('----')
+            print(output)
+            print('----')
             raise OnnxRuntimeAssertionError(
                 "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
         tested += 1
