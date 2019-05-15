@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from pandas import DataFrame
 from sklearn.tree import DecisionTreeClassifier
@@ -19,12 +20,16 @@ from test_utils import (
     dump_multiple_classification,
 )
 from test_utils import dump_multiple_regression, dump_single_regression
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(__version__) <= StrictVersion("0.3.0"),
+        reason="No suitable kernel definition found "
+               "for op Cast(9) (node Cast)")
     def test_decisiontree_classifier1(self):
         model = DecisionTreeClassifier(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
