@@ -19,8 +19,6 @@ except ImportError:
     # not avaiable in 0.19
     ColumnTransformer = None
     TransformedTargetRegressor = None
-from .. import convert_sklearn
-from ..helpers.onnx_helper import select_model_inputs_outputs
 
 
 def enumerate_pipeline_models(pipe, coor=None, vs=None):
