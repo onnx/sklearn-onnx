@@ -13,7 +13,14 @@ from scipy.sparse.csr import csr_matrix
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.base import RegressorMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+try:
+    from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+except ImportError:
+    # not avaiable in 0.19
+    ColumnTransformer = None
+    TransformedTargetRegressor = None
+from .. import convert_sklearn
+from ..helpers.onnx_helper import select_model_inputs_outputs
 
 
 def enumerate_pipeline_models(pipe, coor=None, vs=None):
@@ -47,7 +54,7 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
         for i, (_, model) in enumerate(pipe.steps):
             for couple in enumerate_pipeline_models(model, coor + (i,)):
                 yield couple
-    elif isinstance(pipe, ColumnTransformer):
+    elif ColumnTransformer is not None and isinstance(pipe, ColumnTransformer):
         for i, (_, fitted_transformer, column) in enumerate(pipe.transformers):
             for couple in enumerate_pipeline_models(
                     fitted_transformer, coor + (i,), column):
@@ -56,7 +63,8 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
         for i, (_, model) in enumerate(pipe.transformer_list):
             for couple in enumerate_pipeline_models(model, coor + (i,)):
                 yield couple
-    elif isinstance(pipe, TransformedTargetRegressor):
+    elif TransformedTargetRegressor is not None and isinstance(
+            pipe, TransformedTargetRegressor):
         raise NotImplementedError(
             "Not yet implemented for TransformedTargetRegressor.")
     elif isinstance(pipe, (TransformerMixin, ClassifierMixin, RegressorMixin)):
