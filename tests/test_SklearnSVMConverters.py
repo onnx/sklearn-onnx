@@ -120,7 +120,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnBinSVCLinearPF-NoProbOpp",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_svc_binary_linear_ptrue(self):
@@ -176,7 +176,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMclSVCLinearPF-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_svc_multi_linear_ptrue(self):
@@ -205,7 +205,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMclSVCLinearPT-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_svr_linear(self):
@@ -255,7 +255,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnBinNuSVCPF-NoProbOpp",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_nusvc_binary_ptrue(self):
@@ -310,7 +310,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMclNuSVCPF-Dec2",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_svc_multi_pfalse_4(self):
@@ -326,7 +326,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMcSVCPF",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     @unittest.skipIf(
@@ -346,7 +346,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMcSVCPFBTF",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " < StrictVersion('0.5.0')"
         )
 
     def test_convert_svc_multi_ptrue_4(self):
