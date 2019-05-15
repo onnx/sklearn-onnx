@@ -19,9 +19,15 @@ from test_utils import dump_data_and_model
 class TestSklearnGradientBoostingModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_gradient_boosting_classifier(self):
+    def test_gradient_boosting_classifier1(self):
+        model = GradientBoostingClassifier(n_estimators=1)
+        dump_binary_classification(model, suffix="1")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gradient_boosting_classifier3(self):
         model = GradientBoostingClassifier(n_estimators=3)
-        dump_binary_classification(model)
+        dump_binary_classification(model, suffix="3")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
