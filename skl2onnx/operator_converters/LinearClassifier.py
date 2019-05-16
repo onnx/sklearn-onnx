@@ -13,14 +13,16 @@ from ..proto import onnx_proto
 
 def convert_sklearn_linear_classifier(scope, operator, container):
     op = operator.raw_operator
+    classes = op.classes_
+    number_of_classes = len(classes)
     coefficients = op.coef_.flatten().astype(float).tolist()
     if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
         # fit_intercept = False
-        intercepts = [0.0]
+        intercepts = ([0.0] * number_of_classes if number_of_classes != 2 else
+                      [0.0])
     else:
         intercepts = op.intercept_.tolist()
-    classes = op.classes_
-    if len(classes) == 2:
+    if number_of_classes == 2:
         coefficients = list(map(lambda x: -1 * x, coefficients)) + coefficients
         intercepts = list(map(lambda x: -1 * x, intercepts)) + intercepts
 
@@ -44,7 +46,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         classifier_attrs['post_transform'] = 'NONE'
     elif op.__class__.__name__ == 'LogisticRegression':
         if multi_class == 2:
-            if len(op.classes_) == 2:
+            if number_of_classes == 2:
                 """
                 See method _predict_proba_lr.
                 When number if classes is two, the function
