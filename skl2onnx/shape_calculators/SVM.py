@@ -7,6 +7,7 @@
 import numbers
 import numpy as np
 import six
+from sklearn.svm import SVC, NuSVC
 from ..common._registration import register_shape_calculator
 from ..common.data_types import FloatTensorType, Int64TensorType
 from ..common.data_types import StringTensorType
@@ -35,7 +36,7 @@ def calculate_sklearn_svm_output_shapes(operator):
     op = operator.raw_operator
 
     N = operator.inputs[0].type.shape[0]
-    if operator.type in ['SklearnSVC']:
+    if operator.type in ['SklearnSVC'] or isinstance(op, (SVC, NuSVC)):
         number_of_classes = len(op.classes_)
         check_input_and_output_numbers(operator, input_count_range=[1, None],
                                        output_count_range=[1, 2])
