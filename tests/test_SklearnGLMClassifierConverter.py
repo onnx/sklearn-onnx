@@ -1,5 +1,7 @@
+from distutils.version import StrictVersion
 import unittest
 import numpy
+import sklearn
 from sklearn import datasets
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -72,7 +74,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegression())
         model_onnx = convert_sklearn(
             model,
-            "maximum entropy classifier",
+            "multi-class logistic regression",
             [("input", FloatTensorType([1, 3]))],
         )
         self.assertIsNotNone(model_onnx)
@@ -81,6 +83,103 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMulti",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_no_intercept(self):
+        model, X = self._fit_model_multiclass_classification(
+            linear_model.LogisticRegression(fit_intercept=False))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMultiNoIntercept",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_lbfgs(self):
+        penalty = (
+            'l2'
+            if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0')
+            else 'none')
+        model, X = self._fit_model_multiclass_classification(
+            linear_model.LogisticRegression(solver='lbfgs', penalty=penalty))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMultiLbfgs",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_liblinear_l1(self):
+        model, X = self._fit_model_multiclass_classification(
+            linear_model.LogisticRegression(solver='liblinear', penalty='l1'))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMultiLiblinearL1",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_saga_elasticnet(self):
+        if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0'):
+            model, X = self._fit_model_multiclass_classification(
+                linear_model.LogisticRegression(solver='saga'))
+        else:
+            model, X = self._fit_model_multiclass_classification(
+                linear_model.LogisticRegression(
+                    solver='saga', penalty='elasticnet', l1_ratio=0.1))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMultiSagaElasticnet",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
