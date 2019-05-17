@@ -109,7 +109,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_binary_class_log_l1(self):
+    def test_model_sgd_binary_class_log_l1_no_intercept(self):
         model, X = self._fit_model_classification(
             SGDClassifier(loss='log', penalty='l1', fit_intercept=False), 2)
         model_onnx = convert_sklearn(
@@ -145,28 +145,6 @@ class TestSGDClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDClassifierMultiLogL1NoIntercept",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
-
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    def test_model_sgd_binary_class_modified_huber(self):
-        model, X = self._fit_model_classification(
-            SGDClassifier(loss='modified_huber'), 2)
-        model_onnx = convert_sklearn(
-            model,
-            "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(X.shape))],
-        )
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnSGDClassifierBinaryModifiedHuber",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -213,6 +191,28 @@ class TestSGDClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDClassifierMultiLogElasticnetPowerT",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_sgd_binary_class_modified_huber(self):
+        model, X = self._fit_model_classification(
+            SGDClassifier(loss='modified_huber'), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD binary classifier",
+            [("input", FloatTensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryModifiedHuber",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
