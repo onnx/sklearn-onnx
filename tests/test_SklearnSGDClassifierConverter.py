@@ -23,7 +23,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_hinge(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='hinge'), 2)
+            SGDClassifier(loss='hinge', random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -45,7 +45,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_hinge(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='hinge'), 5)
+            SGDClassifier(loss='hinge', random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
@@ -67,7 +67,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_log(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log'), 2)
+            SGDClassifier(loss='log', random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -89,12 +89,13 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_log(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log'), 5)
+            SGDClassifier(loss='log', random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType(X.shape))],
         )
+        X = X[4740:4800]
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32),
@@ -111,7 +112,8 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_log_l1_no_intercept(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log', penalty='l1', fit_intercept=False), 2)
+            SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
+                          random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -133,7 +135,9 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_log_l1_no_intercept(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log', penalty='l1', fit_intercept=False), 5)
+            SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
+                          random_state=42), 5)
+        X = X[:30]
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
@@ -153,10 +157,10 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_binary_class_log_elasticnet_power_t(self):
+    def test_model_sgd_binary_class_elasticnet_power_t(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.3,
-                          power_t=2), 2)
+            SGDClassifier(penalty='elasticnet', l1_ratio=0.3,
+                          power_t=2, random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -167,7 +171,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierBinaryLogElasticnetPowerT",
+            basename="SklearnSGDClassifierBinaryElasticnetPowerT-Out0",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -176,10 +180,10 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_multi_class_log_elasticnet_power_t(self):
+    def test_model_sgd_multi_class_elasticnet_power_t(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.3,
-                          power_t=2), 5)
+            SGDClassifier(penalty='elasticnet', l1_ratio=0.3,
+                          power_t=2, random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
@@ -190,7 +194,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierMultiLogElasticnetPowerT",
+            basename="SklearnSGDClassifierMultiElasticnetPowerT-Out0",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -201,7 +205,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_modified_huber(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='modified_huber'), 2)
+            SGDClassifier(loss='modified_huber', random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -212,7 +216,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierBinaryModifiedHuber",
+            basename="SklearnSGDClassifierBinaryModifiedHuber-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -222,19 +226,17 @@ class TestSGDClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_modified_huber(self):
-        X, y = make_classification(n_classes=5, n_features=10, n_samples=10,
-                                   random_state=42, n_informative=7)
-        X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.2,
-                                                       random_state=42)
-        model = SGDClassifier(loss='modified_huber').fit(X_train, y_train)
+        model, X = self._fit_model_classification(
+            SGDClassifier(loss='modified_huber', random_state=42), 5)
+        X = X[:2]
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType(X.shape))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X.astype(np.float32),
             model,
             model_onnx,
             basename="SklearnSGDClassifierMultiModifiedHuber",
@@ -248,7 +250,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_squared_hinge(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='squared_hinge'), 2)
+            SGDClassifier(loss='squared_hinge', random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -270,7 +272,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_squared_hinge(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='squared_hinge'), 5)
+            SGDClassifier(loss='squared_hinge', random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
@@ -292,7 +294,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_perceptron(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='perceptron'), 2)
+            SGDClassifier(loss='perceptron', random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
@@ -314,7 +316,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_preceptron(self):
         model, X = self._fit_model_classification(
-            SGDClassifier(loss='perceptron'), 5)
+            SGDClassifier(loss='perceptron', random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
