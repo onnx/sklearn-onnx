@@ -76,11 +76,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
 
 
 def _normalise_proba(scope, operator, container, proba, num_classes,
-                     unity_name=None):
-    if not unity_name:
-        unity_name = scope.get_unique_variable_name('unity')
-        container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
-                                  [], [1])
+                     unity_name):
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
 
@@ -155,7 +151,7 @@ def _predict_proba_modified_huber(scope, operator, container,
     apply_div(scope, [add_result_name, constant_name],
               proba_name, container, broadcast=1)
     return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes)
+                            num_classes, unity_name)
 
 
 def convert_sklearn_sgd_classifier(scope, operator, container):
