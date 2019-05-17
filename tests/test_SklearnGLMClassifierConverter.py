@@ -1,5 +1,7 @@
+from distutils.version import StrictVersion
 import unittest
 import numpy
+import sklearn
 from sklearn import datasets
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -112,8 +114,12 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_lbfgs(self):
+        penalty = (
+            'l2'
+            if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0')
+            else 'none')
         model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(solver='lbfgs', penalty='none'))
+            linear_model.LogisticRegression(solver='lbfgs', penalty=penalty))
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
@@ -156,9 +162,13 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(
-                solver='saga', penalty='elasticnet', l1_ratio=0.1))
+        if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0'):
+            model, X = self._fit_model_multiclass_classification(
+                linear_model.LogisticRegression(solver='saga'))
+        else:
+            model, X = self._fit_model_multiclass_classification(
+                linear_model.LogisticRegression(
+                    solver='saga', penalty='elasticnet', l1_ratio=0.1))
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
