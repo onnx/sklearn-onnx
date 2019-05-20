@@ -227,29 +227,6 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_multi_class_modified_huber(self):
-        model, X = self._fit_model_classification(
-            SGDClassifier(loss='modified_huber', random_state=42), 5)
-        X = X[17:20]
-        model_onnx = convert_sklearn(
-            model,
-            "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(X.shape))],
-        )
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnSGDClassifierMultiModifiedHuber",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
-
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_squared_hinge(self):
         model, X = self._fit_model_classification(
             SGDClassifier(loss='squared_hinge', random_state=42), 2)
