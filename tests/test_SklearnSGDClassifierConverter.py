@@ -1,3 +1,5 @@
+"""Tests scikit-learn's SGDClassifier converter."""
+
 import unittest
 import numpy as np
 from sklearn.datasets import make_classification

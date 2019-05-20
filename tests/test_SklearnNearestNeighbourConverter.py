@@ -1,5 +1,5 @@
 """
-Tests GLMRegressor converter.
+Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
 import unittest
 import numpy
