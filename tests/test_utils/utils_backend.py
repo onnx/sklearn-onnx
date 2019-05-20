@@ -178,7 +178,8 @@ def extract_options(name):
     else:
         res = {}
         for opt in opts[1:]:
-            if opt in ("SkipDim1", "OneOff", "NoProb", "Dec4", "Dec3", "Dec2",
+            if opt in ("SkipDim1", "OneOff", "NoProb", "NoProbOpp",
+                       "Dec4", "Dec3", "Dec2", 'Svm',
                        'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
                 res[opt] = True
             else:
@@ -193,6 +194,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
     """
     SkipDim1 = kwargs.pop("SkipDim1", False)
     NoProb = kwargs.pop("NoProb", False)
+    NoProbOpp = kwargs.pop("NoProbOpp", False)
     Dec4 = kwargs.pop("Dec4", False)
     Dec3 = kwargs.pop("Dec3", False)
     Dec2 = kwargs.pop("Dec2", False)
@@ -214,19 +216,23 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                 tuple([d for d in expected.shape if d > 1]))
             output = output.reshape(tuple([d for d in expected.shape
                                            if d > 1]))
-        if NoProb:
+        if NoProb or NoProbOpp:
             # One vector is (N,) with scores, negative for class 0
             # positive for class 1
             # The other vector is (N, 2) score in two columns.
             if len(output.shape) == 2 and output.shape[1] == 2 and len(
                     expected.shape) == 1:
                 output = output[:, 1]
+                if NoProbOpp:
+                    output = -output
             elif len(output.shape) == 1 and len(expected.shape) == 1:
                 pass
             elif len(expected.shape) == 1 and len(output.shape) == 2 and \
                     expected.shape[0] == output.shape[0] and \
                     output.shape[1] == 1:
                 output = output[:, 0]
+                if NoProbOpp:
+                    output = -output
             elif expected.shape != output.shape:
                 raise NotImplementedError("No good shape: {0} != {1}".format(
                     expected.shape, output.shape))
