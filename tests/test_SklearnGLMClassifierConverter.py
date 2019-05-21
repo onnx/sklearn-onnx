@@ -11,6 +11,12 @@ from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
+def sklearn_version():
+    # Remove development version 0.22.dev0 becomes 0.22.
+    v = ".".join(sklearn.__version__.split('.')[:2])
+    return StrictVersion(v)
+
+
 class TestGLMClassifierConverter(unittest.TestCase):
     def _fit_model_binary_classification(self, model):
         iris = datasets.load_iris()
@@ -116,7 +122,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
     def test_model_logistic_regression_multi_class_lbfgs(self):
         penalty = (
             'l2'
-            if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0')
+            if sklearn_version() < StrictVersion('0.21.0')
             else 'none')
         model, X = self._fit_model_multiclass_classification(
             linear_model.LogisticRegression(solver='lbfgs', penalty=penalty))
@@ -162,7 +168,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
-        if StrictVersion(sklearn.__version__) < StrictVersion('0.21.0'):
+        if sklearn_version() < StrictVersion('0.21.0'):
             model, X = self._fit_model_multiclass_classification(
                 linear_model.LogisticRegression(solver='saga'))
         else:
