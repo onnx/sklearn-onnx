@@ -121,7 +121,7 @@ class OnnxOperatorMixin:
             if inputs:
                 op = self.to_onnx_operator(inputs=inputs)
             else:
-                op = self.to_onnx_operator(inputs=inputs)
+                op = self.to_onnx_operator()
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map.get(
@@ -156,7 +156,7 @@ class OnnxOperatorMixin:
             if inputs:
                 op = self.to_onnx_operator(inputs=inputs)
             else:
-                op = self.to_onnx_operator(inputs=inputs)
+                op = self.to_onnx_operator()
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map[parent]

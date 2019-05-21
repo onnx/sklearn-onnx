@@ -93,8 +93,8 @@ class OnnxOperator:
                                         type(inp)))
 
         if self.inputs is not None:
-            if len(self.inputs) < self.input_range[0] or \
-                    len(self.inputs) > self.input_range[1]:
+            if len(self.inputs) < self.input_range[0] or (
+                    len(self.inputs) > self.input_range[1]):
                 raise RuntimeError("Operator '{}' expects a number of inputs "
                                    "in [{}, {}] not {}".format(
                                        self.operator_name,
@@ -102,8 +102,8 @@ class OnnxOperator:
                                        len(self.inputs)))
 
         # check output
-        if hasattr(output_names, 'outputs') and \
-                output_names.outputs is not None:
+        if hasattr(output_names, 'outputs') and (
+                output_names.outputs is not None):
             self.output_names = [out.full_name
                                  for out in output_names.outputs]
         else:
@@ -124,8 +124,8 @@ class OnnxOperator:
         """
         if hasattr(self, 'output_names_'):
             return self.output_names_[i]
-        if self.output_names and i < len(self.output_names) and \
-                self.output_names[i]:
+        if self.output_names and i < len(self.output_names) and (
+                self.output_names[i]):
             return self.output_names[i]
         if i < len(self.__class__.expected_outputs):
             return self.__class__.expected_outputs[i][0]

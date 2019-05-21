@@ -68,10 +68,10 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                                outputs=[('Y', FloatTensorType((1, dim)))])
             return onx
 
-        exp = [np.array([[0., 0., 0., 0., 0.]]),
-               np.array([[0., 0., 0., 0., 0.]]),
-               np.array([[0., 0., 0., 0., 0.]]),
-               np.array([[0., 0., 0., 0., 0.]])]
+        exp = [np.zeros((1, 5)),
+               np.zeros((1, 5)),
+               np.zeros((1, 5)),
+               np.zeros((1, 5))]
         for i, nbnode in enumerate((1, 2, 3, 100)):
             onx = generate_onnx_graph(5, nbnode)
             as_string = onx.SerializeToString()

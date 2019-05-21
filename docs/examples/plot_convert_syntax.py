@@ -12,7 +12,6 @@ in an easy way.
 
 .. contents::
     :local:
-    
 
 Predict with onnxruntime
 ++++++++++++++++++++++++
@@ -29,13 +28,12 @@ from skl2onnx import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
 from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
-from onnxruntime import InferenceSession
 
 
 def predict_with_onnxruntime(onx, X):
     sess = InferenceSession(onx.SerializeToString())
-    input = sess.get_inputs()[0].name
-    res = sess.run(None, {input: X.astype(np.float32)})
+    input_name = sess.get_inputs()[0].name
+    res = sess.run(None, {input_name: X.astype(np.float32)})
     return res[0]
 
 #################################
@@ -44,11 +42,13 @@ def predict_with_onnxruntime(onx, X):
 #
 # The first way: :func:`convert_sklearn`.
 
+
 X = np.arange(20).reshape(10, 2)
 tr = KMeans(n_clusters=2)
 tr.fit(X)
 
-onx = convert_sklearn(tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+onx = convert_sklearn(tr, initial_types=[('X',
+                                          FloatTensorType((1, X.shape[1])))])
 print(predict_with_onnxruntime(onx, X))
 
 #################################
@@ -109,12 +109,12 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
 
     def transform(self, X):
         return (X - self.W_) / self.S_
-        
-    def onnx_shape_calculator(self):        
+
+    def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = operator.inputs[0].type
         return shape_calculator
-    
+
     def to_onnx_operator(self, inputs=None, outputs=('Y', )):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
@@ -127,11 +127,13 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
 #############################
 # Way 1
 
+
 X = np.arange(20).reshape(10, 2)
-tr = make_pipeline(CustomOpTransformer (), KMeans(n_clusters=2))
+tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
-onx = convert_sklearn(tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+onx = convert_sklearn(tr, initial_types=[('X',
+                                          FloatTensorType((1, X.shape[1])))])
 print(predict_with_onnxruntime(onx, X))
 
 #############################
@@ -160,7 +162,8 @@ print(predict_with_onnxruntime(onx, X))
 # Way 4
 
 X = np.arange(20).reshape(10, 2)
-tr = wrap_as_onnx_mixin(make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)))
+tr = wrap_as_onnx_mixin(make_pipeline(CustomOpTransformer(),
+                                      KMeans(n_clusters=2)))
 
 tr.fit(X)
 
@@ -173,28 +176,29 @@ print(predict_with_onnxruntime(onx, X))
 #
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer  # noqa
 pydot_graph = GetPydotGraph(onx.graph, name=onx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+                            node_producer=GetOpNodeProducer(
+                                "docstring", color="yellow",
+                                fillcolor="yellow", style="filled"))
 pydot_graph.write_dot("pipeline_onnx_mixin.dot")
 
-import os
+import os  # noqa
 os.system('dot -O -Gdpi=300 -Tpng pipeline_onnx_mixin.dot')
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa
 image = plt.imread("pipeline_onnx_mixin.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
 ax.axis('off')
-                             
+
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy, sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
+import onnx, onnxruntime, skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
