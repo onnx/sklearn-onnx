@@ -7,6 +7,7 @@ from skl2onnx.common.data_types import (
     DictionaryType,
     StringTensorType,
     FloatTensorType,
+    Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
@@ -43,14 +44,14 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_sort_false(self):
         model = DictVectorizer(sparse=False, sort=False)
-        data = [{"amy": 1.0, "chin": 200.0}, {"nice": 3.0, "amy": 1.0}]
+        data = [{1: 1.0, 2: 200.0}, {1: 3.0, 3: 1.0}]
         model.fit_transform(data)
         model_onnx = convert_sklearn(
             model,
             "dictionary vectorizer",
             [(
                 "input",
-                DictionaryType(StringTensorType([1]), FloatTensorType([1])),
+                DictionaryType(Int64TensorType([1]), FloatTensorType([1])),
             )],
         )
         self.assertTrue(model_onnx is not None)

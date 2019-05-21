@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 from sklearn.decomposition import TruncatedSVD
 
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
 from test_utils import create_tensor
 from test_utils import dump_data_and_model
@@ -46,17 +46,17 @@ class TestTruncatedSVD(unittest.TestCase):
         dump_data_and_model(X, svd, model_onnx,
                             basename="SklearnTruncatedSVDArpack")
 
-    def test_truncated_svd_default(self):
-        X = create_tensor(5, 5)
+    def test_truncated_svd_int(self):
+        X = create_tensor(5, 5).astype(np.int64)
         svd = TruncatedSVD(n_iter=20, random_state=42).fit(X)
         model_onnx = convert_sklearn(svd,
                                      initial_types=[
                                          ("input",
-                                          FloatTensorType(shape=X.shape))
+                                          Int64TensorType(shape=X.shape))
                                      ])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, svd, model_onnx,
-                            basename="SklearnTruncatedSVDDefaut")
+                            basename="SklearnTruncatedSVDInt")
 
 
 if __name__ == "__main__":

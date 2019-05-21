@@ -130,7 +130,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         # (this test will fail by then).
         data = [['Male', 1], ['Female', 3], ['Female', 2]]
         test_data = [['Unknown', 4]]
-        model = OneHotEncoder(handle_unknown='ignore')
+        model = OneHotEncoder(handle_unknown='ignore',
+                              categorical_features='all')
         model.fit(data)
         inputs = [
             ("input1", StringTensorType([1, 1])),
