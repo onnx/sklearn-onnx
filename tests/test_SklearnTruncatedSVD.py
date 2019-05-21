@@ -55,11 +55,12 @@ class TestTruncatedSVD(unittest.TestCase):
                                           Int64TensorType(shape=X.shape))
                                      ])
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X, svd, model_onnx,
-                            basename="SklearnTruncatedSVDInt",
-                            allow_failure="StrictVersion("
-                            "onnxruntime.__version__)"
-                            "<= StrictVersion('0.2.1')",
+        dump_data_and_model(
+            X, svd, model_onnx,
+            basename="SklearnTruncatedSVDInt",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 
