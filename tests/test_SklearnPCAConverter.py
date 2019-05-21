@@ -99,6 +99,9 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPCADefaultIntRandomised",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 

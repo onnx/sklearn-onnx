@@ -56,7 +56,11 @@ class TestTruncatedSVD(unittest.TestCase):
                                      ])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, svd, model_onnx,
-                            basename="SklearnTruncatedSVDInt")
+                            basename="SklearnTruncatedSVDInt",
+                            allow_failure="StrictVersion("
+                            "onnxruntime.__version__)"
+                            "<= StrictVersion('0.2.1')",
+        )
 
 
 if __name__ == "__main__":
