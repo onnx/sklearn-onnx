@@ -1,10 +1,11 @@
-"""
-Tests scikit-onehotencoder converter.
-"""
+"""Tests scikit-learn's OneHotEncoder converter."""
+
 import unittest
-import numpy
 import inspect
+
+import numpy
 from sklearn.preprocessing import OneHotEncoder
+
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     Int64TensorType,
@@ -118,6 +119,32 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOneHotEncoderTwoStringCat",
+        )
+
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder does not support strings in 0.19",
+    )
+    def test_one_hot_encoder_one_string_one_int_cat(self):
+        # categorical_features will be removed in 0.22
+        # (this test will fail by then).
+        data = [['Male', 1], ['Female', 3], ['Female', 2]]
+        test_data = [['Unknown', 4]]
+        model = OneHotEncoder(handle_unknown='ignore',
+                              categorical_features='all')
+        model.fit(data)
+        inputs = [
+            ("input1", StringTensorType([1, 1])),
+            ("input2", Int64TensorType([1, 1]))
+        ]
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder one string and int categories", inputs)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            test_data,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderOneStringOneIntCat",
         )
 
 
