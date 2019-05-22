@@ -12,8 +12,12 @@ import sys
 import platform
 import numpy
 import pandas
-from sklearn.datasets import make_classification
+from sklearn.datasets import (
+    make_classification,
+    make_multilabel_classification
+)
 from sklearn.base import BaseEstimator
+from sklearn.preprocessing import MultiLabelBinarizer
 from .utils_backend import (
     compare_backend,
     extract_options,
@@ -224,7 +228,7 @@ def dump_data_and_model(
         model.save(dest)
     else:
         dest = os.path.join(folder, basename + ".model.pkl")
-        names.append(dest)        
+        names.append(dest)
         with open(dest, "wb") as f:
             try:
                 pickle.dump(model, f)
@@ -478,14 +482,81 @@ def dump_multiple_classification(
     )
 
 
+def dump_multilabel_classification(
+        model,
+        suffix="",
+        folder=None,
+        allow_failure=None,
+        verbose=False,
+        label_string=False,
+        first_class=0,
+        comparable_outputs=None):
+    """
+    Trains and dumps a model for a binary classification problem.
+    The function trains a model and calls
+    :func:`dump_data_and_model`.
+
+    Every created filename will follow the pattern:
+    ``<folder>/<prefix><task><classifier-name><suffix>.<data|expected|model|onnx>.<pkl|onnx>``.
+    """
+    X = [[0, 1], [1, 1], [2, 0], [0.5, 0.5], [1.1, 1.1], [2.1, 0.1]]
+    X = numpy.array(X, dtype=numpy.float32)
+    if label_string:
+        y = [["l0"], ["l1"], ["l2"], ["l0", "l1"], ["l1"], ["l2"]]
+    else:
+        y = [[0 + first_class], [1 + first_class], [2 + first_class],
+             [0 + first_class, 1 + first_class],
+             [1 + first_class], [2 + first_class]]
+    y = MultiLabelBinarizer().fit_transform(y)
+    model.fit(X, y)
+    if verbose:
+        print("[make_multilabel_classification] model '{}'".format(
+            model.__class__.__name__))
+    model_onnx, prefix = convert_model(model, "multi-class classifier",
+                                       [("input", FloatTensorType([1, 2]))])
+    if verbose:
+        print("[make_multilabel_classification] model was converted")
+    dump_data_and_model(
+        X.astype(numpy.float32),
+        model,
+        model_onnx,
+        folder=folder,
+        allow_failure=allow_failure,
+        basename=prefix + "Mcl" + model.__class__.__name__ + suffix,
+        verbose=verbose,
+        comparable_outputs=comparable_outputs,
+    )
+
+    X, y = make_multilabel_classification(40, n_features=4, random_state=42,
+                                          n_classes=3)
+    X = X[:, :2]
+    model.fit(X, y)
+    if verbose:
+        print("[make_multilabel_classification] model '{}'".format(
+            model.__class__.__name__))
+    model_onnx, prefix = convert_model(model, "multi-class classifier",
+                                       [("input", FloatTensorType([1, 2]))])
+    if verbose:
+        print("[make_multilabel_classification] model was converted")
+    dump_data_and_model(
+        X[:10].astype(numpy.float32),
+        model,
+        model_onnx,
+        folder=folder,
+        allow_failure=allow_failure,
+        basename=prefix + "RndMla" + model.__class__.__name__ + suffix,
+        verbose=verbose,
+        comparable_outputs=comparable_outputs,
+    )
+
+
 def dump_multiple_regression(
         model,
         suffix="",
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False,
-):
+        verbose=False):
     """
     Trains and dumps a model for a multi regression problem.
     The function trains a model and calls
