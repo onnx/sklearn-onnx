@@ -17,6 +17,12 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X
 
+    def _fit_model_multi(self, model):
+        X, y = datasets.make_regression(n_features=4, random_state=0,
+                                        n_targets=2, n_samples=10)
+        model.fit(X, y)
+        return model, X
+
     def test_model_linear_regression(self):
         model, X = self._fit_model(linear_model.LinearRegression())
         model_onnx = convert_sklearn(model, "linear regression",
@@ -106,6 +112,19 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLassoLars-Dec4",
+        )
+
+    def test_model_multi_linear_regression(self):
+        model, X = self._fit_model_multi(linear_model.LinearRegression())
+        model_onnx = convert_sklearn(model, "linear regression",
+                                     [("input", FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnLinearRegression-Dec4",
         )
 
 

@@ -12,10 +12,12 @@ def convert_sklearn_linear_regressor(scope, operator, container):
     op = operator.raw_operator
     op_type = 'LinearRegressor'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
-    attrs['coefficients'] = op.coef_.astype(float)
+    attrs['coefficients'] = op.coef_.astype(float).ravel()
     attrs['intercepts'] = (op.intercept_.astype(float)
                            if isinstance(op.intercept_, collections.Iterable)
                            else [float(op.intercept_)])
+    if len(op.coef_.shape) == 2:
+        attrs['targets'] = op.coef_.shape[0]
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',
                        **attrs)
