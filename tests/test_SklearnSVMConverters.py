@@ -9,7 +9,8 @@ from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 from sklearn import __version__ as sk__version__
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.operator_converters.SVM import convert_sklearn_svm
+from skl2onnx.operator_converters.support_vector_machines import (
+    convert_sklearn_svm)
 from skl2onnx.shape_calculators.SVM import calculate_sklearn_svm_output_shapes
 from test_utils import dump_data_and_model
 
