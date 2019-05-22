@@ -9,6 +9,7 @@ from .tests_helper import dump_data_and_model  # noqa
 from .tests_helper import (  # noqa
     dump_one_class_classification,
     dump_binary_classification,
+    dump_multilabel_classification,
     dump_multiple_classification,
 )
 from .tests_helper import (  # noqa
