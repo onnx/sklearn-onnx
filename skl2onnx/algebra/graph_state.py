@@ -96,7 +96,6 @@ class GraphState:
                 "Unexpected type {}\n{}".format(type(output), output))
 
     def run(self, operator=None):
-
         if self.computed_outputs is None:
             if self.expected_outputs is None:
                 eoli = [self._get_var_name(o, True, operator=operator)

@@ -48,13 +48,13 @@ class OnnxOperatorMixin:
                            "and initial_types are not defined")
 
     def _find_sklearn_parent(self):
-        if hasattr(self.__class__, 'predict') and \
-                "predict" in self.__class__.__dict__:
+        if (hasattr(self.__class__, 'predict') and
+                "predict" in self.__class__.__dict__):
             raise RuntimeError("Method predict was modified. "
                                "There is no parser or converter available "
                                "for class '{}'.".format(self.__class__))
-        if hasattr(self.__class__, 'transform') and \
-                "transform" in self.__class__.__dict__:
+        if (hasattr(self.__class__, 'transform') and
+                "transform" in self.__class__.__dict__):
             raise RuntimeError("Method transform was modified. "
                                "There is no parser or converter available "
                                "for class '{}'.".format(self.__class__))

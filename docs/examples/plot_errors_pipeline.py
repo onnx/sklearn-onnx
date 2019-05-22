@@ -44,7 +44,7 @@ from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
 from skl2onnx.common.data_types import StringTensorType
 from sklearn.linear_model import LogisticRegression
 from skl2onnx import update_registered_converter
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
 from skl2onnx.common.data_types import DictionaryType, SequenceType
 import numbers
 from skl2onnx import convert_sklearn

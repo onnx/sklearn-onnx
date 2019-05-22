@@ -52,13 +52,13 @@ class CustomOpTransformerShape(CustomOpTransformer):
         return shape_calculator
 
 
+class CustomOpScaler(StandardScaler, OnnxOperatorMixin):
+    pass
+
+
 class TestCustomModelAlgebra(unittest.TestCase):
 
     def test_base_api(self):
-
-        class CustomOpScaler(StandardScaler, OnnxOperatorMixin):
-            pass
-
         model = CustomOpScaler()
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
         model.fit(data)
@@ -69,7 +69,6 @@ class TestCustomModelAlgebra(unittest.TestCase):
             assert "Method enumerate_initial_types is missing" in str(e)
 
     def test_custom_scaler(self):
-
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         tr = CustomOpTransformerShape()
         tr.fit(mat)
@@ -87,7 +86,6 @@ class TestCustomModelAlgebra(unittest.TestCase):
             basename="CustomTransformerAlgebra")
 
     def test_custom_scaler_pipeline_right(self):
-
         pipe = make_pipeline(StandardScaler(), CustomOpTransformerShape())
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         pipe.fit(mat)
@@ -109,7 +107,6 @@ class TestCustomModelAlgebra(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.3.0"),
                      reason="not available")
     def test_custom_scaler_pipeline_left(self):
-
         pipe = make_pipeline(CustomOpTransformer(), StandardScaler())
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         pipe.fit(mat)

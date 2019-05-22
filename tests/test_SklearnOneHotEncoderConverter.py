@@ -1,7 +1,6 @@
 """Tests scikit-learn's OneHotEncoder converter."""
 
 import unittest
-import inspect
 import numpy
 from distutils.version import StrictVersion
 from sklearn import __version__ as sklearn_version

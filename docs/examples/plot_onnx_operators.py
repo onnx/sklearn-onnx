@@ -7,7 +7,7 @@
 Play with ONNX operators
 ========================
 
-ONNX aims at describing most of the machine learning models 
+ONNX aims at describing most of the machine learning models
 implemented in *scikit-learn* but it does not necessarily describe
 the prediction function the same way *scikit-learn* does.
 If it is possible to define custom operators, it usually
@@ -35,14 +35,17 @@ Let's try the example given by ONNX documentation:
 `PythonAPIOverview.md
 <https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md
 #creating-an-onnx-model-using-helper-functions>`_.
-It relies on *protobuf* whose definition can be found 
+It relies on *protobuf* whose definition can be found
 on github `onnx.proto
 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`_.
 """
-
+import os
+import numpy as np
+import matplotlib.pyplot as plt
 import onnx
 from onnx import helper
-from onnx import AttributeProto, TensorProto, GraphProto
+from onnx import TensorProto
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
 X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
@@ -52,10 +55,10 @@ Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [1, 4])
 
 # Create a node (NodeProto)
 node_def = helper.make_node(
-    'Pad', # node name
-    ['X'], # inputs
-    ['Y'], # outputs
-    mode='constant', # attributes
+    'Pad',  # node name
+    ['X'],  # inputs
+    ['Y'],  # outputs
+    mode='constant',  # attributes
     value=1.5,
     pads=[0, 1, 0, 1],
 )
@@ -83,7 +86,7 @@ print('The model is checked!')
 # The list is dynamically created based on the installed
 # onnx package.
 
-from skl2onnx.algebra.onnx_ops import OnnxPad
+from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
 pad = OnnxPad('X', output_names=['Y'],
               mode='constant', value=1.5,
@@ -130,8 +133,7 @@ onnx.checker.check_model(original_model)
 #####################################
 # Which we translate into:
 
-import numpy as np
-from skl2onnx.algebra.onnx_ops import OnnxTranspose
+from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
 node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
@@ -148,10 +150,11 @@ def predict_with_onnxruntime(model_def, *inputs):
     import onnxruntime as ort
     sess = ort.InferenceSession(model_def.SerializeToString())
     names = [i.name for i in sess.get_inputs()]
-    input = {name: input for name, input in zip(names, inputs)}
-    res = sess.run(None, input)
+    dinputs = {name: input for name, input in zip(names, inputs)}
+    res = sess.run(None, dinputs)
     names = [o.name for o in sess.get_outputs()]
     return {name: output for name, output in zip(names, res)}
+
 
 Y = predict_with_onnxruntime(model_def, X)
 print(Y)
@@ -160,16 +163,14 @@ print(Y)
 # Display the ONNX graph
 # ++++++++++++++++++++++
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-pydot_graph = GetPydotGraph(model_def.graph, name=model_def.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                            fillcolor="yellow", style="filled"))
+pydot_graph = GetPydotGraph(
+    model_def.graph, name=model_def.graph.name, rankdir="TB",
+    node_producer=GetOpNodeProducer("docstring", color="yellow",
+                                    fillcolor="yellow", style="filled"))
 pydot_graph.write_dot("pipeline_transpose2x.dot")
 
-import os
 os.system('dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot')
 
-import matplotlib.pyplot as plt
 image = plt.imread("pipeline_transpose2x.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
@@ -178,10 +179,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn
+import numpy, sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx
+import onnx, onnxruntime, skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

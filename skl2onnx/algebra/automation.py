@@ -184,7 +184,7 @@ def get_rst_doc(op_name=None):
         rep = {
             '[the doc](IR.md)': '`ONNX <{0}docs/IR.md>`_',
             '[the doc](Broadcasting.md)':
-                'Broadcasting in ONNX <docs/Broadcasting.md>`_',
+                '`Broadcasting in ONNX <{0}docs/Broadcasting.md>`_',
             '<dl>': '',
             '</dl>': '',
             '<dt>': '* ',
