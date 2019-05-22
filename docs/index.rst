@@ -23,9 +23,10 @@ toolkits into `ONNX <https://onnx.ai>`_.
     tutorial
     api_summary
     auto_examples/index
-    supported
     pipeline
     parameterized
+    supported
+    onnx_ops
 
 **Issues, questions**
 
@@ -98,5 +99,3 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 **License**
 
 It is licensed with `MIT License <../LICENSE>`_.
-
-

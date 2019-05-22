@@ -25,8 +25,8 @@ Manipulate ONNX graphs
 
 .. autofunction:: skl2onnx.helpers.onnx_helper.save_onnx_model
 
-Registered functions
-====================
+Register a new converter
+========================
 
 .. autofunction:: skl2onnx.supported_converters
 

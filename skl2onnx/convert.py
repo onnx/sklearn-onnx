@@ -102,11 +102,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
 
-    It used in example :ref:`l-example-tfidfvectorizer`.
+    It is used in example :ref:`l-example-tfidfvectorizer`.
     """ # noqa
     if initial_types is None:
-        raise ValueError('Initial types are required. See usage of '
-                         'convert(...) in skl2onnx.convert for details')
+        if hasattr(model, 'infer_initial_types'):
+            initial_types = model.infer_initial_types()
+        else:
+            raise ValueError('Initial types are required. See usage of '
+                             'convert(...) in skl2onnx.convert for details')
 
     if name is None:
         name = str(uuid4().hex)
@@ -127,3 +130,46 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                   options=options)
 
     return (onnx_model, topology) if intermediate else onnx_model
+
+
+def to_onnx(model, X=None, name=None, initial_types=None):
+    """
+    Calls :func:`convert_sklearn` with simplified parameters.
+
+    :param model: model to convert
+    :param X: training set, can be None, it is used to infered the
+        input types (*initial_types*)
+    :param initial_types: if X is None, then *initial_types* must be
+        defined
+    :param name: name of the model
+    :return: converted model
+
+    This function checks if the model inherits from class
+    :class:`OnnxOperatorMixin`, it calls method *to_onnx*
+    in that case otherwise it calls :func:`convert_sklearn`.
+    """
+    from .algebra.onnx_operator_mixin import OnnxOperatorMixin
+    from .algebra.type_helper import guess_initial_types
+
+    if isinstance(model, OnnxOperatorMixin):
+        return model.to_onnx(X=X, name=name)
+    if name is None:
+        name = model.__class__.__name__
+    initial_types = guess_initial_types(X, initial_types)
+    return convert_sklearn(model, initial_types=initial_types, name=name)
+
+
+def wrap_as_onnx_mixin(model):
+    """
+    Combines a *scikit-learn* class with :class:`OnnxOperatorMixin`
+    which produces a new object which combines *scikit-learn* API
+    and *OnnxOperatorMixin* API.
+    """
+    from .algebra.sklearn_ops import find_class
+    cl = find_class(model.__class__)
+    if "automation" in str(cl):
+        raise RuntimeError("Wrong class name '{}'.".format(cl))
+    state = model.__getstate__()
+    obj = object.__new__(cl)
+    obj.__setstate__(state)
+    return obj

@@ -1,11 +1,10 @@
 """Tests scikit-learn's OneHotEncoder converter."""
 
 import unittest
-import inspect
-
 import numpy
+from distutils.version import StrictVersion
+from sklearn import __version__ as sklearn_version
 from sklearn.preprocessing import OneHotEncoder
-
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     Int64TensorType,
@@ -15,9 +14,9 @@ from test_utils import dump_data_and_model
 
 
 def one_hot_encoder_supports_string():
-    sig = inspect.signature(OneHotEncoder.__init__)
-    keys = list(sig.parameters.keys())
-    return "n_values" not in keys
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.20.0")
 
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):

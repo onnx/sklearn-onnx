@@ -30,7 +30,7 @@ import onnx
 import sklearn
 import pandas
 from heapq import nlargest
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 import json
@@ -62,14 +62,13 @@ with open("rf_iris.onnx", "wb") as f:
 # Compute ONNX prediction similarly as scikit-learn transformer
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
 with open("rf_iris.onnx", "rb") as f:
     content = f.read()
 
 ot = OnnxTransformer(content, output_name="output_probability")
 ot.fit(X_train, y_train)
 
-print(ot.transform(X_test[:5]))
+print(ot.transform(X_test[:5].astype(np.float32)))
 
 ###################################
 # .. index:: transfer learning, MobileNet, ImageNet
@@ -125,8 +124,8 @@ with open(model_file, "rb") as f:
 ot = OnnxTransformer(model_bytes)
 
 img2 = img.resize((224, 224))
-X = numpy.asarray(img2).transpose((2, 0, 1))
-X = X[numpy.newaxis, :, :, :] / 255.0
+X = np.asarray(img2).transpose((2, 0, 1))
+X = X[np.newaxis, :, :, :] / 255.0
 print(X.shape, X.min(), X.max())
 
 pred = ot.fit_transform(X)[0, :]
@@ -185,10 +184,10 @@ plt.axis('off')
 # It needs to be zoomed, converted into an array,
 # resized, transposed.
 img2 = img.resize((416, 416))
-X = numpy.asarray(img2)
+X = np.asarray(img2)
 X = X.transpose(2, 0, 1)
 X = X.reshape(1, 3, 416, 416)
-X = X.astype(numpy.float32)
+X = X.astype(np.float32)
 
 #####################################
 # Let's create the OnnxTransformer
@@ -272,8 +271,10 @@ plt.axis('off')
 #################################
 # **Versions used for this example**
 
+import numpy, sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
+import onnx, onnxruntime, skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

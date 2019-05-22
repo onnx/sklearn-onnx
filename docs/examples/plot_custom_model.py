@@ -181,11 +181,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
     def get_params(self, deep=True):
         """
         Returns the parameters for all the embedded objects.
-        @param      deep        unused here
-        @return                 dict
-        :meth:`set_params <mlinsights.mlmodel.tsne_transformer.
-        PredictableTSNE.set_params>`
-        describes the pattern parameters names follow.
         """
         res = {}
         for k, v in self.transformer.get_params().items():
@@ -200,8 +195,6 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         Every parameter prefixed by ``'e_'`` is an estimator
         parameter, every parameter prefixed by
         ``t_`` is for a transformer parameter.
-        @param      values      valeurs
-        @return                 dict
         """
         pt, pe, pn = {}, {}, {}
         for k, v in values.items():

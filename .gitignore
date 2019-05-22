@@ -42,6 +42,8 @@ docs/examples/imagenet_class_index.json
 TESTDUMP/*
 htmlcov/*
 tests/temp_onnx_helper_load_save.onnx
+tests/*.new
 benchmarks/*.csv
 benchmarks/*.png
-docs/examples/classifier.pkl
+tests/Operators*.md
+docs/examples/*.pkl
