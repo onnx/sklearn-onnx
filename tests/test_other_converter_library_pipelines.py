@@ -12,7 +12,7 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes, )
-from skl2onnx.operator_converters.LinearClassifier import (
+from skl2onnx.operator_converters.linear_classifier import (
     convert_sklearn_linear_classifier, )
 from test_utils import dump_data_and_model
 
