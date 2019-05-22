@@ -7,16 +7,21 @@
 import re
 import warnings
 from logging import getLogger
+import numpy as np
 from onnx import onnx_pb as onnx_proto
+from onnxconverter_common.data_types import DataType, TensorType
 from ..proto import helper
 from ..proto import get_opset_number_from_onnx
 from . import _registration
 from . import utils
-from .data_types import FloatType, Int64Type, StringType, TensorType
-from .data_types import DictionaryType, FloatTensorType # noqa
-from .data_types import Int64TensorType, SequenceType # noqa
+from onnxconverter_common.data_types import FloatType, Int64Type, StringType
+from onnxconverter_common.data_types import DictionaryType, FloatTensorType # noqa
+from onnxconverter_common.data_types import Int64TensorType, SequenceType # noqa
+from onnxconverter_common.data_types import StringTensorType, DoubleTensorType # noqa
+from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType # noqa
 from ._container import ModelComponentContainer
 from .interface import OperatorBase
+type_fct = type
 
 
 class Variable:
@@ -48,6 +53,23 @@ class Variable:
         self.is_root = None
         self.is_leaf = None
         self.is_abandoned = False
+        if self.type is not None and not isinstance(self.type, DataType):
+            raise TypeError("shape must be a DataType not {}.".format(
+                self.type))
+        if isinstance(self.type, TensorType):
+            shape = self.type.shape
+            if not isinstance(shape, (list, tuple)):
+                try:
+                    shape = list(shape)
+                except TypeError:
+                    raise TypeError("shape must be a tuple or a list not "
+                                    "{}.".format(type_fct(shape)))
+            for dim in shape:
+                if dim == 'None':
+                    continue
+                if not isinstance(dim, (int, np.int32, np.int64)):
+                    raise TypeError("shape must contains integers not "
+                                    "'{}'.".format(dim))
 
     @property
     def full_name(self):
@@ -59,6 +81,46 @@ class Variable:
     def __repr__(self):
         return ("Variable(raw_name='{0}', onnx_name='{1}', type={2})".format(
                 self.raw_name, self.onnx_name, self.type))
+
+    @staticmethod
+    def from_pb(obj):
+        """
+        Creates a data type from a protobuf object.
+        """
+        def get_shape(tt):
+            return [tt.shape.dim[i].dim_value
+                    for i in range(len(tt.shape.dim))]
+
+        if hasattr(obj, 'extend'):
+            return [Variable.from_pb(o) for o in obj]
+        name = obj.name
+        if obj.type.tensor_type:
+            tt = obj.type.tensor_type
+            elem = tt.elem_type
+            shape = get_shape(tt)
+            if elem == onnx_proto.TensorProto.FLOAT:
+                ty = FloatTensorType(shape)
+            elif elem == onnx_proto.TensorProto.BOOL:
+                ty = BooleanTensorType(shape)
+            elif elem == onnx_proto.TensorProto.DOUBLE:
+                ty = DoubleTensorType(shape)
+            elif elem == onnx_proto.TensorProto.STRING:
+                ty = StringTensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT64:
+                ty = Int64TensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT32:
+                ty = Int32TensorType(shape)
+            else:
+                raise NotImplementedError("Unsupported type '{}' "
+                                          "elem_type={}".format(
+                                              type(obj.type.tensor_type),
+                                              elem))
+        else:
+            raise NotImplementedError("Unsupported type '{}' as "
+                                      "a string={}".format(
+                                        type(obj), obj))
+
+        return Variable(name, name, None, ty)
 
 
 class Operator(OperatorBase):
@@ -206,6 +268,8 @@ class Scope:
         """
         Creates a unique variable ID based on the given seed.
         """
+        if not isinstance(seed, str):
+            raise TypeError("seed must be a string not {}".format(type(seed)))
         return Topology._generate_unique_name(seed, self.onnx_variable_names)
 
     def get_unique_operator_name(self, seed):
@@ -673,6 +737,9 @@ class Topology:
                 self.custom_shape_calculators[mtype](operator)
             elif operator.type in self.custom_shape_calculators:
                 self.custom_shape_calculators[operator.type](operator)
+            elif hasattr(operator.raw_operator, "onnx_shape_calculator"):
+                shape_calc = operator.raw_operator.onnx_shape_calculator()
+                shape_calc(operator)
             else:
                 operator.infer_types()
 
@@ -934,6 +1001,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             conv = topology.custom_conversion_functions[mtype]
         elif operator.type in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[operator.type]
+        elif hasattr(operator.raw_operator, "onnx_converter"):
+            conv = operator.raw_operator.onnx_converter()
         else:
             # Convert the selected operator into some ONNX objects and
             # save them into the container

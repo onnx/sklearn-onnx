@@ -5,78 +5,103 @@
 # --------------------------------------------------------------------------
 
 import unittest
-from sklearn.datasets import load_diabetes
+import numpy as np
+from sklearn.datasets import load_diabetes, load_digits
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
 from test_utils import dump_data_and_model
 
 
+def _fit_model_pca(model):
+    data = load_diabetes()
+    X_train, X_test, *_ = train_test_split(
+        data.data, data.target, test_size=0.2, random_state=42)
+    model.fit(X_train)
+    return model, X_test.astype(np.float32)
+
+
 class TestSklearnPCAConverter(unittest.TestCase):
     def test_pca_default(self):
-        data = load_diabetes()
-        X_train, X_test, y_train, y_test = train_test_split(data.data,
-                                                            data.target,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = PCA().fit(X_train, y_train)
+        model, X_test = _fit_model_pca(PCA(random_state=42))
         model_onnx = convert_sklearn(
             model,
             initial_types=[("input", FloatTensorType(shape=X_test.shape))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype("float32"),
+            X_test,
             model,
             model_onnx,
             basename="SklearnPCADefault",
         )
 
-    def test_pca_parameters_1(self):
-        data = load_diabetes()
-        X_train, X_test, y_train, y_test = train_test_split(data.data,
-                                                            data.target,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = PCA(
-            copy=True,
-            iterated_power="auto",
-            n_components=0.9005263157894737,
-            random_state=None,
-            svd_solver="auto",
-            tol=0.0,
-            whiten=False,
-        ).fit(X_train, y_train)
+    def test_pca_parameters_auto(self):
+        model, X_test = _fit_model_pca(PCA(
+            random_state=42, copy=False, tol=0.1, whiten=True,
+            n_components=0.9005263157894737, svd_solver="auto"))
         model_onnx = convert_sklearn(
             model,
             initial_types=[("input", FloatTensorType(shape=X_test.shape))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype("float32"),
+            X_test,
             model,
             model_onnx,
-            basename="SklearnPCAParameters1",
+            basename="SklearnPCAParametersAuto",
         )
 
-    def test_pca_parameters_2(self):
-        data = load_diabetes()
-        X_train, X_test, y_train, y_test = train_test_split(data.data,
-                                                            data.target,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = PCA(n_components=4).fit(X_train, y_train)
+    def test_pca_parameters_arpack(self):
+        model, X_test = _fit_model_pca(PCA(
+            random_state=42, n_components=4, svd_solver='arpack'))
         model_onnx = convert_sklearn(
             model,
             initial_types=[("input", FloatTensorType(shape=X_test.shape))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype("float32"),
+            X_test,
             model,
             model_onnx,
-            basename="SklearnPCAParameters2",
+            basename="SklearnPCAParametersArpack",
+        )
+
+    def test_pca_parameters_full(self):
+        model, X_test = _fit_model_pca(PCA(
+            random_state=42, n_components=5, svd_solver='full', whiten=True))
+        model_onnx = convert_sklearn(
+            model,
+            initial_types=[("input", FloatTensorType(shape=X_test.shape))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnPCAParametersFull",
+        )
+
+    def test_pca_default_int_randomised(self):
+        data = load_digits()
+        X_train, X_test, *_ = train_test_split(
+            data.data, data.target, test_size=0.2, random_state=42)
+        model = PCA(random_state=42, svd_solver='randomized',
+                    iterated_power=3).fit(X_train)
+        model_onnx = convert_sklearn(
+            model,
+            initial_types=[("input", Int64TensorType(shape=X_test.shape))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test.astype(np.int64),
+            model,
+            model_onnx,
+            basename="SklearnPCADefaultIntRandomised",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 

@@ -5,12 +5,14 @@
 # --------------------------------------------------------------------------
 
 import unittest
+
 import numpy as np
-from skl2onnx.common.data_types import FloatTensorType
+from sklearn.decomposition import TruncatedSVD
+
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
 from test_utils import create_tensor
 from test_utils import dump_data_and_model
-from sklearn.decomposition import TruncatedSVD
 
 
 class TestTruncatedSVD(unittest.TestCase):
@@ -30,6 +32,36 @@ class TestTruncatedSVD(unittest.TestCase):
                                      ])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(x, svd, model_onnx, basename="SklearnTruncatedSVD")
+
+    def test_truncated_svd_arpack(self):
+        X = create_tensor(10, 10)
+        svd = TruncatedSVD(n_components=5, algorithm='arpack', n_iter=10,
+                           tol=0.1, random_state=42).fit(X)
+        model_onnx = convert_sklearn(svd,
+                                     initial_types=[
+                                         ("input",
+                                          FloatTensorType(shape=X.shape))
+                                     ])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X, svd, model_onnx,
+                            basename="SklearnTruncatedSVDArpack")
+
+    def test_truncated_svd_int(self):
+        X = create_tensor(5, 5).astype(np.int64)
+        svd = TruncatedSVD(n_iter=20, random_state=42).fit(X)
+        model_onnx = convert_sklearn(svd,
+                                     initial_types=[
+                                         ("input",
+                                          Int64TensorType(shape=X.shape))
+                                     ])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X, svd, model_onnx,
+            basename="SklearnTruncatedSVDInt",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
 
 
 if __name__ == "__main__":

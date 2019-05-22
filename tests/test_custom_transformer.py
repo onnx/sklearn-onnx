@@ -136,7 +136,8 @@ def predictable_tsne_converter(scope, operator, container):
                        **attrs)
 
 
-class TestOtherLibrariesInPipeline(unittest.TestCase):
+class TestCustomTransformer(unittest.TestCase):
+
     def test_custom_pipeline_scaler(self):
 
         digits = datasets.load_digits(n_class=6)

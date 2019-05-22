@@ -11,7 +11,7 @@ import sys
 import traceback
 import warnings
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
-from ..proto import helper
+from ..proto import helper, TensorProto
 from .interface import ModelContainer
 from .utils import get_domain
 
@@ -196,9 +196,16 @@ class ModelComponentContainer(ModelContainer):
                         or a float array).
         :return: created tensor
         """
-        if any(d is None for d in shape):
-            raise ValueError('Shape of initializer cannot contain None')
-        tensor = helper.make_tensor(name, onnx_type, shape, content)
+        if isinstance(content, TensorProto):
+            tensor = TensorProto()
+            tensor.data_type = content.data_type
+            tensor.name = name
+            tensor.raw_data = content.raw_data
+            tensor.dims.extend(content.dims)
+        else:
+            if any(d is None for d in shape):
+                raise ValueError('Shape of initializer cannot contain None')
+            tensor = helper.make_tensor(name, onnx_type, shape, content)
         self.initializers.append(tensor)
         return tensor
 
@@ -250,7 +257,7 @@ class ModelComponentContainer(ModelContainer):
                       attributes' names and attributes' values,
                       respectively.
         """
-        if op_domain in ('', None):
+        if op_domain is None:
             op_domain = get_domain()
         self._check_operator(op_type)
 

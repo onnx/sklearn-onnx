@@ -9,6 +9,7 @@ import os
 import sys
 import skl2onnx
 import sphinx_modern_theme_modified
+import tabulate
 
 sys.path.append(os.path.abspath('exts'))
 

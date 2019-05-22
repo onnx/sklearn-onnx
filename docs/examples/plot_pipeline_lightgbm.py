@@ -38,8 +38,8 @@ from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from skl2onnx import convert_sklearn
 from skl2onnx import update_registered_converter
-from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
+from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes  # noqa
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
 import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
 import numpy
