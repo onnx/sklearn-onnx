@@ -38,8 +38,8 @@ class TestInvestigate(unittest.TestCase):
 
         model.transform(data)
         for step in steps:
-            short_onnx = step['short_onnx']
-            sess = onnxruntime.InferenceSession(short_onnx.SerializeToString())
+            onnx_step = step['onnx_step']
+            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
@@ -74,12 +74,12 @@ class TestInvestigate(unittest.TestCase):
             data_in = step_model._debug.inputs['transform']
             t = guess_data_type(data_in)
             try:
-                short_onnx = convert_sklearn(step_model, initial_types=t)
+                onnx_step = convert_sklearn(step_model, initial_types=t)
             except MissingShapeCalculator as e:
                 if "MyScaler" in str(e):
                     continue
                 raise
-            sess = onnxruntime.InferenceSession(short_onnx.SerializeToString())
+            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
             onnx_outputs = sess.run(None, {'input': data_in})
             onnx_output = onnx_outputs[0]
             skl_outputs = step_model._debug.outputs['transform']

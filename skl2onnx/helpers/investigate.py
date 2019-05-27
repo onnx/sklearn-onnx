@@ -253,7 +253,7 @@ def collect_intermediate_steps(model, *args, **kwargs):
             'model_onnx': model_onnx,
             'inputs': inputs,
             'outputs': outputs,
-            'short_onnx': select_model_inputs_outputs(
+            'onnx_step': select_model_inputs_outputs(
                 model_onnx, outputs=outputs)
         })
     return steps

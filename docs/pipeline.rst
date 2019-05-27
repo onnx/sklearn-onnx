@@ -232,27 +232,27 @@ a pipeline and each of its components independently.
     # and modifies the current pipeline to keep
     # intermediate inputs and outputs when method
     # predict or transform is called.
-    steps = collect_intermediate_steps(model, "pipeline",
-                                       [("input",
-                                         FloatTensorType([1, 2]))])
+    operators = collect_intermediate_steps(model, "pipeline",
+                                           [("input",
+                                             FloatTensorType([1, 2]))])
 
     # Method and transform is called.
     model.transform(data)
 
     # Loop on every operator.
-    for step in steps:
+    for op in operators:
     
         # The ONNX for this operator.
-        short_onnx = step['short_onnx']
+        onnx_step = op['onnx_step']
         
         # Use onnxruntime to compute ONNX outputs
-        sess = onnxruntime.InferenceSession(short_onnx.SerializeToString())
+        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
     
         # Let's use the initial data as the ONNX model
         # contains all nodes from the first inputs to this node.
         onnx_outputs = sess.run(None, {'input': data})
         onnx_output = onnx_outputs[0]
-        skl_outputs = step['model']._debug.outputs['transform']
+        skl_outputs = op['model']._debug.outputs['transform']
         
         # Compares the outputs between scikit-learn and onnxruntime.
         assert_almost_equal(onnx_output, skl_outputs)
@@ -305,22 +305,20 @@ them.
     all_models = list(enumerate_pipeline_models(model))
     
     # Loop on every operator.
-    for ind, step, last in all_models:
+    for ind, op, last in all_models:
         if ind == (0,):
             # whole pipeline
             continue
         
-        step_model = step
-        
         # The dump input data for this operator.
-        data_in = step_model._debug.inputs['transform']
+        data_in = op._debug.inputs['transform']
         
         # Let's infer some initial shape.        
         t = guess_data_type(data_in)
         
         # Let's convert.
         try:
-            short_onnx = convert_sklearn(step_model, initial_types=t)            
+            onnx_step = convert_sklearn(op, initial_types=t)            
         except MissingShapeCalculator as e:
             if "MyScaler" in str(e):
                 print(e)
@@ -329,9 +327,9 @@ them.
         
         # If it does not fail, let's compare the ONNX outputs with
         # the original operator.
-        sess = onnxruntime.InferenceSession(short_onnx.SerializeToString())
+        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
         onnx_outputs = sess.run(None, {'input': data_in})
         onnx_output = onnx_outputs[0]
-        skl_outputs = step_model._debug.outputs['transform']
+        skl_outputs = op._debug.outputs['transform']
         assert_almost_equal(onnx_output, skl_outputs)
         compare_objects(onnx_output, skl_outputs)

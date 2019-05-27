@@ -87,8 +87,8 @@ assert len(steps) == 2
 pipe.predict_proba(X_digits[:2])
 
 for i, step in enumerate(steps):
-    short_onnx = step['short_onnx']
-    sess = rt.InferenceSession(short_onnx.SerializeToString())
+    onnx_step = step['onnx_step']
+    sess = rt.InferenceSession(onnx_step.SerializeToString())
     onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
     skl_outputs = step['model']._debug.outputs
     print("step 1", type(step['model']))
