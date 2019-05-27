@@ -36,6 +36,7 @@ class TestMetaOnnx(unittest.TestCase):
                      reason="too unstable with older versions")
     def test_onnx_spec(self):
         untested = {'AveragePool',  # issue with ceil_mode
+                    'BitShift',  # opset 11
                     'Cast',  # unsupported type
                     'Compress',  # shape inference fails
                     # Input X must be 4-dimensional. X: {1,1,3}
