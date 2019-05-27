@@ -121,7 +121,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_multinomial(self):
         model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(multi_class="multinomial"))
+            linear_model.LogisticRegression(
+                multi_class="multinomial", solver="lbfgs"))
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
