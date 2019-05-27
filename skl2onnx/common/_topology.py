@@ -14,6 +14,7 @@ from ..proto import helper
 from ..proto import get_opset_number_from_onnx
 from . import _registration
 from . import utils
+from .exceptions import MissingShapeCalculator, MissingConverter
 from onnxconverter_common.data_types import FloatType, Int64Type, StringType
 from onnxconverter_common.data_types import DictionaryType, FloatTensorType # noqa
 from onnxconverter_common.data_types import Int64TensorType, SequenceType # noqa
@@ -184,14 +185,15 @@ class Operator(OperatorBase):
     def infer_types(self):
         # Invoke a core inference function
         if self.type is None:
-            raise RuntimeError("Unable to find a shape calculator for type "
-                               "'{}'.".format(type(self.raw_operator)))
+            raise MissingShapeCalculator(
+                "Unable to find a shape calculator for type '{}'.".format(
+                    type(self.raw_operator)))
         try:
             shape_calc = _registration.get_shape_calculator(self.type)
         except ValueError:
-            raise ValueError("Unable to find a shape calculator for alias "
-                             "'{}' and type '{}'.".format(
-                                self.type, type(self.raw_operator)))
+            raise MissingShapeCalculator(
+                "Unable to find a shape calculator for alias '{}' "
+                "and type '{}'.".format(self.type, type(self.raw_operator)))
         shape_calc(self)
 
 
@@ -1009,7 +1011,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             try:
                 conv = _registration.get_converter(operator.type)
             except ValueError:
-                raise ValueError(
+                raise MissingConverter(
                     "Unable to find converter for alias '{}' type "
                     "'{}'.".format(operator.type,
                                    type(getattr(operator, 'raw_model', None))))

@@ -24,7 +24,8 @@ class MyCustomClassifier(BaseEstimator, ClassifierMixin):
         BaseEstimator.__init__(self)
         ClassifierMixin.__init__(self)
         self.penalty = penalty
-        self.estimator = LogisticRegression(penalty=self.penalty)
+        self.estimator = LogisticRegression(penalty=self.penalty,
+                                            solver="liblinear")
 
     def fit(self, X, y, sample_weight=None):
         self.estimator_ = self.estimator.fit(X, y, sample_weight=sample_weight)
