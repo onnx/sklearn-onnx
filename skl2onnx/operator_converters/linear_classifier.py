@@ -38,33 +38,10 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         'name': scope.get_unique_operator_name(classifier_type)
     }
 
-    # nb = NodeBuilder(context, 'LinearClassifier', op_domain='ai.onnx.ml')
     classifier_attrs['coefficients'] = coefficients
     classifier_attrs['intercepts'] = intercepts
     classifier_attrs['multi_class'] = 1 if multi_class == 2 else 0
-    if op.__class__.__name__ == 'LinearSVC':
-        classifier_attrs['post_transform'] = 'NONE'
-    elif op.__class__.__name__ == 'LogisticRegression':
-        if multi_class == 2:
-            if number_of_classes == 2:
-                """
-                See method _predict_proba_lr.
-                When number if classes is two, the function
-                is not SOFTMAX.
-                https://github.com/scikit-learn/scikit-learn/blob/bac89c253b35a8f1a3827389fbee0f5bebcbc985/sklearn/linear_model/base.py#L300
-                """ # noqa
-                classifier_attrs['post_transform'] = 'LOGISTIC'
-            else:
-                classifier_attrs['post_transform'] = 'LOGISTIC'
-        else:
-            classifier_attrs['post_transform'] = 'LOGISTIC'
-    elif op.__class__.__name__ in ('LinearSVC'):
-        classifier_attrs['post_transform'] = 'NONE'
-    else:
-        if multi_class == 2:
-            classifier_attrs['post_transform'] = 'SOFTMAX'
-        else:
-            classifier_attrs['post_transform'] = 'LOGISTIC'
+    classifier_attrs['post_transform'] = 'NONE'
 
     if all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
         class_labels = [str(i) for i in classes]
@@ -77,7 +54,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
 
     label_name = operator.outputs[0].full_name
 
-    if op.__class__.__name__ == 'LinearSVC' and op.classes_.shape[0] <= 2:
+    if op.classes_.shape[0] <= 2:
         raw_scores_tensor_name = scope.get_unique_variable_name(
                                                         'raw_scores_tensor')
         positive_class_index_name = scope.get_unique_variable_name(
@@ -95,27 +72,9 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             operator.outputs[1].full_name, op_domain='ai.onnx.ml',
             name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     else:
-        # Make sure the probability sum is 1 over all classes
-        if multi_class > 0 and op.__class__.__name__ != 'LinearSVC':
-            probability_tensor_name = scope.get_unique_variable_name(
-                                                    'probability_tensor')
-            container.add_node(classifier_type, operator.inputs[0].full_name,
-                               [label_name, probability_tensor_name],
-                               op_domain='ai.onnx.ml', **classifier_attrs)
-            normalizer_type = 'Normalizer'
-            normalizer_attrs = {
-                'name': scope.get_unique_operator_name(normalizer_type),
-                'norm': 'L1'
-            }
-            container.add_node(normalizer_type, probability_tensor_name,
-                               operator.outputs[1].full_name,
-                               op_domain='ai.onnx.ml', **normalizer_attrs)
-        else:
-            container.add_node(classifier_type, operator.inputs[0].full_name,
-                               [label_name, operator.outputs[1].full_name],
-                               op_domain='ai.onnx.ml', **classifier_attrs)
+        container.add_node(classifier_type, operator.inputs[0].full_name,
+                            [label_name, operator.outputs[1].full_name],
+                            op_domain='ai.onnx.ml', **classifier_attrs)
 
 
-register_converter('SklearnLinearClassifier',
-                   convert_sklearn_linear_classifier)
 register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier)

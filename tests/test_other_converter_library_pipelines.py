@@ -12,8 +12,8 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes, )
-from skl2onnx.operator_converters.linear_classifier import (
-    convert_sklearn_linear_classifier, )
+from skl2onnx.operator_converters.logistic_regression import (
+    convert_sklearn_logistic_regression)
 from test_utils import dump_data_and_model
 
 
@@ -50,7 +50,7 @@ def my_custom_shape_extractor(operator):
 def my_custom_converter(scope, operator, container):
     raw = operator.raw_operator
     operator.raw_operator = raw.estimator_
-    convert_sklearn_linear_classifier(scope, operator, container)
+    convert_sklearn_logistic_regression(scope, operator, container)
     operator.raw_operator = raw
 
 

@@ -8,8 +8,6 @@ from ..common._registration import register_shape_calculator
 from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 
 
-register_shape_calculator('SklearnLinearClassifier',
-                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnLinearSVC',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnAdaBoostClassifier',
@@ -33,4 +31,6 @@ register_shape_calculator('SklearnCalibratedClassifierCV',
 register_shape_calculator('SklearnMLPClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnSGDClassifier',
+                          calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnLogisticRegression',
                           calculate_linear_classifier_output_shapes)

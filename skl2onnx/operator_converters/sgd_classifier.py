@@ -21,12 +21,19 @@ def _decision_function(scope, operator, container, model):
     matmul_result_name = scope.get_unique_variable_name(
         'matmul_result')
     score_name = scope.get_unique_variable_name('score')
+
     coef = model.coef_.T
+    intercepts = model.intercept_
+    if isinstance(intercepts, (float, np.float32)) and intercepts == 0:
+        # fit_intercept = False
+        number_of_classes = len(model.classes_)
+        intercepts = np.array(
+            [0.0] * number_of_classes if number_of_classes != 2 else [0.0])
 
     container.add_initializer(coef_name, onnx_proto.TensorProto.FLOAT,
                               coef.shape, coef.ravel())
     container.add_initializer(intercept_name, onnx_proto.TensorProto.FLOAT,
-                              model.intercept_.shape, model.intercept_)
+                              intercepts.shape, intercepts)
 
     container.add_node(
         'MatMul', [operator.inputs[0].full_name, coef_name],

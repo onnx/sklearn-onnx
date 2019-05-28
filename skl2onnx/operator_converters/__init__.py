@@ -25,6 +25,7 @@ from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import logistic_regression
 from . import multilayer_perceptron
 from . import naive_bayes
 from . import nearest_neighbours
@@ -61,6 +62,7 @@ __all__ = [
     label_encoder,
     linear_classifier,
     linear_regressor,
+    logistic_regression,
     multilayer_perceptron,
     naive_bayes,
     nearest_neighbours,
