@@ -41,6 +41,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearRegression-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_linear_regression_int(self):
@@ -53,6 +56,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearRegressionInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_linear_regression_nointercept(self):
@@ -66,6 +72,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearRegressionNoIntercept-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_linear_svr(self):
@@ -78,6 +87,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearSvr-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_linear_svr_int(self):
@@ -90,6 +102,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearSvrInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_ridge(self):
@@ -102,6 +117,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnRidge-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_ridge_int(self):
@@ -114,6 +132,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnRidgeInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_sgd_regressor(self):
@@ -129,6 +150,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDRegressor-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_sgd_regressor_int(self):
@@ -141,6 +165,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_elastic_net_regressor(self):
@@ -156,6 +183,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnElasticNet-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_elastic_net_regressor_int(self):
@@ -168,6 +198,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnElasticNetRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_lasso_lars(self):
@@ -180,6 +213,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLassoLars-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_lasso_lars_int(self):
@@ -192,6 +228,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLassoLarsInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
     def test_model_multi_linear_regression(self):
@@ -205,6 +244,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model_onnx,
             verbose=False,
             basename="SklearnLinearRegression-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 
