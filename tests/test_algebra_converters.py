@@ -5,6 +5,7 @@ import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.preprocessing import StandardScaler
+from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxExp, OnnxAdd, OnnxDiv
 try:
     from skl2onnx.algebra.sklearn_ops import OnnxSklearnStandardScaler
     from skl2onnx import wrap_as_onnx_mixin
@@ -59,6 +60,23 @@ class TestAlgebraConverters(unittest.TestCase):
         except RuntimeError as e:
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, op.transform(X))
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_algebra_to_onnx(self):
+        X = numpy.random.randn(5, 4)
+        beta = numpy.array([1, 2, 3, 4]) / 10
+        beta32 = beta.astype(numpy.float32)
+        onnxExpM = OnnxExp(OnnxMatMul('X', beta32))
+        cst = numpy.ones((1, 3), dtype=numpy.float32)
+        onnxExpM1 = OnnxAdd(onnxExpM, cst)
+        onnxPred = OnnxDiv(onnxExpM, onnxExpM1)
+        inputs = {'X': X[:1].astype(numpy.float32)}
+        model_onnx = onnxPred.to_onnx(inputs)
+        s1 = str(model_onnx)
+        model_onnx = onnxPred.to_onnx(inputs)
+        s2 = str(model_onnx)
+        assert s1 == s2
 
 
 if __name__ == "__main__":
