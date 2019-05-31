@@ -7,10 +7,12 @@
 import numbers
 import numpy as np
 import six
+from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..proto import onnx_proto
 
 
 def convert_sklearn_decision_tree_classifier(scope, operator, container):
@@ -50,7 +52,12 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
     attrs['n_targets'] = int(op.n_outputs_)
     add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False)
 
-    container.add_node(op_type, operator.input_full_names,
+    cast_input_name = scope.get_unique_variable_name('cast_input')
+
+    apply_cast(scope, operator.input_full_names, cast_input_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+
+    container.add_node(op_type, cast_input_name,
                        operator.output_full_names, op_domain='ai.onnx.ml',
                        **attrs)
 

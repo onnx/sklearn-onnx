@@ -382,6 +382,7 @@ def convert_sklearn_knn(scope, operator, container):
     negate_name = scope.get_unique_variable_name('negate')
     negated_reshaped_result_name = scope.get_unique_variable_name(
         'negated_reshaped_result')
+    cast_input_name = scope.get_unique_variable_name('cast_input')
 
     container.add_initializer(
         training_examples_name, onnx_proto.TensorProto.FLOAT,
@@ -392,7 +393,10 @@ def convert_sklearn_knn(scope, operator, container):
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
 
-    apply_sub(scope, [operator.inputs[0].full_name, training_examples_name],
+
+    apply_cast(scope, operator.inputs[0].full_name, cast_input_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+    apply_sub(scope, [cast_input_name, training_examples_name],
               sub_results_name, container, broadcast=1)
     apply_abs(scope, sub_results_name, abs_results_name, container)
     apply_pow(scope, [abs_results_name, distance_power_name], distance_name,

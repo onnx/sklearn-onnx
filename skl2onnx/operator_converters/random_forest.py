@@ -7,10 +7,12 @@
 import numbers
 import numpy as np
 import six
+from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..proto import onnx_proto
 
 
 def _num_estimators(op):
@@ -77,8 +79,13 @@ def convert_sklearn_random_forest_regressor_converter(scope,
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
                                     tree_weight, 0, False)
 
+    cast_input_name = scope.get_unique_variable_name('cast_input')
+
+    apply_cast(scope, operator.input_full_names, cast_input_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
+
     container.add_node(
-            op_type, operator.input_full_names,
+            op_type, cast_input_name,
             operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
 
 

@@ -216,7 +216,7 @@ class TestSklearnSVM(unittest.TestCase):
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         self._check_attributes(
-            nodes[0],
+            nodes[1],
             {
                 "coefficients": None,
                 "kernel_params": None,
@@ -394,7 +394,7 @@ class TestSklearnSVM(unittest.TestCase):
         model, X = self._fit_binary_classification(NuSVR())
         model_onnx = convert_sklearn(
             model, "SVR", [("input", FloatTensorType([1, X.shape[1]]))])
-        node = model_onnx.graph.node[0]
+        node = model_onnx.graph.node[1]
         self.assertIsNotNone(node)
         self._check_attributes(
             node,

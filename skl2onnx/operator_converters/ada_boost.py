@@ -214,6 +214,10 @@ def _get_estimators_label(scope, operator, container, model):
 
     concatenated_labels_name = scope.get_unique_variable_name(
         'concatenated_labels')
+    cast_input_name = scope.get_unique_variable_name('cast_input')
+
+    apply_cast(scope, operator.input_full_names, cast_input_name,
+               container, to=onnx_proto.TensorProto.FLOAT)
 
     estimators_results_list = []
     for tree_id in range(len(model.estimators_)):
@@ -227,7 +231,7 @@ def _get_estimators_label(scope, operator, container, model):
                                     model.estimators_[tree_id].tree_,
                                     0, model.learning_rate, 0, False)
 
-        container.add_node(op_type, operator.input_full_names,
+        container.add_node(op_type, cast_input_name,
                            estimator_label_name, op_domain='ai.onnx.ml',
                            **attrs)
 
