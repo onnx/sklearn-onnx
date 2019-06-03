@@ -11,7 +11,7 @@ from docutils.statemachine import StringList
 from sphinx.util.nodes import nested_parse_with_titles
 from tabulate import tabulate
 import skl2onnx
-from skl2onnx import supported_converters
+from skl2onnx._supported_operators import build_sklearn_operator_name_map
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.sklearn_ops import dynamic_class_creation_sklearn
 import onnxruntime
@@ -205,7 +205,10 @@ def missing_ops():
             except TypeError:
                 continue
             if cl.__name__ in {'Pipeline', 'ColumnTransformer',
-                               'FeatureUnion'}:
+                               'FeatureUnion', 'BaseEstimator'}:
+                continue
+            if (sub in {'calibration', 'dummy', 'manifold'} and
+                'Calibrated' not in cl.__name__):
                 continue
             if issub:
                 found.append((cl.__name__, sub, cl))
@@ -228,13 +231,13 @@ class AllSklearnOpsDirective(Directive):
         from sklearn import __version__ as skver
         found = missing_ops()
         nbconverters = 0
-        supported = set(supported_converters(True))
+        supported = set(build_sklearn_operator_name_map())
         rows = [".. list-table::", "    :header-rows: 1", "    :widths: 10 7 4",
                 "", "    * - Name", "      - Package", "      - Supported"]
         for name, sub, cl in found:
             rows.append("    * - " + name)
             rows.append("      - " + sub)
-            if name in supported:
+            if cl in supported:
                 rows.append("      - Yes")
                 nbconverters += 1
             else:
