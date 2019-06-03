@@ -157,6 +157,38 @@ class ModelComponentContainer(ModelContainer):
         # Additional options given to converters.
         self.options = options
 
+    def __str__(self):
+        """
+        Shows internal information.
+        """
+        rows = []
+        if self.inputs:
+            rows.append("INPUTS")
+            for inp in self.inputs:
+                rows.append(
+                    "  " + str(inp).replace(" ", "").replace("\n", " "))
+        if self.outputs:
+            rows.append("OUTPUTS")
+            for out in self.outputs:
+                rows.append(
+                    "  " + str(out).replace(" ", "").replace("\n", " "))
+        if self.initializers:
+            rows.append("INITIALIZERS")
+            for ini in self.initializers:
+                rows.append(
+                    "  " + str(ini).replace(" ", "").replace("\n", " "))
+        if self.value_info:
+            rows.append("NODES")
+            for val in self.value_info:
+                rows.append(
+                    "  " + str(val).replace(" ", "").replace("\n", " "))
+        if self.nodes:
+            rows.append("PROTO")
+            for nod in self.nodes:
+                rows.append(
+                    "  " + str(nod).replace(" ", "").replace("\n", " "))
+        return "\n".join(rows)
+
     def _make_value_info(self, variable):
         value_info = helper.ValueInfoProto()
         value_info.name = variable.full_name
