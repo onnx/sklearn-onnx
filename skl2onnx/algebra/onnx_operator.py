@@ -223,6 +223,20 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
+    def _clean_attributes(self, *args, recursive=True):
+        """
+        Removes attributes in this node and its parents.
+        """
+        for arg in args:
+            if arg == 'state':
+                self.state = None
+            elif hasattr(self, arg):
+                delattr(self, arg)
+        if recursive:
+            for obj in self.inputs:
+                if isinstance(obj, OnnxOperator):
+                    obj._clean_attributes(*args, recursive=True)
+
     def to_onnx(self, inputs=None, outputs=None):
         """
         Converts this operator into an ONNX graph.
@@ -231,6 +245,9 @@ class OnnxOperator:
             default inputs if not specified
         :param outputs: specific outputs
         """
+        if hasattr(self, "state"):
+            # The conversion already happened and needs to be cleaned.
+            self._clean_attributes("output_names_", "state")
         if inputs is None:
             raise NotImplementedError("inputs must be specified.")
         if isinstance(inputs, dict):
