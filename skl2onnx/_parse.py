@@ -10,6 +10,7 @@ from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
 from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import LinearSVC, NuSVC, SVC
+from sklearn.preprocessing import FunctionTransformer
 try:
     from sklearn.compose import ColumnTransformer
 except ModuleNotFoundError:
@@ -61,6 +62,9 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         stage
     """
     # alias can be None
+    if isinstance(model, str):
+        raise RuntimeError("model must be an object not a "
+                           "string '{0}'.".format(model))
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
@@ -169,8 +173,9 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
     """
     # Output variable name of each transform. It's a list of string.
     transformed_result_names = []
+    input_indices = []
     # Encode each transform as our IR object
-    for name, transform, column_indices in model.transformers:
+    for name, _, column_indices in model.transformers:
         if isinstance(column_indices, slice):
             column_indices = list(range(
                 column_indices.start
@@ -180,6 +185,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         elif isinstance(column_indices, (int, str)):
             column_indices = [column_indices]
         names = get_column_indices(column_indices, inputs, multiple=True)
+        for _, inp_ind in names.items():
+            input_indices.extend(inp_ind)
         transform_inputs = []
         for onnx_var, onnx_is in names.items():
             tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
@@ -196,10 +203,33 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
             conc_op.outputs.append(conc_names)
             transform_inputs = [conc_names]
 
+        model_obj = model.named_transformers_[name]
+        if isinstance(model_obj, str):
+            if model_obj == "passthrough":
+                model_obj = FunctionTransformer()
+            else:
+                raise RuntimeError("Unknown operator nickname string "
+                                   "'{0}'.".format(model_obj))
         var_out = parse_sklearn(
-            scope, model.named_transformers_[name],
+            scope, model_obj,
             transform_inputs, custom_parsers=custom_parsers)[0]
         transformed_result_names.append(var_out)
+
+    if model.remainder == "passthrough":
+        input_indices = set(input_indices)
+        left_over = [i for i in range(len(inputs)) if i not in input_indices]
+        if len(left_over) > 0:
+            for i in sorted(left_over):
+                onnx_var, onnx_is = get_column_indices([i], inputs,
+                                                       multiple=False)
+                tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]],
+                                               onnx_is)
+                transform_inputs = tr_inputs
+                model_obj = FunctionTransformer()
+                var_out = parse_sklearn(
+                    scope, model_obj,
+                    transform_inputs, custom_parsers=custom_parsers)[0]
+                transformed_result_names.append(var_out)
 
     # Create a Concat ONNX node
     if len(transformed_result_names) > 1:
