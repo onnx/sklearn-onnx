@@ -51,26 +51,12 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                (op.multi_class == 'auto' and (op.classes_.size <= 2 or
                                               op.solver == 'liblinear')))
         post_transform = 'LOGISTIC' if ovr else 'SOFTMAX'
-        if multi_class == 2:
-            if number_of_classes == 2:
-                """
-                See method _predict_proba_lr.
-                When number if classes is two, the function
-                is not SOFTMAX.
-                https://github.com/scikit-learn/scikit-learn/blob/bac89c253b35a8f1a3827389fbee0f5bebcbc985/sklearn/linear_model/base.py#L300
-                """ # noqa
-                classifier_attrs['post_transform'] = post_transform
-            else:
-                classifier_attrs['post_transform'] = post_transform
-        else:
-            classifier_attrs['post_transform'] = post_transform
+        classifier_attrs['post_transform'] = post_transform
     elif op.__class__.__name__ in ('LinearSVC'):
         classifier_attrs['post_transform'] = 'NONE'
     else:
-        if multi_class == 2:
-            classifier_attrs['post_transform'] = 'SOFTMAX'
-        else:
-            classifier_attrs['post_transform'] = 'LOGISTIC'
+        post_transform = 'LOGISTIC' if multi_class > 2 else 'SOFTMAX'
+        classifier_attrs['post_transform'] = post_transform
 
     if all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
         class_labels = [str(i) for i in classes]
