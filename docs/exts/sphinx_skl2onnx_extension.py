@@ -3,6 +3,7 @@
 """
 Extension for sphinx.
 """
+from importlib import import_module
 import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive
@@ -10,6 +11,7 @@ from docutils.statemachine import StringList
 from sphinx.util.nodes import nested_parse_with_titles
 from tabulate import tabulate
 import skl2onnx
+from skl2onnx import supported_converters
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.sklearn_ops import dynamic_class_creation_sklearn
 import onnxruntime
@@ -181,6 +183,72 @@ class SupportedSklearnOpsDirective(Directive):
         return [main]
 
 
+def missing_ops():
+    """
+    Builds the list of supported and not supported models.
+    """
+    from sklearn import __all__
+    from sklearn.base import BaseEstimator
+    found = []
+    for sub in __all__:
+        try:
+            mod = import_module("{0}.{1}".format("sklearn", sub))
+        except ModuleNotFoundError:
+            continue
+        cls = getattr(mod, "__all__", None)
+        if cls is None:
+            cls = list(mod.__dict__)
+        cls = [mod.__dict__[cl] for cl in cls]
+        for cl in cls:
+            try:
+                issub = issubclass(cl, BaseEstimator)
+            except TypeError:
+                continue
+            if issub:
+                found.append((cl.__name__, sub, cl))
+    found.sort()
+    return found
+    
+
+class AllSklearnOpsDirective(Directive):
+    """
+    Displays the list of models implemented in scikit-learn
+    and whether or not there is an associated converter.
+    """
+    required_arguments = False
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = False
+
+    def run(self):
+        from sklearn import __version__ as skver
+        found = missing_ops()
+        nbconverters = 0
+        supported = set(supported_converters(True))
+        rows = [".. list-table::", "    :header-rows: 1", "    :widths: 10 7 4",
+                "", "    * - Name", "      - Package", "      - Supported"]
+        for name, sub, cl in found:
+            rows.append("    * - " + name)
+            rows.append("      - " + sub)
+            if name in supported:
+                rows.append("      - Yes")
+                nbconverters += 1
+            else:
+                rows.append("      -")
+            
+        rows.append("")
+        rows.append("scikit-learn's version is **{0}**.".format(skver))
+        rows.append("{0}/{1} models are covered.".format(nbconverters, len(found)))
+
+        node = nodes.container()
+        st = StringList(rows)
+        nested_parse_with_titles(self.state, st, node)
+        main = nodes.container()
+        main += node
+        return [main]
+    
+
 def setup(app):
     # Placeholder to initialize the folder before
     # generating the documentation.
@@ -188,5 +256,6 @@ def setup(app):
     app.add_directive('supported-skl2onnx', SupportedSkl2OnnxDirective)
     app.add_directive('supported-onnx-ops', SupportedOnnxOpsDirective)
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
+    app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
 
