@@ -204,6 +204,9 @@ def missing_ops():
                 issub = issubclass(cl, BaseEstimator)
             except TypeError:
                 continue
+            if cl.__name__ in {'Pipeline', 'ColumnTransformer',
+                               'FeatureUnion'}:
+                continue
             if issub:
                 found.append((cl.__name__, sub, cl))
     found.sort()
