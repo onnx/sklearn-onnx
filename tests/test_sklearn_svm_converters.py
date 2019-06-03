@@ -8,11 +8,11 @@ from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR
 from sklearn import __version__ as sk__version__
 from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.operator_converters.support_vector_machines import (
     convert_sklearn_svm)
 from skl2onnx.shape_calculators.svm import calculate_sklearn_svm_output_shapes
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_regression_model
 
 
 class SVC_raw(SVC):
@@ -416,6 +416,42 @@ class TestSklearnSVM(unittest.TestCase):
             model, "SVR", [("input", FloatTensorType([1, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRegNuSVR2")
+
+    def test_convert_svr_int(self):
+        model, X = fit_regression_model(
+            SVR(), is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "SVR",
+            [("input", Int64TensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnSVRInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
+
+    def test_convert_nusvr_int(self):
+        model, X = fit_regression_model(
+            NuSVR(), is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "NuSVR",
+            [("input", Int64TensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnNuSVRInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
 
 
 if __name__ == "__main__":

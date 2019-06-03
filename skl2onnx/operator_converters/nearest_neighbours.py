@@ -393,7 +393,6 @@ def convert_sklearn_knn(scope, operator, container):
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
 
-
     apply_cast(scope, operator.inputs[0].full_name, cast_input_name,
                container, to=onnx_proto.TensorProto.FLOAT)
     apply_sub(scope, [cast_input_name, training_examples_name],

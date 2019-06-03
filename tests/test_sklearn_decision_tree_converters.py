@@ -12,13 +12,14 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
 from test_utils import (
     dump_one_class_classification,
     dump_binary_classification,
     dump_multiple_classification,
 )
+from test_utils import dump_data_and_model, fit_regression_model
 from test_utils import dump_multiple_regression, dump_single_regression
 from onnxruntime import InferenceSession, __version__
 
@@ -96,6 +97,24 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
+        )
+
+    def test_decision_tree_regressor_int(self):
+        model, X = fit_regression_model(
+            DecisionTreeRegressor(random_state=42), is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "decision tree regression",
+            [("input", Int64TensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeRegressionInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
         )
 
 

@@ -100,8 +100,7 @@ def convert_sklearn_svm(scope, operator, container):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
-                container, to=onnx_proto.TensorProto.FLOAT)
-
+                   container, to=onnx_proto.TensorProto.FLOAT)
         container.add_node(op_type, cast_input_name,
                            operator.output_full_names,
                            op_domain='ai.onnx.ml', **svm_attrs)
