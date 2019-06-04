@@ -9,6 +9,7 @@ import numpy as np
 import six
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR
 from ..common._apply_operation import apply_cast
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -97,11 +98,15 @@ def convert_sklearn_svm(scope, operator, container):
         svm_attrs['post_transform'] = 'NONE'
         svm_attrs['n_supports'] = len(op.support_)
 
-        cast_input_name = scope.get_unique_variable_name('cast_input')
+        input_name = operator.input_full_names
+        if type(operator.inputs[0].type) == Int64TensorType:
+            cast_input_name = scope.get_unique_variable_name('cast_input')
 
-        apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
-        container.add_node(op_type, cast_input_name,
+            apply_cast(scope, operator.input_full_names, cast_input_name,
+                       container, to=onnx_proto.TensorProto.FLOAT)
+            input_name = cast_input_name
+
+        container.add_node(op_type, input_name,
                            operator.output_full_names,
                            op_domain='ai.onnx.ml', **svm_attrs)
     else:

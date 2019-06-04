@@ -8,6 +8,7 @@ import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
     apply_reshape, apply_sub, apply_topk, apply_transpose)
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
@@ -38,7 +39,7 @@ def _samme_proba(scope, container, proba_name, n_classes):
     container.add_node(
         'Clip', proba_name, clipped_proba_name,
         name=scope.get_unique_operator_name('Clip'),
-        min=np.finfo(float).eps)  # max=None)
+        min=np.finfo(float).eps)
     container.add_node(
         'Log', clipped_proba_name, log_proba_name,
         name=scope.get_unique_operator_name('Log'))
@@ -214,10 +215,14 @@ def _get_estimators_label(scope, operator, container, model):
 
     concatenated_labels_name = scope.get_unique_variable_name(
         'concatenated_labels')
-    cast_input_name = scope.get_unique_variable_name('cast_input')
 
-    apply_cast(scope, operator.input_full_names, cast_input_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+    input_name = operator.input_full_names
+    if type(operator.inputs[0].type) == Int64TensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.input_full_names, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
 
     estimators_results_list = []
     for tree_id in range(len(model.estimators_)):
@@ -231,7 +236,7 @@ def _get_estimators_label(scope, operator, container, model):
                                     model.estimators_[tree_id].tree_,
                                     0, model.learning_rate, 0, False)
 
-        container.add_node(op_type, cast_input_name,
+        container.add_node(op_type, input_name,
                            estimator_label_name, op_domain='ai.onnx.ml',
                            **attrs)
 
