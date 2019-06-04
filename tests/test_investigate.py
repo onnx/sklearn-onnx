@@ -111,8 +111,8 @@ class TestInvestigate(unittest.TestCase):
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
-            assert_almost_equal(onnx_output.tolist(), skl_outputs.tolist())
-            compare_objects(onnx_output, skl_outputs)
+            assert_almost_equal(onnx_output, skl_outputs)
+            compare_objects(onnx_output.tolist(), skl_outputs.tolist())
 
     def test_simple_feature_union(self):
         data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
@@ -136,8 +136,8 @@ class TestInvestigate(unittest.TestCase):
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
-            assert_almost_equal(onnx_output, skl_outputs.tolist())
-            compare_objects(onnx_output, skl_outputs)
+            assert_almost_equal(onnx_output, skl_outputs)
+            compare_objects(onnx_output, skl_outputs.tolist())
 
     def test_simple_pipeline_predict(self):
         data = load_iris()
