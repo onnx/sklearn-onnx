@@ -39,6 +39,8 @@ class TestOnnxOperators(unittest.TestCase):
             W = operator.raw_operator.W
             op = OnnxSub(operator.inputs[0], W, output_names=operator.outputs)
             op.add_to(scope, container)
+            text = str(container)
+            assert 'name:"Sub"' in text
 
         def shape(operator):
             N = operator.inputs[0].type.shape[0]
