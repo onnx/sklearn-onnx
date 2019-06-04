@@ -143,6 +143,9 @@ class Operator(OperatorBase):
                              a CoreML Normalizer.
         :param target_opset: The target opset number for the converted model.
         """
+        if isinstance(raw_operator, str):
+            raise RuntimeError("raw_operator must be an object not a "
+                               "string '{0}'.".format(raw_operator))
         # operator name in the converted model
         self.onnx_name = onnx_name
         self.scope = scope
