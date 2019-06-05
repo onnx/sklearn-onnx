@@ -50,13 +50,13 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         ovr = (op.multi_class in ["ovr", "warn"] or
                (op.multi_class == 'auto' and (op.classes_.size <= 2 or
                                               op.solver == 'liblinear')))
-        post_transform = 'LOGISTIC' if ovr else 'SOFTMAX'
-        classifier_attrs['post_transform'] = post_transform
+        classifier_attrs['post_transform'] = (
+            'LOGISTIC' if ovr else 'SOFTMAX')
     elif op.__class__.__name__ in ('LinearSVC'):
         classifier_attrs['post_transform'] = 'NONE'
     else:
-        post_transform = 'LOGISTIC' if multi_class > 2 else 'SOFTMAX'
-        classifier_attrs['post_transform'] = post_transform
+        classifier_attrs['post_transform'] = (
+            'LOGISTIC' if multi_class > 2 else 'SOFTMAX')
 
     if all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
         class_labels = [str(i) for i in classes]
