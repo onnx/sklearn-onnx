@@ -6,10 +6,13 @@
 import numpy as np
 from ..proto import TensorProto, ValueInfoProto, onnx_proto
 from ..common._topology import Variable
-from ..common.data_types import FloatTensorType, Int64TensorType
-from ..common.data_types import StringTensorType
-from ..common.data_types import Int32TensorType, DoubleTensorType
-from ..common.data_types import BooleanTensorType
+from ..common.data_types import (
+    BooleanTensorType,
+    DoubleTensorType, FloatTensorType,
+    Int64Type,
+    Int64TensorType, Int32TensorType,
+    StringTensorType
+)
 
 
 def _guess_type_proto(data_type, dims):
@@ -39,6 +42,8 @@ def _guess_type(given_type):
     if isinstance(given_type, np.ndarray):
         if given_type.dtype == np.float32:
             return FloatTensorType(given_type.shape)
+        elif given_type.dtype == np.int32:
+            return Int32TensorType(given_type.shape)
         elif given_type.dtype == np.int64:
             return Int64TensorType(given_type.shape)
         elif given_type.dtype == np.str:
@@ -60,6 +65,8 @@ def _guess_type(given_type):
         dims = [ttype.shape.dim[i].dim_value
                 for i in range(len(ttype.shape.dim))]
         return _guess_type_proto(ttype.elem_type, dims)
+    elif isinstance(given_type, np.int64):
+        return Int64Type()
     else:
         raise NotImplementedError(
             "Unsupported type '{}'".format(type(given_type)))

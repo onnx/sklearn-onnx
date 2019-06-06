@@ -12,7 +12,34 @@ in *scikit-onnx*.
 Converters
 ==========
 
+Both functions convert a *scikit-learn* model into ONNX.
+The first one lets the user manually 
+define the inputs name and types. The second one
+infers this information from the training data.
+These two functions are the main entry points to converter.
+The rest of the API is needed if a model has not converter
+implemented in this package. A new converter has then to be
+registered, whether it is imported from another package
+or created from scratch.
+
 .. autofunction:: skl2onnx.convert_sklearn
+
+.. autofunction:: skl2onnx.to_onnx
+
+Register a new converter
+========================
+
+If a model has not converter
+implemented in this package, a new converter has then to be
+registered, whether it is imported from another package
+or created from scratch. Section :ref:`l-converter-list`
+lists all available converters.
+
+.. autofunction:: skl2onnx.supported_converters
+
+.. autofunction:: skl2onnx.update_registered_converter
+
+.. autofunction:: skl2onnx.update_registered_parser
 
 Manipulate ONNX graphs
 ======================
@@ -24,15 +51,6 @@ Manipulate ONNX graphs
 .. autofunction:: skl2onnx.helpers.onnx_helper.select_model_inputs_outputs
 
 .. autofunction:: skl2onnx.helpers.onnx_helper.save_onnx_model
-
-Register a new converter
-========================
-
-.. autofunction:: skl2onnx.supported_converters
-
-.. autofunction:: skl2onnx.update_registered_converter
-
-.. autofunction:: skl2onnx.update_registered_parser
 
 Parsers
 =======

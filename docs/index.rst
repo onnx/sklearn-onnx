@@ -26,7 +26,6 @@ toolkits into `ONNX <https://onnx.ai>`_.
     pipeline
     parameterized
     supported
-    onnx_ops
 
 **Issues, questions**
 
