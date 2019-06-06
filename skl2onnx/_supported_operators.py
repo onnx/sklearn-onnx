@@ -24,6 +24,9 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import SGDRegressor
 from sklearn.svm import LinearSVR
 
+# Mixture
+from sklearn.mixture import GaussianMixture
+
 # Multi-class
 from sklearn.multiclass import OneVsRestClassifier
 
@@ -143,7 +146,7 @@ def build_sklearn_operator_name_map():
                 RobustScaler, OneHotEncoder, DictVectorizer,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
-                VarianceThreshold,
+                VarianceThreshold, GaussianMixture
     ] if k is not None}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',
