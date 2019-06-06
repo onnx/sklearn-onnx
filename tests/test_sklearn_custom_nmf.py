@@ -38,7 +38,8 @@ class TestSklearnCustomNMF(unittest.TestCase):
                 exp.append((i, j, pred[i, j]))
                 got.append((i, j, predict(W, H, i, j)))
 
-        assert exp == got
+        max_diff = max(abs(e[2] - o[2]) for e, o in zip(exp, got))
+        assert max_diff <= 1e-5
 
         def nmf_to_onnx(W, H):
             """
