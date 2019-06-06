@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 import json
 import os
-from onnxruntime.sklapi import OnnxTransformer
+from skonnxrt.sklapi import OnnxTransformer
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn
 from sklearn.datasets import load_iris

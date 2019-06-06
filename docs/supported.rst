@@ -15,6 +15,16 @@ implements *to_onnx* methods.
 .. contents::
     :local:
 
+Covered Converters
+==================
+
+.. covered-sklearn-ops::
+
+Converters Documentation
+========================
+
+.. supported-sklearn-ops::
+
 Pipeline
 ========
 
@@ -26,9 +36,4 @@ Pipeline
 
 .. autoclass:: skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion
     :members: to_onnx, to_onnx_operator, onnx_parser, onnx_shape_calculator, onnx_converter
-
-Implemented Converters
-======================
-
-.. supported-sklearn-ops::
 
