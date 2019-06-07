@@ -5,7 +5,10 @@
 # --------------------------------------------------------------------------
 
 import collections
+from ..common._apply_operation import apply_cast
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
+from ..proto import onnx_proto
 
 
 def convert_sklearn_linear_regressor(scope, operator, container):
@@ -18,7 +21,15 @@ def convert_sklearn_linear_regressor(scope, operator, container):
                            else [float(op.intercept_)])
     if len(op.coef_.shape) == 2:
         attrs['targets'] = op.coef_.shape[0]
-    container.add_node(op_type, operator.input_full_names,
+
+    input_name = operator.input_full_names
+    if type(operator.inputs[0].type) == Int64TensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.input_full_names, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
+    container.add_node(op_type, input_name,
                        operator.output_full_names, op_domain='ai.onnx.ml',
                        **attrs)
 
