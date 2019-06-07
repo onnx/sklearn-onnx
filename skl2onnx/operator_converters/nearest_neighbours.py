@@ -10,6 +10,7 @@ from ..common._apply_operation import apply_abs, apply_cast, apply_mul
 from ..common._apply_operation import apply_add, apply_div
 from ..common._apply_operation import apply_reshape, apply_sub, apply_topk
 from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -392,7 +393,15 @@ def convert_sklearn_knn(scope, operator, container):
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
 
-    apply_sub(scope, [operator.inputs[0].full_name, training_examples_name],
+    input_name = operator.inputs[0].full_name
+    if type(operator.inputs[0].type) == Int64TensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.inputs[0].full_name, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
+
+    apply_sub(scope, [input_name, training_examples_name],
               sub_results_name, container, broadcast=1)
     apply_abs(scope, sub_results_name, abs_results_name, container)
     apply_pow(scope, [abs_results_name, distance_power_name], distance_name,

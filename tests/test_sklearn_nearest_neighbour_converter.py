@@ -6,7 +6,7 @@ import numpy
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
@@ -180,6 +180,24 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
             "StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+
+    def test_model_knn_regressor_int(self):
+        model, X = self._fit_model(KNeighborsRegressor())
+        X = X.astype(numpy.int64)
+        model_onnx = convert_sklearn(
+            model,
+            "KNN regressor",
+            [("input", Int64TensorType([1, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionInt-OneOffArray",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
 
 
 if __name__ == "__main__":

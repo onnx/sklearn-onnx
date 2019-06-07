@@ -14,8 +14,10 @@ import numpy
 import pandas
 from sklearn.datasets import (
     make_classification,
-    make_multilabel_classification
+    make_multilabel_classification,
+    make_regression,
 )
+from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import MultiLabelBinarizer
 from .utils_backend import (
@@ -43,6 +45,15 @@ def _has_transform_model(model):
     if hasattr(model, "voting"):
         return False
     return hasattr(model, "fit_transform") and hasattr(model, "score")
+
+
+def fit_regression_model(model, is_int=False):
+    X, y = make_regression(n_features=10, n_samples=1000, random_state=42)
+    X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                   random_state=42)
+    model.fit(X_train, y_train)
+    return model, X_test
 
 
 def dump_data_and_model(

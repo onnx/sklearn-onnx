@@ -8,14 +8,14 @@ import unittest
 import numpy as np
 from distutils.version import StrictVersion
 from pandas import DataFrame
-from sklearn.datasets import make_regression, make_classification
+from sklearn.datasets import make_classification
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_binary_classification, dump_multiple_classification
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_regression_model
 from onnxruntime import InferenceSession, __version__
 
 
@@ -73,18 +73,13 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             "<= StrictVersion('0.5.0')",
         )
 
-    def _fit_regression_model(self, model):
-        X, y = make_regression(n_features=4, random_state=42)
-        model.fit(X, y)
-        return model, X.astype(np.float32)
-
     def test_gradient_boosting_regressor_ls_loss(self):
-        model, X = self._fit_regression_model(
+        model, X = fit_regression_model(
             GradientBoostingRegressor(n_estimators=3, loss="ls"))
         model_onnx = convert_sklearn(
             model,
             "gradient boosting regression",
-            [("input", FloatTensorType([1, 4]))],
+            [("input", FloatTensorType(X.shape))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -93,16 +88,16 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model_onnx,
             basename="SklearnGradientBoostingRegressionLsLoss",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')"
+                          " <= StrictVersion('0.2.1')"
         )
 
     def test_gradient_boosting_regressor_lad_loss(self):
-        model, X = self._fit_regression_model(
+        model, X = fit_regression_model(
             GradientBoostingRegressor(n_estimators=3, loss="lad"))
         model_onnx = convert_sklearn(
             model,
             "gradient boosting regression",
-            [("input", FloatTensorType([1, 4]))],
+            [("input", FloatTensorType(X.shape))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -110,15 +105,17 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionLadLoss",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
         )
 
     def test_gradient_boosting_regressor_huber_loss(self):
-        model, X = self._fit_regression_model(
+        model, X = fit_regression_model(
             GradientBoostingRegressor(n_estimators=3, loss="huber"))
         model_onnx = convert_sklearn(
             model,
             "gradient boosting regression",
-            [("input", FloatTensorType([1, 4]))],
+            [("input", FloatTensorType(X.shape))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -126,15 +123,17 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionHuberLoss",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
         )
 
     def test_gradient_boosting_regressor_quantile_loss(self):
-        model, X = self._fit_regression_model(
+        model, X = fit_regression_model(
             GradientBoostingRegressor(n_estimators=3, loss="quantile"))
         model_onnx = convert_sklearn(
             model,
             "gradient boosting regression",
-            [("input", FloatTensorType([1, 4]))],
+            [("input", FloatTensorType(X.shape))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -142,6 +141,26 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionQuantileLoss",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
+
+    def test_gradient_boosting_regressor_int(self):
+        model, X = fit_regression_model(
+            GradientBoostingRegressor(random_state=42), is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gradient boosting regression",
+            [("input", Int64TensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
         )
 
 
