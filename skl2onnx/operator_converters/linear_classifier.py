@@ -73,7 +73,8 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         class_labels = [int(i) for i in classes]
         classifier_attrs['classlabels_ints'] = class_labels
     else:
-        raise RuntimeError('Label vector must be a string or a integer tensor')
+        raise RuntimeError('Label vector must be a string or a integer '
+                           'tensor.')
 
     label_name = operator.outputs[0].full_name
 

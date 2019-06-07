@@ -45,7 +45,7 @@ class OnnxOperatorMixin:
         if hasattr(self, 'enumerate_initial_types'):
             return list(self.enumerate_initial_types())
         raise RuntimeError("Method enumerate_initial_types is missing "
-                           "and initial_types are not defined")
+                           "and initial_types are not defined.")
 
     def _find_sklearn_parent(self):
         if (hasattr(self.__class__, 'predict') and

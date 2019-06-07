@@ -83,7 +83,8 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
                 categorical_feature_indices = [
                     int(i) for i in op.categorical_features]
         else:
-            raise ValueError('Unknown operation mode')
+            raise ValueError("Unknown operation mode '{0}'.".format(
+                op.categorical_features))
 
         # Calculate the number of allowed categorical values in each
         # original categorical coordinate.

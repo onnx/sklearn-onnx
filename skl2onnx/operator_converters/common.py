@@ -34,8 +34,8 @@ def concatenate_variables(scope, variables, container):
     number_type_set = {FloatType, FloatTensorType, Int64Type, Int64TensorType}
     if (StringType in type_set and
             any(number_type in type_set for number_type in number_type_set)):
-        raise RuntimeError('We are not able to concatenate numerical '
-                           'tensor(s) and string tensor(s)')
+        raise RuntimeError('Numerical tensor(s) and string tensor(s) '
+                           'cannot be concatenated.')
     # input variables' names we want to concatenate
     input_names = []
     # dimensions of the variables that is going to be concatenated

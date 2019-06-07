@@ -71,7 +71,7 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
         pass
     else:
         raise TypeError(
-            "pipe is not a scikit-learn object: {}\n{}".format(
+            "Parameter pipe is not a scikit-learn object: {}\n{}".format(
                 type(pipe), pipe))
 
 

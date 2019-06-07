@@ -34,7 +34,7 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
         class_labels = [str(i) for i in classes]
         attrs['classlabels_strings'] = class_labels
     else:
-        raise ValueError('Only support pure string or integer class labels')
+        raise ValueError('Labels must be all integers or all strings.')
 
     add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True)
 

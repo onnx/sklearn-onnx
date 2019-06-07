@@ -86,7 +86,7 @@ def convert_sklearn_svm(scope, operator, container):
             svm_attrs['classlabels_strings'] = labels
             zipmap_attrs['classlabels_strings'] = labels
         else:
-            raise RuntimeError('Invalid class label type [%s]' % op.classes_)
+            raise RuntimeError("Invalid class label type '%s'." % op.classes_)
 
         container.add_node(op_type, operator.inputs[0].full_name,
                            [label_name, probability_tensor_name],
@@ -110,7 +110,8 @@ def convert_sklearn_svm(scope, operator, container):
                            operator.output_full_names,
                            op_domain='ai.onnx.ml', **svm_attrs)
     else:
-        raise ValueError('Unknown support vector machine model type found')
+        raise ValueError("Unknown support vector machine model type found "
+                         "'{0}'.".format(operator.type))
 
 
 register_converter('SklearnSVC', convert_sklearn_svm)

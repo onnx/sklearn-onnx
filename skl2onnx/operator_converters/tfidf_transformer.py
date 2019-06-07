@@ -23,7 +23,8 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         # np.log(X.data, X.data) --> does not apply on null coefficient
         # X.data += 1
         raise RuntimeError(
-            "ONNX does not support sparse tensors, sublinear_tf must be False")
+            "ONNX does not support sparse tensors before opset < 11, "
+            "sublinear_tf must be False.")
 
         logged = scope.get_unique_variable_name('logged')
         apply_log(scope, data, logged, container)
@@ -69,7 +70,10 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         if op.norm in norm_map:
             attrs['norm'] = norm_map[op.norm]
         else:
-            raise RuntimeError('Invalid norm: %s' % op.norm)
+            raise RuntimeError("Invalid norm '%s'. "
+                               "You may raise an issue at "
+                               "https://github.com/onnx/sklearn-onnx/"
+                               "issues." % op.norm)
 
         container.add_node(op_type, data, operator.output_full_names,
                            op_domain='ai.onnx.ml', **attrs)
