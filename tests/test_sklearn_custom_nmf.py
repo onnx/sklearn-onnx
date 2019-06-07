@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from sklearn.decomposition import NMF
+import onnx
 from skl2onnx.common.data_types import FloatTensorType, onnx_built_with_ml
 from skl2onnx.algebra.onnx_ops import (
     OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
@@ -16,6 +18,8 @@ from onnxruntime import InferenceSession
 class TestSklearnCustomNMF(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+                     reason="not available")
     def test_custom_nmf(self):
 
         mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
