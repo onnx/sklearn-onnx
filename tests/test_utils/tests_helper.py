@@ -70,6 +70,7 @@ def dump_data_and_model(
         dump_error_log=None,
         benchmark=None,
         comparable_outputs=None,
+        intermediate_steps=False,
         verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
@@ -110,6 +111,8 @@ def dump_data_and_model(
         If not specified, it falls back into a default behaviour implemented
         for classifiers, regressors, clustering.
     :param comparable_outputs: compares only these outputs
+    :param intermediate_steps: displays intermediate steps
+        in case of an error
     :return: the created files
 
     Some convention for the name,
@@ -284,6 +287,7 @@ def dump_data_and_model(
                     context=context,
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
+                    intermediate_steps=intermediate_steps,
                 )
             else:
                 try:
@@ -294,6 +298,7 @@ def dump_data_and_model(
                         context=context,
                         verbose=verbose,
                         comparable_outputs=comparable_outputs,
+                        intermediate_steps=intermediate_steps,
                     )
                 except AssertionError as e:
                     if dump_error_log:

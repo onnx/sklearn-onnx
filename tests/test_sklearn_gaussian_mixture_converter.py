@@ -79,6 +79,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2",
+            intermediate_steps=True,
             # Operator gemm is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",

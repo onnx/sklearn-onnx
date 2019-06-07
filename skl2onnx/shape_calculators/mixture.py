@@ -20,9 +20,10 @@ def calculate_gaussian_mixture_output_shapes(operator):
     if len(operator.inputs[0].type.shape) != 2:
         raise RuntimeError('Input must be a [N, C]-tensor')
 
+    op = operator.raw_operator
     N = operator.inputs[0].type.shape[0]
     operator.outputs[0].type = Int64TensorType([N, 1])
-    operator.outputs[1].type = FloatTensorType([N, 1])
+    operator.outputs[1].type = FloatTensorType([N, op.n_components])
 
 
 register_shape_calculator('SklearnGaussianMixture',
