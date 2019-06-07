@@ -4,8 +4,10 @@
 # license information.
 # --------------------------------------------------------------------------
 """
-Common functions to convert any learner based on trees.
+Functions to calculate output shapes of linear classifiers
+and regressors.
 """
+
 import numbers
 import numpy as np
 import six
@@ -27,7 +29,7 @@ def calculate_linear_classifier_output_shapes(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=[1, 2])
     check_input_and_output_types(operator, good_input_types=[
-                                    FloatTensorType, Int64TensorType])
+        FloatTensorType, Int64TensorType])
 
     if len(operator.inputs[0].type.shape) != 2:
         raise RuntimeError('Input must be a [N, C]-tensor')
@@ -39,7 +41,7 @@ def calculate_linear_classifier_output_shapes(operator):
     if all(isinstance(i, np.ndarray) for i in class_labels):
         class_labels = np.concatenate(class_labels)
     if all(isinstance(i, (six.string_types, six.text_type))
-            for i in class_labels):
+           for i in class_labels):
         operator.outputs[0].type = StringTensorType(shape=[N])
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             operator.outputs[1].type = FloatTensorType([N, number_of_classes])
@@ -71,6 +73,8 @@ def calculate_linear_regressor_output_shapes(operator):
     """
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
+    check_input_and_output_types(operator, good_input_types=[
+        FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].type.shape[0]
     operator.outputs[0].type = FloatTensorType([N, 1])
