@@ -50,6 +50,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'QLinearConv',
                     'QLinearMatMul',
                     "QuantizeLinear",
+                    "Round",  # opset 11
                     'Scan',  # Graph attribute inferencing returned type
                     # information for 2 outputs. Expected 1
                     # Node () has input size 5 not in range [min=1, max=1].

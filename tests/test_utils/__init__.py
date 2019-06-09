@@ -16,6 +16,7 @@ from .tests_helper import (  # noqa
     dump_multiple_regression,
     dump_single_regression,
     convert_model,
+    fit_regression_model,
 )
 
 

@@ -25,7 +25,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPClassifier().fit(X_train, y_train)
+        model = MLPClassifier(random_state=42).fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -50,7 +50,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPClassifier().fit(X_train, y_train)
+        model = MLPClassifier(random_state=42).fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -73,7 +73,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPRegressor().fit(X_train, y_train)
+        model = MLPRegressor(random_state=42).fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
@@ -98,7 +98,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPClassifier(activation="identity").fit(X_train, y_train)
+        model = MLPClassifier(random_state=42, activation="identity").fit(
+            X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -121,7 +122,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPRegressor(activation="identity").fit(
+        model = MLPRegressor(random_state=42, activation="identity").fit(
             X_train.astype(np.int64), y_train)
         model_onnx = convert_sklearn(
             model,
@@ -147,7 +148,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPClassifier(activation="logistic").fit(X_train, y_train)
+        model = MLPClassifier(random_state=42, activation="logistic").fit(
+            X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -172,7 +174,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPRegressor(activation="logistic").fit(X_train, y_train)
+        model = MLPRegressor(random_state=42, activation="logistic").fit(
+            X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
@@ -197,7 +200,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPClassifier(activation="tanh").fit(X_train, y_train)
+        model = MLPClassifier(random_state=42, activation="tanh").fit(
+            X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -220,7 +224,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = MLPRegressor(activation="tanh").fit(X_train, y_train)
+        model = MLPRegressor(random_state=42, activation="tanh").fit(
+            X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
