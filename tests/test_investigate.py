@@ -1,7 +1,11 @@
 import unittest
 import numpy
 from numpy.testing import assert_almost_equal
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    # not avaiable in 0.19
+    ColumnTransformer = None
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
@@ -90,6 +94,8 @@ class TestInvestigate(unittest.TestCase):
             compare_objects(onnx_output, skl_outputs)
 
     def test_simple_column_transformer(self):
+        if ColumnTransformer is None:
+            return
         data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
                            dtype=numpy.float32)
         model = ColumnTransformer([("scaler1", StandardScaler(), [0]),
