@@ -97,6 +97,51 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_ovr(self):
+        model, X = self._fit_model_multiclass_classification(
+            linear_model.LogisticRegression(multi_class='ovr'))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMulti",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_multinomial(self):
+        model, X = self._fit_model_multiclass_classification(
+            linear_model.LogisticRegression(
+                multi_class="multinomial", solver="lbfgs"))
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([1, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionMulti",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_no_intercept(self):
         model, X = self._fit_model_multiclass_classification(
             linear_model.LogisticRegression(fit_intercept=False))
