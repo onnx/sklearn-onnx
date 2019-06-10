@@ -46,14 +46,14 @@ def _guess_type(given_type):
             return Int32TensorType(given_type.shape)
         elif given_type.dtype == np.int64:
             return Int64TensorType(given_type.shape)
-        elif given_type.dtype == np.str:
+        elif given_type.dtype == np.str or str(given_type.dtype) in ('<U1', ):
             return StringTensorType(given_type.shape)
         else:
             raise NotImplementedError(
                 "Unsupported type '{}'. Double should "
                 "be converted into single floats.".format(given_type.dtype))
     elif isinstance(given_type, (FloatTensorType, Int64TensorType,
-                                 StringTensorType)):
+                                 Int32TensorType, StringTensorType)):
         return given_type
     elif isinstance(given_type, Variable):
         return given_type.type

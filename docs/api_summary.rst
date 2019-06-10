@@ -14,10 +14,10 @@ Converters
 
 Both functions convert a *scikit-learn* model into ONNX.
 The first one lets the user manually 
-define the inputs name and types. The second one
+define the input's name and types. The second one
 infers this information from the training data.
 These two functions are the main entry points to converter.
-The rest of the API is needed if a model has not converter
+The rest of the API is needed if a model has no converter
 implemented in this package. A new converter has then to be
 registered, whether it is imported from another package
 or created from scratch.
@@ -29,7 +29,7 @@ or created from scratch.
 Register a new converter
 ========================
 
-If a model has not converter
+If a model has no converter
 implemented in this package, a new converter has then to be
 registered, whether it is imported from another package
 or created from scratch. Section :ref:`l-converter-list`

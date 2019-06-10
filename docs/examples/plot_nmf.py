@@ -10,11 +10,11 @@ sklearn.decomposition.NMF.html>`_ factorizes an input matrix
 into two matrices *W, H* of rank *k* so that :math:`WH \\sim M``.
 :math:`M=(m_{ij})` may be a binary matrix where *i* is a user
 and *j* a product he bought. The prediction
-function depends on whether or not the user needs an
+function depends on whether or not the user needs a
 recommandation for an existing user or a new user.
 This example addresses the first case.
 
-The second case is more complex as it theoritically
+The second case is more complex as it theoretically
 requires the estimation of a new matrix *W* with a
 gradient descent.
 
