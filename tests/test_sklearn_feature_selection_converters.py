@@ -75,7 +75,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         )
 
     def test_rfecv_int(self):
-        model = RFECV(estimator=SVR(kernel="linear"))
+        model = RFECV(estimator=SVR(kernel="linear"), cv=3)
         X = np.array(
             [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]],
             dtype=np.int64,
@@ -304,7 +304,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         )
 
     def test_rfecv_float(self):
-        model = RFECV(estimator=SVR(kernel="linear"))
+        model = RFECV(estimator=SVR(kernel="linear"), cv=3)
         X = np.array(
             [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]],
             dtype=np.float32,
