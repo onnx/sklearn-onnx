@@ -1,5 +1,5 @@
 """Tests scikit-learn's OneHotEncoder converter."""
-
+import inspect
 import unittest
 import numpy
 from distutils.version import StrictVersion
@@ -129,8 +129,17 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         # (this test will fail by then).
         data = [['Male', 1], ['Female', 3], ['Female', 2]]
         test_data = [['Unknown', 4]]
-        model = OneHotEncoder(handle_unknown='ignore',
-                              categorical_features='all')
+        sig = inspect.signature(OneHotEncoder)
+        if "categorical_features" in sig.parameters:
+            # scikit-learn < 0.21
+            model = OneHotEncoder(handle_unknown='ignore',
+                                  categorical_features='all')
+        elif "categories" in sig.parameters:
+            # scikit-learn >= 0.22
+            model = OneHotEncoder(handle_unknown='ignore',
+                                  categories='auto')
+        else:
+            raise AssertionError("scikit-learn's API has changed.")
         model.fit(data)
         inputs = [
             ("input1", StringTensorType([1, 1])),
