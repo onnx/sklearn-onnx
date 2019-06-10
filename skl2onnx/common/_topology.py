@@ -112,14 +112,12 @@ class Variable:
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
             else:
-                raise NotImplementedError("Unsupported type '{}' "
-                                          "elem_type={}".format(
-                                              type(obj.type.tensor_type),
-                                              elem))
+                raise NotImplementedError(
+                    "Unsupported type '{}' elem_type={}".format(
+                        type(obj.type.tensor_type), elem))
         else:
-            raise NotImplementedError("Unsupported type '{}' as "
-                                      "a string={}".format(
-                                        type(obj), obj))
+            raise NotImplementedError(
+                "Unsupported type '{}' as a string={}".format(type(obj), obj))
 
         return Variable(name, name, None, ty)
 
