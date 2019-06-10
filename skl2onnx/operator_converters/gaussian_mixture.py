@@ -39,10 +39,12 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         # shape(op.means_) = (n_components, n_features)
         # shape(op.precisions_cholesky_) =
         #   (n_components, n_features, n_features)
+
         # log_prob = np.empty((n_samples, n_components))
         # for k, (mu, prec_chol) in enumerate(zip(means, precisions_chol)):
         #     y = np.dot(X, prec_chol) - np.dot(mu, prec_chol)
         #     log_prob[:, k] = np.sum(np.square(y), axis=1)
+
         ys = []
         for c in range(n_components):
             prec_chol = op.precisions_cholesky_[c, :, :]
@@ -50,37 +52,74 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
             y = OnnxGemm(X, prec_chol, cst, alpha=1., beta=1.)
             y2s = OnnxReduceSumSquare(y, axes=[1])
             ys.append(y2s)
-
         log_prob = OnnxConcat(*ys, axis=1)
 
     elif op.covariance_type == 'tied':
-        raise NotImplementedError("covariance_type == 'tied'"
-                                  " not implemented yet")
+        # shape(op.means_) = (n_components, n_features)
+        # shape(op.precisions_cholesky_) =
+        #   (n_features, n_features)
+
         # log_prob = np.empty((n_samples, n_components))
         # for k, mu in enumerate(means):
         #     y = np.dot(X, precisions_chol) - np.dot(mu, precisions_chol)
         #     log_prob[:, k] = np.sum(np.square(y), axis=1)
 
+        precisions_chol = op.precisions_cholesky_
+        ys = []
+        for f in range(n_components):
+            cst = - np.dot(op.means_[f, :], precisions_chol)
+            y = OnnxGemm(X, precisions_chol, cst, alpha=1., beta=1.)
+            y2s = OnnxReduceSumSquare(y, axes=[1])
+            ys.append(y2s)
+        log_prob = OnnxConcat(*ys, axis=1)
+
     elif op.covariance_type == 'diag':
-        raise NotImplementedError("covariance_type == 'diag'"
-                                  " not implemented yet")
+        # shape(op.means_) = (n_components, n_features)
+        # shape(op.precisions_cholesky_) =
+        #   (n_components, n_features)
+
         # precisions = precisions_chol ** 2
         # log_prob = (np.sum((means ** 2 * precisions), 1) -
         #             2. * np.dot(X, (means * precisions).T) +
         #             np.dot(X ** 2, precisions.T))
 
+        precisions = op.precisions_cholesky_ ** 2
+        mp = np.sum((op.means_ ** 2 * precisions), 1)
+        zeros = np.zeros((n_components, ))
+        xmp = OnnxGemm(X, (op.means_ * precisions).T, zeros,
+                       alpha=-2., beta=0.)
+        term = OnnxGemm(OnnxMul(X, X), precisions.T, zeros, alpha=1., beta=0.)
+        log_prob = OnnxAdd(OnnxAdd(mp, xmp), term)
+
     elif op.covariance_type == 'spherical':
-        raise NotImplementedError("covariance_type == 'spherical'"
-                                  " not implemented yet")
+        # shape(op.means_) = (n_components, n_features)
+        # shape(op.precisions_cholesky_) = (n_components, )
+
         # precisions = precisions_chol ** 2
         # log_prob = (np.sum(means ** 2, 1) * precisions -
         #             2 * np.dot(X, means.T * precisions) +
         #             np.outer(row_norms(X, squared=True), precisions))
 
+        zeros = np.zeros((n_components, ))
+        precisions = op.precisions_cholesky_ ** 2
+        normX = OnnxReduceSumSquare(X, axes=[1])
+        outer = OnnxGemm(normX, precisions[np.newaxis, :], zeros,
+                         alpha=1., beta=1.)
+        xmp = OnnxGemm(X, (op.means_.T * precisions), zeros,
+                       alpha=-2., beta=0.)
+        mp = np.sum(op.means_ ** 2, 1) * precisions
+        log_prob = OnnxAdd(mp, OnnxAdd(xmp, outer))
+    else:
+        raise RuntimeError("Unknown op.covariance_type='{}'. Upgrade "
+                           "to a mroe recent version of skearn-onnx "
+                           "or raise an issue.".format(op.covariance_type))
+
     # -.5 * (cst + log_prob) + log_det
     cst = np.array([n_features * np.log(2 * np.pi)])
     add = OnnxAdd(cst, log_prob)
     mul = OnnxMul(add, np.array([-0.5]))
+    if isinstance(log_det, float):
+        log_det = np.array([log_det])
     weighted_log_prob = OnnxAdd(OnnxAdd(mul, log_det), log_weights)
 
     # labels

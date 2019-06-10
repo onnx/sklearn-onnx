@@ -6,8 +6,10 @@ import pandas
 import warnings
 from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs,
-    enumerate_model_node_outputs
+    enumerate_model_node_outputs,
+    enumerate_model_initializers
 )
+from skl2onnx.algebra.type_helper import _guess_type
 
 from .utils_backend import (
     load_data_and_model,
@@ -24,6 +26,9 @@ def _display_intermediate_steps(model_onnx, inputs):
     if isinstance(model_onnx, str):
         import onnx
         model_onnx = onnx.load(model_onnx)
+
+    for name, node in enumerate_model_initializers(model_onnx, add_node=True):
+        print("INIT: {} - {}".format(name, _guess_type(node)))
 
     for out, node in enumerate_model_node_outputs(model_onnx, add_node=True):
         print('-')

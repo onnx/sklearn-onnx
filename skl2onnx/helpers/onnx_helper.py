@@ -47,7 +47,7 @@ def save_onnx_model(model, filename=None):
 
 def enumerate_model_node_outputs(model, add_node=False):
     """
-    Enumerates all the node of a model.
+    Enumerates all the nodes of a model.
 
     :param model: ONNX graph
     :param add_node: if False, the function enumerates
@@ -61,6 +61,20 @@ def enumerate_model_node_outputs(model, add_node=False):
     for node in model.graph.node:
         for out in node.output:
             yield (out, node) if add_node else out
+
+
+def enumerate_model_initializers(model, add_node=False):
+    """
+    Enumerates all the initializers of a model.
+
+    :param model: ONNX graph
+    :param add_node: if False, the function enumerates
+        all output names from every node, otherwise, it
+        enumerates tuple (output name, node)
+    :return: enumerator
+    """
+    for node in model.graph.initializer:
+        yield (node.name, node) if add_node else node.name
 
 
 def select_model_inputs_outputs(model, outputs=None, inputs=None):

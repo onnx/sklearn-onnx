@@ -85,6 +85,90 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                           " < StrictVersion('1.2')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_full(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='full')
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "GM",
+                                     [("input", FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2Full",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_tied(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='tied')
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "GM",
+                                     [("input", FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2Tied",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_diag(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='diag')
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "GM",
+                                     [("input", FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2Diag",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_spherical(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='spherical')
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "GM",
+                                     [("input", FloatTensorType([1, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2Spherical",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
