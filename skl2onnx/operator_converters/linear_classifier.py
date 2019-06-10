@@ -52,8 +52,6 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                                               op.solver == 'liblinear')))
         classifier_attrs['post_transform'] = (
             'LOGISTIC' if ovr else 'SOFTMAX')
-    elif op.__class__.__name__ in ('LinearSVC'):
-        classifier_attrs['post_transform'] = 'NONE'
     else:
         classifier_attrs['post_transform'] = (
             'LOGISTIC' if multi_class > 2 else 'SOFTMAX')
