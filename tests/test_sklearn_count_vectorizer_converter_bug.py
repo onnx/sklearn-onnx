@@ -30,7 +30,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
 
         extra = {
             CountVectorizer: {
-                "sep": ["ZZZZ"]
+                "separators": ["ZZZZ"]
             }
         }
 
@@ -46,7 +46,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11CustomTokenizer-OneOff-SklCol",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.0')")
+                          "StrictVersion('0.4.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
