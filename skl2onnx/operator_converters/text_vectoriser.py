@@ -54,16 +54,11 @@ def _intelligent_split(text, op, tokenizer, existing):
     spl = tuple(spl)
     if spl in existing:
         raise RuntimeError("The converter cannot guess how to "
-<<<<<<< HEAD:skl2onnx/operator_converters/text_vectoriser.py
                            "split an expression into tokens. "
                            "This happens when "
                            "a token contain spaces.")
     if op.ngram_range[0] == 1 and \
             (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
-=======
-                           "split an expression into tokens.")
-    if op.ngram_range[0] == 1 and op.ngram_range[1] > 1:
->>>>>>> Enables opset 9 for TextVectorizer:skl2onnx/operator_converters/TextVectorizer.py
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
@@ -222,11 +217,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                 'is_case_sensitive': not op.lowercase,
             })
             op_version = 10
-<<<<<<< HEAD:skl2onnx/operator_converters/text_vectoriser.py
             domain = ''
-=======
-            domain = 'ai.onnx'
->>>>>>> Enables opset 9 for TextVectorizer:skl2onnx/operator_converters/TextVectorizer.py
         else:
             attrs.update({
                 'casechangeaction': 'LOWER',
