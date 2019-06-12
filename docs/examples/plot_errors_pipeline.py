@@ -102,7 +102,7 @@ def lightgbm_classifier_shape_extractor(operator):
         operator.outputs[1].type = SequenceType(
             DictionaryType(Int64TensorType([]), FloatTensorType([])), N)
     else:
-        raise ValueError('Unsupported or mixed label types')
+        raise ValueError('Unsupported or mixed label types.')
 
 
 ###################################

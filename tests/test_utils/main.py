@@ -23,9 +23,9 @@ def set_model_domain(model, domain):
         set_model_domain(onnx_model, "com.acme")
     """
     if model is None or not isinstance(model, onnx_proto.ModelProto):
-        raise ValueError("model is not an onnx model")
+        raise ValueError("Parameter model is not an onnx model.")
     if not convert_utils.is_string_type(domain):
-        raise ValueError("domain must be a string type")
+        raise ValueError("Parameter domain must be a string type.")
     model.domain = domain
 
 
@@ -44,9 +44,9 @@ def set_model_version(model, version):
         set_model_version(onnx_model, 1)
     """
     if model is None or not isinstance(model, onnx_proto.ModelProto):
-        raise ValueError("model is not an onnx model")
+        raise ValueError("Parameter model is not an onnx model.")
     if not convert_utils.is_numeric_type(version):
-        raise ValueError("version must be a numeric type")
+        raise ValueError("Parameter version must be a numeric type.")
     model.model_version = version
 
 
@@ -67,12 +67,12 @@ def set_model_doc_string(model, doc, override=False):
         set_model_doc_string(onnx_model, "Sample doc string")
     """
     if model is None or not isinstance(model, onnx_proto.ModelProto):
-        raise ValueError("model is not an onnx model")
+        raise ValueError("Parameter model is not an onnx model.")
     if not convert_utils.is_string_type(doc):
-        raise ValueError("doc must be a string type")
+        raise ValueError("Parameter doc must be a string type.")
     if model.doc_string and not doc and override is False:
         raise ValueError(
-            "failing to overwrite the doc string with a blank string,"
-            " set override to True if intentional"
+            "Failed to overwrite the doc string with a blank string,"
+            " set override to True if intentional."
         )
     model.doc_string = doc

@@ -14,9 +14,11 @@ from ..common._registration import register_converter
 def convert_sklearn_k_bins_discretiser(scope, operator, container):
     op = operator.raw_operator
 
-    if op.encode == 'ohehot':
-        raise RuntimeError("onehot encoding not supported since"
-                           "ONNX does not support sparse tensors.")
+    if op.encode == 'onehot':
+        raise RuntimeError("onehot encoding not supported. "
+                           "ONNX does not support sparse tensors. "
+                           "with opset < 11. You may raise an isue at "
+                           "https://github.com/onnx/sklearn-onnx/issues.")
 
     ranges = list(map(lambda e: e[1:-1] if len(e) > 2
                       else [np.finfo(np.float32).max], op.bin_edges_))

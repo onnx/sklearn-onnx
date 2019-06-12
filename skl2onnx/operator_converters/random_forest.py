@@ -45,7 +45,7 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
         class_labels = [str(i) for i in classes]
         attr_pairs['classlabels_strings'] = class_labels
     else:
-        raise ValueError('Only string and integer class labels are allowed')
+        raise ValueError('Only string and integer class labels are allowed.')
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.

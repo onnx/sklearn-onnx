@@ -20,7 +20,7 @@ def calculate_sklearn_kmeans_output_shapes(operator):
 
     variable = operator.inputs[0]
     if len(variable.type.shape) != 2:
-        raise RuntimeError('Only 2-D tensor(s) can be input(s)')
+        raise RuntimeError('Only 2-D tensor(s) can be input(s).')
 
     N = variable.type.shape[0]
     op = operator.raw_operator

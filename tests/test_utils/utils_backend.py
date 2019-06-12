@@ -35,12 +35,15 @@ def evaluate_condition(backend, condition):
         return eval(condition)
     else:
         raise NotImplementedError(
-            "Not implemented for backend '{0}'".format(backend))
+            "Not implemented for backend '{0}' and "
+            "condition '{1}'.".format(backend, condition))
 
 
 def is_backend_enabled(backend):
     """
     Tells if a backend is enabled.
+    Raises an exception if backend != 'onnxruntime'.
+    Unit tests only test models against this backend.
     """
     if backend == "onnxruntime":
         try:
@@ -234,7 +237,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                 if NoProbOpp:
                     output = -output
             elif expected.shape != output.shape:
-                raise NotImplementedError("No good shape: {0} != {1}".format(
+                raise NotImplementedError("Shape mismatch: {0} != {1}".format(
                     expected.shape, output.shape))
         if len(expected.shape) == 1 and len(
                 output.shape) == 2 and output.shape[1] == 1:

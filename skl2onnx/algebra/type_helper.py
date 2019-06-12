@@ -69,13 +69,15 @@ def _guess_type(given_type):
         return Int64Type()
     else:
         raise NotImplementedError(
-            "Unsupported type '{}'".format(type(given_type)))
+            "Unsupported type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(type(given_type)))
 
 
 def guess_initial_types(X, initial_types):
-    if X is None:
+    if X is None and initial_types is None:
         raise NotImplementedError("Initial types must be specified.")
-    else:
+    elif initial_types is None:
         if isinstance(X, np.ndarray):
             X = X[:1]
         gt = _guess_type(X)

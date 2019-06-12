@@ -24,7 +24,9 @@ def convert_sklearn_normalizer(scope, operator, container):
     if op.norm in norm_map:
         attrs['norm'] = norm_map[op.norm]
     else:
-        raise RuntimeError('Invalid norm: %s' % op.norm)
+        raise RuntimeError("Invalid norm '%s'. You may raise an issue"
+                           "at https://github.com/onnx/sklearn-onnx/"
+                           "issues." % op.norm)
 
     container.add_node(op_type, feature_name, operator.outputs[0].full_name,
                        op_domain='ai.onnx.ml', **attrs)

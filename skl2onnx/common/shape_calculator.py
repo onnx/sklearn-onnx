@@ -32,7 +32,7 @@ def calculate_linear_classifier_output_shapes(operator):
         FloatTensorType, Int64TensorType])
 
     if len(operator.inputs[0].type.shape) != 2:
-        raise RuntimeError('Input must be a [N, C]-tensor')
+        raise RuntimeError('Inputs must be a [N, C]-tensor.')
 
     N = operator.inputs[0].type.shape[0]
 
@@ -59,7 +59,7 @@ def calculate_linear_classifier_output_shapes(operator):
             # the positive class
             operator.outputs[1].type = FloatTensorType(shape=[N, 1])
     else:
-        raise ValueError('Unsupported or mixed label types')
+        raise ValueError('Label types must be all integers or all strings.')
 
 
 def calculate_linear_regressor_output_shapes(operator):

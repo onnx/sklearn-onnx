@@ -22,7 +22,7 @@ def convert_sklearn_dict_vectorizer(scope, operator, container):
              for feature_name in op.feature_names_):
         attrs['int64_vocabulary'] = list(int(i) for i in op.feature_names_)
     else:
-        raise ValueError('Unsupported key type found')
+        raise ValueError('Keys must be all integers or all strings.')
 
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',

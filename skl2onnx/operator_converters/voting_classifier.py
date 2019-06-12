@@ -79,7 +79,10 @@ def convert_voting_classifier(scope, operator, container):
     elif op.voting == 'soft':
         op_name = 'ReduceMean'
     else:
-        raise RuntimeError("Unuspported voting kind '{}'.".format(op.voting))
+        raise RuntimeError("Unuspported voting kind '{}'. "
+                           "You may raise an issue at "
+                           "https://github.com/onnx/sklearn-onnx/issues"
+                           ".".format(op.voting))
 
     if op.flatten_transform in (False, None):
         red_name = operator.outputs[1].full_name
@@ -88,7 +91,9 @@ def convert_voting_classifier(scope, operator, container):
             name=scope.get_unique_operator_name(op_name), axes=[0])
     else:
         raise NotImplementedError(
-            "flatten_transform==True is not implemented yet.")
+            "flatten_transform==True is not implemented yet. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
 
     # labels
     label_name = scope.get_unique_variable_name('label_name')
