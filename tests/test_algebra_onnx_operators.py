@@ -41,6 +41,17 @@ class TestOnnxOperators(unittest.TestCase):
             op.add_to(scope, container)
             text = str(container)
             assert 'name:"Sub"' in text
+            nin = list(op.enumerate_initial_types())
+            nno = list(op.enumerate_nodes())
+            nva = list(op.enumerate_variables())
+            assert len(nin) == 1
+            assert nin[0][0] == 'input'
+            assert nin[0][1].shape == [1, 2]
+            assert len(nno) == 1
+            assert nno[0].output_names == ['variable']
+            assert len(nva) == 1
+            assert isinstance(nva[0], tuple)
+            assert nva[0][1] == 0
 
         def shape(operator):
             N = operator.inputs[0].type.shape[0]

@@ -340,7 +340,7 @@ class OnnxOperator:
         yield self
         for input in self.inputs:
             if isinstance(input, OnnxOperator):
-                for i in input:
+                for i in input.enumerate_nodes():
                     yield i
 
     def enumerate_variables(self):
@@ -365,9 +365,9 @@ class OnnxOperator:
         :return: list of `(name, type)`
         """
         for node, i in self.enumerate_variables():
-            input = node.inputes[i]
+            input = node.inputs[i]
             if isinstance(input, Variable):
-                yield (input.name, input.type)
+                yield (input.onnx_name, input.type)
             elif isinstance(input, OnnxOperator.UnscopedVariable):
                 name = input.name
                 typ = node.__class__.expected_inputs[i]
