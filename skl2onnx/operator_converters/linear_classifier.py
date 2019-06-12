@@ -16,12 +16,14 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     classes = op.classes_
     number_of_classes = len(classes)
     coefficients = op.coef_.flatten().astype(float).tolist()
+
     if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
         # fit_intercept = False
         intercepts = ([0.0] * number_of_classes if number_of_classes != 2 else
                       [0.0])
     else:
         intercepts = op.intercept_.tolist()
+
     if number_of_classes == 2:
         coefficients = list(map(lambda x: -1 * x, coefficients)) + coefficients
         intercepts = list(map(lambda x: -1 * x, intercepts)) + intercepts
@@ -45,26 +47,14 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     if op.__class__.__name__ == 'LinearSVC':
         classifier_attrs['post_transform'] = 'NONE'
     elif op.__class__.__name__ == 'LogisticRegression':
-        if multi_class == 2:
-            if number_of_classes == 2:
-                """
-                See method _predict_proba_lr.
-                When number if classes is two, the function
-                is not SOFTMAX.
-                https://github.com/scikit-learn/scikit-learn/blob/bac89c253b35a8f1a3827389fbee0f5bebcbc985/sklearn/linear_model/base.py#L300
-                """ # noqa
-                classifier_attrs['post_transform'] = 'LOGISTIC'
-            else:
-                classifier_attrs['post_transform'] = 'LOGISTIC'
-        else:
-            classifier_attrs['post_transform'] = 'LOGISTIC'
-    elif op.__class__.__name__ in ('LinearSVC'):
-        classifier_attrs['post_transform'] = 'NONE'
+        ovr = (op.multi_class in ["ovr", "warn"] or
+               (op.multi_class == 'auto' and (op.classes_.size <= 2 or
+                                              op.solver == 'liblinear')))
+        classifier_attrs['post_transform'] = (
+            'LOGISTIC' if ovr else 'SOFTMAX')
     else:
-        if multi_class == 2:
-            classifier_attrs['post_transform'] = 'SOFTMAX'
-        else:
-            classifier_attrs['post_transform'] = 'LOGISTIC'
+        classifier_attrs['post_transform'] = (
+            'LOGISTIC' if multi_class > 2 else 'SOFTMAX')
 
     if all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
         class_labels = [str(i) for i in classes]

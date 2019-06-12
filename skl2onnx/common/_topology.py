@@ -118,7 +118,7 @@ class Variable:
                                               elem))
         else:
             raise NotImplementedError("Unsupported type '{}' as "
-                                      "a string ({})..".format(
+                                      "a string ({}).".format(
                                         type(obj), obj))
 
         return Variable(name, name, None, ty)
