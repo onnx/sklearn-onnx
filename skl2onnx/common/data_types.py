@@ -30,10 +30,10 @@ def _guess_type_proto(data_type, dims):
     elif data_type == onnx_proto.TensorProto.BOOL:
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported type '{}' "
-                                  "data_type={}".format(
-                                      type(data_type),
-                                      dims))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def _guess_type_proto_str(data_type, dims):
@@ -51,8 +51,10 @@ def _guess_type_proto_str(data_type, dims):
     elif data_type == "tensor(bool)":
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported data_type='{}'".format(
-            data_type))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def _guess_numpy_type(data_type, dims):
@@ -72,8 +74,10 @@ def _guess_numpy_type(data_type, dims):
     elif data_type == np.bool:
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported data_type='{}'".format(
-            data_type))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def guess_data_type(type_, shape=None):
@@ -96,4 +100,6 @@ def guess_data_type(type_, shape=None):
         return [('input', _guess_numpy_type(type_.dtype, type_.shape))]
     else:
         raise TypeError("Type {} cannot be converted into a "
-                        "DataType.".format(type(type_)))
+                        "DataType. You may raise an issue at "
+                        "https://github.com/onnx/sklearn-onnx/issues."
+                        "".format(type(type_)))

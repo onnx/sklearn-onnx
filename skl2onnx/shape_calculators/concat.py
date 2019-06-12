@@ -30,7 +30,9 @@ def calculate_sklearn_concat(operator):
             seen_types.append(nt)
         elif nt != seen_types[0]:
             inps = "\n".join(str(v) for v in operator.inputs)
-            raise RuntimeError("Columns must have the same type.\nInputs:\n"
+            raise RuntimeError("Columns must have the same type. "
+                               "C++ backends do not support mixed types. "
+                               "Inputs:\n"
                                + inps)
     operator.outputs[0].type.shape = [N, C]
 

@@ -23,11 +23,12 @@ class GraphState:
         self.computed_outputs = None
         self.attrs = attrs
         if isinstance(self.inputs, tuple):
-            raise TypeError("inputs must be a list or a string or a Variable.")
+            raise TypeError("Parameter inputs must be a list or a string or a "
+                            "Variable not tuple.")
         elif not isinstance(self.inputs, list):
             self.inputs = [self.inputs]
         if self.expected_outputs is None:
-            raise ValueError("expected_outputs must be named.")
+            raise ValueError("Parameter outputs must not be empty.")
         if not isinstance(self.expected_outputs, list):
             self.expected_outputs = [self.expected_outputs]
 
@@ -53,13 +54,14 @@ class GraphState:
                         return var.full_name
                     elif isinstance(var, str):
                         return var
-            raise RuntimeError("Unexpected type {}".format(outputs))
+            raise RuntimeError("Unexpected output type {}".format(outputs))
         elif hasattr(var, 'name') and isinstance(var.name, str) and var.name:
             return var.name
         elif isinstance(var, str):
             return var
         else:
-            raise RuntimeError("Unexpected type: {0}".format(type(var)))
+            raise RuntimeError("Unexpected type for parameter 'var': {0}."
+                               "".format(type(var)))
 
     def _add_constant(self, cst):
         if isinstance(cst, np.ndarray):
@@ -70,7 +72,9 @@ class GraphState:
                 ty = onnx_proto.TensorProto.FLOAT
             else:
                 raise NotImplementedError(
-                    "Unable to guess ONNX type from type {}.".format(
+                    "Unable to guess ONNX type from type {}. "
+                    "You may raise an issue at https://github.com/onnx/"
+                    "sklearn-onnx/issues.".format(
                         cst.dtype))
             self.container.add_initializer(
                 name, ty, shape, cst.astype(np.float64).flatten())
@@ -82,7 +86,9 @@ class GraphState:
             return name
         else:
             raise NotImplementedError(
-                "Unable to add a constant of type {}.".format(type(cst)))
+                "Unable to add a constant of type {}. "
+                "You may raise an issue at https://github.com/onnx/"
+                "sklearn-onnx/issues.".format(type(cst)))
 
     def _get_output_name(self, output):
         if isinstance(output, Variable):
@@ -93,7 +99,9 @@ class GraphState:
             return output[0]
         else:
             raise NotImplementedError(
-                "Unexpected type {}\n{}".format(type(output), output))
+                "Unexpected output type {} [{}]. "
+                "You may raise an issue at https://github.com/onnx/"
+                "sklearn-onnx/issues.".format(type(output), output))
 
     def run(self, operator=None):
         if self.computed_outputs is None:
