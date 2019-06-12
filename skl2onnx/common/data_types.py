@@ -7,11 +7,10 @@ import numpy as np
 from ..proto import TensorProto, onnx_proto
 from onnxconverter_common.data_types import DataType, Int64Type, FloatType  # noqa
 from onnxconverter_common.data_types import StringType, TensorType  # noqa
-from onnxconverter_common.data_types import Int64TensorType
-from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType
-from onnxconverter_common.data_types import FloatTensorType, StringTensorType
-from onnxconverter_common.data_types import DoubleTensorType
-from onnxconverter_common.data_types import DictionaryType, SequenceType  # noqa
+from onnxconverter_common.data_types import (  # noqa
+    Int64TensorType, Int32TensorType, BooleanTensorType,
+    FloatTensorType, StringTensorType, DoubleTensorType,
+    DictionaryType, SequenceType)
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 
 
