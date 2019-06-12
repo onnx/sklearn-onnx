@@ -112,12 +112,14 @@ class Variable:
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
             else:
-                raise NotImplementedError(
-                    "Unsupported type '{}' elem_type={}".format(
-                        type(obj.type.tensor_type), elem))
+                raise NotImplementedError("Unsupported type '{}' "
+                                          "(elem_type={}).".format(
+                                              type(obj.type.tensor_type),
+                                              elem))
         else:
-            raise NotImplementedError(
-                "Unsupported type '{}' as a string={}".format(type(obj), obj))
+            raise NotImplementedError("Unsupported type '{}' as "
+                                      "a string ({}).".format(
+                                        type(obj), obj))
 
         return Variable(name, name, None, ty)
 
@@ -142,8 +144,8 @@ class Operator(OperatorBase):
         :param target_opset: The target opset number for the converted model.
         """
         if isinstance(raw_operator, str):
-            raise RuntimeError("raw_operator must be an object not a "
-                               "string '{0}'.".format(raw_operator))
+            raise RuntimeError("Parameter raw_operator must be an object not "
+                               "a string '{0}'.".format(raw_operator))
         # operator name in the converted model
         self.onnx_name = onnx_name
         self.scope = scope
@@ -272,7 +274,8 @@ class Scope:
         Creates a unique variable ID based on the given seed.
         """
         if not isinstance(seed, str):
-            raise TypeError("seed must be a string not {}".format(type(seed)))
+            raise TypeError("Parameter seed must be a string not {}."
+                            "".format(type(seed)))
         return Topology._generate_unique_name(seed, self.onnx_variable_names)
 
     def get_unique_operator_name(self, seed):
@@ -352,7 +355,7 @@ class Scope:
         """
         if (onnx_name not in self.onnx_operator_names or
                 onnx_name not in self.operators):
-            raise RuntimeError('The operator to be removed not found')
+            raise RuntimeError('The operator to remove was not found.')
         self.onnx_operator_names.discard(onnx_name)
         del self.operators[onnx_name]
 
@@ -362,7 +365,7 @@ class Scope:
         """
         if (onnx_name not in self.onnx_variable_names or
                 onnx_name not in self.variables):
-            raise RuntimeError('The variable to be removed not found')
+            raise RuntimeError('The variable to remove was not found.')
         self.onnx_variable_names.discard(onnx_name)
         raw_name = self.variables[onnx_name].raw_name
         self.variable_name_mapping[raw_name].remove(onnx_name)
@@ -462,7 +465,7 @@ class Topology:
         :return: a string similar to the seed
         """
         if seed == '':
-            raise ValueError('Name seed must be an non-empty string')
+            raise ValueError('Name seed must be a non-empty string.')
 
         # Make the seed meet C-style naming convention
         # Only alphabets and numbers are allowed
@@ -561,7 +564,7 @@ class Topology:
                         # an output somewhere
                         if variable.is_fed:
                             raise RuntimeError('One variable can only be '
-                                               'assigned once')
+                                               'assigned once.')
                         # Mark this variable as filled
                         variable.is_fed = True
                     # Make this operator as handled
@@ -917,8 +920,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     elif target_opset > get_opset_number_from_onnx():
         found = get_opset_number_from_onnx()
         raise RuntimeError(
-            "target_opset {} > {} is higher than the number of the installed "
-            "onnx package. See "
+            "Parameter target_opset {} > {} is higher than the "
+            "number of the installed onnx package. See "
             "https://github.com/onnx/onnx/blob/master/docs/Versioning.md#released-versions" # noqa
             ".".format(target_opset, found))
 
@@ -1014,8 +1017,10 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             except ValueError:
                 raise MissingConverter(
                     "Unable to find converter for alias '{}' type "
-                    "'{}'.".format(operator.type,
-                                   type(getattr(operator, 'raw_model', None))))
+                    "'{}'. You may raise an issue at "
+                    "https://github.com/onnx/sklearn-onnx/issues."
+                    "".format(operator.type,
+                              type(getattr(operator, 'raw_model', None))))
         conv(scope, operator, container)
 
     # Create a graph from its main components

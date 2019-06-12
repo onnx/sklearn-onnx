@@ -57,7 +57,8 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                 categorical_feature_indices = [
                             int(i) for i in op.categorical_features]
         else:
-            raise ValueError('Unknown operation mode')
+            raise ValueError("Unknown operation mode '{0}'."
+                             "".format(op.categorical_features))
 
         if op.n_values == 'auto':
             # Use active feature to determine output length

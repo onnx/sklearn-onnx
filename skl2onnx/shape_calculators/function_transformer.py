@@ -15,7 +15,9 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
     '''
     if operator.raw_operator.func is not None:
         raise RuntimeError("FunctionTransformer is not supported unless the "
-                           "transform function is None (= identity).")
+                           "transform function is None (= identity). "
+                           "You may raise an issue at "
+                           "https://github.com/onnx/sklearn-onnx/issues.")
     N = operator.inputs[0].type.shape[0]
     C = 0
     for variable in operator.inputs:

@@ -117,7 +117,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
 
     def to_onnx_operator(self, inputs=None, outputs=('Y', )):
         if inputs is None:
-            raise RuntimeError("inputs should contain one name")
+            raise RuntimeError("Parameter inputs should contain at least "
+                               "one name.")
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_

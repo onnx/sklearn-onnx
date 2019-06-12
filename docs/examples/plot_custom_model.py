@@ -96,11 +96,11 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         self.keep_tsne_outputs = keep_tsne_outputs
         if not hasattr(transformer, "fit_transform"):
             raise AttributeError(
-                "transformer {} does not have a 'fit_transform' "
+                "Transformer {} does not have a 'fit_transform' "
                 "method.".format(type(transformer)))
         if not hasattr(estimator, "predict"):
             raise AttributeError(
-                "estimator {} does not have a 'predict' method.".format(
+                "Estimator {} does not have a 'predict' method.".format(
                     type(estimator)))
         self.normalize = normalize
         if kwargs:
@@ -205,7 +205,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
             elif k.startswith('n_'):
                 pn[k[2:]] = v
             else:
-                raise ValueError("Unexpected parameter name '{0}'".format(k))
+                raise ValueError("Unexpected parameter name '{0}'.".format(k))
         self.transformer.set_params(**pt)
         self.estimator.set_params(**pe)
 

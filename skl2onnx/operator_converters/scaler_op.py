@@ -40,7 +40,10 @@ def convert_sklearn_scaler(scope, operator, container):
         attrs['offset'] = [0.] * C
     else:
         raise ValueError('Only scikit-learn StandardScaler and RobustScaler '
-                         'are supported but got %s' % type(op))
+                         'are supported but got %s. You may raise '
+                         'an issue at '
+                         'https://github.com/onnx/sklearn-onnx/issues.'
+                         '' % type(op))
 
     # ONNX does not convert arrays of float32.
     for k in attrs:

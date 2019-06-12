@@ -29,7 +29,7 @@ from .common.utils import get_column_indices
 
 def _fetch_input_slice(scope, inputs, column_indices):
     if not isinstance(inputs, list):
-        raise TypeError("inputs must be a list of 1 input.")
+        raise TypeError("Parameter inputs must be a list.")
     if len(inputs) == 0:
         raise RuntimeError("Operator ArrayFeatureExtractor requires at "
                            "least one inputs.")
@@ -63,7 +63,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     """
     # alias can be None
     if isinstance(model, str):
-        raise RuntimeError("model must be an object not a "
+        raise RuntimeError("Parameter model must be an object not a "
                            "string '{0}'.".format(model))
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
@@ -208,8 +208,10 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
             if model_obj == "passthrough":
                 model_obj = FunctionTransformer()
             else:
-                raise RuntimeError("Unknown operator nickname string "
-                                   "'{0}'.".format(model_obj))
+                raise RuntimeError("Unknown operator alias "
+                                   "'{0}'. These are specified in "
+                                   "_supported_operators.py."
+                                   "".format(model_obj))
         var_out = parse_sklearn(
             scope, model_obj,
             transform_inputs, custom_parsers=custom_parsers)[0]

@@ -51,7 +51,8 @@ def calculate_sklearn_svm_output_shapes(operator):
             operator.outputs[1].type = FloatTensorType([N, number_of_classes])
         else:
             raise RuntimeError('Class labels should be either all strings or '
-                               'all integers')
+                               'all integers. C++ backends do not support '
+                               'mixed types.')
 
     if operator.type in ['SklearnSVR']:
         check_input_and_output_numbers(operator, input_count_range=[1, None],
