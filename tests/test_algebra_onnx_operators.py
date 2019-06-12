@@ -169,9 +169,9 @@ class TestOnnxOperators(unittest.TestCase):
         onnx2 = model_def.SerializeToString()
         self.assertEqual(onx.outputs, ['Y'])
         # There should be 2 outputs here, bug in ONNX?
-        # self.assertEqual(len(model_def.graph.output), 1)
+        self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))
-        # self.assertEqual(len(reload.graph.output), 1)
+        self.assertEqual(len(reload.graph.output), 1)
         assert reload is not None
 
     def test_onnx_reversed_order_second(self):
@@ -197,5 +197,4 @@ class TestOnnxOperators(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestOnnxOperators().test_onnx_reversed_order()
     unittest.main()

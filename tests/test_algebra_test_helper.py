@@ -38,7 +38,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
                 pass
 
     def test_guess_data_type(self):
-        ty = guess_data_type(np.array([3, 5]))
+        ty = guess_data_type(np.array([3, 5], dtype=np.int32))
         self.assertEqual(len(ty), 1)
         self.assertEqual(ty[0][0], 'input')
         assert isinstance(ty[0][1], Int32TensorType)
