@@ -26,13 +26,13 @@ Building a simple model
 
 """
 
+import os
 import skl2onnx
 import onnxruntime
 import sklearn
 from sklearn.decomposition import NMF
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnx
 from skl2onnx.algebra.onnx_ops import (
