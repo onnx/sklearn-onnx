@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+from io import BytesIO
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
@@ -8,9 +9,11 @@ from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
 from skl2onnx.algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
+from onnx import helper, TensorProto, load_model
 from test_utils import dump_data_and_model
 
 
@@ -142,6 +145,57 @@ class TestOnnxOperators(unittest.TestCase):
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")
 
+    def test_unscoped(self):
+        var2 = OnnxOperator.UnscopedVariable("a")
+        var1 = OnnxOperator.UnscopedVariable("a")
+        self.assertEqual(var1, var2)
+        self.assertEqual(var1, "a")
+        self.assertEqual(repr(var1), "UnscopedVariable('a')")
+
+    def test_constant(self):
+        cst = OnnxOperator.ConstantVariable("a")
+        self.assertEqual(cst.value, "a")
+
+    def test_onnx_reversed_order(self):
+        idi = np.identity(2)
+        idi2 = np.identity(2) * 2
+
+        onx = OnnxAdd(OnnxAdd('X', idi), idi2, output_names=['Y'])
+        model_def = onx.to_onnx({'X': idi.astype(np.float32)})
+        # onnx1 = model_def.SerializeToString()
+        self.assertEqual(len(model_def.graph.output), 1)
+        onx = OnnxAdd(idi2, OnnxAdd('X', idi), output_names=['Y'])
+        model_def = onx.to_onnx({'X': idi.astype(np.float32)})
+        onnx2 = model_def.SerializeToString()
+        self.assertEqual(onx.outputs, ['Y'])
+        # There should be 2 outputs here, bug in ONNX?
+        # self.assertEqual(len(model_def.graph.output), 1)
+        reload = load_model(BytesIO(onnx2))
+        # self.assertEqual(len(reload.graph.output), 1)
+        assert reload is not None
+
+    def test_onnx_reversed_order_second(self):
+
+        X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [2, 2])
+        Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [2, 2])
+
+        nodes = [
+            helper.make_node('Add', ['X', 'idi'], ['temp']),
+            helper.make_node('Add', ['temp', 'idi2'], ['Y'])
+        ]
+        graph_def = helper.make_graph(nodes, 't1', [X], [Y])
+        model_def = helper.make_model(graph_def, producer_name='A')
+        self.assertEqual(len(model_def.graph.output), 1)
+
+        nodes = [
+            helper.make_node('Add', ['X', 'idi'], ['temp']),
+            helper.make_node('Add', ['idi2', 'temp'], ['Y'])
+        ]
+        graph_def = helper.make_graph(nodes, 't1', [X], [Y])
+        model_def = helper.make_model(graph_def, producer_name='A')
+        self.assertEqual(len(model_def.graph.output), 1)
+
 
 if __name__ == "__main__":
+    # TestOnnxOperators().test_onnx_reversed_order()
     unittest.main()

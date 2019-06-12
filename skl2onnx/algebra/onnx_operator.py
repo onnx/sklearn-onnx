@@ -294,7 +294,8 @@ class OnnxOperator:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
         else:
-            shapes = infer_outputs(container, container.inputs)
+            shapes = infer_outputs(container, container.inputs,
+                                   initializer=container.initializers)
 
             if self.output_names:
                 shapes = [shape for shape in shapes

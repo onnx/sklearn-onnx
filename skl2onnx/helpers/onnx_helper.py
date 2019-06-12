@@ -137,7 +137,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     return onnx_model
 
 
-def infer_outputs(op_type, inputs, outputs=None, **atts):
+def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
     """
     Infers outputs type and shapes given an ONNX operator.
     """
@@ -175,9 +175,9 @@ def infer_outputs(op_type, inputs, outputs=None, **atts):
             onnx_inputs.append(input)
 
     graph = helper.make_graph(node, 'infer_shapes',
-                              onnx_inputs, [])
+                              onnx_inputs, [],
+                              initializer=initializer)
     original_model = helper.make_model(graph, producer_name='skl2onnx')
-
     domains = {}
     for n in node:
         domains[n.domain] = max(domains.get(n.domain, 1),

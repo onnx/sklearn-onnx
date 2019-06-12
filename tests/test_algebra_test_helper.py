@@ -61,6 +61,11 @@ class TestAlgebraTestHelper(unittest.TestCase):
         ty = guess_data_type("tensor(string)")
         assert isinstance(ty, StringTensorType)
 
+        try:
+            guess_data_type(None)
+        except TypeError as e:
+            assert "cannot be converted into a DataType" in str(e)
+
 
 if __name__ == "__main__":
     unittest.main()
