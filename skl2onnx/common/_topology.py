@@ -465,7 +465,7 @@ class Topology:
         :return: a string similar to the seed
         """
         if seed == '':
-            raise ValueError('Name seed must be an non-empty string.')
+            raise ValueError('Name seed must be a non-empty string.')
 
         # Make the seed meet C-style naming convention
         # Only alphabets and numbers are allowed
