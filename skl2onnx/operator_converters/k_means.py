@@ -72,11 +72,15 @@ def convert_sklearn_kmeans(scope, operator, container):
     N = X.type.shape[0]
     zeros = np.zeros((N, ))
 
-    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
-    z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
-    y2 = OnnxAdd(C2, z)
-    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
-    y2s = OnnxSqrt(y2, output_names=out[1:])
+    opv = container.target_opset
+    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1, op_version=opv)
+    z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2.,
+                             transB=1, op_version=opv),
+                op_version=opv)
+    y2 = OnnxAdd(C2, z, op_version=opv)
+    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1],
+                    op_version=opv)
+    y2s = OnnxSqrt(y2, output_names=out[1:], op_version=opv)
 
     ll.add_to(scope, container)
     y2s.add_to(scope, container)

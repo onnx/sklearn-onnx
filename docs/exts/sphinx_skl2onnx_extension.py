@@ -11,9 +11,9 @@ from docutils.statemachine import StringList
 from sphinx.util.nodes import nested_parse_with_titles
 from tabulate import tabulate
 import skl2onnx
-from skl2onnx._supported_operators import build_sklearn_operator_name_map
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.sklearn_ops import dynamic_class_creation_sklearn
+from skl2onnx.validate import sklearn_operators
 import onnxruntime
 
 
@@ -181,39 +181,6 @@ class SupportedSklearnOpsDirective(Directive):
             main += node
 
         return [main]
-
-
-def missing_ops():
-    """
-    Builds the list of supported and not supported models.
-    """
-    from sklearn import __all__
-    from sklearn.base import BaseEstimator
-    found = []
-    for sub in __all__:
-        try:
-            mod = import_module("{0}.{1}".format("sklearn", sub))
-        except ModuleNotFoundError:
-            continue
-        cls = getattr(mod, "__all__", None)
-        if cls is None:
-            cls = list(mod.__dict__)
-        cls = [mod.__dict__[cl] for cl in cls]
-        for cl in cls:
-            try:
-                issub = issubclass(cl, BaseEstimator)
-            except TypeError:
-                continue
-            if cl.__name__ in {'Pipeline', 'ColumnTransformer',
-                               'FeatureUnion', 'BaseEstimator'}:
-                continue
-            if (sub in {'calibration', 'dummy', 'manifold'} and
-                'Calibrated' not in cl.__name__):
-                continue
-            if issub:
-                found.append((cl.__name__, sub, cl))
-    found.sort()
-    return found
     
 
 class AllSklearnOpsDirective(Directive):
@@ -229,12 +196,12 @@ class AllSklearnOpsDirective(Directive):
 
     def run(self):
         from sklearn import __version__ as skver
-        found = missing_ops()
+        found = [(d['name'], d['subfolder'], d['cl'], d['supported'])
+                 for d in sklearn_operators()]
         nbconverters = 0
-        supported = set(build_sklearn_operator_name_map())
         rows = [".. list-table::", "    :header-rows: 1", "    :widths: 10 7 4",
                 "", "    * - Name", "      - Package", "      - Supported"]
-        for name, sub, cl in found:
+        for name, sub, cl, supported in found:
             rows.append("    * - " + name)
             rows.append("      - " + sub)
             if cl in supported:
@@ -253,6 +220,53 @@ class AllSklearnOpsDirective(Directive):
         main = nodes.container()
         main += node
         return [main]
+
+
+class AllSklearnOpsOpsetDirective(Directive):
+    """
+    Displays the list of models implemented in scikit-learn
+    and whether or not there is an associated converter.
+    """
+    required_arguments = False
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = False
+
+    def run(self):
+        from skl2onnx.validate import validate_operator_opsets
+        from tabulate import tabulate
+        
+        obs = validate_operator_opsets()
+                
+        def aggfunc(values):
+            if len(values) != 1:
+                raise ValueError(values)
+            val = values.iloc[0]
+            if isinstance(val, float) and numpy.isnan(val):
+                return ""
+            else:
+                return val
+
+        piv = pandas.pivot_table(df, values="available", 
+                                 index=['name', 'problem', 'scenario'], 
+                                 columns='opset', 
+                                 aggfunc=aggfunc).reset_index(drop=False)
+        cols = piv.columns
+        versions = ["opset%d" % t for t in range(1, piv.shape[1] - 2)]
+        indices = ["name","problem","scenario"]
+        piv.columns = indices + versions
+        piv = piv[indices + list(reversed(versions))]
+
+        rest = tabulate(piv, tablefmt="rst")
+        rows = rest.split('\n')
+
+        node = nodes.container()
+        st = StringList(rows)
+        nested_parse_with_titles(self.state, st, node)
+        main = nodes.container()
+        main += node
+        return [main]
     
 
 def setup(app):
@@ -263,5 +277,5 @@ def setup(app):
     app.add_directive('supported-onnx-ops', SupportedOnnxOpsDirective)
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
+    app.add_directive('supported-onnx-ops-opset', AllSklearnOpsOpsetDirective)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
-

@@ -8,7 +8,8 @@ from .automation import get_rst_doc
 
 def ClassFactory(class_name, op_name, inputs, outputs,
                  input_range, output_range,
-                 domain, attr_names, doc):
+                 domain, attr_names, doc,
+                 deprecated, since_version):
     from .onnx_operator import OnnxOperator
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +38,9 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                      'operator_name': op_name,
                      'input_range': input_range,
                      'output_range': output_range,
-                     'domain': domain})
+                     'domain': domain,
+                     'is_deprecated': deprecated,
+                     'since_version': since_version})
     return newclass
 
 
@@ -76,7 +79,8 @@ def dynamic_class_creation():
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
                           schema.domain, args,
-                          "**Version**" + doc.split('**Version**')[-1])
+                          "**Version**" + doc.split('**Version**')[-1],
+                          schema.deprecated, schema.since_version)
         cls[class_name] = cl
     return cls
 

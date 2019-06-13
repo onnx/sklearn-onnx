@@ -17,18 +17,18 @@ implements *to_onnx* methods.
 
 .. _l-converter-list:
 
-Covered Converters
-==================
+Covered and Uncovered Converters
+================================
 
 .. covered-sklearn-ops::
 
-Converters Documentation
-========================
+Documentation of Implemented Converters
+=======================================
 
 .. supported-sklearn-ops::
 
-Pipeline
-========
+Supported Pipeline Operators
+============================
 
 .. autoclass:: skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline
     :members: to_onnx, to_onnx_operator, onnx_parser, onnx_shape_calculator, onnx_converter
@@ -56,3 +56,35 @@ of the *ONNX* operators on any data as shown
 in example :ref:`l-onnx-operators`.
 
 .. supported-onnx-ops::
+
+Availability of Converters for each Opset
+=========================================
+
+Some ONNX operators converters are using were not all 
+available in older version of ONNX. This version is called
+*opset number*. ONNX 1.4.0 is opset 9, ONNX 1.5.0 is opset 10...
+Next table shows which operator is available in which opset.
+An empty cell means it is not available. Other cells
+contains concatenated flags whose meaning is the following:
+
+* ``ERROR`` means the automated process failed to give
+  a appropriate status or the runtime produces predictions
+  too far from the original predictions,
+* ``OK``: the converter works fine and the runtime produces
+  predictions almost equal to the orignal predictions,
+  absolute difference is below :math:`1e-5`,
+* ``e<0.01``: the converter works fine and the runtime produces
+  predictions close to the orignal predictions,
+  absolute difference is below :math:`0.01`,
+* ``e<0.1``: the converter works fine but the runtime produces
+  predictions close to the orignal predictions,
+  absolute difference is below :math:`0.1`,
+* ``i|j``: the model was converted for a specific opset but
+  the converted ONNX is compatible with smaller opset,
+  *i* is the smallest compatible opset for the main domain,
+  *j* is the smallest compatible opset for the ai domain,
+* ``NOBATCH``: the runtime is unable to compute the predictions
+  for multiple observations at the same time, it needs to be
+  called for each observation.
+
+.. supported-onnx-ops-opset::

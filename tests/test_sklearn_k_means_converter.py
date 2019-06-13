@@ -49,6 +49,36 @@ class TestSklearnKMeansModel(unittest.TestCase):
                           " < StrictVersion('1.2')",
         )
 
+    def test_batchkmeans_clustering_opset9(self):
+        data = load_iris()
+        X = data.data
+        model = MiniBatchKMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", FloatTensorType([1, 4]))],
+                                     target_opset=9)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnKMeansOp9-Dec4",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    def test_batchkmeans_clustering_opset1(self):
+        data = load_iris()
+        X = data.data
+        model = MiniBatchKMeans(n_clusters=3)
+        model.fit(X)
+        try:
+            convert_sklearn(model, "kmeans",
+                            [("input", FloatTensorType([1, 4]))],
+                            target_opset=1)
+        except RuntimeError as e:
+            assert "Node 'OnnxAdd' has been changed since version" in str(e)
+
 
 if __name__ == "__main__":
     unittest.main()

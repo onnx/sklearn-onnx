@@ -47,3 +47,4 @@ benchmarks/*.csv
 benchmarks/*.png
 tests/Operators*.md
 docs/examples/*.pkl
+tests/sklearn_opsets_report.*
