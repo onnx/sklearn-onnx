@@ -160,6 +160,8 @@ class TestOnnxOperators(unittest.TestCase):
         cst = OnnxOperator.ConstantVariable("a")
         self.assertEqual(cst.value, "a")
 
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
     def test_onnx_reversed_order(self):
         idi = np.identity(2)
         idi2 = np.identity(2) * 2
@@ -178,8 +180,6 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertEqual(len(reload.graph.output), 1)
         assert reload is not None
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
     def test_onnx_reversed_order_second(self):
         X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [2, 2])
         Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [2, 2])
