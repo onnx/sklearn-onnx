@@ -214,6 +214,11 @@ def _measure_absolute_difference(skl_pred, ort_pred):
     if skl_pred.shape != ort_pred.shape:
         return np.nan
 
+    if hasattr(skl_pred, 'todense'):
+        skl_pred = skl_pred.todense()
+    if hasattr(ort_pred, 'todense'):
+        ort_pred = ort_pred.todense()
+
     diff = np.max(np.abs(skl_pred.ravel() - ort_pred.ravel()))
 
     if np.isnan(diff):
