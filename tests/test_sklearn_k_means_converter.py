@@ -5,12 +5,14 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.datasets import load_iris
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model
+import onnx
 
 
 class TestSklearnKMeansModel(unittest.TestCase):
@@ -49,6 +51,8 @@ class TestSklearnKMeansModel(unittest.TestCase):
                           " < StrictVersion('1.2')",
         )
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="OnnxOperator not working")
     def test_batchkmeans_clustering_opset9(self):
         data = load_iris()
         X = data.data
