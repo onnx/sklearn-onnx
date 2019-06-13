@@ -7,11 +7,10 @@ import numpy as np
 from ..proto import TensorProto, onnx_proto
 from onnxconverter_common.data_types import DataType, Int64Type, FloatType  # noqa
 from onnxconverter_common.data_types import StringType, TensorType  # noqa
-from onnxconverter_common.data_types import Int64TensorType
-from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType
-from onnxconverter_common.data_types import FloatTensorType, StringTensorType
-from onnxconverter_common.data_types import DoubleTensorType
-from onnxconverter_common.data_types import DictionaryType, SequenceType  # noqa
+from onnxconverter_common.data_types import (  # noqa
+    Int64TensorType, Int32TensorType, BooleanTensorType,
+    FloatTensorType, StringTensorType, DoubleTensorType,
+    DictionaryType, SequenceType)
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 
 
@@ -30,10 +29,10 @@ def _guess_type_proto(data_type, dims):
     elif data_type == onnx_proto.TensorProto.BOOL:
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported type '{}' "
-                                  "data_type={}".format(
-                                      type(data_type),
-                                      dims))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def _guess_type_proto_str(data_type, dims):
@@ -51,8 +50,10 @@ def _guess_type_proto_str(data_type, dims):
     elif data_type == "tensor(bool)":
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported data_type='{}'".format(
-            data_type))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def _guess_numpy_type(data_type, dims):
@@ -72,8 +73,10 @@ def _guess_numpy_type(data_type, dims):
     elif data_type == np.bool:
         return BooleanTensorType(dims)
     else:
-        raise NotImplementedError("Unsupported data_type='{}'".format(
-            data_type))
+        raise NotImplementedError(
+            "Unsupported data_type '{}'. You may raise an issue "
+            "at https://github.com/onnx/sklearn-onnx/issues."
+            "".format(data_type))
 
 
 def guess_data_type(type_, shape=None):
@@ -96,4 +99,6 @@ def guess_data_type(type_, shape=None):
         return [('input', _guess_numpy_type(type_.dtype, type_.shape))]
     else:
         raise TypeError("Type {} cannot be converted into a "
-                        "DataType.".format(type(type_)))
+                        "DataType. You may raise an issue at "
+                        "https://github.com/onnx/sklearn-onnx/issues."
+                        "".format(type(type_)))

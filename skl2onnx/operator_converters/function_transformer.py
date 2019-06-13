@@ -12,7 +12,9 @@ def convert_sklearn_function_transformer(scope, operator, container):
     op = operator.raw_operator
     if op.func is not None:
         raise RuntimeError("FunctionTransformer is not supported unless the "
-                           "transform function is None (= identity).")
+                           "transform function is None (= identity). "
+                           "You may raise an issue at "
+                           "https://github.com/onnx/sklearn-onnx/issues.")
     if len(operator.inputs) == 1:
         apply_identity(scope, operator.inputs[0].full_name,
                        operator.outputs[0].full_name, container)

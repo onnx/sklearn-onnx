@@ -42,7 +42,8 @@ def _intelligent_split(text, op, tokenizer, existing):
                 # known substrings.
                 raise RuntimeError("Unable to split n-grams '{}' "
                                    "into tokens existing in the "
-                                   "vocabulary.".format(text))
+                                   "vocabulary. This happens when "
+                                   "a token contain spaces.".format(text))
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -53,7 +54,9 @@ def _intelligent_split(text, op, tokenizer, existing):
     spl = tuple(spl)
     if spl in existing:
         raise RuntimeError("The converter cannot guess how to "
-                           "split an expression into tokens.")
+                           "split an expression into tokens. "
+                           "This happens when "
+                           "a token contain spaces.")
     if op.ngram_range[0] == 1 and \
             (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
         # All grams should be existing in the vocabulary.
@@ -63,11 +66,12 @@ def _intelligent_split(text, op, tokenizer, existing):
                 couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
                 possible = ['{}'.format(w[0])
                             for w in couples if w[1] == nos]
-                raise RuntimeError("Unable to split n-grams '{}' "
-                                   "due to '{}' "
-                                   "into tokens existing in the "
-                                   "vocabulary. Found:\n{}".format(
-                                       text, g, possible))
+                raise RuntimeError(
+                    "Unable to split n-grams '{}' due to '{}' "
+                    "into tokens existing in the "
+                    "vocabulary. This happens when "
+                    "a token contain spaces. Ambiguity found is '{}' "
+                    ".".format(text, g, possible))
     existing.add(spl)
     return spl
 
@@ -139,11 +143,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only tokenizer='word' is supported.")
+            "only tokenizer='word' is supported. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only stip_accents=None is supported.")
+            "only stip_accents=None is supported. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
 
     options = container.get_options(
             op, dict(separators="DEFAULT",
@@ -177,20 +185,26 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             default_separators = options['separators']
     else:
         if options['separators'] != 'DEFAULT':
-            raise RuntimeError("Option separators has not effect "
+            raise RuntimeError("Option separators has no effect "
                                "if analyser != 'word'.")
         regex = options['tokenexp'] if options['tokenexp'] else '.'
         default_separators = None
 
     if op.preprocessor is not None:
         raise NotImplementedError(
-            "Custom preprocessor cannot be converted into ONNX.")
+            "Custom preprocessor cannot be converted into ONNX. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.tokenizer is not None:
         raise NotImplementedError(
-            "Custom tokenizer cannot be converted into ONNX.")
+            "Custom tokenizer cannot be converted into ONNX. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.strip_accents is not None:
         raise NotImplementedError(
-            "Operator StringNormalizer cannot remove accents.")
+            "Operator StringNormalizer cannot remove accents. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
@@ -325,7 +339,10 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         if op.norm in norm_map:
             attrs['norm'] = norm_map[op.norm]
         else:
-            raise RuntimeError('Invalid norm: %s' % op.norm)
+            raise RuntimeError("Invalid norm '%s'. "
+                               "You may raise an issue at "
+                               "https://github.com/onnx/sklearn-onnx/"
+                               "issues." % op.norm)
 
         container.add_node(op_type, output, operator.output_full_names,
                            op_domain='ai.onnx.ml', **attrs)

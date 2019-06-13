@@ -20,7 +20,8 @@ def convert_sklearn_label_encoder(scope, operator, container):
         attrs['default_string'] = '__unknown__'
     else:
         raise RuntimeError(
-            'Unsupported input type: %s' % type(operator.inputs[0].type))
+            'Unsupported input type: %s. It must be int64 or dtring.'
+            '' % type(operator.inputs[0].type))
 
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',
