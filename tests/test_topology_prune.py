@@ -1,5 +1,5 @@
 """
-Tests scikit-learn's binarizer converter.
+Tests topology.
 """
 import unittest
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -31,9 +31,7 @@ class identity(IdentityTransformer):
 
 def dummy_shape_calculator(operator):
     op_input = operator.inputs[0]
-    N = op_input.type.shape[0]
-    C = op_input.type.shape[1]
-    operator.outputs[0].type = FloatTensorType([N, C])
+    operator.outputs[0].type = FloatTensorType(op_input.type.shape)
 
 
 def dummy_converter(scope, operator, container):
