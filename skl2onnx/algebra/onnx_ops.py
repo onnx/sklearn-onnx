@@ -80,7 +80,8 @@ def dynamic_class_creation():
                           [schema.min_output, schema.max_output],
                           schema.domain, args,
                           "**Version**" + doc.split('**Version**')[-1],
-                          schema.deprecated, schema.since_version)
+                          getattr(schema, 'deprecated', False),
+                          schema.since_version)
         cls[class_name] = cl
     return cls
 

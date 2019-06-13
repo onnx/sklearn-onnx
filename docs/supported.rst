@@ -87,4 +87,12 @@ contains concatenated flags whose meaning is the following:
   for multiple observations at the same time, it needs to be
   called for each observation.
 
+The model are tested through simple problems using the Iris dataset.
+The datasets is split into train test datasets.
+
+* *bin-class*: binary classification,
+* *multi-class*: multi-class classification,
+* *regression*: regression,
+* *num-transform*: no label, only numerical features
+
 .. supported-onnx-ops-opset::

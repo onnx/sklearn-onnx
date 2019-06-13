@@ -4,8 +4,10 @@ Tests on functions in common.
 
 import unittest
 from logging import getLogger
+from distutils.version import StrictVersion
 from pandas import DataFrame
 from skl2onnx.validate import sklearn_operators, validate_operator_opsets
+import onnx
 
 
 class TestValidate(unittest.TestCase):
@@ -15,6 +17,8 @@ class TestValidate(unittest.TestCase):
         assert len(res) > 0
         assert len(res[0]) == 4
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="OnnxOperator not working")
     def test_validate_sklearn_operators_all(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True

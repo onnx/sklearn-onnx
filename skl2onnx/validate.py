@@ -10,12 +10,13 @@ import pandas
 from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
 from sklearn.base import BaseEstimator
 from sklearn.datasets import load_iris
-from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import VotingClassifier
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.feature_selection import RFE, RFECV
-from sklearn.svm import SVC, NuSVC
+from sklearn.feature_selection import SelectFromModel, RFE, RFECV
 from sklearn.model_selection import train_test_split
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.svm import SVC, NuSVC
+from sklearn.tree import DecisionTreeRegressor
 from .common.data_types import FloatTensorType
 from ._supported_operators import build_sklearn_operator_name_map
 from .convert import get_opset_number_from_onnx, convert_sklearn
@@ -94,6 +95,18 @@ def _problem_for_predictor_regression():
             'predict', 0, X.astype(np.float32))
 
 
+def _problem_for_numerical_transform():
+    """
+    Returns *X, y, intial_types, method, name, X runtime* for a
+    multi-class classification problem.
+    It is based on Iris dataset.
+    """
+    data = load_iris()
+    X = data.data
+    return (X, None, [('X', FloatTensorType((1, X.shape[1])))],
+            'transform', 0, X.astype(np.float32))
+
+
 def find_suitable_problem(model):
     """
     Finds a datasets suitable for a given operator.
@@ -104,6 +117,9 @@ def find_suitable_problem(model):
     if hasattr(model, 'predict'):
         return ['regression']
 
+    if hasattr(model, 'transform'):
+        return ['num-transform']
+
     raise RuntimeError("Unable to find problem for model '{}'."
                        "".format(model.__name__))
 
@@ -112,6 +128,7 @@ _problems = {
     "bin-class": _problem_for_predictor_binary_classification,
     "multi-class": _problem_for_predictor_multi_classification,
     "regression": _problem_for_predictor_regression,
+    "num-transform": _problem_for_numerical_transform,
 }
 
 
@@ -140,6 +157,11 @@ _extra_parameters = {
         ('logreg', {
             'estimator': LogisticRegression(solver='liblinear'),
         })
+    ],
+    SelectFromModel: [
+        ('rf', {
+            'estimator': DecisionTreeRegressor(),
+        }),
     ],
     SGDClassifier: [
         ('log', {
@@ -235,9 +257,14 @@ def enumerate_compatible_opset(model, opset_min=1, opset_max=None,
 
     for prob in problems:
         X_, y_, init_types, method, output_index, Xort_ = _problems[prob]()
-        (X_train, X_test, y_train, y_test,
-            Xort_train, Xort_test) = train_test_split(
-                X_, y_, Xort_, random_state=42)
+        if y_ is None:
+            (X_train, X_test, Xort_train,
+                Xort_test) = train_test_split(
+                    X_, Xort_, random_state=42)
+        else:
+            (X_train, X_test, y_train, y_test,
+                Xort_train, Xort_test) = train_test_split(
+                    X_, y_, Xort_, random_state=42)
 
         for scenario, extra in extras:
 
@@ -253,7 +280,17 @@ def enumerate_compatible_opset(model, opset_min=1, opset_max=None,
                 raise RuntimeError(
                     "Unable to instantiate model '{}'.\nextra=\n{}".format(
                         model.__name__, pprint.pformat(extra))) from e
-            t1 = _measure_time(lambda: inst.fit(X_train, y_train))[1]
+
+            try:
+                if y_ is None:
+                    t1 = _measure_time(lambda: inst.fit(X_train))[1]
+                else:
+                    t1 = _measure_time(lambda: inst.fit(X_train, y_train))[1]
+            except (AttributeError, TypeError, ValueError) as e:
+                obs["training_time_exc"] = str(e)
+                yield obs
+                continue
+
             obs["training_time"] = t1
 
             # runtime
@@ -267,7 +304,12 @@ def enumerate_compatible_opset(model, opset_min=1, opset_max=None,
                     raise AttributeError(
                         "Unable to get method '{}' for model "
                         "'{}'.".format(method, model.__class__)) from e
-                ypred, t4 = _measure_time(lambda: meth(X_test))
+                try:
+                    ypred, t4 = _measure_time(lambda: meth(X_test))
+                except ValueError as e:
+                    obs['prediction_exc'] = str(e)
+                    yield obs
+                    continue
                 obs['prediction_time'] = t4
 
             # converting
