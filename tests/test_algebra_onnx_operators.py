@@ -1,6 +1,7 @@
 import unittest
-import numpy as np
+from distutils.version import StrictVersion
 from io import BytesIO
+import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
@@ -13,7 +14,10 @@ from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
 from skl2onnx.algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
-from onnx import helper, TensorProto, load_model
+from onnx import (
+    helper, TensorProto, load_model,
+    __version__ as onnx__version__
+)
 from test_utils import dump_data_and_model
 
 
@@ -174,8 +178,9 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertEqual(len(reload.graph.output), 1)
         assert reload is not None
 
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
     def test_onnx_reversed_order_second(self):
-
         X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [2, 2])
         Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [2, 2])
 
