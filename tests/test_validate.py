@@ -23,8 +23,9 @@ class TestValidate(unittest.TestCase):
         logger = getLogger('skl2onnx')
         logger.disabled = True
         verbose = 1 if __name__ == "__main__" else 0
+        # rows = validate_operator_opsets(
+        # verbose, debug={"KNeighborsClassifier"}, opset_min=10)
         rows = validate_operator_opsets(verbose, debug=None)
-        # debug={"DecisionTreeRegressor"})
         assert len(rows) > 0
         df = DataFrame(rows)
         if verbose > 0:

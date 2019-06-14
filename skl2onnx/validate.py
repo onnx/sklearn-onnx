@@ -5,12 +5,13 @@
 # --------------------------------------------------------------------------
 from time import perf_counter
 from importlib import import_module
+import warnings
 import numpy as np
 import pandas
 from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
 from sklearn.base import BaseEstimator
 from sklearn.datasets import load_iris
-from sklearn.ensemble import VotingClassifier
+from sklearn.ensemble import VotingClassifier, AdaBoostRegressor
 from sklearn.feature_selection import SelectFromModel, RFE, RFECV
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
@@ -112,7 +113,10 @@ def find_suitable_problem(model):
     Finds a datasets suitable for a given operator.
     """
     if hasattr(model, 'predict_proba'):
-        return ['bin-class', 'multi-class']
+        if model is OneVsRestClassifier:
+            return ['multi-class']
+        else:
+            return ['bin-class', 'multi-class']
 
     if hasattr(model, 'predict'):
         return ['regression']
@@ -133,9 +137,14 @@ _problems = {
 
 
 _extra_parameters = {
+    AdaBoostRegressor: [
+        ('default', {
+            'n_estimators': 5,
+        }),
+    ],
     LogisticRegression: [
         ('liblinear', {
-            'solver': 'liblinear'
+            'solver': 'liblinear',
         }),
     ],
     NuSVC: [
@@ -203,27 +212,45 @@ def _measure_absolute_difference(skl_pred, ort_pred):
     if isinstance(ort_pred, list):
         if isinstance(ort_pred[0], dict):
             ort_pred = pandas.DataFrame(ort_pred).values
+        elif (isinstance(ort_pred[0], list) and
+                isinstance(ort_pred[0][0], dict)):
+            if len(ort_pred) == 1:
+                ort_pred = pandas.DataFrame(ort_pred[0]).values
+            elif len(ort_pred[0]) == 1:
+                ort_pred = pandas.DataFrame([o[0] for o in ort_pred]).values
+            else:
+                raise RuntimeError("Unable to compute differences between"
+                                   "\n{}--------\n{}".format(
+                                        skl_pred, ort_pred))
         else:
             ort_pred = np.array(ort_pred)
-    if skl_pred.shape != ort_pred.shape and len(ort_pred.shape) > 1:
-        sh = list(set(ort_pred.shape[1:]))
-        if len(sh) != 1 or sh[0] != 1:
-            return np.nan
-        ort_pred = ort_pred.ravel()
-
-    if skl_pred.shape != ort_pred.shape:
-        return np.nan
 
     if hasattr(skl_pred, 'todense'):
         skl_pred = skl_pred.todense()
     if hasattr(ort_pred, 'todense'):
         ort_pred = ort_pred.todense()
 
+    if isinstance(ort_pred, list):
+        raise RuntimeError("Issue with {}\n{}".format(ort_pred, ort_pred_))
+
+    if skl_pred.shape != ort_pred.shape and skl_pred.size == ort_pred.size:
+        ort_pred = ort_pred.ravel()
+        skl_pred = skl_pred.ravel()
+
+    if skl_pred.shape != ort_pred.shape:
+        warnings.warn("Unable to compute differences between {}-{}\n{}\n"
+                      "--------\n{}".format(
+                        skl_pred.shape, ort_pred.shape,
+                        skl_pred, ort_pred))
+        return np.nan
+
     diff = np.max(np.abs(skl_pred.ravel() - ort_pred.ravel()))
 
     if np.isnan(diff):
-        raise RuntimeError("Unable to compute differences between\n{}\n"
-                           "--------\n{}".format(skl_pred, ort_pred_))
+        raise RuntimeError("Unable to compute differences between {}-{}\n{}\n"
+                           "--------\n{}".format(
+                            skl_pred.shape, ort_pred.shape,
+                            skl_pred, ort_pred))
     return diff
 
 
@@ -383,7 +410,8 @@ def enumerate_compatible_opset(model, opset_min=1, opset_max=None,
                             if debug and np.isnan(max_abs_diff):
                                 raise RuntimeError(
                                     "Unable to compute differences between"
-                                    "\n{}\n--------\n{}".format(
+                                    " {}-{}\n{}\n--------\n{}".format(
+                                        ypred.shape, opred.shape,
                                         ypred, opred))
                             obs_op['max_abs_diff_batch'] = max_abs_diff
 
@@ -479,6 +507,10 @@ def validate_operator_opsets(verbose=0, opset_min=1, opset_max=None,
             if diff is not None:
                 if diff < 1e-5:
                     obs['available'] = 'OK'
+                elif diff < 0.0001:
+                    obs['available'] = 'e<0.0001'
+                elif diff < 0.001:
+                    obs['available'] = 'e<0.001'
                 elif diff < 0.01:
                     obs['available'] = 'e<0.01'
                 elif diff < 0.1:
