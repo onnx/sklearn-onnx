@@ -47,6 +47,20 @@ def _has_transform_model(model):
     return hasattr(model, "fit_transform") and hasattr(model, "score")
 
 
+def fit_classification_model(model, n_classes, is_int=False,
+                             pos_features=False):
+    X, y = make_classification(n_classes=n_classes, n_features=100,
+                               n_samples=1000,
+                               random_state=42, n_informative=5)
+    X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
+    if pos_features:
+        X = numpy.abs(X)
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                   random_state=42)
+    model.fit(X_train, y_train)
+    return model, X_test
+
+
 def fit_regression_model(model, is_int=False):
     X, y = make_regression(n_features=10, n_samples=1000, random_state=42)
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
