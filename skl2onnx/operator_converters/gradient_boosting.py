@@ -96,7 +96,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
 
-    if op.init_ == 'zero':
+    if op.init == 'zero':
         cst = np.zeros((operator.inputs[0].type.shape[0], op.loss_.K))
     else:
         # constant_ was introduced in scikit-learn 0.21.
