@@ -15,8 +15,7 @@ from ..algebra.onnx_ops import (
 
 def convert_sklearn_gaussian_mixture(scope, operator, container):
     """
-    Converter for GaussianMixture.
-
+    Converter for *GaussianMixture*.
     Parameters which change the prediction function:
 
     * *covariance_type*
@@ -27,6 +26,8 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     n_features = X.type.shape[1]
     n_components = op.means_.shape[0]
 
+    # All comments come from scikit-learn code and tells
+    # which functions is being onnxified.
     # def _estimate_weighted_log_prob(self, X):
     # self._estimate_log_prob(X) + self._estimate_log_weights()
     log_weights = np.log(op.weights_)  # self._estimate_log_weights()
