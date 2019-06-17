@@ -35,7 +35,9 @@ class MissingShapeCalculator(RuntimeError):
 class MissingConverter(RuntimeError):
     """
     Raised when there is no registered converter
-    for a machine learning operator.
+    for a machine learning operator. If the model is
+    part of scikit-learn, you may raise an issue at
+    https://github.com/onnx/sklearn-onnx/issues.
     """
     def __init__(self, msg):
         super().__init__(msg + _missing_converter)

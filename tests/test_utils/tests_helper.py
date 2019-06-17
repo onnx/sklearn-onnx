@@ -217,7 +217,7 @@ def dump_data_and_model(
                 lambda_original = lambda: model.transform(dataone)  # noqa
         else:
             raise TypeError(
-                "Model has not predict or transform method: {0}".format(
+                "Model has no predict or transform method: {0}".format(
                     type(model)))
 
     runtime_test["expected"] = prediction

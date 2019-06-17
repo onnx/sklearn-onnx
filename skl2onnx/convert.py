@@ -87,7 +87,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     ::
 
-        extra = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+        extra = {TfidfVectorizer: {"separators": [' ', '[.]', '\\\\?',
+                    ',', ';', ':', '\\\\!', '\\\\(', '\\\\)']}}
         model_onnx = convert_sklearn(model, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)
@@ -97,7 +98,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     ::
 
-        extra = {id(model): {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')']}}
+        extra = {id(model): {"separators": [' ', '.', '\\\\?', ',', ';',
+                    ':', '\\\\!', '\\\\(', '\\\\)']}}
         model_onnx = convert_sklearn(pipeline, "pipeline-with-2-tfidf",
                                      initial_types=[("input", StringTensorType([1, 1]))],
                                      options=extra)

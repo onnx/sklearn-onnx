@@ -20,7 +20,10 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
     if op.loss != 'deviance':
-        raise RuntimeError("loss '{}' not supported.".format(op.loss))
+        raise NotImplementedError(
+            "Loss '{0}' is not supported yet. You "
+            "may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.".format(op.loss))
 
     attrs = get_default_tree_classifier_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -40,7 +43,10 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
             base_values = np.clip(base_values, eps, 1 - eps)
             base_values = np.log(base_values / (1 - base_values))
         else:
-            raise NotImplementedError("Other losses are not yet converted.")
+            raise NotImplementedError(
+                "Loss '{0}' is not supported yet. You "
+                "may raise an issue at "
+                "https://github.com/onnx/sklearn-onnx/issues.".format(op.loss))
     else:
         transform = 'SOFTMAX'
         # class_prior_ was introduced in scikit-learn 0.21.
@@ -61,7 +67,7 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         class_labels = [str(i) for i in classes]
         attrs['classlabels_strings'] = class_labels
     else:
-        raise ValueError('Only string or integer label vector is allowed')
+        raise ValueError('Labels must be all integer or all strings.')
 
     tree_weight = op.learning_rate
     if op.n_classes_ == 2:

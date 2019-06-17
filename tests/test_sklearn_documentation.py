@@ -70,7 +70,9 @@ class TestSklearnDocumentation(unittest.TestCase):
         tfi.fit(tdata.ravel())
         extra = {
             TfidfVectorizer: {
-                "sep": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]
+                "separators": [
+                    " ", "[.]", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"
+                ]
             }
         }
         model_onnx = convert_sklearn(
@@ -114,22 +116,22 @@ class TestSklearnDocumentation(unittest.TestCase):
         pipeline.fit(train_data[:300])
         extra = {
             TfidfVectorizer: {
-                "sep": [
+                "separators": [
                     " ",
-                    ".",
-                    "?",
+                    "[.]",
+                    "\\?",
                     ",",
                     ";",
                     ":",
-                    "!",
-                    "(",
-                    ")",
+                    "\\!",
+                    "\\(",
+                    "\\)",
                     "\n",
                     '"',
                     "'",
                     "-",
-                    "[",
-                    "]",
+                    "\\[",
+                    "\\]",
                     "@",
                 ]
             }
