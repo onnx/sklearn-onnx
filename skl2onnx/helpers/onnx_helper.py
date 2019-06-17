@@ -137,7 +137,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     return onnx_model
 
 
-def infer_outputs(op_type, inputs, outputs=None, **atts):
+def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
     """
     Infers outputs type and shapes given an ONNX operator.
     """
@@ -160,8 +160,11 @@ def infer_outputs(op_type, inputs, outputs=None, **atts):
         raise RuntimeError("Unable to build ONNX nodes from type {}.".format(
             type(op_type)))
 
+    input_init = inputs.copy()
+    if initializer:
+        input_init.extend(initializer)
     onnx_inputs = []
-    for input in inputs:
+    for input in input_init:
         if isinstance(input, Variable):
             onnx_type = input.type.to_onnx_type()
             tensor_type = onnx_type.tensor_type
@@ -171,13 +174,17 @@ def infer_outputs(op_type, inputs, outputs=None, **atts):
                                                 tensor_type.elem_type,
                                                 tuple(shape))
             onnx_inputs.append(inp)
+        elif isinstance(input, onnx.TensorProto):
+            v = helper.make_tensor_value_info(
+                input.name, input.data_type.real,
+                list(d for d in input.dims))
+            onnx_inputs.append(v)
         else:
             onnx_inputs.append(input)
 
     graph = helper.make_graph(node, 'infer_shapes',
                               onnx_inputs, [])
     original_model = helper.make_model(graph, producer_name='skl2onnx')
-
     domains = {}
     for n in node:
         domains[n.domain] = max(domains.get(n.domain, 1),
