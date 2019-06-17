@@ -168,7 +168,6 @@ class TestOnnxOperators(unittest.TestCase):
 
         onx = OnnxAdd(OnnxAdd('X', idi), idi2, output_names=['Y'])
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
-        # onnx1 = model_def.SerializeToString()
         self.assertEqual(len(model_def.graph.output), 1)
         onx = OnnxAdd(idi2, OnnxAdd('X', idi), output_names=['Y'])
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})

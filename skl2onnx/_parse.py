@@ -260,7 +260,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     if np.issubdtype(model.classes_.dtype, np.floating):
         classes = np.array(list(map(lambda x: int(x), classes)))
         if set(map(lambda x: float(x), classes)) != set(model.classes_):
-            raise RuntimeError("skl2onnx implicitely converts float class "
+            raise RuntimeError("skl2onnx implicitly converts float class "
                                "labels into integers but at least one label "
                                "is not an integer. Class labels should "
                                "be integers or strings.")
