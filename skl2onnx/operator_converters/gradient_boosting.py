@@ -103,7 +103,9 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs['base_values'] = [float(x) for x in cst]
 
     tree_weight = op.learning_rate
-    for i in range(op.n_estimators_):
+    n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
+             op.n_estimators)
+    for i in range(n_est):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
