@@ -24,7 +24,7 @@ def calculate_sklearn_truncated_svd_output_shapes(operator):
         good_output_types=[FloatTensorType])
 
     if len(operator.inputs[0].type.shape) != 2:
-        raise RuntimeError('Only 2-D tensor(s) can be input(s)')
+        raise RuntimeError('Only 2-D tensor(s) can be input(s).')
 
     N = operator.inputs[0].type.shape[0]
     K = (operator.raw_operator.n_components

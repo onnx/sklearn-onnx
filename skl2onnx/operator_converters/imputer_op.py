@@ -26,7 +26,10 @@ def convert_sklearn_imputer(scope, operator, container):
     elif isinstance(op.missing_values, float):
         attrs['replaced_value_float'] = float(op.missing_values)
     else:
-        raise RuntimeError('Unsupported proposed value')
+        raise RuntimeError("Unsupported proposed value '{0}'. "
+                           "You may raise an issue at "
+                           "https://github.com/onnx/sklearn-onnx/issues."
+                           "".format(op.missing_values))
 
     concatenated_feature = concatenate_variables(scope, operator.inputs,
                                                  container)

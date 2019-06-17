@@ -56,7 +56,7 @@ def enumerate_model_node_outputs(model, add_node=False):
     :return: enumerator
     """
     if not hasattr(model, "graph"):
-        raise TypeError("*model* is not an *ONNX* model but "
+        raise TypeError("Parameter model is not an ONNX model but "
                         "{}".format(type(model)))
     for node in model.graph.node:
         for out in node.output:
@@ -89,9 +89,9 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     The function removes unneeded files.
     """
     if inputs is not None:
-        raise NotImplementedError("Inputs cannot be changed yet.")
+        raise NotImplementedError("Parameter inputs cannot be empty.")
     if outputs is None:
-        raise RuntimeError("outputs and inputs are None")
+        raise RuntimeError("Parameter outputs cannot be None.")
     if not isinstance(outputs, list):
         outputs = [outputs]
 

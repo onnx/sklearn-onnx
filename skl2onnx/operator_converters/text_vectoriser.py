@@ -42,7 +42,8 @@ def _intelligent_split(text, op, tokenizer, existing):
                 # known substrings.
                 raise RuntimeError("Unable to split n-grams '{}' "
                                    "into tokens existing in the "
-                                   "vocabulary.".format(text))
+                                   "vocabulary. This happens when "
+                                   "a token contain spaces.".format(text))
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -53,7 +54,9 @@ def _intelligent_split(text, op, tokenizer, existing):
     spl = tuple(spl)
     if spl in existing:
         raise RuntimeError("The converter cannot guess how to "
-                           "split an expression into tokens.")
+                           "split an expression into tokens. "
+                           "This happens when "
+                           "a token contain spaces.")
     if op.ngram_range[0] == 1 and \
             (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
         # All grams should be existing in the vocabulary.
@@ -63,11 +66,12 @@ def _intelligent_split(text, op, tokenizer, existing):
                 couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
                 possible = ['{}'.format(w[0])
                             for w in couples if w[1] == nos]
-                raise RuntimeError("Unable to split n-grams '{}' "
-                                   "due to '{}' "
-                                   "into tokens existing in the "
-                                   "vocabulary. Found:\n{}".format(
-                                       text, g, possible))
+                raise RuntimeError(
+                    "Unable to split n-grams '{}' due to '{}' "
+                    "into tokens existing in the "
+                    "vocabulary. This happens when "
+                    "a token contain spaces. Ambiguity found is '{}' "
+                    ".".format(text, g, possible))
     existing.add(spl)
     return spl
 
@@ -75,7 +79,8 @@ def _intelligent_split(text, op, tokenizer, existing):
 def convert_sklearn_text_vectorizer(scope, operator, container):
     """
     Converters for class
-    `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
+    `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/
+    sklearn.feature_extraction.text.TfidfVectorizer.html>`_.
     The current implementation is a work in progress and the ONNX version
     does not produce the exact same results. The converter lets the user
     change some of its parameters.
@@ -83,24 +88,26 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     Additional options
     ------------------
 
-    regex: string
+    tokenexp: string
         The default will change to true in version 1.6.0.
         The tokenizer splits into words using this regular
         expression or the regular expression specified by
         *scikit-learn* is the value is an empty string.
         See also note below.
         Default value: None
-    sep: list of separators
+    separators: list of separators
         These separators are used to split a string into words.
-        Options *sep* is ignore if options *regex* is not None.
-        Default value: ``[' ', '.', '?', ',', ';', ':', '!']``.
+        Options *separators* is ignore if options *tokenexp* is not None.
+        Default value: ``[' ', '[.]', '\\\\?', ',', ';', ':', '\\\\!']``.
 
     Example (from :ref:`l-example-tfidfvectorizer`):
 
     ::
 
-        seps = {TfidfVectorizer: {"sep": [' ', '.', '?', ',', ';', ':', '!', '(', ')',
-                                           '\\n', '"', "'", "-", "[", "]", "@"]}}
+        seps = {TfidfVectorizer: {"separators": [' ', '[.]', '\\\\?', ',', ';',
+                                                 ':', '!', '\\\\(', '\\\\)',
+                                                 '\\n', '\\\\"', "'", "-",
+                                                 "\\\\[", "\\\\]", "@"]}}
         model_onnx = convert_sklearn(pipeline, "tfidf",
                                      initial_types=[("input", StringTensorType([1, 2]))],
                                      options=seps)
@@ -123,6 +130,10 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     Regular expression ``[^\\\\\\\\n]`` is used to split
     a sentance into character (and not works) if ``analyser=='char'``.
     The mode ``analyser=='char_wb'`` is not implemented.
+    
+    .. versionchanged:: 1.6
+        Parameters have been renamed: *sep* into *separators*,
+        *regex* into *tokenexp*.
     ````
     
     """ # noqa
@@ -132,34 +143,38 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only tokenizer='word' is supported.")
+            "only tokenizer='word' is supported. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only stip_accents=None is supported.")
+            "only stip_accents=None is supported. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
 
     options = container.get_options(
-            op, dict(sep="DEFAULT",
-                     regex=None))
-    if set(options) != {'sep', 'regex'}:
+            op, dict(separators="DEFAULT",
+                     tokenexp=None))
+    if set(options) != {'separators', 'tokenexp'}:
         raise RuntimeError("Unknown option {} for {}".format(
-                                set(options) - {'sep'}, type(op)))
+                                set(options) - {'separators'}, type(op)))
 
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'
-        if options['sep'] == "DEFAULT" and options['regex'] is None:
+        if options['separators'] == "DEFAULT" and options['tokenexp'] is None:
             warnings.warn("Converter for TfidfVectorizer will use "
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
                           DeprecationWarning)
-            default_separators = [' ', '.', '?', ',', ';', ':', '!']
+            default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'
             default_separators = None
-        elif options['regex'] is not None:
-            if options['regex']:
-                regex = options['regex']
+        elif options['tokenexp'] is not None:
+            if options['tokenexp']:
+                regex = options['tokenexp']
             else:
                 regex = op.token_pattern
                 if regex == default_pattern:
@@ -167,23 +182,29 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             default_separators = None
         else:
             regex = None
-            default_separators = options['sep']
+            default_separators = options['separators']
     else:
-        if options['sep'] != 'DEFAULT':
-            raise RuntimeError("Option sep has not effect "
+        if options['separators'] != 'DEFAULT':
+            raise RuntimeError("Option separators has no effect "
                                "if analyser != 'word'.")
-        regex = options['regex'] if options['regex'] else '.'
+        regex = options['tokenexp'] if options['tokenexp'] else '.'
         default_separators = None
 
     if op.preprocessor is not None:
         raise NotImplementedError(
-            "Custom preprocessor cannot be converted into ONNX.")
+            "Custom preprocessor cannot be converted into ONNX. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.tokenizer is not None:
         raise NotImplementedError(
-            "Custom tokenizer cannot be converted into ONNX.")
+            "Custom tokenizer cannot be converted into ONNX. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
     if op.strip_accents is not None:
         raise NotImplementedError(
-            "Operator StringNormalizer cannot remove accents.")
+            "Operator StringNormalizer cannot remove accents. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.")
 
     if op.lowercase or op.stop_words_:
         # StringNormalizer
@@ -318,7 +339,10 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         if op.norm in norm_map:
             attrs['norm'] = norm_map[op.norm]
         else:
-            raise RuntimeError('Invalid norm: %s' % op.norm)
+            raise RuntimeError("Invalid norm '%s'. "
+                               "You may raise an issue at "
+                               "https://github.com/onnx/sklearn-onnx/"
+                               "issues." % op.norm)
 
         container.add_node(op_type, output, operator.output_full_names,
                            op_domain='ai.onnx.ml', **attrs)

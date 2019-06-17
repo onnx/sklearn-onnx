@@ -26,4 +26,4 @@ def create_tensor(N, C, H=None, W=None):
     elif H is not None and W is not None:
         return np.random.rand(N, C, H, W).astype(np.float32, copy=False)
     else:
-        raise ValueError('This function only produce 2-D or 4-D tensor')
+        raise ValueError('This function only produce 2-D or 4-D tensor.')
