@@ -4,35 +4,16 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, ValueInfoProto, onnx_proto
+from ..proto import TensorProto, ValueInfoProto
 from ..common._topology import Variable
 from ..common.data_types import (
-    BooleanTensorType,
-    DoubleTensorType, FloatTensorType,
+    _guess_numpy_type,
+    _guess_type_proto,
+    FloatTensorType,
     Int64Type,
     Int64TensorType, Int32TensorType,
     StringTensorType
 )
-
-
-def _guess_type_proto(data_type, dims):
-    if data_type == onnx_proto.TensorProto.FLOAT:
-        return FloatTensorType(dims)
-    elif data_type == onnx_proto.TensorProto.DOUBLE:
-        return DoubleTensorType(dims)
-    elif data_type == onnx_proto.TensorProto.STRING:
-        return StringTensorType(dims)
-    elif data_type == onnx_proto.TensorProto.INT64:
-        return Int64TensorType(dims)
-    elif data_type == onnx_proto.TensorProto.INT32:
-        return Int32TensorType(dims)
-    elif data_type == onnx_proto.TensorProto.BOOL:
-        return BooleanTensorType(dims)
-    else:
-        raise NotImplementedError("Unsupported type '{}' "
-                                  "data_type={}".format(
-                                      type(data_type),
-                                      dims))
 
 
 def _guess_type(given_type):
@@ -40,18 +21,7 @@ def _guess_type(given_type):
     Returns the proper type of an input.
     """
     if isinstance(given_type, np.ndarray):
-        if given_type.dtype == np.float32:
-            return FloatTensorType(given_type.shape)
-        elif given_type.dtype == np.int32:
-            return Int32TensorType(given_type.shape)
-        elif given_type.dtype == np.int64:
-            return Int64TensorType(given_type.shape)
-        elif given_type.dtype == np.str or str(given_type.dtype) in ('<U1', ):
-            return StringTensorType(given_type.shape)
-        else:
-            raise NotImplementedError(
-                "Unsupported type '{}'. Double should "
-                "be converted into single floats.".format(given_type.dtype))
+        return _guess_numpy_type(given_type.dtype, list(given_type.shape))
     elif isinstance(given_type, (FloatTensorType, Int64TensorType,
                                  Int32TensorType, StringTensorType)):
         return given_type
