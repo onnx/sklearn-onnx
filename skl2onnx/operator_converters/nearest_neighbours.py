@@ -133,21 +133,25 @@ def _get_probability_score(scope, container, operator, weights,
                 'weighted_distance')
 
             container.add_node('Equal', [labels_name[i], topk_labels_name],
-                               output_label_name[i])
+                               output_label_name[i],
+                               name=scope.get_unique_operator_name('Equal'))
             apply_cast(scope, output_label_name[i], output_cast_label_name[i],
                        container, to=onnx_proto.TensorProto.FLOAT)
             apply_mul(scope, [output_cast_label_name[i], weights_val],
                       weighted_distance_name, container, broadcast=0)
             container.add_node('ReduceSum', weighted_distance_name,
-                               output_label_reduced_name[i], axes=[1])
+                               output_label_reduced_name[i], axes=[1],
+                               name=scope.get_unique_operator_name('ReduceSum'))
     else:
         for i in range(len(classes)):
             container.add_node('Equal', [labels_name[i], topk_labels_name],
-                               output_label_name[i])
+                               output_label_name[i],
+                               name=scope.get_unique_operator_name('Equal'))
             apply_cast(scope, output_label_name[i], output_cast_label_name[i],
                        container, to=onnx_proto.TensorProto.INT32)
             container.add_node('ReduceSum', output_cast_label_name[i],
-                               output_label_reduced_name[i], axes=[1])
+                               output_label_reduced_name[i], axes=[1],
+                               name=scope.get_unique_operator_name('ReduceSum'))
 
     concat_labels_name = scope.get_unique_variable_name('concat_labels')
     cast_concat_labels_name = scope.get_unique_variable_name(
