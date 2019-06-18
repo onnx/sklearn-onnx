@@ -87,7 +87,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType(X.shape))],
         )
-        X = X[1:3]
+        X = np.array([X[1], X[1]])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32),
@@ -129,7 +129,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model, X = fit_classification_model(
             SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
                           random_state=42), 5)
-        X = X[3:5]
+        X = np.array([X[4], X[4]])
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
@@ -379,7 +379,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             "scikit-learn SGD multi-class classifier",
             [("input", Int64TensorType(X.shape))],
         )
-        X = X[1:3]
+        X = np.array([X[0], X[0]])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
