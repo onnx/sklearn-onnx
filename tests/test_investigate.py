@@ -50,6 +50,9 @@ class TestInvestigate(unittest.TestCase):
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
+            assert str(step['model']._debug) is not None
+            sdt = step['model']._debug.display(data, 5)
+            assert 'shape' in sdt
             assert_almost_equal(onnx_output, skl_outputs)
             compare_objects(onnx_output, skl_outputs)
 

@@ -60,15 +60,13 @@ def _guess_numpy_type(data_type, dims):
     # This could be moved to onnxconverter_common.
     if data_type == np.float32:
         return FloatTensorType(dims)
-    elif data_type in (np.float64, float):
-        # onnxruntime does not support double.
-        return FloatTensorType(dims)
-    elif data_type in (np.str, str, object):
+    elif data_type in (np.str, str, object) or str(
+        data_type) in ('<U1', ): # noqa
         return StringTensorType(dims)
     elif data_type in (np.int64, np.uint64) or str(data_type) == '<U6':
         return Int64TensorType(dims)
     elif data_type in (np.int32, np.uint32) or str(
-        data_type) in ('<U4', '<U1'): # noqa
+        data_type) in ('<U4', ): # noqa
         return Int32TensorType(dims)
     elif data_type == np.bool:
         return BooleanTensorType(dims)
