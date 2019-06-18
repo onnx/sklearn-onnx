@@ -163,6 +163,25 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                           " <= StrictVersion('0.2.1')"
         )
 
+    def test_gradient_boosting_regressor_zero_init(self):
+        model, X = fit_regression_model(
+            GradientBoostingRegressor(n_estimators=30, init="zero",
+                                      random_state=42))
+        model_onnx = convert_sklearn(
+            model,
+            "gradient boosting regression",
+            [("input", FloatTensorType([1, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionZeroInit-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
