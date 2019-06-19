@@ -141,7 +141,8 @@ def _get_probability_score(scope, container, operator, weights,
                       weighted_distance_name, container, broadcast=0)
             container.add_node('ReduceSum', weighted_distance_name,
                                output_label_reduced_name[i], axes=[1],
-                               name=scope.get_unique_operator_name('ReduceSum'))
+                               name=scope.get_unique_operator_name(
+                                'ReduceSum'))
     else:
         for i in range(len(classes)):
             container.add_node('Equal', [labels_name[i], topk_labels_name],
@@ -151,7 +152,8 @@ def _get_probability_score(scope, container, operator, weights,
                        container, to=onnx_proto.TensorProto.INT32)
             container.add_node('ReduceSum', output_cast_label_name[i],
                                output_label_reduced_name[i], axes=[1],
-                               name=scope.get_unique_operator_name('ReduceSum'))
+                               name=scope.get_unique_operator_name(
+                                'ReduceSum'))
 
     concat_labels_name = scope.get_unique_variable_name('concat_labels')
     cast_concat_labels_name = scope.get_unique_variable_name(
