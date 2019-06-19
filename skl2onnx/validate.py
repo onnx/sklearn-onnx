@@ -766,7 +766,7 @@ def summary_report(df):
                 break
             elif isinstance(val, str) and val.startswith("ERR"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "Signficiant discrepancies"
+                piv.iloc[i, poscol['Issue']] = "Significant discrepancies"
                 break
             elif isinstance(val, str):
                 last = val

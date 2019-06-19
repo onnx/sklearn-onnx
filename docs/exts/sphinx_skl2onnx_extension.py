@@ -392,10 +392,18 @@ def covered_opset_converters(app):
     for only *onxruntime*. Batch predictions might be working with
     other runtime.
 
-    * *bin-class*: binary classification,
-    * *multi-class*: multi-class classification,
-    * *regression*: regression,
-    * *num-transform*: no label, only numerical features
+    * `bin-class`: binary classification
+    * `mutli-class`: multi-class classification
+    * `regression`: regression
+    * `multi-reg`: regression multi-output
+    * `num-transform`: transform numerical features
+    * `scoring`: transform numerical features, target is usually needed
+    * `outlier`: outlier prediction
+    * `linearsvc`: classifier without *predict_proba*
+    * `cluster`: similar to transform
+    * `num+y-trans`: similar to transform with targets
+    * `num-trans-cluster`: similar to cluster, but returns
+        scores or distances instead of cluster
 
     """)
     
@@ -418,4 +426,6 @@ def setup(app):
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     app.connect('builder-inited', covered_opset_converters)
-    return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
+    return {'version': sphinx.__display_version__,
+            'parallel_read_safe': False,
+            'parallel_write_safe': False}
