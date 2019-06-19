@@ -134,7 +134,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     return (onnx_model, topology) if intermediate else onnx_model
 
 
-def to_onnx(model, X=None, name=None, initial_types=None):
+def to_onnx(model, X=None, name=None, initial_types=None,
+            target_opset=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -144,6 +145,8 @@ def to_onnx(model, X=None, name=None, initial_types=None):
     :param initial_types: if X is None, then *initial_types* must be
         defined
     :param name: name of the model
+    :param target_opset: number, for example, 7 for ONNX 1.2,
+        and 8 for ONNX 1.3.
     :return: converted model
 
     This function checks if the model inherits from class
@@ -158,7 +161,8 @@ def to_onnx(model, X=None, name=None, initial_types=None):
     if name is None:
         name = model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
-    return convert_sklearn(model, initial_types=initial_types, name=name)
+    return convert_sklearn(model, initial_types=initial_types,
+                           name=name, target_opset=target_opset)
 
 
 def wrap_as_onnx_mixin(model):

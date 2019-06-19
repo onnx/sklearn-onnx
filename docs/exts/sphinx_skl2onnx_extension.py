@@ -366,53 +366,40 @@ def df2rst(df, add_line=True, align="l", column_size=None, index=False,
         return table
 
 
-class AllSklearnOpsOpsetDirective(Directive):
-    """
-    Displays the list of models implemented in scikit-learn
-    and whether or not there is an associated converter.
-    """
-    required_arguments = False
-    optional_arguments = 0
-    final_argument_whitespace = True
-    option_spec = {}
-    has_content = False
+def covered_opset_converters(app):
+    from skl2onnx.validate import validate_operator_opsets
+    import pandas
+    import numpy
+    
+    text = dedent("""
+    Availability of Converters for each Opset
+    =========================================
 
-    def run(self):
-        from skl2onnx.validate import validate_operator_opsets
-        import pandas
-        import numpy
-        
-        obs = validate_operator_opsets()
-                
-        def aggfunc(values):
-            if len(values) != 1:
-                raise ValueError(values)
-            val = values.iloc[0]
-            if isinstance(val, float) and numpy.isnan(val):
-                return ""
-            else:
-                return val
+    Some ONNX operators converters are using were not all 
+    available in older version of ONNX. This version is called
+    *opset number*. ONNX 1.4.0 is opset 9, ONNX 1.5.0 is opset 10...
+    Next table shows which operator is available in which opset.
+    An empty cell means it is not available. Other cells
+    contains concatenated flags whose meaning is the following:
 
-        df = pandas.DataFrame(obs)
-        piv = pandas.pivot_table(df, values="available", 
-                                 index=['name', 'problem', 'scenario'], 
-                                 columns='opset', 
-                                 aggfunc=aggfunc).reset_index(drop=False)
-        cols = piv.columns
-        versions = ["opset%d" % t for t in range(1, piv.shape[1] - 2)]
-        indices = ["name","problem","scenario"]
-        piv.columns = indices + versions
-        piv = piv[indices + list(reversed(versions))]
+    The runtime is sometimes unable to compute the predictions
+    for multiple observations at the same time, it needs to be
+    called for each observation. This configuration is checked
+    for only *onxruntime*. Batch predictions might be working with
+    other runtime.
 
-        rest = df2rst(piv)
-        rows = rest.split('\n')
+    * *bin-class*: binary classification,
+    * *multi-class*: multi-class classification,
+    * *regression*: regression,
+    * *num-transform*: no label, only numerical features
 
-        node = nodes.container()
-        st = StringList(rows)
-        nested_parse_with_titles(self.state, st, node)
-        main = nodes.container()
-        main += node
-        return [main]
+    """)
+    
+    rest = text + df2rst(piv)
+    srcdir = app.builder.srcdir
+    dest = os.path.join(srcdir, "supported_covered.rst")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(dest)
     
 
 def setup(app):
@@ -424,4 +411,5 @@ def setup(app):
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     app.add_directive('supported-onnx-ops-opset', AllSklearnOpsOpsetDirective)
+    app.connect('builder-inited', covered_opset_converters)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
