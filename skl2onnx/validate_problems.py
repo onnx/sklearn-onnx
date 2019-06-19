@@ -206,8 +206,8 @@ def find_suitable_problem(model):
         else:
             res.extend(['num-transform'])
 
-    if (hasattr(model, 'predict') and issubclass(model,
-            (ClusterMixin, BiclusterMixin))):
+    if hasattr(model, 'predict') and issubclass(
+            model, (ClusterMixin, BiclusterMixin)):
         res.extend(['cluster'])
 
     if issubclass(model, (OutlierMixin)):

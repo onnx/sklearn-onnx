@@ -36,7 +36,7 @@ class TestValidate(unittest.TestCase):
         assert df.shape[1] > 0
         sdf = summary_report(df)
         sdf.to_excel("sklearn_opsets_summary_NMF.xlsx", index=False)
-        assert sdf.loc[0, 'Issue'] == "NO CONVERTER"
+        assert sdf.loc[0, 'Issue'] == "No converter"
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")

@@ -3,6 +3,8 @@
 """
 Extension for sphinx.
 """
+import os
+from textwrap import dedent
 from importlib import import_module
 import sphinx
 from docutils import nodes
@@ -367,7 +369,9 @@ def df2rst(df, add_line=True, align="l", column_size=None, index=False,
 
 
 def covered_opset_converters(app):
-    from skl2onnx.validate import validate_operator_opsets
+    from skl2onnx.validate import (
+        summary_report, enumerate_validated_operator_opsets
+    )
     import pandas
     import numpy
     
@@ -395,11 +399,14 @@ def covered_opset_converters(app):
 
     """)
     
+    rows = list(enumerate_validated_operator_opsets(verbose=1, debug=False))
+    df = pandas.DataFrame(rows)
+    piv = summary_report(df)
     rest = text + df2rst(piv)
     srcdir = app.builder.srcdir
     dest = os.path.join(srcdir, "supported_covered.rst")
     with open(dest, "w", encoding="utf-8") as f:
-        f.write(dest)
+        f.write(rest)
     
 
 def setup(app):
@@ -410,6 +417,5 @@ def setup(app):
     app.add_directive('supported-onnx-ops', SupportedOnnxOpsDirective)
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
-    app.add_directive('supported-onnx-ops-opset', AllSklearnOpsOpsetDirective)
     app.connect('builder-inited', covered_opset_converters)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
