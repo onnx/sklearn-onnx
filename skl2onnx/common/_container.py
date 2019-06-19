@@ -319,7 +319,8 @@ class ModelComponentContainer(ModelContainer):
                 raise ValueError('Failed to create ONNX node. Undefined '
                                  'attribute pair (%s, %s) found' % (k, v))
 
-        node = helper.make_node(op_type, inputs, outputs, **attrs)
+        node = helper.make_node(op_type, inputs, outputs,
+                                name=name, **attrs)
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))

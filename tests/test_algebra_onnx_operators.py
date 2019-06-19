@@ -47,7 +47,9 @@ class TestOnnxOperators(unittest.TestCase):
             op = OnnxSub(operator.inputs[0], W, output_names=operator.outputs)
             op.add_to(scope, container)
             text = str(container)
-            assert 'name:"Sub"' in text
+            if 'name:"Sub"' not in text:
+                raise AssertionError(
+                    "Unnamed operator:\n".format(text))
             nin = list(op.enumerate_initial_types())
             nno = list(op.enumerate_nodes())
             nva = list(op.enumerate_variables())
