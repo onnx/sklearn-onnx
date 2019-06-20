@@ -176,6 +176,10 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderCatSparse-SkipDim1",
         )
 
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder does not support this in 0.19",
+    )
     def test_model_one_hot_encoder_list_dense(self):
         model = OneHotEncoder(categories=[[0, 1, 4, 5],
                                           [1, 2, 3, 5],
