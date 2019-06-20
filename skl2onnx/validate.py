@@ -14,8 +14,13 @@ from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
 from sklearn.base import BaseEstimator
 from sklearn.decomposition import SparseCoder
 from sklearn.ensemble import (
-    VotingClassifier, AdaBoostRegressor, VotingRegressor
+    VotingClassifier, AdaBoostRegressor,
 )
+try:
+    from sklearn.ensemble import VotingRegressor
+except ImportError:
+    # Available only in 0.21
+    VotingRegressor = 'VotingRegressor'
 from sklearn.feature_selection import SelectFromModel, RFE, RFECV
 from sklearn.linear_model import (
     LogisticRegression, SGDClassifier, LinearRegression
