@@ -766,15 +766,15 @@ def summary_report(df):
                 break
             elif 'OK-NOBATCH' == val:
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "No batch prediction"
+                piv.iloc[i, poscol['Comment']] = "No batch prediction"
                 break
             elif isinstance(val, str) and val.startswith("e"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "Still discrepancies " + val[1:]
+                piv.iloc[i, poscol['Comment']] = "Still discrepancies " + val[1:]
                 break
             elif isinstance(val, str) and val.startswith("ERR"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "Still significant discrepancies"
+                piv.iloc[i, poscol['Comment']] = "Still significant discrepancies"
                 break
             elif isinstance(val, str):
                 last = val
@@ -789,10 +789,10 @@ def summary_report(df):
 
         def replace_msg(text):
             if isinstance(text, MissingShapeCalculator):
-                return "No converter yet"
+                return "Not supported yet"
             if str(text).startswith("Unable to find a shape "
                                     "calculator for type '"):
-                return "No converter yet"
+                return "Not supported yet"
             return str(text)
 
         piv2 = pandas.pivot_table(df, values="available-ERROR",
@@ -806,7 +806,7 @@ def summary_report(df):
         for i in range(piv.shape[0]):
             err = piv.iloc[i, poscol['ERROR-msg']]
             if isinstance(err, str) and err != '':
-                piv.iloc[i, poscol['Issue']] = err
+                piv.iloc[i, poscol['Comment']] = err
                 piv.iloc[i, poscol[new_col]] = ''
         piv = piv.drop('ERROR-msg', axis=1)
 
