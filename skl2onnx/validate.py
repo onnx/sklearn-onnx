@@ -753,7 +753,7 @@ def summary_report(df):
     piv = piv[indices + list(reversed(versions))].copy()
     new_col = "Opset"
     piv[new_col] = ""
-    piv["Issue"] = ""
+    piv["Comment"] = ""
     poscol = {name: i for i, name in enumerate(piv.columns)}
 
     # simplification
