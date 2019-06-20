@@ -76,7 +76,7 @@ class TestOnnxHelper(unittest.TestCase):
         model_onnx = convert_sklearn(model, "pipe3",
                                      [("input", FloatTensorType([1, 2]))])
         dot = to_dot(model_onnx)
-        assert "rounded" in dot
+        assert "filled" in dot
         assert "digraph" in dot
         assert "Scaler/Scaler" in dot
 

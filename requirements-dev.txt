@@ -4,6 +4,7 @@ codecov
 pandas
 py-cpuinfo
 pybind11
+pydot
 pytest
 pytest-cov
 scipy

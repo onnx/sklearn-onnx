@@ -770,11 +770,11 @@ def summary_report(df):
                 break
             elif isinstance(val, str) and val.startswith("e"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "Discrepancies " + val[1:]
+                piv.iloc[i, poscol['Issue']] = "Still discrepancies " + val[1:]
                 break
             elif isinstance(val, str) and val.startswith("ERR"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Issue']] = "Significant discrepancies"
+                piv.iloc[i, poscol['Issue']] = "Still significant discrepancies"
                 break
             elif isinstance(val, str):
                 last = val
@@ -789,10 +789,10 @@ def summary_report(df):
 
         def replace_msg(text):
             if isinstance(text, MissingShapeCalculator):
-                return "No converter"
+                return "No converter yet"
             if str(text).startswith("Unable to find a shape "
                                     "calculator for type '"):
-                return "No converter"
+                return "No converter yet"
             return str(text)
 
         piv2 = pandas.pivot_table(df, values="available-ERROR",
