@@ -39,6 +39,7 @@ from onnxruntime import InferenceSession
 from . import __version__ as ort_version
 from .convert import to_onnx
 from .validate_problems import _problems, find_suitable_problem
+from .helpers.onnx_helper import to_dot
 
 
 def get_opset_number_from_onnx():
@@ -232,7 +233,7 @@ def _measure_time(fct):
     begin = perf_counter()
     res = fct()
     end = perf_counter()
-    return res, begin - end
+    return res, end - begin
 
 
 def _measure_absolute_difference(skl_pred, ort_pred):
@@ -308,7 +309,8 @@ def dump_into_folder(dump_folder, obs_op=None, **kwargs):
 def enumerate_compatible_opset(model, opset_min=9, opset_max=None,
                                check_runtime=True, debug=False,
                                runtime='CPU', dump_folder=None,
-                               store_models=False, fLOG=print):
+                               store_models=False,
+                               dot_graph=False, fLOG=print):
     """
     Lists all compatiable opsets for a specific model.
 
@@ -324,6 +326,7 @@ def enumerate_compatible_opset(model, opset_min=9, opset_max=None,
     :param store_models: if True, the function
         also stores the fitted model and its conversion
         into *ONNX*
+    :param dot_graph: generate a DOT graph for every ONNX model
     :param fLOG: logging function
     :return: dictionaries, each row has the following
         keys: opset, exception if any, conversion time,
@@ -443,6 +446,9 @@ def enumerate_compatible_opset(model, opset_min=9, opset_max=None,
                     obs_op["_4convert_exc"] = e
                     yield obs_op
                     continue
+
+                if dot_graph and "_4convert_exc" not in obs_op:
+                    obs_op['DOT'] = to_dot(conv)
 
                 if store_models:
                     obs_op['ONNX'] = conv
@@ -599,7 +605,7 @@ def enumerate_validated_operator_opsets(verbose=0, opset_min=1, opset_max=None,
                                         check_runtime=True, debug=False,
                                         runtime='onnxruntime',
                                         models=None, dump_folder=None,
-                                        store_models=False,
+                                        store_models=False, dot_graph=False,
                                         fLOG=print):
     """
     Tests all possible configuration for all possible
@@ -619,6 +625,7 @@ def enumerate_validated_operator_opsets(verbose=0, opset_min=1, opset_max=None,
     :param store_models: if True, the function
         also stores the fitted model and its conversion
         into *onnx*
+    :param dot_graph: generate a DOT graph for every ONNX model
     :param fLOG: logging function
     :return: list of dictionaries
 
@@ -660,7 +667,8 @@ def enumerate_validated_operator_opsets(verbose=0, opset_min=1, opset_max=None,
                 model, opset_min=opset_min, opset_max=opset_max,
                 check_runtime=check_runtime, runtime=runtime,
                 debug=debug, dump_folder=dump_folder,
-                store_models=store_models, fLOG=fLOG):
+                store_models=store_models, dot_graph=dot_graph,
+                fLOG=fLOG):
 
             if verbose > 1:
                 fLOG("  ", obs)

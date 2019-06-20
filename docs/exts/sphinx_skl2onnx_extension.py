@@ -4,7 +4,7 @@
 Extension for sphinx.
 """
 import os
-from textwrap import dedent
+from textwrap import dedent, indent
 from importlib import import_module
 import sphinx
 from docutils import nodes
@@ -368,6 +368,22 @@ def df2rst(df, add_line=True, align="l", column_size=None, index=False,
         return table
 
 
+_meanings = {
+    'bin-class': 'binary classification',
+    'multi-class': 'multi-class classification',
+    'regression': 'regression',
+    'multi-reg': 'regression multi-output',
+    'num-transform': 'numerical transform',
+    'scoring': 'numerical scoring (target is usually needed)',
+    'outlier': 'outlier prediction',
+    'linearsvc': 'classifier (no *predict_proba*)',
+    'cluster': 'clustering (labels)',
+    'num+y-trans': 'numerical transform with targets',
+    'num-trans-cluster': 'clustering (scores)',
+    'clnoproba': 'binary classification (no probabilities)',
+}
+
+
 def covered_opset_converters(app):
     from skl2onnx.validate import (
         summary_report, enumerate_validated_operator_opsets
@@ -392,29 +408,119 @@ def covered_opset_converters(app):
     for only *onxruntime*. Batch predictions might be working with
     other runtime.
 
-    * `bin-class`: binary classification
-    * `mutli-class`: multi-class classification
-    * `regression`: regression
-    * `multi-reg`: regression multi-output
-    * `num-transform`: transform numerical features
-    * `scoring`: transform numerical features, target is usually needed
-    * `outlier`: outlier prediction
-    * `linearsvc`: classifier without *predict_proba*
-    * `cluster`: similar to transform
-    * `num+y-trans`: similar to transform with targets
-    * `num-trans-cluster`: similar to cluster, but returns
-        scores or distances instead of cluster
+    {0}
 
     """)
+    probs = ["* `{0}`: {1}".format(k, v) for k, v in sorted(_meanings.items())]
+    text = text.format("\n".join(probs))
     
-    rows = list(enumerate_validated_operator_opsets(verbose=1, debug=False))
+    def create_onnx_link(row):
+        if row.get('Opset', '') == '':
+            return ''
+        name = row.get("name", "")
+        problem = row.get("problem", "")
+        scenario = row.get("scenario", "")
+        if "" not in [name, problem, scenario]:
+            lab = "l-dot-{name}-{problem}-{scenario}".format(
+                name=name, problem=problem, scenario=scenario)
+            return ":ref:`ONNX <{}>`".format(lab)
+        return ""
+
+    rows = list(enumerate_validated_operator_opsets(verbose=1, debug=False,
+                                                    dot_graph=True,
+                                                    store_models=True))
     df = pandas.DataFrame(rows)
     piv = summary_report(df)
+    piv['ONNX'] = piv.apply(create_onnx_link, axis=1)
     rest = text + df2rst(piv)
     srcdir = app.builder.srcdir
     dest = os.path.join(srcdir, "supported_covered.rst")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(rest)
+    
+    # second part: visual representation
+    opset_max = max(row.get('opset', -1) for row in rows)
+
+    keys = ['MODEL', 'DOT', 'name', 'scenario', 'problem']
+    dots = []
+    for row in rows:
+        if row.get('opset', -1) != opset_max:
+            continue
+        dot = {k: v for k, v in row.items() if k in keys}
+        if len(dot) == len(keys):
+            dot["sub"] = dot["MODEL"].__class__.__module__.split('.')[-2]
+            dots.append(dot)
+    if len(dots) == 0:
+        import pprint
+        raise RuntimeError("List is empty:\n{}".format(pprint.pformat(rows)))
+    
+    def clean_dot(dot):
+        rep = 'URL="javascript:alert(\'\')", '
+        res = dot.replace(rep, "")
+        res = res.replace(", ", " ")
+        assert "javascript" not in res
+        return res
+    
+    # write
+    folder = os.path.join(srcdir, "graphs")
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    dots = [(dot['sub'], dot['name'], dot['problem'], dot['scenario'],
+             dot) for dot in dots]
+    dots.sort()
+    title = "Visual Representation of Converted Models"
+    contents = [title, "=" * len(title), "",
+                ".. contents::", "    :local:", ""]
+    last_sub = None
+    for sub, name, problem, scenario, dot in dots:
+        if sub == 'base':
+            import pprint
+            raise RuntimeError("Issue with module {}\n{}".format(
+                dot['MODEL'].__class__.__module__,
+                pprint.pformat(dot)))
+        filename = "dot_{name}_{problem}_{scenario}".format(
+            name=name, problem=problem, scenario=scenario)
+        if last_sub is None or sub != last_sub:
+            contents.append("")
+            contents.append(sub)
+            contents.append("+" * len(sub))
+            contents.append("")
+            contents.append(".. toctree::")            
+            contents.append("")
+            last_sub = sub
+        contents.append("    %s" % filename)
+        title = "{0}, {1}, {2}".format(name, problem, scenario)
+        
+        with open(os.path.join(folder, "%s.rst" % filename), "w") as f:
+            f.write(dedent("""
+            .. _l-dot-{name}-{problem}-{scenario}:
+            
+            {title}
+            {equal}
+            
+            The model was trained on a {problem2} problem:
+            
+            ::
+            
+            {skl}
+            
+            And its representation once converted into *ONNX*:
+            
+            .. graphviz::
+                
+            {dot}
+            
+            """).format(title=title, name=name,
+                        equal="=" * len(title),
+                        problem=problem,
+                        scenario=scenario,
+                        problem2=_meanings[problem],
+                        dot=indent(clean_dot(dot['DOT']), "    "),
+                        skl=indent(repr(dot['MODEL']), "    ")))
+        
+    dest = os.path.join(folder, "index.rst")
+    with open(dest, "w") as f:
+        f.write("\n".join(contents))
     
 
 def setup(app):

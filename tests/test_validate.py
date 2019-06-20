@@ -6,6 +6,7 @@ import unittest
 from logging import getLogger
 from distutils.version import StrictVersion
 from pandas import DataFrame
+import sklearn
 from skl2onnx.validate import (
     enumerate_validated_operator_opsets, sklearn_operators,
     summary_report
@@ -22,6 +23,10 @@ class TestValidate(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")
+    @unittest.skipIf(("dev" not in sklearn.__version__ and
+                      StrictVersion(sklearn.__version__) <
+                      StrictVersion("0.21")),
+                     reason="needed only once")
     def test_validate_sklearn_operators_one(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
@@ -40,12 +45,16 @@ class TestValidate(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")
+    @unittest.skipIf(("dev" not in sklearn.__version__ and
+                      StrictVersion(sklearn.__version__) <
+                      StrictVersion("0.21")),
+                     reason="needed only once")
     def test_validate_sklearn_operators_two(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
         verbose = 0
         rows = list(enumerate_validated_operator_opsets(verbose, debug=False,
-                    models={'LinearRegression'}))
+                    models={'LinearRegression'}, dot_graph=True))
         assert len(rows) > 0
         assert rows[0]['max_abs_diff_batch'] <= 1e-5
         df = DataFrame(rows)
@@ -59,6 +68,10 @@ class TestValidate(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")
+    @unittest.skipIf(("dev" not in sklearn.__version__ and
+                      StrictVersion(sklearn.__version__) <
+                      StrictVersion("0.21")),
+                     reason="needed only once")
     def test_validate_sklearn_operators_all(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True

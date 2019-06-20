@@ -11,6 +11,7 @@ from skl2onnx.helpers.onnx_helper import (
     load_onnx_model,
     save_onnx_model,
     select_model_inputs_outputs,
+    to_dot
 )
 
 
@@ -66,6 +67,18 @@ class TestOnnxHelper(unittest.TestCase):
         X2 = tr2(X)
         assert X1.shape == (4, 2)
         assert X2.shape == (4, 2)
+
+    def test_onnx_to_dot(self):
+        model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
+                              StandardScaler())
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", FloatTensorType([1, 2]))])
+        dot = to_dot(model_onnx)
+        assert "rounded" in dot
+        assert "digraph" in dot
+        assert "Scaler/Scaler" in dot
 
 
 if __name__ == "__main__":

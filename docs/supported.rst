@@ -13,7 +13,10 @@ which inherits from :class:`OnnxOperatorMixin` which
 implements *to_onnx* methods.
 
 .. toctree::
+    :maxdepth: 1
+
     supported_covered
     supported_impl
     supported_pipe
     supported_onnx
+    graphs/index

@@ -51,3 +51,4 @@ tests/sklearn_opsets_report.*
 tests/~$*
 docs/supported_covered.rst
 tests/sklearn_opsets*.xlsx
+docs/graphs/*
