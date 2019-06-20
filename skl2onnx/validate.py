@@ -770,11 +770,13 @@ def summary_report(df):
                 break
             elif isinstance(val, str) and val.startswith("e"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Comment']] = "Still discrepancies " + val[1:]
+                piv.iloc[i, poscol['Comment']] = (
+                    "Still discrepancies " + val[1:])
                 break
             elif isinstance(val, str) and val.startswith("ERR"):
                 piv.iloc[i, poscol[new_col]] = col.replace('opset', '') + '+'
-                piv.iloc[i, poscol['Comment']] = "Still significant discrepancies"
+                piv.iloc[i, poscol['Comment']] = (
+                    "Still significant discrepancies")
                 break
             elif isinstance(val, str):
                 last = val
