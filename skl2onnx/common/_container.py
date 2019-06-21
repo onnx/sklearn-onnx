@@ -269,7 +269,7 @@ class ModelComponentContainer(ModelContainer):
                         op_type, fct.__name__))
 
     def add_node(self, op_type, inputs, outputs, op_domain='', op_version=1,
-                 **attrs):
+                 name=None, **attrs):
         """
         Adds a *NodeProto* into the node list of the final ONNX model.
         If the input operator's domain-version information cannot be
@@ -285,10 +285,15 @@ class ModelComponentContainer(ModelContainer):
                           operator we are trying to add.
         :param op_version: The version number (e.g., 0 and 1) of the
                            operator we are trying to add.
+        :param name: name of the node, this name cannot be empty
         :param attrs: A Python dictionary. Keys and values are
                       attributes' names and attributes' values,
                       respectively.
         """
+        if name is None or not isinstance(
+                name, str) or name == '':
+            raise RuntimeError("Parameter name cannot be empty "
+                               "and must be a string.")
         if op_domain is None:
             op_domain = get_domain()
         self._check_operator(op_type)
@@ -314,7 +319,8 @@ class ModelComponentContainer(ModelContainer):
                 raise ValueError('Failed to create ONNX node. Undefined '
                                  'attribute pair (%s, %s) found' % (k, v))
 
-        node = helper.make_node(op_type, inputs, outputs, **attrs)
+        node = helper.make_node(op_type, inputs, outputs,
+                                name=name, **attrs)
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
