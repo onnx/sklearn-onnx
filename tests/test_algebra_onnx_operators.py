@@ -11,9 +11,12 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_operator import OnnxOperator
-from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
-from skl2onnx.algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
-from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
+from skl2onnx.algebra.onnx_ops import (
+    OnnxSub, OnnxDiv,
+    OnnxReduceSumSquare, OnnxGemm,
+    OnnxAdd, OnnxArgMin, OnnxSqrt,
+    OnnxArrayFeatureExtractor,
+)
 from onnx import (
     helper, TensorProto, load_model,
     __version__ as onnx__version__
@@ -200,6 +203,17 @@ class TestOnnxOperators(unittest.TestCase):
         graph_def = helper.make_graph(nodes, 't1', [X], [Y])
         model_def = helper.make_model(graph_def, producer_name='A')
         self.assertEqual(len(model_def.graph.output), 1)
+
+    def test_onnxt_array_feature_extractor(self):
+        onx = OnnxArrayFeatureExtractor('X', np.array([1], dtype=np.int64),
+                                        output_names=['Y'])
+        X = np.array([[1, 2], [3, 4]], dtype=np.float32)
+        model_def = onx.to_onnx({'X': X},
+                                outputs=[('Y', FloatTensorType([2]))])
+        sess = InferenceSession(model_def.SerializeToString())
+        got = sess.run(None, {'X': X})[0]
+        self.assertEqual(got.shape, (2, 1))
+        assert_almost_equal(X[:, 1:2], got)
 
 
 if __name__ == "__main__":
