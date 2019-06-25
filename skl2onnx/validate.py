@@ -35,8 +35,15 @@ from sklearn.multiclass import (
 )
 from sklearn.multioutput import (
     MultiOutputRegressor, MultiOutputClassifier,
-    ClassifierChain, RegressorChain
 )
+try:
+    from sklearn.multioutput import (
+        ClassifierChain, RegressorChain
+    )
+except ImportError:
+    # Available only in 0.21
+    ClassifierChain = 'ClassifierChain'
+    RegressorChain = 'RegressorChain'
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import SVC, NuSVC
 from sklearn.tree import DecisionTreeRegressor
