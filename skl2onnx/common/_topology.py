@@ -112,10 +112,9 @@ class Variable:
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
             else:
-                raise NotImplementedError("Unsupported type '{}' "
-                                          "(elem_type={}).".format(
-                                              type(obj.type.tensor_type),
-                                              elem))
+                raise NotImplementedError(
+                    "Unsupported type '{}' (elem_type={}).".format(
+                    type(obj.type.tensor_type), elem))
         else:
             raise NotImplementedError("Unsupported type '{}' as "
                                       "a string ({}).".format(
@@ -273,19 +272,6 @@ class Scope:
         Creates a unique operator ID based on the given seed.
         """
         return Topology._generate_unique_name(seed, self.onnx_operator_names)
-
-    def find_sink_variables(self):
-        """
-        Finds sink variables in this scope.
-        """
-        # First we assume all variables are sinks
-        is_sink = {name: True for name in self.variables.keys()}
-        # Then, we remove those variables which are inputs of some operators
-        for operator in self.operators.values():
-            for variable in operator.inputs:
-                is_sink[variable.onnx_name] = False
-        return [variable for name, variable in self.variables.items()
-                if is_sink[name]]
 
     def declare_local_variable(self, raw_name, type=None, prepend=False):
         """
