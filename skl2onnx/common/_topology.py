@@ -114,7 +114,7 @@ class Variable:
             else:
                 raise NotImplementedError(
                     "Unsupported type '{}' (elem_type={}).".format(
-                    type(obj.type.tensor_type), elem))
+                        type(obj.type.tensor_type), elem))
         else:
             raise NotImplementedError("Unsupported type '{}' as "
                                       "a string ({}).".format(
