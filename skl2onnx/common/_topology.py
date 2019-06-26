@@ -259,16 +259,6 @@ class Scope:
         """
         return self.custom_shape_calculators.get(model_type, None)
 
-    def get_onnx_variable_name(self, seed):
-        """
-        Retrieves the variable ID of the given seed or create one
-        if it is the first time of seeing this seed.
-        """
-        if seed in self.variable_name_mapping:
-            return self.variable_name_mapping[seed][-1]
-        else:
-            return self.get_unique_variable_name(seed)
-
     def get_unique_variable_name(self, seed):
         """
         Creates a unique variable ID based on the given seed.
@@ -319,25 +309,6 @@ class Scope:
         else:
             self.variable_name_mapping[raw_name] = [onnx_name]
         return variable
-
-    def get_local_variable_or_declare_one(self, raw_name, type=None):
-        """
-        This function first checks if *raw_name* has been used to create
-        some variables. If yes, the latest one named in
-        ``self.variable_name_mapping[raw_name]`` will be returned.
-        Otherwise, a new variable will be created and then returned.
-        """
-        onnx_name = self.get_onnx_variable_name(raw_name)
-        if onnx_name in self.variables:
-            return self.variables[onnx_name]
-        else:
-            variable = Variable(raw_name, onnx_name, self.name, type)
-            self.variables[onnx_name] = variable
-            if raw_name in self.variable_name_mapping:
-                self.variable_name_mapping[raw_name].append(onnx_name)
-            else:
-                self.variable_name_mapping[raw_name] = [onnx_name]
-            return variable
 
     def declare_local_operator(self, type, raw_model=None):
         """
