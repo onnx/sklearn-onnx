@@ -8,6 +8,7 @@ import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -28,8 +29,16 @@ def _decision_function(scope, operator, container, model):
     container.add_initializer(intercept_name, onnx_proto.TensorProto.FLOAT,
                               model.intercept_.shape, model.intercept_)
 
+    input_name = operator.inputs[0].full_name
+    if type(operator.inputs[0].type) == Int64TensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.input_full_names, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
+
     container.add_node(
-        'MatMul', [operator.inputs[0].full_name, coef_name],
+        'MatMul', [input_name, coef_name],
         matmul_result_name,
         name=scope.get_unique_operator_name('MatMul'))
     apply_add(scope, [matmul_result_name, intercept_name],
