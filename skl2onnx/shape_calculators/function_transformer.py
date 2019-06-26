@@ -6,7 +6,6 @@
 
 import copy
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType
 
 
 def calculate_sklearn_function_transformer_output_shapes(operator):
