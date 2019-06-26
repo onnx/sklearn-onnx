@@ -204,6 +204,8 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = helper.make_model(graph_def, producer_name='A')
         self.assertEqual(len(model_def.graph.output), 1)
 
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
     def test_onnxt_array_feature_extractor(self):
         onx = OnnxArrayFeatureExtractor('X', np.array([1], dtype=np.int64),
                                         output_names=['Y'])
