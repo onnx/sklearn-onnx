@@ -4,15 +4,16 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import copy
 from ..common._registration import register_shape_calculator
 from ..common.data_types import FloatTensorType
 
 
 def calculate_sklearn_function_transformer_output_shapes(operator):
-    '''
+    """
     This operator is used only to merge columns in a pipeline.
-    Only id function is supported.
-    '''
+    Only identity function is supported.
+    """
     if operator.raw_operator.func is not None:
         raise RuntimeError("FunctionTransformer is not supported unless the "
                            "transform function is None (= identity). "
@@ -27,7 +28,8 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
             C = 'None'
             break
 
-    operator.outputs[0].type = FloatTensorType([N, C])
+    operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
+    operator.outputs[0].type.shape = [N, C]
 
 
 register_shape_calculator('SklearnFunctionTransformer',
