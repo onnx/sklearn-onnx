@@ -512,30 +512,6 @@ class Topology:
             for variable in scope.variables.values():
                 yield variable
 
-    def find_root_and_sink_variables(self):
-        """
-        Finds root variables of the whole graph.
-        """
-        # First we assume all variables are roots
-        is_root = {
-            name: True for scope in self.scopes
-            for name in scope.variables.keys()
-        }
-        # Then, we remove those variables which are outputs of some operators
-        for operator in self.unordered_operator_iterator():
-            for variable in operator.outputs:
-                is_root[variable.onnx_name] = False
-        is_sink = {
-            name: True for scope in self.scopes
-            for name in scope.variables.keys()
-        }
-        for operator in self.unordered_operator_iterator():
-            for variable in operator.inputs:
-                is_sink[variable.onnx_name] = False
-        return [variable for scope in self.scopes
-                for name, variable in scope.variables.items()
-                if is_root[name] or is_sink[name]]
-
     def topological_operator_iterator(self):
         """
         This is an iterator of all operators in Topology object.
@@ -577,62 +553,6 @@ class Topology:
             # to terminate this procedure to avoid dead lock.
             if not is_evaluation_happened:
                 break
-
-    def rename_variable(self, old_name, new_name):
-        """
-        Replaces the old ONNX variable name with a new ONNX variable
-        name. There are several fields we need to edit.
-
-        a. Topology
-            1. scopes (the scope where the specified ONNX variable was
-                       declared)
-            2. variable_name_set
-        b. Scope
-            1. onnx_variable_names (a mirror of Topology's
-                                    variable_name_set)
-            2. variable_name_mapping
-            3. variables
-
-        :param old_name: a string
-        :param new_name: a string
-        """
-        # Search for the first variable that is named as old_name.
-        scope, onnx_name, variable = next(
-            (scope, onnx_name, variable) for scope in self.scopes
-            for onnx_name, variable in scope.variables.items()
-            if onnx_name == old_name)
-
-        # Rename the variable we just found
-        variable.onnx_name = new_name
-
-        # Because the ONNX name of the targeted variable got changed,
-        # the (onnx_name, variable) pair in the associated scope's
-        # variable dictionary should be changed as well. We therefore
-        # create a new pair to replace the old pair.
-        scope.variables[new_name] = variable
-        del scope.variables[old_name]
-
-        # One original CoreML name may have several ONNX names recorded.
-        # To fix the record affected by renaming, we need to replace
-        # old_name with new_name in the record of the associated CoreML
-        # name (variable.raw_name). Note that derived_names contains
-        # all ONNX variable names derived from variable.raw_name.
-        derived_names = scope.variable_name_mapping[variable.raw_name]
-        for i in range(len(derived_names)):
-            # Find old_name in derived_names
-            if old_name != derived_names[i]:
-                continue
-            # Replace the recorded ONNX name with the new name
-            derived_names[i] = new_name
-            # Because ONNX names are unique so name replacement only
-            # happens once, we terminate the loop right after one name
-            # replacement.
-            break
-
-        # Finally, new_name takes the place of old_name in the set of
-        # all existing variable names
-        scope.onnx_variable_names.remove(old_name)
-        scope.onnx_variable_names.add(new_name)
 
     def _check_structure(self):
         """
