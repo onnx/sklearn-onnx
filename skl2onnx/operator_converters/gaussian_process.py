@@ -6,7 +6,10 @@
 import numpy as np
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
-    OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt
+    OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
+    OnnxTranspose, OnnxDiv, OnnxArrayFeatureExtractor,
+    OnnxReduceSumSquare, OnnxExp, OnnxConcat,
+    OnnxSub
 )
 from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
@@ -35,12 +38,56 @@ def convert_kernel_diag(kernel, X, output_names=None):
                        np.array([1],
                                 dtype=np.float32),
                        output_names=output_names)
-    raise RuntimeError("Unable to convert diag function for "
+    raise RuntimeError("Unable to convert diag method for "
                        "class {}.".format(type(kernel)))
 
 
 def convert_kernel(kernel, X, output_names=None):
-    raise NotImplementedError()
+    if isinstance(kernel, Sum):
+        return OnnxAdd(convert_kernel(kernel.k1, X),
+                       convert_kernel(kernel.k2, X),
+                       output_names=output_names)
+    if isinstance(kernel, Product):
+        return OnnxMul(convert_kernel(kernel.k1, X),
+                       convert_kernel(kernel.k2, X),
+                       output_names=output_names)
+    if isinstance(kernel, ConstantKernel):
+        zeros = np.zeros((X.type.shape[1], 1))
+        onnx_zeros = OnnxMatMul(X, zeros)
+        tr = OnnxTranspose(onnx_zeros)
+        mat = OnnxMatMul(onnx_zeros, tr)
+        return OnnxAdd(mat,
+                       np.array([kernel.constant_value],
+                                dtype=np.float32),
+                       output_names=output_names)
+    if isinstance(kernel, RBF):
+        if not isinstance(kernel.length_scale, (float, int)):
+            raise NotImplementedError(
+                "length_scale should be float not {}.".format(type(kernel.length_scale)))
+        # length_scale = np.squeeze(length_scale).astype(float)
+        X_scaled = OnnxDiv(X, np.array([kernel.length_scale],
+                                       dtype=np.float32))
+
+        # dists = pdist(X / length_scale, metric='sqeuclidean')
+        rows = []
+        for d in range(X.type.shape[1]):
+            vec = OnnxArrayFeatureExtractor(
+                    X_scaled, np.array([d], dtype=np.int64))
+            dist = OnnxReduceSumSquare(OnnxSub(X_scaled, vec), axes=[0])
+            rows.append(dist)
+        conc = OnnxConcat(*rows, axis=0)
+        # K = np.exp(-.5 * dists)
+        exp = OnnxExp(OnnxMul(conc, np.array([5], dtype=np.float32)),
+                      output_names=output_names)
+
+        # This should not be needed.
+        # K = squareform(K)
+        # np.fill_diagonal(K, 1)
+
+        return exp
+                       
+    raise RuntimeError("Unable to convert __call__ method for "
+                       "class {}.".format(type(kernel)))
 
 
 def convert_gaussian_process_regressor(scope, operator, container):

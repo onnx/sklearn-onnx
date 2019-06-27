@@ -75,6 +75,12 @@ Ytest_ = pd.read_csv(StringIO("""
 
 class TestSklearnGaussianProcess(unittest.TestCase):
 
+    def remove_dim1(self, arr):
+        new_shape = tuple(v for v in arr.shape if v != 1)
+        if new_shape != arr.shape:
+            arr = arr.reshape(new_shape)
+        return arr
+
     def check_outputs(self, model, model_onnx, Xtest, predict_attributes):
         if predict_attributes is None:
             predict_attributes = {}
@@ -83,13 +89,14 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         got = sess.run(None, {'X': Xtest})
         if isinstance(exp, tuple):
             if len(exp) != len(got):
-                raise AssertionError("Mismatched number of outputs")
+                raise AssertionError("Mismatched number of outputs.")
             for i, (e, g) in enumerate(zip(exp, got)):
                 try:
-                    assert_almost_equal(exp, got)
+                    assert_almost_equal(e, self.remove_dim1(g))
                 except AssertionError as e:  # noqa
-                    raise AssertionError("Mismatch for output {}"
-                                         ".".format(i)) from e
+                    raise AssertionError(
+                        "Mismatch for output {} and attributes {}"
+                        ".".format(i, predict_attributes)) from e
         else:
             assert_almost_equal(exp, got)
 
