@@ -560,13 +560,8 @@ class Topology:
         for variable in self.unordered_variable_iterator():
             # If root_names is set, we only set those variable to be
             # fed. Otherwise, all roots would be fed.
-            if self.root_names:
-                if variable.onnx_name in self.root_names:
-                    variable.is_fed = True
-                else:
-                    variable.is_fed = False
-            else:
-                variable.is_fed = True
+            variable.is_fed = (False if self.root_names and variable.onnx_name
+                               not in self.root_names else True)
             variable.is_root = True
             variable.is_leaf = True
 
