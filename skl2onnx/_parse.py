@@ -14,7 +14,7 @@ from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.preprocessing import FunctionTransformer
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     # ColumnTransformer was introduced in 0.20.
     ColumnTransformer = None
 
