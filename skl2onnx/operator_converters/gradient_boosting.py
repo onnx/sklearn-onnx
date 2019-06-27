@@ -70,13 +70,15 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         raise ValueError('Labels must be all integer or all strings.')
 
     tree_weight = op.learning_rate
+    n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
+             op.n_estimators)
     if op.n_classes_ == 2:
-        for tree_id in range(op.n_estimators):
+        for tree_id in range(n_est):
             tree = op.estimators_[tree_id][0].tree_
             add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
                                         tree_weight, 0, False)
     else:
-        for i in range(op.n_estimators):
+        for i in range(n_est):
             for c in range(op.n_classes_):
                 tree_id = i * op.n_classes_ + c
                 tree = op.estimators_[i][c].tree_
