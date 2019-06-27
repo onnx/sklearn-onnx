@@ -122,7 +122,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     # (i.e., Topology)
     topology = parse_sklearn_model(model, initial_types, target_opset,
                                    custom_conversion_functions,
-                                   custom_shape_calculators, custom_parsers)
+                                   custom_shape_calculators,
+                                   custom_parsers,
+                                   options=options)
 
     # Infer variable shapes
     topology.compile()
@@ -134,7 +136,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     return (onnx_model, topology) if intermediate else onnx_model
 
 
-def to_onnx(model, X=None, name=None, initial_types=None):
+def to_onnx(model, X=None, name=None, initial_types=None, options=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -143,6 +145,8 @@ def to_onnx(model, X=None, name=None, initial_types=None):
         input types (*initial_types*)
     :param initial_types: if X is None, then *initial_types* must be
         defined
+    :param options: specific options given to converters
+        (see :ref:`l-conv-options`)
     :param name: name of the model
     :return: converted model
 
@@ -158,7 +162,8 @@ def to_onnx(model, X=None, name=None, initial_types=None):
     if name is None:
         name = model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
-    return convert_sklearn(model, initial_types=initial_types, name=name)
+    return convert_sklearn(model, initial_types=initial_types,
+                           name=name, options=options)
 
 
 def wrap_as_onnx_mixin(model):

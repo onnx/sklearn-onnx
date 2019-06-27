@@ -20,7 +20,7 @@ from onnxconverter_common.data_types import DictionaryType, FloatTensorType # no
 from onnxconverter_common.data_types import Int64TensorType, SequenceType # noqa
 from onnxconverter_common.data_types import StringTensorType, DoubleTensorType # noqa
 from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType # noqa
-from ._container import ModelComponentContainer
+from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
 type_fct = type
 
@@ -209,7 +209,7 @@ class Scope:
 
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
-                 custom_shape_calculators=None):
+                 custom_shape_calculators=None, options=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -226,6 +226,7 @@ class Scope:
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying
                                 the user customized shape calculator
+        :param options: see :ref:`l-conv-options`
         """
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
@@ -249,6 +250,9 @@ class Scope:
         # A map of local operators defined in this scope.
         # (key, value) = (onnx_name, operator)
         self.operators = {}
+
+        # Additional options given to converters.
+        self.options = options
 
     def get_shape_calculator(self, model_type):
         """
@@ -371,6 +375,17 @@ class Scope:
         self.variable_name_mapping[raw_name].remove(onnx_name)
         del self.variables[onnx_name]
 
+    def get_options(self, model, default_values=None):
+        """
+        Returns additional options for a model.
+        It first looks by class then by id (``id(model)``).
+        :param model: model being converted
+        :param default_values: default options (it is modified by
+                               the function)
+        :return: dictionary
+        """
+        return _build_options(model, self.options, default_values)
+
 
 class Topology:
     """
@@ -490,7 +505,7 @@ class Topology:
     def get_unique_scope_name(self, seed):
         return Topology._generate_unique_name(seed, self.scope_names)
 
-    def declare_scope(self, seed, parent_scopes=None):
+    def declare_scope(self, seed, parent_scopes=None, options=None):
         """
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
@@ -498,7 +513,8 @@ class Topology:
         scope = Scope(
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
-            custom_shape_calculators=self.custom_shape_calculators)
+            custom_shape_calculators=self.custom_shape_calculators,
+            options=options)
         self.scopes.append(scope)
         return scope
 

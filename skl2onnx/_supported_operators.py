@@ -40,6 +40,9 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 
+# Gaussian processes
+from sklearn.gaussian_process import GaussianProcessRegressor
+
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
@@ -143,7 +146,7 @@ def build_sklearn_operator_name_map():
                 RobustScaler, OneHotEncoder, DictVectorizer,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
-                VarianceThreshold,
+                VarianceThreshold, GaussianProcessRegressor,
     ] if k is not None}
     res.update({
         ElasticNet: 'SklearnElasticNetRegressor',

@@ -46,6 +46,14 @@ def _get_operation_list():
     return res
 
 
+def _build_options(model, defined_options, default_values):
+    opts = {} if default_values is None else default_values
+    if defined_options is not None:
+        opts.update(defined_options.get(type(model), {}))
+        opts.update(defined_options.get(id(model), {}))
+    return opts
+
+
 _apply_operation_specific = _get_operation_list()
 
 
@@ -335,8 +343,4 @@ class ModelComponentContainer(ModelContainer):
                                the function)
         :return: dictionary
         """
-        opts = {} if default_values is None else default_values
-        if self.options is not None:
-            opts.update(self.options.get(type(model), {}))
-            opts.update(self.options.get(id(model), {}))
-        return opts
+        return _build_options(model, self.options, default_values)

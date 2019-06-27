@@ -8,6 +8,7 @@ import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
+from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.preprocessing import FunctionTransformer
@@ -281,6 +282,28 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
+def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(
+            model, dict(return_cov=False, return_std=False))
+    if options['return_std'] and options['return_cov']:
+        raise RuntimeError(
+            "Not returning standard deviation of predictions when "
+            "returning full covariance.")
+
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
+    mean_tensor = scope.declare_local_variable("GPmean", FloatTensorType())
+    this_operator.inputs = inputs
+    this_operator.outputs.append(mean_tensor)
+
+    if options['return_std'] or options['return_cov']:
+        # covarance or standard deviation
+        covstd_tensor = scope.declare_local_variable('GPcovstd',
+                                                     FloatTensorType())
+        this_operator.outputs.append(covstd_tensor)
+    return this_operator.outputs
+
+
 def parse_sklearn(scope, model, inputs, custom_parsers=None):
     """
     This is a delegate function. It does nothing but invokes the
@@ -316,7 +339,8 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None):
 def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
-                        custom_parsers=None):
+                        custom_parsers=None,
+                        options=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -336,6 +360,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary
         ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
+    :param options: specific options given to converters
+        (see :ref:`l-conv-options`)
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
     raw_model_container = SklearnModelContainerNode(model)
@@ -351,7 +377,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # Declare an object to provide variables' and operators' naming mechanism.
     # In contrast to CoreML, one global scope
     # is enough for parsing scikit-learn models.
-    scope = topology.declare_scope('__root__')
+    scope = topology.declare_scope('__root__', options=options)
 
     # Declare input variables. They should be the inputs of the scikit-learn
     # model you want to convert into ONNX.
@@ -382,6 +408,7 @@ def build_sklearn_parsers_map():
     map_parser = {
         pipeline.Pipeline: _parse_sklearn_pipeline,
         pipeline.FeatureUnion: _parse_sklearn_feature_union,
+        GaussianProcessRegressor: _parse_sklearn_gaussian_process,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
