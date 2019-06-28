@@ -112,7 +112,8 @@ class OnnxOperator:
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
 
-        if output_names is not None:
+        if output_names is not None and isinstance(output_names, list):
+            output_names = output_names.copy()
             for i in range(len(output_names)):
                 if isinstance(output_names[i], str):
                     output_names[i] = output_names[i].format(idself=id(self))
