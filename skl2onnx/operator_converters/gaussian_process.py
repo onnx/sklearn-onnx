@@ -54,7 +54,7 @@ def convert_kernel(kernel, X, output_names=None):
     if isinstance(kernel, ConstantKernel):
         zeros = np.zeros((X.type.shape[1], 1))
         onnx_zeros = OnnxMatMul(X, zeros)
-        tr = OnnxTranspose(onnx_zeros)
+        tr = OnnxTranspose(onnx_zeros, perm=[1, 0])
         mat = OnnxMatMul(onnx_zeros, tr)
         return OnnxAdd(mat,
                        np.array([kernel.constant_value],
@@ -65,11 +65,14 @@ def convert_kernel(kernel, X, output_names=None):
             raise NotImplementedError(
                 "length_scale should be float not {}.".format(type(kernel.length_scale)))
         # length_scale = np.squeeze(length_scale).astype(float)
-        X_scaled = OnnxDiv(X, np.array([kernel.length_scale],
-                                       dtype=np.float32))
+        scale = np.full((1, X.type.shape[1]), kernel.length_scale,
+                        dtype=np.float32)
+        X_scaled = OnnxDiv(X, scale)
 
         # dists = pdist(X / length_scale, metric='sqeuclidean')
         rows = []
+        # The loop must be done as many times as the number of
+        # rows, scan or loop must be used.
         for d in range(X.type.shape[1]):
             vec = OnnxArrayFeatureExtractor(
                     X_scaled, np.array([d], dtype=np.int64))
@@ -77,8 +80,9 @@ def convert_kernel(kernel, X, output_names=None):
             rows.append(dist)
         conc = OnnxConcat(*rows, axis=0)
         # K = np.exp(-.5 * dists)
-        exp = OnnxExp(OnnxMul(conc, np.array([5], dtype=np.float32)),
-                      output_names=output_names)
+        constzero = OnnxMul(rows[0], np.array([0], dtype=np.float32))
+        constfive = OnnxAdd(constzero, np.array([-5], dtype=np.float32))
+        exp = OnnxExp(OnnxMul(conc, constfive), output_names=output_names)
 
         # This should not be needed.
         # K = squareform(K)
