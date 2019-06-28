@@ -14,6 +14,46 @@ from .graph_state import GraphState
 from .type_helper import _guess_type
 
 
+class OnnxOperatorItem:
+    """
+    Accessor to one of the output returned by a *OnnxOperator*.
+
+    :param onx_op: OnnxOperator
+    :param index: integer
+    """
+    def __init__(self, onx_op, index):
+        if not isinstance(index, int):
+            raise TypeError("index must be an integer.")
+        self.onx_op = onx_op
+        self.index = index
+
+    def add_to(self, scope, container, operator=None):
+        """
+        Adds outputs to the container if not already added,
+        registered the outputs if the node is not final.
+
+        :param scope: scope
+        :param container: container
+        :param operator: overwrite inputs
+        """
+        self.onx_op.add_to(scope, container, operator=operator)
+
+    def get_output(self, i=0):
+        """
+        Returns the output.
+        """
+        if i != 0:
+            raise IndexError("Can only return the first item.")
+        return self.onx_op.get_output(self.index)
+
+    @property
+    def outputs(self):
+        """
+        Returns the outputs of the node.
+        """
+        return self.onx_op.outputs[self.index:self.index + 1]
+
+
 class OnnxOperator:
     """
     Ancestor to every *ONNX* operator exposed in
@@ -64,6 +104,19 @@ class OnnxOperator:
 
     def __init__(self, *inputs, op_version=None, output_names=None,
                  domain=None, **kwargs):
+
+        if output_names is None and self.__class__.__name__ in {
+                "OnnxScan"}:
+            raise NotImplementedError(
+                "The class cannot infer the number of variables "
+                "for node '{}' yet. output_names must be specified"
+                ".".format(self.__class__.__name__))
+
+        if output_names is not None:
+            for i in range(len(output_names)):
+                if isinstance(output_names[i], str):
+                    output_names[i] = output_names[i].format(idself=id(self))
+
         self.state = None
         self.op_version = op_version or get_opset_number_from_onnx()
         self.domain = domain
@@ -81,11 +134,14 @@ class OnnxOperator:
             for inp in inputs:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
-                elif isinstance(inp, (OnnxOperator, Variable)):
+                elif isinstance(inp, (OnnxOperator, Variable,
+                                      OnnxOperatorItem)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, TensorProto)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, OnnxOperator.OnnxOperatorVariable):
+                    self.inputs.append(inp)
+                elif isinstance(inp, (np.int64, np.float32, np.bool)):
                     self.inputs.append(inp)
                 else:
                     raise TypeError("Unable to interpret the "
@@ -117,6 +173,13 @@ class OnnxOperator:
                     raise TypeError("output_names must be a list of strings "
                                     "and element {} is {}".format(
                                         i, type(name)))
+
+    def __getitem__(self, index):
+        """
+        Returns an accessor to one of the output
+        of this node.
+        """
+        return OnnxOperatorItem(self, index)
 
     def get_output(self, i):
         """
@@ -237,13 +300,16 @@ class OnnxOperator:
                 if isinstance(obj, OnnxOperator):
                     obj._clean_attributes(*args, recursive=True)
 
-    def to_onnx(self, inputs=None, outputs=None):
+    def to_onnx(self, inputs=None, outputs=None, other_outputs=None):
         """
         Converts this operator into an ONNX graph.
 
         :param inputs: specific inputs (as a dictionary) or
             default inputs if not specified
         :param outputs: specific outputs
+        :param other_outputs: additional outputs to consider
+            as graph outputs but not outputs of this particular
+            node
         """
         if hasattr(self, "state"):
             # The conversion already happened and needs to be cleaned.
@@ -281,6 +347,12 @@ class OnnxOperator:
             container.add_input(Variable(inp[0], inp[0],
                                          scope=scope, type=inp[1]))
         self.add_to(scope, container)
+        if other_outputs is not None:
+            for out in other_outputs:
+                if not hasattr(out, 'add_to'):
+                    raise RuntimeError(
+                        "Extra outputs must have method 'add_to'.")
+                out.add_to(scope, container)
 
         # infer shapes
         if outputs:

@@ -7,10 +7,10 @@ import numpy as np
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
-    OnnxTranspose, OnnxDiv, OnnxArrayFeatureExtractor,
-    OnnxReduceSumSquare, OnnxExp, OnnxConcat,
-    OnnxSub
+    OnnxTranspose, OnnxDiv, OnnxExp,
+    OnnxConstantOfShape, OnnxShape
 )
+from ..algebra.complex_functions import squareform_cdist
 from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 
@@ -63,33 +63,26 @@ def convert_kernel(kernel, X, output_names=None):
     if isinstance(kernel, RBF):
         if not isinstance(kernel.length_scale, (float, int)):
             raise NotImplementedError(
-                "length_scale should be float not {}.".format(type(kernel.length_scale)))
+                "length_scale should be float not {}.".format(
+                    type(kernel.length_scale)))
         # length_scale = np.squeeze(length_scale).astype(float)
         scale = np.full((1, X.type.shape[1]), kernel.length_scale,
                         dtype=np.float32)
         X_scaled = OnnxDiv(X, scale)
 
-        # dists = pdist(X / length_scale, metric='sqeuclidean')
-        rows = []
-        # The loop must be done as many times as the number of
-        # rows, scan or loop must be used.
-        for d in range(X.type.shape[1]):
-            vec = OnnxArrayFeatureExtractor(
-                    X_scaled, np.array([d], dtype=np.int64))
-            dist = OnnxReduceSumSquare(OnnxSub(X_scaled, vec), axes=[0])
-            rows.append(dist)
-        conc = OnnxConcat(*rows, axis=0)
+        pdist = squareform_cdist(X_scaled, metric='sqeuclidean')
+        shape = OnnxShape(pdist)
+        cst5 = OnnxConstantOfShape(shape, value=-5.)
+
         # K = np.exp(-.5 * dists)
-        constzero = OnnxMul(rows[0], np.array([0], dtype=np.float32))
-        constfive = OnnxAdd(constzero, np.array([-5], dtype=np.float32))
-        exp = OnnxExp(OnnxMul(conc, constfive), output_names=output_names)
+        exp = OnnxExp(OnnxMul(pdist, cst5), output_names=output_names)
 
         # This should not be needed.
         # K = squareform(K)
         # np.fill_diagonal(K, 1)
 
         return exp
-                       
+
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
 

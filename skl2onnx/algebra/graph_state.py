@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from onnx import AttributeProto
 from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
 
@@ -40,7 +41,8 @@ class GraphState:
     def _get_var_name(self, var, unused, operator=None):
         if isinstance(var, Variable):
             return var.full_name
-        elif isinstance(var, np.ndarray):
+        elif isinstance(var, (np.ndarray, np.bool, np.int64,
+                              np.float32, np.bool)):
             return self._add_constant(var)
         elif hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue)
@@ -71,12 +73,15 @@ class GraphState:
             if cst.dtype in (np.float32, np.float64):
                 ty = onnx_proto.TensorProto.FLOAT
                 astype = np.float64
-            elif cst.dtype == np.int32:
-                ty = onnx_proto.TensorProto.INT32
-                astype = np.int64
             elif cst.dtype == np.int64:
                 ty = onnx_proto.TensorProto.INT64
                 astype = np.int64
+            elif cst.dtype == np.int32:
+                ty = onnx_proto.TensorProto.INT32
+                astype = np.int64
+            elif cst.dtype == np.bool:
+                ty = onnx_proto.TensorProto.BOOL
+                astype = np.bool
             else:
                 raise NotImplementedError(
                     "Unable to guess ONNX type from type {}. "
@@ -90,6 +95,18 @@ class GraphState:
             name = self.scope.get_unique_variable_name(
                 self.operator_name + 'cst')
             self.container.add_initializer(name, None, None, cst)
+            return name
+        elif isinstance(cst, np.int64):
+            name = self.scope.get_unique_variable_name(
+                self.operator_name + 'cst')
+            ty = AttributeProto.INT
+            self.container.add_initializer(name, ty, None, cst)
+            return name
+        elif isinstance(cst, np.bool):
+            name = self.scope.get_unique_variable_name(
+                self.operator_name + 'cst')
+            ty = AttributeProto.INT
+            self.container.add_initializer(name, ty, None, cst)
             return name
         else:
             raise NotImplementedError(

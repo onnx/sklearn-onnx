@@ -242,6 +242,8 @@ class ModelComponentContainer(ModelContainer):
             tensor.name = name
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
+        elif shape is None:
+            tensor = helper.make_attribute(name, content)
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None')

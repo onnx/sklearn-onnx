@@ -7,6 +7,7 @@
 from io import BytesIO
 import onnx
 from onnx import helper, shape_inference
+from onnx import onnx_pb as onnx_proto
 from ..common._topology import Variable
 
 
@@ -179,6 +180,13 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
                 input.name, input.data_type.real,
                 list(d for d in input.dims))
             onnx_inputs.append(v)
+        elif isinstance(input, onnx.AttributeProto):
+            value_info = helper.ValueInfoProto()
+            value_info.name = input.name
+            onnx_type = onnx_proto.TypeProto()
+            onnx_type.tensor_type.elem_type = input.type
+            value_info.type.CopyFrom(onnx_type)
+            onnx_inputs.append(value_info)
         else:
             onnx_inputs.append(input)
 

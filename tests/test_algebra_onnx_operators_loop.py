@@ -1,0 +1,167 @@
+import unittest
+from distutils.version import StrictVersion
+from collections import OrderedDict
+import numpy as np
+from numpy.testing import assert_almost_equal
+from scipy.spatial.distance import pdist, squareform
+import onnx
+from onnxruntime import InferenceSession
+from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.algebra.onnx_ops import (
+    OnnxAdd, OnnxIdentity, OnnxScan,
+    OnnxSub, OnnxReduceSumSquare,
+    OnnxSqueeze
+)
+from onnx import (
+    helper, TensorProto,
+    __version__ as onnx__version__
+)
+from skl2onnx.algebra.complex_functions import squareform_cdist
+
+
+class TestOnnxOperatorsLoop(unittest.TestCase):
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnx_example(self):
+        sum_in = onnx.helper.make_tensor_value_info(
+            'sum_in', onnx.TensorProto.FLOAT, [2])
+        next = onnx.helper.make_tensor_value_info(
+            'next', onnx.TensorProto.FLOAT, [2])
+        sum_out = onnx.helper.make_tensor_value_info(
+            'sum_out', onnx.TensorProto.FLOAT, [2])
+        scan_out = onnx.helper.make_tensor_value_info(
+            'scan_out', onnx.TensorProto.FLOAT, [2])
+        add_node = onnx.helper.make_node(
+            'Add',
+            inputs=['sum_in', 'next'],
+            outputs=['sum_out']
+        )
+        id_node = onnx.helper.make_node(
+            'Identity',
+            inputs=['sum_out'],
+            outputs=['scan_out']
+        )
+        scan_body = onnx.helper.make_graph(
+            [add_node, id_node],
+            'scan_body',
+            [sum_in, next],
+            [sum_out, scan_out]
+        )
+        node = onnx.helper.make_node(
+            'Scan',
+            inputs=['initial', 'x'],
+            outputs=['y', 'z'],
+            num_scan_inputs=1,
+            body=scan_body
+        )
+
+        initial = helper.make_tensor_value_info(
+            'initial', TensorProto.FLOAT, [2, ])
+        X = helper.make_tensor_value_info('x', TensorProto.FLOAT, [3, 2])
+        Y = helper.make_tensor_value_info('y', TensorProto.FLOAT, [2, ])
+        Z = helper.make_tensor_value_info('z', TensorProto.FLOAT, [3, 2])
+
+        graph_def = helper.make_graph(
+            [node],
+            'test-model',
+            [initial, X],
+            [Y, Z],
+        )
+
+        model_def = helper.make_model(graph_def, producer_name='onnx-example')
+
+        initial = np.array([0, 0]).astype(np.float32).reshape((2,))
+        x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'initial': initial, 'x': x})
+
+        y = np.array([9, 12]).astype(np.float32).reshape((2,))
+        z = np.array([1, 2, 4, 6, 9, 12]).astype(np.float32).reshape((3, 2))
+        assert_almost_equal(y, res[0])
+        assert_almost_equal(z, res[1])
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnx_example_algebra(self):
+        initial = np.array([0, 0]).astype(np.float32).reshape((2,))
+        x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
+
+        add_node = OnnxAdd('sum_in', 'next', output_names=['sum_out'])
+        id_node = OnnxIdentity(add_node, output_names=['scan_out'])
+        scan_body = id_node.to_onnx(
+            {'sum_in': initial, 'next': initial},
+            outputs=[('sum_out', FloatTensorType()),
+                     ('scan_out', FloatTensorType())])
+
+        node = OnnxScan('initial', 'x', output_names=['y', 'z'],
+                        num_scan_inputs=1, body=scan_body.graph)
+        model_def = node.to_onnx(
+            {'initial': initial, 'x': x},
+            outputs=[('y', FloatTensorType()),
+                     ('z', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'initial': initial, 'x': x})
+
+        y = np.array([9, 12]).astype(np.float32).reshape((2,))
+        z = np.array([1, 2, 4, 6, 9, 12]).astype(np.float32).reshape((3, 2))
+        assert_almost_equal(y, res[0])
+        assert_almost_equal(z, res[1])
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnx_example_pdist(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+
+        diff = OnnxSub('next_in', 'next', output_names=['diff'])
+        id_next = OnnxIdentity('next_in', output_names=['next_out'])
+        norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
+        flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
+        scan_body = id_next.to_onnx(
+            OrderedDict([('next_in', x), ('next', FloatTensorType())]),
+            outputs=[('next_out', FloatTensorType([3, 2])),
+                     ('scan_out', FloatTensorType([3]))],
+            other_outputs=[flat])
+
+        sess = InferenceSession(scan_body.SerializeToString())
+        res = sess.run(None, {'next_in': x, 'next': x[:1]})
+        assert_almost_equal(x, res[0])
+        exp = np.array([0., 18., 20.], dtype=np.float32)
+        assert_almost_equal(exp, res[1])
+
+        node = OnnxScan('x', 'x', output_names=['y', 'z'],
+                        num_scan_inputs=1, body=scan_body.graph)
+        model_def = node.to_onnx({'x': x},
+                                 outputs=[('y', FloatTensorType([3, 2])),
+                                          ('z', FloatTensorType([3, 3]))])
+        onnx.checker.check_model(model_def)
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'x': x})
+
+        exp = squareform(pdist(x, metric="sqeuclidean"))
+        assert_almost_equal(x, res[0])
+        assert_almost_equal(exp, res[1])
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnx_example_pdist_in(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+        cop = OnnxAdd('input', 'input')
+        cdist = squareform_cdist(cop)
+        cop2 = OnnxIdentity(cdist, output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            {'input': x}, outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+
+        exp = squareform(pdist(x * 2, metric="sqeuclidean"))
+        assert_almost_equal(exp, res[0])
+
+
+if __name__ == "__main__":
+    unittest.main()
