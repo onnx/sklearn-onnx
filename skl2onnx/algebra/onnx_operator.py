@@ -228,6 +228,17 @@ class OnnxOperator:
         :param operator: overwrite inputs
         """
         if self.state is None:
+            if self.is_deprecated:
+                raise RuntimeError("Node '{}' is deprecated. "
+                                   "This API cannot deprecated nodes."
+                                   "".format(self.__class__.__name__))
+            if (self.op_version is not None and
+                    self.op_version < self.since_version):
+                raise RuntimeError("Node '{}' has been changed since "
+                                   "version {}. This API cannot convert "
+                                   "older version."
+                                   "".format(self.__class__.__name__,
+                                             self.since_version))
             if self.kwargs.get('op_version', '') is None:
                 kwargs = self.kwargs.copy()
                 del kwargs['op_version']

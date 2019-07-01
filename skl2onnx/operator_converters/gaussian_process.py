@@ -4,36 +4,45 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from onnx.helper import make_tensor
+from onnx import TensorProto
+from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
     OnnxTranspose, OnnxDiv, OnnxExp,
-    OnnxConstantOfShape, OnnxShape
+    OnnxConstantOfShape, OnnxShape,
+    OnnxReduceSum, OnnxSqueeze
 )
-from ..algebra.complex_functions import squareform_cdist
-from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from ..algebra.complex_functions import squareform_pdist
 
 
-def convert_kernel_diag(kernel, X, output_names=None):
+def convert_kernel_diag(context, kernel, X, output_names=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel_diag(kernel.k1, X),
-                       convert_kernel_diag(kernel.k2, X),
+        return OnnxAdd(convert_kernel_diag(context, kernel.k1, X),
+                       convert_kernel_diag(context, kernel.k2, X),
                        output_names=output_names)
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel_diag(kernel.k1, X),
-                       convert_kernel_diag(kernel.k2, X),
+        return OnnxMul(convert_kernel_diag(context, kernel.k1, X),
+                       convert_kernel_diag(context, kernel.k2, X),
                        output_names=output_names)
     if isinstance(kernel, ConstantKernel):
-        zeros = np.zeros((X.type.shape[1], 1))
-        onnx_zeros = OnnxMatMul(X, zeros)
+        if 'zerov' in context:
+            onnx_zeros = context['zerov']
+        else:
+            onnx_zeros = _zero_vector_of_size(X)
+            context['zerov'] = onnx_zeros
         return OnnxAdd(onnx_zeros,
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
                        output_names=output_names)
     if isinstance(kernel, RBF):
-        zeros = np.zeros((X.type.shape[1], 1))
-        onnx_zeros = OnnxMatMul(X, zeros)
+        if 'zerov' in context:
+            onnx_zeros = context['zerov']
+        else:
+            onnx_zeros = _zero_vector_of_size(X)
+            context['zerov'] = onnx_zeros
         return OnnxAdd(onnx_zeros,
                        np.array([1],
                                 dtype=np.float32),
@@ -42,18 +51,23 @@ def convert_kernel_diag(kernel, X, output_names=None):
                        "class {}.".format(type(kernel)))
 
 
-def convert_kernel(kernel, X, output_names=None):
+def convert_kernel(context, kernel, X, output_names=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel(kernel.k1, X),
-                       convert_kernel(kernel.k2, X),
+        return OnnxAdd(convert_kernel(context, kernel.k1, X),
+                       convert_kernel(context, kernel.k2, X),
                        output_names=output_names)
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel(kernel.k1, X),
-                       convert_kernel(kernel.k2, X),
+        return OnnxMul(convert_kernel(context, kernel.k1, X),
+                       convert_kernel(context, kernel.k2, X),
                        output_names=output_names)
     if isinstance(kernel, ConstantKernel):
-        zeros = np.zeros((X.type.shape[1], 1))
-        onnx_zeros = OnnxMatMul(X, zeros)
+
+        if 'zerov' in context:
+            onnx_zeros = context['zerov']
+        else:
+            onnx_zeros = _zero_vector_of_size(X)
+            context['zerov'] = onnx_zeros
+
         tr = OnnxTranspose(onnx_zeros, perm=[1, 0])
         mat = OnnxMatMul(onnx_zeros, tr)
         return OnnxAdd(mat,
@@ -65,14 +79,36 @@ def convert_kernel(kernel, X, output_names=None):
             raise NotImplementedError(
                 "length_scale should be float not {}.".format(
                     type(kernel.length_scale)))
-        # length_scale = np.squeeze(length_scale).astype(float)
-        scale = np.full((1, X.type.shape[1]), kernel.length_scale,
-                        dtype=np.float32)
-        X_scaled = OnnxDiv(X, scale)
 
-        pdist = squareform_cdist(X_scaled, metric='sqeuclidean')
-        shape = OnnxShape(pdist)
-        cst5 = OnnxConstantOfShape(shape, value=-5.)
+        # length_scale = np.squeeze(length_scale).astype(float)
+        if 'zeroh' in context:
+            zeroh = context['zeroh']
+        else:
+            zeroh = _zero_vector_of_size(X, axis=1)
+            context['zeroh'] = zeroh
+
+        if 'zerov' in context:
+            zerov = context['zerov']
+        else:
+            zerov = _zero_vector_of_size(X, axis=0)
+            context['zerov'] = zeroh
+
+        tensor_value = make_tensor(
+            "value", TensorProto.FLOAT, (1,), [kernel.length_scale])
+        const = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zeroh),
+                                                value=tensor_value),
+                            axes=[0])
+        X_scaled = OnnxDiv(X, const)
+        pdist = squareform_pdist(X_scaled, metric='sqeuclidean')
+
+        if 'cst5' in context:
+            cst5 = context['cst5']
+        else:
+            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [-.5])
+            cst5 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
+                                                   value=tensor_value),
+                               axes=[1])
+            context['cst5'] = cst5
 
         # K = np.exp(-.5 * dists)
         exp = OnnxExp(OnnxMul(pdist, cst5), output_names=output_names)
@@ -85,6 +121,13 @@ def convert_kernel(kernel, X, output_names=None):
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
+
+
+def _zero_vector_of_size(X, output_names=None, axis=0):
+    res = OnnxReduceSum(OnnxConstantOfShape(OnnxShape(X)),
+                        axes=[1-axis],
+                        output_names=output_names)
+    return res
 
 
 def convert_gaussian_process_regressor(scope, operator, container):
@@ -103,22 +146,21 @@ def convert_gaussian_process_regressor(scope, operator, container):
         else:
             kernel = op.kernel
 
-        y_mean = np.zeros((X.type.shape[1], 1))
+        out0 = _zero_vector_of_size(X, output_names=out[:1])
+        outputs = [out0]
+        context = dict(zerov=out0)
 
         if options['return_cov']:
-            out = [OnnxMatMul(X, y_mean, output_names=out[:1]),
-                   convert_kernel(kernel, X, output_names=out[1:])]
-        elif options['return_std']:
-            out = [OnnxMatMul(X, y_mean, output_names=out[:1]),
-                   OnnxSqrt(convert_kernel_diag(kernel, X),
-                            output_names=out[1:])]
-        else:
-            out = [OnnxMatMul(X, y_mean, output_names=out[:1])]
+            outputs.append(convert_kernel(context, kernel, X,
+                                          output_names=out[1:]))
+        if options['return_std']:
+            outputs.append(OnnxSqrt(convert_kernel_diag(context, kernel, X),
+                                    output_names=out[1:]))
     else:
         raise RuntimeError("The converter does not handle fitted "
                            "gaussian processes yet.")
 
-    for o in out:
+    for o in outputs:
         o.add_to(scope, container)
 
 

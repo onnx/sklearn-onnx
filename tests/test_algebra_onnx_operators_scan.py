@@ -10,13 +10,13 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
     OnnxSub, OnnxReduceSumSquare,
-    OnnxSqueeze
+    OnnxSqueeze, OnnxShape, OnnxConstantOfShape
 )
 from onnx import (
     helper, TensorProto,
     __version__ as onnx__version__
 )
-from skl2onnx.algebra.complex_functions import squareform_cdist
+from skl2onnx.algebra.complex_functions import squareform_pdist
 
 
 class TestOnnxOperatorsLoop(unittest.TestCase):
@@ -150,16 +150,43 @@ class TestOnnxOperatorsLoop(unittest.TestCase):
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         cop = OnnxAdd('input', 'input')
-        cdist = squareform_cdist(cop)
-        cop2 = OnnxIdentity(cdist, output_names=['cdist'])
+        cop2 = OnnxIdentity(squareform_pdist(cop), output_names=['pdist'])
 
         model_def = cop2.to_onnx(
-            {'input': x}, outputs=[('cdist', FloatTensorType())])
+            inputs=[('input', FloatTensorType())],
+            outputs=[('pdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
         res = sess.run(None, {'input': x})
-
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
+        assert_almost_equal(exp, res[0])
+
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((2, 3))
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = squareform(pdist(x * 2, metric="sqeuclidean"))
+        assert_almost_equal(exp, res[0])
+
+    def test_onnx_example_constant_of_shape(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+
+        cop2 = OnnxConstantOfShape(OnnxShape('input'), output_names=['mat'])
+        model_def = cop2.to_onnx({'input': x},
+                                 outputs=[('mat', FloatTensorType())])
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = np.zeros((3, 2), dtype=np.float32)
+        assert_almost_equal(exp, res[0])
+
+        tensor_value = onnx.helper.make_tensor("value", onnx.TensorProto.FLOAT,
+                                               (1,), [-5])
+        cop2 = OnnxConstantOfShape(OnnxShape('input'), value=tensor_value,
+                                   output_names=['mat'])
+        model_def = cop2.to_onnx({'input': x},
+                                 outputs=[('mat', FloatTensorType())])
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
 
 
