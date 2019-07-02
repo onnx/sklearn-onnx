@@ -3,7 +3,7 @@ from distutils.version import StrictVersion
 from collections import OrderedDict
 import numpy as np
 from numpy.testing import assert_almost_equal
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist, squareform, cdist as scipy_cdist
 import onnx
 from onnxruntime import InferenceSession
 from skl2onnx.common.data_types import FloatTensorType
@@ -16,10 +16,12 @@ from onnx import (
     helper, TensorProto,
     __version__ as onnx__version__
 )
-from skl2onnx.algebra.complex_functions import squareform_pdist
+from skl2onnx.algebra.complex_functions import (
+    squareform_pdist, cdist
+)
 
 
-class TestOnnxOperatorsLoop(unittest.TestCase):
+class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
@@ -188,6 +190,24 @@ class TestOnnxOperatorsLoop(unittest.TestCase):
         res = sess.run(None, {'input': x})
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnx_example_cdist_in(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+        x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
+            np.float32).reshape((4, 2))
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(cdist(cop, x2), output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType())],
+            outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
+        assert_almost_equal(exp, res[0], decimal=5)
 
 
 if __name__ == "__main__":

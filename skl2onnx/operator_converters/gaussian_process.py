@@ -15,7 +15,7 @@ from ..algebra.onnx_ops import (
     OnnxConstantOfShape, OnnxShape,
     OnnxReduceSum, OnnxSqueeze
 )
-from ..algebra.complex_functions import squareform_pdist
+from ..algebra.complex_functions import squareform_pdist, cdist
 
 
 def convert_kernel_diag(context, kernel, X, output_names=None):
@@ -51,17 +51,19 @@ def convert_kernel_diag(context, kernel, X, output_names=None):
                        "class {}.".format(type(kernel)))
 
 
-def convert_kernel(context, kernel, X, output_names=None):
+def convert_kernel(context, kernel, X, output_names=None,
+                   x_train=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel(context, kernel.k1, X),
-                       convert_kernel(context, kernel.k2, X),
+        return OnnxAdd(convert_kernel(context, kernel.k1, X, x_train=x_train),
+                       convert_kernel(context, kernel.k2, X, x_train=x_train),
                        output_names=output_names)
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel(context, kernel.k1, X),
-                       convert_kernel(context, kernel.k2, X),
+        return OnnxMul(convert_kernel(context, kernel.k1, X, x_train=x_train),
+                       convert_kernel(context, kernel.k2, X, x_train=x_train),
                        output_names=output_names)
-    if isinstance(kernel, ConstantKernel):
 
+    if isinstance(kernel, ConstantKernel):
+        # X and x_train should have the same number of features.
         if 'zerov' in context:
             onnx_zeros = context['zerov']
         else:
@@ -74,6 +76,7 @@ def convert_kernel(context, kernel, X, output_names=None):
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
                        output_names=output_names)
+
     if isinstance(kernel, RBF):
         if not isinstance(kernel.length_scale, (float, int)):
             raise NotImplementedError(
@@ -99,7 +102,11 @@ def convert_kernel(context, kernel, X, output_names=None):
                                                 value=tensor_value),
                             axes=[0])
         X_scaled = OnnxDiv(X, const)
-        pdist = squareform_pdist(X_scaled, metric='sqeuclidean')
+        if x_train is None:
+            dist = squareform_pdist(X_scaled, metric='sqeuclidean')
+        else:
+            x_train_scaled = OnnxDiv(x_train, const)
+            dist = cdist(X_scaled, x_train_scaled, metric='sqeuclidean')
 
         if 'cst5' in context:
             cst5 = context['cst5']
@@ -111,12 +118,11 @@ def convert_kernel(context, kernel, X, output_names=None):
             context['cst5'] = cst5
 
         # K = np.exp(-.5 * dists)
-        exp = OnnxExp(OnnxMul(pdist, cst5), output_names=output_names)
+        exp = OnnxExp(OnnxMul(dist, cst5), output_names=output_names)
 
         # This should not be needed.
         # K = squareform(K)
         # np.fill_diagonal(K, 1)
-
         return exp
 
     raise RuntimeError("Unable to convert __call__ method for "
@@ -138,18 +144,17 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
     options = container.get_options(op, dict(return_cov=False,
                                              return_std=False))
+    if op.kernel is None:
+        kernel = (C(1.0, constant_value_bounds="fixed") *
+                  RBF(1.0, length_scale_bounds="fixed"))
+    else:
+        kernel = op.kernel
 
     if not hasattr(op, "X_train_"):
-        if op.kernel is None:
-            kernel = (C(1.0, constant_value_bounds="fixed") *
-                      RBF(1.0, length_scale_bounds="fixed"))
-        else:
-            kernel = op.kernel
-
         out0 = _zero_vector_of_size(X, output_names=out[:1])
-        outputs = [out0]
         context = dict(zerov=out0)
 
+        outputs = [out0]
         if options['return_cov']:
             outputs.append(convert_kernel(context, kernel, X,
                                           output_names=out[1:]))
@@ -157,8 +162,25 @@ def convert_gaussian_process_regressor(scope, operator, container):
             outputs.append(OnnxSqrt(convert_kernel_diag(context, kernel, X),
                                     output_names=out[1:]))
     else:
-        raise RuntimeError("The converter does not handle fitted "
-                           "gaussian processes yet.")
+        out0 = _zero_vector_of_size(X)
+        context = dict(zerov=out0)
+
+        # Code scikit-learn
+        # K_trans = self.kernel_(X, self.X_train_)
+        # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
+        # y_mean = self._y_train_mean + y_mean  # undo normal.
+
+        k_trans = convert_kernel(context, kernel, X,
+                                 x_train=op.X_train_.astype(np.float32))
+        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(np.float32))
+        y_mean = OnnxAdd(y_mean_b, op._y_train_mean.astype(np.float32),
+                         output_names=out[:1])
+        outputs = [y_mean]
+
+        if options['return_cov']:
+            raise NotImplementedError()
+        if options['return_std']:
+            raise NotImplementedError()
 
     for o in outputs:
         o.add_to(scope, container)

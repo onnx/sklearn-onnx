@@ -5,9 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from io import StringIO
+from distutils.version import StrictVersion
 import numpy as np
 import pandas as pd
-from io import StringIO
 from numpy.testing import assert_almost_equal
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
@@ -18,7 +19,7 @@ from sklearn.gaussian_process.kernels import Sum  # , Product
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx
 from skl2onnx.operator_converters.gaussian_process import convert_kernel
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from test_utils import dump_data_and_model
 
 
@@ -171,6 +172,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_ker2_def(self):
         ker = Sum(
             C(0.1, (1e-3, 1e3)) * RBF(length_scale=10,
@@ -187,7 +191,10 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    def _test_gpr_rbf_unfitted(self):
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="onnxruntime 0.4.0 has bug about memory management")
+    def test_gpr_rbf_unfitted(self):
 
         se = (C(1.0, (1e-3, 1e3)) *
               RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
@@ -204,7 +211,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
-                            basename="SklearnGaussianProcessRBF")
+                            basename="SklearnGaussianProcessRBFUnfitted")
 
         # return_cov=True, return_std=True
         options = {GaussianProcessRegressor: {"return_std": True,
@@ -237,22 +244,38 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
-    def _test_gpr_rbf(self):
+    def test_gpr_rbf_fitted(self):
 
-        se = (C(1.0, (1e-3, 1e3)) *
-              RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
-        kernel = (Sum(se, C(0.1, (1e-3, 1e3)) *
-                  RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
-
-        gp = GaussianProcessRegressor(alpha=1e-7, kernel=kernel,
+        gp = GaussianProcessRegressor(alpha=1e-7,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
-        model_onnx = to_onnx(gp, Xtrain_.astype(np.float32))
 
+        # return_cov=False, return_std=False
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['None', 'None']))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
+                            verbose=False,
                             basename="SklearnGaussianProcessRBF")
+
+    @unittest.skipIf(reason="not implemented")
+    def test_gpr_rbf_fitted_return_std(self):
+
+        gp = GaussianProcessRegressor(alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['None', 'None']))],
+            options=options)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+                           predict_attributes=options[
+                             GaussianProcessRegressor])
 
 
 if __name__ == "__main__":
