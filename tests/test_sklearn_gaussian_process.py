@@ -259,7 +259,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                             verbose=False,
                             basename="SklearnGaussianProcessRBF")
 
-    @unittest.skipIf(reason="not implemented")
+    @unittest.skip(reason="not implemented")
     def test_gpr_rbf_fitted_return_std(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
