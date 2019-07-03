@@ -14,6 +14,14 @@ from skl2onnx.validate import (
 import onnx
 
 
+def has_openpyxl():
+    try:
+        import pydot  # noqa
+        return True
+    except ImportError:
+        return False
+
+
 class TestValidate(unittest.TestCase):
 
     def test_sklearn_operators(self):
@@ -27,6 +35,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
+    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
     def test_validate_sklearn_operators_one(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
@@ -49,6 +58,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
+    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
     def test_validate_sklearn_operators_two(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
@@ -72,6 +82,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
+    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
     def test_validate_sklearn_operators_all(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True

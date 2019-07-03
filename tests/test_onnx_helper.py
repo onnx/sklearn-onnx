@@ -15,6 +15,14 @@ from skl2onnx.helpers.onnx_helper import (
 )
 
 
+def has_pydot():
+    try:
+        import pydot  # noqa
+        return True
+    except ImportError:
+        return False
+
+
 class TestOnnxHelper(unittest.TestCase):
     def get_model(self, model):
         try:
@@ -68,6 +76,7 @@ class TestOnnxHelper(unittest.TestCase):
         assert X1.shape == (4, 2)
         assert X2.shape == (4, 2)
 
+    @unittest.skipIf(not has_pydot(), reason="missing dependency")
     def test_onnx_to_dot(self):
         model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
                               StandardScaler())
