@@ -19,14 +19,14 @@ jobs:
         numpy.version: 'numpy==1.16.2'
         scipy.version: 'scipy'
         onnxrt.version: '==0.4.0'
-        sklearn.version: '==0.20.3'
+        sklearn.version: '==0.21.2'
       Py36-Onnx130-Rt021-Npy1162:
         python.version: '3.6.7'
         onnx.version: 'onnx==1.3.0'
         numpy.version: 'numpy==1.16.3'
         scipy.version: 'scipy'
         onnxrt.version: '==0.2.1'
-        sklearn.version: '==0.20.3'
+        sklearn.version: '==0.21.2'
     maxParallel: 3
 
   steps:
@@ -37,7 +37,6 @@ jobs:
 
   - script: |
       conda install -y -c conda-forge protobuf
-      python -m pip install --upgrade pip
       pip install $(numpy.version)
       pip install $(scipy.version)
       pip install $(onnx.version)
@@ -57,7 +56,6 @@ jobs:
 
   - script: |
       pip install -r requirements.txt
-      pip install -r requirements-dev.txt
       pip install pytest
     displayName: 'install requirements'
 
