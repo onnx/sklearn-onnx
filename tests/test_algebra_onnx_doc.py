@@ -1,5 +1,6 @@
 import unittest
 from distutils.version import StrictVersion
+import sys
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
@@ -51,10 +52,14 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
         res = self.predict_with_onnxruntime(model_def, X)
         assert_almost_equal(res['Y'], X)
 
+    @unittest.skipIf(sys.platform.startswith("win"),
+                     reason="onnx schema are incorrect on Windows")
     def test_doc_onnx(self):
         rst = get_rst_doc()
         assert "**Summary**" in rst
 
+    @unittest.skipIf(sys.platform.startswith("win"),
+                     reason="onnx schema are incorrect on Windows")
     def test_doc_sklearn(self):
         rst = get_rst_doc_sklearn()
         assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
