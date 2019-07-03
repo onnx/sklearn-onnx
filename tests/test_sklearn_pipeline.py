@@ -5,14 +5,14 @@ from sklearn import datasets
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     # not available in 0.19
     ColumnTransformer = None
 from sklearn.decomposition import TruncatedSVD
 
 try:
     from sklearn.impute import SimpleImputer
-except ModuleNotFoundError:
+except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
