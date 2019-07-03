@@ -7,12 +7,12 @@ import unittest
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     # not available in 0.19
     ColumnTransformer = None
 try:
     from sklearn.impute import SimpleImputer
-except ModuleNotFoundError:
+except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
