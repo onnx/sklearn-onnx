@@ -46,6 +46,8 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                 raise TypeError("Categories must be int or strings "
                                 "not {0}.".format(cat.dtype))
     else:
+        # Relies on n_values: deprecated in 0.20,
+        # removed in 0.22.
         if op.categorical_features == 'all':
             categorical_feature_indices = [i for i in range(C)]
         elif isinstance(op.categorical_features, collections.Iterable):

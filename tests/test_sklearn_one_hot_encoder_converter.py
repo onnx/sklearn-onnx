@@ -155,6 +155,56 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderOneStringOneIntCat",
         )
 
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder does not support this in 0.19",
+    )
+    def test_model_one_hot_encoder_list_sparse(self):
+        model = OneHotEncoder(categories=[[0, 1, 4, 5],
+                                          [1, 2, 3, 5],
+                                          [0, 3, 4, 6]],
+                              sparse=True)
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int64)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int64TensorType([1, 3]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderCatSparse-SkipDim1",
+        )
+
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder does not support this in 0.19",
+    )
+    def test_model_one_hot_encoder_list_dense(self):
+        model = OneHotEncoder(categories=[[0, 1, 4, 5],
+                                          [1, 2, 3, 5],
+                                          [0, 3, 4, 6]],
+                              sparse=False)
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int64)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int64TensorType([1, 3]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderCatDense-SkipDim1",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
