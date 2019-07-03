@@ -26,10 +26,6 @@ register_shape_calculator('SklearnGradientBoostingRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnKNeighborsRegressor',
                           calculate_linear_regressor_output_shapes)
-register_shape_calculator('SklearnLasso',
-                          calculate_linear_regressor_output_shapes)
-register_shape_calculator('SklearnLassoLars',
-                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnMLPRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnRidge',

@@ -203,6 +203,36 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_lars(self):
+        model, X = _fit_model(linear_model.Lars())
+        model_onnx = convert_sklearn(model, "lars",
+                                     [("input", FloatTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLars-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_lars_cv(self):
+        model, X = _fit_model(linear_model.LarsCV())
+        model_onnx = convert_sklearn(model, "lars",
+                                     [("input", FloatTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLarsCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     def test_model_lasso_lars(self):
         model, X = _fit_model(linear_model.LassoLars(alpha=0.01))
         model_onnx = convert_sklearn(model, "lasso lars",
@@ -213,6 +243,51 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLassoLars-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_lasso_lars_cv(self):
+        model, X = _fit_model(linear_model.LassoLarsCV())
+        model_onnx = convert_sklearn(model, "lasso lars cv",
+                                     [("input", FloatTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLassoLarsCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_lasso_lars_ic(self):
+        model, X = _fit_model(linear_model.LassoLarsIC())
+        model_onnx = convert_sklearn(model, "lasso lars cv",
+                                     [("input", FloatTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLassoLarsIC-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_lasso_cv(self):
+        model, X = _fit_model(linear_model.LassoCV())
+        model_onnx = convert_sklearn(model, "lasso cv",
+                                     [("input", FloatTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLassoCV-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",

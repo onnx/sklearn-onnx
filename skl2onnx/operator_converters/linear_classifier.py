@@ -7,6 +7,7 @@
 import numbers
 import numpy as np
 import six
+from sklearn.linear_model import LogisticRegression
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -46,7 +47,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     classifier_attrs['multi_class'] = 1 if multi_class == 2 else 0
     if op.__class__.__name__ == 'LinearSVC':
         classifier_attrs['post_transform'] = 'NONE'
-    elif op.__class__.__name__ == 'LogisticRegression':
+    elif isinstance(op, LogisticRegression):
         ovr = (op.multi_class in ["ovr", "warn"] or
                (op.multi_class == 'auto' and (op.classes_.size <= 2 or
                                               op.solver == 'liblinear')))
