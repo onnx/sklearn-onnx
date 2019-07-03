@@ -9,13 +9,17 @@ from onnx import TensorProto
 from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 from ..common._registration import register_converter
+from ..algebra.complex_functions import squareform_pdist, cdist
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
     OnnxTranspose, OnnxDiv, OnnxExp,
-    OnnxConstantOfShape, OnnxShape,
+    OnnxShape,
     OnnxReduceSum, OnnxSqueeze
 )
-from ..algebra.complex_functions import squareform_pdist, cdist
+try:
+    from ..algebra.onnx_ops import OnnxConstantOfShape
+except ImportError:
+    OnnxConstantOfShape = None
 
 
 def convert_kernel_diag(context, kernel, X, output_names=None):
@@ -186,5 +190,6 @@ def convert_gaussian_process_regressor(scope, operator, container):
         o.add_to(scope, container)
 
 
-register_converter('SklearnGaussianProcessRegressor',
-                   convert_gaussian_process_regressor)
+if OnnxConstantOfShape is not None:
+    register_converter('SklearnGaussianProcessRegressor',
+                       convert_gaussian_process_regressor)
