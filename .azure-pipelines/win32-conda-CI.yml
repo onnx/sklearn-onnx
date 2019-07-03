@@ -46,7 +46,8 @@ jobs:
       pip install $(numpy.version)
       pip install $(scipy.version)
       pip install $(onnx.version)
-    displayName: 'Install numpy, scipy, onnx'
+      pip install pandas
+    displayName: 'Install numpy, scipy, onnx, pandas'
 
   - script: |
       pip install scikit-learn$(sklearn.version)
