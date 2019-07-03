@@ -34,8 +34,5 @@ def convert_sklearn_linear_regressor(scope, operator, container):
                        **attrs)
 
 
-register_converter('SklearnElasticNetRegressor',
-                   convert_sklearn_linear_regressor)
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
-register_converter('SklearnRidge', convert_sklearn_linear_regressor)

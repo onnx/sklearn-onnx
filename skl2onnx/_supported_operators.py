@@ -16,13 +16,13 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.svm import LinearSVC
 
 # Linear regressors
-from sklearn.linear_model import ElasticNet
+from sklearn.linear_model import ElasticNet, ElasticNetCV
 from sklearn.linear_model import Lars, LarsCV
 from sklearn.linear_model import Lasso, LassoCV
 from sklearn.linear_model import LassoLars, LassoLarsCV
 from sklearn.linear_model import LassoLarsIC
 from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.linear_model import SGDRegressor
 from sklearn.svm import LinearSVR
 
@@ -134,7 +134,7 @@ def build_sklearn_operator_name_map():
                 GradientBoostingClassifier, GradientBoostingRegressor,
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
-                LinearRegression, Lasso, LassoLars, Ridge,
+                LinearRegression,
                 MLPClassifier, MLPRegressor,
                 MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
@@ -151,10 +151,12 @@ def build_sklearn_operator_name_map():
                 VarianceThreshold
     ] if k is not None}
     res.update({
-        ElasticNet: 'SklearnElasticNetRegressor',
+        ElasticNet: 'SklearnLinearRegressor',
+        ElasticNetCV: 'SklearnLinearRegressor',
         LinearRegression: 'SklearnLinearRegressor',
         Lars: 'SklearnLinearRegressor',
         LarsCV: 'SklearnLinearRegressor',
+        Lasso: 'SklearnLinearRegressor',
         LassoCV: 'SklearnLinearRegressor',
         LassoLars: 'SklearnLinearRegressor',
         LassoLarsCV: 'SklearnLinearRegressor',
@@ -163,6 +165,8 @@ def build_sklearn_operator_name_map():
         LogisticRegressionCV: 'SklearnLinearClassifier',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        Ridge: 'SklearnLinearRegressor',
+        RidgeCV: 'SklearnLinearRegressor',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
     })

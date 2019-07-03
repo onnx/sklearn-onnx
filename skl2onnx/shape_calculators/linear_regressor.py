@@ -10,8 +10,6 @@ from ..common.shape_calculator import calculate_linear_regressor_output_shapes
 
 register_shape_calculator('SklearnAdaBoostRegressor',
                           calculate_linear_regressor_output_shapes)
-register_shape_calculator('SklearnElasticNetRegressor',
-                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnLinearRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnLinearSVR',
@@ -27,6 +25,4 @@ register_shape_calculator('SklearnGradientBoostingRegressor',
 register_shape_calculator('SklearnKNeighborsRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnMLPRegressor',
-                          calculate_linear_regressor_output_shapes)
-register_shape_calculator('SklearnRidge',
                           calculate_linear_regressor_output_shapes)

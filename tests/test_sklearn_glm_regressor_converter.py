@@ -188,6 +188,24 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_elastic_net_cv_regressor(self):
+        model, X = _fit_model(linear_model.ElasticNetCV())
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn elastic-net regression",
+            [("input", FloatTensorType(X.shape))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnElasticNetCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     def test_model_elastic_net_regressor_int(self):
         model, X = _fit_model(linear_model.ElasticNet(), is_int=True)
         model_onnx = convert_sklearn(model, "elastic net regression",
