@@ -80,7 +80,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressor-OneOffArray",
+            basename="SklearnAdaBoostRegressor-OneOffArray-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.2.1') or "
