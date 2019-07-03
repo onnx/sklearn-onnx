@@ -14,6 +14,7 @@ jobs:
   strategy:
     matrix:
       Py37-Onnx150-Rt040-Npy1162:
+        do.bench:'1'
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
         numpy.version: 'numpy==1.16.2'
@@ -21,6 +22,7 @@ jobs:
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.21.2'
       Py36-Onnx130-Rt021-Npy1162:
+        do.bench:'0'
         python.version: '3.6.7'
         onnx.version: 'onnx==1.3.0'
         numpy.version: 'numpy==1.16.3'
@@ -77,17 +79,6 @@ jobs:
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
-
-  - script: |
-      pip install onnxmltools openpyxl
-      coverage run --include=skl2onnx/** tests/benchmark.py
-      coverage report -m
-      coverage html
-    displayName: 'coverage'
-
-  - script: |
-      python tests/benchmark.py
-    displayName: 'benchmark'
 
   - task: PublishTestResults@2
     inputs:
