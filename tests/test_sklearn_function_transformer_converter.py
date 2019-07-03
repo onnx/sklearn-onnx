@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     ColumnTransformer = None
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
