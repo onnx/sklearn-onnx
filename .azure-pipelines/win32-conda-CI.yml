@@ -30,12 +30,21 @@ jobs:
     maxParallel: 3
 
   steps:
-  - task: CondaEnvironment@1
-    inputs:
-      createCustomEnvironment: true
-      environmentName: skl2onnxenv
-      updateConda: true
-      packageSpecs: 'python=$(python.version)'
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
+
+  - script: conda create --yes --quiet --name skl2onnxEnvironment
+    displayName: Create Anaconda environment
+
+  - script: |
+      call activate skl2onnxEnvironment
+      conda install --yes --quiet --name skl2onnxEnvironment python=$(python.version)
+    displayName: Install Anaconda packages
+  - script: |
+      call activate myEnvironment
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: pytest
 
   - script: |
       conda install -y -c conda-forge protobuf
