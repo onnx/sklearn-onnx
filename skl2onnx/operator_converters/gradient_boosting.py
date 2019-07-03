@@ -96,17 +96,22 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
 
-    # constant_ was introduced in scikit-learn 0.21.
-    if hasattr(op.init_, 'constant_'):
-        cst = [float(x) for x in op.init_.constant_]
-    elif op.loss == 'ls':
-        cst = [op.init_.mean]
+    if op.init == 'zero':
+        cst = np.zeros((operator.inputs[0].type.shape[0], op.loss_.K))
     else:
-        cst = [op.init_.quantile]
+        # constant_ was introduced in scikit-learn 0.21.
+        if hasattr(op.init_, 'constant_'):
+            cst = [float(x) for x in op.init_.constant_]
+        elif op.loss == 'ls':
+            cst = [op.init_.mean]
+        else:
+            cst = [op.init_.quantile]
     attrs['base_values'] = [float(x) for x in cst]
 
     tree_weight = op.learning_rate
-    for i in range(op.n_estimators):
+    n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
+             op.n_estimators)
+    for i in range(n_est):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,

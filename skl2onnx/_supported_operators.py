@@ -74,7 +74,7 @@ from sklearn.feature_selection import VarianceThreshold
 try:
     # 0.20
     from sklearn.impute import SimpleImputer
-except ModuleNotFoundError:
+except ImportError:
     # 0.19
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.preprocessing import Binarizer

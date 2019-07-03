@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     ColumnTransformer = None
 
 from skl2onnx import convert_sklearn

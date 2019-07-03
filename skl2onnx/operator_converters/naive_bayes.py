@@ -8,6 +8,7 @@ import numpy as np
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_add, apply_cast, apply_exp
 from ..common._apply_operation import apply_log, apply_sub, apply_reshape
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 
 
@@ -207,11 +208,19 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     else:
         sum_op_version = 8
 
+    input_name = operator.inputs[0].full_name
+    if type(operator.inputs[0].type) == Int64TensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.input_full_names, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
+
     if operator.type == 'SklearnMultinomialNB':
         matmul_result_name = scope.get_unique_variable_name('matmul_result')
 
         container.add_node(
-            'MatMul', [operator.inputs[0].full_name, feature_log_prob_name],
+            'MatMul', [input_name, feature_log_prob_name],
             matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
         apply_add(scope, [matmul_result_name, class_log_prior_name],
                   sum_result_name, container, broadcast=1)
@@ -229,7 +238,6 @@ def convert_sklearn_naive_bayes(scope, operator, container):
 
         container.add_initializer(constant_name, onnx_proto.TensorProto.FLOAT,
                                   [], [1.0])
-        input_name = operator.inputs[0].full_name
 
         if nb.binarize is not None:
             threshold_name = scope.get_unique_variable_name('threshold')
@@ -250,7 +258,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                 np.zeros((M, num_features)).ravel())
 
             container.add_node(
-                'Greater', [operator.inputs[0].full_name, threshold_name],
+                'Greater', [input_name, threshold_name],
                 condition_name, name=scope.get_unique_operator_name('Greater'),
                 op_version=9)
             apply_cast(scope, condition_name, cast_values_name, container,

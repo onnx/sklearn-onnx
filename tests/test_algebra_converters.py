@@ -77,6 +77,12 @@ class TestAlgebraConverters(unittest.TestCase):
         model_onnx = onnxPred.to_onnx(inputs)
         s2 = str(model_onnx)
         assert s1 == s2
+        nin = list(onnxExpM1.enumerate_initial_types())
+        nno = list(onnxExpM1.enumerate_nodes())
+        nva = list(onnxExpM1.enumerate_variables())
+        self.assertEqual(len(nin), 0)
+        self.assertEqual(len(nno), 3)
+        self.assertEqual(len(nva), 0)
 
 
 if __name__ == "__main__":
