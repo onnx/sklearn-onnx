@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform, cdist as scipy_cdist
 import onnx
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
@@ -25,6 +25,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
             'sum_in', onnx.TensorProto.FLOAT, [2])
@@ -86,6 +88,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -114,6 +118,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -149,6 +155,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         cop = OnnxAdd('input', 'input')
@@ -169,6 +177,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -193,6 +203,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
