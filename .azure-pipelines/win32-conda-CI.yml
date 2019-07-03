@@ -40,11 +40,6 @@ jobs:
       call activate skl2onnxEnvironment
       conda install --yes --quiet --name skl2onnxEnvironment python=$(python.version)
     displayName: Install Anaconda packages
-  - script: |
-      call activate myEnvironment
-      pip install pytest pytest-azurepipelines
-      pytest
-    displayName: pytest
 
   - script: |
       conda install -y -c conda-forge protobuf
