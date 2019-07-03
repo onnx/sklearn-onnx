@@ -65,6 +65,10 @@ jobs:
 
   - script: |
       pip install -r requirements.txt
+      git clone https://github.com/microsoft/onnxconverter-common
+      cd onnxconverter-common
+      pip install -e .
+      cd ..
       pip install pytest
     displayName: 'install requirements'
 
