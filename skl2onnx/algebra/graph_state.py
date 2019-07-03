@@ -70,6 +70,13 @@ class GraphState:
                 self.operator_name + 'cst')
             if cst.dtype in (np.float32, np.float64):
                 ty = onnx_proto.TensorProto.FLOAT
+                astype = np.float64
+            elif cst.dtype == np.int32:
+                ty = onnx_proto.TensorProto.INT32
+                astype = np.int64
+            elif cst.dtype == np.int64:
+                ty = onnx_proto.TensorProto.INT64
+                astype = np.int64
             else:
                 raise NotImplementedError(
                     "Unable to guess ONNX type from type {}. "
@@ -77,7 +84,7 @@ class GraphState:
                     "sklearn-onnx/issues.".format(
                         cst.dtype))
             self.container.add_initializer(
-                name, ty, shape, cst.astype(np.float64).flatten())
+                name, ty, shape, cst.astype(astype).flatten())
             return name
         elif isinstance(cst, TensorProto):
             name = self.scope.get_unique_variable_name(
