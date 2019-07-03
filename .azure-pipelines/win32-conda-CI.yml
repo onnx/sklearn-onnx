@@ -32,7 +32,9 @@ jobs:
   steps:
   - task: CondaEnvironment@1
     inputs:
-      createCustomEnvironment: false
+      createCustomEnvironment: true
+      environmentName: skl2onnxenv
+      updateConda: true
       packageSpecs: 'python=$(python.version)'
 
   - script: |
