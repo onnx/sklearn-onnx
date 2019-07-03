@@ -150,6 +150,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinSVCLinearPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_svc_multi_linear_pfalse(self):
@@ -207,7 +209,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMclSVCLinearPT-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_svr_linear(self):
@@ -287,6 +289,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinNuSVCPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvc_multi_pfalse(self):
@@ -365,6 +369,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMcSVCPF4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvc_multi_ptrue(self):
@@ -392,6 +398,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMclNuSVCPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvr(self):
