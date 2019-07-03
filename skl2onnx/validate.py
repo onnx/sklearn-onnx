@@ -77,7 +77,7 @@ def sklearn_operators(subfolder=None):
             continue
         try:
             mod = import_module("{0}.{1}".format("sklearn", sub))
-        except ModuleNotFoundError:
+        except ImportError:
             continue
         cls = getattr(mod, "__all__", None)
         if cls is None:
