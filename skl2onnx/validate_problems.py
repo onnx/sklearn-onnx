@@ -4,7 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy
-from sklearn.base import ClusterMixin, BiclusterMixin, OutlierMixin
+from sklearn.base import ClusterMixin, BiclusterMixin
+try:
+    from sklearn.base import OutlierMixin
+except ImportError:
+    OutlierMixin = None
 from sklearn.base import RegressorMixin, ClassifierMixin
 from sklearn.datasets import load_iris
 from sklearn.feature_selection import RFE, RFECV
@@ -210,7 +214,7 @@ def find_suitable_problem(model):
             model, (ClusterMixin, BiclusterMixin)):
         res.extend(['cluster'])
 
-    if issubclass(model, (OutlierMixin)):
+    if OutlierMixin is not None and issubclass(model, (OutlierMixin)):
         res.extend(['outlier'])
 
     if issubclass(model, ClassifierMixin):
