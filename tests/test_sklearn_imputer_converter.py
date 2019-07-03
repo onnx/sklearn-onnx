@@ -10,7 +10,7 @@ except ImportError:
 
 try:
     from sklearn.impute import SimpleImputer
-except ModuleNotFoundError:
+except ImportError:
     # changed in 0.20
     SimpleImputer = None
 from skl2onnx import convert_sklearn

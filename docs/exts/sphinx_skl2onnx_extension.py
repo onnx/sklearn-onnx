@@ -183,6 +183,39 @@ class SupportedSklearnOpsDirective(Directive):
             main += node
 
         return [main]
+
+
+def missing_ops():
+    """
+    Builds the list of supported and not supported models.
+    """
+    from sklearn import __all__
+    from sklearn.base import BaseEstimator
+    found = []
+    for sub in __all__:
+        try:
+            mod = import_module("{0}.{1}".format("sklearn", sub))
+        except ImportError:
+            continue
+        cls = getattr(mod, "__all__", None)
+        if cls is None:
+            cls = list(mod.__dict__)
+        cls = [mod.__dict__[cl] for cl in cls]
+        for cl in cls:
+            try:
+                issub = issubclass(cl, BaseEstimator)
+            except TypeError:
+                continue
+            if cl.__name__ in {'Pipeline', 'ColumnTransformer',
+                               'FeatureUnion', 'BaseEstimator'}:
+                continue
+            if (sub in {'calibration', 'dummy', 'manifold'} and
+                'Calibrated' not in cl.__name__):
+                continue
+            if issub:
+                found.append((cl.__name__, sub, cl))
+    found.sort()
+    return found
     
 
 class AllSklearnOpsDirective(Directive):
