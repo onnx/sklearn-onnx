@@ -20,10 +20,8 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
                            "GaussianProcessRegressor.")
 
     variable = operator.inputs[0]
-    if len(variable.type.shape) != 2:
-        raise RuntimeError('Only 2-D tensor(s) can be input(s).')
 
-    N = variable.type.shape[0]
+    N = variable.type.shape[0] if len(variable.type.shape) > 0 else 1
     op = operator.raw_operator
 
     # Output 1 is mean

@@ -6,7 +6,7 @@
 
 import unittest
 from io import StringIO
-from distutils.version import StrictVersion
+# from distutils.version import StrictVersion
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
@@ -19,7 +19,8 @@ from sklearn.gaussian_process.kernels import Sum  # , Product
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx
 from skl2onnx.operator_converters.gaussian_process import convert_kernel
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import InferenceSession
+# from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model
 
 
@@ -103,9 +104,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         else:
             assert_almost_equal(exp, got)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
+    # @unittest.skipIf(
+    #     StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    #     reason="onnxruntime 0.4.0")
     def test_kernel_rbf1(self):
         ker = RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
@@ -117,9 +118,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_rbf10(self):
         ker = RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
@@ -131,9 +129,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_rbf2(self):
         ker = RBF(length_scale=1, length_scale_bounds="fixed")
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
@@ -145,9 +140,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_rbf_mul(self):
         ker = (C(1.0, constant_value_bounds="fixed") *
                RBF(1.0, length_scale_bounds="fixed"))
@@ -160,9 +152,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_ker1_def(self):
         ker = (C(1.0, (1e-3, 1e3)) *
                RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
@@ -175,9 +164,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_ker12_def(self):
         ker = (Sum(C(0.1, (1e-3, 1e3)), C(0.1, (1e-3, 1e3)) *
                RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
@@ -190,9 +176,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_kernel_ker2_def(self):
         ker = Sum(
             C(0.1, (1e-3, 1e3)) * RBF(length_scale=10,
@@ -209,9 +192,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_gpr_rbf_unfitted(self):
 
         se = (C(1.0, (1e-3, 1e3)) *
@@ -225,7 +205,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         # return_cov=False, return_std=False
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['None', 'None']))])
+            gp, initial_types=[('X', FloatTensorType([]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
@@ -262,9 +242,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
-    @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
-        reason="onnxruntime 0.4.0 has bug about memory management")
     def test_gpr_rbf_fitted(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,

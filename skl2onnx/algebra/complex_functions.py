@@ -47,8 +47,8 @@ def _squareform_pdist_sqeuclidean(X, **kwargs):
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', FloatTensorType()),
                      ('next', FloatTensorType())]),
-        outputs=[('next_out', FloatTensorType(['None', 'None'])),
-                 ('scan_out', FloatTensorType(['None']))],
+        outputs=[('next_out', FloatTensorType([])),
+                 ('scan_out', FloatTensorType([]))],
         other_outputs=[flat])
 
     node = OnnxScan(X, X, output_names=['scan0_{idself}', 'scan1_{idself}'],
@@ -69,8 +69,8 @@ def _cdist_sqeuclidean(X, Y, **kwargs):
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', FloatTensorType()),
                      ('next', FloatTensorType())]),
-        outputs=[('next_out', FloatTensorType(['None', 'None'])),
-                 ('scan_out', FloatTensorType(['None']))],
+        outputs=[('next_out', FloatTensorType([])),
+                 ('scan_out', FloatTensorType([]))],
         other_outputs=[flat])
 
     node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
