@@ -21,7 +21,7 @@ from skl2onnx.algebra.complex_functions import (
 )
 
 
-threshold = "0.3.0"
+threshold = "0.4.0"
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
