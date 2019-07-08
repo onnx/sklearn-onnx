@@ -21,11 +21,14 @@ from skl2onnx.algebra.complex_functions import (
 )
 
 
+threshold = "0.4.0"
+
+
 class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
@@ -88,7 +91,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
@@ -118,7 +121,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -155,7 +158,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -163,7 +166,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         cop2 = OnnxIdentity(squareform_pdist(cop), output_names=['pdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType())],
+            inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('pdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
@@ -177,7 +180,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -203,7 +206,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -213,7 +216,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         cop2 = OnnxIdentity(cdist(cop, x2), output_names=['cdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType())],
+            inputs=[('input', FloatTensorType([3, 2]))],
             outputs=[('cdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
