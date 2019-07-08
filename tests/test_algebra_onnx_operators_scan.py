@@ -21,7 +21,7 @@ from skl2onnx.algebra.complex_functions import (
 )
 
 
-threshold = "0.4.0"
+threshold = "0.3.0"
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
@@ -166,7 +166,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         cop2 = OnnxIdentity(squareform_pdist(cop), output_names=['pdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType([None, None]))],
+            inputs=[('input', FloatTensorType(["", ""]))],
             outputs=[('pdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
