@@ -34,6 +34,9 @@ def cdist(X, Y, metric='sqeuclidean', **kwargs):
     """
     if metric == 'sqeuclidean':
         return _cdist_sqeuclidean(X, Y, **kwargs)
+    elif metric == 'euclidean':
+        res = _cdist_sqeuclidean(X, Y)
+        return OnnxSqrt(res, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))

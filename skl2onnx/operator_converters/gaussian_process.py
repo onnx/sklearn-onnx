@@ -17,7 +17,8 @@ from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
-    OnnxReduceSum, OnnxSqueeze
+    OnnxReduceSum, OnnxSqueeze,
+    OnnxIdentity
 )
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
@@ -56,6 +57,40 @@ def convert_kernel_diag(context, kernel, X, output_names=None):
                        output_names=output_names)
     raise RuntimeError("Unable to convert diag method for "
                        "class {}.".format(type(kernel)))
+
+
+def py_make_float_array(cst):
+    return np.array([cst], dtype=np.float32)
+
+
+def _convert_exp_sine_squared_none(X, length_scale=1.2, periodicity=1.1,
+                                   pi=3.141592653589793, **kwargs):
+    dists = squareform_pdist(X, metric="euclidean")
+    t_pi = py_make_float_array(pi)
+    t_periodicity = py_make_float_array(periodicity)
+    arg = OnnxMul(OnnxDiv(dists, t_periodicity), t_pi)
+    sin_of_arg = OnnxSin(arg)
+    t_2 = py_make_float_array(2)
+    t__2 = py_make_float_array(-2)
+    t_length_scale = py_make_float_array(length_scale)
+    K = OnnxExp(OnnxMul(OnnxPow(OnnxDiv(sin_of_arg, t_length_scale),
+                                t_2), t__2))
+    return OnnxIdentity(K, **kwargs)
+
+
+def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
+                              pi=3.141592653589793, **kwargs):
+    dists = cdist(X, Y, metric="euclidean")
+    t_pi = py_make_float_array(pi)
+    t_periodicity = py_make_float_array(periodicity)
+    arg = OnnxMul(OnnxDiv(dists, t_periodicity), t_pi)
+    sin_of_arg = OnnxSin(arg)
+    t_2 = py_make_float_array(2)
+    t__2 = py_make_float_array(-2)
+    t_length_scale = py_make_float_array(length_scale)
+    K = OnnxExp(OnnxMul(OnnxPow(OnnxDiv(sin_of_arg, t_length_scale),
+                                t_2), t__2))
+    return OnnxIdentity(K, **kwargs)
 
 
 def convert_kernel(context, kernel, X, output_names=None,
@@ -138,69 +173,16 @@ def convert_kernel(context, kernel, X, output_names=None,
                 "length_scale should be float not {}.".format(
                     type(kernel.length_scale)))
 
-        # length_scale = np.squeeze(length_scale).astype(float)
-        if 'zeroh' in context:
-            zeroh = context['zeroh']
-        else:
-            zeroh = _zero_vector_of_size(X, axis=1)
-            context['zeroh'] = zeroh
-
-        if 'zerov' in context:
-            zerov = context['zerov']
-        else:
-            zerov = _zero_vector_of_size(X, axis=0)
-            context['zerov'] = zeroh
-
-        tensor_value = make_tensor(
-            "value", TensorProto.FLOAT, (1,), [kernel.length_scale])
-        const = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zeroh),
-                                                value=tensor_value),
-                            axes=[0])
-        X_scaled = OnnxDiv(X, const)
         if x_train is None:
-            dist = squareform_pdist(X_scaled, metric='sqeuclidean')
+            return _convert_exp_sine_squared_none(
+                X, length_scale=kernel.length_scale,
+                periodicity=kernel.periodicity,
+                output_names=output_names)
         else:
-            x_train_scaled = OnnxDiv(x_train, const)
-            dist = cdist(X_scaled, x_train_scaled, metric='sqeuclidean')
-
-        tensor_value = make_tensor("value", TensorProto.FLOAT, (1,),
-                                   [np.pi / kernel.periodicity])
-        piper = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
-                                                value=tensor_value),
-                            axes=[1])
-
-        # arg = np.pi * dists / self.periodicity
-        # sin_of_arg = np.sin(arg)
-        sinm = OnnxSin(OnnxMul(dist, piper))
-
-        tensor_value = make_tensor("value", TensorProto.FLOAT, (1,),
-                                   [1. / kernel.length_scale])
-        scale = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
-                                                value=tensor_value),
-                            axes=[1])
-
-        if 'cst2' in context:
-            cst2 = context['cst2']
-        else:
-            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [2.])
-            cst2 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
-                                                   value=tensor_value),
-                               axes=[1])
-        if 'cst_2' in context:
-            cst_2 = context['cst_2']
-        else:
-            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [-2.])
-            cst_2 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
-                                                    value=tensor_value),
-                                axes=[1])
-        scaled = OnnxMul(OnnxPow(OnnxMul(sinm, scale), cst2), cst_2)
-
-        exp = OnnxExp(scaled, output_names=output_names)
-
-        # This should not be needed.
-        # K = squareform(K)
-        # np.fill_diagonal(K, 1)
-        return exp
+            return _convert_exp_sine_squared(
+                X, x_train, length_scale=kernel.length_scale,
+                periodicity=kernel.periodicity,
+                output_names=output_names)
 
     if isinstance(kernel, DotProduct):
         if isinstance(kernel.sigma_0, (int, float)):
