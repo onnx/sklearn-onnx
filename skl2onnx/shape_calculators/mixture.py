@@ -15,7 +15,8 @@ from ..common.utils import (
 def calculate_gaussian_mixture_output_shapes(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=2)
-    check_input_and_output_types(operator, good_input_types=[FloatTensorType])
+    check_input_and_output_types(
+        operator, good_input_types=[FloatTensorType, Int64TensorType])
 
     if len(operator.inputs[0].type.shape) != 2:
         raise RuntimeError('Input must be a [N, C]-tensor')
