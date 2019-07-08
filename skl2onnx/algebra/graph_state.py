@@ -108,6 +108,12 @@ class GraphState:
             ty = AttributeProto.INT
             self.container.add_initializer(name, ty, None, cst)
             return name
+        elif isinstance(cst, np.float32):
+            name = self.scope.get_unique_variable_name(
+                self.operator_name + 'cst')
+            ty = AttributeProto.FLOAT
+            self.container.add_initializer(name, ty, None, float(cst))
+            return name
         else:
             raise NotImplementedError(
                 "Unable to add a constant of type {}. "

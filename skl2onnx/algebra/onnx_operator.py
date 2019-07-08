@@ -144,10 +144,15 @@ class OnnxOperator:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.int64, np.float32, np.bool)):
                     self.inputs.append(inp)
+                elif isinstance(inp, (np.float32, float)):
+                    self.inputs.append(np.float32(inp))
+                elif isinstance(inp, (int, )):
+                    self.inputs.append(np.int64(inp))
                 else:
                     raise TypeError("Unable to interpret the "
-                                    "input name for type {}.".format(
-                                        type(inp)))
+                                    "input name for type {} in "
+                                    "operator '{}'.".format(
+                                        type(inp), self.__class__.__name__))
 
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or

@@ -6,14 +6,17 @@
 import numpy as np
 from onnx.helper import make_tensor
 from onnx import TensorProto
-from sklearn.gaussian_process.kernels import Sum, Product, ConstantKernel
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from sklearn.gaussian_process.kernels import (
+    Sum, Product, ConstantKernel,
+    RBF, ConstantKernel as C, DotProduct,
+    ExpSineSquared
+)
 from ..common._registration import register_converter
-from ..algebra.complex_functions import squareform_pdist, cdist
+from ..algebra.complex_functions import squareform_pdist, cdist, inner
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
     OnnxTranspose, OnnxDiv, OnnxExp,
-    OnnxShape,
+    OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSum, OnnxSqueeze
 )
 try:
@@ -128,6 +131,94 @@ def convert_kernel(context, kernel, X, output_names=None,
         # K = squareform(K)
         # np.fill_diagonal(K, 1)
         return exp
+
+    if isinstance(kernel, ExpSineSquared):
+        if not isinstance(kernel.length_scale, (float, int)):
+            raise NotImplementedError(
+                "length_scale should be float not {}.".format(
+                    type(kernel.length_scale)))
+
+        # length_scale = np.squeeze(length_scale).astype(float)
+        if 'zeroh' in context:
+            zeroh = context['zeroh']
+        else:
+            zeroh = _zero_vector_of_size(X, axis=1)
+            context['zeroh'] = zeroh
+
+        if 'zerov' in context:
+            zerov = context['zerov']
+        else:
+            zerov = _zero_vector_of_size(X, axis=0)
+            context['zerov'] = zeroh
+
+        tensor_value = make_tensor(
+            "value", TensorProto.FLOAT, (1,), [kernel.length_scale])
+        const = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zeroh),
+                                                value=tensor_value),
+                            axes=[0])
+        X_scaled = OnnxDiv(X, const)
+        if x_train is None:
+            dist = squareform_pdist(X_scaled, metric='sqeuclidean')
+        else:
+            x_train_scaled = OnnxDiv(x_train, const)
+            dist = cdist(X_scaled, x_train_scaled, metric='sqeuclidean')
+
+        tensor_value = make_tensor("value", TensorProto.FLOAT, (1,),
+                                   [np.pi / kernel.periodicity])
+        piper = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
+                                                value=tensor_value),
+                            axes=[1])
+
+        # arg = np.pi * dists / self.periodicity
+        # sin_of_arg = np.sin(arg)
+        sinm = OnnxSin(OnnxMul(dist, piper))
+
+        tensor_value = make_tensor("value", TensorProto.FLOAT, (1,),
+                                   [1. / kernel.length_scale])
+        scale = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
+                                                value=tensor_value),
+                            axes=[1])
+
+        if 'cst2' in context:
+            cst2 = context['cst2']
+        else:
+            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [2.])
+            cst2 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
+                                                   value=tensor_value),
+                               axes=[1])
+        if 'cst_2' in context:
+            cst_2 = context['cst_2']
+        else:
+            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [-2.])
+            cst_2 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
+                                                    value=tensor_value),
+                                axes=[1])
+        scaled = OnnxMul(OnnxPow(OnnxMul(sinm, scale), cst2), cst_2)
+
+        exp = OnnxExp(scaled, output_names=output_names)
+
+        # This should not be needed.
+        # K = squareform(K)
+        # np.fill_diagonal(K, 1)
+        return exp
+
+    if isinstance(kernel, DotProduct):
+        if isinstance(kernel.sigma_0, (int, float)):
+            if x_train is None:
+                dot = inner(X, X)
+                tensor_value = make_tensor(
+                    "value", TensorProto.FLOAT, (1,), [kernel.sigma_0 ** 2])
+                cst = OnnxConstantOfShape(OnnxShape(X), value=tensor_value)
+                add = OnnxAdd(dot, cst)
+            else:
+                dot = inner(X, x_train)
+                add = OnnxAdd(dot, np.full((1, x_train.shape[1]),
+                                           kernel.sigma_0 ** 2,
+                                           dtype=np.float32))
+        else:
+            raise NotImplementedError("Not implemented yet for type {}"
+                                      "".format(type(kernel.sigma_0)))
+        return add
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))

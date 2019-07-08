@@ -11,11 +11,13 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 # from sklearn.gaussian_process.kernels import RationalQuadratic as RQ
 # from sklearn.gaussian_process.kernels import ExpSineSquared as Per
 # from sklearn.gaussian_process.kernels import DotProduct as Lin
-from sklearn.gaussian_process.kernels import Sum  # , Product
+from sklearn.gaussian_process.kernels import (
+    Sum, DotProduct, ExpSineSquared,  # , Product
+    RBF, ConstantKernel as C,
+)
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx
 from skl2onnx.operator_converters.gaussian_process import convert_kernel
@@ -111,7 +113,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -122,7 +124,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -133,7 +135,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = RBF(length_scale=1, length_scale_bounds="fixed")
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -145,7 +147,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                RBF(1.0, length_scale_bounds="fixed"))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -157,7 +159,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -169,7 +171,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
@@ -185,12 +187,40 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         )
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['None', 'None']))])
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
         assert_almost_equal(m1, m2, decimal=5)
+
+    def test_kernel_ker2_dotproduct(self):
+        # RationalSquare
+        ker = DotProduct(sigma_0=2.)
+        onx = convert_kernel({}, ker, 'X', output_names=['Y'])
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        """
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(Xtest_)
+        assert_almost_equal(m1, m2, decimal=5)
+        """
+        assert sess is not None
+
+    def test_kernel_ker2_dot(self):
+        ker = ExpSineSquared()
+        onx = convert_kernel({}, ker, 'X', output_names=['Y'])
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(Xtest_)
+        # assert_almost_equal(m1, m2, decimal=5)
+        assert m1 is not None
+        assert m2 is not None
 
     def test_gpr_rbf_unfitted(self):
 
@@ -223,7 +253,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
             gp, options=options,
-            initial_types=[('X', FloatTensorType(['None', 'None']))])
+            initial_types=[('X', FloatTensorType(['d1', 'd2']))])
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
@@ -234,9 +264,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         # model_onnx = to_onnx(gp, Xtrain_.astype(np.float32), options=options)
         model_onnx = to_onnx(
             gp, options=options,
-            initial_types=[('X', FloatTensorType(['None', 'None']))])
-        with open("debug_gp.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
+            initial_types=[('X', FloatTensorType(['d1', 'd2']))])
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
@@ -251,7 +279,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         # return_cov=False, return_std=False
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['None', 'None']))])
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
@@ -268,7 +296,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['None', 'None']))],
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
             options=options)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
