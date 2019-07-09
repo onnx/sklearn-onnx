@@ -12,7 +12,7 @@ from sklearn.gaussian_process.kernels import (
     ExpSineSquared
 )
 from ..common._registration import register_converter
-from ..algebra.complex_functions import squareform_pdist, cdist, inner
+from ..algebra.complex_functions import squareform_pdist, cdist
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd, OnnxSqrt,
     OnnxTranspose, OnnxDiv, OnnxExp,
@@ -90,6 +90,14 @@ def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
     t_length_scale = py_make_float_array(length_scale)
     K = OnnxExp(OnnxMul(OnnxPow(OnnxDiv(sin_of_arg, t_length_scale),
                                 t_2), t__2))
+    return OnnxIdentity(K, **kwargs)
+
+
+def _convert_dot_product(X, Y, sigma_0=2.0, **kwargs):
+    # It only works in two dimensions.
+    t_sigma_0 = py_make_float_array(sigma_0 ** 2)
+    K = OnnxAdd(OnnxMatMul(X, OnnxTranspose(Y, perm=[1, 0])),
+                t_sigma_0)
     return OnnxIdentity(K, **kwargs)
 
 
@@ -185,22 +193,21 @@ def convert_kernel(context, kernel, X, output_names=None,
                 output_names=output_names)
 
     if isinstance(kernel, DotProduct):
-        if isinstance(kernel.sigma_0, (int, float)):
-            if x_train is None:
-                dot = inner(X, X)
-                tensor_value = make_tensor(
-                    "value", TensorProto.FLOAT, (1,), [kernel.sigma_0 ** 2])
-                cst = OnnxConstantOfShape(OnnxShape(X), value=tensor_value)
-                add = OnnxAdd(dot, cst)
-            else:
-                dot = inner(X, x_train)
-                add = OnnxAdd(dot, np.full((1, x_train.shape[1]),
-                                           kernel.sigma_0 ** 2,
-                                           dtype=np.float32))
+        if not isinstance(kernel.sigma_0, (float, int)):
+            raise NotImplementedError(
+                "sigma_0 should be float not {}.".format(
+                    type(kernel.length_scale)))
+
+        if x_train is None:
+            return _convert_dot_product(X, X, sigma_0=kernel.sigma_0,
+                                        output_names=output_names)
         else:
-            raise NotImplementedError("Not implemented yet for type {}"
-                                      "".format(type(kernel.sigma_0)))
-        return add
+            if len(x_train.shape) != 2:
+                raise NotImplementedError(
+                    "Only DotProduct for two dimension train set is "
+                    "implemented.")
+            return _convert_dot_product(X, x_train, sigma_0=kernel.sigma_0,
+                                        output_names=output_names)
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))

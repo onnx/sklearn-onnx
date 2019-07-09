@@ -78,7 +78,7 @@ Ytest_ = pd.read_csv(StringIO("""
 """.strip("\n\r ")), header=None).values
 
 
-threshold = "0.4.0"
+threshold = "0.3.0"
 
 
 class TestSklearnGaussianProcess(unittest.TestCase):
@@ -218,19 +218,23 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(threshold),
         reason="onnxruntime 0.4.0")
     def test_kernel_ker2_dotproduct(self):
-        # RationalSquare
         ker = DotProduct(sigma_0=2.)
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
         model_onnx = onx.to_onnx(
-            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+            inputs=[('X', FloatTensorType())],
+            outputs=[('Y', FloatTensorType())])
         sess = InferenceSession(model_onnx.SerializeToString())
-        """
-        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
-        m1 = res
-        m2 = ker(Xtest_)
+
+        x = np.array([[1, 2], [3, 4], [5, 6]], dtype=np.float32)
+        res = sess.run(None, {'X': x})
+        m1 = res[0]
+        m2 = ker(x)
         assert_almost_equal(m1, m2, decimal=5)
-        """
-        assert sess is not None
+
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})
+        m1 = res[0]
+        m2 = ker(Xtest_)
+        assert_almost_equal(m1, m2, decimal=2)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
