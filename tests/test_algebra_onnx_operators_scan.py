@@ -12,6 +12,11 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxReduceSumSquare,
     OnnxSqueeze, OnnxShape, OnnxConstantOfShape
 )
+try:
+    from skl2onnx.algebra.onnx_ops import OnnxConstantOfShape
+except ImportError:
+    # onnx is too old
+    OnnxConstantOfShape = None
 from onnx import (
     helper, TensorProto,
     __version__ as onnx__version__
@@ -180,7 +185,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf((OnnxConstantOfShape is None or 
+                      StrictVersion(ort_version) <= StrictVersion(threshold)),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
