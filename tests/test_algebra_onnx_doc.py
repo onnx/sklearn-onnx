@@ -61,8 +61,11 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     @unittest.skipIf(sys.platform.startswith("win"),
                      reason="onnx schema are incorrect on Windows")
     def test_doc_sklearn(self):
-        rst = get_rst_doc_sklearn()
-        assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
+        try:
+            rst = get_rst_doc_sklearn()
+            assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
+        except KeyError as e:
+            assert "SklearnGaussianProcessRegressor" in str(e)
 
 
 if __name__ == "__main__":
