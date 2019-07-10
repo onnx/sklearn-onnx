@@ -12,37 +12,37 @@ from .onnx_ops import (
 )
 
 
-def squareform_pdist(X, metric='sqeuclidean', **kwargs):
+def onnx_squareform_pdist(X, metric='sqeuclidean', **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric=metric))``.
     """
     if metric == 'sqeuclidean':
-        return _squareform_pdist_sqeuclidean(X, **kwargs)
+        return _onnx_squareform_pdist_sqeuclidean(X, **kwargs)
     elif metric == 'euclidean':
-        res = _squareform_pdist_sqeuclidean(X)
+        res = _onnx_squareform_pdist_sqeuclidean(X)
         return OnnxSqrt(res, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
 
 
-def cdist(X, Y, metric='sqeuclidean', **kwargs):
+def onnx_cdist(X, Y, metric='sqeuclidean', **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, Y, metric=metric)``.
     """
     if metric == 'sqeuclidean':
-        return _cdist_sqeuclidean(X, Y, **kwargs)
+        return _onnx_cdist_sqeuclidean(X, Y, **kwargs)
     elif metric == 'euclidean':
-        res = _cdist_sqeuclidean(X, Y)
+        res = _onnx_cdist_sqeuclidean(X, Y)
         return OnnxSqrt(res, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
 
 
-def _squareform_pdist_sqeuclidean(X, **kwargs):
+def _onnx_squareform_pdist_sqeuclidean(X, **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric='sqeuclidean'))``.
@@ -64,7 +64,7 @@ def _squareform_pdist_sqeuclidean(X, **kwargs):
     return node[1]
 
 
-def _cdist_sqeuclidean(X, Y, **kwargs):
+def _onnx_cdist_sqeuclidean(X, Y, **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, metric='sqeuclidean')``.
