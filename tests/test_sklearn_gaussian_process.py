@@ -328,6 +328,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         m2 = ker(Xtest_, Xtest_ * 2)
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_kernel_rational_quadratic(self):
         ker = RationalQuadratic()
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
@@ -418,6 +421,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                             verbose=False,
                             basename="SklearnGaussianProcessRBF")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_rbf_fitted_return_std(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
@@ -435,6 +441,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
@@ -453,6 +462,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_rbf_fitted_return_std_dot_product(self):
 
         gp = GaussianProcessRegressor(kernel=DotProduct(),
@@ -471,6 +483,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_rbf_fitted_return_std_rational_quadratic(self):
 
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
