@@ -4,10 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from scipy.linalg import solve_triangular
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxSqrt, OnnxMatMul
+    OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
+    OnnxMul
 )
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
@@ -65,7 +67,30 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             raise NotImplementedError()
         if options['return_std']:
-            raise NotImplementedError()
+            if op._K_inv is None:
+                L_inv = solve_triangular(op.L_.T,
+                                         np.eye(op.L_.shape[0]))
+                _K_inv = L_inv.dot(L_inv.T)
+            else:
+                _K_inv = op._K_inv
+
+            # y_var = self.kernel_.diag(X)
+            y_var = convert_kernel_diag(context, op.kernel_, X)
+
+            # y_var -= np.einsum("ij,ij->i",
+            #       np.dot(K_trans, self._K_inv), K_trans)
+            k_dot = OnnxMatMul(k_trans, _K_inv.astype(np.float32))
+            ys_var = OnnxSub(y_var,
+                             OnnxReduceSum(OnnxMul(k_dot, k_trans), axes=[1]))
+
+            # skips next part
+            # y_var_negative = y_var < 0
+            # if np.any(y_var_negative):
+            #     y_var[y_var_negative] = 0.0
+
+            # var = np.sqrt(y_var)
+            var = OnnxSqrt(ys_var, output_names=out[1:])
+            outputs.append(var)
 
     for o in outputs:
         o.add_to(scope, container)

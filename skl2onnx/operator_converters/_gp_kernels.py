@@ -8,7 +8,8 @@ from onnx.helper import make_tensor
 from onnx import TensorProto
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
-    RBF, DotProduct, ExpSineSquared
+    RBF, DotProduct, ExpSineSquared,
+    RationalQuadratic,
 )
 from ..algebra.complex_functions import onnx_squareform_pdist, onnx_cdist
 from ..algebra.onnx_ops import (
@@ -100,6 +101,22 @@ def _convert_dot_product(X, Y, sigma_0=2.0, **kwargs):
     t_sigma_0 = py_make_float_array(sigma_0 ** 2)
     K = OnnxAdd(OnnxMatMul(X, OnnxTranspose(Y, perm=[1, 0])),
                 t_sigma_0)
+    return OnnxIdentity(K, **kwargs)
+
+
+def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0, **kwargs):
+    """
+    Implements the kernel
+    :math:`k(x_i,x_j)=(1 + d(x_i, x_j)^2 / (2*\\alpha * l^2))^{-\\alpha}`.
+    """
+    dists = onnx_cdist(X, Y, metric="sqeuclidean")
+    cst = length_scale ** 2 * alpha * 2
+    t_cst = py_make_float_array(cst)
+    tmp = OnnxDiv(dists, t_cst)
+    t_one = py_make_float_array(1)
+    base = OnnxAdd(tmp, t_one)
+    t_alpha = py_make_float_array(-alpha)
+    K = OnnxPow(base, t_alpha)
     return OnnxIdentity(K, **kwargs)
 
 
@@ -198,7 +215,7 @@ def convert_kernel(context, kernel, X, output_names=None,
         if not isinstance(kernel.sigma_0, (float, int)):
             raise NotImplementedError(
                 "sigma_0 should be float not {}.".format(
-                    type(kernel.length_scale)))
+                    type(kernel.sigma_0)))
 
         if x_train is None:
             return _convert_dot_product(X, X, sigma_0=kernel.sigma_0,
@@ -210,6 +227,16 @@ def convert_kernel(context, kernel, X, output_names=None,
                     "implemented.")
             return _convert_dot_product(X, x_train, sigma_0=kernel.sigma_0,
                                         output_names=output_names)
+
+    if isinstance(kernel, RationalQuadratic):
+        if x_train is None:
+            return _convert_rational_quadratic(
+                X, X, length_scale=kernel.length_scale,
+                alpha=kernel.alpha, output_names=output_names)
+        else:
+            return _convert_rational_quadratic(
+                X, x_train, length_scale=kernel.length_scale,
+                alpha=kernel.alpha, output_names=output_names)
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
