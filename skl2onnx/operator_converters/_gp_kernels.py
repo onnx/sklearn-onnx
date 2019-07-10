@@ -17,7 +17,7 @@ from ..algebra.onnx_ops import (
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSum, OnnxSqueeze,
-    OnnxIdentity
+    OnnxIdentity, OnnxReduceSumSquare
 )
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
@@ -30,10 +30,12 @@ def convert_kernel_diag(context, kernel, X, output_names=None):
         return OnnxAdd(convert_kernel_diag(context, kernel.k1, X),
                        convert_kernel_diag(context, kernel.k2, X),
                        output_names=output_names)
+
     if isinstance(kernel, Product):
         return OnnxMul(convert_kernel_diag(context, kernel.k1, X),
                        convert_kernel_diag(context, kernel.k2, X),
                        output_names=output_names)
+
     if isinstance(kernel, ConstantKernel):
         if 'zerov' in context:
             onnx_zeros = context['zerov']
@@ -44,16 +46,29 @@ def convert_kernel_diag(context, kernel, X, output_names=None):
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
                        output_names=output_names)
-    if isinstance(kernel, RBF):
+
+    if isinstance(kernel, (RBF, ExpSineSquared, RationalQuadratic)):
         if 'zerov' in context:
             onnx_zeros = context['zerov']
         else:
             onnx_zeros = _zero_vector_of_size(X)
             context['zerov'] = onnx_zeros
-        return OnnxAdd(onnx_zeros,
-                       np.array([1],
-                                dtype=np.float32),
-                       output_names=output_names)
+        if isinstance(kernel, RBF):
+            return OnnxAdd(onnx_zeros,
+                           np.array([1],
+                                    dtype=np.float32),
+                           output_names=output_names)
+        else:
+            return OnnxSqueeze(
+                OnnxAdd(onnx_zeros, np.array([1], dtype=np.float32)),
+                axes=[1], output_names=output_names)
+
+    if isinstance(kernel, DotProduct):
+        t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2)
+        return OnnxSqueeze(
+            OnnxAdd(OnnxReduceSumSquare(X, axes=[1]), t_sigma_0),
+            output_names=output_names, axes=[1])
+
     raise RuntimeError("Unable to convert diag method for "
                        "class {}.".format(type(kernel)))
 

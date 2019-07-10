@@ -75,7 +75,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
                 _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
-            y_var = convert_kernel_diag(context, op.kernel_, X)
+            y_var = convert_kernel_diag(context, kernel, X)
 
             # y_var -= np.einsum("ij,ij->i",
             #       np.dot(K_trans, self._K_inv), K_trans)

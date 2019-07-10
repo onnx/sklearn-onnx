@@ -17,7 +17,9 @@ from sklearn.gaussian_process.kernels import (
 )
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx
-from skl2onnx.operator_converters.gaussian_process import convert_kernel
+from skl2onnx.operator_converters.gaussian_process import (
+    convert_kernel, convert_kernel_diag
+)
 from onnxruntime import InferenceSession
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model
@@ -98,7 +100,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                 raise AssertionError("Mismatched number of outputs.")
             for i, (e, g) in enumerate(zip(exp, got)):
                 try:
-                    assert_almost_equal(np.squeeze(e), np.squeeze(g),
+                    assert_almost_equal(self.remove_dim1(e),
+                                        self.remove_dim1(g),
                                         decimal=5)
                 except AssertionError as e:  # noqa
                     raise AssertionError(
@@ -262,6 +265,48 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
         reason="onnxruntime %s" % threshold)
+    def test_kernel_exp_sine_squared_diag(self):
+        ker = ExpSineSquared()
+        onx = convert_kernel_diag({}, ker, 'X', output_names=['Y'])
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker.diag(Xtest_)
+        assert_almost_equal(m1, m2, decimal=4)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_kernel_rational_quadratic_diag(self):
+        ker = RationalQuadratic()
+        onx = convert_kernel_diag({}, ker, 'X', output_names=['Y'])
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker.diag(Xtest_)
+        assert_almost_equal(m1, m2, decimal=4)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_kernel_dot_preduct_diag(self):
+        ker = DotProduct()
+        onx = convert_kernel_diag({}, ker, 'X', output_names=['Y'])
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType(['d1', 'd2']))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker.diag(Xtest_)
+        assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_kernel_dot_product(self):
         ker = DotProduct()
         onx = convert_kernel({}, ker, 'X', output_names=['Y'])
@@ -376,6 +421,60 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
+            options=options)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+                           predict_attributes=options[
+                             GaussianProcessRegressor])
+
+    def test_gpr_rbf_fitted_return_std_exp_sine_squared(self):
+
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
+                                      alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
+            options=options)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+                           predict_attributes=options[
+                             GaussianProcessRegressor])
+
+    def test_gpr_rbf_fitted_return_std_dot_product(self):
+
+        gp = GaussianProcessRegressor(kernel=DotProduct(),
+                                      alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
+            options=options)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+                           predict_attributes=options[
+                             GaussianProcessRegressor])
+
+    def test_gpr_rbf_fitted_return_std_rational_quadratic(self):
+
+        gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
+                                      alpha=1e-7,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
