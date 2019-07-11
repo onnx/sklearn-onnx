@@ -55,6 +55,26 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_cv_binary_class(self):
+        model, X = self._fit_model_binary_classification(
+            linear_model.LogisticRegressionCV())
+        model_onnx = convert_sklearn(model, "logistic regression cv",
+                                     [("input", FloatTensorType([1, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLogitisticCVRegressionBinary",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_nointercept(self):
         model, X = self._fit_model_binary_classification(
             linear_model.LogisticRegression(fit_intercept=False))
