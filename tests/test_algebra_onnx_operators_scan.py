@@ -222,13 +222,33 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         cop2 = OnnxIdentity(onnx_cdist(cop, x2), output_names=['cdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType([3, 2]))],
+            inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
             outputs=[('cdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=5)
+
+        x = np.array([[6.1, 2.8, 4.7, 1.2],
+                      [5.7, 3.8, 1.7, 0.3],
+                      [7.7, 2.6, 6.9, 2.3],
+                      [6.0, 2.9, 4.5, 1.5],
+                      [6.8, 2.8, 4.8, 1.4],
+                      [5.4, 3.4, 1.5, 0.4],
+                      [5.6, 2.9, 3.6, 1.3],
+                      [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(onnx_cdist(cop, x), output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
+            outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
+        assert_almost_equal(exp, res[0], decimal=4)
 
 
 if __name__ == "__main__":

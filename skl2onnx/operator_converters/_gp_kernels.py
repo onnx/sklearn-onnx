@@ -25,34 +25,26 @@ except ImportError:
     OnnxConstantOfShape = None
 
 
-def convert_kernel_diag(context, kernel, X, output_names=None):
+def convert_kernel_diag(kernel, X, output_names=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel_diag(context, kernel.k1, X),
-                       convert_kernel_diag(context, kernel.k2, X),
+        return OnnxAdd(convert_kernel_diag(kernel.k1, X),
+                       convert_kernel_diag(kernel.k2, X),
                        output_names=output_names)
 
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel_diag(context, kernel.k1, X),
-                       convert_kernel_diag(context, kernel.k2, X),
+        return OnnxMul(convert_kernel_diag(kernel.k1, X),
+                       convert_kernel_diag(kernel.k2, X),
                        output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
-        if 'zerov' in context:
-            onnx_zeros = context['zerov']
-        else:
-            onnx_zeros = _zero_vector_of_size(X)
-            context['zerov'] = onnx_zeros
+        onnx_zeros = _zero_vector_of_size(X)
         return OnnxAdd(onnx_zeros,
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
                        output_names=output_names)
 
     if isinstance(kernel, (RBF, ExpSineSquared, RationalQuadratic)):
-        if 'zerov' in context:
-            onnx_zeros = context['zerov']
-        else:
-            onnx_zeros = _zero_vector_of_size(X)
-            context['zerov'] = onnx_zeros
+        onnx_zeros = _zero_vector_of_size(X)
         if isinstance(kernel, RBF):
             return OnnxAdd(onnx_zeros,
                            np.array([1],
@@ -75,21 +67,6 @@ def convert_kernel_diag(context, kernel, X, output_names=None):
 
 def py_make_float_array(cst):
     return np.array([cst], dtype=np.float32)
-
-
-def _convert_exp_sine_squared_none(X, length_scale=1.2, periodicity=1.1,
-                                   pi=3.141592653589793, **kwargs):
-    dists = onnx_squareform_pdist(X, metric="euclidean")
-    t_pi = py_make_float_array(pi)
-    t_periodicity = py_make_float_array(periodicity)
-    arg = OnnxMul(OnnxDiv(dists, t_periodicity), t_pi)
-    sin_of_arg = OnnxSin(arg)
-    t_2 = py_make_float_array(2)
-    t__2 = py_make_float_array(-2)
-    t_length_scale = py_make_float_array(length_scale)
-    K = OnnxExp(OnnxMul(OnnxPow(OnnxDiv(sin_of_arg, t_length_scale),
-                                t_2), t__2))
-    return OnnxIdentity(K, **kwargs)
 
 
 def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
@@ -135,27 +112,28 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0, **kwargs):
     return OnnxIdentity(K, **kwargs)
 
 
-def convert_kernel(context, kernel, X, output_names=None,
+def convert_kernel(kernel, X, output_names=None,
                    x_train=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel(context, kernel.k1, X, x_train=x_train),
-                       convert_kernel(context, kernel.k2, X, x_train=x_train),
+        return OnnxAdd(convert_kernel(kernel.k1, X, x_train=x_train),
+                       convert_kernel(kernel.k2, X, x_train=x_train),
                        output_names=output_names)
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel(context, kernel.k1, X, x_train=x_train),
-                       convert_kernel(context, kernel.k2, X, x_train=x_train),
+        return OnnxMul(convert_kernel(kernel.k1, X, x_train=x_train),
+                       convert_kernel(kernel.k2, X, x_train=x_train),
                        output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
-        if 'zerov' in context:
-            onnx_zeros = context['zerov']
+        if x_train is None:
+            onnx_zeros_x = _zero_vector_of_size(X)
+            onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros = _zero_vector_of_size(X)
-            context['zerov'] = onnx_zeros
+            onnx_zeros_x = _zero_vector_of_size(X)
+            onnx_zeros_y = _zero_vector_of_size(x_train)
 
-        tr = OnnxTranspose(onnx_zeros, perm=[1, 0])
-        mat = OnnxMatMul(onnx_zeros, tr)
+        tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0])
+        mat = OnnxMatMul(onnx_zeros_x, tr)
         return OnnxAdd(mat,
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
@@ -168,17 +146,8 @@ def convert_kernel(context, kernel, X, output_names=None,
                     type(kernel.length_scale)))
 
         # length_scale = np.squeeze(length_scale).astype(float)
-        if 'zeroh' in context:
-            zeroh = context['zeroh']
-        else:
-            zeroh = _zero_vector_of_size(X, axis=1)
-            context['zeroh'] = zeroh
-
-        if 'zerov' in context:
-            zerov = context['zerov']
-        else:
-            zerov = _zero_vector_of_size(X, axis=0)
-            context['zerov'] = zeroh
+        zeroh = _zero_vector_of_size(X, axis=1)
+        zerov = _zero_vector_of_size(X, axis=0)
 
         tensor_value = make_tensor(
             "value", TensorProto.FLOAT, (1,), [kernel.length_scale])
@@ -192,14 +161,9 @@ def convert_kernel(context, kernel, X, output_names=None,
             x_train_scaled = OnnxDiv(x_train, const)
             dist = onnx_cdist(X_scaled, x_train_scaled, metric='sqeuclidean')
 
-        if 'cst5' in context:
-            cst5 = context['cst5']
-        else:
-            tensor_value = make_tensor("value", TensorProto.FLOAT, (1,), [-.5])
-            cst5 = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zerov),
-                                                   value=tensor_value),
-                               axes=[1])
-            context['cst5'] = cst5
+        tensor_value = make_tensor(
+            "value", TensorProto.FLOAT, (1,), [-0.5])
+        cst5 = OnnxConstantOfShape(OnnxShape(zerov), value=tensor_value)
 
         # K = np.exp(-.5 * dists)
         exp = OnnxExp(OnnxMul(dist, cst5), output_names=output_names)
@@ -215,16 +179,11 @@ def convert_kernel(context, kernel, X, output_names=None,
                 "length_scale should be float not {}.".format(
                     type(kernel.length_scale)))
 
-        if x_train is None:
-            return _convert_exp_sine_squared_none(
-                X, length_scale=kernel.length_scale,
-                periodicity=kernel.periodicity,
-                output_names=output_names)
-        else:
-            return _convert_exp_sine_squared(
-                X, x_train, length_scale=kernel.length_scale,
-                periodicity=kernel.periodicity,
-                output_names=output_names)
+        return _convert_exp_sine_squared(
+            X, Y=X if x_train is None else x_train,
+            length_scale=kernel.length_scale,
+            periodicity=kernel.periodicity,
+            output_names=output_names)
 
     if isinstance(kernel, DotProduct):
         if not isinstance(kernel.sigma_0, (float, int)):

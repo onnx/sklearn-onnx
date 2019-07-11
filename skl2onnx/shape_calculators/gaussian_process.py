@@ -26,8 +26,8 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
 
     # Output 1 is mean
     # Output 2 is cov or std
-    if hasattr(op, 'y_train_'):
-        dim = 1 if len(op.y_train_) == 1 else op.y_train_.shape[1]
+    if hasattr(op, 'y_train_') and op.y_train_ is not None:
+        dim = 1 if len(op.y_train_.shape) == 1 else op.y_train_.shape[1]
     else:
         dim = 1
     operator.outputs[0].type.shape = [N, dim]
