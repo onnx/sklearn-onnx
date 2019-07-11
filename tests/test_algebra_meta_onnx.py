@@ -39,6 +39,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'BitShift',  # opset 11
                     'Cast',  # unsupported type
                     'Compress',  # shape inference fails
+                    'CumSum', # opset 11
                     # Input X must be 4-dimensional. X: {1,1,3}
                     'ConvInteger',
                     'ConvTranspose',
