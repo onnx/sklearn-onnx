@@ -81,7 +81,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
             #       np.dot(K_trans, self._K_inv), K_trans)
             k_dot = OnnxMatMul(k_trans, _K_inv.astype(np.float32))
             ys_var = OnnxSub(y_var,
-                             OnnxReduceSum(OnnxMul(k_dot, k_trans), axes=[1]))
+                             OnnxReduceSum(OnnxMul(k_dot, k_trans),
+                                           axes=[1], keepdims=0))
 
             # y_var_negative = y_var < 0
             # if np.any(y_var_negative):
