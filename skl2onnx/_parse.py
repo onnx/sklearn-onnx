@@ -253,6 +253,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     probability_tensor = _parse_sklearn_simple_model(
             scope, model, inputs, custom_parsers=custom_parsers)
+    if model.__class__ in [NuSVC, SVC] and not model.probability:
+        return probability_tensor
     this_operator = scope.declare_local_operator('SklearnZipMap')
     this_operator.inputs = probability_tensor
     classes = model.classes_
@@ -414,7 +416,7 @@ def build_sklearn_parsers_map():
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
 
     for tmodel in sklearn_classifier_list:
-        if tmodel not in [LinearSVC, SVC, NuSVC]:
+        if tmodel not in [LinearSVC]:
             map_parser[tmodel] = _parse_sklearn_classifier
     return map_parser
 
