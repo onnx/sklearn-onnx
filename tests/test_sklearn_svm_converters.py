@@ -12,6 +12,7 @@ from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.operator_converters.support_vector_machines import (
     convert_sklearn_svm)
 from skl2onnx.shape_calculators.svm import calculate_sklearn_svm_output_shapes
+from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
 
 
@@ -149,6 +150,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinSVCLinearPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_svc_multi_linear_pfalse(self):
@@ -206,7 +209,7 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnMclSVCLinearPT-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_svr_linear(self):
@@ -259,6 +262,9 @@ class TestSklearnSVM(unittest.TestCase):
                           " < StrictVersion('0.5.0')"
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="use of recent Cast operator")
     def test_convert_nusvc_binary_ptrue(self):
         model, X = self._fit_binary_classification(NuSVC(probability=True))
         model_onnx = convert_sklearn(
@@ -283,6 +289,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinNuSVCPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvc_multi_pfalse(self):
@@ -361,6 +369,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMcSVCPF4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvc_multi_ptrue(self):
@@ -388,6 +398,8 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMclNuSVCPT",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')"
         )
 
     def test_convert_nusvr(self):

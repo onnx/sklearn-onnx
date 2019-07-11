@@ -2,8 +2,9 @@
 Tests scikit-imputer converter.
 """
 import unittest
+import numpy as np
 import pandas
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_digits, load_iris
 from sklearn.pipeline import Pipeline
 
 try:
@@ -44,10 +45,10 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 inputs.append((k, t))
             return inputs
 
-        data = load_iris()
+        data = load_digits()
         X = data.data[:, :2]
         y = data.target
-        data = pandas.DataFrame(X, columns=["X1", "X2"])
+        data = pandas.DataFrame(X, columns=["X1", "X2"], dtype=np.int64)
 
         pipe = Pipeline(steps=[
             (
