@@ -4,7 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from scipy.linalg import solve_triangular
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
@@ -24,7 +23,11 @@ from ._gp_kernels import (
 
 
 def convert_gaussian_process_regressor(scope, operator, container):
-
+    """
+    The method *predict* from class *GaussianProcessRegressor*
+    may cache some results if it is called with parameter
+    ``return_std=True`` or ``return_cov=True``.
+    """
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
@@ -39,8 +42,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
     else:
         kernel = op.kernel
 
-    if not hasattr(op, "X_train_"):
-        out0 = _zero_vector_of_size(X, output_names=out[:1])
+    if not hasattr(op, "X_train_") or op.X_train_ is None:
+        out0 = _zero_vector_of_size(X, keepdims=1, output_names=out[:1])
 
         outputs = [out0]
         if options['return_cov']:
@@ -50,7 +53,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             outputs.append(OnnxSqrt(convert_kernel_diag(kernel, X),
                                     output_names=out[1:]))
     else:
-        out0 = _zero_vector_of_size(X)
+        out0 = _zero_vector_of_size(X, keepdims=1)
 
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
@@ -68,11 +71,13 @@ def convert_gaussian_process_regressor(scope, operator, container):
             raise NotImplementedError()
         if options['return_std']:
             if op._K_inv is None:
-                L_inv = solve_triangular(op.L_.T,
-                                         np.eye(op.L_.shape[0]))
-                _K_inv = L_inv.dot(L_inv.T)
-            else:
-                _K_inv = op._K_inv
+                raise RuntimeError(
+                    "The method *predict* must be called once with parameter "
+                    "return_std=True to compute internal variables. "
+                    "They cannot be computed here as the same operation "
+                    "(matrix inversion) produces too many discrepencies "
+                    "if done with single floats than double floats.")
+            _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
             y_var = convert_kernel_diag(kernel, X)

@@ -37,23 +37,22 @@ def convert_kernel_diag(kernel, X, output_names=None):
                        output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
-        onnx_zeros = _zero_vector_of_size(X)
+        onnx_zeros = _zero_vector_of_size(X, keepdims=0)
         return OnnxAdd(onnx_zeros,
                        np.array([kernel.constant_value],
                                 dtype=np.float32),
                        output_names=output_names)
 
     if isinstance(kernel, (RBF, ExpSineSquared, RationalQuadratic)):
-        onnx_zeros = _zero_vector_of_size(X)
+        onnx_zeros = _zero_vector_of_size(X, keepdims=0)
         if isinstance(kernel, RBF):
             return OnnxAdd(onnx_zeros,
                            np.array([1],
                                     dtype=np.float32),
                            output_names=output_names)
         else:
-            return OnnxSqueeze(
-                OnnxAdd(onnx_zeros, np.array([1], dtype=np.float32)),
-                axes=[1], output_names=output_names)
+            return OnnxAdd(onnx_zeros, np.array([1], dtype=np.float32),
+                           output_names=output_names)
 
     if isinstance(kernel, DotProduct):
         t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2)
@@ -126,11 +125,11 @@ def convert_kernel(kernel, X, output_names=None,
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
         if x_train is None:
-            onnx_zeros_x = _zero_vector_of_size(X)
+            onnx_zeros_x = _zero_vector_of_size(X, keepdims=1)
             onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros_x = _zero_vector_of_size(X)
-            onnx_zeros_y = _zero_vector_of_size(x_train)
+            onnx_zeros_x = _zero_vector_of_size(X, keepdims=1)
+            onnx_zeros_y = _zero_vector_of_size(x_train, keepdims=1)
 
         tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0])
         mat = OnnxMatMul(onnx_zeros_x, tr)
@@ -146,14 +145,13 @@ def convert_kernel(kernel, X, output_names=None,
                     type(kernel.length_scale)))
 
         # length_scale = np.squeeze(length_scale).astype(float)
-        zeroh = _zero_vector_of_size(X, axis=1)
-        zerov = _zero_vector_of_size(X, axis=0)
+        zeroh = _zero_vector_of_size(X, axis=1, keepdims=0)
+        zerov = _zero_vector_of_size(X, axis=0, keepdims=1)
 
         tensor_value = make_tensor(
             "value", TensorProto.FLOAT, (1,), [kernel.length_scale])
-        const = OnnxSqueeze(OnnxConstantOfShape(OnnxShape(zeroh),
-                                                value=tensor_value),
-                            axes=[0])
+        const = OnnxConstantOfShape(OnnxShape(zeroh),
+                                    value=tensor_value)
         X_scaled = OnnxDiv(X, const)
         if x_train is None:
             dist = onnx_squareform_pdist(X_scaled, metric='sqeuclidean')
@@ -216,8 +214,10 @@ def convert_kernel(kernel, X, output_names=None,
                        "class {}.".format(type(kernel)))
 
 
-def _zero_vector_of_size(X, output_names=None, axis=0):
+def _zero_vector_of_size(X, output_names=None, axis=0, keepdims=None):
+    if keepdims is None:
+        raise ValueError("Default for keepdims is not allowed.")
     res = OnnxReduceSum(OnnxConstantOfShape(OnnxShape(X)),
-                        axes=[1-axis],
+                        axes=[1-axis], keepdims=keepdims,
                         output_names=output_names)
     return res

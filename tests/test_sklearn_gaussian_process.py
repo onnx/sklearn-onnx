@@ -447,6 +447,13 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
+        try:
+            to_onnx(
+                gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
+                options=options)
+        except RuntimeError as e:
+            assert "The method *predict* must be called" in str(e)
+        gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
             options=options)
@@ -471,6 +478,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
+        gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
             options=options)
