@@ -9,6 +9,7 @@ import numpy as np
 from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
 from sklearn.neighbors import NearestNeighbors
+from sklearn.mixture import GaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.preprocessing import FunctionTransformer
 try:
@@ -110,6 +111,13 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          FloatTensorType())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+    elif type(model) == GaussianMixture:
+        label_variable = scope.declare_local_variable('label',
+                                                      Int64TensorType())
+        prob_variable = scope.declare_local_variable('probabilities',
+                                                     FloatTensorType())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(prob_variable)
     else:
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable('variable', FloatTensorType())

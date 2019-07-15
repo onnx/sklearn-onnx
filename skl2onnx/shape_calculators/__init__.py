@@ -18,6 +18,7 @@ from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import mixture
 from . import nearest_neighbours
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
@@ -43,6 +44,7 @@ __all__ = [
     label_encoder,
     linear_classifier,
     linear_regressor,
+    mixture,
     nearest_neighbours,
     one_hot_encoder,
     one_vs_rest_classifier,
