@@ -18,6 +18,7 @@ from . import feature_selection
 from . import flatten_op
 from . import function_transformer
 from . import gaussian_process
+from . import gaussian_mixture
 from . import gradient_boosting
 from . import imputer_op
 from . import k_bins_discretiser
@@ -55,6 +56,7 @@ __all__ = [
     flatten_op,
     function_transformer,
     gaussian_process,
+    gaussian_mixture,
     gradient_boosting,
     imputer_op,
     k_bins_discretiser,
