@@ -19,7 +19,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    dtype=np.float64, intermediate=False):
+                    dtype=np.float32, intermediate=False):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -140,7 +140,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
 
 def to_onnx(model, X=None, name=None, initial_types=None, options=None,
-            dtype=np.float64):
+            dtype=np.float32):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 

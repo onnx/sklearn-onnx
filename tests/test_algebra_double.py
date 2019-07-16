@@ -20,7 +20,7 @@ class TestAlgebraDouble(unittest.TestCase):
         onnx_fct = OnnxSub(OnnxMatMul('X', coef),
                            numpy.array([intercept], dtype=numpy.float64),
                            output_names=['Y'])
-        onnx_model = onnx_fct.to_onnx({'X': X_test})
+        onnx_model = onnx_fct.to_onnx({'X': X_test}, dtype=numpy.float64)
 
         sess = InferenceSession(onnx_model.SerializeToString())
         ort_pred = sess.run(None, {'X': X_test})[0]

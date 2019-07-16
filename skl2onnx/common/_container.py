@@ -262,6 +262,12 @@ class ModelComponentContainer(ModelContainer):
                         or a float array).
         :return: created tensor
         """
+        if (isinstance(content, np.ndarray) and 
+                onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
+                onnx_type != self.forced_proto_dtype):
+            content = content.astype(self.forced_dtype)
+            onnx_type = self.forced_proto_dtype
+
         if isinstance(content, TensorProto):
             tensor = TensorProto()
             tensor.data_type = content.data_type
@@ -350,11 +356,17 @@ class ModelComponentContainer(ModelContainer):
             type_list = ','.join(list(str(type(s)) for s in outputs))
             raise ValueError('Outputs must be a list of string but get [%s]'
                              % type_list)
+        upd = {}
         for k, v in attrs.items():
             if v is None:
                 raise ValueError('Failed to create ONNX node. Undefined '
                                  'attribute pair (%s, %s) found' % (k, v))
+            if (isinstance(v, np.ndarray) and v.dtype in (np.float32, np.float64)
+                    and v.dtype != self.forced_dtype):
+                upd[k] = v.astype(self.forced_dtype)
 
+        if upd:
+            attrs.update(upd)
         node = make_node(op_type, inputs, outputs, name=name, **attrs)
         node.domain = op_domain
 

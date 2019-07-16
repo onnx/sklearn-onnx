@@ -320,7 +320,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                dtype=None):
+                dtype=np.float32):
         """
         Converts this operator into an ONNX graph.
 

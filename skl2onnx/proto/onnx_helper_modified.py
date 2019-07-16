@@ -26,7 +26,7 @@ def make_node(
         doc_string=None,  # type: Optional[Text]
         domain=None,  # type: Optional[Text]
         **kwargs  # type: Any
-):  # type: (...) -> NodeProto
+        ):  # type: (...) -> NodeProto
     """Construct a NodeProto.
 
     Arguments:
@@ -77,32 +77,27 @@ def make_attribute(
 
     is_iterable = isinstance(value, collections.Iterable)
     bytes_or_false = _to_bytes_or_false(value)
-    # First, singular cases
-    # float
+
     if isinstance(value, np.float32):
         attr.f = value
         attr.type = AttributeProto.FLOAT
-    # First, singular cases
-    # float
     elif isinstance(value, np.float64):
-        attr.d = value
-        attr.type = AttributeProto.DOUBLE
-    # other floats
+        attr.f = value
+        attr.type = AttributeProto.FLOAT
     elif isinstance(value, float):
-        raise RuntimeError("float is not allowed anymore due to ambiguities, "
-                           "use numpy types, key='{}'.".format(key))
-    # integer
+        attr.f = value
+        attr.type = AttributeProto.FLOAT
+        # raise RuntimeError("float is not allowed anymore due to ambiguities, "
+        #                    "use numpy types, key='{}'.".format(key))
     elif isinstance(value, np.int32):
         attr.i = value
         attr.type = AttributeProto.INT
     elif isinstance(value, np.int64):
         attr.i = value
         attr.type = AttributeProto.INT64
-    # other integers
     elif isinstance(value, numbers.Integral):
         attr.i = value
         attr.type = AttributeProto.INT
-    # string
     elif bytes_or_false:
         assert isinstance(bytes_or_false, bytes)
         attr.s = bytes_or_false
@@ -117,29 +112,40 @@ def make_attribute(
     elif is_iterable:
         byte_array = [_to_bytes_or_false(v) for v in value]
         if all(isinstance(v, np.float32) for v in value):
-            return make_attribute(
-                key, doc_string=doc_string,
-                value=make_tensor(
-                    key, TensorProto.FLOAT,
-                    getshape(value), value))
+            attr.floats.extend(value)
+            attr.type = AttributeProto.FLOATS
+            # return make_attribute(
+            #     key, doc_string=doc_string,
+            #     value=make_tensor(
+            #         key, TensorProto.FLOAT,
+            #         getshape(value), value))
         elif all(isinstance(v, np.float64) for v in value):
-            return make_attribute(
-                key, doc_string=doc_string,
-                value=make_tensor(
-                    key, TensorProto.DOUBLE,
-                    getshape(value), value))
+            attr.floats.extend(value)
+            attr.type = AttributeProto.FLOATS
+            # return make_attribute(
+            #    key, doc_string=doc_string,
+            #     value=make_tensor(
+            #         key, TensorProto.DOUBLE,
+            #         getshape(value), value))
+        elif all(isinstance(v, float) for v in value):
+            attr.floats.extend(value)
+            attr.type = AttributeProto.FLOATS
         elif all(isinstance(v, np.int32) for v in value):
-            return make_attribute(
-                key, doc_string=doc_string,
-                value=make_tensor(
-                    key, TensorProto.INT32,
-                    getshape(value), value))
+            attr.ints.extend(int(v) for v in value)
+            attr.type = AttributeProto.INTS
+            # return make_attribute(
+            #     key, doc_string=doc_string,
+            #     value=make_tensor(
+            #         key, TensorProto.INT32,
+            #         getshape(value), value))
         elif all(isinstance(v, np.int64) for v in value):
-            return make_attribute(
-                key, doc_string=doc_string,
-                value=make_tensor(
-                    key, TensorProto.INT64,
-                    getshape(value), value))
+            attr.ints.extend(int(v) for v in value)
+            attr.type = AttributeProto.INTS
+            # return make_attribute(
+            #     key, doc_string=doc_string,
+            #     value=make_tensor(
+            #         key, TensorProto.INT64,
+            #         getshape(value), value))
         elif all(isinstance(v, numbers.Integral) for v in value):
             # Turn np.int32/64 into Python built-in int.
             attr.ints.extend(int(v) for v in value)
@@ -156,7 +162,9 @@ def make_attribute(
         else:
             raise ValueError(
                 "You passed in an iterable attribute but I cannot figure out "
-                "its applicable type.")
+                "its applicable type, key='{}', type={}, types={}.".format(
+                    key, type(value),
+                    [type(_) for _, __ in zip(value, range(0, 5))]))
     else:
         raise ValueError(
             'Value "{}" is not valid attribute data type.'.format(value))
