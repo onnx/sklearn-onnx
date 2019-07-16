@@ -63,7 +63,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(np.float32))
         y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(np.float32))
-        y_mean = OnnxAdd(y_mean_b, op._y_train_mean.astype(np.float32),
+        mean_y = op._y_train_mean.astype(np.float32)
+        if len(mean_y.shape) == 1:
+            mean_y = mean_y.reshape(mean_y.shape + (1,))
+        y_mean = OnnxAdd(y_mean_b, mean_y,
                          output_names=out[:1])
         outputs = [y_mean]
 
