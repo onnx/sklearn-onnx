@@ -53,7 +53,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
                                           output_names=out[1:],
                                           dtype=dtype))
         if options['return_std']:
-            outputs.append(OnnxSqrt(convert_kernel_diag(kernel, X),
+            outputs.append(OnnxSqrt(convert_kernel_diag(
+                                        kernel, X, dtype=dtype),
                                     output_names=out[1:]))
     else:
         out0 = _zero_vector_of_size(X, keepdims=1, dtype=dtype)

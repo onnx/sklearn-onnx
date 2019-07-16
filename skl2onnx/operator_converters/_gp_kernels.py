@@ -17,6 +17,7 @@ from ..algebra.onnx_ops import (
     OnnxReduceSum, OnnxSqueeze,
     OnnxIdentity, OnnxReduceSumSquare
 )
+from ..proto.onnx_helper_modified import from_array
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
@@ -61,14 +62,15 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None):
                        "class {}.".format(type(kernel)))
 
 
-def py_make_float_array(cst, dtype):
+def py_make_float_array(cst, dtype, as_tensor=False):
     if dtype not in (np.float32, np.float64):
         raise TypeError("A float array must be of dtype "
                         "np.float32 or np.float64.")
     if not isinstance(cst, (int, float, np.float32, np.float64,
                             np.int32, np.int64)):
         raise TypeError("cst must be a number not {}".format(type(cst)))
-    return np.array([cst], dtype=dtype)
+    res = np.array([cst], dtype=dtype)
+    return from_array(res) if as_tensor else res
 
 
 def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
@@ -157,7 +159,8 @@ def convert_kernel(kernel, X, output_names=None,
         zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype)
         zerov = _zero_vector_of_size(X, axis=0, keepdims=1, dtype=dtype)
 
-        tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype)
+        tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
+                                           as_tensor=True)
         const = OnnxConstantOfShape(OnnxShape(zeroh),
                                     value=tensor_value)
         X_scaled = OnnxDiv(X, const)
@@ -169,7 +172,7 @@ def convert_kernel(kernel, X, output_names=None,
             dist = onnx_cdist(X_scaled, x_train_scaled, metric='sqeuclidean',
                               dtype=dtype)
 
-        tensor_value = py_make_float_array(-0.5, dtype=dtype)
+        tensor_value = py_make_float_array(-0.5, dtype=dtype, as_tensor=True)
         cst5 = OnnxConstantOfShape(OnnxShape(zerov), value=tensor_value)
 
         # K = np.exp(-.5 * dists)
@@ -220,7 +223,7 @@ def convert_kernel(kernel, X, output_names=None,
         else:
             return _convert_rational_quadratic(
                 X, x_train, length_scale=kernel.length_scale,
-                dtype=dtype, alpha=kernel.alpha.alpha,
+                dtype=dtype, alpha=kernel.alpha,
                 output_names=output_names)
 
     raise RuntimeError("Unable to convert __call__ method for "
@@ -231,9 +234,16 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
                          keepdims=None, dtype=None):
     if keepdims is None:
         raise ValueError("Default for keepdims is not allowed.")
-    res = OnnxReduceSum(
-        OnnxConstantOfShape(
-            OnnxShape(X), value=py_make_float_array(0, dtype=dtype)),
-        axes=[1-axis], keepdims=keepdims,
-        output_names=output_names)
+    if dtype == np.float32:
+        res = OnnxReduceSum(
+            OnnxConstantOfShape(OnnxShape(X)),
+            axes=[1-axis], keepdims=keepdims,
+            output_names=output_names)
+    else:
+        res = OnnxReduceSum(
+            OnnxConstantOfShape(
+                OnnxShape(X), value=py_make_float_array(
+                    0, dtype=dtype, as_tensor=True)),
+            axes=[1-axis], keepdims=keepdims,
+            output_names=output_names)
     return res

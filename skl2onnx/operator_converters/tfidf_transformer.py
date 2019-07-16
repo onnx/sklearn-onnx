@@ -12,9 +12,9 @@ from ..common._apply_operation import apply_mul, apply_identity
 
 def convert_sklearn_tfidf_transformer(scope, operator, container):
     # TODO: use sparse containers when available
-    float_type = container.forced_float_type
+    float_type = container.forced_dtype
     # onnx_proto.TensorProto.FLOAT
-    proto_type = container.forced_proto_float_type
+    proto_type = container.forced_proto_dtype
     op = operator.raw_operator
     data = operator.input_full_names
     final = operator.output_full_names

@@ -11,6 +11,7 @@ from onnx.helper import (  # noqa
     make_tensor, make_model, make_graph, _to_bytes_or_false,
     make_tensor_value_info, ValueInfoProto
 )
+from onnx.numpy_helper import from_array  # noqa
 from typing import (
     Text, Sequence, Any, Optional,
     List, cast
@@ -87,8 +88,9 @@ def make_attribute(
     elif isinstance(value, float):
         attr.f = value
         attr.type = AttributeProto.FLOAT
-        # raise RuntimeError("float is not allowed anymore due to ambiguities, "
-        #                    "use numpy types, key='{}'.".format(key))
+        # raise RuntimeError("float is not allowed anymore
+        # due to ambiguities, "
+        # "use numpy types, key='{}'.".format(key))
     elif isinstance(value, np.int32):
         attr.i = value
         attr.type = AttributeProto.INT

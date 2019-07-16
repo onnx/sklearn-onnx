@@ -4,6 +4,7 @@ import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxSub
+import onnxruntime
 from onnxruntime import InferenceSession
 
 
@@ -11,6 +12,9 @@ class TestAlgebraDouble(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
+                     <= StrictVersion("0.4.0"),
+                     reason="Sub(7) not available")
     def test_algebra_converter(self):
 
         coef = numpy.array([[1, 2], [3, 4]], dtype=numpy.float64)

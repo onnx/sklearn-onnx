@@ -262,7 +262,7 @@ class ModelComponentContainer(ModelContainer):
                         or a float array).
         :return: created tensor
         """
-        if (isinstance(content, np.ndarray) and 
+        if (isinstance(content, np.ndarray) and
                 onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
                 onnx_type != self.forced_proto_dtype):
             content = content.astype(self.forced_dtype)
@@ -361,8 +361,9 @@ class ModelComponentContainer(ModelContainer):
             if v is None:
                 raise ValueError('Failed to create ONNX node. Undefined '
                                  'attribute pair (%s, %s) found' % (k, v))
-            if (isinstance(v, np.ndarray) and v.dtype in (np.float32, np.float64)
-                    and v.dtype != self.forced_dtype):
+            if (isinstance(v, np.ndarray) and
+                    v.dtype in (np.float32, np.float64) and
+                    v.dtype != self.forced_dtype):
                 upd[k] = v.astype(self.forced_dtype)
 
         if upd:
