@@ -9,7 +9,7 @@ from onnx import (
 )
 from onnx.helper import (  # noqa
     make_tensor, make_model, make_graph, _to_bytes_or_false,
-    make_tensor_value_info
+    make_tensor_value_info, ValueInfoProto
 )
 from typing import (
     Text, Sequence, Any, Optional,
