@@ -168,7 +168,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         cop = OnnxAdd('input', 'input')
-        cop2 = OnnxIdentity(onnx_squareform_pdist(cop), output_names=['pdist'])
+        cop2 = OnnxIdentity(onnx_squareform_pdist(cop, dtype=np.float32),
+                            output_names=['pdist'])
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType(["", ""]))],
@@ -179,6 +180,13 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
+        x = np.array([1, 2, 4, 5]).astype(np.float32).reshape((2, 2))
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = squareform(pdist(x * 2, metric="sqeuclidean"))
+        assert_almost_equal(exp, res[0])
+
+        x = np.array([1, 2, 4, 5, 5, 6]).astype(np.float32).reshape((2, 3))
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((2, 3))
         sess = InferenceSession(model_def.SerializeToString())
         res = sess.run(None, {'input': x})
@@ -219,7 +227,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
         cop = OnnxAdd('input', 'input')
-        cop2 = OnnxIdentity(onnx_cdist(cop, x2), output_names=['cdist'])
+        cop2 = OnnxIdentity(onnx_cdist(cop, x2, dtype=np.float32),
+                            output_names=['cdist'])
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
@@ -239,7 +248,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                       [5.6, 2.9, 3.6, 1.3],
                       [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
         cop = OnnxAdd('input', 'input')
-        cop2 = OnnxIdentity(onnx_cdist(cop, x), output_names=['cdist'])
+        cop2 = OnnxIdentity(onnx_cdist(cop, x, dtype=np.float32),
+                            output_names=['cdist'])
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
