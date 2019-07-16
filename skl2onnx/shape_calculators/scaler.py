@@ -6,7 +6,9 @@
 
 import numbers
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType, Int64TensorType
+from ..common.data_types import (
+    FloatTensorType, Int64TensorType, DoubleTensorType
+)
 from ..common.utils import check_input_and_output_numbers
 from ..common.utils import check_input_and_output_types
 
@@ -21,9 +23,10 @@ def calculate_sklearn_scaler_output_shapes(operator):
     """
     check_input_and_output_numbers(operator, input_count_range=[1, None],
                                    output_count_range=1)
-    check_input_and_output_types(operator, good_input_types=[
-                                 FloatTensorType, Int64TensorType],
-                                 good_output_types=[FloatTensorType])
+    check_input_and_output_types(
+        operator, good_input_types=[
+            FloatTensorType, Int64TensorType, DoubleTensorType],
+        good_output_types=[FloatTensorType, DoubleTensorType])
     # Inputs: multiple float- and integer-tensors
     # Output: one float tensor
     for variable in operator.inputs:

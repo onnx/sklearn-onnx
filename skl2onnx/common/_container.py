@@ -10,8 +10,13 @@ import six
 import sys
 import traceback
 import warnings
+import numpy as np
+from onnx import onnx_pb as onnx_proto
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
-from ..proto import helper, TensorProto
+from ..proto import TensorProto
+from ..proto.onnx_helper_modified import (
+    make_node, ValueInfoProto, make_tensor, make_attribute
+)
 from .interface import ModelContainer
 from .utils import get_domain
 
@@ -136,13 +141,17 @@ class ModelComponentContainer(ModelContainer):
     *ONNX* *ModelProto*.
     """
 
-    def __init__(self, target_opset, options=None):
+    def __init__(self, target_opset, options=None, dtype=None):
         """
         :param target_opset: number, for example, 7 for *ONNX 1.2*, and
                              8 for *ONNX 1.3*.
         :param targeted_onnx: A string, for example, '1.1.2' and '1.2'.
+        :param dtype: float type to be used for every float coefficient
         :param options: see :ref:`l-conv-options`
         """
+        if dtype is None:
+            raise ValueError("dtype must be specified, it should be either "
+                             "np.float32 or np.float64.")
         # Inputs of ONNX graph. They are ValueInfoProto in ONNX.
         self.inputs = []
         # Outputs of ONNX graph. They are ValueInfoProto in ONNX.
@@ -164,6 +173,23 @@ class ModelComponentContainer(ModelContainer):
         self.target_opset = target_opset
         # Additional options given to converters.
         self.options = options
+        self.dtype = dtype
+
+        if dtype == np.float32:
+            self.proto_dtype = onnx_proto.TensorProto.FLOAT
+        elif dtype == np.float64:
+            self.proto_dtype = onnx_proto.TensorProto.DOUBLE
+        else:
+            raise ValueError("dtype should be either np.float32 or "
+                             "np.float64.")
+
+    @property
+    def forced_dtype(self):
+        return self.dtype
+
+    @property
+    def forced_proto_dtype(self):
+        return self.proto_dtype
 
     def __str__(self):
         """
@@ -198,7 +224,7 @@ class ModelComponentContainer(ModelContainer):
         return "\n".join(rows)
 
     def _make_value_info(self, variable):
-        value_info = helper.ValueInfoProto()
+        value_info = ValueInfoProto()
         value_info.name = variable.full_name
         value_info.type.CopyFrom(variable.type.to_onnx_type())
         if variable.type.doc_string:
@@ -243,11 +269,11 @@ class ModelComponentContainer(ModelContainer):
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
         elif shape is None:
-            tensor = helper.make_attribute(name, content)
+            tensor = make_attribute(name, content)
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None')
-            tensor = helper.make_tensor(name, onnx_type, shape, content)
+            tensor = make_tensor(name, onnx_type, shape, content)
         self.initializers.append(tensor)
         return tensor
 
@@ -329,8 +355,7 @@ class ModelComponentContainer(ModelContainer):
                 raise ValueError('Failed to create ONNX node. Undefined '
                                  'attribute pair (%s, %s) found' % (k, v))
 
-        node = helper.make_node(op_type, inputs, outputs,
-                                name=name, **attrs)
+        node = make_node(op_type, inputs, outputs, name=name, **attrs)
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))

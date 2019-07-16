@@ -4,11 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, helper
+from ..proto import TensorProto
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
 from .type_helper import _guess_type
@@ -142,10 +143,11 @@ class OnnxOperator:
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, OnnxOperator.OnnxOperatorVariable):
                     self.inputs.append(inp)
-                elif isinstance(inp, (np.int64, np.float32, np.bool)):
+                elif isinstance(inp, (np.int64, np.float32,
+                                      np.float64, np.bool)):
                     self.inputs.append(inp)
-                elif isinstance(inp, (np.float32, float)):
-                    self.inputs.append(np.float32(inp))
+                elif isinstance(inp, (float, )):
+                    self.inputs.append(np.float64(inp))
                 elif isinstance(inp, (int, )):
                     self.inputs.append(np.int64(inp))
                 else:
@@ -317,7 +319,8 @@ class OnnxOperator:
                 if isinstance(obj, OnnxOperator):
                     obj._clean_attributes(*args, recursive=True)
 
-    def to_onnx(self, inputs=None, outputs=None, other_outputs=None):
+    def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
+                dtype=None):
         """
         Converts this operator into an ONNX graph.
 
@@ -327,6 +330,8 @@ class OnnxOperator:
         :param other_outputs: additional outputs to consider
             as graph outputs but not outputs of this particular
             node
+        :param dtype: force the use of a specific float type,
+            either `np.float32` or `np.float64`, it must be specified
         """
         if hasattr(self, "state"):
             # The conversion already happened and needs to be cleaned.
@@ -353,7 +358,7 @@ class OnnxOperator:
                                        name, self.__class__.__name__))
 
         target_opset = get_opset_number_from_onnx()
-        container = ModelComponentContainer(target_opset)
+        container = ModelComponentContainer(target_opset, dtype=dtype)
         if container.target_opset < 9:
             raise RuntimeError("The operator cannot be converted into ONNX."
                                " It requires ONNX op_set >= 9.")
@@ -395,10 +400,10 @@ class OnnxOperator:
             container.add_output(shape)
 
         # convert the graph
-        graph = helper.make_graph(
+        graph = make_graph(
             container.nodes, model_name, container.inputs,
             container.outputs, container.initializers)
-        onnx_model = helper.make_model(graph)
+        onnx_model = make_model(graph)
 
         # domains
         domains = {}

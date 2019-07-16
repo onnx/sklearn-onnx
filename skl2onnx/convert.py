@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 from uuid import uuid4
+import numpy as np
 from .proto import get_opset_number_from_onnx
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
@@ -18,7 +19,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    intermediate=False):
+                    dtype=np.float64, intermediate=False):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -44,6 +45,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :param options: specific options given to converters (see :ref:`l-conv-options`)
+    :param dtype: float type to use everywhere in the graph,
+        `np.float32` or `np.float64`
     :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
         it returns the converted model otherwise
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
@@ -131,12 +134,13 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
-                                  options=options)
+                                  dtype=dtype, options=options)
 
     return (onnx_model, topology) if intermediate else onnx_model
 
 
-def to_onnx(model, X=None, name=None, initial_types=None, options=None):
+def to_onnx(model, X=None, name=None, initial_types=None, options=None,
+            dtype=np.float64):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -148,6 +152,8 @@ def to_onnx(model, X=None, name=None, initial_types=None, options=None):
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param name: name of the model
+    :param dtype: float type to use everywhere in the graph,
+        `np.float32` or `np.float64`
     :return: converted model
 
     This function checks if the model inherits from class
@@ -163,7 +169,7 @@ def to_onnx(model, X=None, name=None, initial_types=None, options=None):
         name = model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
     return convert_sklearn(model, initial_types=initial_types,
-                           name=name, options=options)
+                           name=name, options=options, dtype=dtype)
 
 
 def wrap_as_onnx_mixin(model):

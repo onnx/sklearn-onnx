@@ -60,6 +60,8 @@ def _guess_numpy_type(data_type, dims):
     # This could be moved to onnxconverter_common.
     if data_type == np.float32:
         return FloatTensorType(dims)
+    elif data_type == np.float64:
+        return DoubleTensorType(dims)
     elif data_type in (np.str, str, object) or str(
         data_type) in ('<U1', ): # noqa
         return StringTensorType(dims)

@@ -42,7 +42,7 @@ class GraphState:
         if isinstance(var, Variable):
             return var.full_name
         elif isinstance(var, (np.ndarray, np.bool, np.int64,
-                              np.float32, np.bool)):
+                              np.float32, np.float64, np.bool)):
             return self._add_constant(var)
         elif hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue)
@@ -70,8 +70,11 @@ class GraphState:
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
                 self.operator_name + 'cst')
-            if cst.dtype in (np.float32, np.float64):
+            if cst.dtype == np.float32:
                 ty = onnx_proto.TensorProto.FLOAT
+                astype = np.float64
+            elif cst.dtype == np.float64:
+                ty = onnx_proto.TensorProto.DOUBLE
                 astype = np.float64
             elif cst.dtype == np.int64:
                 ty = onnx_proto.TensorProto.INT64
@@ -107,6 +110,12 @@ class GraphState:
                 self.operator_name + 'cst')
             ty = AttributeProto.INT
             self.container.add_initializer(name, ty, None, cst)
+            return name
+        elif isinstance(cst, np.float64):
+            name = self.scope.get_unique_variable_name(
+                self.operator_name + 'cst')
+            ty = AttributeProto.DOUBLE
+            self.container.add_initializer(name, ty, None, float(cst))
             return name
         elif isinstance(cst, np.float32):
             name = self.scope.get_unique_variable_name(

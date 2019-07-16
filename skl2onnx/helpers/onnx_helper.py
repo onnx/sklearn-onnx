@@ -6,7 +6,11 @@
 
 from io import BytesIO
 import onnx
-from onnx import helper, shape_inference
+from onnx import shape_inference
+from ..proto.onnx_helper_modified import (
+    make_node, make_tensor_value_info, make_graph,
+    make_model, ValueInfoProto
+)
 from onnx import onnx_pb as onnx_proto
 from ..common._topology import Variable
 
@@ -139,12 +143,12 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
 
     var_out = []
     for out in outputs:
-        value_info = helper.ValueInfoProto()
+        value_info = ValueInfoProto()
         value_info.name = out
         var_out.append(value_info)
-    graph = helper.make_graph(keep_nodes, model.graph.name, model.graph.input,
-                              var_out, model.graph.initializer)
-    onnx_model = helper.make_model(graph)
+    graph = make_graph(keep_nodes, model.graph.name, model.graph.input,
+                       var_out, model.graph.initializer)
+    onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version
     onnx_model.producer_name = model.producer_name
     onnx_model.producer_version = model.producer_version
@@ -172,8 +176,8 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
                     required_outputs.append(o)
                 else:
                     raise TypeError("Unable to require output {}.".format(o))
-        node = helper.make_node(op_type, [i.onnx_name for i in inputs],
-                                required_outputs, **atts)
+        node = make_node(op_type, [i.onnx_name for i in inputs],
+                         required_outputs, **atts)
         node = [node]
     elif hasattr(op_type, 'nodes'):
         node = op_type.nodes
@@ -191,17 +195,17 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
             tensor_type = onnx_type.tensor_type
             shape = [tensor_type.shape.dim[i].dim_value
                      for i in range(len(tensor_type.shape.dim))]
-            inp = helper.make_tensor_value_info(input.onnx_name,
-                                                tensor_type.elem_type,
-                                                tuple(shape))
+            inp = make_tensor_value_info(input.onnx_name,
+                                         tensor_type.elem_type,
+                                         tuple(shape))
             onnx_inputs.append(inp)
         elif isinstance(input, onnx.TensorProto):
-            v = helper.make_tensor_value_info(
+            v = make_tensor_value_info(
                 input.name, input.data_type.real,
                 list(d for d in input.dims))
             onnx_inputs.append(v)
         elif isinstance(input, onnx.AttributeProto):
-            value_info = helper.ValueInfoProto()
+            value_info = ValueInfoProto()
             value_info.name = input.name
             onnx_type = onnx_proto.TypeProto()
             onnx_type.tensor_type.elem_type = input.type
@@ -210,9 +214,9 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
         else:
             onnx_inputs.append(input)
 
-    graph = helper.make_graph(node, 'infer_shapes',
-                              onnx_inputs, [])
-    original_model = helper.make_model(graph, producer_name='skl2onnx')
+    graph = make_graph(node, 'infer_shapes',
+                       onnx_inputs, [])
+    original_model = make_model(graph, producer_name='skl2onnx')
     domains = {}
     for n in node:
         domains[n.domain] = max(domains.get(n.domain, 1),

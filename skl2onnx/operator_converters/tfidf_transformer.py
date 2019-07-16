@@ -8,11 +8,13 @@ import numpy as np
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_log, apply_add
 from ..common._apply_operation import apply_mul, apply_identity
-from ..proto import onnx_proto
 
 
 def convert_sklearn_tfidf_transformer(scope, operator, container):
     # TODO: use sparse containers when available
+    float_type = container.forced_float_type
+    # onnx_proto.TensorProto.FLOAT
+    proto_type = container.forced_proto_float_type
     op = operator.raw_operator
     data = operator.input_full_names
     final = operator.output_full_names
@@ -34,9 +36,8 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         else:
             loggedplus1 = scope.get_unique_variable_name('loggedplus1')
         ones = scope.get_unique_variable_name('ones')
-        cst = np.ones((C,), dtype=np.float32)
-        container.add_initializer(ones, onnx_proto.TensorProto.FLOAT, [C],
-                                  cst.flatten())
+        cst = np.ones((C,), dtype=float_type)
+        container.add_initializer(ones, proto_type, [C], cst.flatten())
         apply_add(scope, [logged, ones], loggedplus1, container, broadcast=1)
 
         data = [loggedplus1]
@@ -44,7 +45,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
     if op.use_idf:
         # code scikit-learn
         # X = X * self._idf_diag
-        cst = op._idf_diag.astype(np.float32)
+        cst = op._idf_diag.astype(float_type)
         if not isinstance(cst, np.ndarray):
             if len(cst.shape) > 1:
                 n = cst.shape[0]
@@ -56,8 +57,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         cst = cst.ravel().flatten()
         shape = [len(cst)]
         idfcst = scope.get_unique_variable_name('idfcst')
-        container.add_initializer(idfcst, onnx_proto.TensorProto.FLOAT,
-                                  shape, cst)
+        container.add_initializer(idfcst, proto_type, shape, cst)
         idfed = (final if op.norm is None
                  else scope.get_unique_variable_name('idfed'))
         apply_mul(scope, data + [idfcst], idfed, container, broadcast=1)

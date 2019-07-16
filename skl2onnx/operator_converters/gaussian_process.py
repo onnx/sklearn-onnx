@@ -28,6 +28,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
     may cache some results if it is called with parameter
     ``return_std=True`` or ``return_cov=True``.
     """
+    dtype = container.forced_dtype
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
@@ -43,17 +44,19 @@ def convert_gaussian_process_regressor(scope, operator, container):
         kernel = op.kernel
 
     if not hasattr(op, "X_train_") or op.X_train_ is None:
-        out0 = _zero_vector_of_size(X, keepdims=1, output_names=out[:1])
+        out0 = _zero_vector_of_size(X, keepdims=1, output_names=out[:1],
+                                    dtype=dtype)
 
         outputs = [out0]
         if options['return_cov']:
             outputs.append(convert_kernel(kernel, X,
-                                          output_names=out[1:]))
+                                          output_names=out[1:],
+                                          dtype=dtype))
         if options['return_std']:
             outputs.append(OnnxSqrt(convert_kernel_diag(kernel, X),
                                     output_names=out[1:]))
     else:
-        out0 = _zero_vector_of_size(X, keepdims=1)
+        out0 = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
 
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
@@ -61,9 +64,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
         # y_mean = self._y_train_mean + y_mean  # undo normal.
 
         k_trans = convert_kernel(kernel, X,
-                                 x_train=op.X_train_.astype(np.float32))
-        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(np.float32))
-        mean_y = op._y_train_mean.astype(np.float32)
+                                 x_train=op.X_train_.astype(dtype),
+                                 dtype=dtype)
+        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype))
+        mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
         y_mean = OnnxAdd(y_mean_b, mean_y,
@@ -83,11 +87,11 @@ def convert_gaussian_process_regressor(scope, operator, container):
             _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
-            y_var = convert_kernel_diag(kernel, X)
+            y_var = convert_kernel_diag(kernel, X, dtype=dtype)
 
             # y_var -= np.einsum("ij,ij->i",
             #       np.dot(K_trans, self._K_inv), K_trans)
-            k_dot = OnnxMatMul(k_trans, _K_inv.astype(np.float32))
+            k_dot = OnnxMatMul(k_trans, _K_inv.astype(dtype))
             ys_var = OnnxSub(y_var,
                              OnnxReduceSum(OnnxMul(k_dot, k_trans),
                                            axes=[1], keepdims=0))
@@ -95,7 +99,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             # y_var_negative = y_var < 0
             # if np.any(y_var_negative):
             #     y_var[y_var_negative] = 0.0
-            ys0_var = OnnxMax(ys_var, np.array([0], dtype=np.float32))
+            ys0_var = OnnxMax(ys_var, np.array([0], dtype=dtype))
 
             # var = np.sqrt(ys0_var)
             var = OnnxSqrt(ys0_var, output_names=out[1:])

@@ -11,7 +11,9 @@ and regressors.
 import numbers
 import numpy as np
 import six
-from .data_types import FloatTensorType, Int64TensorType, StringTensorType
+from .data_types import (
+    FloatTensorType, Int64TensorType, StringTensorType, DoubleTensorType
+)
 from .utils import check_input_and_output_numbers, check_input_and_output_types
 
 
@@ -29,7 +31,7 @@ def calculate_linear_classifier_output_shapes(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=[1, 2])
     check_input_and_output_types(operator, good_input_types=[
-        FloatTensorType, Int64TensorType])
+        FloatTensorType, Int64TensorType, DoubleTensorType])
 
     if len(operator.inputs[0].type.shape) != 2:
         raise RuntimeError('Inputs must be a [N, C]-tensor.')
@@ -74,7 +76,7 @@ def calculate_linear_regressor_output_shapes(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
     check_input_and_output_types(operator, good_input_types=[
-        FloatTensorType, Int64TensorType])
+        FloatTensorType, Int64TensorType, DoubleTensorType])
 
     N = operator.inputs[0].type.shape[0]
     operator.outputs[0].type = FloatTensorType([N, 1])

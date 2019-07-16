@@ -9,17 +9,21 @@ import warnings
 from logging import getLogger
 import numpy as np
 from onnx import onnx_pb as onnx_proto
-from onnxconverter_common.data_types import DataType, TensorType
-from ..proto import helper
+from onnxconverter_common.data_types import (  # noqa
+    DataType, TensorType,
+    FloatType, Int64Type, StringType,
+    DictionaryType, FloatTensorType,  # noqa
+    Int64TensorType, SequenceType,  # noqa
+    StringTensorType, DoubleTensorType,
+    Int32TensorType, BooleanTensorType,
+)
 from ..proto import get_opset_number_from_onnx
+from ..proto.onnx_helper_modified import (
+    make_graph, make_model, make_tensor_value_info
+)
 from . import _registration
 from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
-from onnxconverter_common.data_types import FloatType, Int64Type, StringType
-from onnxconverter_common.data_types import DictionaryType, FloatTensorType # noqa
-from onnxconverter_common.data_types import Int64TensorType, SequenceType # noqa
-from onnxconverter_common.data_types import StringTensorType, DoubleTensorType # noqa
-from onnxconverter_common.data_types import Int32TensorType, BooleanTensorType # noqa
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
 type_fct = type
@@ -789,7 +793,8 @@ class Topology:
 
 
 def convert_topology(topology, model_name, doc_string, target_opset,
-                     channel_first_inputs=None, options=None):
+                     channel_first_inputs=None, dtype=None,
+                     options=None):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
@@ -800,6 +805,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     :param doc_string: A string attached to the produced model
     :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for
                          ONNX 1.3.
+    :param dtype: float type to use everywhere in the graph,
+        `np.float32` or `np.float64`
     :param options: see :ref:`l-conv-options`
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
@@ -817,7 +824,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     topology._initialize_graph_status_for_traversing()
 
-    container = ModelComponentContainer(target_opset, options=options)
+    container = ModelComponentContainer(
+        target_opset, options=options, dtype=dtype)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.
@@ -934,20 +942,20 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
             # Initializers are always tensors so we can just call
             # make_tensor_value_info(...).
-            value_info = helper.make_tensor_value_info(
+            value_info = make_tensor_value_info(
                 tensor.name, tensor.data_type, tensor.dims)
             extra_inputs.append(value_info)
 
         # Before ONNX opset 9, initializers were needed to be passed in
         # with inputs.
-        graph = helper.make_graph(container.nodes, model_name,
-                                  container.inputs + extra_inputs,
-                                  container.outputs, container.initializers)
+        graph = make_graph(container.nodes, model_name,
+                           container.inputs + extra_inputs,
+                           container.outputs, container.initializers)
     else:
         # In ONNX opset 9 and above, initializers are included as
         # operator inputs and therefore do not need to be passed as
         # extra_inputs.
-        graph = helper.make_graph(
+        graph = make_graph(
             container.nodes, model_name, container.inputs,
             container.outputs, container.initializers)
 
@@ -955,7 +963,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     graph.value_info.extend(container.value_info)
 
     # Create model
-    onnx_model = helper.make_model(graph)
+    onnx_model = make_model(graph)
 
     # Merge operator sets for the same domain, the largest version
     # number would be kept
@@ -972,7 +980,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     for op_domain, op_version in purified_operator_set.items():
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
-            # helper.make_model(...)
+            # make_model(...)
             op_set = onnx_model.opset_import[0]
         else:
             # Just create one ONNX element in opset_import

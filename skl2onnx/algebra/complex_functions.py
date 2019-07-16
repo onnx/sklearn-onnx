@@ -12,37 +12,37 @@ from .onnx_ops import (
 )
 
 
-def onnx_squareform_pdist(X, metric='sqeuclidean', **kwargs):
+def onnx_squareform_pdist(X, metric='sqeuclidean', dtype=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric=metric))``.
     """
     if metric == 'sqeuclidean':
-        return _onnx_squareform_pdist_sqeuclidean(X, **kwargs)
+        return _onnx_squareform_pdist_sqeuclidean(X, dtype=dtype, **kwargs)
     elif metric == 'euclidean':
-        res = _onnx_squareform_pdist_sqeuclidean(X)
+        res = _onnx_squareform_pdist_sqeuclidean(X, dtype=dtype)
         return OnnxSqrt(res, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
 
 
-def onnx_cdist(X, Y, metric='sqeuclidean', **kwargs):
+def onnx_cdist(X, Y, metric='sqeuclidean', dtype=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, Y, metric=metric)``.
     """
     if metric == 'sqeuclidean':
-        return _onnx_cdist_sqeuclidean(X, Y, **kwargs)
+        return _onnx_cdist_sqeuclidean(X, Y, dtype=dtype, **kwargs)
     elif metric == 'euclidean':
-        res = _onnx_cdist_sqeuclidean(X, Y)
+        res = _onnx_cdist_sqeuclidean(X, Y, dtype=dtype)
         return OnnxSqrt(res, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
 
 
-def _onnx_squareform_pdist_sqeuclidean(X, **kwargs):
+def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric='sqeuclidean'))``.
@@ -56,7 +56,8 @@ def _onnx_squareform_pdist_sqeuclidean(X, **kwargs):
                      ('next', FloatTensorType())]),
         outputs=[('next_out', FloatTensorType()),
                  ('scan_out', FloatTensorType())],
-        other_outputs=[flat])
+        other_outputs=[flat],
+        dtype=dtype)
 
     node = OnnxScan(X, X, output_names=['scan0_{idself}', 'scan1_{idself}'],
                     num_scan_inputs=1, body=scan_body.graph,
@@ -64,7 +65,7 @@ def _onnx_squareform_pdist_sqeuclidean(X, **kwargs):
     return node[1]
 
 
-def _onnx_cdist_sqeuclidean(X, Y, **kwargs):
+def _onnx_cdist_sqeuclidean(X, Y, dtype=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, metric='sqeuclidean')``.
@@ -78,7 +79,8 @@ def _onnx_cdist_sqeuclidean(X, Y, **kwargs):
                      ('next', FloatTensorType())]),
         outputs=[('next_out', FloatTensorType()),
                  ('scan_out', FloatTensorType())],
-        other_outputs=[flat])
+        other_outputs=[flat],
+        dtype=dtype)
 
     node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
                     num_scan_inputs=1, body=scan_body.graph)
