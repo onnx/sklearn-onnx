@@ -4,7 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 from collections import OrderedDict
-from ..common.data_types import FloatTensorType
+import numpy as np
+from ..common.data_types import FloatTensorType, DoubleTensorType
 from .onnx_ops import (
     OnnxIdentity, OnnxScan, OnnxTranspose,
     OnnxSub, OnnxReduceSumSquare, OnnxSqueeze,
@@ -51,11 +52,12 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, **kwargs):
     id_next = OnnxIdentity('next_in', output_names=['next_out'])
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
     flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
+    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', FloatTensorType()),
-                     ('next', FloatTensorType())]),
-        outputs=[('next_out', FloatTensorType()),
-                 ('scan_out', FloatTensorType())],
+        OrderedDict([('next_in', tensor_type()),
+                     ('next', tensor_type())]),
+        outputs=[('next_out', tensor_type()),
+                 ('scan_out', tensor_type())],
         other_outputs=[flat],
         dtype=dtype)
 
@@ -74,11 +76,12 @@ def _onnx_cdist_sqeuclidean(X, Y, dtype=None, **kwargs):
     id_next = OnnxIdentity('next_in', output_names=['next_out'])
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
     flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
+    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', FloatTensorType()),
-                     ('next', FloatTensorType())]),
-        outputs=[('next_out', FloatTensorType()),
-                 ('scan_out', FloatTensorType())],
+        OrderedDict([('next_in', tensor_type()),
+                     ('next', tensor_type())]),
+        outputs=[('next_out', tensor_type()),
+                 ('scan_out', tensor_type())],
         other_outputs=[flat],
         dtype=dtype)
 

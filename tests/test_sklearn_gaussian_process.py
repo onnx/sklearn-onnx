@@ -580,6 +580,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_fitted_shapes(self):
         data = load_iris()
         X = data.data.astype(np.float32)
