@@ -160,6 +160,18 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
             _parse_sklearn_simple_model(
                 scope, transform, inputs,
                 custom_parsers=custom_parsers)[0])
+        if (model.transformer_weights is not None and name in
+                model.transformer_weights):
+            transform_result = [transformed_result_names.pop()]
+            # Create a Multiply ONNX node
+            multiply_operator = scope.declare_local_operator('SklearnMultiply')
+            multiply_operator.inputs = transform_result
+            multiply_operator.operand = model.transformer_weights[name]
+            multiply_output = scope.declare_local_variable(
+                'multiply_output', FloatTensorType())
+            multiply_operator.outputs.append(multiply_output)
+            transformed_result_names.append(multiply_operator.outputs[0])
+
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
