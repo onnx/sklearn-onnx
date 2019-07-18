@@ -36,7 +36,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
             C = 'None'
             break
 
-    operator.outputs[0].type = FloatTensorType([N, C])
+    operator.outputs[0].type.shape = [N, C]
 
 
 register_shape_calculator('SklearnImputer',

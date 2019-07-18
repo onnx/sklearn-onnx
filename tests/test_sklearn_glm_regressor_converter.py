@@ -7,7 +7,9 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVR
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    FloatTensorType, Int64TensorType, DoubleTensorType
+)
 from test_utils import dump_data_and_model
 
 
@@ -45,6 +47,14 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+
+    def test_model_linear_regression64(self):
+        model, X = _fit_model(linear_model.LinearRegression())
+        model_onnx = convert_sklearn(model, "linear regression",
+                                     [("input", DoubleTensorType(X.shape))],
+                                     dtype=numpy.float64)
+        self.assertIsNotNone(model_onnx)
+        self.assertIn("elem_type: 11", str(model_onnx))
 
     def test_model_linear_regression_int(self):
         model, X = _fit_model(linear_model.LinearRegression(), is_int=True)

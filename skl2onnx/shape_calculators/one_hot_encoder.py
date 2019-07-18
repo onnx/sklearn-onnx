@@ -8,7 +8,6 @@ import collections
 import numbers
 import numpy as np
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType
 
 
 def calculate_sklearn_one_hot_encoder_output_shapes(operator):
@@ -118,7 +117,7 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
     else:
         C = 'None'
 
-    operator.outputs[0].type = FloatTensorType([N, C])
+    operator.outputs[0].type.shape = [N, C]
 
 
 register_shape_calculator('SklearnOneHotEncoder',

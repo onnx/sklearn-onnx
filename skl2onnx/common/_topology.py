@@ -16,6 +16,7 @@ from onnxconverter_common.data_types import (  # noqa
     Int64TensorType, SequenceType,  # noqa
     StringTensorType, DoubleTensorType,
     Int32TensorType, BooleanTensorType,
+    DoubleTensorType,
 )
 from ..proto import get_opset_number_from_onnx
 from ..proto.onnx_helper_modified import (
@@ -214,7 +215,8 @@ class Scope:
 
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
-                 custom_shape_calculators=None, options=None):
+                 custom_shape_calculators=None, options=None,
+                 dtype=np.float32):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -231,6 +233,8 @@ class Scope:
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying
                                 the user customized shape calculator
+        :param dtype: select the computation for real type,
+            by default it is float but double is sometime needed
         :param options: see :ref:`l-conv-options`
         """
         self.name = name
@@ -241,6 +245,14 @@ class Scope:
             operator_name_set if operator_name_set is not None else set())
         self.target_opset = target_opset
         self.custom_shape_calculators = custom_shape_calculators
+
+        if dtype == np.float32:
+            self.tensor_type = FloatTensorType
+        elif dtype == np.float64:
+            self.tensor_type = DoubleTensorType
+        else:
+            raise NotImplementedError(
+                "dtype must be either np.float32 or np.float64.")
 
         # An one-to-many map from raw variable name to ONNX variable
         # names. It looks like
@@ -468,7 +480,8 @@ class Topology:
     def get_unique_scope_name(self, seed):
         return Topology._generate_unique_name(seed, self.scope_names)
 
-    def declare_scope(self, seed, parent_scopes=None, options=None):
+    def declare_scope(self, seed, parent_scopes=None, options=None,
+                      dtype=np.float32):
         """
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
@@ -477,7 +490,7 @@ class Topology:
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options)
+            options=options, dtype=dtype)
         self.scopes.append(scope)
         return scope
 

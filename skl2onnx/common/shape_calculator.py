@@ -7,7 +7,6 @@
 Functions to calculate output shapes of linear classifiers
 and regressors.
 """
-
 import numbers
 import numpy as np
 import six
@@ -46,20 +45,20 @@ def calculate_linear_classifier_output_shapes(operator):
            for i in class_labels):
         operator.outputs[0].type = StringTensorType(shape=[N])
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
+            operator.outputs[1].type.shape = [N, number_of_classes]
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class
-            operator.outputs[1].type = FloatTensorType(shape=[N, 1])
+            operator.outputs[1].type.shape = [N, 1]
     elif all(isinstance(i, (numbers.Real, bool, np.bool_))
              for i in class_labels):
         operator.outputs[0].type = Int64TensorType(shape=[N])
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
+            operator.outputs[1].type.shape = [N, number_of_classes]
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class
-            operator.outputs[1].type = FloatTensorType(shape=[N, 1])
+            operator.outputs[1].type.shape = [N, 1]
     else:
         raise ValueError('Label types must be all integers or all strings.')
 
@@ -79,4 +78,4 @@ def calculate_linear_regressor_output_shapes(operator):
         FloatTensorType, Int64TensorType, DoubleTensorType])
 
     N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type = FloatTensorType([N, 1])
+    operator.outputs[0].type.shape = [N, 1]

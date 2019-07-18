@@ -22,7 +22,7 @@ def calculate_sklearn_nearest_neighbours(operator):
     N = operator.inputs[0].type.shape[0]
     neighbours = operator.raw_operator.n_neighbors
     operator.outputs[0].type = Int64TensorType([N, neighbours])
-    operator.outputs[1].type = FloatTensorType([N, neighbours])
+    operator.outputs[1].type.shape = [N, neighbours]
 
 
 register_shape_calculator('SklearnNearestNeighbors',

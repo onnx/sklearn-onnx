@@ -21,7 +21,7 @@ def calculate_sklearn_k_bins_discretiser(operator):
     M = operator.inputs[0].type.shape[0]
     model = operator.raw_operator
     N = len(model.n_bins_) if model.encode == 'ordinal' else sum(model.n_bins_)
-    operator.outputs[0].type = FloatTensorType([M, N])
+    operator.outputs[0].type.shape = [M, N]
 
 
 register_shape_calculator('SklearnKBinsDiscretizer',
