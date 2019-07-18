@@ -53,6 +53,7 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, **kwargs):
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
     flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
+    id_next.set_onnx_name_prefix('pdistsqe')
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', tensor_type()),
                      ('next', tensor_type())]),
@@ -77,6 +78,7 @@ def _onnx_cdist_sqeuclidean(X, Y, dtype=None, **kwargs):
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
     flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
+    id_next.set_onnx_name_prefix('cdistsqe')
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', tensor_type()),
                      ('next', tensor_type())]),

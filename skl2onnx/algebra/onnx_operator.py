@@ -128,6 +128,7 @@ class OnnxOperator:
         self.op_version = op_version or get_opset_number_from_onnx()
         self.domain = domain
         self.kwargs = kwargs
+        self.onnx_prefix_name = None
 
         # check inputs
         if len(inputs) == 0:
@@ -187,6 +188,30 @@ class OnnxOperator:
                     raise TypeError("output_names must be a list of strings "
                                     "and element {} is {}".format(
                                         i, type(name)))
+
+    def set_onnx_name_prefix(self, onnx_prefix_name):
+        """
+        Provides a name to define a prefix in the onnx graph
+        to avoid to get unreadable node names. The method
+        does not overwrite an existing name, it propagates
+        the prefix to inputs and stops the propagation
+        if the prefix is already defined.
+        """
+        if self.onnx_prefix_name is None:
+            self.onnx_prefix_name = onnx_prefix_name
+            for inp in self.inputs:
+                if hasattr(inp, 'onnx_prefix_name'):
+                    inp.set_onnx_name_prefix(onnx_prefix_name)
+
+    @property
+    def onnx_prefix(self):
+        if self.onnx_prefix_name is None:
+            name = self.__class__.__name__
+            if name.startswith("Onnx"):
+                name = name[4:]
+            return name[:2]
+        else:
+            return self.onnx_prefix_name
 
     def __getitem__(self, index):
         """
@@ -266,7 +291,8 @@ class OnnxOperator:
             else:
                 outputs = []
                 for name in self.__class__.expected_outputs:
-                    name = scope.get_unique_variable_name(name[0])
+                    name = scope.get_unique_variable_name(
+                        self.onnx_prefix + "_" + name[0])
                     outputs.append(name)
                 self.output_names_ = outputs
 
@@ -294,12 +320,11 @@ class OnnxOperator:
                                            "{} in {}.".format(input, vars))
                 else:
                     inputs.append(input)
-            self.state = GraphState(inputs, self.output_names_,
-                                    self.operator_name,
-                                    scope, container, None,
-                                    op_version=self.op_version,
-                                    op_domain=domain,
-                                    **self.kwargs)
+            self.state = GraphState(
+                inputs, self.output_names_, self.operator_name,
+                scope, container, None, op_version=self.op_version,
+                op_domain=domain, onnx_prefix_name=self.onnx_prefix,
+                **self.kwargs)
             self.state.run(operator=operator)
 
     @property

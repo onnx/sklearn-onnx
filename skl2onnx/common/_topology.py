@@ -311,7 +311,8 @@ class Scope:
         if not isinstance(seed, str):
             raise TypeError("Parameter seed must be a string not {}."
                             "".format(type(seed)))
-        return Topology._generate_unique_name(seed, self.onnx_variable_names)
+        name = Topology._generate_unique_name(seed, self.onnx_variable_names)
+        return name
 
     def get_unique_operator_name(self, seed):
         """

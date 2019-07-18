@@ -64,10 +64,12 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             outputs.append(convert_kernel(kernel, X,
                                           output_names=out[1:],
-                                          dtype=dtype))
+                                          dtype=dtype,
+                                          try_float64=options['float64']))
         if options['return_std']:
             outputs.append(OnnxSqrt(convert_kernel_diag(
-                                        kernel, X, dtype=dtype),
+                                        kernel, X, dtype=dtype,
+                                        try_float64=options['float64']),
                                     output_names=out[1:]))
     else:
         out0 = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
@@ -79,7 +81,9 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),
-                                 dtype=dtype)
+                                 dtype=dtype,
+                                 try_float64=options['float64'])
+        k_trans.set_onnx_name_prefix('kgpd')
 
         if options['float64']:
             if dtype == np.float64:
@@ -100,6 +104,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
         y_mean = OnnxAdd(y_mean_b, mean_y,
                          output_names=out[:1])
+        y_mean.set_onnx_name_prefix('gpr')
         outputs = [y_mean]
 
         if options['return_cov']:
@@ -115,7 +120,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
             _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
-            y_var = convert_kernel_diag(kernel, X, dtype=dtype)
+            y_var = convert_kernel_diag(kernel, X, dtype=dtype,
+                                        try_float64=options['float64'])
 
             # y_var -= np.einsum("ij,ij->i",
             #       np.dot(K_trans, self._K_inv), K_trans)
@@ -131,6 +137,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
             # var = np.sqrt(ys0_var)
             var = OnnxSqrt(ys0_var, output_names=out[1:])
+            var.set_onnx_name_prefix('gprv')
             outputs.append(var)
 
     for o in outputs:
