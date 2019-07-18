@@ -135,7 +135,8 @@ class Operator(OperatorBase):
     Defines an operator available in *ONNX*.
     """
 
-    def __init__(self, onnx_name, scope, type, raw_operator, target_opset):
+    def __init__(self, onnx_name, scope, type, raw_operator,
+                 target_opset, dtype):
         """
         :param onnx_name: A unique ID, which is a string
         :param scope: The name of the scope where this operator is
@@ -147,6 +148,7 @@ class Operator(OperatorBase):
         :param raw_operator: The original operator which defines this operator;
                              for example, a scikit-learn Imputer and
                              a CoreML Normalizer.
+        :param dtype: preferred output type
         :param target_opset: The target opset number for the converted model.
         """
         if isinstance(raw_operator, str):
@@ -162,6 +164,7 @@ class Operator(OperatorBase):
         self.is_evaluated = None
         self.is_abandoned = False
         self.target_opset = target_opset
+        self.dtype = dtype
 
     @property
     def full_name(self):
@@ -205,6 +208,26 @@ class Operator(OperatorBase):
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
         shape_calc(self)
 
+    @property
+    def tensor_type(self):
+        if self.dtype == np.float32:
+            return FloatTensorType
+        elif self.dtype == np.float64:
+            return FloatTensorType
+        else:
+            raise NotImplementedError(
+                "Unable to guess the tensor type from {}.".format(self.dtype))
+
+    @property
+    def proto_type(self):
+        if self.dtype == np.float32:
+            return onnx_proto.TensorProto.FLOAT
+        elif self.dtype == np.float64:
+            return onnx_proto.TensorProto.DOUBLE
+        else:
+            raise ValueError("dtype should be either np.float32 or "
+                             "np.float64.")
+
 
 class Scope:
     """
@@ -246,6 +269,7 @@ class Scope:
         self.target_opset = target_opset
         self.custom_shape_calculators = custom_shape_calculators
 
+        self.dtype = dtype
         if dtype == np.float32:
             self.tensor_type = FloatTensorType
         elif dtype == np.float64:
@@ -324,7 +348,7 @@ class Scope:
         """
         onnx_name = self.get_unique_operator_name(str(type))
         operator = Operator(onnx_name, self.name, type, raw_model,
-                            self.target_opset)
+                            self.target_opset, self.dtype)
         self.operators[onnx_name] = operator
         return operator
 

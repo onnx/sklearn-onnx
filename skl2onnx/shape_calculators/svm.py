@@ -34,7 +34,7 @@ def calculate_sklearn_svm_output_shapes(operator):
     output shape would be [N, 1].
     """
     op = operator.raw_operator
-    tensor_type = operator.inputs[0].type.__class__
+    tensor_type = operator.tensor_type
 
     N = operator.inputs[0].type.shape[0]
     if operator.type in ['SklearnSVC'] or isinstance(op, (SVC, NuSVC)):

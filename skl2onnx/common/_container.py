@@ -173,8 +173,8 @@ class ModelComponentContainer(ModelContainer):
         self.target_opset = target_opset
         # Additional options given to converters.
         self.options = options
-        self.dtype = dtype
 
+        self.dtype = None
         if dtype == np.float32:
             self.proto_dtype = onnx_proto.TensorProto.FLOAT
         elif dtype == np.float64:
@@ -182,14 +182,6 @@ class ModelComponentContainer(ModelContainer):
         else:
             raise ValueError("dtype should be either np.float32 or "
                              "np.float64.")
-
-    @property
-    def forced_dtype(self):
-        return self.dtype
-
-    @property
-    def forced_proto_dtype(self):
-        return self.proto_dtype
 
     def __str__(self):
         """
@@ -264,9 +256,9 @@ class ModelComponentContainer(ModelContainer):
         """
         if (isinstance(content, np.ndarray) and
                 onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
-                onnx_type != self.forced_proto_dtype):
+                onnx_type != self.proto_dtype):
             content = content.astype(self.forced_dtype)
-            onnx_type = self.forced_proto_dtype
+            onnx_type = self.proto_dtype
 
         if isinstance(content, TensorProto):
             tensor = TensorProto()
@@ -363,8 +355,8 @@ class ModelComponentContainer(ModelContainer):
                                  'attribute pair (%s, %s) found' % (k, v))
             if (isinstance(v, np.ndarray) and
                     v.dtype in (np.float32, np.float64) and
-                    v.dtype != self.forced_dtype):
-                upd[k] = v.astype(self.forced_dtype)
+                    v.dtype != self.dtype):
+                upd[k] = v.astype(self.dtype)
 
         if upd:
             attrs.update(upd)
