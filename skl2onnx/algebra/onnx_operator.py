@@ -96,12 +96,17 @@ class OnnxOperator:
             return "UnscopedVariable('%s')" % self.name
 
     class ConstantVariable:
-        def __init__(self, value):
+        def __init__(self, value, implicit_cast=True):
             self.value = value
+            self.implicit_cast = implicit_cast
 
         @property
         def ConstantValue(self):
             return self.value
+
+        @property
+        def ImplicitCast(self):
+            return self.implicit_cast
 
     def __init__(self, *inputs, op_version=None, output_names=None,
                  domain=None, **kwargs):
@@ -141,7 +146,8 @@ class OnnxOperator:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, TensorProto)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
-                elif isinstance(inp, OnnxOperator.OnnxOperatorVariable):
+                elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
+                                      OnnxOperator.ConstantVariable)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.int64, np.float32,
                                       np.float64, np.bool)):

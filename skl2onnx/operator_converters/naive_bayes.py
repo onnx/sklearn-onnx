@@ -165,7 +165,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #                                                                   |
     #         output_probability [M, C] <- ZIPMAP <---------------------'
     float_type = container.dtype
-    proto_type = container.proto_type
+    proto_type = container.proto_dtype
     nb = operator.raw_operator
     class_log_prior = nb.class_log_prior_.astype(float_type).reshape((1, -1))
     feature_log_prob = nb.feature_log_prob_.T.astype(float_type)

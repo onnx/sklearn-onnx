@@ -14,7 +14,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
     # TODO: use sparse containers when available
     float_type = container.dtype
     # onnx_proto.TensorProto.FLOAT
-    proto_type = container.proto_type
+    proto_type = container.proto_dtype
     op = operator.raw_operator
     data = operator.input_full_names
     final = operator.output_full_names

@@ -45,7 +45,7 @@ class GraphState:
                               np.float32, np.float64, np.bool)):
             return self._add_constant(var)
         elif hasattr(var, 'ConstantValue'):
-            return self._add_constant(var.ConstantValue)
+            return self._add_constant(var.ConstantValue, var.ImplicitCast)
         elif hasattr(var, 'add_to'):
             var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
@@ -65,7 +65,7 @@ class GraphState:
             raise RuntimeError("Unexpected type for parameter 'var': {0}."
                                "".format(type(var)))
 
-    def _add_constant(self, cst):
+    def _add_constant(self, cst, can_cast=True):
         if isinstance(cst, np.ndarray):
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
@@ -92,7 +92,8 @@ class GraphState:
                     "sklearn-onnx/issues.".format(
                         cst.dtype))
             self.container.add_initializer(
-                name, ty, shape, cst.astype(astype).flatten())
+                name, ty, shape, cst.astype(astype).flatten(),
+                can_cast=can_cast)
             return name
         elif isinstance(cst, TensorProto):
             name = self.scope.get_unique_variable_name(

@@ -241,7 +241,7 @@ class ModelComponentContainer(ModelContainer):
         """
         self.outputs.append(self._make_value_info(variable))
 
-    def add_initializer(self, name, onnx_type, shape, content):
+    def add_initializer(self, name, onnx_type, shape, content, can_cast=True):
         """
         Adds a *TensorProto* into the initializer list of the final
         ONNX model.
@@ -252,9 +252,11 @@ class ModelComponentContainer(ModelContainer):
         :param shape: Tensor shape, a list of integers.
         :param content: Flattened tensor values (i.e., a float list
                         or a float array).
+        :param can_cast: the method can take the responsability
+            to cast the constant
         :return: created tensor
         """
-        if (isinstance(content, np.ndarray) and
+        if (can_cast and isinstance(content, np.ndarray) and
                 onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
                 onnx_type != self.proto_dtype):
             content = content.astype(self.dtype)

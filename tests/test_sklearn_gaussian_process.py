@@ -80,7 +80,7 @@ Ytest_ = pd.read_csv(StringIO("""
 """.strip("\n\r ")), header=None).values
 
 
-threshold = "0.4.0"
+threshold = "0.3.0"
 
 
 class TestSklearnGaussianProcess(unittest.TestCase):
@@ -116,7 +116,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         else:
             if skip_if_float32 and Xtest.dtype == np.float32:
                 return
-            assert_almost_equal(exp, got, decimal=decimal)
+            assert_almost_equal(np.squeeze(exp),
+                                np.squeeze(got), decimal=decimal)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
@@ -596,6 +597,33 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {}, skip_if_float32=True)
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_gpr_fitted_partial_float64(self):
+        data = load_iris()
+        X = data.data.astype(np.float32)
+        y = data.target.astype(np.float32)
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor()
+        gp.fit(X_train, y_train)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))])
+        self.assertTrue(model_onnx is not None)
+        try:
+            self.check_outputs(gp, model_onnx, X_test, {})
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
+            options={GaussianProcessRegressor: {'float64': True}})
+        self.assertTrue(model_onnx is not None)
+        print(model_onnx)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
 
 if __name__ == "__main__":
+    TestSklearnGaussianProcess().test_gpr_fitted_partial_float64()
     unittest.main()
