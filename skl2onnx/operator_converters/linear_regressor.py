@@ -15,12 +15,12 @@ from ..proto import onnx_proto
 def convert_sklearn_linear_regressor(scope, operator, container):
     op = operator.raw_operator
     op_type = 'LinearRegressor'
-    dtype = container.forced_dtype
+    dtype = container.dtype
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs['coefficients'] = op.coef_.astype(dtype).ravel()
     attrs['intercepts'] = (op.intercept_.astype(dtype)
                            if isinstance(op.intercept_, collections.Iterable)
-                           else [dtype(op.intercept_)])
+                           else np.array([op.intercept_], dtype=dtype))
     if len(op.coef_.shape) == 2:
         attrs['targets'] = op.coef_.shape[0]
 

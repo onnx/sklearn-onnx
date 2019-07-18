@@ -848,6 +848,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     """
+    if dtype is None:
+        raise ValueError("dtype must be specified.")
 
     if target_opset is None:
         target_opset = get_opset_number_from_onnx()

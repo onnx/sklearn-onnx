@@ -65,7 +65,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None):
 def py_make_float_array(cst, dtype, as_tensor=False):
     if dtype not in (np.float32, np.float64):
         raise TypeError("A float array must be of dtype "
-                        "np.float32 or np.float64.")
+                        "np.float32 or np.float64 ({}).".format(dtype))
     if not isinstance(cst, (int, float, np.float32, np.float64,
                             np.int32, np.int64)):
         raise TypeError("cst must be a number not {}".format(type(cst)))
@@ -239,11 +239,14 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
             OnnxConstantOfShape(OnnxShape(X)),
             axes=[1-axis], keepdims=keepdims,
             output_names=output_names)
-    else:
+    elif dtype in (np.float64, np.int32, np.int64):
         res = OnnxReduceSum(
             OnnxConstantOfShape(
                 OnnxShape(X), value=py_make_float_array(
                     0, dtype=dtype, as_tensor=True)),
             axes=[1-axis], keepdims=keepdims,
             output_names=output_names)
+    else:
+        raise NotImplementedError(
+            "Unable to create zero vector of type {}".format(dtype))
     return res

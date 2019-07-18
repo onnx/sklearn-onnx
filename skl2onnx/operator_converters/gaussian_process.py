@@ -28,7 +28,9 @@ def convert_gaussian_process_regressor(scope, operator, container):
     may cache some results if it is called with parameter
     ``return_std=True`` or ``return_cov=True``.
     """
-    dtype = container.forced_dtype
+    dtype = container.dtype
+    if dtype is None:
+        raise RuntimeError("dtype cannot be None")
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator

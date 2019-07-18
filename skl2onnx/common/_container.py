@@ -174,7 +174,7 @@ class ModelComponentContainer(ModelContainer):
         # Additional options given to converters.
         self.options = options
 
-        self.dtype = None
+        self.dtype = dtype
         if dtype == np.float32:
             self.proto_dtype = onnx_proto.TensorProto.FLOAT
         elif dtype == np.float64:
@@ -257,7 +257,7 @@ class ModelComponentContainer(ModelContainer):
         if (isinstance(content, np.ndarray) and
                 onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
                 onnx_type != self.proto_dtype):
-            content = content.astype(self.forced_dtype)
+            content = content.astype(self.dtype)
             onnx_type = self.proto_dtype
 
         if isinstance(content, TensorProto):
