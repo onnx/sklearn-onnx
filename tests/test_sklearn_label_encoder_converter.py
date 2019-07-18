@@ -28,6 +28,42 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             basename="SklearnLabelEncoder",
         )
 
+    def test_model_label_encoder_float(self):
+        model = LabelEncoder()
+        data = np.array([1.2, 3.4, 5.4, 1.2])
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn label encoder",
+            [("input", StringTensorType([1, 1]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        self.assertTrue(model_onnx.graph.node is not None)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnLabelEncoderFloat",
+        )
+
+    def test_model_label_encoder_int(self):
+        model = LabelEncoder()
+        data = np.array([10, 3, 5, -34, 0])
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn label encoder",
+            [("input", StringTensorType([1, 1]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        self.assertTrue(model_onnx.graph.node is not None)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnLabelEncoderInt",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
