@@ -29,6 +29,9 @@ def convert_gaussian_process_regressor(scope, operator, container):
     ``return_std=True`` or ``return_cov=True``. This converter
     needs to be called with theses options to enable
     the second results.
+    See example :ref:`l-gpr-example` to see how to
+    use this converter which does not behave exactly
+    as the others.
     """
     dtype = container.dtype
     if dtype is None:
