@@ -1,6 +1,7 @@
 """Tests GLMRegressor converter."""
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from sklearn import datasets
 from sklearn import linear_model
@@ -10,6 +11,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
 )
+from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model
 
 
@@ -48,6 +50,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="old onnxruntime does not support double")
     def test_model_linear_regression64(self):
         model, X = _fit_model(linear_model.LinearRegression())
         model_onnx = convert_sklearn(model, "linear regression",

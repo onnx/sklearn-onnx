@@ -30,7 +30,7 @@ import onnxruntime
 import onnx
 import sklearn
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import DotProduct
+from sklearn.gaussian_process.kernels import DotProduct, RBF
 import numpy
 import onnxruntime as rt
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
@@ -41,7 +41,7 @@ from sklearn.model_selection import train_test_split
 bost = load_boston()
 X, y = bost.data, bost.target
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-gpr = GaussianProcessRegressor(DotProduct(), alpha=1.)
+gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.)
 gpr.fit(X_train, y_train)
 print(gpr)
 
