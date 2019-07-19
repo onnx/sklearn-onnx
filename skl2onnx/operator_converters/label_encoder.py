@@ -23,8 +23,7 @@ def convert_sklearn_label_encoder(scope, operator, container):
 
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',
-                       op_version=10,
-                       **attrs)
+                       op_version=2, **attrs)
 
 
 register_converter('SklearnLabelEncoder', convert_sklearn_label_encoder)

@@ -1,8 +1,7 @@
-"""
-Tests scikit-labebencoder converter.
-"""
+"""Tests scikit-LabelEncoder converter"""
+
 import unittest
-import numpy
+import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
@@ -22,7 +21,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
         dump_data_and_model(
-            numpy.array(data),
+            np.array(data),
             model,
             model_onnx,
             basename="SklearnLabelEncoder",
