@@ -5,13 +5,11 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
-from ..proto import onnx_proto
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
-    OnnxMul, OnnxMax, OnnxCast
+    OnnxMul, OnnxMax
 )
-from ..algebra.onnx_operator import OnnxOperator
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
@@ -31,12 +29,6 @@ def convert_gaussian_process_regressor(scope, operator, container):
     ``return_std=True`` or ``return_cov=True``. This converter
     needs to be called with theses options to enable
     the second results.
-
-    Last option is ``float64=True``. The converted
-    model may have too many discrepencies if float32
-    are used. The conversion may happen fully with float64
-    or partially if this option is set up. In that case,
-    a few operator only will be used running with float64.
     """
     dtype = container.dtype
     if dtype is None:
@@ -46,8 +38,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
     op = operator.raw_operator
 
     options = container.get_options(op, dict(return_cov=False,
-                                             return_std=False,
-                                             float64=False))
+                                             return_std=False))
     if hasattr(op, 'kernel_') and op.kernel_ is not None:
         kernel = op.kernel_
     elif op.kernel is None:
@@ -64,12 +55,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             outputs.append(convert_kernel(kernel, X,
                                           output_names=out[1:],
-                                          dtype=dtype,
-                                          try_float64=options['float64']))
+                                          dtype=dtype))
         if options['return_std']:
             outputs.append(OnnxSqrt(convert_kernel_diag(
-                                        kernel, X, dtype=dtype,
-                                        try_float64=options['float64']),
+                                        kernel, X, dtype=dtype),
                                     output_names=out[1:]))
     else:
         out0 = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
@@ -81,23 +70,9 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),
-                                 dtype=dtype,
-                                 try_float64=options['float64'])
+                                 dtype=dtype)
         k_trans.set_onnx_name_prefix('kgpd')
-
-        if options['float64']:
-            if dtype == np.float64:
-                raise RuntimeError(
-                    "Redundant option. Option float64 should not be "
-                    "defined if dtype=float64.")
-            k_trans64 = OnnxCast(k_trans, to=onnx_proto.TensorProto.DOUBLE)
-            y_mean_b_64 = OnnxMatMul(k_trans64,
-                                     OnnxOperator.ConstantVariable(
-                                        op.alpha_.astype(np.float64),
-                                        implicit_cast=False))
-            y_mean_b = OnnxCast(y_mean_b_64, to=onnx_proto.TensorProto.FLOAT)
-        else:
-            y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype))
+        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype))
 
         mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
@@ -120,8 +95,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
-            y_var = convert_kernel_diag(kernel, X, dtype=dtype,
-                                        try_float64=options['float64'])
+            y_var = convert_kernel_diag(kernel, X, dtype=dtype)
 
             # y_var -= np.einsum("ij,ij->i",
             #       np.dot(K_trans, self._K_inv), K_trans)

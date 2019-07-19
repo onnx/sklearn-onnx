@@ -389,7 +389,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         (see :ref:`l-conv-options`)
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainerNode(model)
+    raw_model_container = SklearnModelContainerNode(model, dtype)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.

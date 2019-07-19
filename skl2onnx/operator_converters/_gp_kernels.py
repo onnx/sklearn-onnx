@@ -15,32 +15,24 @@ from ..algebra.onnx_ops import (
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSum, OnnxSqueeze,
-    OnnxIdentity, OnnxReduceSumSquare,
-    OnnxCast
+    OnnxIdentity, OnnxReduceSumSquare
 )
 from ..proto.onnx_helper_modified import from_array
-from ..proto import onnx_proto
-from ..algebra.onnx_operator import OnnxOperator
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
     OnnxConstantOfShape = None
 
 
-def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
-                        try_float64=False):
+def convert_kernel_diag(kernel, X, output_names=None, dtype=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel_diag(kernel.k1, X, dtype=dtype,
-                                           try_float64=try_float64),
-                       convert_kernel_diag(kernel.k2, X, dtype=dtype,
-                                           try_float64=try_float64),
+        return OnnxAdd(convert_kernel_diag(kernel.k1, X, dtype=dtype),
+                       convert_kernel_diag(kernel.k2, X, dtype=dtype),
                        output_names=output_names)
 
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel_diag(kernel.k1, X, dtype=dtype,
-                                           try_float64=try_float64),
-                       convert_kernel_diag(kernel.k2, X, dtype=dtype,
-                                           try_float64=try_float64),
+        return OnnxMul(convert_kernel_diag(kernel.k1, X, dtype=dtype),
+                       convert_kernel_diag(kernel.k2, X, dtype=dtype),
                        output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
@@ -96,31 +88,18 @@ def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
     return OnnxIdentity(K, **kwargs)
 
 
-def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None,
-                         try_float64=False, **kwargs):
+def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, **kwargs):
     """
     Implements the kernel
     :math:`k(x_i,x_j)=\\sigma_0^2+x_i\\cdot x_j`.
     """
     # It only works in two dimensions.
     t_sigma_0 = py_make_float_array(sigma_0 ** 2, dtype=dtype)
-    if try_float64:
-        if isinstance(Y, np.ndarray):
-            tr = OnnxOperator.ConstantVariable(
-                    Y.T.astype(np.float64),
-                    implicit_cast=False)
-            matm1 = OnnxCast(X, to=onnx_proto.TensorProto.DOUBLE)
-            matm = OnnxCast(OnnxMatMul(matm1, tr),
-                            to=onnx_proto.TensorProto.FLOAT)
-        else:
-            tr = OnnxTranspose(Y, perm=[1, 0])
-            matm = OnnxMatMul(X, tr)
+    if isinstance(Y, np.ndarray):
+        tr = Y.T
     else:
-        if isinstance(Y, np.ndarray):
-            tr = Y.T
-        else:
-            tr = OnnxTranspose(Y, perm=[1, 0])
-        matm = OnnxMatMul(X, tr)
+        tr = OnnxTranspose(Y, perm=[1, 0])
+    matm = OnnxMatMul(X, tr)
     K = OnnxAdd(matm, t_sigma_0)
     return OnnxIdentity(K, **kwargs)
 
@@ -143,23 +122,18 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
 
 
 def convert_kernel(kernel, X, output_names=None,
-                   x_train=None, dtype=None, try_float64=False):
+                   x_train=None, dtype=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel(
-                            kernel.k1, X, x_train=x_train, dtype=dtype,
-                            try_float64=try_float64),
-                       convert_kernel(
-                            kernel.k2, X, x_train=x_train, dtype=dtype,
-                            try_float64=try_float64),
-                       output_names=output_names)
-    if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel(
-                            kernel.k1, X, x_train=x_train, dtype=dtype,
-                            try_float64=try_float64),
-                       convert_kernel(
-                            kernel.k2, X, x_train=x_train, dtype=dtype,
-                            try_float64=try_float64),
-                       output_names=output_names)
+        clop = OnnxAdd
+    elif isinstance(kernel, Product):
+        clop = OnnxMul
+    else:
+        clop = None
+    if clop is not None:
+        return clop(
+            convert_kernel(kernel.k1, X, x_train=x_train, dtype=dtype),
+            convert_kernel(kernel.k2, X, x_train=x_train, dtype=dtype),
+            output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
@@ -233,8 +207,7 @@ def convert_kernel(kernel, X, output_names=None,
         if x_train is None:
             return _convert_dot_product(X, X, sigma_0=kernel.sigma_0,
                                         dtype=dtype,
-                                        output_names=output_names,
-                                        try_float64=try_float64)
+                                        output_names=output_names)
         else:
             if len(x_train.shape) != 2:
                 raise NotImplementedError(
@@ -242,8 +215,7 @@ def convert_kernel(kernel, X, output_names=None,
                     "implemented.")
             return _convert_dot_product(
                 X, x_train, sigma_0=kernel.sigma_0,
-                dtype=dtype, output_names=output_names,
-                try_float64=try_float64)
+                dtype=dtype, output_names=output_names)
 
     if isinstance(kernel, RationalQuadratic):
         if x_train is None:

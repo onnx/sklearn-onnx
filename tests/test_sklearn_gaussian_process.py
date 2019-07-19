@@ -17,7 +17,7 @@ from sklearn.gaussian_process.kernels import (
     RBF, ConstantKernel as C,
 )
 from sklearn.model_selection import train_test_split
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import to_onnx
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
@@ -484,8 +484,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
         reason="onnxruntime %s" % threshold)
-    @unittest.skipIf(True, "Huge discrepencies due to the use "
-                           "of float instead of doubles")
     def test_gpr_rbf_fitted_return_std_exp_sine_squared(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
@@ -507,17 +505,43 @@ class TestSklearnGaussianProcess(unittest.TestCase):
             basename="SklearnGaussianProcessExpSineSquaredStd-Out0-Dec3")
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
-                             GaussianProcessRegressor])
+                             GaussianProcessRegressor],
+                           decimal=4)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
         reason="onnxruntime %s" % threshold)
-    @unittest.skipIf(True, "Huge discrepencies due to the use "
-                           "of float instead of doubles")
+    def test_gpr_rbf_fitted_return_std_exp_sine_squared_double(self):
+
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
+                                      alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        gp.predict(Xtrain_, return_std=True)
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType(['d1', 'd2']))],
+            options=options, dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            Xtest_.astype(np.float64), gp, model_onnx,
+            verbose=False,
+            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0")
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+                           predict_attributes=options[
+                             GaussianProcessRegressor],
+                           decimal=4)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
     def test_gpr_rbf_fitted_return_std_dot_product(self):
 
         gp = GaussianProcessRegressor(kernel=DotProduct(),
-                                      alpha=1e-7,
+                                      alpha=1.,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
@@ -526,21 +550,20 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
-            options=options)
+            gp, initial_types=[('X', DoubleTensorType(['d1', 'd2']))],
+            options=options, dtype=np.float64)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float32), gp, model_onnx,
-            basename="SklearnGaussianProcessDotProductStd-Out0")
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+            Xtest_.astype(np.float64), gp, model_onnx,
+            basename="SklearnGaussianProcessDotProductStdDouble-Out0-Dec3")
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor])
+                             GaussianProcessRegressor],
+                           decimal=3)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(threshold),
         reason="onnxruntime %s" % threshold)
-    @unittest.skipIf(True, "Huge discrepencies due to the use "
-                           "of float instead of doubles")
     def test_gpr_rbf_fitted_return_std_rational_quadratic(self):
 
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
@@ -553,20 +576,20 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
-            options=options)
+            gp, initial_types=[('X', DoubleTensorType(['d1', 'd2']))],
+            options=options, dtype=np.float64)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float32), gp, model_onnx,
-            basename="SklearnGaussianProcessRationalQuadraticStd-Out0")
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
+            Xtest_.astype(np.float64), gp, model_onnx,
+            basename="SklearnGaussianProcessRationalQuadraticStdDouble-Out0")
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
     @unittest.skipIf(True, "needs to convert cho_solve")
     def test_gpr_rbf_fitted_return_cov(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-7,
+        gp = GaussianProcessRegressor(alpha=1.,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
@@ -602,27 +625,27 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         reason="onnxruntime %s" % threshold)
     def test_gpr_fitted_partial_float64(self):
         data = load_iris()
-        X = data.data.astype(np.float32)
-        y = data.target.astype(np.float32)
+        X = data.data
+        y = data.target
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=DotProduct(), alpha=10.)
         gp.fit(X_train, y_train)
 
-        if False:
-            model_onnx = to_onnx(
-                gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))])
-            self.assertTrue(model_onnx is not None)
-            try:
-                self.check_outputs(gp, model_onnx, X_test, {})
-            except AssertionError as e:
-                assert "Max relative difference:" in str(e)
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))])
+        self.assertTrue(model_onnx is not None)
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
 
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType(['d1', 'd2']))],
-            options={GaussianProcessRegressor: {'float64': True}})
+            gp, initial_types=[('X', DoubleTensorType(['d1', 'd2']))],
+            dtype=np.float64)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
 
 if __name__ == "__main__":
+    TestSklearnGaussianProcess().test_gpr_fitted_partial_float64()
     unittest.main()

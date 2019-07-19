@@ -126,8 +126,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology = parse_sklearn_model(model, initial_types, target_opset,
                                    custom_conversion_functions,
                                    custom_shape_calculators,
-                                   custom_parsers,
-                                   options=options)
+                                   custom_parsers, options=options,
+                                   dtype=dtype)
 
     # Infer variable shapes
     topology.compile()
@@ -139,8 +139,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     return (onnx_model, topology) if intermediate else onnx_model
 
 
-def to_onnx(model, X=None, name=None, initial_types=None, options=None,
-            dtype=np.float32):
+def to_onnx(model, X=None, name=None, initial_types=None,
+            target_opset=None, options=None, dtype=np.float32):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -149,6 +149,7 @@ def to_onnx(model, X=None, name=None, initial_types=None, options=None,
         input types (*initial_types*)
     :param initial_types: if X is None, then *initial_types* must be
         defined
+    :param target_opset: conversion with a specific target opset
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param name: name of the model
@@ -164,11 +165,21 @@ def to_onnx(model, X=None, name=None, initial_types=None, options=None,
     from .algebra.type_helper import guess_initial_types
 
     if isinstance(model, OnnxOperatorMixin):
-        return model.to_onnx(X=X, name=name)
+        if target_opset is not None:
+            raise NotImplementedError(
+                "target opset not yet implemented for OnnxOperatorMixin.")
+        if options is not None:
+            raise NotImplementedError(
+                "options not yet implemented for OnnxOperatorMixin.")
+        return model.to_onnx(X=X, name=name, dtype=dtype)
     if name is None:
-        name = model.__class__.__name__
+        name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
+    if dtype not in (np.float32, np.float64):
+        raise NotImplementedError(
+            "dtype should be real not {}".format(dtype))
     return convert_sklearn(model, initial_types=initial_types,
+                           target_opset=target_opset,
                            name=name, options=options, dtype=dtype)
 
 
