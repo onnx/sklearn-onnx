@@ -34,7 +34,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         for cl in [None, 0.231, 1e-6, 0.9]:
             if cl is not None:
                 model.init_.class_prior_ = np.array([cl, cl])
-            initial_types = [('input', FloatTensorType((1, X.shape[1])))]
+            initial_types = [('input', FloatTensorType(('N', X.shape[1])))]
             model_onnx = convert_sklearn(model, initial_types=initial_types)
             if "Regressor" in str(model_onnx):
                 raise AssertionError(str(model_onnx))
@@ -170,7 +170,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gradient boosting regression",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType(['N', X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

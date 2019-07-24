@@ -66,7 +66,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
         op = OnnxNormalizer('I0', norm='L1', op_version=1, output_names=['O0'])
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)},
-                         outputs=[('O0', FloatTensorType((1, 2)))])
+                         outputs=[('O0', FloatTensorType(('N', 2)))])
         assert onx is not None
         sonx = str(onx)
         assert "ai.onnx.ml" in sonx
@@ -175,8 +175,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
             i2 = list(rand(1, dim).ravel())
             matrices.append(i2)
             node = OnnxScaler(i1, offset=i2, scale=scale, output_names=['Y'])
-            onx = node.to_onnx([(input_name, FloatTensorType((1, dim)))],
-                               outputs=[('Y', FloatTensorType((1, dim)))])
+            onx = node.to_onnx([(input_name, FloatTensorType(('N', dim)))],
+                               outputs=[('Y', FloatTensorType(('N', dim)))])
             return onx, matrices
 
         import onnxruntime as ort

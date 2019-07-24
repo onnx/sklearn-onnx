@@ -48,7 +48,7 @@ tr = KMeans(n_clusters=2)
 tr.fit(X)
 
 onx = convert_sklearn(tr, initial_types=[('X',
-                                          FloatTensorType((1, X.shape[1])))])
+                                          FloatTensorType(('N', X.shape[1])))])
 print(predict_with_onnxruntime(onx, X))
 
 #################################
@@ -134,7 +134,7 @@ tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
 onx = convert_sklearn(tr, initial_types=[('X',
-                                          FloatTensorType((1, X.shape[1])))])
+                                          FloatTensorType(('N', X.shape[1])))])
 print(predict_with_onnxruntime(onx, X))
 
 #############################

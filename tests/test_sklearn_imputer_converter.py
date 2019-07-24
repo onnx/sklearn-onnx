@@ -30,7 +30,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
         # There is no nan integer. The runtime is not tested
         # in this case.
         model_onnx = convert_sklearn(model, "scikit-learn imputer",
-                                     [("input", Int64TensorType([1, 2]))])
+                                     [("input", Int64TensorType(['N', 2]))])
         self.assertTrue(model_onnx is not None)
 
     @unittest.skipIf(Imputer is None,
@@ -40,7 +40,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
         data = [[1, 2], [np.nan, 3], [7, 6]]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn imputer",
-                                     [("input", Int64TensorType([1, 2]))])
+                                     [("input", Int64TensorType(['N', 2]))])
         self.assertEqual(len(model_onnx.graph.node), 2)
 
         # Last node should be Imputer
@@ -57,7 +57,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
         model.fit(data)
 
         model_onnx = convert_sklearn(model, "scikit-learn imputer",
-                                     [("input", FloatTensorType([1, 2]))])
+                                     [("input", FloatTensorType(['N', 2]))])
         self.assertTrue(model_onnx.graph.node is not None)
 
         # should contain only node
@@ -85,7 +85,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn simple imputer",
-            [("input", FloatTensorType([1, 2]))],
+            [("input", FloatTensorType(['N', 2]))],
         )
         self.assertTrue(model_onnx.graph.node is not None)
 

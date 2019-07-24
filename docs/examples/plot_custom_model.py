@@ -374,7 +374,7 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 # to convert.
 
 model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                             [('input', FloatTensorType([1,
+                             [('input', FloatTensorType(['N',
                                                          X_test.shape[1]]))])
 
 # And save.

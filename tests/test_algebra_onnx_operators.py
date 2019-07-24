@@ -15,7 +15,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
-    OnnxArrayFeatureExtractor,
+    OnnxArrayFeatureExtractor, OnnxMul
 )
 from onnx import (
     helper, TensorProto, load_model,
@@ -58,7 +58,7 @@ class TestOnnxOperators(unittest.TestCase):
             nva = list(op.enumerate_variables())
             assert len(nin) == 1
             assert nin[0][0] == 'input'
-            assert nin[0][1].shape == [1, 2]
+            assert nin[0][1].shape == ['N', 2]
             assert len(nno) == 1
             assert nno[0].output_names == ['variable']
             assert len(nva) == 1
@@ -71,7 +71,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub', [('input', FloatTensorType([1, 2]))],
+            tr, 'a-sub', [('input', FloatTensorType(['N', 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -113,7 +113,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub-div', [('input', FloatTensorType([1, 2]))],
+            tr, 'a-sub-div', [('input', FloatTensorType(['N', 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -131,10 +131,14 @@ class TestOnnxOperators(unittest.TestCase):
             C = op.cluster_centers_
             C2 = row_norms(C, squared=True)
 
-            N = X.type.shape[0]
-            zeros = np.zeros((N, ))
-
             rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
+
+            N = X.type.shape[0]
+            if isinstance(N, int):
+                zeros = np.zeros((N, ))
+            else:
+                zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
+
             z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
             y2 = OnnxAdd(C2, z)
             lo = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
@@ -148,7 +152,7 @@ class TestOnnxOperators(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(
-            model, 'a-kmeans', [('input', FloatTensorType([1, X.shape[1]]))],
+            model, 'a-kmeans', [('input', FloatTensorType(['N', X.shape[1]]))],
             custom_conversion_functions={KMeans: conv})
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,

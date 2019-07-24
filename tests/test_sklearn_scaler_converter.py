@@ -20,7 +20,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", Int64TensorType([1, 3]))])
+                                     [("input", Int64TensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.int64),
@@ -39,7 +39,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -57,7 +57,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -75,7 +75,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -93,7 +93,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -111,7 +111,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -129,7 +129,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -147,7 +147,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -165,7 +165,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -183,7 +183,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
@@ -201,7 +201,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),

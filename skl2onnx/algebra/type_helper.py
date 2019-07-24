@@ -21,7 +21,9 @@ def _guess_type(given_type):
     Returns the proper type of an input.
     """
     if isinstance(given_type, np.ndarray):
-        return _guess_numpy_type(given_type.dtype, list(given_type.shape))
+        shape = list(given_type.shape)
+        shape[0] = 'N'
+        return _guess_numpy_type(given_type.dtype, shape)
     elif isinstance(given_type, (FloatTensorType, Int64TensorType,
                                  Int32TensorType, StringTensorType)):
         return given_type

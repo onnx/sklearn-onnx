@@ -38,7 +38,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(model, "pipeline",
                                            [("input",
-                                             FloatTensorType([1, 2]))])
+                                             FloatTensorType(['N', 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -67,7 +67,7 @@ class TestInvestigate(unittest.TestCase):
 
         try:
             collect_intermediate_steps(model, "pipeline",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType(['N', 2]))])
         except MissingShapeCalculator as e:
             assert "MyScaler" in str(e)
             assert "gallery" in str(e)
@@ -108,7 +108,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(model, "coulmn transformer",
                                            [("input",
-                                             FloatTensorType([1, 2]))])
+                                             FloatTensorType(['N', 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -130,10 +130,9 @@ class TestInvestigate(unittest.TestCase):
                              ("scaler2", RobustScaler())])
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
-
         steps = collect_intermediate_steps(model, "feature union",
                                            [("input",
-                                             FloatTensorType([1, 2]))])
+                                             FloatTensorType(['N', 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3

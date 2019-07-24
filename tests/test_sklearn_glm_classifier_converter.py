@@ -39,7 +39,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(
             linear_model.LogisticRegression())
         model_onnx = convert_sklearn(model, "logistic regression",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
@@ -59,7 +59,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(
             linear_model.LogisticRegressionCV())
         model_onnx = convert_sklearn(model, "logistic regression cv",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
@@ -79,7 +79,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(
             linear_model.LogisticRegression(fit_intercept=False))
         model_onnx = convert_sklearn(model, "logistic regression",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
@@ -101,7 +101,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -123,7 +123,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -146,7 +146,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -168,7 +168,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -194,7 +194,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -216,7 +216,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -243,7 +243,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -262,7 +262,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
     def test_model_linear_svc_binary_class(self):
         model, X = self._fit_model_binary_classification(LinearSVC())
         model_onnx = convert_sklearn(model, "linear SVC",
-                                     [("input", FloatTensorType([1, 3]))])
+                                     [("input", FloatTensorType(['N', 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
@@ -280,7 +280,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multi-class linear SVC",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType(['N', 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

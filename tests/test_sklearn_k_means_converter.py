@@ -20,7 +20,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType(['N', 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
@@ -38,7 +38,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model = MiniBatchKMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType(['N', 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],

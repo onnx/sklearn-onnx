@@ -66,8 +66,8 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         pipe.fit(X, y)
 
         try:
-            model_onnx = convert_sklearn(pipe, "pipeline",
-                                         [("input", FloatTensorType([1, 2]))])
+            model_onnx = convert_sklearn(
+                pipe, "pipeline", [("input", FloatTensorType(['N', 2]))])
         except RuntimeError as e:
             if "No proper shape calculator found for" not in str(
                     e
@@ -78,7 +78,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             model_onnx = convert_sklearn(
                 pipe,
                 "pipeline",
-                [("input", FloatTensorType([1, 2]))],
+                [("input", FloatTensorType(['N', 2]))],
                 custom_conversion_functions={
                     "MyCustomClassifier": my_custom_converter
                 },
@@ -94,7 +94,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             pipe,
             "pipeline",
-            [("input", FloatTensorType([1, 2]))],
+            [("input", FloatTensorType(['N', 2]))],
             custom_conversion_functions={
                 MyCustomClassifier: my_custom_converter
             },
@@ -118,7 +118,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
         )
 
         model_onnx = convert_sklearn(pipe, "pipeline",
-                                     [("input", FloatTensorType([1, 2]))])
+                                     [("input", FloatTensorType(['N', 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(numpy.float32),

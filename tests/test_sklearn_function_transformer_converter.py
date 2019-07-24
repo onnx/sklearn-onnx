@@ -37,11 +37,11 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType(['N', 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType(['N', 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType(['N', 1])
                 inputs.append((k, t))
             return inputs
 
@@ -88,11 +88,11 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType(['N', 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType(['N', 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType(['N', 1])
                 inputs.append((k, t))
             return inputs
 
@@ -137,11 +137,11 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType(['N', 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType(['N', 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType(['N', 1])
                 inputs.append((k, t))
             return inputs
 

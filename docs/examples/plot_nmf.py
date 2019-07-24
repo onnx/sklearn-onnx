@@ -103,7 +103,7 @@ def nmf_to_onnx(W, H):
     indices_type = np.array([0], dtype=np.int64)
     onx = res.to_onnx(inputs={'col': indices_type,
                               'row': indices_type},
-                      outputs=[('rec', FloatTensorType((1, 1)))])
+                      outputs=[('rec', FloatTensorType(('N', 1)))])
     return onx
 
 

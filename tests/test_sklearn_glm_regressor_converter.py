@@ -329,7 +329,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_multi_linear_regression(self):
         model, X = _fit_model_multi(linear_model.LinearRegression())
         model_onnx = convert_sklearn(model, "linear regression",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType(['N', 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),

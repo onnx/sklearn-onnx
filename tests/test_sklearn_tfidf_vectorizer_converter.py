@@ -29,7 +29,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -54,7 +54,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus[:3].ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))],
+                                     [('input', StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
 
@@ -80,7 +80,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         # onnxruntime fails with empty strings
@@ -106,7 +106,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         corpus = numpy.array([
@@ -137,7 +137,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(2, 2), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -157,7 +157,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -182,7 +182,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -207,7 +207,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm="l1")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType(['N', 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -231,7 +231,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm="l2")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -256,7 +256,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 3), norm=None)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1, 1]))],
+                                     [("input", StringTensorType(['N', 1]))],
                                      options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -290,7 +290,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         model_onnx = convert_sklearn(
             vect,
             "TfidfVectorizer",
-            [("input", StringTensorType([1, 1]))],
+            [("input", StringTensorType(['N', 1]))],
             options=extra,
         )
         self.assertTrue(model_onnx is not None)
@@ -327,7 +327,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             convert_sklearn(
                 vect,
                 "TfidfVectorizer",
-                [("input", StringTensorType([1, 1]))],
+                [("input", StringTensorType(['N', 1]))],
                 options=extra,
             )
         except RuntimeError:
@@ -343,7 +343,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         model_onnx = convert_sklearn(
             vect,
             "TfidfVectorizer",
-            [("input", StringTensorType([1, 1]))],
+            [("input", StringTensorType(['N', 1]))],
             options=extra,
         )
         self.assertTrue(model_onnx is not None)

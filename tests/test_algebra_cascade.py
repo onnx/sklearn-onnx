@@ -22,7 +22,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 i1 = node
             i2 = (np.ones((1, dim)) * nbnode * 10).astype(np.float32)
             node = OnnxAdd(i1, i2, output_names=['Y'])
-            onx = node.to_onnx([(input_name, FloatTensorType((1, dim)))],
+            onx = node.to_onnx([(input_name, FloatTensorType(('N', dim)))],
                                outputs=[('Y', FloatTensorType())])
             return onx
 
@@ -64,8 +64,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 i1 = node
             i2 = list(map(float, np.ones((1, dim)).astype(np.float32).ravel()))
             node = OnnxScaler(i1, offset=i2, scale=scale, output_names=['Y'])
-            onx = node.to_onnx([(input_name, FloatTensorType((1, dim)))],
-                               outputs=[('Y', FloatTensorType((1, dim)))])
+            onx = node.to_onnx([(input_name, FloatTensorType(('N', dim)))],
+                               outputs=[('Y', FloatTensorType(('N', dim)))])
             return onx
 
         exp = [np.zeros((1, 5)),

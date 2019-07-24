@@ -72,7 +72,7 @@ pipe.fit(X, y)
 
 try:
     model_onnx = convert_sklearn(pipe, 'pipeline',
-                                 [('input', FloatTensorType([1, 2]))])
+                                 [('input', FloatTensorType(['N', 2]))])
 except Exception as e:
     print(e)
 
@@ -120,7 +120,7 @@ update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
 # Let's convert again.
 
 model_onnx = convert_sklearn(pipe, 'pipeline',
-                             [('input', FloatTensorType([1, 2]))])
+                             [('input', FloatTensorType(['N', 2]))])
 
 print(str(model_onnx)[:300] + "\n...")
 
@@ -161,11 +161,11 @@ def convert_dataframe_schema(df, drop=None):
         if drop is not None and k in drop:
             continue
         if v == 'int64':
-            t = Int64TensorType([1, 1])
+            t = Int64TensorType(['N', 1])
         elif v == 'float64':
-            t = FloatTensorType([1, 1])
+            t = FloatTensorType(['N', 1])
         else:
-            t = StringTensorType([1, 1])
+            t = StringTensorType(['N', 1])
         inputs.append((k, t))
     return inputs
 
@@ -189,7 +189,7 @@ except Exception as e:
 # Let's try it that way:
 
 model_onnx = convert_sklearn(
-    clf, initial_types=[('X', FloatTensorType([1, 2]))])
+    clf, initial_types=[('X', FloatTensorType(['N', 2]))])
 print(str(model_onnx)[:300] + "\n...")
 
 ##################################

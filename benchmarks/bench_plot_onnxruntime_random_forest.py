@@ -32,7 +32,7 @@ def fcts_model(X, y, max_depth, n_estimators):
     rf = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators)
     rf.fit(X, y)
 
-    initial_types = [('X', FloatTensorType([1, X.shape[1]]))]
+    initial_types = [('X', FloatTensorType(['N', X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())
