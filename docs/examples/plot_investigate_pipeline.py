@@ -57,7 +57,7 @@ pipe.fit(X_digits, y_digits)
 # ++++++++++++++++++
 
 
-initial_types = [('input', FloatTensorType(('N', X_digits.shape[1])))]
+initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
 model_onnx = convert_sklearn(pipe, initial_types=initial_types)
 
 sess = rt.InferenceSession(model_onnx.SerializeToString())

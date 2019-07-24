@@ -32,7 +32,7 @@ def fcts_model(X, y, fit_intercept):
     rf = LogisticRegression(fit_intercept=fit_intercept)
     rf.fit(X, y)
 
-    initial_types = [('X', FloatTensorType(['N', X.shape[1]]))]
+    initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())

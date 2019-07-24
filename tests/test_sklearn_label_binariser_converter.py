@@ -17,7 +17,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label binariser",
-            [("input", Int64TensorType([len(X)]))],
+            [("input", Int64TensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -36,7 +36,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label binariser",
-            [("input", Int64TensorType([len(X)]))],
+            [("input", Int64TensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -55,7 +55,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label binariser",
-            [("input", Int64TensorType([len(X)]))],
+            [("input", Int64TensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -74,7 +74,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label binariser",
-            [("input", Int64TensorType([len(X)]))],
+            [("input", Int64TensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

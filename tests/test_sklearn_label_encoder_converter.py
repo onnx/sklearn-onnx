@@ -17,7 +17,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label encoder",
-            [("input", StringTensorType(['N', 1]))],
+            [("input", StringTensorType([None, 1]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)

@@ -158,7 +158,7 @@ class TestCustomTransformer(unittest.TestCase):
         model_onnx = convert_sklearn(
             ptsne_knn,
             "predictable_tsne",
-            [("input", FloatTensorType(['N', Xd.shape[1]]))],
+            [("input", FloatTensorType([None, Xd.shape[1]]))],
         )
 
         dump_data_and_model(
@@ -180,7 +180,7 @@ class TestCustomTransformer(unittest.TestCase):
         model_onnx = convert_sklearn(
             ptsne_knn,
             "predictable_tsne",
-            [("input", FloatTensorType(['N', Xd.shape[1]]))],
+            [("input", FloatTensorType([None, Xd.shape[1]]))],
             custom_parsers={PredictableTSNE: my_parser},
         )
         assert len(trace_line) == 1
@@ -198,7 +198,7 @@ class TestCustomTransformer(unittest.TestCase):
         model_onnx = convert_sklearn(
             ptsne_knn,
             "predictable_tsne",
-            [("input", FloatTensorType(['N', Xd.shape[1]]))],
+            [("input", FloatTensorType([None, Xd.shape[1]]))],
         )
 
         assert len(trace_line) == 2

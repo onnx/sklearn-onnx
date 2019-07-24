@@ -327,7 +327,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             convert_sklearn(
                 vect,
                 "TfidfVectorizer",
-                [("input", StringTensorType(['N', 1]))],
+                [("input", StringTensorType([None, 1]))],
                 options=extra,
             )
         except RuntimeError:

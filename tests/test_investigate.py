@@ -38,7 +38,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(model, "pipeline",
                                            [("input",
-                                             FloatTensorType(['N', 2]))])
+                                             FloatTensorType([None, 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -67,7 +67,7 @@ class TestInvestigate(unittest.TestCase):
 
         try:
             collect_intermediate_steps(model, "pipeline",
-                                       [("input", FloatTensorType(['N', 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
         except MissingShapeCalculator as e:
             assert "MyScaler" in str(e)
             assert "gallery" in str(e)
@@ -108,7 +108,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(model, "coulmn transformer",
                                            [("input",
-                                             FloatTensorType(['N', 2]))])
+                                             FloatTensorType([None, 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -132,7 +132,7 @@ class TestInvestigate(unittest.TestCase):
         all_models = list(enumerate_pipeline_models(model))
         steps = collect_intermediate_steps(model, "feature union",
                                            [("input",
-                                             FloatTensorType(['N', 2]))])
+                                             FloatTensorType([None, 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -157,7 +157,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType(('N', X.shape[1])))])
+            [("input", FloatTensorType((None, X.shape[1])))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -184,7 +184,7 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType(['N', X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3

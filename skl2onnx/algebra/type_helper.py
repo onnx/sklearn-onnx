@@ -22,7 +22,7 @@ def _guess_type(given_type):
     """
     if isinstance(given_type, np.ndarray):
         shape = list(given_type.shape)
-        shape[0] = 'N'
+        shape[0] = None
         return _guess_numpy_type(given_type.dtype, shape)
     elif isinstance(given_type, (FloatTensorType, Int64TensorType,
                                  Int32TensorType, StringTensorType)):

@@ -78,7 +78,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         model_onnx = convert_sklearn(
             tfi,
             "tfidf",
-            initial_types=[("input", StringTensorType(['N', 1]))],
+            initial_types=[("input", StringTensorType([None, 1]))],
             options=extra,
         )
         dump_data_and_model(
@@ -139,7 +139,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         model_onnx = convert_sklearn(
             pipeline,
             "tfidf",
-            initial_types=[("input", StringTensorType(['N', 2]))],
+            initial_types=[("input", StringTensorType([None, 2]))],
             options=extra,
         )
         test_data = np.array([

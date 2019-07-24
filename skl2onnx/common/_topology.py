@@ -66,7 +66,7 @@ class Variable:
                     raise TypeError("shape must be a tuple or a list not "
                                     "{}.".format(type_fct(shape)))
             for dim in shape:
-                if dim in ('None', 'N'):
+                if dim in ('None', 'N', None):
                     continue
                 if not isinstance(dim, (int, np.int32, np.int64)):
                     raise TypeError("shape must contains integers not "

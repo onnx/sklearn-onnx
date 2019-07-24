@@ -19,7 +19,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -41,7 +41,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -63,7 +63,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -85,7 +85,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         X = np.array([X[1], X[1]])
         self.assertIsNotNone(model_onnx)
@@ -109,7 +109,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -133,7 +133,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -156,7 +156,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -179,7 +179,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -201,7 +201,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -223,7 +223,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -245,7 +245,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -267,7 +267,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -289,7 +289,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -311,7 +311,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -333,7 +333,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -355,7 +355,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -377,7 +377,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD multi-class classifier",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         X = np.array([X[0], X[0]])
         self.assertIsNotNone(model_onnx)

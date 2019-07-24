@@ -35,7 +35,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input", Int64TensorType(['N', 3]))],
+            [("input", Int64TensorType([None, 3]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -63,8 +63,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model = OneHotEncoder(categories="auto")
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType(['N', 2])),
-            ("input2", Int64TensorType(['N', 1])),
+            ("input1", StringTensorType([None, 2])),
+            ("input2", Int64TensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(model,
                                      "one-hot encoder mixed-type inputs",
@@ -88,7 +88,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         data = [["cat"], ["cat"]]
         model = OneHotEncoder(categories="auto")
         model.fit(data)
-        inputs = [("input1", StringTensorType(['N', 1]))]
+        inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(model, "one-hot encoder one string cat",
                                      inputs)
         self.assertTrue(model_onnx is not None)
@@ -109,7 +109,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         data = [["cat2"], ["cat1"]]
         model = OneHotEncoder(categories="auto")
         model.fit(data)
-        inputs = [("input1", StringTensorType(['N', 1]))]
+        inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(model, "one-hot encoder two string cats",
                                      inputs)
         self.assertTrue(model_onnx is not None)
@@ -142,8 +142,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             raise AssertionError("scikit-learn's API has changed.")
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType(['N', 1])),
-            ("input2", Int64TensorType(['N', 1]))
+            ("input1", StringTensorType([None, 1])),
+            ("input2", Int64TensorType([None, 1]))
         ]
         model_onnx = convert_sklearn(
             model, "one-hot encoder one string and int categories", inputs)
@@ -170,7 +170,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input", Int64TensorType(['N', 3]))],
+            [("input", Int64TensorType([None, 3]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -195,7 +195,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input", Int64TensorType(['N', 3]))],
+            [("input", Int64TensorType([None, 3]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

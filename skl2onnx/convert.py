@@ -51,14 +51,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     Example of *initial_types*:
     Assume that the specified *scikit-learn* model takes a heterogeneous list as its input.
     If the first 5 elements are floats and the last 10 elements are integers,
-    we need to specify initial types as below. The ['N'] in ['N', 5] indicates
+    we need to specify initial types as below. The [None] in [None, 5] indicates
     the batch size here is unknown.
 
     ::
 
         from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-        initial_type = [('float_input', FloatTensorType(['N', 5])),
-                        ('int64_input', Int64TensorType(['N', 10]))]
+        initial_type = [('float_input', FloatTensorType([None, 5])),
+                        ('int64_input', Int64TensorType([None, 10]))]
 
     .. note::
 
@@ -90,7 +90,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         extra = {TfidfVectorizer: {"separators": [' ', '[.]', '\\\\?',
                     ',', ';', ':', '\\\\!', '\\\\(', '\\\\)']}}
         model_onnx = convert_sklearn(model, "tfidf",
-                                     initial_types=[("input", StringTensorType(['N', 1]))],
+                                     initial_types=[("input", StringTensorType([None, 1]))],
                                      options=extra)
 
     But if a pipeline contains two model of the same class,
@@ -101,7 +101,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         extra = {id(model): {"separators": [' ', '.', '\\\\?', ',', ';',
                     ':', '\\\\!', '\\\\(', '\\\\)']}}
         model_onnx = convert_sklearn(pipeline, "pipeline-with-2-tfidf",
-                                     initial_types=[("input", StringTensorType(['N', 1]))],
+                                     initial_types=[("input", StringTensorType([None, 1]))],
                                      options=extra)
 
     It is used in example :ref:`l-example-tfidfvectorizer`.

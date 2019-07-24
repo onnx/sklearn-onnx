@@ -26,7 +26,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model = FeatureUnion([('standard', StandardScaler()),
                               ('minmax', MinMaxScaler())]).fit(X_train)
         model_onnx = convert_sklearn(
-            model, 'feature union', [('input', FloatTensorType(X_test.shape))])
+            model, 'feature union', [('input', FloatTensorType([None, X_test.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X_test,
                             model,
@@ -44,7 +44,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              transformer_weights={'standard': 2, 'minmax': 4}
                              ).fit(X_train)
         model_onnx = convert_sklearn(
-            model, 'feature union', [('input', FloatTensorType(X_test.shape))])
+            model, 'feature union', [('input', FloatTensorType([None, X_test.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X_test,
                             model,
@@ -62,7 +62,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              transformer_weights={'pca': 10, 'svd': 3}
                              ).fit(X_train)
         model_onnx = convert_sklearn(
-            model, 'feature union', [('input', Int64TensorType(X_test.shape))])
+            model, 'feature union', [('input', Int64TensorType([None, X_test.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test,
@@ -85,7 +85,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              transformer_weights={'pca1': 10, 'svd2': 3}
                              ).fit(X_train)
         model_onnx = convert_sklearn(
-            model, 'feature union', [('input', FloatTensorType(X_test.shape))])
+            model, 'feature union', [('input', FloatTensorType([None, X_test.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test,

@@ -58,7 +58,7 @@ class TestOnnxOperators(unittest.TestCase):
             nva = list(op.enumerate_variables())
             assert len(nin) == 1
             assert nin[0][0] == 'input'
-            assert nin[0][1].shape == ['N', 2]
+            assert nin[0][1].shape == [None, 2]
             assert len(nno) == 1
             assert nno[0].output_names == ['variable']
             assert len(nva) == 1
@@ -71,7 +71,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub', [('input', FloatTensorType(['N', 2]))],
+            tr, 'a-sub', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -113,7 +113,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub-div', [('input', FloatTensorType(['N', 2]))],
+            tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -152,7 +152,7 @@ class TestOnnxOperators(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(
-            model, 'a-kmeans', [('input', FloatTensorType(['N', X.shape[1]]))],
+            model, 'a-kmeans', [('input', FloatTensorType([None, X.shape[1]]))],
             custom_conversion_functions={KMeans: conv})
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,

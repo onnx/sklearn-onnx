@@ -42,7 +42,7 @@ class TestOtherLibrariesInPipelineScikitPandas(unittest.TestCase):
             model_onnx = convert_sklearn(  # noqa
                 mapper,
                 "predictable_tsne",
-                [("input", FloatTensorType(['N', df.shape[1]]))],
+                [("input", FloatTensorType([None, df.shape[1]]))],
                 custom_shape_calculators={
                     DataFrameMapper: dataframe_mapper_shape_calculator
                 },

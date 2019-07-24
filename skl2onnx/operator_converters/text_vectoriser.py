@@ -109,7 +109,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                                                  '\\n', '\\\\"', "'", "-",
                                                  "\\\\[", "\\\\]", "@"]}}
         model_onnx = convert_sklearn(pipeline, "tfidf",
-                                     initial_types=[("input", StringTensorType(['N', 2]))],
+                                     initial_types=[("input", StringTensorType([None, 2]))],
                                      options=seps)
 
     The default regular expression of the tokenizer is ``(?u)\\\\b\\\\w\\\\w+\\\\b``

@@ -32,7 +32,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gaussian_mixture",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -52,7 +52,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gaussian_mixture",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -72,7 +72,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model = GaussianMixture(n_components=2)
         model.fit(X)
         model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType(['N', 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -93,7 +93,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model = GaussianMixture(n_components=2, covariance_type='full')
         model.fit(X)
         model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType(['N', 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -114,7 +114,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model = GaussianMixture(n_components=2, covariance_type='tied')
         model.fit(X)
         model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType(['N', 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -135,7 +135,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model = GaussianMixture(n_components=2, covariance_type='diag')
         model.fit(X)
         model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType(['N', 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -156,7 +156,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model = GaussianMixture(n_components=2, covariance_type='spherical')
         model.fit(X)
         model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType(['N', 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],

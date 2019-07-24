@@ -87,11 +87,11 @@ def guess_data_type(type_, shape=None):
         return _guess_type_proto_str(type_, shape)
     elif hasattr(type_, 'columns') and hasattr(type_, 'dtypes'):
         # DataFrame
-        return [(name, _guess_numpy_type(dt, ['N', 1]))
+        return [(name, _guess_numpy_type(dt, [None, 1]))
                 for name, dt in zip(type_.columns, type_.dtypes)]
     elif hasattr(type_, 'name') and hasattr(type_, 'dtype'):
         # Series
-        return [(type_.name, _guess_numpy_type(type_.dtype, ['N', 1]))]
+        return [(type_.name, _guess_numpy_type(type_.dtype, [None, 1]))]
     elif hasattr(type_, 'shape') and hasattr(type_, 'dtype'):
         # array
         return [('input', _guess_numpy_type(type_.dtype, type_.shape))]

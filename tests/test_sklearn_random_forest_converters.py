@@ -61,7 +61,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'binary classifier',
                                            [('input',
-                                             FloatTensorType(['N', 2]))])
+                                             FloatTensorType([None, 2]))])
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Bin" +
                             model.__class__.__name__ +
@@ -91,7 +91,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'single regressor',
                                            [('input',
-                                             FloatTensorType(['N', 2]))])
+                                             FloatTensorType([None, 2]))])
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Reg" +
                             model.__class__.__name__ +

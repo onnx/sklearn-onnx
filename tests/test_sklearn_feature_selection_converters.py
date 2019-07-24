@@ -36,7 +36,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -60,7 +60,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfe", [("input", Int64TensorType(['N', X.shape[1]]))])
+            model, "rfe", [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -83,7 +83,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfecv", [("input", Int64TensorType(['N', X.shape[1]]))])
+            model, "rfecv", [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -103,7 +103,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fdr",
-            [("input", Int64TensorType(['N', X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.int64),
@@ -126,7 +126,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fpr",
-            [("input", Int64TensorType(['N', X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -150,7 +150,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select from model",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -170,7 +170,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fwe",
-            [("input", Int64TensorType(['N', X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.int64),
@@ -194,7 +194,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select k best",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -219,7 +219,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select percentile",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -244,7 +244,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "variance threshold",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -269,7 +269,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -292,7 +292,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfe", [("input", FloatTensorType(['N', X.shape[1]]))])
+            model, "rfe", [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -315,7 +315,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfecv", [("input", FloatTensorType(['N', X.shape[1]]))])
+            model, "rfecv", [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -335,7 +335,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fdr",
-            [("input", FloatTensorType(['N', X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
@@ -358,7 +358,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fpr",
-            [("input", FloatTensorType(['N', X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -382,7 +382,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select from model",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -402,7 +402,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model.fit(X, y)
         model_onnx = convert_sklearn(
             model, "select fwe",
-            [("input", FloatTensorType(['N', X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
@@ -426,7 +426,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select k best",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -451,7 +451,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select percentile",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -476,7 +476,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "variance threshold",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

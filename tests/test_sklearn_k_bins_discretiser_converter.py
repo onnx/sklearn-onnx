@@ -29,7 +29,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -55,7 +55,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -80,7 +80,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -107,7 +107,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -133,7 +133,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -159,7 +159,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", FloatTensorType(['N', X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -184,7 +184,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -209,7 +209,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -233,7 +233,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -258,7 +258,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -283,7 +283,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -308,7 +308,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn KBinsDiscretiser",
-            [("input", Int64TensorType(['N', X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
