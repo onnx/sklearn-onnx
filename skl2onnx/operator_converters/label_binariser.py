@@ -14,10 +14,9 @@ def convert_sklearn_label_binariser(scope, operator, container):
     """Converts Scikit Label Binariser model to onnx format."""
     binariser_op = operator.raw_operator
     classes = binariser_op.classes_
-    input_samples = operator.inputs[0].type.shape[0]
-    zeros_tensor = np.full((input_samples, len(classes)),
+    zeros_tensor = np.full((1, len(classes)),
                            binariser_op.neg_label, dtype=np.float)
-    unit_tensor = np.full((input_samples, len(classes)),
+    unit_tensor = np.full((1, len(classes)),
                           binariser_op.pos_label, dtype=np.float)
 
     reshaped_input_name = scope.get_unique_variable_name('reshaped_input')
