@@ -25,7 +25,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='word', token_pattern=".{1,2}")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType(['N', 1]))])
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -48,7 +48,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         vect.fit(corpus.ravel())
         try:
             convert_sklearn(vect, 'TfidfVectorizer',
-                            [('input', StringTensorType(['N', 1]))])
+                            [('input', StringTensorType([1, 1]))])
         except RuntimeError as e:
             assert ("Unable to split n-grams ' seco nd do' "
                     "into tokens") in str(e)
@@ -65,7 +65,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType(['N', 1]))])
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -87,7 +87,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType(['N', 1]))])
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l1', analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType(['N', 1]))])
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
@@ -150,7 +150,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='word', token_pattern=".{1,3}")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType(['N', 1]))])
+                                     [('input', StringTensorType([1, 1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
