@@ -226,7 +226,7 @@ class TestSklearnPipeline(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
         if __name__ == "__main__":
