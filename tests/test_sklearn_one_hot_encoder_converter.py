@@ -11,6 +11,7 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from test_utils import dump_data_and_model
+from onnxruntime import __version__ as ort_version
 
 
 def one_hot_encoder_supports_string():
@@ -45,6 +46,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderInt64-SkipDim1",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
@@ -120,6 +123,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderTwoStringCat",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
