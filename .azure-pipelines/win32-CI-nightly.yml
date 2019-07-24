@@ -22,13 +22,19 @@ jobs:
     maxParallel: 3
 
   steps:
-  - task: CondaEnvironment@1
+  - task: UsePythonVersion@0
     inputs:
-      createCustomEnvironment: false
-      packageSpecs: 'python=$(python.version)'
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
+
+  - script: conda create --yes --quiet --name py$(python.version) -c conda-forge python=$(python.version) protobuf
+    displayName: Create Anaconda environment
 
   - script: |
-      conda install -y -c conda-forge protobuf
+      call activate py$(python.version)
       python -m pip install --upgrade pip
       pip install $(numpy.version)
       pip install $(scipy.version)
@@ -36,6 +42,7 @@ jobs:
     displayName: 'Install numpy, scipy, onnx'
 
   - script: |
+      call activate py$(python.version)
       pip install -r requirements.txt
       git clone https://github.com/microsoft/onnxconverter-common
       cd onnxconverter-common
@@ -46,14 +53,17 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
+      call activate py$(python.version)
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
   - script: |
+      call activate py$(python.version)
       pip install -e .
     displayName: 'install skl2onnx'
 
   - script: |
+      call activate py$(python.version)
       python -c "import numpy;print('numpy:',numpy.__version__)"
       python -c "import scipy;print('scipy:',scipy.__version__)"
       python -c "import onnx;print('onnx:',onnx.__version__)"
@@ -62,10 +72,12 @@ jobs:
     displayName: 'version'
 
   - script: |
+      call activate py$(python.version)
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
+      call activate py$(python.version)
       pip install onnxmltools openpyxl
       coverage run --include=skl2onnx/** tests/benchmark.py
       coverage report -m
@@ -73,6 +85,7 @@ jobs:
     displayName: 'coverage'
 
   - script: |
+      call activate py$(python.version)
       python tests/benchmark.py
     displayName: 'benchmark'
 
