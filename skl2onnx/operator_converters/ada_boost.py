@@ -160,7 +160,7 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
             attrs['classlabels_strings'] = classes
 
         add_tree_to_attribute_pairs(attrs, True, op.estimators_[tree_id].tree_,
-                                    0, op.learning_rate, 0, True)
+                                    0, 1, 0, True)
         container.add_node(
             op_type, operator.input_full_names,
             [label_name, proba_name],
@@ -234,7 +234,7 @@ def _get_estimators_label(scope, operator, container, model):
         attrs['n_targets'] = int(model.estimators_[tree_id].n_outputs_)
         add_tree_to_attribute_pairs(attrs, False,
                                     model.estimators_[tree_id].tree_,
-                                    0, model.learning_rate, 0, False)
+                                    0, 1, 0, False)
 
         container.add_node(op_type, input_name,
                            estimator_label_name, op_domain='ai.onnx.ml',

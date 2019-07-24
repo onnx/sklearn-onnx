@@ -9,6 +9,7 @@ import numpy as np
 from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
 from sklearn.neighbors import NearestNeighbors
+from sklearn.mixture import GaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.preprocessing import FunctionTransformer
 try:
@@ -110,6 +111,13 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          FloatTensorType())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+    elif type(model) == GaussianMixture:
+        label_variable = scope.declare_local_variable('label',
+                                                      Int64TensorType())
+        prob_variable = scope.declare_local_variable('probabilities',
+                                                     FloatTensorType())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(prob_variable)
     else:
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable('variable', FloatTensorType())
@@ -152,6 +160,18 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
             _parse_sklearn_simple_model(
                 scope, transform, inputs,
                 custom_parsers=custom_parsers)[0])
+        if (model.transformer_weights is not None and name in
+                model.transformer_weights):
+            transform_result = [transformed_result_names.pop()]
+            # Create a Multiply ONNX node
+            multiply_operator = scope.declare_local_operator('SklearnMultiply')
+            multiply_operator.inputs = transform_result
+            multiply_operator.operand = model.transformer_weights[name]
+            multiply_output = scope.declare_local_variable(
+                'multiply_output', FloatTensorType())
+            multiply_operator.outputs.append(multiply_output)
+            transformed_result_names.append(multiply_operator.outputs[0])
+
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
@@ -252,6 +272,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     probability_tensor = _parse_sklearn_simple_model(
             scope, model, inputs, custom_parsers=custom_parsers)
+    if model.__class__ in [NuSVC, SVC] and not model.probability:
+        return probability_tensor
     this_operator = scope.declare_local_operator('SklearnZipMap')
     this_operator.inputs = probability_tensor
     classes = model.classes_
@@ -387,7 +409,7 @@ def build_sklearn_parsers_map():
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
 
     for tmodel in sklearn_classifier_list:
-        if tmodel not in [LinearSVC, SVC, NuSVC]:
+        if tmodel not in [LinearSVC]:
             map_parser[tmodel] = _parse_sklearn_classifier
     return map_parser
 

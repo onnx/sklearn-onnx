@@ -28,32 +28,39 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     attrs = get_default_tree_classifier_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
 
-    if op.n_classes_ == 2:
-        transform = 'LOGISTIC'
-        # class_prior_ was introduced in scikit-learn 0.21.
-        if hasattr(op.init_, 'class_prior_'):
-            base_values = op.init_.class_prior_
-            assert base_values.shape == (2, )
+    transform = 'LOGISTIC' if op.n_classes_ == 2 else 'SOFTMAX'
+    if op.init == 'zero':
+        base_values = np.zeros(op.loss_.K)
+    elif op.init is None:
+        if op.n_classes_ == 2:
+            # class_prior_ was introduced in scikit-learn 0.21.
+            if hasattr(op.init_, 'class_prior_'):
+                base_values = op.init_.class_prior_
+                assert base_values.shape == (2, )
+            else:
+                base_values = [op.init_.prior]
+            if op.loss == 'deviance':
+                # See https://github.com/scikit-learn/scikit-learn/blob/
+                # master/sklearn/ensemble/_gb_losses.py#L666.
+                eps = np.finfo(np.float32).eps
+                base_values = np.clip(base_values, eps, 1 - eps)
+                base_values = np.log(base_values / (1 - base_values))
+            else:
+                raise NotImplementedError(
+                    "Loss '{0}' is not supported yet. You "
+                    "may raise an issue at "
+                    "https://github.com/onnx/sklearn-onnx/issues.".format(
+                        op.loss))
         else:
-            base_values = [op.init_.prior]
-        if op.loss == 'deviance':
-            # See https://github.com/scikit-learn/scikit-learn/blob/
-            # master/sklearn/ensemble/_gb_losses.py#L666.
-            eps = np.finfo(np.float32).eps
-            base_values = np.clip(base_values, eps, 1 - eps)
-            base_values = np.log(base_values / (1 - base_values))
-        else:
-            raise NotImplementedError(
-                "Loss '{0}' is not supported yet. You "
-                "may raise an issue at "
-                "https://github.com/onnx/sklearn-onnx/issues.".format(op.loss))
+            # class_prior_ was introduced in scikit-learn 0.21.
+            if hasattr(op.init_, 'class_prior_'):
+                base_values = op.init_.class_prior_
+            else:
+                base_values = op.init_.priors
     else:
-        transform = 'SOFTMAX'
-        # class_prior_ was introduced in scikit-learn 0.21.
-        if hasattr(op.init_, 'class_prior_'):
-            base_values = op.init_.class_prior_
-        else:
-            base_values = op.init_.priors
+        raise NotImplementedError(
+            'Setting init to an estimator is not supported, you may raise an '
+            'issue at https://github.com/onnx/sklearn-onnx/issues.')
 
     attrs['base_values'] = [float(v) for v in base_values]
     attrs['post_transform'] = transform
@@ -70,13 +77,15 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         raise ValueError('Labels must be all integer or all strings.')
 
     tree_weight = op.learning_rate
+    n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
+             op.n_estimators)
     if op.n_classes_ == 2:
-        for tree_id in range(op.n_estimators):
+        for tree_id in range(n_est):
             tree = op.estimators_[tree_id][0].tree_
             add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
                                         tree_weight, 0, False)
     else:
-        for i in range(op.n_estimators):
+        for i in range(n_est):
             for c in range(op.n_classes_):
                 tree_id = i * op.n_classes_ + c
                 tree = op.estimators_[i][c].tree_
@@ -97,8 +106,8 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
     attrs['n_targets'] = 1
 
     if op.init == 'zero':
-        cst = np.zeros((operator.inputs[0].type.shape[0], op.loss_.K))
-    else:
+        cst = np.zeros(op.loss_.K)
+    elif op.init is None:
         # constant_ was introduced in scikit-learn 0.21.
         if hasattr(op.init_, 'constant_'):
             cst = [float(x) for x in op.init_.constant_]
@@ -106,6 +115,11 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
             cst = [op.init_.mean]
         else:
             cst = [op.init_.quantile]
+    else:
+        raise NotImplementedError(
+            'Setting init to an estimator is not supported, you may raise an '
+            'issue at https://github.com/onnx/sklearn-onnx/issues.')
+
     attrs['base_values'] = [float(x) for x in cst]
 
     tree_weight = op.learning_rate
