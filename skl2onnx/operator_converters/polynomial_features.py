@@ -21,7 +21,7 @@ def convert_sklearn_polynomial_features(scope, operator, container):
     for i, comb in enumerate(combinations):
         if len(comb) == 0:
             unit_name = scope.get_unique_variable_name('unit')
-            array = np.ones((operator.inputs[0].type.shape[0], 1))
+            array = np.ones((1, 1))
 
             container.add_initializer(unit_name, onnx_proto.TensorProto.FLOAT,
                                       array.shape, array.flatten())

@@ -54,7 +54,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "CustomTransform",
-            [("input", FloatTensorType([3, Xd.shape[1]]))],
+            [("input", FloatTensorType(['N', Xd.shape[1]]))],
             custom_shape_calculators={
                 CustomTransform: custom_transform_shape_calculator
             },

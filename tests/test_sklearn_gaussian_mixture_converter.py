@@ -32,7 +32,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gaussian_mixture",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType(['N', X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -52,7 +52,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gaussian_mixture",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType(['N', X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

@@ -436,7 +436,7 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "SVR",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType(['N', X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -454,7 +454,7 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "NuSVR",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType(['N', X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

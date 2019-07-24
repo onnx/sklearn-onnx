@@ -155,9 +155,9 @@ class TestInvestigate(unittest.TestCase):
         model.fit(X, y)
         all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(model, "pipeline",
-                                           [("input",
-                                             FloatTensorType(X.shape))])
+        steps = collect_intermediate_steps(
+            model, "pipeline",
+            [("input", FloatTensorType(('N', X.shape[1])))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -182,9 +182,9 @@ class TestInvestigate(unittest.TestCase):
         model.fit(X, y)
         all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(model, "pipeline",
-                                           [("input",
-                                             FloatTensorType(X.shape))])
+        steps = collect_intermediate_steps(
+            model, "pipeline",
+            [("input", FloatTensorType(['N', X.shape[1]]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
