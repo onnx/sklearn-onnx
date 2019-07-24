@@ -42,7 +42,8 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
                         model_onnx = convert_sklearn(
                             model,
                             "TfidfTransformer",
-                            [("input", FloatTensorType([None, data.shape[1]]))],
+                            [("input",
+                              FloatTensorType([None, data.shape[1]]))],
                         )
                         self.assertTrue(model_onnx is not None)
                         suffix = norm.upper() if norm else ""

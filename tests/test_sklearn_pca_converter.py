@@ -27,7 +27,8 @@ class TestSklearnPCAConverter(unittest.TestCase):
         model, X_test = _fit_model_pca(PCA(random_state=42))
         model_onnx = convert_sklearn(
             model,
-            initial_types=[("input", FloatTensorType([None, X_test.shape[1]]))],
+            initial_types=[("input",
+                            FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -43,7 +44,8 @@ class TestSklearnPCAConverter(unittest.TestCase):
             n_components=0.9005263157894737, svd_solver="auto"))
         model_onnx = convert_sklearn(
             model,
-            initial_types=[("input", FloatTensorType([None, X_test.shape[1]]))],
+            initial_types=[("input",
+                            FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -58,7 +60,8 @@ class TestSklearnPCAConverter(unittest.TestCase):
             random_state=42, n_components=4, svd_solver='arpack'))
         model_onnx = convert_sklearn(
             model,
-            initial_types=[("input", FloatTensorType([None, X_test.shape[1]]))],
+            initial_types=[("input",
+                            FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -73,7 +76,8 @@ class TestSklearnPCAConverter(unittest.TestCase):
             random_state=42, n_components=5, svd_solver='full', whiten=True))
         model_onnx = convert_sklearn(
             model,
-            initial_types=[("input", FloatTensorType([None, X_test.shape[1]]))],
+            initial_types=[("input",
+                            FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -91,7 +95,8 @@ class TestSklearnPCAConverter(unittest.TestCase):
                     iterated_power=3).fit(X_train)
         model_onnx = convert_sklearn(
             model,
-            initial_types=[("input", Int64TensorType([None, X_test.shape[1]]))],
+            initial_types=[("input",
+                            Int64TensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

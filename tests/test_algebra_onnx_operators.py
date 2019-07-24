@@ -152,7 +152,8 @@ class TestOnnxOperators(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(
-            model, 'a-kmeans', [('input', FloatTensorType([None, X.shape[1]]))],
+            model, 'a-kmeans',
+            [('input', FloatTensorType([None, X.shape[1]]))],
             custom_conversion_functions={KMeans: conv})
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
