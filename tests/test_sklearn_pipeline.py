@@ -1,4 +1,5 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy
 import pandas
 from sklearn import datasets
@@ -26,6 +27,7 @@ from skl2onnx.common.data_types import (
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
+from onnxruntime import __version__ as ort_version
 
 
 class PipeConcatenateInput:
@@ -162,6 +164,8 @@ class TestSklearnPipeline(unittest.TestCase):
     )
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     def test_pipeline_column_transformer(self):
 
         iris = datasets.load_iris()
