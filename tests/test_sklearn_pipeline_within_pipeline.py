@@ -298,7 +298,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "pipelinewithinpipeline",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

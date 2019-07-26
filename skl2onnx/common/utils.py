@@ -55,7 +55,7 @@ def get_column_index(i, inputs):
     If *i* is a string, the function looks for input name with
     this name and returns (index, 0).
     If *i* is an integer, let's assume first we have two inputs
-    *I0 = FloatTensorType([1, 2])* and *I1 = FloatTensorType([1, 3])*,
+    *I0 = FloatTensorType([None, 2])* and *I1 = FloatTensorType([None, 3])*,
     in this case, here are the results:
 
     ::

@@ -28,7 +28,7 @@ class TestTruncatedSVD(unittest.TestCase):
         model_onnx = convert_sklearn(svd,
                                      initial_types=[
                                          ("input",
-                                          FloatTensorType(shape=[1, C]))
+                                          FloatTensorType(shape=[None, C]))
                                      ])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(x, svd, model_onnx, basename="SklearnTruncatedSVD")
@@ -52,7 +52,7 @@ class TestTruncatedSVD(unittest.TestCase):
         model_onnx = convert_sklearn(svd,
                                      initial_types=[
                                          ("input",
-                                          Int64TensorType(shape=X.shape))
+                                          Int64TensorType([None, X.shape[1]]))
                                      ])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

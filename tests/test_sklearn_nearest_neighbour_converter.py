@@ -37,7 +37,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
@@ -53,7 +53,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2],
@@ -69,7 +69,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2),
                                    n_targets=2)
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2],
@@ -84,7 +84,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor_weights_distance(self):
         model, X = self._fit_model(KNeighborsRegressor(weights="distance"))
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
@@ -99,7 +99,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor_metric_cityblock(self):
         model, X = self._fit_model(KNeighborsRegressor(metric="cityblock"))
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([1, 4]))])
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
@@ -119,7 +119,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "KNN classifier binary",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType([None, 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -141,7 +141,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "KNN classifier multi-class",
-            [("input", FloatTensorType([1, 3]))],
+            [("input", FloatTensorType([None, 3]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -159,7 +159,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(weights='distance'))
         model_onnx = convert_sklearn(
-            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
@@ -172,7 +172,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(metric='cityblock'))
         model_onnx = convert_sklearn(
-            model, 'KNN classifier', [('input', FloatTensorType([1, 3]))])
+            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
@@ -187,7 +187,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "KNN regressor",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

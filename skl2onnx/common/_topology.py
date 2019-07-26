@@ -73,8 +73,6 @@ class Variable:
             for dim in shape:
                 if dim is None:
                     continue
-                if isinstance(dim, str):
-                    continue
                 if not isinstance(dim, (int, np.int32, np.int64)):
                     raise TypeError("shape must contains integers not "
                                     "'{}'.".format(dim))

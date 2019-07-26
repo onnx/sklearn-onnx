@@ -102,7 +102,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             AdaBoostRegressor(n_estimators=5))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([1, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -121,7 +121,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             AdaBoostRegressor(n_estimators=5), is_int=True)
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", Int64TensorType([1, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -140,7 +140,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([1, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

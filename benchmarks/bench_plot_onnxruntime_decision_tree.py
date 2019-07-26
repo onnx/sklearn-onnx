@@ -32,7 +32,7 @@ def fcts_model(X, y, max_depth):
     rf = DecisionTreeClassifier(max_depth=max_depth)
     rf.fit(X, y)
 
-    initial_types = [('X', FloatTensorType([1, X.shape[1]]))]
+    initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())

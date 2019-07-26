@@ -110,11 +110,11 @@ def convert_dataframe_schema(df, drop=None):
         if drop is not None and k in drop:
             continue
         if v == 'int64':
-            t = Int64TensorType([1, 1])
+            t = Int64TensorType([None, 1])
         elif v == 'float64':
-            t = FloatTensorType([1, 1])
+            t = FloatTensorType([None, 1])
         else:
-            t = StringTensorType([1, 1])
+            t = StringTensorType([None, 1])
         inputs.append((k, t))
     return inputs
 

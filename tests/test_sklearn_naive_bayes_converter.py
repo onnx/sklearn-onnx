@@ -19,7 +19,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multinomial naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -44,7 +44,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "bernoulli naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -65,7 +65,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multinomial naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -86,7 +86,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multinomial naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -111,7 +111,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "bernoulli naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -136,7 +136,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "bernoulli naive bayes",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -157,7 +157,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multinomial naive bayes",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -182,7 +182,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "bernoulli naive bayes",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -203,7 +203,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "multinomial naive bayes",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
@@ -228,8 +228,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "bernoulli naive bayes",
-            [("input", Int64TensorType(X.shape))],
-            dtype=np.float32,
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

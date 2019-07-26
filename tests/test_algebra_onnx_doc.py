@@ -20,7 +20,7 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     def test_pad(self):
         from skl2onnx.algebra.onnx_ops import OnnxPad
 
-        X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
+        X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
 
         pad = OnnxPad('X', output_names=['Y'],
                       mode='constant', value=1.5,

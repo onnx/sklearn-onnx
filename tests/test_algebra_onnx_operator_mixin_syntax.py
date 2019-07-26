@@ -49,7 +49,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -112,7 +112,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,

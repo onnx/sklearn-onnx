@@ -29,7 +29,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -54,7 +54,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -77,7 +77,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -103,7 +103,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
-            [("input", Int64TensorType(X_test.shape))],
+            [("input", Int64TensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -127,7 +127,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
-            [("input", Int64TensorType(X_test.shape))],
+            [("input", Int64TensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -153,7 +153,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -179,7 +179,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -205,7 +205,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -229,7 +229,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
