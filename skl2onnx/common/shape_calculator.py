@@ -44,7 +44,8 @@ def calculate_linear_classifier_output_shapes(operator):
            for i in class_labels):
         operator.outputs[0].type = StringTensorType(shape=[N])
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
+            operator.outputs[1].type = FloatTensorType(
+                [N, number_of_classes])
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class
@@ -53,7 +54,8 @@ def calculate_linear_classifier_output_shapes(operator):
              for i in class_labels):
         operator.outputs[0].type = Int64TensorType(shape=[N])
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            operator.outputs[1].type = FloatTensorType([N, number_of_classes])
+            operator.outputs[1].type = FloatTensorType(
+                [N, number_of_classes])
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class

@@ -20,8 +20,8 @@ def calculate_sklearn_text_vectorizer_output_shapes(operator):
                                    output_count_range=1)
 
     C = max(operator.raw_operator.vocabulary_.values()) + 1
-
-    operator.outputs[0].type = FloatTensorType([1, C])
+    N = operator.inputs[0].type.shape[0]
+    operator.outputs[0].type = FloatTensorType([N, C])
 
 
 register_shape_calculator('SklearnCountVectorizer',

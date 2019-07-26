@@ -73,8 +73,8 @@ Once fitted, the model is converted into *ONNX*:
 
 ::
 
-    initial_type = [('numfeat', FloatTensorType([1, 3])),
-                    ('strfeat', StringTensorType([1, 2]))]
+    initial_type = [('numfeat', FloatTensorType([None, 3])),
+                    ('strfeat', StringTensorType([None, 2]))]
     model_onnx = convert_sklearn(model, initial_types=initial_type)
 
 It can be represented as a 
@@ -234,7 +234,7 @@ a pipeline and each of its components independently.
     # predict or transform is called.
     operators = collect_intermediate_steps(model, "pipeline",
                                            [("input",
-                                             FloatTensorType([1, 2]))])
+                                             FloatTensorType([None, 2]))])
 
     # Method and transform is called.
     model.transform(data)

@@ -149,7 +149,7 @@ seps = {TfidfVectorizer: {"sep": [' ', '.', '\\?', ',', ';', ':', '!',
                                   "-", "\\[", "\\]", "@"]}}
 model_onnx = convert_sklearn(pipeline, "tfidf",
                              initial_types=[
-                                 ("input", StringTensorType([1, 2]))],
+                                 ("input", StringTensorType([None, 2]))],
                              options=seps)
 
 #################################

@@ -36,7 +36,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((1, X.shape[1])))]
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(model, initial_types=initial_types)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
@@ -51,7 +51,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((1, X.shape[1])))]
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(model, initial_types=initial_types)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
@@ -105,7 +105,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "decision tree regression",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

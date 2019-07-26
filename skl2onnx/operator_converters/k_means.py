@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.utils.extmath import row_norms
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
-from ..algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
+from ..algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt, OnnxMul
 
 
 def convert_sklearn_kmeans(scope, operator, container):
@@ -68,11 +68,14 @@ def convert_sklearn_kmeans(scope, operator, container):
 
     C = op.cluster_centers_
     C2 = row_norms(C, squared=True)
+    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
 
     N = X.type.shape[0]
-    zeros = np.zeros((N, ))
+    if isinstance(N, int):
+        zeros = np.zeros((N, ))
+    else:
+        zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
 
-    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
     z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
     y2 = OnnxAdd(C2, z)
     ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])

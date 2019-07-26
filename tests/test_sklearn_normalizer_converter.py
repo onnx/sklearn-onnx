@@ -15,7 +15,7 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn normalizer",
-            [("input", Int64TensorType([1, 1]))],
+            [("input", Int64TensorType([None, 1]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
@@ -25,7 +25,7 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn normalizer",
-            [("input", FloatTensorType([1, 1]))],
+            [("input", FloatTensorType([None, 1]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)

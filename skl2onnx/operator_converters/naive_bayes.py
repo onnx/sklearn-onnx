@@ -247,15 +247,14 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             binarised_input_name = scope.get_unique_variable_name(
                                                         'binarised_input')
             num_features = nb.feature_count_.shape[1]
-            M = operator.inputs[0].type.shape[0]
 
             container.add_initializer(threshold_name,
                                       onnx_proto.TensorProto.FLOAT,
                                       [1], [nb.binarize])
             container.add_initializer(
                 zero_tensor_name,
-                onnx_proto.TensorProto.FLOAT, [M, num_features],
-                np.zeros((M, num_features)).ravel())
+                onnx_proto.TensorProto.FLOAT, [1, num_features],
+                np.zeros((1, num_features)).ravel())
 
             container.add_node(
                 'Greater', [input_name, threshold_name],

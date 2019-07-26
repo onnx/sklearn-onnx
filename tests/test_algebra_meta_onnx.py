@@ -44,6 +44,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'ConvInteger',
                     'ConvTranspose',
                     'DequantizeLinear',
+                    'Equal',  # opset 11
                     'Expand',  # shape inference fails
                     'MatMulInteger',
                     'MaxPool',  # issue with ceil_mode
