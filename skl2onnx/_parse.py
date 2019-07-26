@@ -320,7 +320,7 @@ def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     this_operator.outputs.append(mean_tensor)
 
     if options['return_std'] or options['return_cov']:
-        # covarance or standard deviation
+        # covariance or standard deviation
         covstd_tensor = scope.declare_local_variable('GPcovstd',
                                                      scope.tensor_type())
         this_operator.outputs.append(covstd_tensor)

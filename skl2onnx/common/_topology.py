@@ -733,7 +733,7 @@ class Topology:
                 # duplicate.
                 if len(original.type.shape) == len(duplicate.type.shape):
                     for i in range(len(original.type.shape)):
-                        if original.type.shape[i] != None:
+                        if original.type.shape[i] is not None:
                             continue
                         original.type.shape[i] = duplicate.type.shape[i]
 

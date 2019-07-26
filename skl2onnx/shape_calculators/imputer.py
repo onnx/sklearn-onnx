@@ -30,7 +30,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
     N = operator.inputs[0].type.shape[0]
     C = 0
     for variable in operator.inputs:
-        if variable.type.shape[1] != None:
+        if variable.type.shape[1] is not None:
             C += variable.type.shape[1]
         else:
             C = None
