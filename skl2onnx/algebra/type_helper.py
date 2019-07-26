@@ -10,6 +10,7 @@ from ..common.data_types import (
     _guess_numpy_type,
     _guess_type_proto,
     BooleanTensorType,
+    DataType,
     DoubleTensorType,
     FloatTensorType,
     Int64Type,
@@ -32,6 +33,8 @@ def _guess_type(given_type):
         return given_type
     elif isinstance(given_type, Variable):
         return given_type.type
+    elif isinstance(given_type, DataType):
+        return given_type
     elif isinstance(given_type, TensorProto):
         return _guess_type_proto(given_type.data_type,
                                  given_type.dims)

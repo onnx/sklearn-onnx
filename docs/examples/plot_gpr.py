@@ -4,7 +4,7 @@
 """
 .. _l-gpr-example:
 
-Discrepencies with GaussianProcessorRegressor: sue of double
+Discrepencies with GaussianProcessorRegressor: use of double
 ============================================================
 
 The `GaussianProcessRegressor

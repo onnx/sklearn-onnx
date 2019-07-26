@@ -351,7 +351,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                dtype=np.float32):
+                dtype=np.float32, target_opset=None):
         """
         Converts this operator into an ONNX graph.
 
@@ -363,6 +363,7 @@ class OnnxOperator:
             node
         :param dtype: force the use of a specific float type,
             either `np.float32` or `np.float64`, it must be specified
+        :param target_opset: target opset, None for the default one
         """
         if hasattr(self, "state"):
             # The conversion already happened and needs to be cleaned.
@@ -388,7 +389,8 @@ class OnnxOperator:
                                    "input types.".format(
                                        name, self.__class__.__name__))
 
-        target_opset = get_opset_number_from_onnx()
+        if target_opset is None:
+            target_opset = get_opset_number_from_onnx()
         container = ModelComponentContainer(target_opset, dtype=dtype)
         if container.target_opset < 9:
             raise RuntimeError("The operator cannot be converted into ONNX."
@@ -438,7 +440,7 @@ class OnnxOperator:
 
         # domains
         domains = {}
-        version = get_opset_number_from_onnx()
+        version = target_opset
         for n in container.nodes:
             domains[n.domain] = max(domains.get(n.domain, version),
                                     getattr(n, 'op_version', version))

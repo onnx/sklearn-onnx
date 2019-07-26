@@ -272,9 +272,12 @@ class Scope:
             self.tensor_type = FloatTensorType
         elif dtype == np.float64:
             self.tensor_type = DoubleTensorType
+        elif dtype == np.int64:
+            self.tensor_type = Int64TensorType
         else:
             raise NotImplementedError(
-                "dtype must be either np.float32 or np.float64.")
+                "dtype must be either np.float32, np.float64, "
+                "np.int64.")
 
         # An one-to-many map from raw variable name to ONNX variable
         # names. It looks like

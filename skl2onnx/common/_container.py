@@ -79,9 +79,11 @@ class RawModelContainerNode(object):
             self.proto_dtype = onnx_proto.TensorProto.FLOAT
         elif dtype == np.float64:
             self.proto_dtype = onnx_proto.TensorProto.DOUBLE
+        elif dtype == np.int64:
+            self.proto_dtype = onnx_proto.TensorProto.INT64
         else:
-            raise ValueError("dtype should be either np.float32 or "
-                             "np.float64.")
+            raise ValueError("dtype should be either np.float32, "
+                             "np.float64, np.int64.")
 
     @property
     def raw_model(self):
@@ -153,7 +155,6 @@ class ModelComponentContainer(ModelContainer):
         """
         :param target_opset: number, for example, 7 for *ONNX 1.2*, and
                              8 for *ONNX 1.3*.
-        :param targeted_onnx: A string, for example, '1.1.2' and '1.2'.
         :param dtype: float type to be used for every float coefficient
         :param options: see :ref:`l-conv-options`
         """
@@ -187,9 +188,11 @@ class ModelComponentContainer(ModelContainer):
             self.proto_dtype = onnx_proto.TensorProto.FLOAT
         elif dtype == np.float64:
             self.proto_dtype = onnx_proto.TensorProto.DOUBLE
+        elif dtype == np.int64:
+            self.proto_dtype = onnx_proto.TensorProto.INT64
         else:
-            raise ValueError("dtype should be either np.float32 or "
-                             "np.float64.")
+            raise ValueError("dtype should be either np.float32, "
+                             "np.float64, np.int64.")
 
     def __str__(self):
         """

@@ -296,6 +296,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         this_operator.classlabels_strings = classes
         label_type = StringType()
 
+    print("***", scope.tensor_type())
     output_label = scope.declare_local_variable('output_label', label_type)
     output_probability = scope.declare_local_variable(
         'output_probability',

@@ -42,7 +42,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #   input [M, N] -> MATMUL <- feature_log_prob.T [N, C]
     #                    |
     #                    V
-    #        matmul_result [M, C] -> CAST <- onnx_proto.TensorProto.FLOAT
+    #        matmul_result [M, C] -> CAST <- proto_type
     #                                |
     #                                V
     #                    cast_result [M, C] -> SUM <- class_log_prior [1, C]
@@ -59,7 +59,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     # array_feature_extractor_result [M, 1] --------------------------.
     #           (int labels) |                                        |
     #                        V                                        |
-    #              CAST(to=onnx_proto.TensorProto.FLOAT)              |
+    #              CAST(to=proto_type)              |
     #                        |                                        |
     #                        V                                        |
     #                  cast2_result [M, 1]                            |
@@ -118,7 +118,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #  array_feature_extractor_result [M, 1] ----------------.
     #          (int labels) |                                |
     #                       V                                |
-    #   CAST(to=onnx_proto.TensorProto.FLOAT)                |
+    #   CAST(to=proto_type)                |
     #                       |                                |
     #                       V                                |
     #                cast2_result [M, 1]                     |
@@ -139,7 +139,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #    input [M, N] -> GREATER <- threshold [1]
     #       |              |
     #       |              V
-    #       |       condition [M, N] -> CAST(to=onnx_proto.TensorProto.FLOAT)
+    #       |       condition [M, N] -> CAST(to=proto_type)
     #       |                             |
     #       |                             V
     #       |                          cast_values [M, N]
@@ -164,11 +164,12 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #                     log_prob [M, C] -> EXP -> prob_tensor [M, C] -.
     #                                                                   |
     #         output_probability [M, C] <- ZIPMAP <---------------------'
-    float_type = container.dtype
+    float_dtype = container.dtype
     proto_type = container.proto_dtype
+
     nb = operator.raw_operator
-    class_log_prior = nb.class_log_prior_.astype(float_type).reshape((1, -1))
-    feature_log_prob = nb.feature_log_prob_.T.astype(float_type)
+    class_log_prior = nb.class_log_prior_.astype(float_dtype).reshape((1, -1))
+    feature_log_prob = nb.feature_log_prob_.T.astype(float_dtype)
     classes = nb.classes_
     output_shape = (-1,)
 
@@ -252,7 +253,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                                       [1], [nb.binarize])
             container.add_initializer(
                 zero_tensor_name,
-                onnx_proto.TensorProto.FLOAT, [1, num_features],
+                proto_type, [1, num_features],
                 np.zeros((1, num_features)).ravel())
 
             container.add_node(

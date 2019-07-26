@@ -172,7 +172,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                             output_names=['pdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType(["", ""]))],
+            inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('pdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
@@ -231,7 +231,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                             output_names=['cdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
+            inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())
@@ -252,7 +252,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                             output_names=['cdist'])
 
         model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType(['aaa', 'bbb']))],
+            inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
         sess = InferenceSession(model_def.SerializeToString())

@@ -4,7 +4,9 @@ import numpy as np
 from distutils.version import StrictVersion
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    FloatTensorType, Int64TensorType, DoubleTensorType
+)
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, fit_classification_model
 
@@ -24,12 +26,34 @@ class TestNaiveBayesConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X.astype(np.float32),
             model,
             model_onnx,
             basename="SklearnBinMultinomialNB-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multinomial_nb_binary_classification_double(self):
+        model, X = fit_classification_model(
+            MultinomialNB(), 2, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multinomial naive bayes",
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            dtype=np.float64,
+        )
+        self.assertIsNotNone(model_onnx)
+        # runtime does not allow double in ZipMap
+        dump_data_and_model(
+            X.astype(np.float64),
+            model,
+            model_onnx,
+            basename="SklearnBinMultinomialNBDouble-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(

@@ -149,7 +149,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                       if i not in categorical_feature_indices]
     if len(passed_indices) > 0:
         variables = get_column_indices(passed_indices, operator.inputs,
-                                       mutiple=True)
+                                       multiple=True)
         passed_feature_names = []
         for name, inds in variables.items():
             passed_feature_name = scope.get_unique_variable_name(
