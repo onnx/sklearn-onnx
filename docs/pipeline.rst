@@ -118,7 +118,7 @@ order:
   depending on the model and is called after all
   outputs were defined (topology). This steps defines
   the number of outputs and their types for every node
-  and sets them to a default shape ``[1, 'None']``
+  and sets them to a default shape ``[None, None]``
   which the output node has one row and no known
   columns yet.
 * **shape_calculator(model):**

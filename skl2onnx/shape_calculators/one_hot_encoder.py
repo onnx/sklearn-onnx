@@ -36,8 +36,8 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
     >>> 2 + 2 + 1
 
     Allowed input/output patterns are
-        1. [N, C] ---> [N, C']
-        2. [N, 'None'] ---> [N, 'None']
+        1. [N, C] ---> [None, C]
+        2. [N, None] ---> [None, None]
     """
     op = operator.raw_operator
 
@@ -111,11 +111,11 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
     N = operator.inputs[0].type.shape[0]
     # Calculate the output feature length by replacing the count
     # of categorical features with their encoded widths
-    if operator.inputs[0].type.shape[1] != 'None':
+    if operator.inputs[0].type.shape[1] is not None:
         C = (operator.inputs[0].type.shape[1]
              - len(categorical_feature_indices) + sum(encoded_slot_sizes))
     else:
-        C = 'None'
+        C = None
 
     operator.outputs[0].type.shape = [N, C]
 

@@ -43,7 +43,7 @@ def calculate_sklearn_scaler_output_shapes(operator):
         if isinstance(variable.type.shape[1], numbers.Integral):
             C += variable.type.shape[1]
         else:
-            C = 'None'
+            C = None
             break
 
     operator.outputs[0].type.shape = [N, C]

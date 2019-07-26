@@ -75,7 +75,7 @@ def get_column_index(i, inputs):
         pos = 0
         end = (inputs[0].type.shape[1]
                if isinstance(inputs[0].type, TensorType) else 1)
-        if end in ('None', None):
+        if end is None:
             raise RuntimeError("Cannot extract a specific column {0} when "
                                "one input ('{1}') has unknown "
                                "dimension.".format(i, inputs[0]))
@@ -86,7 +86,7 @@ def get_column_index(i, inputs):
             pos = end
             rel_end = (inputs[vi].type.shape[1]
                        if isinstance(inputs[vi].type, TensorType) else 1)
-            if rel_end in ('None', None):
+            if rel_end is None:
                 raise RuntimeError("Cannot extract a specific column {0} when "
                                    "one input ('{1}') has unknown "
                                    "dimension.".format(i, inputs[vi]))

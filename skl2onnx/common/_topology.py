@@ -407,7 +407,7 @@ class Topology:
                       classes. It contains the original model.
         :param default_batch_size: batch_size prepend to scalar and
                                    array types from CoreML. It's usually
-                                   1 or 'None'.
+                                   1 or None.
         :param initial_types: A list providing some types for some
                               root variables.
         Each element is a tuple of a variable name and a type defined
@@ -733,7 +733,7 @@ class Topology:
                 # duplicate.
                 if len(original.type.shape) == len(duplicate.type.shape):
                     for i in range(len(original.type.shape)):
-                        if original.type.shape[i] != 'None':
+                        if original.type.shape[i] != None:
                             continue
                         original.type.shape[i] = duplicate.type.shape[i]
 
