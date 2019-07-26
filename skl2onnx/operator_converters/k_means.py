@@ -65,10 +65,11 @@ def convert_sklearn_kmeans(scope, operator, container):
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
+    opv = container.target_opset
 
     C = op.cluster_centers_
     C2 = row_norms(C, squared=True)
-    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
+    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1, op_version=opv)
 
     N = X.type.shape[0]
     if isinstance(N, int):
@@ -76,11 +77,13 @@ def convert_sklearn_kmeans(scope, operator, container):
     else:
         zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
 
-    z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
-    y2 = OnnxAdd(C2, z)
-    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
-    y2s = OnnxSqrt(y2, output_names=out[1:])
-
+    z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2.,
+                             transB=1, op_version=opv),
+                op_version=opv)
+    y2 = OnnxAdd(C2, z, op_version=opv)
+    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1],
+                    op_version=opv)
+    y2s = OnnxSqrt(y2, output_names=out[1:], op_version=opv)
     ll.add_to(scope, container)
     y2s.add_to(scope, container)
 

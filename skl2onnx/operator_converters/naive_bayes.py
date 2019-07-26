@@ -42,7 +42,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #   input [M, N] -> MATMUL <- feature_log_prob.T [N, C]
     #                    |
     #                    V
-    #        matmul_result [M, C] -> CAST <- onnx_proto.TensorProto.FLOAT
+    #        matmul_result [M, C] -> CAST <- proto_type
     #                                |
     #                                V
     #                    cast_result [M, C] -> SUM <- class_log_prior [1, C]
@@ -59,7 +59,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     # array_feature_extractor_result [M, 1] --------------------------.
     #           (int labels) |                                        |
     #                        V                                        |
-    #              CAST(to=onnx_proto.TensorProto.FLOAT)              |
+    #              CAST(to=proto_type)              |
     #                        |                                        |
     #                        V                                        |
     #                  cast2_result [M, 1]                            |
@@ -118,7 +118,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #  array_feature_extractor_result [M, 1] ----------------.
     #          (int labels) |                                |
     #                       V                                |
-    #   CAST(to=onnx_proto.TensorProto.FLOAT)                |
+    #   CAST(to=proto_type)                |
     #                       |                                |
     #                       V                                |
     #                cast2_result [M, 1]                     |
@@ -139,7 +139,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #    input [M, N] -> GREATER <- threshold [1]
     #       |              |
     #       |              V
-    #       |       condition [M, N] -> CAST(to=onnx_proto.TensorProto.FLOAT)
+    #       |       condition [M, N] -> CAST(to=proto_type)
     #       |                             |
     #       |                             V
     #       |                          cast_values [M, N]
@@ -164,10 +164,12 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #                     log_prob [M, C] -> EXP -> prob_tensor [M, C] -.
     #                                                                   |
     #         output_probability [M, C] <- ZIPMAP <---------------------'
+    float_dtype = container.dtype
+    proto_type = container.proto_dtype
 
     nb = operator.raw_operator
-    class_log_prior = nb.class_log_prior_.astype('float32').reshape((1, -1))
-    feature_log_prob = nb.feature_log_prob_.T.astype('float32')
+    class_log_prior = nb.class_log_prior_.astype(float_dtype).reshape((1, -1))
+    feature_log_prob = nb.feature_log_prob_.T.astype(float_dtype)
     classes = nb.classes_
     output_shape = (-1,)
 
@@ -194,11 +196,11 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         classes = np.array([s.encode('utf-8') for s in classes])
 
     container.add_initializer(
-        feature_log_prob_name, onnx_proto.TensorProto.FLOAT,
+        feature_log_prob_name, proto_type,
         feature_log_prob.shape, feature_log_prob.flatten())
     container.add_initializer(classes_name, class_type, classes.shape, classes)
     container.add_initializer(
-        class_log_prior_name, onnx_proto.TensorProto.FLOAT,
+        class_log_prior_name, proto_type,
         class_log_prior.shape, class_log_prior.flatten())
 
     if container.target_opset < 6:
@@ -213,7 +215,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
+                   container, to=proto_type)
         input_name = cast_input_name
 
     if operator.type == 'SklearnMultinomialNB':
@@ -236,8 +238,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         partial_sum_result_name = scope.get_unique_variable_name(
                                                 'partial_sum_result')
 
-        container.add_initializer(constant_name, onnx_proto.TensorProto.FLOAT,
-                                  [], [1.0])
+        container.add_initializer(constant_name, proto_type, [], [1.0])
 
         if nb.binarize is not None:
             threshold_name = scope.get_unique_variable_name('threshold')
@@ -248,12 +249,11 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                                                         'binarised_input')
             num_features = nb.feature_count_.shape[1]
 
-            container.add_initializer(threshold_name,
-                                      onnx_proto.TensorProto.FLOAT,
+            container.add_initializer(threshold_name, proto_type,
                                       [1], [nb.binarize])
             container.add_initializer(
                 zero_tensor_name,
-                onnx_proto.TensorProto.FLOAT, [1, num_features],
+                proto_type, [1, num_features],
                 np.zeros((1, num_features)).ravel())
 
             container.add_node(
@@ -261,7 +261,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                 condition_name, name=scope.get_unique_operator_name('Greater'),
                 op_version=9)
             apply_cast(scope, condition_name, cast_values_name, container,
-                       to=onnx_proto.TensorProto.FLOAT)
+                       to=proto_type)
             apply_add(scope, [zero_tensor_name, cast_values_name],
                       binarised_input_name, container, broadcast=1)
             input_name = binarised_input_name
@@ -318,7 +318,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     if class_type == onnx_proto.TensorProto.INT32:
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
-                   to=onnx_proto.TensorProto.FLOAT)
+                   to=proto_type)
         apply_reshape(scope, cast2_result_name, reshaped_result_name,
                       container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name,

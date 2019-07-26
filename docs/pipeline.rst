@@ -117,15 +117,20 @@ order:
   changes the shapes and types for each of them
   depending on the model and is called after all
   outputs were defined (topology). This steps defines
-  the number of outputs for every node and sets them to
-  a default type and default shape ``[1, 'None']``
+  the number of outputs and their types for every node
+  and sets them to a default shape ``[None, None]``
   which the output node has one row and no known
   columns yet.
 * **shape_calculator(model):**
-  The shape calculator changes the shape and types
+  The shape calculator changes the shape
   of the outputs created by the parser. Once this function
   returned its results, the graph structure is fully defined
-  and cannot be changed.
+  and cannot be changed. The shape calculator should
+  not change types. Many runtimes are implemented in C++
+  and do not support implicit casts. A change of type
+  might make the runtime fail due to a type mismatch
+  between two consecutive nodes produces by two different
+  converters.
 * **converter(scope, operator, container):**
   The converter converts the transformers or predictors into
   *ONNX* nodes. Each node can an *ONNX*

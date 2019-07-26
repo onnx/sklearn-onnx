@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType
 from ..common.utils import check_input_and_output_numbers
 
 
@@ -13,8 +12,7 @@ def calculate_sklearn_tfidf_transformer_output_shapes(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
     C = operator.inputs[0].type.shape[1]
-    N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type = FloatTensorType([N, C])
+    operator.outputs[0].type.shape = [1, C]
 
 
 register_shape_calculator('SklearnTfidfTransformer',

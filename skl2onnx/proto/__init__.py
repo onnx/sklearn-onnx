@@ -9,14 +9,13 @@
 # fixes by overwriting ONNX functions without changing any lines
 # elsewhere.
 import onnx
-from onnx import helper
 from onnx import onnx_pb as onnx_proto # noqa
 
 # Overwrite the make_tensor defined in onnx.helper because of a bug
 # (string tensor get assigned twice)
 from onnx import mapping
-from onnx.helper import split_complex_to_pairs
 from onnx.onnx_pb import TensorProto, ValueInfoProto # noqa
+from onnx.helper import split_complex_to_pairs
 
 
 def _check_onnx_version():
@@ -30,7 +29,7 @@ def _check_onnx_version():
 _check_onnx_version()
 
 
-def _make_tensor_fixed(name, data_type, dims, vals, raw=False):
+def make_tensor_fixed(name, data_type, dims, vals, raw=False):
     '''
     Make a TensorProto with specified arguments.  If raw is False, this
     function will choose the corresponding proto field to store the
@@ -54,9 +53,6 @@ def _make_tensor_fixed(name, data_type, dims, vals, raw=False):
 
     tensor.dims.extend(dims)
     return tensor
-
-
-helper.make_tensor = _make_tensor_fixed
 
 
 def get_opset_number_from_onnx():

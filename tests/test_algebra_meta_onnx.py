@@ -43,6 +43,7 @@ class TestMetaOnnx(unittest.TestCase):
                     # Input X must be 4-dimensional. X: {1,1,3}
                     'ConvInteger',
                     'ConvTranspose',
+                    'CumSum',  # opset 11
                     'DequantizeLinear',
                     'Equal',  # opset 11
                     'Expand',  # shape inference fails
