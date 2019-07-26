@@ -60,6 +60,8 @@ def _guess_numpy_type(data_type, dims):
     # This could be moved to onnxconverter_common.
     if data_type == np.float32:
         return FloatTensorType(dims)
+    elif data_type == np.float64:
+        return DoubleTensorType(dims)
     elif data_type in (np.str, str, object) or str(
         data_type) in ('<U1', ): # noqa
         return StringTensorType(dims)
@@ -87,11 +89,11 @@ def guess_data_type(type_, shape=None):
         return _guess_type_proto_str(type_, shape)
     elif hasattr(type_, 'columns') and hasattr(type_, 'dtypes'):
         # DataFrame
-        return [(name, _guess_numpy_type(dt, [1, 1]))
+        return [(name, _guess_numpy_type(dt, [None, 1]))
                 for name, dt in zip(type_.columns, type_.dtypes)]
     elif hasattr(type_, 'name') and hasattr(type_, 'dtype'):
         # Series
-        return [(type_.name, _guess_numpy_type(type_.dtype, [1, 1]))]
+        return [(type_.name, _guess_numpy_type(type_.dtype, [None, 1]))]
     elif hasattr(type_, 'shape') and hasattr(type_, 'dtype'):
         # array
         return [('input', _guess_numpy_type(type_.dtype, type_.shape))]

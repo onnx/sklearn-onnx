@@ -130,8 +130,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='word', token_pattern=".{1,3}")
         vect.fit(corpus.ravel())
         try:
-            model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                         [('input', StringTensorType([1, 1]))])
+            model_onnx = convert_sklearn(
+                vect, 'TfidfVectorizer',
+                [('input', StringTensorType([None, 1]))])
             self.assertTrue(model_onnx is not None)
         except RuntimeError as e:
             if "Unable to split n-grams 'he  sec'" not in str(e):

@@ -373,9 +373,9 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 # We just need to call *convert_sklearn* as any other model
 # to convert.
 
-model_onnx = convert_sklearn(ptsne_knn, 'predictable_tsne',
-                             [('input', FloatTensorType([1,
-                                                         X_test.shape[1]]))])
+model_onnx = convert_sklearn(
+    ptsne_knn, 'predictable_tsne',
+    [('input', FloatTensorType([None, X_test.shape[1]]))])
 
 # And save.
 with open("predictable_tsne.onnx", "wb") as f:

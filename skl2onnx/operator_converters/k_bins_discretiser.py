@@ -7,7 +7,10 @@
 import numpy as np
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
+from ..common._apply_operation import (
+    apply_cast, apply_concat, apply_reshape,
+    apply_mul, apply_add
+)
 from ..common._registration import register_converter
 
 
@@ -23,13 +26,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
     ranges = list(map(lambda e: e[1:-1] if len(e) > 2
                       else [np.finfo(np.float32).max], op.bin_edges_))
     digitised_output_name = [None] * len(ranges)
-    instances = operator.inputs[0].type.shape[0]
-
-    last_column_name = scope.get_unique_variable_name('last_column')
-
-    container.add_initializer(
-        last_column_name, onnx_proto.TensorProto.FLOAT,
-        [instances, 1], np.ones(instances))
+    last_column_name = None
 
     for i, item in enumerate(ranges):
         digitised_output_name[i] = (
@@ -63,6 +60,23 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
             name=scope.get_unique_operator_name('Less'))
         apply_cast(scope, less_result_name, cast_result_name,
                    container, to=onnx_proto.TensorProto.FLOAT)
+
+        if last_column_name is None:
+            last_column_name = scope.get_unique_variable_name('last_column')
+            zero_float = scope.get_unique_variable_name('zero_float')
+            one_float = scope.get_unique_variable_name('one_float')
+            zero_column = scope.get_unique_variable_name('zero_column')
+            container.add_initializer(
+                one_float, onnx_proto.TensorProto.FLOAT,
+                [1], np.ones(1))
+            container.add_initializer(
+                zero_float, onnx_proto.TensorProto.FLOAT,
+                [1], np.zeros(1))
+            apply_mul(scope, [column_name, zero_float], zero_column,
+                      container, broadcast=1)
+            apply_add(scope, [zero_column, one_float], last_column_name,
+                      container, broadcast=1)
+
         apply_concat(scope, [cast_result_name, last_column_name],
                      concatenated_array_name, container, axis=1)
         container.add_node('ArgMax', concatenated_array_name,
@@ -79,7 +93,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
                 cats_int64s=list(range(op.n_bins_[i])),
                 op_domain='ai.onnx.ml')
             apply_reshape(scope, onehot_result_name, digitised_output_name[i],
-                          container, desired_shape=(instances, op.n_bins_[i]))
+                          container, desired_shape=(1, op.n_bins_[i]))
         else:
             apply_cast(scope, argmax_output_name, digitised_output_name[i],
                        container, to=onnx_proto.TensorProto.FLOAT)

@@ -11,6 +11,7 @@ from . import concat
 from . import dict_vectorizer
 from . import flatten
 from . import function_transformer
+from . import gaussian_process
 from . import imputer
 from . import k_bins_discretiser
 from . import k_means
@@ -37,6 +38,7 @@ __all__ = [
     dict_vectorizer,
     flatten,
     function_transformer,
+    gaussian_process,
     imputer,
     k_bins_discretiser,
     k_means,

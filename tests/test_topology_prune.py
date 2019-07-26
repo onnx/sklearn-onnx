@@ -63,7 +63,7 @@ class TestTopologyPrune(unittest.TestCase):
         model_onnx = convert_sklearn(
             idtr,
             "idtr",
-            [("input", FloatTensorType([1, Xd.shape[1]]))],
+            [("input", FloatTensorType([None, Xd.shape[1]]))],
         )
 
         idnode = [node for node in model_onnx.graph.node

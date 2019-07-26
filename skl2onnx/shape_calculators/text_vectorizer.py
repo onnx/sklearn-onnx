@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType
 from ..common.utils import check_input_and_output_numbers
 
 
@@ -20,8 +19,7 @@ def calculate_sklearn_text_vectorizer_output_shapes(operator):
                                    output_count_range=1)
 
     C = max(operator.raw_operator.vocabulary_.values()) + 1
-
-    operator.outputs[0].type = FloatTensorType([1, C])
+    operator.outputs[0].type.shape = [None, C]
 
 
 register_shape_calculator('SklearnCountVectorizer',

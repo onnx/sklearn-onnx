@@ -33,10 +33,10 @@ def _forward_pass(scope, container, model, activations):
         add_result_name = scope.get_unique_variable_name('add_result')
 
         container.add_initializer(
-            coefficient_name, onnx_proto.TensorProto.FLOAT,
+            coefficient_name, container.proto_dtype,
             model.coefs_[i].shape, model.coefs_[i].ravel())
         container.add_initializer(
-            intercepts_name, onnx_proto.TensorProto.FLOAT,
+            intercepts_name, container.proto_dtype,
             [1, len(model.intercepts_[i])], model.intercepts_[i])
 
         container.add_node(
@@ -75,7 +75,7 @@ def _predict(scope, input_name, container, model):
     cast_input_name = scope.get_unique_variable_name('cast_input')
 
     apply_cast(scope, input_name, cast_input_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+               container, to=container.proto_dtype)
 
     # forward propagate
     activations = _forward_pass(scope, container, model, [cast_input_name])
@@ -122,7 +122,7 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
         unity_name = scope.get_unique_variable_name('unity')
         negative_class_proba_name = scope.get_unique_variable_name(
             'negative_class_proba')
-        container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+        container.add_initializer(unity_name, container.proto_dtype,
                                   [], [1])
 
         apply_sub(scope, [unity_name, y_pred],

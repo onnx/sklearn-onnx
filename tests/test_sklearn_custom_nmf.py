@@ -60,7 +60,7 @@ class TestSklearnCustomNMF(unittest.TestCase):
             indices_type = np.array([0], dtype=np.int64)
             onx = res.to_onnx(inputs={'col': indices_type,
                                       'row': indices_type},
-                              outputs=[('rec', FloatTensorType((1, 1)))])
+                              outputs=[('rec', FloatTensorType((None, 1)))])
             return onx
 
         model_onnx = nmf_to_onnx(W, H)
