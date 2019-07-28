@@ -52,8 +52,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             sess = InferenceSession(model_onnx.SerializeToString())
             res = sess.run(None, {'input': X.astype(np.float32)})
             pred = model.predict_proba(X)
-            if (res[1][0][0] - pred[0, 0]) > 1e-5:
-                rows = ["diff", str(res[1][0][0] - pred[0, 0]),
+            delta = abs(res[1][0][0] - pred[0, 0])
+            if delta > 1e-5:
+                rows = ["diff", str(delta),
                         "X", str(X),
                         "base_values_", str(model.init_.class_prior_),
                         "predicted_label", str(model.predict(X)),
