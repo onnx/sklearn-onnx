@@ -53,10 +53,12 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
                         op.loss))
         else:
             # class_prior_ was introduced in scikit-learn 0.21.
-            if hasattr(op.init_, 'class_prior_'):
-                base_values = op.init_.class_prior_
-            else:
-                base_values = op.init_.priors
+            x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
+            base_values = op._raw_predict_init(x0).ravel()
+            # if hasattr(op.init_, 'class_prior_'):
+            #     base_values = op.init_.class_prior_
+            # else:
+            #     base_values = op.init_.priors
     else:
         raise NotImplementedError(
             'Setting init to an estimator is not supported, you may raise an '
