@@ -54,7 +54,15 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         else:
             # class_prior_ was introduced in scikit-learn 0.21.
             x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
-            base_values = op._raw_predict_init(x0).ravel()
+            if hasattr(op, '_raw_predict_init'):
+                # sklearn >= 0.21
+                base_values = op._raw_predict_init(x0).ravel()
+            elif hasattr(op, '_init_decision_function'):
+                # sklearn >= 0.21
+                base_values = op._init_decision_function(x0).ravel()
+            else:
+                raise RuntimeError("scikit-learn < 0.19 is not supported.")
+
             # if hasattr(op.init_, 'class_prior_'):
             #     base_values = op.init_.class_prior_
             # else:
