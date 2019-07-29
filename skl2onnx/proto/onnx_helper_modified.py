@@ -82,15 +82,15 @@ def make_attribute(
     if isinstance(value, np.float32):
         attr.f = value
         attr.type = AttributeProto.FLOAT
-    elif isinstance(value, np.float64):
-        attr.f = value
-        attr.type = AttributeProto.FLOAT
-    elif isinstance(value, float):
-        attr.f = value
-        attr.type = AttributeProto.FLOAT
-        # raise RuntimeError("float is not allowed anymore
-        # due to ambiguities, "
-        # "use numpy types, key='{}'.".format(key))
+    elif isinstance(value, (float, np.float64)):
+        if use_float64:
+            attr.type = AttributeProto.TENSOR
+            attr.t.CopyFrom(
+                make_tensor(
+                    key, TensorProto.DOUBLE, (len(value), ), [value]))
+        else:
+            attr.f = value
+            attr.type = AttributeProto.FLOAT
     elif isinstance(value, np.int32):
         attr.i = value
         attr.type = AttributeProto.INT
