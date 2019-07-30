@@ -77,7 +77,6 @@ def convert_sklearn_kmeans(scope, operator, container):
     else:
         zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
 
-
     z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2.,
                              transB=1, op_version=opv),
                 op_version=opv)
