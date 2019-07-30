@@ -4,13 +4,17 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from logging import getLogger
 import unittest
 import numpy as np
 from distutils.version import StrictVersion
 from pandas import DataFrame
 from sklearn.datasets import make_classification
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import (
+    GradientBoostingClassifier,
+    GradientBoostingRegressor
+)
+from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -18,12 +22,19 @@ from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import dump_data_and_model, fit_regression_model
 from onnxruntime import InferenceSession, __version__
 
+threshold = "0.4.0"
+
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
+
+    def setUp(self):
+        log = getLogger('skl2onnx')
+        log.disabled = True
+
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(__version__) <= StrictVersion("0.5.0"),
+        StrictVersion(__version__) <= StrictVersion(threshold),
         reason="Depends on PR #1015 onnxruntime.")
     def test_gradient_boosting_classifier1Deviance(self):
         model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
@@ -41,8 +52,10 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             sess = InferenceSession(model_onnx.SerializeToString())
             res = sess.run(None, {'input': X.astype(np.float32)})
             pred = model.predict_proba(X)
-            if res[1][0][0] != pred[0, 0]:
-                rows = ["X", str(X),
+            delta = abs(res[1][0][0] - pred[0, 0])
+            if delta > 1e-5:
+                rows = ["diff", str(delta),
+                        "X", str(X),
                         "base_values_", str(model.init_.class_prior_),
                         "predicted_label", str(model.predict(X)),
                         "expected", str(pred),
@@ -52,7 +65,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         dump_binary_classification(
             model, suffix="1Deviance",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')")
+                          " <= StrictVersion('%s')" % threshold)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -61,7 +74,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         dump_binary_classification(
             model, suffix="3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')")
+                          " <= StrictVersion('%s')" % threshold)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -70,7 +83,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         dump_multiple_classification(
             model,
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= StrictVersion('%s')" % threshold,
         )
 
     def test_gradient_boosting_regressor_ls_loss(self):
@@ -181,6 +194,25 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )
+
+    @unittest.skipIf(
+        StrictVersion(__version__) <= StrictVersion(threshold),
+        reason="Depends on PR #1015 onnxruntime.")
+    def test_gradient_boosting_regressor_learning_rate(self):
+        X, y = make_classification(
+            n_features=100, n_samples=1000, n_classes=2, n_informative=8)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.5, random_state=42)
+        model = GradientBoostingClassifier().fit(X_train, y_train)
+        onnx_model = convert_sklearn(
+            model, 'lr2', [('input', FloatTensorType(X_test.shape))])
+        sess = InferenceSession(onnx_model.SerializeToString())
+        res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
+        r1 = np.mean(np.isclose(model.predict_proba(X_test),
+                     list(map(lambda x: list(map(lambda y: x[y], x)),
+                              res[1])), atol=1e-4))
+        r2 = np.mean(res[0] == model.predict(X_test))
+        assert r1 == r2
 
 
 if __name__ == "__main__":
