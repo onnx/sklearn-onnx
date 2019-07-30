@@ -4,6 +4,13 @@ Helpers to test runtimes.
 import numpy
 import pandas
 import warnings
+from skl2onnx.helpers.onnx_helper import (
+    select_model_inputs_outputs,
+    enumerate_model_node_outputs,
+    enumerate_model_initializers
+)
+from skl2onnx.algebra.type_helper import _guess_type
+
 from .utils_backend import (
     load_data_and_model,
     extract_options,
@@ -13,12 +20,42 @@ from .utils_backend import (
 )
 
 
+def _display_intermediate_steps(model_onnx, inputs):
+    import onnxruntime
+    print("[_display_intermediate_steps] BEGIN")
+    if isinstance(model_onnx, str):
+        import onnx
+        model_onnx = onnx.load(model_onnx)
+
+    for name, node in enumerate_model_initializers(model_onnx, add_node=True):
+        print("INIT: {} - {}".format(name, _guess_type(node)))
+
+    for out, node in enumerate_model_node_outputs(model_onnx, add_node=True):
+        print('-')
+        print("OUTPUT: {} from {}".format(out, node.name))
+        step = select_model_inputs_outputs(model_onnx, out)
+        try:
+            step_sess = onnxruntime.InferenceSession(step.SerializeToString())
+        except Exception as e:
+            raise RuntimeError("Unable to load ONNX model with onnxruntime. "
+                               "Last added node is:\n{}".format(node)) from e
+        for o in step_sess.get_inputs():
+            print("IN :", o)
+        for o in step_sess.get_outputs():
+            print("OUT: ", o)
+        if inputs:
+            res = step_sess.run(inputs)
+            print(res)
+    print("[_display_intermediate_steps] END")
+
+
 def compare_runtime(test,
                     decimal=5,
                     options=None,
                     verbose=False,
                     context=None,
-                    comparable_outputs=None):
+                    comparable_outputs=None,
+                    intermediate_steps=False):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -34,6 +71,8 @@ def compare_runtime(test,
     :param verbose: in case of error, the function may print
         more information on the standard output
     :param comparable_outputs: compare only these outputs
+    :param intermediate_steps: displays intermediate steps
+        in case of an error
     :return: tuple (outut, lambda function to run the predictions)
 
     The function does not return anything but raises an error
@@ -75,6 +114,8 @@ def compare_runtime(test,
             raise ExpectedAssertionError(
                 "Unable to load onnx '{0}' due to\n{1}".format(onx, e))
         else:
+            if intermediate_steps:
+                _display_intermediate_steps(onx, None)
             if verbose:
                 import onnx
                 model = onnx.load(onx)
@@ -190,6 +231,8 @@ def compare_runtime(test,
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
+                    if intermediate_steps:
+                        _display_intermediate_steps(onx, {name: input})
                     raise OnnxRuntimeAssertionError(
                         "Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
@@ -219,6 +262,8 @@ def compare_runtime(test,
                 except ExpectedAssertionError as expe:
                     raise expe
                 except Exception as e:
+                    if intermediate_steps:
+                        _display_intermediate_steps(onx, iii)
                     if verbose:
                         import onnx
                         model = onnx.load(onx)
@@ -259,6 +304,8 @@ def compare_runtime(test,
         except ExpectedAssertionError as expe:
             raise expe
         except RuntimeError as e:
+            if intermediate_steps:
+                _display_intermediate_steps(onx, inputs, run_options)
             if "-Fail" in onx:
                 raise ExpectedAssertionError(
                     "onnxruntime cannot compute the prediction for '{0}'".

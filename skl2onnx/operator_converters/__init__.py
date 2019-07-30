@@ -17,6 +17,8 @@ from . import dict_vectoriser
 from . import feature_selection
 from . import flatten_op
 from . import function_transformer
+from . import gaussian_process
+from . import gaussian_mixture
 from . import gradient_boosting
 from . import imputer_op
 from . import k_bins_discretiser
@@ -26,6 +28,7 @@ from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
 from . import multilayer_perceptron
+from . import multiply_op
 from . import naive_bayes
 from . import nearest_neighbours
 from . import normaliser
@@ -53,6 +56,8 @@ __all__ = [
     feature_selection,
     flatten_op,
     function_transformer,
+    gaussian_process,
+    gaussian_mixture,
     gradient_boosting,
     imputer_op,
     k_bins_discretiser,
@@ -62,6 +67,7 @@ __all__ = [
     linear_classifier,
     linear_regressor,
     multilayer_perceptron,
+    multiply_op,
     naive_bayes,
     nearest_neighbours,
     normaliser,

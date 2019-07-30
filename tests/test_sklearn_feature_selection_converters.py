@@ -36,7 +36,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -60,7 +60,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfe", [("input", Int64TensorType([1, X.shape[1]]))])
+            model, "rfe", [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -83,7 +83,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfecv", [("input", Int64TensorType([1, X.shape[1]]))])
+            model, "rfecv", [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -102,7 +102,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         X, y = load_breast_cancer(return_X_y=True)
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fdr", [("input", Int64TensorType([1, X.shape[1]]))])
+            model, "select fdr",
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.int64),
@@ -124,7 +125,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fpr", [("input", Int64TensorType([1, X.shape[1]]))])
+            model, "select fpr",
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -148,7 +150,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select from model",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -167,7 +169,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         X, y = load_breast_cancer(return_X_y=True)
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fwe", [("input", Int64TensorType([1, X.shape[1]]))])
+            model, "select fwe",
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.int64),
@@ -191,7 +194,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select k best",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -216,7 +219,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select percentile",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -241,7 +244,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "variance threshold",
-            [("input", Int64TensorType([1, X.shape[1]]))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -266,7 +269,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -289,7 +292,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfe", [("input", FloatTensorType([1, X.shape[1]]))])
+            model, "rfe", [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -312,7 +315,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "rfecv", [("input", FloatTensorType([1, X.shape[1]]))])
+            model, "rfecv", [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -331,7 +334,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         X, y = load_breast_cancer(return_X_y=True)
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fdr", [("input", FloatTensorType([1, X.shape[1]]))])
+            model, "select fdr",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
@@ -353,7 +357,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fpr", [("input", FloatTensorType([1, X.shape[1]]))])
+            model, "select fpr",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X,
@@ -377,7 +382,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select from model",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -396,7 +401,8 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         X, y = load_breast_cancer(return_X_y=True)
         model.fit(X, y)
         model_onnx = convert_sklearn(
-            model, "select fwe", [("input", FloatTensorType([1, X.shape[1]]))])
+            model, "select fwe",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
@@ -420,7 +426,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select k best",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -445,7 +451,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "select percentile",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -470,7 +476,7 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "variance threshold",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

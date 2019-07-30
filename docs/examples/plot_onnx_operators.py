@@ -48,10 +48,10 @@ from onnx import TensorProto
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
-X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [1, 2])
+X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
 
 # Create one output (ValueInfoProto)
-Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [1, 4])
+Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [None, 4])
 
 # Create a node (NodeProto)
 node_def = helper.make_node(

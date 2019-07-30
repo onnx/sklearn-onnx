@@ -52,3 +52,4 @@ tests/~$*
 docs/supported_covered.rst
 tests/sklearn_opsets*.xlsx
 docs/graphs/*
+tests/debug_gp.onnx

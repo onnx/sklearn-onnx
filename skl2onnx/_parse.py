@@ -8,7 +8,9 @@ import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import ClassifierMixin, ClusterMixin
+from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neighbors import NearestNeighbors
+from sklearn.mixture import GaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.preprocessing import FunctionTransformer
 try:
@@ -21,7 +23,7 @@ from ._supported_operators import _get_sklearn_operator_name, cluster_list
 from ._supported_operators import sklearn_classifier_list
 from .common._container import SklearnModelContainerNode
 from .common._topology import Topology
-from .common.data_types import DictionaryType, FloatTensorType
+from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
 from .common.data_types import Int64Type, StringType, TensorType
 from .common.utils import get_column_indices
@@ -74,7 +76,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         if parser_names is not None:
             names = parser_names()
             for name in names:
-                var = scope.declare_local_variable(name, FloatTensorType())
+                var = scope.declare_local_variable(name, scope.tensor_type())
                 this_operator.outputs.append(var)
             return this_operator.outputs
 
@@ -85,9 +87,9 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         # their types here are not necessarily correct and they will
         # be fixed in shape inference phase
         label_variable = scope.declare_local_variable('label',
-                                                      FloatTensorType())
+                                                      scope.tensor_type())
         probability_tensor_variable = scope.declare_local_variable(
-                                    'probabilities', FloatTensorType())
+                                    'probabilities', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
     elif type(model) in cluster_list or isinstance(model, ClusterMixin):
@@ -95,10 +97,10 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         # the other one for scores of all classes. Notice that their
         # types here are not necessarily correct and they will be fixed
         # in shape inference phase
-        label_variable = scope.declare_local_variable('label',
-                                                      Int64TensorType())
-        score_tensor_variable = scope.declare_local_variable('scores',
-                                                             FloatTensorType())
+        label_variable = scope.declare_local_variable(
+            'label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable(
+            'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
     elif type(model) == NearestNeighbors:
@@ -107,12 +109,20 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         index_variable = scope.declare_local_variable('index',
                                                       Int64TensorType())
         distance_variable = scope.declare_local_variable('distance',
-                                                         FloatTensorType())
+                                                         scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+    elif type(model) == GaussianMixture:
+        label_variable = scope.declare_local_variable('label',
+                                                      Int64TensorType())
+        prob_variable = scope.declare_local_variable('probabilities',
+                                                     scope.tensor_type())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(prob_variable)
     else:
         # We assume that all scikit-learn operator produce a single output.
-        variable = scope.declare_local_variable('variable', FloatTensorType())
+        variable = scope.declare_local_variable(
+            'variable', scope.tensor_type())
         this_operator.outputs.append(variable)
 
     return this_operator.outputs
@@ -152,12 +162,24 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
             _parse_sklearn_simple_model(
                 scope, transform, inputs,
                 custom_parsers=custom_parsers)[0])
+        if (model.transformer_weights is not None and name in
+                model.transformer_weights):
+            transform_result = [transformed_result_names.pop()]
+            # Create a Multiply ONNX node
+            multiply_operator = scope.declare_local_operator('SklearnMultiply')
+            multiply_operator.inputs = transform_result
+            multiply_operator.operand = model.transformer_weights[name]
+            multiply_output = scope.declare_local_variable(
+                'multiply_output', scope.tensor_type())
+            multiply_operator.outputs.append(multiply_output)
+            transformed_result_names.append(multiply_operator.outputs[0])
+
     # Create a Concat ONNX node
     concat_operator = scope.declare_local_operator('SklearnConcat')
     concat_operator.inputs = transformed_result_names
 
     # Declare output name of scikit-learn FeatureUnion
-    union_name = scope.declare_local_variable('union', FloatTensorType())
+    union_name = scope.declare_local_variable('union', scope.tensor_type())
     concat_operator.outputs.append(union_name)
 
     return concat_operator.outputs
@@ -195,7 +217,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         if len(transform_inputs) > 1:
             # Many ONNX operators expect one input vector,
             # the default behaviour is to merge columns.
-            ty = transform_inputs[0].type.__class__([1, 'None'])
+            ty = transform_inputs[0].type.__class__([None, None])
 
             conc_op = scope.declare_local_operator('SklearnConcat')
             conc_op.inputs = transform_inputs
@@ -235,7 +257,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 
     # Create a Concat ONNX node
     if len(transformed_result_names) > 1:
-        ty = transformed_result_names[0].type.__class__([1, 'None'])
+        ty = transformed_result_names[0].type.__class__([None, None])
         concat_operator = scope.declare_local_operator('SklearnConcat')
         concat_operator.inputs = transformed_result_names
 
@@ -277,9 +299,31 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     output_label = scope.declare_local_variable('output_label', label_type)
     output_probability = scope.declare_local_variable(
         'output_probability',
-        SequenceType(DictionaryType(label_type, FloatTensorType())))
+        SequenceType(DictionaryType(label_type, scope.tensor_type())))
     this_operator.outputs.append(output_label)
     this_operator.outputs.append(output_probability)
+    return this_operator.outputs
+
+
+def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(
+            model, dict(return_cov=False, return_std=False))
+    if options['return_std'] and options['return_cov']:
+        raise RuntimeError(
+            "Not returning standard deviation of predictions when "
+            "returning full covariance.")
+
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
+    mean_tensor = scope.declare_local_variable("GPmean", scope.tensor_type())
+    this_operator.inputs = inputs
+    this_operator.outputs.append(mean_tensor)
+
+    if options['return_std'] or options['return_cov']:
+        # covariance or standard deviation
+        covstd_tensor = scope.declare_local_variable('GPcovstd',
+                                                     scope.tensor_type())
+        this_operator.outputs.append(covstd_tensor)
     return this_operator.outputs
 
 
@@ -318,7 +362,8 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None):
 def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
-                        custom_parsers=None):
+                        custom_parsers=None, dtype=np.float32,
+                        options=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -338,9 +383,13 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary
         ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
+    :param dtype: parameter which defines the type for
+        float computation (float32 or float64)
+    :param options: specific options given to converters
+        (see :ref:`l-conv-options`)
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainerNode(model)
+    raw_model_container = SklearnModelContainerNode(model, dtype)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.
@@ -353,7 +402,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # Declare an object to provide variables' and operators' naming mechanism.
     # In contrast to CoreML, one global scope
     # is enough for parsing scikit-learn models.
-    scope = topology.declare_scope('__root__')
+    scope = topology.declare_scope('__root__', options=options, dtype=dtype)
 
     # Declare input variables. They should be the inputs of the scikit-learn
     # model you want to convert into ONNX.
@@ -384,6 +433,7 @@ def build_sklearn_parsers_map():
     map_parser = {
         pipeline.Pipeline: _parse_sklearn_pipeline,
         pipeline.FeatureUnion: _parse_sklearn_feature_union,
+        GaussianProcessRegressor: _parse_sklearn_gaussian_process,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer

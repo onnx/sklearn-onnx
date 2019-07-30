@@ -1,4 +1,5 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy
 import pandas
 from sklearn import datasets
@@ -26,6 +27,7 @@ from skl2onnx.common.data_types import (
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
+from onnxruntime import __version__ as ort_version
 
 
 class PipeConcatenateInput:
@@ -57,7 +59,7 @@ class TestSklearnPipeline(unittest.TestCase):
         model = Pipeline([("scaler1", scaler), ("scaler2", scaler)])
 
         model_onnx = convert_sklearn(model, "pipeline",
-                                     [("input", FloatTensorType([1, 2]))])
+                                     [("input", FloatTensorType([None, 2]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data,
                             model,
@@ -77,8 +79,8 @@ class TestSklearnPipeline(unittest.TestCase):
             model,
             "pipeline",
             [
-                ("input1", FloatTensorType([1, 1])),
-                ("input2", FloatTensorType([1, 1])),
+                ("input1", FloatTensorType([None, 1])),
+                ("input2", FloatTensorType([None, 1])),
             ],
         )
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -114,8 +116,8 @@ class TestSklearnPipeline(unittest.TestCase):
             model,
             "pipeline",
             [
-                ("input1", FloatTensorType([1, 1])),
-                ("input2", FloatTensorType([1, 1])),
+                ("input1", FloatTensorType([None, 1])),
+                ("input2", FloatTensorType([None, 1])),
             ],
         )
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -138,8 +140,8 @@ class TestSklearnPipeline(unittest.TestCase):
             model,
             "pipeline",
             [
-                ("input1", Int64TensorType([1, 1])),
-                ("input2", FloatTensorType([1, 1])),
+                ("input1", Int64TensorType([None, 1])),
+                ("input2", FloatTensorType([None, 1])),
             ],
         )
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
@@ -162,6 +164,8 @@ class TestSklearnPipeline(unittest.TestCase):
     )
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     def test_pipeline_column_transformer(self):
 
         iris = datasets.load_iris()
@@ -211,8 +215,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
         model.fit(X_train, y_train)
         initial_type = [
-            ("numfeat", FloatTensorType([1, 3])),
-            ("strfeat", StringTensorType([1, 2])),
+            ("numfeat", FloatTensorType([None, 3])),
+            ("strfeat", StringTensorType([None, 2])),
         ]
 
         X_train = X_train[:11]
@@ -226,7 +230,7 @@ class TestSklearnPipeline(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.4.0')",
         )
 
         if __name__ == "__main__":
@@ -305,11 +309,11 @@ class TestSklearnPipeline(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType([None, 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType([None, 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType([None, 1])
                 inputs.append((k, t))
             return inputs
 

@@ -9,7 +9,7 @@ from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxExp, OnnxAdd, OnnxDiv
 try:
     from skl2onnx.algebra.sklearn_ops import OnnxSklearnStandardScaler
     from skl2onnx import wrap_as_onnx_mixin
-except ImportError:
+except (ImportError, KeyError):
     warnings.warn('Unable to test OnnxSklearnScaler.')
     OnnxSklearnStandardScaler = None
 

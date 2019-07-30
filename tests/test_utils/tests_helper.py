@@ -84,6 +84,7 @@ def dump_data_and_model(
         dump_error_log=None,
         benchmark=None,
         comparable_outputs=None,
+        intermediate_steps=False,
         verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
@@ -124,6 +125,8 @@ def dump_data_and_model(
         If not specified, it falls back into a default behaviour implemented
         for classifiers, regressors, clustering.
     :param comparable_outputs: compares only these outputs
+    :param intermediate_steps: displays intermediate steps
+        in case of an error
     :return: the created files
 
     Some convention for the name,
@@ -298,6 +301,7 @@ def dump_data_and_model(
                     context=context,
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
+                    intermediate_steps=intermediate_steps,
                 )
             else:
                 try:
@@ -308,6 +312,7 @@ def dump_data_and_model(
                         context=context,
                         verbose=verbose,
                         comparable_outputs=comparable_outputs,
+                        intermediate_steps=intermediate_steps,
                     )
                 except AssertionError as e:
                     if dump_error_log:
@@ -380,7 +385,7 @@ def dump_one_class_classification(
     y = [1, 1, 1]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "one_class",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     dump_data_and_model(
         X,
         model,
@@ -413,7 +418,7 @@ def dump_binary_classification(
     y = ["A", "B", "A"]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "binary classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     dump_data_and_model(
         X,
         model,
@@ -429,7 +434,7 @@ def dump_binary_classification(
     X = X[:, :2]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "binary classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     dump_data_and_model(
         X.astype(numpy.float32),
         model,
@@ -470,7 +475,7 @@ def dump_multiple_classification(
         print("[dump_multiple_classification] model '{}'".format(
             model.__class__.__name__))
     model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
@@ -492,7 +497,7 @@ def dump_multiple_classification(
         print("[dump_multiple_classification] model '{}'".format(
             model.__class__.__name__))
     model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
@@ -538,7 +543,7 @@ def dump_multilabel_classification(
         print("[make_multilabel_classification] model '{}'".format(
             model.__class__.__name__))
     model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     if verbose:
         print("[make_multilabel_classification] model was converted")
     dump_data_and_model(
@@ -560,7 +565,7 @@ def dump_multilabel_classification(
         print("[make_multilabel_classification] model '{}'".format(
             model.__class__.__name__))
     model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     if verbose:
         print("[make_multilabel_classification] model was converted")
     dump_data_and_model(
@@ -595,7 +600,7 @@ def dump_multiple_regression(
     y = numpy.array([[100, 50], [100, 49], [100, 99]], dtype=numpy.float32)
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "multi-regressor",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     dump_data_and_model(
         X,
         model,
@@ -626,7 +631,7 @@ def dump_single_regression(model,
     y = numpy.array([100, -10, 50], dtype=numpy.float32)
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "single regressor",
-                                       [("input", FloatTensorType([1, 2]))])
+                                       [("input", FloatTensorType([None, 2]))])
     dump_data_and_model(
         X,
         model,

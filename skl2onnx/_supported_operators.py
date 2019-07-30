@@ -26,6 +26,9 @@ from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.linear_model import SGDRegressor
 from sklearn.svm import LinearSVR
 
+# Mixture
+from sklearn.mixture import GaussianMixture
+
 # Multi-class
 from sklearn.multiclass import OneVsRestClassifier
 
@@ -41,6 +44,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import VotingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
+
+# Gaussian processes
+from sklearn.gaussian_process import GaussianProcessRegressor
 
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
@@ -148,7 +154,7 @@ def build_sklearn_operator_name_map():
                 RobustScaler, OneHotEncoder, DictVectorizer,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
-                VarianceThreshold
+                VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
     ] if k is not None}
     res.update({
         ElasticNet: 'SklearnLinearRegressor',

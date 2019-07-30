@@ -21,10 +21,10 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
     N = operator.inputs[0].type.shape[0]
     C = 0
     for variable in operator.inputs:
-        if variable.type.shape[1] != 'None':
+        if variable.type.shape[1] is not None:
             C += variable.type.shape[1]
         else:
-            C = 'None'
+            C = None
             break
 
     operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
