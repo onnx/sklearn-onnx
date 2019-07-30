@@ -13,12 +13,13 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx150-nightlyRT-Npy1154:
+      Py37-Onnx150-nightlyRT-Npy1163:
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
         numpy.version: 'numpy==1.16.3'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.21.3'
     maxParallel: 3
 
   steps:
@@ -58,6 +59,10 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
+      pip install scikit-learn$(sklearn.version)
+    displayName: 'install scikit-learn'
+
+  - script: |
       call activate py$(python.version)
       pip install -e .
     displayName: 'install skl2onnx'
@@ -66,6 +71,7 @@ jobs:
       call activate py$(python.version)
       python -c "import numpy;print('numpy:',numpy.__version__)"
       python -c "import scipy;print('scipy:',scipy.__version__)"
+      python -c "import sklearn;print('sklearn:',sklearn.__version__)"
       python -c "import onnx;print('onnx:',onnx.__version__)"
       python -c "import onnxconverter_common;print('onnxconverter-common:',onnxconverter_common.__version__)"
       python -c "import onnxruntime;print('onnxruntime:',onnxruntime.__version__)"
