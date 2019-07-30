@@ -44,6 +44,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'ConvInteger',
                     'ConvTranspose',
                     'CumSum',  # opset 11
+                    'DepthToSpace',  # opset 11
                     'DequantizeLinear',
                     'Equal',  # opset 11
                     'Expand',  # shape inference fails
