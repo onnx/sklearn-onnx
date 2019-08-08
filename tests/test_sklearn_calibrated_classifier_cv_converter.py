@@ -27,7 +27,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn CalibratedClassifierCV",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -49,7 +49,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn CalibratedClassifierCV",
-            [("input", Int64TensorType(X.shape))],
+            [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -71,7 +71,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn CalibratedClassifierCV",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -95,7 +95,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn CalibratedClassifierCV",
-            [("input", FloatTensorType(X.shape))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -118,7 +118,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn CalibratedClassifierCV",
-            [("input", FloatTensorType([1, X.shape[1]]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

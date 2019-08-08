@@ -47,3 +47,4 @@ benchmarks/*.csv
 benchmarks/*.png
 tests/Operators*.md
 docs/examples/*.pkl
+tests/debug_gp.onnx

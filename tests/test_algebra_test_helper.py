@@ -30,12 +30,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
         dtypes = [np.float64]
         for dtype in dtypes:
             mat = np.zeros((3, 3), dtype=dtype)
-            try:
-                _guess_type(mat, )
-                raise AssertionError("It should fail for type "
-                                     "{}".format(dtype))
-            except NotImplementedError:
-                pass
+            _guess_type(mat, )
 
     def test_guess_data_type(self):
         ty = guess_data_type(np.array([3, 5], dtype=np.int32))

@@ -39,7 +39,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         model_onnx = convert_sklearn(
             text_clf,
             name="DocClassifierCV-Tfidf",
-            initial_types=[("input", StringTensorType())],
+            initial_types=[("input", StringTensorType([None, 1]))],
         )
         dump_data_and_model(
             twenty_train.data[:10],

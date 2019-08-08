@@ -32,7 +32,7 @@ class TestMetaOnnx(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
                      reason="too unstable with older versions")
     @unittest.skipIf(StrictVersion(onnxruntime.__version__) <
-                     StrictVersion("0.4.0"),
+                     StrictVersion("0.5.0"),
                      reason="too unstable with older versions")
     def test_onnx_spec(self):
         untested = {'AveragePool',  # issue with ceil_mode
@@ -43,8 +43,12 @@ class TestMetaOnnx(unittest.TestCase):
                     # Input X must be 4-dimensional. X: {1,1,3}
                     'ConvInteger',
                     'ConvTranspose',
+                    'CumSum',  # opset 11
+                    'DepthToSpace',  # opset 11
                     'DequantizeLinear',
+                    'Equal',  # opset 11
                     'Expand',  # shape inference fails
+                    'GatherElements',  # opset 11
                     'MatMulInteger',
                     'MaxPool',  # issue with ceil_mode
                     'Mod',
@@ -55,6 +59,8 @@ class TestMetaOnnx(unittest.TestCase):
                     'Scan',  # Graph attribute inferencing returned type
                     # information for 2 outputs. Expected 1
                     # Node () has input size 5 not in range [min=1, max=1].
+                    'ScatterElements',  # opset 11
+                    'Unique',  # opset 11
                     "Upsample",
                     }
         folder = os.path.dirname(onnx.__file__)

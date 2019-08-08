@@ -15,15 +15,15 @@ def calculate_sklearn_flatten(operator):
     i = operator.inputs[0]
     N = i.type.shape[0]
     if isinstance(i.type, TensorType):
-        if i.type.shape[1] in ('None', None):
-            C = 'None'
+        if i.type.shape[1] is None:
+            C = None
         else:
             C = i.type.shape[1]
     elif isinstance(i.type, (Int64Type, FloatType, StringType)):
         C = 1
     else:
-        C = 'None'
-    if C == 'None':
+        C = None
+    if C is None:
         operator.outputs[0].type.shape = [N, C]
     else:
         operator.outputs[0].type.shape = [N * C]

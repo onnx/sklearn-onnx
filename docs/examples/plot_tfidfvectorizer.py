@@ -144,12 +144,18 @@ print(classification_report(pipeline.predict(test_data), test.target))
 # in variable *seps*.
 
 
-seps = {TfidfVectorizer: {"sep": [' ', '.', '\\?', ',', ';', ':', '!',
-                                  '\\(', '\\)', '\n', '"', "'",
-                                  "-", "\\[", "\\]", "@"]}}
+seps = {
+    TfidfVectorizer: {
+        "separators": [
+            ' ', '.', '\\?', ',', ';', ':', '!',
+            '\\(', '\\)', '\n', '"', "'",
+            "-", "\\[", "\\]", "@"
+        ]
+    }
+}
 model_onnx = convert_sklearn(pipeline, "tfidf",
                              initial_types=[
-                                 ("input", StringTensorType([1, 2]))],
+                                 ("input", StringTensorType([None, 2]))],
                              options=seps)
 
 #################################
