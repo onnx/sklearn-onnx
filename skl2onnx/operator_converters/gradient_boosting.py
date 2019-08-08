@@ -35,8 +35,7 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         if op.n_classes_ == 2:
             # class_prior_ was introduced in scikit-learn 0.21.
             if hasattr(op.init_, 'class_prior_'):
-                base_values = op.init_.class_prior_
-                assert base_values.shape == (2, )
+                base_values = [op.init_.class_prior_[0]]
             else:
                 base_values = [op.init_.prior]
             if op.loss == 'deviance':
