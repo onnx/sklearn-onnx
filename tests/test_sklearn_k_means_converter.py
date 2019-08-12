@@ -7,9 +7,9 @@
 import unittest
 import numpy
 from sklearn.cluster import KMeans, MiniBatchKMeans
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_digits, load_iris
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
 
 
@@ -45,6 +45,43 @@ class TestSklearnKMeansModel(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnKMeans-Dec4",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    def test_kmeans_clustering_int(self):
+        data = load_digits()
+        X = data.data
+        model = KMeans(n_clusters=4)
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", Int64TensorType([None,
+                                      X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.int64)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnKMeansInt-Dec4",
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    def test_batchkmeans_clustering_int(self):
+        data = load_digits()
+        X = data.data
+        model = MiniBatchKMeans(n_clusters=4)
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", Int64TensorType([None,
+                                      X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.int64)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnBatchKMeansInt-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
