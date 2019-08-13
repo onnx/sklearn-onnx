@@ -65,7 +65,9 @@ class TestSklearnKMeansModel(unittest.TestCase):
             basename="SklearnKMeansInt-Dec4",
             # Operator gemm is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__) "
+                          "<= StrictVersion('0.2.1')",
         )
 
     def test_batchkmeans_clustering_int(self):
@@ -83,7 +85,9 @@ class TestSklearnKMeansModel(unittest.TestCase):
             model_onnx,
             basename="SklearnBatchKMeansInt-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__) "
+                          "<= StrictVersion('0.2.1')",
         )
 
 
