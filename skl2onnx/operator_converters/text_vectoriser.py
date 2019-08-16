@@ -5,7 +5,9 @@
 # --------------------------------------------------------------------------
 
 import warnings
+from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
+from ..proto import onnx_proto
 
 
 def _intelligent_split(text, op, tokenizer, existing):
@@ -318,7 +320,9 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     })
 
     if getattr(op, 'norm', None) is None:
-        output = operator.output_full_names
+        output = (scope.get_unique_variable_name('output')
+                  if op.binary else operator.output_full_names)
+        norm_output = output
     else:
         notnormalized = scope.get_unique_variable_name('notnormalized')
         output = [notnormalized]
@@ -344,8 +348,19 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                                "https://github.com/onnx/sklearn-onnx/"
                                "issues." % op.norm)
 
-        container.add_node(op_type, output, operator.output_full_names,
+        norm_output = (scope.get_unique_variable_name('norm_result')
+                       if op.binary else operator.output_full_names)
+
+        container.add_node(op_type, output, norm_output,
                            op_domain='ai.onnx.ml', **attrs)
+
+    if op.binary:
+        cast_result_name = scope.get_unique_variable_name('cast_result')
+
+        apply_cast(scope, norm_output, cast_result_name, container,
+                   to=onnx_proto.TensorProto.BOOL)
+        apply_cast(scope, cast_result_name, operator.output_full_names,
+                   container, to=onnx_proto.TensorProto.FLOAT)
 
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
