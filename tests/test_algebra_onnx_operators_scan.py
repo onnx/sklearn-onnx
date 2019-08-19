@@ -158,7 +158,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         try:
             onnx.checker.check_model(model_def)
         except ValidationError as e:
-            if sys.platform.startswith("win"):
+            if (sys.platform.startswith("win") or
+                    StrictVersion(onnx__version__) <= StrictVersion("1.5.0")):
                 # schema information in onnx is incomplete on Windows
                 warnings.warn(e)
             else:
