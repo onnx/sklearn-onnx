@@ -16,6 +16,10 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
     op = operator.raw_operator
     C = operator.inputs[0].type.shape[1]
 
+    container.add_node('OneHotEncoder', extracted_feature_name,
+                        encoded_feature_name, op_domain='ai.onnx.ml',
+                        **encoder_attrs)
+"""
     # encoded_slot_sizes[i] is the number of output coordinates associated
     # with the ith categorical feature
     categorical_values_per_feature = []
@@ -177,6 +181,6 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
     container.add_node(collector_type, final_variable_names,
                        operator.outputs[0].full_name,
                        op_domain='ai.onnx.ml', **collector_attrs)
-
+"""
 
 register_converter('SklearnOneHotEncoder', convert_sklearn_one_hot_encoder)
