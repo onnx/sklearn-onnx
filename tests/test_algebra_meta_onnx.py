@@ -62,6 +62,7 @@ class TestMetaOnnx(unittest.TestCase):
                     # information for 2 outputs. Expected 1
                     # Node () has input size 5 not in range [min=1, max=1].
                     'ScatterElements',  # opset 11
+                    'TopK',  # opset 11
                     'Unique',  # opset 11
                     "Upsample",
                     }
