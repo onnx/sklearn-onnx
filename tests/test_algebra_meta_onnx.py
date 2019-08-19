@@ -38,6 +38,7 @@ class TestMetaOnnx(unittest.TestCase):
         untested = {'AveragePool',  # issue with ceil_mode
                     'BitShift',  # opset 11
                     'Cast',  # unsupported type
+                    'Clip',  # opset 11
                     'Compress',  # shape inference fails
                     'CumSum',  # opset 11
                     # Input X must be 4-dimensional. X: {1,1,3}
