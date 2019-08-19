@@ -25,6 +25,9 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelEncoder",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.5.0')",
         )
 
     def test_model_label_encoder_float(self):
@@ -43,6 +46,9 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelEncoderFloat",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.5.0')",
         )
 
     def test_model_label_encoder_int(self):
@@ -61,6 +67,9 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLabelEncoderInt",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.5.0')",
         )
 
 
