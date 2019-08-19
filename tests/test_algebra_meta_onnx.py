@@ -47,6 +47,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'CumSum',  # opset 11
                     'DepthToSpace',  # opset 11
                     'DequantizeLinear',
+                    'DynamicQuantizeLinear',  # opset 11
                     'Equal',  # opset 11
                     'Expand',  # shape inference fails
                     'GatherElements',  # opset 11
@@ -61,6 +62,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'Scan',  # Graph attribute inferencing returned type
                     # information for 2 outputs. Expected 1
                     # Node () has input size 5 not in range [min=1, max=1].
+                    'Scatter',  # opset 11
                     'ScatterElements',  # opset 11
                     'TopK',  # opset 11
                     'Unique',  # opset 11
