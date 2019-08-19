@@ -52,7 +52,22 @@ def convert_sklearn_label_binariser(scope, operator, container):
         [equal_condition_tensor_name, unit_tensor_name, zeros_tensor_name],
         where_result_name,
         name=scope.get_unique_operator_name('where'))
-    apply_cast(scope, where_result_name, operator.output_full_names, container,
+    where_res = where_result_name
+    if len(binariser_op.classes_) == 2:
+        array_feature_extractor_result_name = scope.get_unique_variable_name(
+            'array_feature_extractor_result')
+        pos_class_index_name = scope.get_unique_variable_name(
+            'pos_class_index')
+
+        container.add_initializer(
+            pos_class_index_name, onnx_proto.TensorProto.INT64, [], [1])
+
+        container.add_node(
+            'ArrayFeatureExtractor', [where_result_name, pos_class_index_name],
+            array_feature_extractor_result_name, op_domain='ai.onnx.ml',
+            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+        where_res = array_feature_extractor_result_name
+    apply_cast(scope, where_res, operator.output_full_names, container,
                to=onnx_proto.TensorProto.INT64)
 
 
