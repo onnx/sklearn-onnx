@@ -55,6 +55,7 @@ class TestMetaOnnx(unittest.TestCase):
                     'QLinearConv',
                     'QLinearMatMul',
                     "QuantizeLinear",
+                    "Resize",   # opset 11
                     "Round",  # opset 11
                     'Scan',  # Graph attribute inferencing returned type
                     # information for 2 outputs. Expected 1

@@ -22,7 +22,7 @@ from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import dump_data_and_model, fit_regression_model
 from onnxruntime import InferenceSession, __version__
 
-threshold = "0.4.0"
+threshold = "0.5.0"
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
