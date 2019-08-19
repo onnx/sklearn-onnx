@@ -3,6 +3,7 @@ import unittest
 from distutils.version import StrictVersion
 from io import StringIO
 import contextlib
+import warnings
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
@@ -35,42 +36,11 @@ class TestMetaOnnx(unittest.TestCase):
                      StrictVersion("0.5.0"),
                      reason="too unstable with older versions")
     def test_onnx_spec(self):
-        untested = {'AveragePool',  # issue with ceil_mode
-                    'BitShift',  # opset 11
-                    'Cast',  # unsupported type
-                    'Clip',  # opset 11
-                    'Compress',  # shape inference fails
-                    'CumSum',  # opset 11
-                    # Input X must be 4-dimensional. X: {1,1,3}
-                    'ConvInteger',
-                    'ConvTranspose',
-                    'CumSum',  # opset 11
-                    'DepthToSpace',  # opset 11
-                    'DequantizeLinear',
-                    'DynamicQuantizeLinear',  # opset 11
-                    'Equal',  # opset 11
-                    'Expand',  # shape inference fails
-                    'GatherElements',  # opset 11
-                    'MatMulInteger',
-                    'MaxPool',  # issue with ceil_mode
-                    'Mod',
-                    'QLinearConv',
-                    'QLinearMatMul',
-                    "QuantizeLinear",
-                    "Resize",   # opset 11
-                    "Round",  # opset 11
-                    'Scan',  # Graph attribute inferencing returned type
-                    # information for 2 outputs. Expected 1
-                    # Node () has input size 5 not in range [min=1, max=1].
-                    'Scatter',  # opset 11
-                    'ScatterElements',  # opset 11
-                    'TopK',  # opset 11
-                    'Unique',  # opset 11
-                    "Upsample",
-                    }
+        untested = {}
         folder = os.path.dirname(onnx.__file__)
         folder = os.path.join(folder, "backend", "test", "data", "node")
         subs = os.listdir(folder)
+        excs = []
         for sub in subs:
             path = os.path.join(folder, sub)
             model = os.path.join(path, "model.onnx")
@@ -98,11 +68,13 @@ class TestMetaOnnx(unittest.TestCase):
                 op_type, success, reason = self._check_algebra_onnxruntime(
                     untested=untested, **tests)
             except Exception as e:
-                raise Exception(
-                    "Unable to handle operator '{}'".format(model)) from e
-            if __name__ == "__main__":
-                if not success:
-                    print("-", op_type, " Failure", reason.split('\n')[0])
+                warnings.warn("Unable to handle operator '{}'".format(model))
+                excs.append((op_type, reason, e))
+        if __name__ == "__main__":
+            if not success or len(excs) > 0:
+                import pprint
+                pprint.pprint([(op, reason or str(exc).split('\n')[0])
+                               for op, reason, exc in excs])
 
     def _load_data(self, name):
         tensor = onnx.TensorProto()
