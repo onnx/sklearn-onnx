@@ -5,14 +5,17 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType, Int64TensorType
+from ..common.data_types import (
+    FloatTensorType, Int64TensorType, DoubleTensorType
+)
 from ..common.utils import check_input_and_output_types
 
 
 def calculate_sklearn_kmeans_output_shapes(operator):
-    check_input_and_output_types(operator, good_input_types=[FloatTensorType],
-                                 good_output_types=[Int64TensorType,
-                                                    FloatTensorType])
+    check_input_and_output_types(
+        operator,
+        good_input_types=[Int64TensorType, FloatTensorType, DoubleTensorType],
+        good_output_types=[Int64TensorType, FloatTensorType, DoubleTensorType])
     if len(operator.inputs) != 1:
         raise RuntimeError("Only one input vector is allowed for KMeans.")
     if len(operator.outputs) != 2:

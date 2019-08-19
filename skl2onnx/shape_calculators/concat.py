@@ -16,14 +16,14 @@ def calculate_sklearn_concat(operator):
     seen_types = []
     for i in operator.inputs:
         if isinstance(i.type, TensorType):
-            if i.type.shape[1] in ('None', None):
-                C = 'None'
+            if i.type.shape[1] is None:
+                C = None
                 break
             C += i.type.shape[1]
         elif isinstance(i.type, (Int64Type, FloatType, StringType)):
             C += 1
         else:
-            C = 'None'
+            C = None
             break
         nt = i.type.__class__.__name__
         if len(seen_types) == 0:

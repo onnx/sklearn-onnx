@@ -29,12 +29,20 @@ import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnx import ModelProto
 import onnx
-from onnxruntime.datasets import get_example
-example1 = get_example("mul_1.pb")
 
-model = onnx.load(example1)  # model is a ModelProto protobuf message
+from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 
+onnx_fct = OnnxAdd(OnnxMul('X', numpy.array([2], dtype=numpy.float32)),
+                   numpy.array([[1, 0], [0, 1]], dtype=numpy.float32),
+                   output_names=['Y'])
+
+X = numpy.array([[4, 5], [-2, 3]], dtype=numpy.float32)
+model = onnx_fct.to_onnx({'X': X})
 print(model)
+
+filename = "example1.onnx"
+with open(filename, "wb") as f:
+    f.write(model.SerializeToString())
 
 
 #################################
@@ -48,7 +56,7 @@ print(model)
 
 
 model = ModelProto()
-with open(example1, 'rb') as fid:
+with open(filename, 'rb') as fid:
     content = fid.read()
     model.ParseFromString(content)
 
