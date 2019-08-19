@@ -97,7 +97,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     But if a pipeline contains two model of the same class,
-    it is possible to disintguish between the two with function *id*:
+    it is possible to distinguish between the two with function *id*:
 
     ::
 
