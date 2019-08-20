@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from onnx import AttributeProto
 from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
 
@@ -11,8 +12,9 @@ from ..common._topology import Variable
 class GraphState:
 
     def __init__(self, inputs, outputs,
-                 operator_name,
-                 scope, container, converter,
+                 operator_name, scope,
+                 container, converter,
+                 onnx_prefix_name=None,
                  **attrs):
         self.inputs = inputs
         self.scope = scope
@@ -21,6 +23,7 @@ class GraphState:
         self.converter = converter
         self.expected_outputs = outputs
         self.computed_outputs = None
+        self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
         if isinstance(self.inputs, tuple):
             raise TypeError("Parameter inputs must be a list or a string or a "
@@ -33,6 +36,13 @@ class GraphState:
             self.expected_outputs = [self.expected_outputs]
 
     @property
+    def onnx_prefix(self):
+        if self.onnx_prefix_name is None:
+            return self.operator_name
+        else:
+            return self.onnx_prefix_name + "_" + self.operator_name
+
+    @property
     def outputs(self):
         self.run()
         return self.computed_outputs
@@ -40,10 +50,11 @@ class GraphState:
     def _get_var_name(self, var, unused, operator=None):
         if isinstance(var, Variable):
             return var.full_name
-        elif isinstance(var, np.ndarray):
+        elif isinstance(var, (np.ndarray, np.bool, np.int64,
+                              np.float32, np.float64, np.bool)):
             return self._add_constant(var)
         elif hasattr(var, 'ConstantValue'):
-            return self._add_constant(var.ConstantValue)
+            return self._add_constant(var.ConstantValue, var.ImplicitCast)
         elif hasattr(var, 'add_to'):
             var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
@@ -63,13 +74,26 @@ class GraphState:
             raise RuntimeError("Unexpected type for parameter 'var': {0}."
                                "".format(type(var)))
 
-    def _add_constant(self, cst):
+    def _add_constant(self, cst, can_cast=True):
         if isinstance(cst, np.ndarray):
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
-                self.operator_name + 'cst')
-            if cst.dtype in (np.float32, np.float64):
+                self.onnx_prefix + 'cst')
+            if cst.dtype == np.float32:
                 ty = onnx_proto.TensorProto.FLOAT
+                astype = np.float64
+            elif cst.dtype == np.float64:
+                ty = onnx_proto.TensorProto.DOUBLE
+                astype = np.float64
+            elif cst.dtype == np.int64:
+                ty = onnx_proto.TensorProto.INT64
+                astype = np.int64
+            elif cst.dtype == np.int32:
+                ty = onnx_proto.TensorProto.INT32
+                astype = np.int64
+            elif cst.dtype == np.bool:
+                ty = onnx_proto.TensorProto.BOOL
+                astype = np.bool
             else:
                 raise NotImplementedError(
                     "Unable to guess ONNX type from type {}. "
@@ -77,12 +101,37 @@ class GraphState:
                     "sklearn-onnx/issues.".format(
                         cst.dtype))
             self.container.add_initializer(
-                name, ty, shape, cst.astype(np.float64).flatten())
+                name, ty, shape, cst.astype(astype).flatten(),
+                can_cast=can_cast)
             return name
         elif isinstance(cst, TensorProto):
             name = self.scope.get_unique_variable_name(
-                self.operator_name + 'cst')
+                self.onnx_prefix + 'cst')
             self.container.add_initializer(name, None, None, cst)
+            return name
+        elif isinstance(cst, np.int64):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = AttributeProto.INT
+            self.container.add_initializer(name, ty, None, cst)
+            return name
+        elif isinstance(cst, np.bool):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = AttributeProto.INT
+            self.container.add_initializer(name, ty, None, cst)
+            return name
+        elif isinstance(cst, np.float64):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = AttributeProto.DOUBLE
+            self.container.add_initializer(name, ty, None, float(cst))
+            return name
+        elif isinstance(cst, np.float32):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = AttributeProto.FLOAT
+            self.container.add_initializer(name, ty, None, float(cst))
             return name
         else:
             raise NotImplementedError(
@@ -114,7 +163,7 @@ class GraphState:
                 v = self._get_var_name(i, False, operator=operator)
                 if v is not None:
                     inputs.append(v)
-            name = self.scope.get_unique_operator_name(self.operator_name)
+            name = self.scope.get_unique_operator_name(self.onnx_prefix)
             outputs = [self._get_output_name(o)
                        for o in self.expected_outputs]
             self.container.add_node(self.operator_name, inputs, outputs,

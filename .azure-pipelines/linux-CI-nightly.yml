@@ -18,7 +18,7 @@ jobs:
         numpy.version: '==1.16.3'
         onnx.version: '==1.5.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.20.3'
+        sklearn.version: '==0.21.3'
     maxParallel: 3
 
   steps:
@@ -57,6 +57,10 @@ jobs:
 
   - script: |
       pip install -r requirements.txt
+      git clone https://github.com/microsoft/onnxconverter-common
+      cd onnxconverter-common
+      pip install -e .
+      cd ..
       pip install -r requirements-dev.txt
       pip install pytest
     displayName: 'install requirements'

@@ -11,6 +11,7 @@ from . import concat
 from . import dict_vectorizer
 from . import flatten
 from . import function_transformer
+from . import gaussian_process
 from . import imputer
 from . import k_bins_discretiser
 from . import k_means
@@ -18,6 +19,7 @@ from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import mixture
 from . import nearest_neighbours
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
@@ -36,6 +38,7 @@ __all__ = [
     dict_vectorizer,
     flatten,
     function_transformer,
+    gaussian_process,
     imputer,
     k_bins_discretiser,
     k_means,
@@ -43,6 +46,7 @@ __all__ = [
     label_encoder,
     linear_classifier,
     linear_regressor,
+    mixture,
     nearest_neighbours,
     one_hot_encoder,
     one_vs_rest_classifier,

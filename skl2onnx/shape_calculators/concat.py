@@ -16,14 +16,14 @@ def calculate_sklearn_concat(operator):
     seen_types = []
     for i in operator.inputs:
         if isinstance(i.type, TensorType):
-            if i.type.shape[1] in ('None', None):
-                C = 'None'
+            if i.type.shape[1] is None:
+                C = None
                 break
             C += i.type.shape[1]
         elif isinstance(i.type, (Int64Type, FloatType, StringType)):
             C += 1
         else:
-            C = 'None'
+            C = None
             break
         nt = i.type.__class__.__name__
         if len(seen_types) == 0:
@@ -40,6 +40,7 @@ def calculate_sklearn_concat(operator):
 register_shape_calculator('SklearnConcat', calculate_sklearn_concat)
 register_shape_calculator('SklearnGenericUnivariateSelect',
                           calculate_sklearn_concat)
+register_shape_calculator('SklearnMultiply', calculate_sklearn_concat)
 register_shape_calculator('SklearnRFE', calculate_sklearn_concat)
 register_shape_calculator('SklearnRFECV', calculate_sklearn_concat)
 register_shape_calculator('SklearnSelectFdr', calculate_sklearn_concat)

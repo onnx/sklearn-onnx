@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     ColumnTransformer = None
 
 from skl2onnx import convert_sklearn
@@ -139,7 +139,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         model_onnx = convert_sklearn(
             pipeline,
             "tfidf",
-            initial_types=[("input", StringTensorType([1, 2]))],
+            initial_types=[("input", StringTensorType([None, 2]))],
             options=extra,
         )
         test_data = np.array([

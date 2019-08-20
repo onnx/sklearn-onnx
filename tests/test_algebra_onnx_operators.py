@@ -11,9 +11,12 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_operator import OnnxOperator
-from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv
-from skl2onnx.algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
-from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt
+from skl2onnx.algebra.onnx_ops import (
+    OnnxSub, OnnxDiv,
+    OnnxReduceSumSquare, OnnxGemm,
+    OnnxAdd, OnnxArgMin, OnnxSqrt,
+    OnnxArrayFeatureExtractor, OnnxMul
+)
 from onnx import (
     helper, TensorProto, load_model,
     __version__ as onnx__version__
@@ -47,7 +50,7 @@ class TestOnnxOperators(unittest.TestCase):
             op = OnnxSub(operator.inputs[0], W, output_names=operator.outputs)
             op.add_to(scope, container)
             text = str(container)
-            if 'name:"Sub"' not in text:
+            if 'name:"Su_Sub"' not in text:
                 raise AssertionError(
                     "Unnamed operator:\n".format(text))
             nin = list(op.enumerate_initial_types())
@@ -55,7 +58,7 @@ class TestOnnxOperators(unittest.TestCase):
             nva = list(op.enumerate_variables())
             assert len(nin) == 1
             assert nin[0][0] == 'input'
-            assert nin[0][1].shape == [1, 2]
+            assert nin[0][1].shape == [None, 2]
             assert len(nno) == 1
             assert nno[0].output_names == ['variable']
             assert len(nva) == 1
@@ -68,7 +71,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub', [('input', FloatTensorType([1, 2]))],
+            tr, 'a-sub', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -110,7 +113,7 @@ class TestOnnxOperators(unittest.TestCase):
             operator.outputs[0].type.shape = [N, W.shape[0]]
 
         model_onnx = convert_sklearn(
-            tr, 'a-sub-div', [('input', FloatTensorType([1, 2]))],
+            tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv})
 
@@ -128,10 +131,14 @@ class TestOnnxOperators(unittest.TestCase):
             C = op.cluster_centers_
             C2 = row_norms(C, squared=True)
 
-            N = X.type.shape[0]
-            zeros = np.zeros((N, ))
-
             rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
+
+            N = X.type.shape[0]
+            if isinstance(N, int):
+                zeros = np.zeros((N, ))
+            else:
+                zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
+
             z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
             y2 = OnnxAdd(C2, z)
             lo = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
@@ -145,7 +152,8 @@ class TestOnnxOperators(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(
-            model, 'a-kmeans', [('input', FloatTensorType([1, X.shape[1]]))],
+            model, 'a-kmeans',
+            [('input', FloatTensorType([None, X.shape[1]]))],
             custom_conversion_functions={KMeans: conv})
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
@@ -200,6 +208,19 @@ class TestOnnxOperators(unittest.TestCase):
         graph_def = helper.make_graph(nodes, 't1', [X], [Y])
         model_def = helper.make_model(graph_def, producer_name='A')
         self.assertEqual(len(model_def.graph.output), 1)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_onnxt_array_feature_extractor(self):
+        onx = OnnxArrayFeatureExtractor('X', np.array([1], dtype=np.int64),
+                                        output_names=['Y'])
+        X = np.array([[1, 2], [3, 4]], dtype=np.float32)
+        model_def = onx.to_onnx({'X': X},
+                                outputs=[('Y', FloatTensorType([2]))])
+        sess = InferenceSession(model_def.SerializeToString())
+        got = sess.run(None, {'X': X})[0]
+        self.assertEqual(got.shape, (2, 1))
+        assert_almost_equal(X[:, 1:2], got)
 
 
 if __name__ == "__main__":

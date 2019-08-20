@@ -13,31 +13,43 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-OnnxGit-Rt040-Skl021:
+      Py37-OnnxGit-Rt050-Skl021:
+        do.bench: '1'
         python.version: '3.7'
-        numpy.version: '==1.16.3'
+        numpy.version: '==1.17.0'
         onnx.version: 'git'
-        onnxrt.version: '==0.4.0'
-        sklearn.version: '==0.21.0'
-      Py37-OnnxGit-Rt040-Skl020:
+        onnxrt.version: '==0.5.0'
+        sklearn.version: '==0.21.3'
+      Py37-Onnx150-Rt050-Skl021:
+        do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.16.3'
+        numpy.version: '==1.17.0'
+        onnx.version: '==1.5.0'
+        onnxrt.version: '==0.5.0'
+        sklearn.version: '==0.21.3'
+      Py37-OnnxGit-Rt040-Skl020:
+        do.bench: '0'
+        python.version: '3.7'
+        numpy.version: '==1.17.0'
         onnx.version: 'git'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx141-Skl020:
+        do.bench: '0'
         python.version: '3.6'
         numpy.version: '==1.16.3'
         onnx.version: '==1.4.1'
         onnxrt.version: '==0.3.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx130-Skl020:
+        do.bench: '0'
         python.version: '3.6'
         numpy.version: '==1.16.3'
         onnx.version: '==1.3.0'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
       Py35-OnnxGit-Skl019:
+        do.bench: '0'
         python.version: '3.5'
         numpy.version: '==1.16.3'
         onnx.version: 'git'
@@ -101,6 +113,10 @@ jobs:
 
   - script: |
       pip install -r requirements.txt
+      git clone https://github.com/microsoft/onnxconverter-common
+      cd onnxconverter-common
+      pip install -e .
+      cd ..
       pip install -r requirements-dev.txt
       pip install pytest
     displayName: 'install requirements'
@@ -134,14 +150,20 @@ jobs:
     displayName: 'flake8'
 
   - script: |
-      pip install onnxmltools openpyxl
-      coverage run --include=skl2onnx/** tests/benchmark.py
-      coverage report -m
-      coverage html
+      if [ '$(do.bench)' == '1' ]
+        then
+          pip install onnxmltools openpyxl
+          coverage run --include=skl2onnx/** tests/benchmark.py
+          coverage report -m
+          coverage html
+      fi
     displayName: 'coverage'
 
   - script: |
-      python tests/benchmark.py
+      if [ '$(do.bench)' == '1' ]
+        then
+          python tests/benchmark.py
+      fi
     displayName: 'benchmark'
 
   - task: PublishTestResults@2

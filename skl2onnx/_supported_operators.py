@@ -11,18 +11,23 @@ from .common._registration import register_converter, register_shape_calculator
 from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.linear_model import SGDClassifier
 from sklearn.svm import LinearSVC
 
 # Linear regressors
-from sklearn.linear_model import ElasticNet
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import LassoLars
+from sklearn.linear_model import ElasticNet, ElasticNetCV
+from sklearn.linear_model import Lars, LarsCV
+from sklearn.linear_model import Lasso, LassoCV
+from sklearn.linear_model import LassoLars, LassoLarsCV
+from sklearn.linear_model import LassoLarsIC
 from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.linear_model import SGDRegressor
 from sklearn.svm import LinearSVR
+
+# Mixture
+from sklearn.mixture import GaussianMixture
 
 # Multi-class
 from sklearn.multiclass import OneVsRestClassifier
@@ -39,6 +44,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import VotingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
+
+# Gaussian processes
+from sklearn.gaussian_process import GaussianProcessRegressor
 
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
@@ -71,7 +79,7 @@ from sklearn.feature_selection import VarianceThreshold
 try:
     # 0.20
     from sklearn.impute import SimpleImputer
-except ModuleNotFoundError:
+except ImportError:
     # 0.19
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.preprocessing import Binarizer
@@ -105,9 +113,12 @@ from sklearn.preprocessing import FunctionTransformer
 # included in the following list and one output for everything not in
 # the list.
 sklearn_classifier_list = [
-    LogisticRegression, SGDClassifier, LinearSVC, SVC, NuSVC,
-    GradientBoostingClassifier, RandomForestClassifier, DecisionTreeClassifier,
-    ExtraTreesClassifier, BernoulliNB, MultinomialNB, KNeighborsClassifier,
+    LogisticRegression, LogisticRegressionCV, SGDClassifier,
+    LinearSVC, SVC, NuSVC,
+    GradientBoostingClassifier, RandomForestClassifier,
+    DecisionTreeClassifier,
+    ExtraTreesClassifier, BernoulliNB, MultinomialNB,
+    KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
     AdaBoostClassifier, MLPClassifier
 ]
@@ -129,7 +140,7 @@ def build_sklearn_operator_name_map():
                 GradientBoostingClassifier, GradientBoostingRegressor,
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
-                LinearRegression, Lasso, LassoLars, Ridge,
+                LinearRegression,
                 MLPClassifier, MLPRegressor,
                 MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
@@ -143,14 +154,25 @@ def build_sklearn_operator_name_map():
                 RobustScaler, OneHotEncoder, DictVectorizer,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
-                VarianceThreshold,
+                VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
     ] if k is not None}
     res.update({
-        ElasticNet: 'SklearnElasticNetRegressor',
+        ElasticNet: 'SklearnLinearRegressor',
+        ElasticNetCV: 'SklearnLinearRegressor',
         LinearRegression: 'SklearnLinearRegressor',
+        Lars: 'SklearnLinearRegressor',
+        LarsCV: 'SklearnLinearRegressor',
+        Lasso: 'SklearnLinearRegressor',
+        LassoCV: 'SklearnLinearRegressor',
+        LassoLars: 'SklearnLinearRegressor',
+        LassoLarsCV: 'SklearnLinearRegressor',
+        LassoLarsIC: 'SklearnLinearRegressor',
         LogisticRegression: 'SklearnLinearClassifier',
+        LogisticRegressionCV: 'SklearnLinearClassifier',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        Ridge: 'SklearnLinearRegressor',
+        RidgeCV: 'SklearnLinearRegressor',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
     })

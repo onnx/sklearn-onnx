@@ -2,13 +2,14 @@
 Tests scikit-imputer converter.
 """
 import unittest
+import numpy as np
 import pandas
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_digits, load_iris
 from sklearn.pipeline import Pipeline
 
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     ColumnTransformer = None
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import LogisticRegression
@@ -36,18 +37,18 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType([None, 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType([None, 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType([None, 1])
                 inputs.append((k, t))
             return inputs
 
-        data = load_iris()
+        data = load_digits()
         X = data.data[:, :2]
         y = data.target
-        data = pandas.DataFrame(X, columns=["X1", "X2"])
+        data = pandas.DataFrame(X, columns=["X1", "X2"], dtype=np.int64)
 
         pipe = Pipeline(steps=[
             (
@@ -87,11 +88,11 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType([None, 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType([None, 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType([None, 1])
                 inputs.append((k, t))
             return inputs
 
@@ -136,11 +137,11 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                 if drop is not None and k in drop:
                     continue
                 if v == "int64":
-                    t = Int64TensorType([1, 1])
+                    t = Int64TensorType([None, 1])
                 elif v == "float64":
-                    t = FloatTensorType([1, 1])
+                    t = FloatTensorType([None, 1])
                 else:
-                    t = StringTensorType([1, 1])
+                    t = StringTensorType([None, 1])
                 inputs.append((k, t))
             return inputs
 

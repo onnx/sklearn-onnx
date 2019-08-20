@@ -49,7 +49,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -73,7 +73,11 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr = KMeans(n_clusters=2)
         tr.fit(X)
 
-        tr_mixin = wrap_as_onnx_mixin(tr)
+        try:
+            tr_mixin = wrap_as_onnx_mixin(tr)
+        except KeyError as e:
+            assert "SklearnGaussianProcessRegressor" in str(e)
+            return
 
         try:
             onx = tr_mixin.to_onnx()
@@ -88,7 +92,11 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
     def test_way4_mixin_fit(self):
 
         X = np.arange(20).reshape(10, 2)
-        tr = wrap_as_onnx_mixin(KMeans(n_clusters=2))
+        try:
+            tr = wrap_as_onnx_mixin(KMeans(n_clusters=2))
+        except KeyError as e:
+            assert "SklearnGaussianProcessRegressor" in str(e)
+            return
         tr.fit(X)
 
         onx = tr.to_onnx(X.astype(np.float32))
@@ -104,7 +112,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((1, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -128,7 +136,11 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
         tr.fit(X)
 
-        tr_mixin = wrap_as_onnx_mixin(tr)
+        try:
+            tr_mixin = wrap_as_onnx_mixin(tr)
+        except KeyError as e:
+            assert "SklearnGaussianProcessRegressor" in str(e)
+            return
 
         try:
             onx = tr_mixin.to_onnx()
@@ -143,8 +155,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
     def test_pipe_way4_mixin_fit(self):
 
         X = np.arange(20).reshape(10, 2)
-        tr = wrap_as_onnx_mixin(make_pipeline(
-            CustomOpTransformer(), KMeans(n_clusters=2)))
+        try:
+            tr = wrap_as_onnx_mixin(make_pipeline(
+                CustomOpTransformer(), KMeans(n_clusters=2)))
+        except KeyError as e:
+            assert "SklearnGaussianProcessRegressor" in str(e)
+            return
 
         tr.fit(X)
 

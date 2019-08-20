@@ -16,7 +16,7 @@ class TestSklearnBinarizer(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn binarizer",
-            [("input", FloatTensorType([1, 1]))],
+            [("input", FloatTensorType([None, 1]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

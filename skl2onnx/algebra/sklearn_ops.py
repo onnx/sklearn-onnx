@@ -6,7 +6,7 @@ import textwrap
 from sklearn.pipeline import Pipeline, FeatureUnion
 try:
     from sklearn.compose import ColumnTransformer
-except ModuleNotFoundError:
+except ImportError:
     # ColumnTransformer was introduced in 0.20.
     ColumnTransformer = None
 from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin

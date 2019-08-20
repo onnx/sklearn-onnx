@@ -4,14 +4,55 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, helper
+from ..proto import TensorProto
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
 from .type_helper import _guess_type
+
+
+class OnnxOperatorItem:
+    """
+    Accessor to one of the output returned by a *OnnxOperator*.
+
+    :param onx_op: OnnxOperator
+    :param index: integer
+    """
+    def __init__(self, onx_op, index):
+        if not isinstance(index, int):
+            raise TypeError("index must be an integer.")
+        self.onx_op = onx_op
+        self.index = index
+
+    def add_to(self, scope, container, operator=None):
+        """
+        Adds outputs to the container if not already added,
+        registered the outputs if the node is not final.
+
+        :param scope: scope
+        :param container: container
+        :param operator: overwrite inputs
+        """
+        self.onx_op.add_to(scope, container, operator=operator)
+
+    def get_output(self, i=0):
+        """
+        Returns the output.
+        """
+        if i != 0:
+            raise IndexError("Can only return the first item.")
+        return self.onx_op.get_output(self.index)
+
+    @property
+    def outputs(self):
+        """
+        Returns the outputs of the node.
+        """
+        return self.onx_op.outputs[self.index:self.index + 1]
 
 
 class OnnxOperator:
@@ -55,19 +96,39 @@ class OnnxOperator:
             return "UnscopedVariable('%s')" % self.name
 
     class ConstantVariable:
-        def __init__(self, value):
+        def __init__(self, value, implicit_cast=True):
             self.value = value
+            self.implicit_cast = implicit_cast
 
         @property
         def ConstantValue(self):
             return self.value
 
+        @property
+        def ImplicitCast(self):
+            return self.implicit_cast
+
     def __init__(self, *inputs, op_version=None, output_names=None,
                  domain=None, **kwargs):
+
+        if output_names is None and self.__class__.__name__ in {
+                "OnnxScan"}:
+            raise NotImplementedError(
+                "The class cannot infer the number of variables "
+                "for node '{}' yet. output_names must be specified"
+                ".".format(self.__class__.__name__))
+
+        if output_names is not None and isinstance(output_names, list):
+            output_names = output_names.copy()
+            for i in range(len(output_names)):
+                if isinstance(output_names[i], str):
+                    output_names[i] = output_names[i].format(idself=id(self))
+
         self.state = None
         self.op_version = op_version or get_opset_number_from_onnx()
         self.domain = domain
         self.kwargs = kwargs
+        self.onnx_prefix_name = None
 
         # check inputs
         if len(inputs) == 0:
@@ -81,16 +142,26 @@ class OnnxOperator:
             for inp in inputs:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
-                elif isinstance(inp, (OnnxOperator, Variable)):
+                elif isinstance(inp, (OnnxOperator, Variable,
+                                      OnnxOperatorItem)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, TensorProto)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
-                elif isinstance(inp, OnnxOperator.OnnxOperatorVariable):
+                elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
+                                      OnnxOperator.ConstantVariable)):
                     self.inputs.append(inp)
+                elif isinstance(inp, (np.int64, np.float32,
+                                      np.float64, np.bool)):
+                    self.inputs.append(inp)
+                elif isinstance(inp, (float, )):
+                    self.inputs.append(np.float64(inp))
+                elif isinstance(inp, (int, )):
+                    self.inputs.append(np.int64(inp))
                 else:
                     raise TypeError("Unable to interpret the "
-                                    "input name for type {}.".format(
-                                        type(inp)))
+                                    "input name for type {} in "
+                                    "operator '{}'.".format(
+                                        type(inp), self.__class__.__name__))
 
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or
@@ -117,6 +188,37 @@ class OnnxOperator:
                     raise TypeError("output_names must be a list of strings "
                                     "and element {} is {}".format(
                                         i, type(name)))
+
+    def set_onnx_name_prefix(self, onnx_prefix_name):
+        """
+        Provides a name to define a prefix in the onnx graph
+        to avoid to get unreadable node names. The method
+        does not overwrite an existing name, it propagates
+        the prefix to inputs and stops the propagation
+        if the prefix is already defined.
+        """
+        if self.onnx_prefix_name is None:
+            self.onnx_prefix_name = onnx_prefix_name
+            for inp in self.inputs:
+                if hasattr(inp, 'onnx_prefix_name'):
+                    inp.set_onnx_name_prefix(onnx_prefix_name)
+
+    @property
+    def onnx_prefix(self):
+        if self.onnx_prefix_name is None:
+            name = self.__class__.__name__
+            if name.startswith("Onnx"):
+                name = name[4:]
+            return name[:2]
+        else:
+            return self.onnx_prefix_name
+
+    def __getitem__(self, index):
+        """
+        Returns an accessor to one of the output
+        of this node.
+        """
+        return OnnxOperatorItem(self, index)
 
     def get_output(self, i):
         """
@@ -164,6 +266,17 @@ class OnnxOperator:
         :param operator: overwrite inputs
         """
         if self.state is None:
+            if self.is_deprecated:
+                raise RuntimeError("Node '{}' is deprecated. "
+                                   "This API cannot deprecated nodes."
+                                   "".format(self.__class__.__name__))
+            if (self.op_version is not None and
+                    self.op_version < self.since_version):
+                raise RuntimeError("Node '{}' has been changed since "
+                                   "version {}. This API cannot convert "
+                                   "older version."
+                                   "".format(self.__class__.__name__,
+                                             self.since_version))
             if self.kwargs.get('op_version', '') is None:
                 kwargs = self.kwargs.copy()
                 del kwargs['op_version']
@@ -178,7 +291,8 @@ class OnnxOperator:
             else:
                 outputs = []
                 for name in self.__class__.expected_outputs:
-                    name = scope.get_unique_variable_name(name[0])
+                    name = scope.get_unique_variable_name(
+                        self.onnx_prefix + "_" + name[0])
                     outputs.append(name)
                 self.output_names_ = outputs
 
@@ -206,12 +320,11 @@ class OnnxOperator:
                                            "{} in {}.".format(input, vars))
                 else:
                     inputs.append(input)
-            self.state = GraphState(inputs, self.output_names_,
-                                    self.operator_name,
-                                    scope, container, None,
-                                    op_version=self.op_version,
-                                    op_domain=domain,
-                                    **self.kwargs)
+            self.state = GraphState(
+                inputs, self.output_names_, self.operator_name,
+                scope, container, None, op_version=self.op_version,
+                op_domain=domain, onnx_prefix_name=self.onnx_prefix,
+                **self.kwargs)
             self.state.run(operator=operator)
 
     @property
@@ -237,13 +350,20 @@ class OnnxOperator:
                 if isinstance(obj, OnnxOperator):
                     obj._clean_attributes(*args, recursive=True)
 
-    def to_onnx(self, inputs=None, outputs=None):
+    def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
+                dtype=np.float32, target_opset=None):
         """
         Converts this operator into an ONNX graph.
 
         :param inputs: specific inputs (as a dictionary) or
             default inputs if not specified
         :param outputs: specific outputs
+        :param other_outputs: additional outputs to consider
+            as graph outputs but not outputs of this particular
+            node
+        :param dtype: force the use of a specific float type,
+            either `np.float32` or `np.float64`, it must be specified
+        :param target_opset: target opset, None for the default one
         """
         if hasattr(self, "state"):
             # The conversion already happened and needs to be cleaned.
@@ -269,8 +389,9 @@ class OnnxOperator:
                                    "input types.".format(
                                        name, self.__class__.__name__))
 
-        target_opset = get_opset_number_from_onnx()
-        container = ModelComponentContainer(target_opset)
+        if target_opset is None:
+            target_opset = get_opset_number_from_onnx()
+        container = ModelComponentContainer(target_opset, dtype=dtype)
         if container.target_opset < 9:
             raise RuntimeError("The operator cannot be converted into ONNX."
                                " It requires ONNX op_set >= 9.")
@@ -281,6 +402,12 @@ class OnnxOperator:
             container.add_input(Variable(inp[0], inp[0],
                                          scope=scope, type=inp[1]))
         self.add_to(scope, container)
+        if other_outputs is not None:
+            for out in other_outputs:
+                if not hasattr(out, 'add_to'):
+                    raise RuntimeError(
+                        "Extra outputs must have method 'add_to'.")
+                out.add_to(scope, container)
 
         # infer shapes
         if outputs:
@@ -306,14 +433,14 @@ class OnnxOperator:
             container.add_output(shape)
 
         # convert the graph
-        graph = helper.make_graph(
+        graph = make_graph(
             container.nodes, model_name, container.inputs,
             container.outputs, container.initializers)
-        onnx_model = helper.make_model(graph)
+        onnx_model = make_model(graph)
 
         # domains
         domains = {}
-        version = get_opset_number_from_onnx()
+        version = target_opset
         for n in container.nodes:
             domains[n.domain] = max(domains.get(n.domain, version),
                                     getattr(n, 'op_version', version))
