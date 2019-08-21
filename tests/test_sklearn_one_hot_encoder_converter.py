@@ -1,5 +1,4 @@
 """Tests scikit-learn's OneHotEncoder converter."""
-import inspect
 import unittest
 import numpy
 from distutils.version import StrictVersion
@@ -22,13 +21,6 @@ def one_hot_encoder_supports_string():
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     def test_model_one_hot_encoder(self):
-        # categorical_features will be removed in 0.22 (this test
-        # will fail by then). FutureWarning: The handling of integer
-        # data will change in version 0.22. Currently, the categories
-        # are determined based on the range [0, max(values)], while
-        # in the future they will be determined based on the unique values.
-        # If you want the future behaviour and silence this warning,
-        # you can specify "categories='auto'".
         model = OneHotEncoder()
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
@@ -52,32 +44,30 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
     )
-    def test_one_hot_encoder_mixed_string_int(self):
-        # categorical_features will be removed in 0.22
-        # (this test will fail by then).
+    def test_one_hot_encoder_mixed_string_drop(self):
         data = [
-            ["c0.4", "c0.2", 3],
-            ["c1.4", "c1.2", 0],
-            ["c0.2", "c2.2", 1],
-            ["c0.2", "c2.2", 1],
-            ["c0.2", "c2.2", 1],
-            ["c0.2", "c2.2", 1],
+            ["c0.4", "c0.2", '3'],
+            ["c1.4", "c1.2", '0'],
+            ["c0.2", "c2.2", '1'],
+            ["c0.2", "c2.2", '1'],
+            ["c0.2", "c2.2", '1'],
+            ["c0.2", "c2.2", '1'],
         ]
-        model = OneHotEncoder(categories="auto")
+        test = [["c0.2", "c2.2", '1']]
+        model = OneHotEncoder(categories="auto", drop=['c0.4', 'c0.2', '3'])
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType([None, 2])),
-            ("input2", Int64TensorType([None, 1])),
+            ("input1", StringTensorType([None, 3])),
         ]
         model_onnx = convert_sklearn(model,
-                                     "one-hot encoder mixed-type inputs",
+                                     "one-hot encoder",
                                      inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
+            test,
             model,
             model_onnx,
-            basename="SklearnOneHotEncoderStringInt64",
+            basename="SklearnOneHotEncoderMixedStringDrop",
             verbose=False,
         )
 
@@ -86,8 +76,6 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder does not support strings in 0.19",
     )
     def test_one_hot_encoder_onecat(self):
-        # categorical_features will be removed in 0.22
-        # (this test will fail by then).
         data = [["cat"], ["cat"]]
         model = OneHotEncoder(categories="auto")
         model.fit(data)
@@ -107,8 +95,6 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder does not support strings in 0.19",
     )
     def test_one_hot_encoder_twocats(self):
-        # categorical_features will be removed in 0.22
-        # (this test will fail by then).
         data = [["cat2"], ["cat1"]]
         model = OneHotEncoder(categories="auto")
         model.fit(data)
@@ -129,35 +115,23 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
     )
-    def test_one_hot_encoder_one_string_one_int_cat(self):
-        # categorical_features will be removed in 0.22
-        # (this test will fail by then).
-        data = [['Male', 1], ['Female', 3], ['Female', 2]]
-        test_data = [['Unknown', 4]]
-        sig = inspect.signature(OneHotEncoder)
-        if "categorical_features" in sig.parameters:
-            # scikit-learn < 0.21
-            model = OneHotEncoder(handle_unknown='ignore',
-                                  categorical_features='all')
-        elif "categories" in sig.parameters:
-            # scikit-learn >= 0.22
-            model = OneHotEncoder(handle_unknown='ignore',
-                                  categories='auto')
-        else:
-            raise AssertionError("scikit-learn's API has changed.")
+    def test_one_hot_encoder_string_drop_first(self):
+        data = [['Male', 'First'], ['Female', 'First'], ['Female', 'Second']]
+        test_data = [['Male', 'Second']]
+        model = OneHotEncoder(drop='first',
+                              categories='auto')
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType([None, 1])),
-            ("input2", Int64TensorType([None, 1]))
+            ("input1", StringTensorType([None, 2])),
         ]
         model_onnx = convert_sklearn(
-            model, "one-hot encoder one string and int categories", inputs)
+            model, "one-hot encoder", inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test_data,
             model,
             model_onnx,
-            basename="SklearnOneHotEncoderOneStringOneIntCat",
+            basename="SklearnOneHotEncoderStringDropFirst",
         )
 
     @unittest.skipIf(
@@ -208,6 +182,60 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOneHotEncoderCatDense-SkipDim1",
+        )
+
+    def test_one_hot_encoder_int_drop(self):
+        data = [
+            [1, 2, 3],
+            [4, 1, 0],
+            [0, 2, 1],
+            [2, 2, 1],
+            [0, 4, 0],
+            [0, 3, 3],
+        ]
+        test = [[2, 2, 1]]
+        model = OneHotEncoder(categories="auto", drop=[0, 1, 3])
+        model.fit(data)
+        inputs = [
+            ("input1", Int64TensorType([None, 3])),
+        ]
+        model_onnx = convert_sklearn(model,
+                                     "one-hot encoder",
+                                     inputs)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            test,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderIntDrop",
+            verbose=False,
+        )
+
+    def test_one_hot_encoder_int_drop_first(self):
+        data = [
+            [1, 2, 3],
+            [4, 1, 0],
+            [0, 2, 1],
+            [2, 2, 1],
+            [0, 4, 0],
+            [0, 3, 3],
+        ]
+        test = [[2, 2, 1]]
+        model = OneHotEncoder(categories="auto", drop='first')
+        model.fit(data)
+        inputs = [
+            ("input1", Int64TensorType([None, 3])),
+        ]
+        model_onnx = convert_sklearn(model,
+                                     "one-hot encoder",
+                                     inputs)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            test,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderIntDropFirst",
+            verbose=False,
         )
 
 
