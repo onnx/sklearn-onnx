@@ -299,8 +299,6 @@ class TestSklearnPipeline(unittest.TestCase):
             ("classifier", LogisticRegression(solver="lbfgs")),
         ])
 
-        clf.fit(X_train, y_train)
-
         # inputs
 
         def convert_dataframe_schema(df, drop=None):
@@ -327,14 +325,16 @@ class TestSklearnPipeline(unittest.TestCase):
             "home.dest",
             "boat",
         }
+        X_train = X_train.drop(to_drop, axis=1)
+        X_test = X_test.drop(to_drop, axis=1)
+        clf.fit(X_train, y_train)
         X_train["pclass"] = X_train["pclass"].astype(str)
         X_test["pclass"] = X_test["pclass"].astype(str)
         inputs = convert_dataframe_schema(X_train, to_drop)
         model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs)
 
-        X_test2 = X_test.drop(to_drop, axis=1)
         dump_data_and_model(
-            X_test2[:5],
+            X_test[:5],
             clf,
             model_onnx,
             basename="SklearnPipelineColumnTransformerPipelinerTitanic-DF",
