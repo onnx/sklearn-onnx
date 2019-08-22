@@ -6,6 +6,7 @@
 """
 Common functions to convert any learner based on trees.
 """
+import numpy as np
 
 
 def get_default_tree_classifier_attribute_pairs():
@@ -47,14 +48,55 @@ def get_default_tree_regressor_attribute_pairs():
     return attrs
 
 
+def sklearn_threshold(dy, dtype, mode):
+    """
+    *scikit-learn* does not compare x to a threshold
+    but (float)x to a double threshold. As we need a float
+    threshold, we need a different value than the threshold
+    rounded to float.
+    """
+    if mode == "BRANCH_LEQ":
+        if dtype == np.float32:
+            fy = np.float32(dy)
+            if fy == dy:
+                return np.float64(fy)
+            if fy < dy:
+                return np.float64(fy)
+            eps = np.finfo(np.float32).eps
+            nfy = np.nextafter([fy], [fy - eps], dtype=np.float32)[0]
+            return np.float64(nfy)
+        elif dtype == np.float64:
+            fy = np.float32(dy)
+            if fy == dy:
+                return np.float64(fy)
+            eps = np.finfo(np.float32).eps
+            afy = np.nextafter([fy], [fy - eps], dtype=np.float32)[0]
+            bfy = np.nextafter([fy], [fy + eps], dtype=np.float32)[0]
+            afy2 = (np.float64(afy) + fy) / 2
+            bfy2 = (np.float64(bfy) + fy) / 2
+            if fy > dy > afy2:
+                return afy2
+            if fy < dy < bfy2:
+                return bfy2
+            return np.float64(fy)
+        raise TypeError("Unexpected dtype {}.".format(dtype))
+    raise RuntimeError("Threshold is not changed for other mode and "
+                       "'BRANCH_LEQ' (actually '{}').".format(mode))
+
+
 def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
              feature_id, mode, value, true_child_id, false_child_id,
-             weights, weight_id_bias, leaf_weights_are_counts):
+             weights, weight_id_bias, leaf_weights_are_counts,
+             adjust_threshold_for_sklearn, dtype):
     attr_pairs['nodes_treeids'].append(tree_id)
     attr_pairs['nodes_nodeids'].append(node_id)
     attr_pairs['nodes_featureids'].append(feature_id)
     attr_pairs['nodes_modes'].append(mode)
-    attr_pairs['nodes_values'].append(value)
+    if adjust_threshold_for_sklearn and mode != 'LEAF':
+        attr_pairs['nodes_values'].append(
+            sklearn_threshold(value, dtype, mode))
+    else:
+        attr_pairs['nodes_values'].append(value)
     attr_pairs['nodes_truenodeids'].append(true_child_id)
     attr_pairs['nodes_falsenodeids'].append(false_child_id)
     attr_pairs['nodes_missing_value_tracks_true'].append(False)
@@ -91,7 +133,9 @@ def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
 
 def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id,
                                 tree_weight, weight_id_bias,
-                                leaf_weights_are_counts):
+                                leaf_weights_are_counts,
+                                adjust_threshold_for_sklearn=False,
+                                dtype=None):
     for i in range(tree.node_count):
         node_id = i
         weight = tree.value[i]
@@ -111,4 +155,6 @@ def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id,
 
         add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
                  feat_id, mode, threshold, left_child_id, right_child_id,
-                 weight, weight_id_bias, leaf_weights_are_counts)
+                 weight, weight_id_bias, leaf_weights_are_counts,
+                 adjust_threshold_for_sklearn=adjust_threshold_for_sklearn,
+                 dtype=dtype)
