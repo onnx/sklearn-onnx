@@ -19,6 +19,12 @@ def one_hot_encoder_supports_string():
     return StrictVersion(vers) >= StrictVersion("0.20.0")
 
 
+def one_hot_encoder_supports_drop():
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.21.0")
+
+
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     def test_model_one_hot_encoder(self):
         model = OneHotEncoder()
@@ -41,8 +47,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
-        not one_hot_encoder_supports_string(),
-        reason="OneHotEncoder does not support strings in 0.19",
+        not one_hot_encoder_supports_drop(),
+        reason="OneHotEncoder does not support drop in scikit versions < 0.21",
     )
     def test_one_hot_encoder_mixed_string_drop(self):
         data = [
@@ -112,8 +118,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
-        not one_hot_encoder_supports_string(),
-        reason="OneHotEncoder does not support strings in 0.19",
+        not one_hot_encoder_supports_drop(),
+        reason="OneHotEncoder does not support drop in scikit versions < 0.21",
     )
     def test_one_hot_encoder_string_drop_first(self):
         data = [['Male', 'First'], ['Female', 'First'], ['Female', 'Second']]
@@ -184,6 +190,10 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderCatDense-SkipDim1",
         )
 
+    @unittest.skipIf(
+        not one_hot_encoder_supports_drop(),
+        reason="OneHotEncoder does not support drop in scikit versions < 0.21",
+    )
     def test_one_hot_encoder_int_drop(self):
         data = [
             [1, 2, 3],
@@ -193,7 +203,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 4, 0],
             [0, 3, 3],
         ]
-        test = [[2, 2, 1]]
+        test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
         model = OneHotEncoder(categories="auto", drop=[0, 1, 3])
         model.fit(data)
         inputs = [
@@ -211,6 +221,10 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             verbose=False,
         )
 
+    @unittest.skipIf(
+        not one_hot_encoder_supports_drop(),
+        reason="OneHotEncoder does not support drop in scikit versions < 0.21",
+    )
     def test_one_hot_encoder_int_drop_first(self):
         data = [
             [1, 2, 3],
@@ -220,7 +234,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 4, 0],
             [0, 3, 3],
         ]
-        test = [[2, 2, 1]]
+        test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
         model = OneHotEncoder(categories="auto", drop='first')
         model.fit(data)
         inputs = [
