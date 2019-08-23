@@ -48,12 +48,40 @@ def get_default_tree_regressor_attribute_pairs():
     return attrs
 
 
+def find_switch_point(fy, nfy):
+    """
+    Finds the double so that
+    ``(float)x != (float)(x + espilon)``.
+    """
+    a = np.float64(fy)
+    b = np.float64(nfy)
+    fa = np.float32(a)
+    a0, b0 = a, a
+    while a != a0 or b != b0:
+        a0, b0 = a, b
+        m = (a + b) / 2
+        fm = np.float32(m)
+        if fm == fa:
+            a = m
+            fa = fm
+        else:
+            b = m
+    return a
+
+
 def sklearn_threshold(dy, dtype, mode):
     """
     *scikit-learn* does not compare x to a threshold
     but (float)x to a double threshold. As we need a float
     threshold, we need a different value than the threshold
-    rounded to float.
+    rounded to float. For floats, it finds float *w* which
+    verifies::
+
+        (float)x <= y <=> (float)x <= w
+
+    For doubles, it finds double *w* which verifies::
+
+        (float)x <= y <=> x <= w
     """
     if mode == "BRANCH_LEQ":
         if dtype == np.float32:
@@ -62,21 +90,19 @@ def sklearn_threshold(dy, dtype, mode):
                 return np.float64(fy)
             if fy < dy:
                 return np.float64(fy)
-            eps = np.finfo(np.float32).eps
+            eps = max(abs(fy), np.finfo(np.float32).eps) * 10
             nfy = np.nextafter([fy], [fy - eps], dtype=np.float32)[0]
             return np.float64(nfy)
         elif dtype == np.float64:
             fy = np.float32(dy)
-            if fy == dy:
-                return np.float64(fy)
-            eps = np.finfo(np.float32).eps
+            eps = max(abs(fy), np.finfo(np.float32).eps) * 10
             afy = np.nextafter([fy], [fy - eps], dtype=np.float32)[0]
-            bfy = np.nextafter([fy], [fy + eps], dtype=np.float32)[0]
-            afy2 = (np.float64(afy) + fy) / 2
-            bfy2 = (np.float64(bfy) + fy) / 2
+            afy2 = find_switch_point(afy, fy)
             if fy > dy > afy2:
                 return afy2
-            if fy < dy < bfy2:
+            bfy = np.nextafter([fy], [fy + eps], dtype=np.float32)[0]
+            bfy2 = find_switch_point(fy, bfy)
+            if fy <= dy <= bfy2:
                 return bfy2
             return np.float64(fy)
         raise TypeError("Unexpected dtype {}.".format(dtype))
