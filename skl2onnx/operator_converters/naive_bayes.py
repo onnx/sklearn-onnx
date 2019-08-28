@@ -237,8 +237,9 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         dot_prod_name = scope.get_unique_variable_name('dot_prod')
         partial_sum_result_name = scope.get_unique_variable_name(
                                                 'partial_sum_result')
-
-        container.add_initializer(constant_name, proto_type, [], [1.0])
+        # Define constant slightly greater than 1 to avoid log 0
+        # scenarios when calculating log (1 - x) and x=1 in line 273
+        container.add_initializer(constant_name, proto_type, [], [1.000000001])
 
         if nb.binarize is not None:
             threshold_name = scope.get_unique_variable_name('threshold')
