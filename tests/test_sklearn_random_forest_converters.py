@@ -6,10 +6,12 @@
 
 import unittest
 import numpy
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import (
+    RandomForestClassifier, RandomForestRegressor,
+    ExtraTreesClassifier, ExtraTreesRegressor
+)
 from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
 from test_utils import (
     dump_one_class_classification,
@@ -67,6 +69,27 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                             model.__class__.__name__ +
                             '_mismatched_estimator_counts')
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_random_forest_regressor_mismatches(self):
+        iris = load_iris()
+        X, y = iris.data, iris.target
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, random_state=13)
+        X_test = X_test.astype(numpy.float32)
+        clr = RandomForestRegressor(n_jobs=1, n_estimators=100)
+        clr.fit(X_train, y_train)
+        clr.fit(X, y)
+        model_onnx, prefix = convert_model(clr, 'reg',
+                                           [('input',
+                                             FloatTensorType([None, 4]))])
+        dump_data_and_model(X_test, clr, model_onnx,
+                            basename=prefix + "RegMis" +
+                            clr.__class__.__name__ +
+                            '_mismatched_estimator_counts')
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
         dump_single_regression(
