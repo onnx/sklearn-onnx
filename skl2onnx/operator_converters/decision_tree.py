@@ -36,7 +36,8 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
     else:
         raise ValueError('Labels must be all integers or all strings.')
 
-    add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True)
+    add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True,
+                                True, dtype=container.dtype)
 
     container.add_node(
         op_type, operator.input_full_names,
@@ -51,7 +52,8 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = int(op.n_outputs_)
-    add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False)
+    add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False,
+                                True, dtype=container.dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:
