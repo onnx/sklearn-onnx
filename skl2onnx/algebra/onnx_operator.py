@@ -108,6 +108,31 @@ class OnnxOperator:
         def ImplicitCast(self):
             return self.implicit_cast
 
+    def find_schema(self, op_version):
+        """
+        Checks if there is an existing schema for a
+        specific version.
+
+        :param op_version: requested version
+        :return: schema
+        """
+        if not hasattr(self.__class__, 'past_version'):
+            raise RuntimeError("Missing attribute 'past_version', there is "
+                               "no other available schema.")
+        found = None
+        for v in self.past_version.values():
+            if v.since_version > op_version:
+                continue
+            if found is None or v.since_version > found.since_version:
+                found = v
+        if found is None:
+            raise RuntimeError(
+                "Operator '{}': requested version {} < "
+                "{} schema version.".format(
+                    self.__class__.__name__,
+                    op_version, self.since_version))
+        return found
+
     def __init__(self, *inputs, op_version=None, output_names=None,
                  domain=None, **kwargs):
 
@@ -124,8 +149,30 @@ class OnnxOperator:
                 if isinstance(output_names[i], str):
                     output_names[i] = output_names[i].format(idself=id(self))
 
-        self.state = None
         self.op_version = op_version or get_opset_number_from_onnx()
+        self.since_version = self.__class__.since_version
+
+        if self.op_version < self.since_version:
+            schema = self.find_schema(self.op_version)
+            self.since_version = schema.since_version
+            self.expected_inputs = schema.expected_inputs
+            self.expected_outputs = schema.expected_outputs
+            self.input_range = schema.input_range
+            self.output_range = schema.output_range
+        else:
+            self.expected_inputs = self.__class__.expected_inputs
+            self.expected_outputs = self.__class__.expected_outputs
+            self.input_range = self.__class__.input_range
+            self.output_range = self.__class__.output_range
+
+        if self.op_version < self.since_version:
+            raise RuntimeError(
+                "Operator '{}': requested version {} < "
+                "{} schema version.".format(
+                    self.__class__.__name__,
+                    self.op_version, self.since_version))
+
+        self.state = None
         self.domain = domain
         self.kwargs = kwargs
         self.onnx_prefix_name = None
@@ -133,7 +180,7 @@ class OnnxOperator:
         # check inputs
         if len(inputs) == 0:
             if self.input_range[0] == self.input_range[1]:
-                self.inputs = [_[0] for _ in self.__class__.expected_inputs]
+                self.inputs = [_[0] for _ in self.expected_inputs]
             else:
                 # The number of inputs may vary.
                 self.inputs = None
@@ -229,9 +276,9 @@ class OnnxOperator:
         if (self.output_names and i < len(self.output_names) and
                 self.output_names[i]):
             return self.output_names[i]
-        if i < len(self.__class__.expected_outputs):
-            return self.__class__.expected_outputs[i][0]
-        elif i < self.__class__.output_range[1]:
+        if i < len(self.expected_outputs):
+            return self.expected_outputs[i][0]
+        elif i < self.output_range[1]:
             if i > 1000:
                 raise IndexError("You should redesign your operator.")
             return "O%d" % i
@@ -272,10 +319,10 @@ class OnnxOperator:
                                    "".format(self.__class__.__name__))
             if (self.op_version is not None and
                     self.op_version < self.since_version):
-                raise RuntimeError("Node '{}' has been changed since "
-                                   "version {}. This API cannot convert "
-                                   "older version."
+                raise RuntimeError("Incompatible versions for node '{}' "
+                                   "op_version {} < since_version {}."
                                    "".format(self.__class__.__name__,
+                                             self.op_version,
                                              self.since_version))
             if self.kwargs.get('op_version', '') is None:
                 kwargs = self.kwargs.copy()
@@ -290,7 +337,7 @@ class OnnxOperator:
                 self.output_names_ = outputs
             else:
                 outputs = []
-                for name in self.__class__.expected_outputs:
+                for name in self.expected_outputs:
                     name = scope.get_unique_variable_name(
                         self.onnx_prefix + "_" + name[0])
                     outputs.append(name)
@@ -503,5 +550,5 @@ class OnnxOperator:
                 yield (input.onnx_name, input.type)
             elif isinstance(input, OnnxOperator.UnscopedVariable):
                 name = input.name
-                typ = node.__class__.expected_inputs[i]
+                typ = node.expected_inputs[i]
                 yield (name, typ)
