@@ -176,8 +176,8 @@ class TestMetaOnnx(unittest.TestCase):
                         "cannot load ONNX model {}".format(e))
             if StrictVersion(onnx.__version__) >= StrictVersion("1.5.0"):
                 # onnx 1.5.0 and onnx dev version have the same version number
-                # some operators defined in onnx nut not yet implemented in
-                # onnxruntime
+                # some operators defined in onnx but not yet implemented in
+                # onnxruntime.
                 return (node.op_type, False,
                         "cannot load ONNX model* {}".format(e))
             raise RuntimeError(
