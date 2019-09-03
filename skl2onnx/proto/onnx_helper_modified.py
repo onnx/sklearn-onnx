@@ -79,6 +79,8 @@ def make_attribute(
     is_iterable = isinstance(value, collections.Iterable)
     bytes_or_false = _to_bytes_or_false(value)
 
+    use_float64 = dtype == np.float64 and domain not in ('', 'ai.onnx.ml')
+
     if isinstance(value, np.float32):
         attr.f = value
         attr.type = AttributeProto.FLOAT
