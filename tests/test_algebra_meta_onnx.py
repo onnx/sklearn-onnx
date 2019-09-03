@@ -174,6 +174,12 @@ class TestMetaOnnx(unittest.TestCase):
             if node.op_type in untested:
                 return (node.op_type, False,
                         "cannot load ONNX model {}".format(e))
+            if StrictVersion(onnx.__version__) >= StrictVersion("1.5.0"):
+                # onnx 1.5.0 and onnx dev version have the same version number
+                # some operators defined in onnx nut not yet implemented in
+                # onnxruntime
+                return (node.op_type, False,
+                        "cannot load ONNX model* {}".format(e))
             raise RuntimeError(
                 "'{}': cannot load(1) due to {}.".format(node.op_type, e))
 
