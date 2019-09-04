@@ -6,7 +6,6 @@
 
 import unittest
 import numpy as np
-from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import Lasso, LassoLars, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
