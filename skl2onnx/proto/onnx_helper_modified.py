@@ -62,6 +62,8 @@ def make_node(
 def make_attribute(
         key,  # type: Text
         value,  # type: Any
+        dtype=None,  # type: [np.float32, np.float64]
+        domain='',  # type: Text
         doc_string=None  # type: Optional[Text]
         ):  # type: (...) -> AttributeProto
     """Makes an AttributeProto based on the value type."""
@@ -79,18 +81,20 @@ def make_attribute(
     is_iterable = isinstance(value, collections.Iterable)
     bytes_or_false = _to_bytes_or_false(value)
 
+    use_float64 = dtype == np.float64 and domain not in ('', 'ai.onnx.ml')
+
     if isinstance(value, np.float32):
         attr.f = value
         attr.type = AttributeProto.FLOAT
-    elif isinstance(value, np.float64):
-        attr.f = value
-        attr.type = AttributeProto.FLOAT
-    elif isinstance(value, float):
-        attr.f = value
-        attr.type = AttributeProto.FLOAT
-        # raise RuntimeError("float is not allowed anymore
-        # due to ambiguities, "
-        # "use numpy types, key='{}'.".format(key))
+    elif isinstance(value, (float, np.float64)):
+        if use_float64:
+            attr.type = AttributeProto.TENSOR
+            attr.t.CopyFrom(
+                make_tensor(
+                    key, TensorProto.DOUBLE, (len(value), ), [value]))
+        else:
+            attr.f = value
+            attr.type = AttributeProto.FLOAT
     elif isinstance(value, np.int32):
         attr.i = value
         attr.type = AttributeProto.INT

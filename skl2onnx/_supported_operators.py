@@ -12,7 +12,7 @@ from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import Perceptron, SGDClassifier
 from sklearn.svm import LinearSVC
 
 # Linear regressors
@@ -113,7 +113,7 @@ from sklearn.preprocessing import FunctionTransformer
 # included in the following list and one output for everything not in
 # the list.
 sklearn_classifier_list = [
-    LogisticRegression, LogisticRegressionCV, SGDClassifier,
+    LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier,
@@ -171,6 +171,7 @@ def build_sklearn_operator_name_map():
         LogisticRegressionCV: 'SklearnLinearClassifier',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
         SGDRegressor: 'SklearnLinearRegressor',

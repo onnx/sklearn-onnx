@@ -92,14 +92,16 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         for tree_id in range(n_est):
             tree = op.estimators_[tree_id][0].tree_
             add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
-                                        tree_weight, 0, False)
+                                        tree_weight, 0, False, True,
+                                        dtype=container.dtype)
     else:
         for i in range(n_est):
             for c in range(op.n_classes_):
                 tree_id = i * op.n_classes_ + c
                 tree = op.estimators_[i][c].tree_
                 add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
-                                            tree_weight, c, False)
+                                            tree_weight, c, False, True,
+                                            dtype=container.dtype)
 
     container.add_node(
             op_type, operator.input_full_names,
@@ -138,7 +140,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
-                                    0, False)
+                                    0, False, True, dtype=container.dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:

@@ -43,15 +43,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         data = [loggedplus1]
 
     if op.use_idf:
-        # code scikit-learn
-        # X = X * self._idf_diag
-        cst = op._idf_diag.astype(float_type)
-        if not isinstance(cst, np.ndarray):
-            if len(cst.shape) > 1:
-                n = cst.shape[0]
-                cst = np.array([cst[i, i] for i in range(n)])
-            else:
-                cst = np.array(cst.todense())
+        cst = op.idf_.astype(float_type)
         if len(cst.shape) > 1:
             cst = np.diag(cst)
         cst = cst.ravel().flatten()

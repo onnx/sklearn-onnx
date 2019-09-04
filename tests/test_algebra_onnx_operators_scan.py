@@ -1,4 +1,3 @@
-import sys
 import unittest
 import warnings
 from distutils.version import StrictVersion
@@ -158,9 +157,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         try:
             onnx.checker.check_model(model_def)
         except ValidationError as e:
-            if (sys.platform.startswith("win") or
-                    StrictVersion(onnx__version__) <= StrictVersion("1.5.0")):
-                # schema information in onnx is incomplete on Windows
+            if StrictVersion(onnx__version__) <= StrictVersion("1.5.0"):
                 warnings.warn(e)
             else:
                 raise e
