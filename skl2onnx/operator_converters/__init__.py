@@ -42,6 +42,7 @@ from . import sgd_classifier
 from . import support_vector_machines
 from . import text_vectoriser
 from . import tfidf_transformer
+from . import tfidf_vectoriser
 from . import voting_classifier
 from . import zip_map
 
@@ -82,6 +83,7 @@ __all__ = [
     support_vector_machines,
     text_vectoriser,
     tfidf_transformer,
+    tfidf_vectoriser,
     voting_classifier,
     zip_map,
 ]

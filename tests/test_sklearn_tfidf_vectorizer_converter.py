@@ -357,6 +357,31 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')")
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    def test_model_tfidf_vectorizer_binary(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vect = TfidfVectorizer(binary=True)
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType([1, 1]))],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizerBinary-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

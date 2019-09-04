@@ -5,7 +5,9 @@
 # --------------------------------------------------------------------------
 
 import warnings
+from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
+from ..proto import onnx_proto
 
 
 def _intelligent_split(text, op, tokenizer, existing):
@@ -268,16 +270,10 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     C = max(op.vocabulary_.values()) + 1
     words = [None for i in range(C)]
     weights = [0 for i in range(C)]
-    if hasattr(op, "idf_"):
-        for k, v in op.vocabulary_.items():
-            words[v] = k
-            weights[v] = op.idf_[v]
-        mode = 'TFIDF'
-    else:
-        for k, v in op.vocabulary_.items():
-            words[v] = k
-            weights[v] = 1.
-        mode = 'IDF' if hasattr(op, 'use_idf') else 'TF'
+    for k, v in op.vocabulary_.items():
+        words[v] = k
+        weights[v] = 1.
+    mode = 'TF'
 
     # Scikit-learn sorts n-grams by alphabetical order..
     # onnx assumes it is sorted by n.
@@ -316,12 +312,8 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         'ngram_counts': ngcounts,
         'weights': weights,
     })
-
-    if getattr(op, 'norm', None) is None:
-        output = operator.output_full_names
-    else:
-        notnormalized = scope.get_unique_variable_name('notnormalized')
-        output = [notnormalized]
+    output = (scope.get_unique_variable_name('output')
+              if op.binary else operator.output_full_names)
 
     if container.target_opset < 9:
         op_type = 'Ngram'
@@ -331,22 +323,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         op_type = 'TfIdfVectorizer'
         container.add_node(op_type, tokenized, output, op_domain='',
                            op_version=9, **attrs)
+    if op.binary:
+        cast_result_name = scope.get_unique_variable_name('cast_result')
 
-    if getattr(op, 'norm', None) is not None:
-        op_type = 'Normalizer'
-        norm_map = {'max': 'MAX', 'l1': 'L1', 'l2': 'L2'}
-        attrs = {'name': scope.get_unique_operator_name(op_type)}
-        if op.norm in norm_map:
-            attrs['norm'] = norm_map[op.norm]
-        else:
-            raise RuntimeError("Invalid norm '%s'. "
-                               "You may raise an issue at "
-                               "https://github.com/onnx/sklearn-onnx/"
-                               "issues." % op.norm)
-
-        container.add_node(op_type, output, operator.output_full_names,
-                           op_domain='ai.onnx.ml', **attrs)
+        apply_cast(scope, output, cast_result_name, container,
+                   to=onnx_proto.TensorProto.BOOL)
+        apply_cast(scope, cast_result_name, operator.output_full_names,
+                   container, to=onnx_proto.TensorProto.FLOAT)
 
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
-register_converter('SklearnTfidfVectorizer', convert_sklearn_text_vectorizer)

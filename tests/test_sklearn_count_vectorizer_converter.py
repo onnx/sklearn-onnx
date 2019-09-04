@@ -109,6 +109,30 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    def test_model_count_vectorizer_binary(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vect = CountVectorizer(binary=True)
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, "CountVectorizer",
+                                     [("input", StringTensorType([1, 1]))])
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnCountVectorizerBinary-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.3.0')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
