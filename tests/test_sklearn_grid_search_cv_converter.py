@@ -6,6 +6,7 @@
 
 import unittest
 import numpy as np
+from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import Lasso, LassoLars, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
@@ -26,7 +27,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
-                               multi_class='auto'),
+                               multi_class='ovr'),
             tuned_parameters, cv=5, iid=False)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
@@ -75,7 +76,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
-                               multi_class='auto'),
+                               multi_class='ovr'),
             tuned_parameters, cv=5, iid=False)
         model, X = fit_classification_model(clf, n_classes=2, is_int=True)
         model_onnx = convert_sklearn(
@@ -100,7 +101,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
-                               multi_class='auto'),
+                               multi_class='multinomial'),
             tuned_parameters, cv=5, iid=False)
         model, X = fit_classification_model(clf, n_classes=4, is_int=True)
         model_onnx = convert_sklearn(
@@ -154,6 +155,28 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGridSearchRegressionFloat-OneOffArray-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) "
+            "<= StrictVersion('0.2.1') or "
+            "StrictVersion(onnx.__version__) "
+            "== StrictVersion('1.4.1')",
+        )
+
+    def test_grid_search_gaussian_regressor_float(self):
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        clf = GridSearchCV(GaussianProcessRegressor(),
+                           tuned_parameters, cv=5, iid=False)
+        model, X = fit_regression_model(clf)
+        model_onnx = convert_sklearn(
+            model, "GridSearchCV",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGridSearchGaussianRegressionFloat"
+                     "-OneOffArray-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.2.1') or "

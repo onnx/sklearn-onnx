@@ -7,7 +7,7 @@
 import numpy as np
 
 from sklearn import pipeline
-from sklearn.base import ClassifierMixin, ClusterMixin
+from sklearn.base import ClassifierMixin, ClusterMixin, is_classifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
@@ -84,7 +84,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     if (type(model) in sklearn_classifier_list
             or isinstance(model, ClassifierMixin)
             or (isinstance(model, GridSearchCV)
-                and type(model.best_estimator_) in sklearn_classifier_list)):
+                and is_classifier(model))):
         # For classifiers, we may have two outputs, one for label and
         # the other one for probabilities of all classes. Notice that
         # their types here are not necessarily correct and they will
@@ -277,7 +277,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     return (_parse_sklearn_classifier(
                 scope, model, inputs, custom_parsers=None)
-            if type(model.best_estimator_) in sklearn_classifier_list else
+            if is_classifier(model) else
             _parse_sklearn_simple_model(scope, model, inputs,
                                         custom_parsers=custom_parsers))
 
