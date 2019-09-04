@@ -9,7 +9,8 @@ from .automation import get_rst_doc
 def ClassFactory(class_name, op_name, inputs, outputs,
                  input_range, output_range,
                  domain, attr_names, doc,
-                 deprecated, since_version):
+                 deprecated, since_version,
+                 past_version):
     from .onnx_operator import OnnxOperator
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +41,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                      'output_range': output_range,
                      'domain': domain,
                      'is_deprecated': deprecated,
-                     'since_version': since_version})
+                     'since_version': since_version,
+                     'past_version': past_version})
     return newclass
 
 
@@ -60,7 +62,13 @@ def dynamic_class_creation():
             # Skips experimental operators.
             continue
         # Multiple version can coexist. The last one is kept.
-        res[schema.name] = schema
+        if schema.name in res:
+            if schema.since_version > res[schema.name].since_version:
+                # We keep the most recent one.
+                res[schema.name] = schema
+        else:
+            res[schema.name] = schema
+        res[schema.name + '_' + str(schema.since_version)] = schema
     cls = {}
 
     def _c(obj, label, i):
@@ -74,15 +82,29 @@ def dynamic_class_creation():
         inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
         outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
-        class_name = "Onnx" + schema.name
+
+        if '_' in name:
+            class_name = "Onnx" + name
+        else:
+            class_name = "Onnx" + schema.name
+
         cl = ClassFactory(class_name, schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
                           [schema.min_output, schema.max_output],
                           schema.domain, args,
                           "**Version**" + doc.split('**Version**')[-1],
                           getattr(schema, 'deprecated', False),
-                          schema.since_version)
+                          schema.since_version, {})
         cls[class_name] = cl
+
+    # Retrieves past classes.
+    for name in cls:
+        if '_' not in name:
+            continue
+        main, version = name.split('_')
+        last = cls[main]
+        last.past_version[name] = cls[name]
+
     return cls
 
 
