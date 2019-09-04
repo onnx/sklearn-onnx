@@ -23,6 +23,29 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                                "'{}'.".format(
                                    len(args), len(inputs), op_name))
 
+        attr_names = self.attr_names
+        op_version = kwargs.pop('op_version', None)
+        if '_' in self.__class__.__name__:
+            op_version_class = int(self.__class__.__name__.split('_')[-1])
+            op_version = min(op_version, op_version_class)
+        else:
+            op_version_class = None
+
+        found = None
+        if op_version is not None:
+            # attr_names refers to the most recent version of
+            # this operator. We may need an older one.
+            for op in range(op_version, 0, -1):
+                name = '{}_{}'.format(self.__class__.__name__, op)
+                if name in self.past_version:
+                    found = (name, op)
+                    attr_names = self.past_version[name].attr_names
+                    break
+        if (op_version_class is not None and found is not None and
+                found[-1] != op_version_class):
+            raise RuntimeError(
+                "op_version={} does not refer to the same opset as the class "
+                "name ('{}').".format(op_version, self.__class__.__name__))
         for key in kwargs:
             if key in {'output_names', 'op_version', 'domain'}:
                 continue
@@ -42,7 +65,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                      'domain': domain,
                      'is_deprecated': deprecated,
                      'since_version': since_version,
-                     'past_version': past_version})
+                     'past_version': past_version,
+                     'attr_names': attr_names})
     return newclass
 
 
