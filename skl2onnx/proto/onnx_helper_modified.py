@@ -63,7 +63,7 @@ def make_attribute(
         key,  # type: Text
         value,  # type: Any
         dtype=None,  # type: [np.float32, np.float64]
-        domain='',  # type: Text        
+        domain='',  # type: Text
         doc_string=None  # type: Optional[Text]
         ):  # type: (...) -> AttributeProto
     """Makes an AttributeProto based on the value type."""
