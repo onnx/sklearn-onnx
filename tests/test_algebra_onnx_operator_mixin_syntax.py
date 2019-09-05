@@ -1,9 +1,11 @@
+from distutils.version import StrictVersion
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.pipeline import make_pipeline
+import onnx
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from skl2onnx.common.data_types import FloatTensorType
@@ -192,6 +194,9 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         got = oinf.run(None, {'X': X})[0]
         assert_almost_equal(np_fct(X), got, decimal=6)
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.5.0"),
+        reason="Code working only with Clip(11) (onnx==1.6.0)")
     def test_onnx_clip(self):
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip(
