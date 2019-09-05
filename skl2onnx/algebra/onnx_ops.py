@@ -53,6 +53,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                 raise TypeError("Argument '%s' not valid for '%s'"
                                 % (key, op_name))
 
+        if op_version is not None:
+            kwargs['op_version'] = op_version
         OnnxOperator.__init__(self, *args, **kwargs)
 
     newclass = type(class_name, (OnnxOperator,),
