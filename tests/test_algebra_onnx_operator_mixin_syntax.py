@@ -187,6 +187,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
                     "Cl_Clip:Clip(11)" in str(e)):
                 # Not yet implemented in onnxruntime
                 return
+            raise e
         X = X.astype(np.float32)
         got = oinf.run(None, {'X': X})[0]
         assert_almost_equal(np_fct(X), got, decimal=6)
