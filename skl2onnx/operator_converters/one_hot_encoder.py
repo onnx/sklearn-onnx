@@ -5,33 +5,49 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from ..common._apply_operation import apply_concat, apply_reshape
+from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
+from ..common.data_types import Int64TensorType, StringTensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
 
 def convert_sklearn_one_hot_encoder(scope, operator, container):
-    op = operator.raw_operator
-    op_type = 'OneHotEncoder'
+    ohe_op = operator.raw_operator
     result, categories_len = [], 0
+    concatenated_input_name = operator.inputs[0].full_name
     concat_result_name = scope.get_unique_variable_name('concat_result')
-    concatenated_input_name = scope.get_unique_variable_name(
-        'concatenated_input')
 
-    if not all(isinstance(inp.type, type(operator.inputs[0].type))
+    if len(operator.inputs) > 1:
+        concatenated_input_name = scope.get_unique_variable_name(
+            'concatenated_input')
+        if all(isinstance(inp.type, type(operator.inputs[0].type))
                for inp in operator.inputs):
-        raise NotImplementedError(
-            "Multiple input datatypes not yet supported."
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues")
-    apply_concat(scope, list(map(lambda x: x.full_name, operator.inputs)),
-                 concatenated_input_name, container, axis=1)
-    for index, categories in enumerate(op.categories_):
-        attrs = {'name': scope.get_unique_operator_name(op_type)}
-        attrs['zeros'] = 1 if op.handle_unknown == 'ignore' else 0
-        if hasattr(op, 'drop_idx_') and op.drop_idx_ is not None:
+            input_names = list(map(lambda x: x.full_name, operator.inputs))
+        else:
+            input_names = []
+            for inp in operator.inputs:
+                if isinstance(inp.type, Int64TensorType):
+                    input_names.append(scope.get_unique_variable_name(
+                        'cast_input'))
+                    apply_cast(scope, inp.full_name, input_names[-1],
+                               container, to=onnx_proto.TensorProto.STRING)
+                elif isinstance(inp.type, StringTensorType):
+                    input_names.append(inp.full_name)
+                else:
+                    raise NotImplementedError(
+                        "{} input datatype not yet supported. "
+                        "You may raise an issue at "
+                        "https://github.com/onnx/sklearn-onnx/issues"
+                        "".format(type(inp.type)))
+
+        apply_concat(scope, input_names,
+                     concatenated_input_name, container, axis=1)
+    for index, categories in enumerate(ohe_op.categories_):
+        attrs = {'name': scope.get_unique_operator_name('OneHotEncoder')}
+        attrs['zeros'] = 1 if ohe_op.handle_unknown == 'ignore' else 0
+        if hasattr(ohe_op, 'drop_idx_') and ohe_op.drop_idx_ is not None:
             categories = (categories[np.arange(len(categories)) !=
-                          op.drop_idx_[index]])
+                                     ohe_op.drop_idx_[index]])
         if len(categories) > 0:
             if (np.issubdtype(categories.dtype, np.floating)
                     or np.issubdtype(categories.dtype, np.signedinteger)):

@@ -1,7 +1,8 @@
 """Tests scikit-learn's OneHotEncoder converter."""
 import unittest
-import numpy
 from distutils.version import StrictVersion
+import numpy
+from onnxruntime import __version__ as ort_version
 from sklearn import __version__ as sklearn_version
 from sklearn.preprocessing import OneHotEncoder
 from skl2onnx import convert_sklearn
@@ -10,7 +11,6 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from test_utils import dump_data_and_model
-from onnxruntime import __version__ as ort_version
 
 
 def one_hot_encoder_supports_string():
@@ -50,20 +50,21 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         not one_hot_encoder_supports_drop(),
         reason="OneHotEncoder does not support drop in scikit versions < 0.21",
     )
-    def test_one_hot_encoder_mixed_string_drop(self):
+    def test_one_hot_encoder_mixed_string_int_drop(self):
         data = [
-            ["c0.4", "c0.2", '3'],
-            ["c1.4", "c1.2", '0'],
-            ["c0.2", "c2.2", '1'],
-            ["c0.2", "c2.2", '1'],
-            ["c0.2", "c2.2", '1'],
-            ["c0.2", "c2.2", '1'],
+            ["c0.4", "c0.2", 3],
+            ["c1.4", "c1.2", 0],
+            ["c0.2", "c2.2", 1],
+            ["c0.2", "c2.2", 1],
+            ["c0.2", "c2.2", 1],
+            ["c0.2", "c2.2", 1],
         ]
-        test = [["c0.2", "c2.2", '1']]
-        model = OneHotEncoder(categories="auto", drop=['c0.4', 'c0.2', '3'])
+        test = [["c0.2", "c2.2", 1]]
+        model = OneHotEncoder(categories="auto", drop=['c0.4', 'c0.2', 3])
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType([None, 3])),
+            ("input1", StringTensorType([None, 2])),
+            ("input2", StringTensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(model,
                                      "one-hot encoder",
@@ -73,7 +74,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             test,
             model,
             model_onnx,
-            basename="SklearnOneHotEncoderMixedStringDrop",
+            basename="SklearnOneHotEncoderMixedStringIntDrop",
             verbose=False,
         )
 
@@ -151,15 +152,17 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
                               sparse=True)
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
+        test = [[4, 1, 3]]
         model.fit(data)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input", Int64TensorType([None, 3]))],
+            [("input1", Int64TensorType([None, 2])),
+             ("input2", Int64TensorType([None, 1]))],
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
+            test,
             model,
             model_onnx,
             basename="SklearnOneHotEncoderCatSparse-SkipDim1",
