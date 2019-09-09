@@ -5,18 +5,27 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from ..proto import onnx_proto
 from ..common._apply_operation import apply_concat, apply_reshape
 from ..common._registration import register_converter
+from ..proto import onnx_proto
 
 
 def convert_sklearn_one_hot_encoder(scope, operator, container):
     op = operator.raw_operator
     op_type = 'OneHotEncoder'
-    result = []
+    result, categories_len = [], 0
     concat_result_name = scope.get_unique_variable_name('concat_result')
-    categories_len = 0
+    concatenated_input_name = scope.get_unique_variable_name(
+        'concatenated_input')
 
+    if not all(isinstance(inp.type, type(operator.inputs[0].type))
+               for inp in operator.inputs):
+        raise NotImplementedError(
+            "Multiple input datatypes not yet supported."
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues")
+    apply_concat(scope, list(map(lambda x: x.full_name, operator.inputs)),
+                 concatenated_input_name, container, axis=1)
     for index, categories in enumerate(op.categories_):
         attrs = {'name': scope.get_unique_operator_name(op_type)}
         attrs['zeros'] = 1 if op.handle_unknown == 'ignore' else 0
@@ -29,7 +38,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                 attrs['cats_int64s'] = categories.astype(np.int64)
             else:
                 attrs['cats_strings'] = np.array(
-                    [s.encode('utf-8') for s in categories])
+                    [str(s).encode('utf-8') for s in categories])
 
             index_name = scope.get_unique_variable_name('index')
             feature_column_name = scope.get_unique_variable_name(
@@ -41,7 +50,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
 
             container.add_node(
                 'ArrayFeatureExtractor',
-                [operator.inputs[0].full_name, index_name],
+                [concatenated_input_name, index_name],
                 feature_column_name, op_domain='ai.onnx.ml',
                 name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
