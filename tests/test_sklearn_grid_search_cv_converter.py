@@ -179,7 +179,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
                      "-OneOffArray-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.2.1') or "
+            "<= StrictVersion('0.4.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
         )
