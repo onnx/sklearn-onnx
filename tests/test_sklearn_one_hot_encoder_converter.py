@@ -152,17 +152,15 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
                               sparse=True)
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
-        test = [[4, 1, 3]]
         model.fit(data)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input1", Int64TensorType([None, 2])),
-             ("input2", Int64TensorType([None, 1]))],
+            [("input1", Int64TensorType([None, 3]))]
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test,
+            data,
             model,
             model_onnx,
             basename="SklearnOneHotEncoderCatSparse-SkipDim1",
