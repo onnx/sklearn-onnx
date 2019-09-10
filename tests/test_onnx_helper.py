@@ -1,8 +1,10 @@
 """
 Tests on functions in *onnx_helper*.
 """
-import numpy
 import unittest
+from distutils.version import StrictVersion
+import numpy
+from sklearn import __version__ as sklearn_version
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
 from skl2onnx import convert_sklearn
@@ -12,6 +14,12 @@ from skl2onnx.helpers.onnx_helper import (
     save_onnx_model,
     select_model_inputs_outputs,
 )
+
+
+def one_hot_encoder_supports_string():
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.20.0")
 
 
 class TestOnnxHelper(unittest.TestCase):
@@ -46,6 +54,10 @@ class TestOnnxHelper(unittest.TestCase):
         assert X1.shape == (2, 2)
         assert X2.shape == (2, 2)
 
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
     def test_onnx_helper_load_save_init(self):
         model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
                               StandardScaler())

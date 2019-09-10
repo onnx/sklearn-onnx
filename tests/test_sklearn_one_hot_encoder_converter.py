@@ -26,6 +26,10 @@ def one_hot_encoder_supports_drop():
 
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
     def test_model_one_hot_encoder(self):
         model = OneHotEncoder()
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
