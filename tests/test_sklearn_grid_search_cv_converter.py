@@ -4,8 +4,10 @@
 # license information.
 # --------------------------------------------------------------------------
 
+from distutils.version import StrictVersion
 import unittest
 import numpy as np
+from onnxruntime import __version__ as ort_version
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import Lasso, LassoLars, LogisticRegression
 from sklearn.model_selection import GridSearchCV
@@ -162,6 +164,9 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             "== StrictVersion('1.4.1')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
