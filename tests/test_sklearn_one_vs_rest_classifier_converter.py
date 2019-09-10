@@ -53,7 +53,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             verbose=False,
             suffix="MultiLabel",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
         dump_multilabel_classification(
             model,
@@ -61,7 +61,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             label_string=True,
             suffix="MultiLabelString",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
         dump_multilabel_classification(
             model,
@@ -69,7 +69,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             first_class=2,
             suffix="MultiLabel",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -81,7 +81,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             verbose=False,
             suffix="MultiLabelReg-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
         dump_multilabel_classification(
             model,
@@ -89,7 +89,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             label_string=False,
             suffix="MultiLabelRegString-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
         dump_multilabel_classification(
             model,
@@ -97,7 +97,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             first_class=2,
             suffix="MultiLabelReg-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
 
 

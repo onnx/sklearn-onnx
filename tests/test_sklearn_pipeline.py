@@ -2,6 +2,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 import pandas
+from sklearn import __version__ as sklearn_version
 from sklearn import datasets
 
 try:
@@ -28,6 +29,12 @@ from skl2onnx.common.data_types import (
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 from onnxruntime import __version__ as ort_version
+
+
+def check_scikit_version():
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.21.0")
 
 
 class PipeConcatenateInput:
@@ -254,6 +261,10 @@ class TestSklearnPipeline(unittest.TestCase):
     )
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.20 causes some mismatches",
+    )
     def test_pipeline_column_transformer_titanic(self):
 
         # fit

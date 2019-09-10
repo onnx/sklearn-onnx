@@ -24,6 +24,14 @@ class OnnxRuntimeAssertionError(AssertionError):
     pass
 
 
+class OnnxRuntimeMissingNewOnnxOperatorException(OnnxRuntimeAssertionError):
+    """
+    Raised when onnxruntime does not implement a new operator
+    defined in the latest onnx.
+    """
+    pass
+
+
 def evaluate_condition(backend, condition):
     """
     Evaluates a condition such as
