@@ -13,6 +13,7 @@ from sklearn.linear_model import Lasso, LassoLars, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import DoubleTensorType
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
@@ -181,6 +182,32 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGridSearchGaussianRegressionFloat"
+                     "-OneOffArray-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) "
+            "<= StrictVersion('0.4.0') or "
+            "StrictVersion(onnx.__version__) "
+            "== StrictVersion('1.4.1')",
+        )
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime %s" % '0.4.0')
+    def test_grid_search_gaussian_regressor_double(self):
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        clf = GridSearchCV(GaussianProcessRegressor(),
+                           tuned_parameters, cv=3, iid=False)
+        model, X = fit_regression_model(clf)
+        model_onnx = convert_sklearn(
+            model, "GridSearchCV",
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            dtype=np.float64)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float64),
+            model,
+            model_onnx,
+            basename="SklearnGridSearchGaussianRegressionDouble"
                      "-OneOffArray-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
