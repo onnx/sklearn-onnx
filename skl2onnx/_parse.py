@@ -7,8 +7,9 @@
 import numpy as np
 
 from sklearn import pipeline
-from sklearn.base import ClassifierMixin, ClusterMixin
+from sklearn.base import ClassifierMixin, ClusterMixin, is_classifier
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
@@ -81,7 +82,9 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list
-            or isinstance(model, ClassifierMixin)):
+            or isinstance(model, ClassifierMixin)
+            or (isinstance(model, GridSearchCV)
+                and is_classifier(model))):
         # For classifiers, we may have two outputs, one for label and
         # the other one for probabilities of all classes. Notice that
         # their types here are not necessarily correct and they will
@@ -271,6 +274,14 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         return transformed_result_names
 
 
+def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
+    return (_parse_sklearn_classifier(
+                scope, model, inputs, custom_parsers=None)
+            if is_classifier(model) else
+            _parse_sklearn_simple_model(scope, model, inputs,
+                                        custom_parsers=custom_parsers))
+
+
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     probability_tensor = _parse_sklearn_simple_model(
             scope, model, inputs, custom_parsers=custom_parsers)
@@ -434,6 +445,7 @@ def build_sklearn_parsers_map():
         pipeline.Pipeline: _parse_sklearn_pipeline,
         pipeline.FeatureUnion: _parse_sklearn_feature_union,
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
+        GridSearchCV: _parse_sklearn_grid_search_cv,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
