@@ -240,6 +240,15 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         var_out = parse_sklearn(
             scope, model_obj,
             transform_inputs, custom_parsers=custom_parsers)[0]
+        if (model.transformer_weights is not None and name in
+                model.transformer_weights):
+            # Create a Multiply ONNX node
+            multiply_operator = scope.declare_local_operator('SklearnMultiply')
+            multiply_operator.inputs.append(var_out)
+            multiply_operator.operand = model.transformer_weights[name]
+            var_out = scope.declare_local_variable(
+                'multiply_output', scope.tensor_type())
+            multiply_operator.outputs.append(var_out)
         transformed_result_names.append(var_out)
 
     if model.remainder == "passthrough":
