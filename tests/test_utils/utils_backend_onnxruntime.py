@@ -16,6 +16,7 @@ from .utils_backend import (
     extract_options,
     ExpectedAssertionError,
     OnnxRuntimeAssertionError,
+    OnnxRuntimeMissingNewOnnxOperatorException,
     compare_outputs,
 )
 
@@ -122,6 +123,13 @@ def compare_runtime(test,
                 smodel = "\nJSON ONNX\n" + str(model)
             else:
                 smodel = ""
+            if ("NOT_IMPLEMENTED : Could not find an implementation "
+                    "for the node" in str(e)):
+                # onnxruntime does not implement a specific node yet.
+                raise OnnxRuntimeMissingNewOnnxOperatorException(
+                    "onnxruntime does not implement a new operator "
+                    "'{0}'\n{1}\nONNX\n{2}".format(
+                        onx, e, smodel))
             raise OnnxRuntimeAssertionError(
                 "Unable to load onnx '{0}'\nONNX\n{1}".format(onx, smodel))
 

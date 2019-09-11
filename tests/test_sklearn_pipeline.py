@@ -2,6 +2,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 import pandas
+from sklearn import __version__ as sklearn_version
 from sklearn import datasets
 
 try:
@@ -9,7 +10,7 @@ try:
 except ImportError:
     # not available in 0.19
     ColumnTransformer = None
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import PCA, TruncatedSVD
 
 try:
     from sklearn.impute import SimpleImputer
@@ -26,8 +27,14 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_classification_model
 from onnxruntime import __version__ as ort_version
+
+
+def check_scikit_version():
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.21.0")
 
 
 class PipeConcatenateInput:
@@ -254,6 +261,10 @@ class TestSklearnPipeline(unittest.TestCase):
     )
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.20 causes some mismatches",
+    )
     def test_pipeline_column_transformer_titanic(self):
 
         # fit
@@ -342,6 +353,34 @@ class TestSklearnPipeline(unittest.TestCase):
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(
+        ColumnTransformer is None,
+        reason="ColumnTransformer not available in 0.19",
+    )
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_column_transformer_weights(self):
+        model, X = fit_classification_model(
+            ColumnTransformer(
+                [('pca', PCA(n_components=5), slice(0, 10)),
+                 ('svd', TruncatedSVD(n_components=5), slice(10, 100))],
+                transformer_weights={'pca': 2, 'svd': 3}), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "column transformer weights",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=numpy.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnColumnTransformerWeights",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 

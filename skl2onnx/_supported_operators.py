@@ -48,6 +48,9 @@ from sklearn.tree import DecisionTreeRegressor
 # Gaussian processes
 from sklearn.gaussian_process import GaussianProcessRegressor
 
+# GridSearchCV
+from sklearn.model_selection import GridSearchCV
+
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
@@ -164,6 +167,7 @@ def build_sklearn_operator_name_map():
     res.update({
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
+        GridSearchCV: 'SklearnGridSearchCV',
         LinearRegression: 'SklearnLinearRegressor',
         Lars: 'SklearnLinearRegressor',
         LarsCV: 'SklearnLinearRegressor',

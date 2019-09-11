@@ -212,7 +212,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
