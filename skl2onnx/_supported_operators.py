@@ -130,7 +130,7 @@ sklearn_classifier_list = [
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
 
-# Classifiers with converters supporting decision_function()
+# Classifiers with converters supporting decision_function().
 decision_function_classifiers = (
     SGDClassifier,
 )
