@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
-from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 
 from skl2onnx import convert_sklearn
@@ -22,7 +22,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     def test_model_calibrated_classifier_cv_float(self):
         data = load_iris()
         X, y = data.data, data.target
-        clf = BernoulliNB().fit(X, y)
+        clf = MultinomialNB().fit(X, y)
         model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -44,7 +44,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     def test_model_calibrated_classifier_cv_int(self):
         data = load_digits()
         X, y = data.data, data.target
-        clf = BernoulliNB().fit(X, y)
+        clf = MultinomialNB().fit(X, y)
         model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -56,7 +56,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnCalibratedClassifierCVInt",
+            basename="SklearnCalibratedClassifierCVInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
@@ -90,7 +90,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
-        clf = BernoulliNB().fit(X, y)
+        clf = MultinomialNB().fit(X, y)
         model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
