@@ -9,49 +9,42 @@ from ..common.data_types import FloatTensorType, DoubleTensorType
 from .onnx_ops import (
     OnnxIdentity, OnnxScan, OnnxTranspose,
     OnnxSub, OnnxReduceSumSquare, OnnxSqueeze,
-    OnnxSqrt
+    OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSum
 )
 
 
-def onnx_squareform_pdist(X, metric='sqeuclidean', dtype=None, **kwargs):
+def onnx_squareform_pdist(X, metric='sqeuclidean', dtype=None,
+                          op_version=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric=metric))``.
     """
     if metric == 'sqeuclidean':
-        return _onnx_squareform_pdist_sqeuclidean(X, dtype=dtype, **kwargs)
+        return _onnx_squareform_pdist_sqeuclidean(
+            X, dtype=dtype, op_version=op_version, **kwargs)
     elif metric == 'euclidean':
-        res = _onnx_squareform_pdist_sqeuclidean(X, dtype=dtype)
-        return OnnxSqrt(res, **kwargs)
+        res = _onnx_squareform_pdist_sqeuclidean(
+            X, dtype=dtype, op_version=op_version)
+        return OnnxSqrt(res, op_version=op_version, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
 
 
-def onnx_cdist(X, Y, metric='sqeuclidean', dtype=None, **kwargs):
-    """
-    Returns the ONNX graph which computes
-    ``cdist(X, Y, metric=metric)``.
-    """
-    if metric == 'sqeuclidean':
-        return _onnx_cdist_sqeuclidean(X, Y, dtype=dtype, **kwargs)
-    elif metric == 'euclidean':
-        res = _onnx_cdist_sqeuclidean(X, Y, dtype=dtype)
-        return OnnxSqrt(res, **kwargs)
-    else:
-        raise NotImplementedError("metric='{}' is not implemented.".format(
-            metric))
-
-
-def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, **kwargs):
+def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
+                                       **kwargs):
     """
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric='sqeuclidean'))``.
     """
-    diff = OnnxSub('next_in', 'next', output_names=['diff'])
-    id_next = OnnxIdentity('next_in', output_names=['next_out'])
-    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
-    flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
+    diff = OnnxSub('next_in', 'next', output_names=['diff'],
+                   op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=['next_out'],
+                           op_version=op_version)
+    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1],
+                               op_version=op_version)
+    flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1],
+                       op_version=op_version)
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     id_next.set_onnx_name_prefix('pdistsqe')
     scan_body = id_next.to_onnx(
@@ -60,23 +53,57 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, **kwargs):
         outputs=[('next_out', tensor_type()),
                  ('scan_out', tensor_type())],
         other_outputs=[flat],
-        dtype=dtype)
+        dtype=dtype, target_opset=op_version)
 
     node = OnnxScan(X, X, output_names=['scan0_{idself}', 'scan1_{idself}'],
                     num_scan_inputs=1, body=scan_body.graph,
-                    **kwargs)
+                    op_version=op_version, **kwargs)
     return node[1]
 
 
-def _onnx_cdist_sqeuclidean(X, Y, dtype=None, **kwargs):
+def onnx_cdist(X, Y, metric='sqeuclidean', dtype=None,
+               op_version=None, **kwargs):
+    """
+    Returns the ONNX graph which computes
+    ``cdist(X, Y, metric=metric)``.
+
+    :param X: array or OnnxOperatorMixin
+    :param Y: array or OnnxOperatorMixin
+    :param metric: distance type
+    :param dtype: *np.float32* or *np.float64*
+    :param op_version: opset version
+    :param kwargs: addition parameter
+    :return: OnnxOperatorMixin
+    """
+    if metric == 'sqeuclidean':
+        return _onnx_cdist_sqeuclidean(
+            X, Y, dtype=dtype, op_version=op_version, **kwargs)
+    elif metric == 'euclidean':
+        res = _onnx_cdist_sqeuclidean(X, Y, dtype=dtype, op_version=op_version)
+        return OnnxSqrt(res, op_version=op_version, **kwargs)
+    elif metric == 'minkowski':
+        p = kwargs.pop('p')
+        res = _onnx_cdist_minkowski(
+            X, Y, dtype=dtype, op_version=op_version, p=p)
+        return OnnxPow(res, np.array([1. / p], dtype=dtype),
+                       op_version=op_version, **kwargs)
+    else:
+        raise NotImplementedError("metric='{}' is not implemented.".format(
+            metric))
+
+
+def _onnx_cdist_sqeuclidean(X, Y, dtype=None, op_version=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, metric='sqeuclidean')``.
     """
-    diff = OnnxSub('next_in', 'next', output_names=['diff'])
-    id_next = OnnxIdentity('next_in', output_names=['next_out'])
-    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1])
-    flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1])
+    diff = OnnxSub('next_in', 'next', output_names=[
+                   'diff'], op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=[
+                           'next_out'], op_version=op_version)
+    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[
+                               1], keepdims=0, op_version=op_version)
+    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     id_next.set_onnx_name_prefix('cdistsqe')
     scan_body = id_next.to_onnx(
@@ -85,9 +112,41 @@ def _onnx_cdist_sqeuclidean(X, Y, dtype=None, **kwargs):
         outputs=[('next_out', tensor_type()),
                  ('scan_out', tensor_type())],
         other_outputs=[flat],
-        dtype=dtype)
+        dtype=dtype, target_opset=op_version)
 
     node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
-                    num_scan_inputs=1, body=scan_body.graph)
-    return OnnxTranspose(node[1], perm=[1, 0],
+                    num_scan_inputs=1, body=scan_body.graph,
+                    op_version=op_version)
+    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
+                         **kwargs)
+
+
+def _onnx_cdist_minkowski(X, Y, dtype=None, op_version=None, p=2, **kwargs):
+    """
+    Returns the ONNX graph which computes the Minkowski distance
+    or ``minkowski(X, Y, p)``.
+    """
+    diff = OnnxSub('next_in', 'next', output_names=[
+                   'diff'], op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=[
+                           'next_out'], op_version=op_version)
+    diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
+                       np.array([p], dtype=dtype), op_version=op_version)
+    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
+                         'norm'], keepdims=0, op_version=op_version)
+    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
+    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
+    id_next.set_onnx_name_prefix('cdistmink')
+    scan_body = id_next.to_onnx(
+        OrderedDict([('next_in', tensor_type()),
+                     ('next', tensor_type())]),
+        outputs=[('next_out', tensor_type()),
+                 ('scan_out', tensor_type())],
+        other_outputs=[flat],
+        dtype=dtype, target_opset=op_version)
+
+    node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
+                    num_scan_inputs=1, body=scan_body.graph,
+                    op_version=op_version)
+    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
                          **kwargs)

@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import inspect
 from io import StringIO
 from distutils.version import StrictVersion
 import numpy as np
@@ -645,7 +646,102 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_gpr_fitted_partial_float64_operator_cdist_rbf(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=RBF(), alpha=10.)
+        gp.fit(X_train, y_train)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'onnxruntime'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(), alpha=100.)
+        gp.fit(X_train, y_train)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'onnxruntime'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(threshold),
+        reason="onnxruntime %s" % threshold)
+    def test_gpr_fitted_partial_float64_operator_cdist_quad(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=RationalQuadratic(), alpha=100.)
+        gp.fit(X_train, y_train)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'onnxruntime'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
 
 if __name__ == "__main__":
-    TestSklearnGaussianProcess().test_gpr_fitted_partial_float64()
     unittest.main()
