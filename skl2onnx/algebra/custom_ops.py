@@ -20,6 +20,7 @@ class OnnxCDist(OnnxOperator):
     is_deprecated = False
     domain = 'skl2onnx'
     operator_name = 'CDist'
+    past_version = []
 
     def __init__(self, X, Y, metric='sqeuclidean', op_version=None,
                  **kwargs):
