@@ -82,6 +82,7 @@ Ytest_ = pd.read_csv(StringIO("""
 
 
 threshold = "0.4.0"
+threshold2 = "0.5.0"
 
 
 class TestSklearnGaussianProcess(unittest.TestCase):
@@ -647,7 +648,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
+        StrictVersion(ort_version) <= StrictVersion(threshold2),
         reason="onnxruntime %s" % threshold)
     def test_gpr_fitted_partial_float64_operator_cdist_rbf(self):
         data = load_iris()
@@ -687,7 +688,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
+        StrictVersion(ort_version) <= StrictVersion(threshold2),
         reason="onnxruntime %s" % threshold)
     def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
         data = load_iris()
@@ -727,7 +728,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
+        StrictVersion(ort_version) <= StrictVersion(threshold2),
         reason="onnxruntime %s" % threshold)
     def test_gpr_fitted_partial_float64_operator_cdist_quad(self):
         data = load_iris()
