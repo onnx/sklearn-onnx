@@ -48,6 +48,9 @@ from sklearn.tree import DecisionTreeRegressor
 # Gaussian processes
 from sklearn.gaussian_process import GaussianProcessRegressor
 
+# GridSearchCV
+from sklearn.model_selection import GridSearchCV
+
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
@@ -127,6 +130,11 @@ sklearn_classifier_list = [
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
 
+# Classifiers with converters supporting decision_function().
+decision_function_classifiers = (
+    SGDClassifier,
+)
+
 
 # Associate scikit-learn types with our operator names. If two
 # scikit-learn models share a single name, it means their are
@@ -159,6 +167,7 @@ def build_sklearn_operator_name_map():
     res.update({
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
+        GridSearchCV: 'SklearnGridSearchCV',
         LinearRegression: 'SklearnLinearRegressor',
         Lars: 'SklearnLinearRegressor',
         LarsCV: 'SklearnLinearRegressor',
