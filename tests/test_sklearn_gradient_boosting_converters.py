@@ -23,7 +23,7 @@ from test_utils import dump_binary_classification, dump_multiple_classification
 from test_utils import fit_classification_model
 from test_utils import dump_data_and_model, fit_regression_model
 
-THRESHOLD = "0.5.0"
+THRESHOLD = "0.2.1"
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
