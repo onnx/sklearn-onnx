@@ -68,7 +68,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model.fit(data)
         inputs = [
             ("input1", StringTensorType([None, 2])),
-            ("input2", StringTensorType([None, 1])),
+            ("input2", Int64TensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(model,
                                      "one-hot encoder",
