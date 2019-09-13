@@ -30,6 +30,7 @@ from skl2onnx.algebra.complex_functions import (
 
 
 threshold = "0.4.0"
+threshold2 = "0.5.0"
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
@@ -271,7 +272,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold2),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in_mink(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -313,9 +314,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.5.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold2),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in_custom_ops(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
