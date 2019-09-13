@@ -154,7 +154,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_multiclass_classification_init_zero(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4, init='zero'), 2)
+            GradientBoostingClassifier(n_estimators=4, init='zero'), 4)
         model_onnx = convert_sklearn(
             model,
             "gradient boosting classifier",
