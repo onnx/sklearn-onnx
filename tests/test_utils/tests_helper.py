@@ -52,7 +52,7 @@ def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
-                               random_state=42, n_informative=5)
+                               random_state=42, n_informative=7)
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
     if pos_features:
         X = numpy.abs(X)
