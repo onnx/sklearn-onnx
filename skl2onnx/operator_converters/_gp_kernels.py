@@ -92,8 +92,10 @@ def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
     if optim is None:
         dists = onnx_cdist(
             X, Y, metric="euclidean", dtype=dtype, op_version=op_version)
-    else:
+    elif optim == 'cdist':
         dists = OnnxCDist(X, Y, metric="euclidean", op_version=op_version)
+    else:
+        raise ValueError("Unknown optimization '{}'.".format(optim))
     t_pi = py_make_float_array(pi, dtype=dtype)
     t_periodicity = py_make_float_array(periodicity, dtype)
     arg = OnnxMul(OnnxDiv(dists, t_periodicity, op_version=op_version), t_pi)
@@ -138,8 +140,10 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
     if optim is None:
         dists = onnx_cdist(X, Y, dtype=dtype, metric="sqeuclidean",
                            op_version=op_version)
-    else:
+    elif optim == 'cdist':
         dists = OnnxCDist(X, Y, metric="sqeuclidean", op_version=op_version)
+    else:
+        raise ValueError("Unknown optimization '{}'.".format(optim))
     cst = length_scale ** 2 * alpha * 2
     t_cst = py_make_float_array(cst, dtype=dtype)
     tmp = OnnxDiv(dists, t_cst, op_version=op_version)
@@ -214,10 +218,12 @@ def convert_kernel(kernel, X, output_names=None,
                 dist = onnx_cdist(X_scaled, x_train_scaled,
                                   metric='sqeuclidean',
                                   dtype=dtype, op_version=op_version)
-            else:
+            elif optim == 'cdist':
                 dist = OnnxCDist(X_scaled, x_train_scaled,
                                  metric='sqeuclidean',
                                  op_version=op_version)
+            else:
+                raise ValueError("Unknown optimization '{}'.".format(optim))
 
         tensor_value = py_make_float_array(-0.5, dtype=dtype, as_tensor=True)
         cst5 = OnnxConstantOfShape(OnnxShape(zerov), value=tensor_value)
