@@ -1,6 +1,8 @@
+cython
 numpy
 protobuf
 codecov
+nose
 pandas
 py-cpuinfo
 pybind11
