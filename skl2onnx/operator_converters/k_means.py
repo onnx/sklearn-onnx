@@ -5,9 +5,11 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from sklearn.utils.extmath import row_norms
+from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
-from ..algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxSqrt, OnnxMul
+from ..algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul
+from ..proto import onnx_proto
 
 
 def convert_sklearn_kmeans(scope, operator, container):
@@ -66,10 +68,15 @@ def convert_sklearn_kmeans(scope, operator, container):
     out = operator.outputs
     op = operator.raw_operator
     opv = container.target_opset
-
     C = op.cluster_centers_
+    input_name = X
+
+    if type(X.type) == Int64TensorType:
+        x_cast = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT)
+        input_name = x_cast
+
     C2 = row_norms(C, squared=True)
-    rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1, op_version=opv)
+    rs = OnnxReduceSumSquare(input_name, axes=[1], keepdims=1, op_version=opv)
 
     N = X.type.shape[0]
     if isinstance(N, int):
@@ -77,7 +84,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     else:
         zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
 
-    z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2.,
+    z = OnnxAdd(rs, OnnxGemm(input_name, C, zeros, alpha=-2.,
                              transB=1, op_version=opv),
                 op_version=opv)
     y2 = OnnxAdd(C2, z, op_version=opv)

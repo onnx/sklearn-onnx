@@ -87,6 +87,25 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_label_binariser_binary_labels(self):
+        X = np.array([1, 0, 0, 0, 1])
+        model = LabelBinarizer().fit(X)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn label binariser",
+            [("input", Int64TensorType([None]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X.astype(np.int64),
+            model,
+            model_onnx,
+            basename="SklearnLabelBinariserBinaryLabels",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

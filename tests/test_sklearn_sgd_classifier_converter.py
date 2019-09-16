@@ -70,7 +70,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierBinaryLog",
+            basename="SklearnSGDClassifierBinaryLog-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -116,7 +116,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierBinaryLogL1NoIntercept",
+            basename="SklearnSGDClassifierBinaryLogL1NoIntercept-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -212,7 +212,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.6.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -379,7 +379,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             "scikit-learn SGD multi-class classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
         )
-        X = np.array([X[0], X[0]])
+        X = X[6:8]
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

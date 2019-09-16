@@ -27,7 +27,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     For pipeline conversion, user needs to make sure each component
     is one of our supported items.
-    This function converts the specified *scikit-learn* model into its *ONNX* counterpart.
+    This function converts the specified *scikit-learn* model
+    into its *ONNX* counterpart.
     Note that for all conversions, initial types are required.
     *ONNX* model name can also be specified.
 
@@ -97,7 +98,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     But if a pipeline contains two model of the same class,
-    it is possible to disintguish between the two with function *id*:
+    it is possible to distinguish between the two with function *id*:
 
     ::
 

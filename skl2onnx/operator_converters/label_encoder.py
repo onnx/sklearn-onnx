@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..common.data_types import StringTensorType, Int64TensorType
+import numpy as np
 from ..common._registration import register_converter
 
 
@@ -12,20 +12,18 @@ def convert_sklearn_label_encoder(scope, operator, container):
     op = operator.raw_operator
     op_type = 'LabelEncoder'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
-    attrs['classes_strings'] = [str(c) for c in op.classes_]
-
-    if isinstance(operator.inputs[0].type, Int64TensorType):
-        attrs['default_int64'] = -1
-    elif isinstance(operator.inputs[0].type, StringTensorType):
-        attrs['default_string'] = '__unknown__'
+    classes = op.classes_
+    if np.issubdtype(classes.dtype, np.floating):
+        attrs['keys_floats'] = classes
+    elif np.issubdtype(classes.dtype, np.signedinteger):
+        attrs['keys_int64s'] = classes
     else:
-        raise RuntimeError(
-            'Unsupported input type: %s. It must be int64 or dtring.'
-            '' % type(operator.inputs[0].type))
+        attrs['keys_strings'] = np.array([s.encode('utf-8') for s in classes])
+    attrs['values_int64s'] = np.arange(len(classes))
 
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',
-                       **attrs)
+                       op_version=2, **attrs)
 
 
 register_converter('SklearnLabelEncoder', convert_sklearn_label_encoder)

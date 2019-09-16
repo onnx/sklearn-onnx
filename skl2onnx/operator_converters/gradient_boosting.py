@@ -32,41 +32,15 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     if op.init == 'zero':
         base_values = np.zeros(op.loss_.K)
     elif op.init is None:
-        if op.n_classes_ == 2:
-            # class_prior_ was introduced in scikit-learn 0.21.
-            if hasattr(op.init_, 'class_prior_'):
-                base_values = op.init_.class_prior_
-                assert base_values.shape == (2, )
-            else:
-                base_values = [op.init_.prior]
-            if op.loss == 'deviance':
-                # See https://github.com/scikit-learn/scikit-learn/blob/
-                # master/sklearn/ensemble/_gb_losses.py#L666.
-                eps = np.finfo(np.float32).eps
-                base_values = np.clip(base_values, eps, 1 - eps)
-                base_values = np.log(base_values / (1 - base_values))
-            else:
-                raise NotImplementedError(
-                    "Loss '{0}' is not supported yet. You "
-                    "may raise an issue at "
-                    "https://github.com/onnx/sklearn-onnx/issues.".format(
-                        op.loss))
+        x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
+        if hasattr(op, '_raw_predict_init'):
+            # sklearn >= 0.21
+            base_values = op._raw_predict_init(x0).ravel()
+        elif hasattr(op, '_init_decision_function'):
+            # sklearn >= 0.20 and sklearn < 0.21
+            base_values = op._init_decision_function(x0).ravel()
         else:
-            # class_prior_ was introduced in scikit-learn 0.21.
-            x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
-            if hasattr(op, '_raw_predict_init'):
-                # sklearn >= 0.21
-                base_values = op._raw_predict_init(x0).ravel()
-            elif hasattr(op, '_init_decision_function'):
-                # sklearn >= 0.21
-                base_values = op._init_decision_function(x0).ravel()
-            else:
-                raise RuntimeError("scikit-learn < 0.19 is not supported.")
-
-            # if hasattr(op.init_, 'class_prior_'):
-            #     base_values = op.init_.class_prior_
-            # else:
-            #     base_values = op.init_.priors
+            raise RuntimeError("scikit-learn < 0.19 is not supported.")
     else:
         raise NotImplementedError(
             'Setting init to an estimator is not supported, you may raise an '
@@ -93,14 +67,16 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
         for tree_id in range(n_est):
             tree = op.estimators_[tree_id][0].tree_
             add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
-                                        tree_weight, 0, False)
+                                        tree_weight, 0, False, True,
+                                        dtype=container.dtype)
     else:
         for i in range(n_est):
             for c in range(op.n_classes_):
                 tree_id = i * op.n_classes_ + c
                 tree = op.estimators_[i][c].tree_
                 add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
-                                            tree_weight, c, False)
+                                            tree_weight, c, False, True,
+                                            dtype=container.dtype)
 
     container.add_node(
             op_type, operator.input_full_names,
@@ -139,7 +115,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
-                                    0, False)
+                                    0, False, True, dtype=container.dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:

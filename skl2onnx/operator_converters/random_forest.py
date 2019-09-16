@@ -55,7 +55,8 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
     for tree_id in range(estimtator_count):
         tree = op.estimators_[tree_id].tree_
         add_tree_to_attribute_pairs(attr_pairs, True, tree, tree_id,
-                                    tree_weight, 0, True)
+                                    tree_weight, 0, True, True,
+                                    dtype=container.dtype)
 
     container.add_node(
         op_type, operator.input_full_names,
@@ -78,7 +79,8 @@ def convert_sklearn_random_forest_regressor_converter(scope,
     for tree_id in range(estimtator_count):
         tree = op.estimators_[tree_id].tree_
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
-                                    tree_weight, 0, False)
+                                    tree_weight, 0, False, True,
+                                    dtype=container.dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:

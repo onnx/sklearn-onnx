@@ -15,6 +15,40 @@ from ..common._registration import register_converter
 from ..proto import onnx_proto
 
 
+def _calculate_distance(scope, container, sub_results_name, metric,
+                        distance_power):
+    """
+    Calculate distance based on distance metric.
+    """
+    if metric in (
+            'cityblock', 'euclidean', 'l1',
+            'l2', 'manhattan', 'minkowski',
+    ):
+        distance_power_name = scope.get_unique_variable_name('distance_power')
+        abs_results_name = scope.get_unique_variable_name('abs_result')
+        distance_name = scope.get_unique_variable_name('distance')
+        reduced_sum_name = scope.get_unique_variable_name('reduced_sum')
+        reshaped_result_name = scope.get_unique_variable_name('reduced_result')
+
+        container.add_initializer(distance_power_name,
+                                  onnx_proto.TensorProto.FLOAT,
+                                  [], [distance_power])
+
+        apply_abs(scope, sub_results_name, abs_results_name, container)
+        apply_pow(scope, [abs_results_name, distance_power_name],
+                  distance_name, container)
+        container.add_node('ReduceSum', distance_name, reduced_sum_name,
+                           name=scope.get_unique_operator_name('ReduceSum'),
+                           axes=[1])
+        apply_reshape(scope, reduced_sum_name, reshaped_result_name, container,
+                      desired_shape=[1, -1])
+        return reshaped_result_name
+    raise NotImplementedError(
+        "Metric '{0}' is not supported yet. You "
+        "may raise an issue at "
+        "https://github.com/onnx/sklearn-onnx/issues.".format(metric))
+
+
 def _calculate_weights(scope, container, unity, distance):
     """
     weights = 1 / distance
@@ -142,7 +176,7 @@ def _get_probability_score(scope, container, operator, weights,
             container.add_node('ReduceSum', weighted_distance_name,
                                output_label_reduced_name[i], axes=[1],
                                name=scope.get_unique_operator_name(
-                                'ReduceSum'))
+                                   'ReduceSum'))
     else:
         for i in range(len(classes)):
             container.add_node('Equal', [labels_name[i], topk_labels_name],
@@ -153,7 +187,7 @@ def _get_probability_score(scope, container, operator, weights,
             container.add_node('ReduceSum', output_cast_label_name[i],
                                output_label_reduced_name[i], axes=[1],
                                name=scope.get_unique_operator_name(
-                                'ReduceSum'))
+                                   'ReduceSum'))
 
     concat_labels_name = scope.get_unique_variable_name('concat_labels')
     cast_concat_labels_name = scope.get_unique_variable_name(
@@ -371,7 +405,7 @@ def convert_sklearn_knn(scope, operator, container):
     knn = operator.raw_operator
     training_examples = knn._fit_X.astype(float)
     distance_power = knn.p if knn.metric == 'minkowski' else (
-        2 if knn.metric == 'euclidean' or knn.metric == 'l2' else 1)
+        2 if knn.metric in ('euclidean', 'l2') else 1)
 
     if operator.type != 'SklearnNearestNeighbors':
         training_labels = knn._y
@@ -379,13 +413,8 @@ def convert_sklearn_knn(scope, operator, container):
     training_examples_name = scope.get_unique_variable_name(
         'training_examples')
     sub_results_name = scope.get_unique_variable_name('sub_results')
-    abs_results_name = scope.get_unique_variable_name('abs_results')
-    distance_name = scope.get_unique_variable_name('distance')
-    distance_power_name = scope.get_unique_variable_name('distance_power')
-    reduced_sum_name = scope.get_unique_variable_name('reduced_sum')
     topk_values_name = scope.get_unique_variable_name('topk_values')
     topk_indices_name = scope.get_unique_variable_name('topk_indices')
-    reshaped_result_name = scope.get_unique_variable_name('reshaped_result')
     negate_name = scope.get_unique_variable_name('negate')
     negated_reshaped_result_name = scope.get_unique_variable_name(
         'negated_reshaped_result')
@@ -393,9 +422,6 @@ def convert_sklearn_knn(scope, operator, container):
     container.add_initializer(
         training_examples_name, onnx_proto.TensorProto.FLOAT,
         training_examples.shape, training_examples.flatten())
-    container.add_initializer(distance_power_name,
-                              onnx_proto.TensorProto.FLOAT,
-                              [], [distance_power])
     container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
                               [], [-1])
 
@@ -409,15 +435,9 @@ def convert_sklearn_knn(scope, operator, container):
 
     apply_sub(scope, [input_name, training_examples_name],
               sub_results_name, container, broadcast=1)
-    apply_abs(scope, sub_results_name, abs_results_name, container)
-    apply_pow(scope, [abs_results_name, distance_power_name], distance_name,
-              container)
-    container.add_node('ReduceSum', distance_name, reduced_sum_name,
-                       name=scope.get_unique_operator_name('ReduceSum'),
-                       axes=[1])
-    apply_reshape(scope, reduced_sum_name, reshaped_result_name, container,
-                  desired_shape=[1, -1])
-    apply_mul(scope, [reshaped_result_name, negate_name],
+    distance_result = _calculate_distance(scope, container, sub_results_name,
+                                          knn.metric, distance_power)
+    apply_mul(scope, [distance_result, negate_name],
               negated_reshaped_result_name, container, broadcast=1)
     apply_topk(scope, negated_reshaped_result_name,
                [topk_values_name, topk_indices_name], container,

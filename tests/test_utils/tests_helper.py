@@ -25,6 +25,7 @@ from .utils_backend import (
     extract_options,
     evaluate_condition,
     is_backend_enabled,
+    OnnxRuntimeMissingNewOnnxOperatorException,
 )
 from skl2onnx.common.data_types import FloatTensorType
 
@@ -51,7 +52,7 @@ def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
-                               random_state=42, n_informative=5)
+                               random_state=42, n_informative=7)
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
     if pos_features:
         X = numpy.abs(X)
@@ -85,6 +86,7 @@ def dump_data_and_model(
         benchmark=None,
         comparable_outputs=None,
         intermediate_steps=False,
+        fail_evenif_notimplemented=False,
         verbose=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
@@ -127,6 +129,9 @@ def dump_data_and_model(
     :param comparable_outputs: compares only these outputs
     :param intermediate_steps: displays intermediate steps
         in case of an error
+    :param fail_evenif_notimplemented: the test is considered as failing
+        even if the error is due to onnxuntime missing the implementation
+        of a new operator defiend in ONNX.
     :return: the created files
 
     Some convention for the name,
@@ -314,6 +319,11 @@ def dump_data_and_model(
                         comparable_outputs=comparable_outputs,
                         intermediate_steps=intermediate_steps,
                     )
+                except OnnxRuntimeMissingNewOnnxOperatorException as e:
+                    if fail_evenif_notimplemented:
+                        raise e
+                    warnings.warn(str(e))
+                    continue
                 except AssertionError as e:
                     if dump_error_log:
                         with open(error_dump, "w", encoding="utf-8") as f:

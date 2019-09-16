@@ -12,6 +12,7 @@ from . import dict_vectorizer
 from . import flatten
 from . import function_transformer
 from . import gaussian_process
+from . import grid_search_cv
 from . import imputer
 from . import k_bins_discretiser
 from . import k_means
@@ -39,6 +40,7 @@ __all__ = [
     flatten,
     function_transformer,
     gaussian_process,
+    grid_search_cv,
     imputer,
     k_bins_discretiser,
     k_means,

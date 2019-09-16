@@ -12,7 +12,7 @@ from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import Perceptron, SGDClassifier
 from sklearn.svm import LinearSVC
 
 # Linear regressors
@@ -47,6 +47,9 @@ from sklearn.tree import DecisionTreeRegressor
 
 # Gaussian processes
 from sklearn.gaussian_process import GaussianProcessRegressor
+
+# GridSearchCV
+from sklearn.model_selection import GridSearchCV
 
 # Support vector machines
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
@@ -113,7 +116,7 @@ from sklearn.preprocessing import FunctionTransformer
 # included in the following list and one output for everything not in
 # the list.
 sklearn_classifier_list = [
-    LogisticRegression, LogisticRegressionCV, SGDClassifier,
+    LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier,
@@ -126,6 +129,11 @@ sklearn_classifier_list = [
 # Clustering algorithms: produces two outputs, label and score for
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
+
+# Classifiers with converters supporting decision_function().
+decision_function_classifiers = (
+    SGDClassifier,
+)
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -159,6 +167,7 @@ def build_sklearn_operator_name_map():
     res.update({
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
+        GridSearchCV: 'SklearnGridSearchCV',
         LinearRegression: 'SklearnLinearRegressor',
         Lars: 'SklearnLinearRegressor',
         LarsCV: 'SklearnLinearRegressor',
@@ -171,6 +180,7 @@ def build_sklearn_operator_name_map():
         LogisticRegressionCV: 'SklearnLinearClassifier',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
         SGDRegressor: 'SklearnLinearRegressor',
