@@ -88,7 +88,11 @@ class TestOnnxHelper(unittest.TestCase):
         assert X1.shape == (4, 2)
         assert X2.shape == (4, 2)
 
-    @unittest.skipIf(not has_pydot(), reason="missing dependency")
+    @unittest.skipIf(not has_pydot(), reason="dot is missing")
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
     def test_onnx_to_dot(self):
         model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
                               StandardScaler())
