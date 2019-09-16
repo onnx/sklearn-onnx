@@ -39,9 +39,11 @@ def convert_gaussian_process_regressor(scope, operator, container):
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
+    opv = container.target_opset
 
     options = container.get_options(op, dict(return_cov=False,
-                                             return_std=False))
+                                             return_std=False,
+                                             optim=None))
     if hasattr(op, 'kernel_') and op.kernel_ is not None:
         kernel = op.kernel_
     elif op.kernel is None:
@@ -58,11 +60,14 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             outputs.append(convert_kernel(kernel, X,
                                           output_names=out[1:],
-                                          dtype=dtype))
+                                          dtype=dtype,
+                                          op_version=opv))
         if options['return_std']:
-            outputs.append(OnnxSqrt(convert_kernel_diag(
-                                        kernel, X, dtype=dtype),
-                                    output_names=out[1:]))
+            outputs.append(
+                OnnxSqrt(
+                    convert_kernel_diag(
+                        kernel, X, dtype=dtype, op_version=opv),
+                    output_names=out[1:], op_version=opv))
     else:
         out0 = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
 
@@ -73,15 +78,18 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),
-                                 dtype=dtype)
+                                 dtype=dtype,
+                                 optim=options.get('optim', None),
+                                 op_version=opv)
         k_trans.set_onnx_name_prefix('kgpd')
-        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype))
+        y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype), op_version=opv)
 
         mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
         y_mean = OnnxAdd(y_mean_b, mean_y,
-                         output_names=out[:1])
+                         output_names=out[:1],
+                         op_version=opv)
         y_mean.set_onnx_name_prefix('gpr')
         outputs = [y_mean]
 
@@ -98,22 +106,27 @@ def convert_gaussian_process_regressor(scope, operator, container):
             _K_inv = op._K_inv
 
             # y_var = self.kernel_.diag(X)
-            y_var = convert_kernel_diag(kernel, X, dtype=dtype)
+            y_var = convert_kernel_diag(kernel, X, dtype=dtype,
+                                        optim=options.get('optim', None),
+                                        op_version=opv)
 
             # y_var -= np.einsum("ij,ij->i",
             #       np.dot(K_trans, self._K_inv), K_trans)
-            k_dot = OnnxMatMul(k_trans, _K_inv.astype(dtype))
-            ys_var = OnnxSub(y_var,
-                             OnnxReduceSum(OnnxMul(k_dot, k_trans),
-                                           axes=[1], keepdims=0))
+            k_dot = OnnxMatMul(k_trans, _K_inv.astype(dtype), op_version=opv)
+            ys_var = OnnxSub(
+                y_var, OnnxReduceSum(
+                    OnnxMul(k_dot, k_trans, op_version=opv),
+                    axes=[1], keepdims=0, op_version=opv),
+                op_version=opv)
 
             # y_var_negative = y_var < 0
             # if np.any(y_var_negative):
             #     y_var[y_var_negative] = 0.0
-            ys0_var = OnnxMax(ys_var, np.array([0], dtype=dtype))
+            ys0_var = OnnxMax(ys_var, np.array([0], dtype=dtype),
+                              op_version=opv)
 
             # var = np.sqrt(ys0_var)
-            var = OnnxSqrt(ys0_var, output_names=out[1:])
+            var = OnnxSqrt(ys0_var, output_names=out[1:], op_version=opv)
             var.set_onnx_name_prefix('gprv')
             outputs.append(var)
 

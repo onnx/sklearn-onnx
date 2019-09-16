@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import math
 import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
@@ -17,6 +18,7 @@ from ..algebra.onnx_ops import (
     OnnxReduceSum, OnnxSqueeze,
     OnnxIdentity, OnnxReduceSumSquare
 )
+from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
@@ -24,39 +26,51 @@ except ImportError:
     OnnxConstantOfShape = None
 
 
-def convert_kernel_diag(kernel, X, output_names=None, dtype=None):
+def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
+                        optim=None, op_version=None):
     if isinstance(kernel, Sum):
-        return OnnxAdd(convert_kernel_diag(kernel.k1, X, dtype=dtype),
-                       convert_kernel_diag(kernel.k2, X, dtype=dtype),
-                       output_names=output_names)
+        return OnnxAdd(
+            convert_kernel_diag(
+                kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
+            convert_kernel_diag(
+                kernel.k2, X, dtype=dtype, optim=optim, op_version=op_version),
+            output_names=output_names)
 
     if isinstance(kernel, Product):
-        return OnnxMul(convert_kernel_diag(kernel.k1, X, dtype=dtype),
-                       convert_kernel_diag(kernel.k2, X, dtype=dtype),
-                       output_names=output_names)
+        return OnnxMul(
+            convert_kernel_diag(
+                kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
+            convert_kernel_diag(
+                kernel.k2, X, dtype=dtype, optim=optim, op_version=op_version),
+            output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
-        onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype)
+        onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype,
+                                          op_version=op_version)
         return OnnxAdd(onnx_zeros,
                        np.array([kernel.constant_value],
                                 dtype=dtype),
-                       output_names=output_names)
+                       output_names=output_names, op_version=op_version)
 
     if isinstance(kernel, (RBF, ExpSineSquared, RationalQuadratic)):
-        onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype)
+        onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype,
+                                          op_version=op_version)
         if isinstance(kernel, RBF):
             return OnnxAdd(onnx_zeros,
                            np.array([1], dtype=dtype),
-                           output_names=output_names)
+                           output_names=output_names,
+                           op_version=op_version)
         else:
             return OnnxAdd(onnx_zeros, np.array([1], dtype=dtype),
-                           output_names=output_names)
+                           output_names=output_names, op_version=op_version)
 
     if isinstance(kernel, DotProduct):
         t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2, dtype=dtype)
         return OnnxSqueeze(
-            OnnxAdd(OnnxReduceSumSquare(X, axes=[1]), t_sigma_0),
-            output_names=output_names, axes=[1])
+            OnnxAdd(OnnxReduceSumSquare(X, axes=[1], op_version=op_version),
+                    t_sigma_0, op_version=op_version),
+            output_names=output_names, axes=[1],
+            op_version=op_version)
 
     raise RuntimeError("Unable to convert diag method for "
                        "class {}.".format(type(kernel)))
@@ -74,21 +88,34 @@ def py_make_float_array(cst, dtype, as_tensor=False):
 
 
 def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
-                              pi=3.141592653589793, dtype=None, **kwargs):
-    dists = onnx_cdist(X, Y, metric="euclidean", dtype=dtype)
+                              pi=math.pi, dtype=None, optim=None,
+                              op_version=None, **kwargs):
+    if optim is None:
+        dists = onnx_cdist(
+            X, Y, metric="euclidean", dtype=dtype, op_version=op_version)
+    elif optim == 'cdist':
+        dists = OnnxCDist(X, Y, metric="euclidean", op_version=op_version)
+    else:
+        raise ValueError("Unknown optimization '{}'.".format(optim))
     t_pi = py_make_float_array(pi, dtype=dtype)
     t_periodicity = py_make_float_array(periodicity, dtype)
-    arg = OnnxMul(OnnxDiv(dists, t_periodicity), t_pi)
-    sin_of_arg = OnnxSin(arg)
+    arg = OnnxMul(OnnxDiv(dists, t_periodicity, op_version=op_version), t_pi)
+    sin_of_arg = OnnxSin(arg, op_version=op_version)
     t_2 = py_make_float_array(2, dtype=dtype)
     t__2 = py_make_float_array(-2, dtype=dtype)
     t_length_scale = py_make_float_array(length_scale, dtype=dtype)
-    K = OnnxExp(OnnxMul(OnnxPow(OnnxDiv(sin_of_arg, t_length_scale),
-                                t_2), t__2))
-    return OnnxIdentity(K, **kwargs)
+    K = OnnxExp(
+        OnnxMul(
+            OnnxPow(
+                OnnxDiv(sin_of_arg, t_length_scale, op_version=op_version),
+                t_2, op_version=op_version),
+            t__2, op_version=op_version),
+        op_version=op_version)
+    return OnnxIdentity(K, op_version=op_version, **kwargs)
 
 
-def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, **kwargs):
+def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, op_version=None,
+                         **kwargs):
     """
     Implements the kernel
     :math:`k(x_i,x_j)=\\sigma_0^2+x_i\\cdot x_j`.
@@ -98,31 +125,39 @@ def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, **kwargs):
     if isinstance(Y, np.ndarray):
         tr = Y.T
     else:
-        tr = OnnxTranspose(Y, perm=[1, 0])
-    matm = OnnxMatMul(X, tr)
-    K = OnnxAdd(matm, t_sigma_0)
-    return OnnxIdentity(K, **kwargs)
+        tr = OnnxTranspose(Y, perm=[1, 0], op_version=op_version)
+    matm = OnnxMatMul(X, tr, op_version=op_version)
+    K = OnnxAdd(matm, t_sigma_0, op_version=op_version)
+    return OnnxIdentity(K, op_version=op_version, **kwargs)
 
 
 def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
-                                dtype=None, **kwargs):
+                                dtype=None, optim=None, op_version=None,
+                                **kwargs):
     """
     Implements the kernel
     :math:`k(x_i,x_j)=(1 + d(x_i, x_j)^2 / (2*\\alpha * l^2))^{-\\alpha}`.
     """
-    dists = onnx_cdist(X, Y, dtype=dtype, metric="sqeuclidean")
+    if optim is None:
+        dists = onnx_cdist(X, Y, dtype=dtype, metric="sqeuclidean",
+                           op_version=op_version)
+    elif optim == 'cdist':
+        dists = OnnxCDist(X, Y, metric="sqeuclidean", op_version=op_version)
+    else:
+        raise ValueError("Unknown optimization '{}'.".format(optim))
     cst = length_scale ** 2 * alpha * 2
     t_cst = py_make_float_array(cst, dtype=dtype)
-    tmp = OnnxDiv(dists, t_cst)
+    tmp = OnnxDiv(dists, t_cst, op_version=op_version)
     t_one = py_make_float_array(1, dtype=dtype)
-    base = OnnxAdd(tmp, t_one)
+    base = OnnxAdd(tmp, t_one, op_version=op_version)
     t_alpha = py_make_float_array(-alpha, dtype=dtype)
-    K = OnnxPow(base, t_alpha)
-    return OnnxIdentity(K, **kwargs)
+    K = OnnxPow(base, t_alpha, op_version=op_version)
+    return OnnxIdentity(K, op_version=op_version, **kwargs)
 
 
 def convert_kernel(kernel, X, output_names=None,
-                   x_train=None, dtype=None):
+                   x_train=None, dtype=None, optim=None,
+                   op_version=None):
     if isinstance(kernel, Sum):
         clop = OnnxAdd
     elif isinstance(kernel, Product):
@@ -131,26 +166,31 @@ def convert_kernel(kernel, X, output_names=None,
         clop = None
     if clop is not None:
         return clop(
-            convert_kernel(kernel.k1, X, x_train=x_train, dtype=dtype),
-            convert_kernel(kernel.k2, X, x_train=x_train, dtype=dtype),
+            convert_kernel(kernel.k1, X, x_train=x_train, dtype=dtype,
+                           optim=optim, op_version=op_version),
+            convert_kernel(kernel.k2, X, x_train=x_train, dtype=dtype,
+                           optim=optim, op_version=op_version),
             output_names=output_names)
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
         if x_train is None:
-            onnx_zeros_x = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
+            onnx_zeros_x = _zero_vector_of_size(
+                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros_x = _zero_vector_of_size(X, keepdims=1, dtype=dtype)
+            onnx_zeros_x = _zero_vector_of_size(
+                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = _zero_vector_of_size(
-                x_train, keepdims=1, dtype=dtype)
+                x_train, keepdims=1, dtype=dtype, op_version=op_version)
 
-        tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0])
-        mat = OnnxMatMul(onnx_zeros_x, tr)
+        tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0], op_version=op_version)
+        mat = OnnxMatMul(onnx_zeros_x, tr, op_version=op_version)
         return OnnxAdd(mat,
                        np.array([kernel.constant_value],
                                 dtype=dtype),
-                       output_names=output_names)
+                       output_names=output_names,
+                       op_version=op_version)
 
     if isinstance(kernel, RBF):
         if not isinstance(kernel.length_scale, (float, int)):
@@ -159,27 +199,39 @@ def convert_kernel(kernel, X, output_names=None,
                     type(kernel.length_scale)))
 
         # length_scale = np.squeeze(length_scale).astype(float)
-        zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype)
-        zerov = _zero_vector_of_size(X, axis=0, keepdims=1, dtype=dtype)
+        zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype,
+                                     op_version=op_version)
+        zerov = _zero_vector_of_size(X, axis=0, keepdims=1, dtype=dtype,
+                                     op_version=op_version)
 
         tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
                                            as_tensor=True)
-        const = OnnxConstantOfShape(OnnxShape(zeroh),
-                                    value=tensor_value)
-        X_scaled = OnnxDiv(X, const)
+        const = OnnxConstantOfShape(OnnxShape(zeroh, op_version=op_version),
+                                    value=tensor_value, op_version=op_version)
+        X_scaled = OnnxDiv(X, const, op_version=op_version)
         if x_train is None:
             dist = onnx_squareform_pdist(
-                X_scaled, metric='sqeuclidean', dtype=dtype)
+                X_scaled, metric='sqeuclidean', dtype=dtype,
+                op_version=op_version)
         else:
-            x_train_scaled = OnnxDiv(x_train, const)
-            dist = onnx_cdist(X_scaled, x_train_scaled, metric='sqeuclidean',
-                              dtype=dtype)
+            x_train_scaled = OnnxDiv(x_train, const, op_version=op_version)
+            if optim is None:
+                dist = onnx_cdist(X_scaled, x_train_scaled,
+                                  metric='sqeuclidean',
+                                  dtype=dtype, op_version=op_version)
+            elif optim == 'cdist':
+                dist = OnnxCDist(X_scaled, x_train_scaled,
+                                 metric='sqeuclidean',
+                                 op_version=op_version)
+            else:
+                raise ValueError("Unknown optimization '{}'.".format(optim))
 
         tensor_value = py_make_float_array(-0.5, dtype=dtype, as_tensor=True)
         cst5 = OnnxConstantOfShape(OnnxShape(zerov), value=tensor_value)
 
         # K = np.exp(-.5 * dists)
-        exp = OnnxExp(OnnxMul(dist, cst5), output_names=output_names)
+        exp = OnnxExp(OnnxMul(dist, cst5, op_version=op_version),
+                      output_names=output_names, op_version=op_version)
 
         # This should not be needed.
         # K = squareform(K)
@@ -196,7 +248,8 @@ def convert_kernel(kernel, X, output_names=None,
             X, Y=X if x_train is None else x_train,
             length_scale=kernel.length_scale,
             periodicity=kernel.periodicity, dtype=dtype,
-            output_names=output_names)
+            output_names=output_names, optim=optim,
+            op_version=op_version)
 
     if isinstance(kernel, DotProduct):
         if not isinstance(kernel.sigma_0, (float, int)):
@@ -207,7 +260,8 @@ def convert_kernel(kernel, X, output_names=None,
         if x_train is None:
             return _convert_dot_product(X, X, sigma_0=kernel.sigma_0,
                                         dtype=dtype,
-                                        output_names=output_names)
+                                        output_names=output_names,
+                                        op_version=op_version)
         else:
             if len(x_train.shape) != 2:
                 raise NotImplementedError(
@@ -215,40 +269,45 @@ def convert_kernel(kernel, X, output_names=None,
                     "implemented.")
             return _convert_dot_product(
                 X, x_train, sigma_0=kernel.sigma_0,
-                dtype=dtype, output_names=output_names)
+                dtype=dtype, output_names=output_names,
+                op_version=op_version)
 
     if isinstance(kernel, RationalQuadratic):
         if x_train is None:
             return _convert_rational_quadratic(
                 X, X, length_scale=kernel.length_scale,
                 dtype=dtype, alpha=kernel.alpha,
-                output_names=output_names)
+                output_names=output_names,
+                optim=optim, op_version=op_version)
         else:
             return _convert_rational_quadratic(
                 X, x_train, length_scale=kernel.length_scale,
                 dtype=dtype, alpha=kernel.alpha,
-                output_names=output_names)
+                output_names=output_names,
+                optim=optim, op_version=op_version)
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
 
 
 def _zero_vector_of_size(X, output_names=None, axis=0,
-                         keepdims=None, dtype=None):
+                         keepdims=None, dtype=None, op_version=None):
     if keepdims is None:
         raise ValueError("Default for keepdims is not allowed.")
     if dtype == np.float32:
         res = OnnxReduceSum(
-            OnnxConstantOfShape(OnnxShape(X)),
+            OnnxConstantOfShape(
+                OnnxShape(X, op_version=op_version),
+                op_version=op_version),
             axes=[1-axis], keepdims=keepdims,
-            output_names=output_names)
+            output_names=output_names, op_version=op_version)
     elif dtype in (np.float64, np.int32, np.int64):
         res = OnnxReduceSum(
             OnnxConstantOfShape(
-                OnnxShape(X), value=py_make_float_array(
-                    0, dtype=dtype, as_tensor=True)),
+                OnnxShape(X, op_version=op_version), value=py_make_float_array(
+                    0, dtype=dtype, as_tensor=True), op_version=op_version),
             axes=[1-axis], keepdims=keepdims,
-            output_names=output_names)
+            output_names=output_names, op_version=op_version)
     else:
         raise NotImplementedError(
             "Unable to create zero vector of type {}".format(dtype))
