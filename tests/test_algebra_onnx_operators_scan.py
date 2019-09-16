@@ -29,15 +29,15 @@ from skl2onnx.algebra.complex_functions import (
 )
 
 
-threshold = "0.4.0"
-threshold2 = "0.5.0"
+THRESHOLD = "0.4.0"
+THRESHOLD2 = "0.5.0"
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
@@ -100,7 +100,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
@@ -130,7 +130,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -173,7 +173,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -204,7 +204,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0])
 
     @unittest.skipIf((OnnxConstantOfShape is None or
-                      StrictVersion(ort_version) <= StrictVersion(threshold)),
+                      StrictVersion(ort_version) <= StrictVersion(THRESHOLD)),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -230,7 +230,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -272,7 +272,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold2),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in_mink(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -316,7 +316,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.5.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold2),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in_custom_ops(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
