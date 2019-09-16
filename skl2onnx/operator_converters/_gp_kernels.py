@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import math
 import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
@@ -87,7 +88,7 @@ def py_make_float_array(cst, dtype, as_tensor=False):
 
 
 def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
-                              pi=3.141592653589793, dtype=None, optim=None,
+                              pi=math.pi, dtype=None, optim=None,
                               op_version=None, **kwargs):
     if optim is None:
         dists = onnx_cdist(
