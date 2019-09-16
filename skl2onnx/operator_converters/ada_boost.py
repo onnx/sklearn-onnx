@@ -356,13 +356,13 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
                        median_idx_name,
                        name=scope.get_unique_operator_name('ArgMin'), axis=1)
     container.add_node(
-        'ArrayFeatureExtractor', [sorted_indices_name, median_idx_name],
-        median_estimators_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+        'GatherElements', [sorted_indices_name, median_idx_name],
+        median_estimators_name, op_domain='ai.onnx.ml', axis=1,
+        name=scope.get_unique_operator_name('GatherElements'))
     container.add_node(
-        'ArrayFeatureExtractor', [concatenated_labels, median_estimators_name],
-        operator.output_full_names, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+        'GatherElements', [concatenated_labels, median_estimators_name],
+        operator.output_full_names, op_domain='ai.onnx.ml', axis=1,
+        name=scope.get_unique_operator_name('GatherElements'))
 
 
 register_converter('SklearnAdaBoostClassifier',
