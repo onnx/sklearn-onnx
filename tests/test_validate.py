@@ -28,8 +28,6 @@ class TestValidate(unittest.TestCase):
         res = sklearn_operators()
         assert len(res) > 0
         assert len(res[0]) == 3
-        import pprint
-        pprint.pprint(res)
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")
