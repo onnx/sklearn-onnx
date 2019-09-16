@@ -81,6 +81,22 @@ jobs:
     displayName: 'install skl2onnx'
 
   - script: |
+      echo "---------------"
+      pip show numpy
+      echo "---------------"
+      pip show onnx
+      echo "---------------"
+      pip show onnxruntime
+      echo "---------------"
+      pip show onnxconverter-common
+      echo "---------------"
+      pip show scikit-learn
+      echo "---------------"
+      pip show cython
+      echo "---------------"
+    displayName: 'version'
+
+  - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
