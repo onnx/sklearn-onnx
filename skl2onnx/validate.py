@@ -5,13 +5,11 @@
 # --------------------------------------------------------------------------
 import os
 from time import perf_counter
-from importlib import import_module
 import pickle
 import numpy
 import pandas
 import onnx
 from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
-from sklearn.base import BaseEstimator
 from sklearn.decomposition import SparseCoder
 from sklearn.ensemble import (
     VotingClassifier, AdaBoostRegressor,
@@ -47,6 +45,7 @@ except ImportError:
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import SVC, NuSVC
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.utils.testing import all_estimators
 from onnxruntime import InferenceSession
 from . import __version__ as ort_version
 from .convert import to_onnx
@@ -71,31 +70,28 @@ def sklearn_operators(subfolder=None):
 
     :param subfolder: look into only one subfolder
     """
+    estims = all_estimators()
+
     found = []
-    for sub in sklearn__all__:
+    for clname, cl in estims:
+        if cl.__name__ in {'Pipeline', 'ColumnTransformer',
+                           'FeatureUnion', 'BaseEstimator'}:
+            continue
+        spl = cl.__module__.split('.')
+        sub = spl[-1]
+        if sub not in sklearn__all__:
+            sub = spl[-2]
+        if sub not in sklearn__all__:
+            continue
+        if (sub in {'calibration', 'dummy', 'manifold'} and
+                'Calibrated' not in clname):
+            continue
         if subfolder is not None and sub != subfolder:
             continue
-        try:
-            mod = import_module("{0}.{1}".format("sklearn", sub))
-        except ImportError:
-            continue
-        cls = getattr(mod, "__all__", None)
-        if cls is None:
-            cls = list(mod.__dict__)
-        cls = [mod.__dict__[cl] for cl in cls]
-        for cl in cls:
-            try:
-                issub = issubclass(cl, BaseEstimator)
-            except TypeError:
-                continue
-            if cl.__name__ in {'Pipeline', 'ColumnTransformer',
-                               'FeatureUnion', 'BaseEstimator'}:
-                continue
-            if (sub in {'calibration', 'dummy', 'manifold'} and
-                    'Calibrated' not in cl.__name__):
-                continue
-            if issub:
-                found.append(dict(name=cl.__name__, subfolder=sub, cl=cl))
+        found.append(dict(name=cl.__name__, subfolder=sub, cl=cl))
+
+    if subfolder is None:
+        found.sort(key=lambda t: (t['subfolder'], t['name']))
     return found
 
 

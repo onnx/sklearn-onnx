@@ -14,7 +14,7 @@ from skl2onnx.validate import (
 import onnx
 
 
-def has_openpyxl():
+def has_pydot():
     try:
         import pydot  # noqa
         return True
@@ -28,6 +28,8 @@ class TestValidate(unittest.TestCase):
         res = sklearn_operators()
         assert len(res) > 0
         assert len(res[0]) == 3
+        import pprint
+        pprint.pprint(res)
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="OnnxOperator not working")
@@ -35,7 +37,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
-    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
+    @unittest.skipIf(not has_pydot(), reason="dot is missing")
     def test_validate_sklearn_operators_one(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
@@ -58,7 +60,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
-    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
+    @unittest.skipIf(not has_pydot(), reason="dot is missing")
     def test_validate_sklearn_operators_two(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
@@ -82,7 +84,7 @@ class TestValidate(unittest.TestCase):
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
                      reason="needed only once")
-    @unittest.skipIf(not has_openpyxl(), reason="missing dependency")
+    @unittest.skipIf(not has_pydot(), reason="dot is missing")
     def test_validate_sklearn_operators_all(self):
         logger = getLogger('skl2onnx')
         logger.disabled = True
