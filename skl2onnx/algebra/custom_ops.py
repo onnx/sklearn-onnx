@@ -12,13 +12,13 @@ class OnnxCDist(OnnxOperator):
     specifications but in onnxruntime.
     """
 
-    since_version = 11
+    since_version = 1
     expected_inputs = ['X', 'Y']
     expected_outputs = ['dist']
     input_range = [2, 2]
     output_range = [1, 1]
     is_deprecated = False
-    domain = 'skl2onnx'
+    domain = 'com.microsoft'
     operator_name = 'CDist'
     past_version = {}
 
