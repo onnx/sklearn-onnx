@@ -173,7 +173,8 @@ def make_attribute(
                     [type(_) for _, __ in zip(value, range(0, 5))]))
     else:
         raise ValueError(
-            'Value "{}" is not valid attribute data type.'.format(value))
+            "Value '{}' is not valid attribute data type for attribute "
+            "'{}'.".format(value, key))
     return attr
 
 
