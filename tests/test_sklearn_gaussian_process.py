@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import inspect
 from io import StringIO
 from distutils.version import StrictVersion
 import numpy as np
@@ -80,7 +81,8 @@ Ytest_ = pd.read_csv(StringIO("""
 """.strip("\n\r ")), header=None).values
 
 
-threshold = "0.4.0"
+THRESHOLD = "0.4.0"
+THRESHOLD2 = "0.5.0"
 
 
 class TestSklearnGaussianProcess(unittest.TestCase):
@@ -120,8 +122,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                                 np.squeeze(got), decimal=decimal)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_constant1(self):
         ker = C(5.)
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -134,8 +136,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rbf1(self):
         ker = RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -148,8 +150,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rbf10(self):
         ker = RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -162,8 +164,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rbf2(self):
         ker = RBF(length_scale=1, length_scale_bounds="fixed")
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -176,8 +178,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rbf_mul(self):
         ker = (C(1.0, constant_value_bounds="fixed") *
                RBF(1.0, length_scale_bounds="fixed"))
@@ -191,8 +193,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_ker1_def(self):
         ker = (C(1.0, (1e-3, 1e3)) *
                RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
@@ -206,8 +208,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_ker12_def(self):
         ker = (Sum(C(0.1, (1e-3, 1e3)), C(0.1, (1e-3, 1e3)) *
                RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
@@ -221,8 +223,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_ker2_def(self):
         ker = Sum(
             C(0.1, (1e-3, 1e3)) * RBF(length_scale=10,
@@ -240,8 +242,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=0)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_ker2_dotproduct(self):
         ker = DotProduct(sigma_0=2.)
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -263,8 +265,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=2)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_ker2_exp_sine_squared(self):
         ker = ExpSineSquared()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -287,8 +289,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_exp_sine_squared_diag(self):
         ker = ExpSineSquared()
         onx = convert_kernel_diag(
@@ -302,8 +304,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rational_quadratic_diag(self):
         ker = RationalQuadratic()
         onx = convert_kernel_diag(
@@ -317,8 +319,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_dot_product_diag(self):
         ker = DotProduct()
         onx = convert_kernel_diag(
@@ -332,8 +334,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_dot_product(self):
         ker = DotProduct()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -356,8 +358,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_kernel_rational_quadratic(self):
         ker = RationalQuadratic()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32)
@@ -380,8 +382,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_unfitted(self):
 
         se = (C(1.0, (1e-3, 1e3)) *
@@ -433,8 +435,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                              GaussianProcessRegressor])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
@@ -452,8 +454,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                             basename="SklearnGaussianProcessRBF")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
@@ -482,8 +484,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                             basename="SklearnGaussianProcessRBFStd-Out0")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
@@ -509,8 +511,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_double(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
@@ -536,8 +538,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_dot_product(self):
 
         gp = GaussianProcessRegressor(kernel=DotProduct(),
@@ -562,8 +564,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_rational_quadratic(self):
 
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
@@ -605,8 +607,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                              GaussianProcessRegressor])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_fitted_shapes(self):
         data = load_iris()
         X = data.data.astype(np.float32)
@@ -621,8 +623,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {}, skip_if_float32=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(threshold),
-        reason="onnxruntime %s" % threshold)
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_fitted_partial_float64(self):
         data = load_iris()
         X = data.data
@@ -645,7 +647,126 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_fitted_partial_float64_operator_cdist_rbf(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=RBF(), alpha=10.)
+        gp.fit(X_train, y_train)
+
+        try:
+            to_onnx(
+                gp, initial_types=[('X', FloatTensorType([None, None]))],
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+            raise AssertionError("CDIST is not implemented")
+        except ValueError:
+            pass
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'cdist'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(), alpha=100.)
+        gp.fit(X_train, y_train)
+
+        try:
+            to_onnx(
+                gp, initial_types=[('X', FloatTensorType([None, None]))],
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+            raise AssertionError("CDIST is not implemented")
+        except ValueError:
+            pass
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'cdist'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_fitted_partial_float64_operator_cdist_quad(self):
+        data = load_iris()
+        X = data.data
+        y = data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        gp = GaussianProcessRegressor(kernel=RationalQuadratic(), alpha=100.)
+        gp.fit(X_train, y_train)
+
+        try:
+            to_onnx(
+                gp, initial_types=[('X', FloatTensorType([None, None]))],
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+            raise AssertionError("CDIST is not implemented")
+        except ValueError:
+            pass
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options={GaussianProcessRegressor: {'optim': 'cdist'}})
+        self.assertTrue(model_onnx is not None)
+        name_save = inspect.currentframe().f_code.co_name + '.onnx'
+        with open(name_save, 'wb') as f:
+            f.write(model_onnx.SerializeToString())
+        try:
+            self.check_outputs(gp, model_onnx, X_test.astype(np.float32), {})
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        except AssertionError as e:
+            assert "Max relative difference:" in str(e)
+
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(gp, model_onnx, X_test, {})
+
 
 if __name__ == "__main__":
-    TestSklearnGaussianProcess().test_gpr_fitted_partial_float64()
     unittest.main()

@@ -373,7 +373,11 @@ class ModelComponentContainer(ModelContainer):
 
         if upd:
             attrs.update(upd)
-        node = make_node(op_type, inputs, outputs, name=name, **attrs)
+        try:
+            node = make_node(op_type, inputs, outputs, name=name, **attrs)
+        except ValueError as e:
+            raise ValueError("Unable to create node '{}' with name='{}'."
+                             "".format(op_type, name)) from e
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
