@@ -409,14 +409,56 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     container.add_node('ArgMin', cast_result_name,
                        median_idx_name,
                        name=scope.get_unique_operator_name('ArgMin'), axis=1)
-    container.add_node(
-        'GatherElements', [sorted_indices_name, median_idx_name],
-        median_estimators_name, op_version=11, axis=1,
-        name=scope.get_unique_operator_name('GatherElements'))
-    container.add_node(
-        'GatherElements', [concatenated_labels, median_estimators_name],
-        operator.output_full_names, op_version=11, axis=1,
-        name=scope.get_unique_operator_name('GatherElements'))
+    _apply_gather_elements(
+        scope, container, [sorted_indices_name, median_idx_name],
+        median_estimators_name, axis=1, dim=len(op.estimators_))
+    output_name = operator.output_full_names[0]
+    _apply_gather_elements(
+        scope, container, [concatenated_labels, median_estimators_name],
+        output_name, axis=1, dim=len(op.estimators_))
+
+
+def _apply_gather_elements(scope, container, inputs, output, axis, dim):
+    if container.target_opset >= 12:
+        container.add_node(
+            'GatherElements', inputs, output, op_version=11, axis=axis,
+            name=scope.get_unique_operator_name('GatherElements'))
+    else:
+        classes_ind_name = scope.get_unique_variable_name('classes_ind')
+        container.add_initializer(
+            classes_ind_name, onnx_proto.TensorProto.INT64,
+            (1, dim), list(range(dim)))
+
+        shape_name = scope.get_unique_variable_name('shape')
+        container.add_node(
+            'Shape', inputs[0], shape_name,
+            name=scope.get_unique_operator_name('Shape'))
+        zero_name = scope.get_unique_variable_name('zero')
+        container.add_node(
+            'ConstantOfShape', shape_name, zero_name,
+            name=scope.get_unique_operator_name('CoSA'),
+            value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                              (1, ), [0.]), op_version=9)
+        one_name = scope.get_unique_variable_name('one')
+        container.add_node(
+            'ConstantOfShape', shape_name, one_name,
+            name=scope.get_unique_operator_name('CoSB'),
+            value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                              (1, ), [1.]), op_version=9)
+
+        equal_name = scope.get_unique_variable_name('equal')
+        container.add_node('Equal', [output, classes_ind_name],
+                           equal_name,
+                           name=scope.get_unique_operator_name('Equal'))
+
+        max_proba_name = scope.get_unique_variable_name('probsmax')
+        container.add_node('Where', [equal_name, one_name, zero_name],
+                           max_proba_name,
+                           name=scope.get_unique_operator_name('Where'))
+
+        container.add_node('Mul', [max_proba_name, inputs[0]],
+                           output,
+                           name=scope.get_unique_operator_name('MulWhere'))
 
 
 register_converter('SklearnAdaBoostClassifier',
