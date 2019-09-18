@@ -97,6 +97,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+                     reason="not available")
     def test_voting_hard_binary_weights(self):
         model = VotingClassifier(
             voting="hard",
@@ -156,6 +158,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+                     reason="not available")
     def test_voting_hard_multi(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(
@@ -176,6 +180,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+                     reason="not available")
     def test_voting_hard_multi_weighted(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(
