@@ -328,7 +328,7 @@ def cum_sum(scope, container, rnn_input_name, sequence_length):
         container.add_node(
             'CumSum', [rnn_input_name, axis_name], [weights_cdf_name],
             name=scope.get_unique_operator_name('CumSum'),
-            version=11)
+            op_version=11)
         return weights_cdf_name
 
 
@@ -411,11 +411,11 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
                        name=scope.get_unique_operator_name('ArgMin'), axis=1)
     container.add_node(
         'GatherElements', [sorted_indices_name, median_idx_name],
-        median_estimators_name, version=11, axis=1,
+        median_estimators_name, op_version=11, axis=1,
         name=scope.get_unique_operator_name('GatherElements'))
     container.add_node(
         'GatherElements', [concatenated_labels, median_estimators_name],
-        operator.output_full_names, version=11, axis=1,
+        operator.output_full_names, op_version=11, axis=1,
         name=scope.get_unique_operator_name('GatherElements'))
 
 
