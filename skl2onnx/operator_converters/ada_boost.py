@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from onnx.helper import make_tensor
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
     apply_reshape, apply_sub, apply_topk, apply_transpose, apply_identity)
@@ -14,7 +15,7 @@ from ..proto import onnx_proto
 from .._supported_operators import sklearn_operator_name_map
 
 
-def _samme_proba(scope, container, proba_name, n_classes):
+def _samme_r_proba(scope, container, proba_name, n_classes):
     clipped_proba_name = scope.get_unique_variable_name('clipped_proba')
     log_proba_name = scope.get_unique_variable_name('log_proba')
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
@@ -113,6 +114,34 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     return operator.outputs[1].full_name
 
 
+def _samme_proba(scope, container, proba_name, n_classes, weight,
+                 zero_name, classes_ind_name, one_name):
+    weight_name = scope.get_unique_variable_name('weight')
+    container.add_initializer(
+        weight_name, onnx_proto.TensorProto.FLOAT, [], [weight])
+
+    argmax_output_name = scope.get_unique_variable_name('argmax_output')
+    container.add_node('ArgMax', proba_name,
+                       argmax_output_name,
+                       name=scope.get_unique_operator_name('ArgMax'),
+                       axis=1)
+
+    equal_name = scope.get_unique_variable_name('equal')
+    container.add_node('Equal', [argmax_output_name, classes_ind_name],
+                       equal_name,
+                       name=scope.get_unique_operator_name('Equal'))
+
+    max_proba_name = scope.get_unique_variable_name('probsmax')
+    container.add_node('Where', [equal_name, one_name, zero_name],
+                       max_proba_name,
+                       name=scope.get_unique_operator_name('Where'))
+
+    samme_proba_name = scope.get_unique_variable_name('samme_proba')
+    apply_mul(scope, [max_proba_name, weight_name],
+              samme_proba_name, container, broadcast=1)
+    return samme_proba_name
+
+
 def convert_sklearn_ada_boost_classifier(scope, operator, container):
     """
     Converter for AdaBoost classifier.
@@ -139,11 +168,15 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     argmax_output_name = scope.get_unique_variable_name('argmax_output')
     array_feature_extractor_result_name = scope.get_unique_variable_name(
         'array_feature_extractor_result')
-    classes_name = scope.get_unique_variable_name('classes')
 
+    classes_name = scope.get_unique_variable_name('classes')
+    classes_ind_name = scope.get_unique_variable_name('classes_ind')
     container.add_initializer(classes_name, class_type, classes.shape, classes)
+    container.add_initializer(classes_ind_name, onnx_proto.TensorProto.INT64,
+                              (1, len(classes)), list(range(len(classes))))
 
     proba_names_list = []
+    zero_name = None
 
     for i_est, estimator in enumerate(op.estimators_):
         label_name = scope.declare_local_variable('elab_name_%d' % i_est)
@@ -157,19 +190,35 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
         this_operator.outputs.extend([label_name, proba_name])
 
         if op.algorithm == 'SAMME.R':
-            cur_proba_name = _samme_proba(
+            cur_proba_name = _samme_r_proba(
                 scope, container, proba_name.onnx_name, op.n_classes_)
         else:  # SAMME
-            weight_name = scope.get_unique_variable_name('weight')
-            samme_proba_name = scope.get_unique_variable_name('samme_proba')
 
-            container.add_initializer(
-                weight_name, onnx_proto.TensorProto.FLOAT,
-                [], [op.estimator_weights_[i_est]])
+            if zero_name is None:
+                shape_name = scope.get_unique_variable_name('shape')
+                container.add_node(
+                    'Shape', proba_name.onnx_name, shape_name,
+                    name=scope.get_unique_operator_name('Shape'))
 
-            apply_mul(scope, [proba_name.onnx_name, weight_name],
-                      samme_proba_name, container, broadcast=1)
-            cur_proba_name = samme_proba_name
+                zero_name = scope.get_unique_variable_name('zero')
+                container.add_node(
+                    'ConstantOfShape', shape_name, zero_name,
+                    name=scope.get_unique_operator_name('CoSA'),
+                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                                      (1, ), [0]))
+
+                one_name = scope.get_unique_variable_name('one')
+                container.add_node(
+                    'ConstantOfShape', shape_name, one_name,
+                    name=scope.get_unique_operator_name('CoSB'),
+                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                                      (1, ), [1.]))
+
+            cur_proba_name = _samme_proba(
+                scope, container, proba_name.onnx_name, op.n_classes_,
+                op.estimator_weights_[i_est], zero_name, classes_ind_name,
+                one_name)
+
         proba_names_list.append(cur_proba_name)
 
     class_prob_name = _normalise_probability(scope, container, operator,

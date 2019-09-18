@@ -53,7 +53,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                                             test_size=0.2,
                                                             random_state=42)
         model = AdaBoostClassifier(n_estimators=5, algorithm="SAMME.R",
-                                   base_estimator=LogisticRegression())
+                                   base_estimator=LogisticRegression(
+                                    solver='liblinear'))
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
@@ -126,6 +127,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_regressor(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5))
@@ -145,6 +148,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             "== StrictVersion('1.4.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_regressor_lreg(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5,
@@ -165,6 +170,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             "== StrictVersion('1.4.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_regressor_int(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5), is_int=True)
@@ -184,6 +191,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             "== StrictVersion('1.4.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_regressor_lr(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
