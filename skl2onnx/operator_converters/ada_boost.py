@@ -275,7 +275,7 @@ def _get_estimators_label(scope, operator, container, model):
     estimators_results_list = []
     for i, estimator in enumerate(model.estimators_):
         estimator_label_name = scope.declare_local_variable(
-            'est_label_%d' % i, FloatTensorType())
+            'est_label_%d' % i, FloatTensorType([None, 1]))
 
         op_type = sklearn_operator_name_map[type(estimator)]
 

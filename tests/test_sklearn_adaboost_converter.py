@@ -99,7 +99,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostClassifierSAMME",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "< StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -148,7 +148,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressor-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.0') or "
+            "< StrictVersion('0.5.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
         )
@@ -171,7 +171,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorLReg-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.0') or "
+            "< StrictVersion('0.5.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
         )
@@ -193,7 +193,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorInt",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.0') or "
+            "< StrictVersion('0.5.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
         )
@@ -238,7 +238,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorLR-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.0') or "
+            "< StrictVersion('0.6.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
             verbose=False
