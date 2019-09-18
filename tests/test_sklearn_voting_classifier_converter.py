@@ -1,5 +1,7 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -73,6 +75,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+                     reason="not available")
     def test_voting_hard_binary(self):
         model = VotingClassifier(
             voting="hard",
