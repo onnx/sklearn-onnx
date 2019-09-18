@@ -170,13 +170,11 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
         'array_feature_extractor_result')
 
     classes_name = scope.get_unique_variable_name('classes')
-    classes_ind_name = scope.get_unique_variable_name('classes_ind')
     container.add_initializer(classes_name, class_type, classes.shape, classes)
-    container.add_initializer(classes_ind_name, onnx_proto.TensorProto.INT64,
-                              (1, len(classes)), list(range(len(classes))))
 
     proba_names_list = []
     zero_name = None
+    classes_ind_name = None
 
     for i_est, estimator in enumerate(op.estimators_):
         label_name = scope.declare_local_variable('elab_name_%d' % i_est)
@@ -193,6 +191,13 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
             cur_proba_name = _samme_r_proba(
                 scope, container, proba_name.onnx_name, op.n_classes_)
         else:  # SAMME
+
+            if classes_ind_name is None:
+                classes_ind_name = scope.get_unique_variable_name(
+                    'classes_ind3')
+                container.add_initializer(
+                    classes_ind_name, onnx_proto.TensorProto.INT64,
+                    (1, len(classes)), list(range(len(classes))))
 
             if zero_name is None:
                 shape_name = scope.get_unique_variable_name('shape')
@@ -422,12 +427,12 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
 
 def _apply_gather_elements(scope, container, inputs, output, axis,
                            dim, zero_type):
-    if container.target_opset >= 11:
+    if container.target_opset >= 110:
         container.add_node(
             'GatherElements', inputs, output, op_version=11, axis=axis,
             name=scope.get_unique_operator_name('GatherElements'))
     else:
-        classes_ind_name = scope.get_unique_variable_name('classes_ind')
+        classes_ind_name = scope.get_unique_variable_name('classes_ind2')
         container.add_initializer(
             classes_ind_name, onnx_proto.TensorProto.INT64,
             (1, dim), list(range(dim)))

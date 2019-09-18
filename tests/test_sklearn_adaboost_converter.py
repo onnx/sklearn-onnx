@@ -31,6 +31,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             "AdaBoost classification",
             [("input", FloatTensorType((None, X_test.shape[1])))],
+            target_opset=10
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -60,6 +61,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             "AdaBoost classification",
             [("input", FloatTensorType((None, X_test.shape[1])))],
+            target_opset=10
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -87,6 +89,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             "AdaBoost classification",
             [("input", FloatTensorType((None, X_test.shape[1])))],
+            target_opset=10,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -115,6 +118,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             "AdaBoost classification",
             [("input", Int64TensorType((None, X_test.shape[1])))],
+            target_opset=10
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -134,13 +138,14 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             AdaBoostRegressor(n_estimators=5))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressor-OneOffArray-Dec4",
+            basename="SklearnAdaBoostRegressor-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.5.0') or "
@@ -156,13 +161,14 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                               base_estimator=LinearRegression()))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorLReg-OneOffArray-Dec4",
+            basename="SklearnAdaBoostRegressorLReg-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.5.0') or "
@@ -177,13 +183,14 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             AdaBoostRegressor(n_estimators=5), is_int=True)
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorInt-OneOffArray",
+            basename="SklearnAdaBoostRegressorInt",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.5.0') or "
@@ -193,23 +200,48 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_ada_boost_regressor_lr(self):
+    def test_ada_boost_regressor_lr10(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorLR-OneOffArray-Dec4",
+            basename="SklearnAdaBoostRegressorLR-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) "
+            "< StrictVersion('0.5.0') or "
+            "StrictVersion(onnx.__version__) "
+            "== StrictVersion('1.4.1')",
+            verbose=False
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ada_boost_regressor_lr11(self):
+        model, X = fit_regression_model(
+            AdaBoostRegressor(learning_rate=0.5, random_state=42))
+        model_onnx = convert_sklearn(
+            model, "AdaBoost regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=11)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostRegressorLR-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "<= StrictVersion('0.5.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
+            verbose=False
         )
 
 
