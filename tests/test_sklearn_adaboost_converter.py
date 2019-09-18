@@ -7,6 +7,7 @@
 import unittest
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -109,6 +110,26 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnAdaBoostRegressor-OneOffArray-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) "
+            "< StrictVersion('0.6.0') or "
+            "StrictVersion(onnx.__version__) "
+            "== StrictVersion('1.4.1')",
+        )
+
+    def test_ada_boost_regressor_lreg(self):
+        model, X = fit_regression_model(
+            AdaBoostRegressor(n_estimators=5,
+                              base_estimator=LinearRegression()))
+        model_onnx = convert_sklearn(
+            model, "AdaBoost regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostRegressorLReg-OneOffArray-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "< StrictVersion('0.6.0') or "
