@@ -88,7 +88,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="Hard-OneOffArray",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -109,7 +109,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="WeightsHard-OneOffArray",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -167,7 +167,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="Hard-OneOffArray",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -188,7 +188,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="WeightedHard-OneOffArray",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+                          " <= StrictVersion('0.5.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
