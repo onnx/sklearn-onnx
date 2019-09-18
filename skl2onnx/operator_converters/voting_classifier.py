@@ -4,8 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
-import numpy as np
-from ..common._apply_operation import apply_concat
+from onnx.helper import make_tensor
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
@@ -17,8 +16,6 @@ from ..proto import onnx_proto
 def convert_voting_classifier(scope, operator, container):
     """
     Converts a *VotingClassifier* into *ONNX* format.
-    The operator cannot compute mulitple prediction at a time due
-    to reduce operators.
 
     *predict_proba* is not defined by *scikit-learn* when ``voting='hard'``.
     The converted model still defines a probability vector equal to the
@@ -31,7 +28,13 @@ def convert_voting_classifier(scope, operator, container):
     """
     op = operator.raw_operator
     n_classes = len(op.classes_)
+
+    classes_ind_name = scope.get_unique_variable_name('classes_ind')
+    container.add_initializer(classes_ind_name, onnx_proto.TensorProto.INT64,
+                              (1, n_classes), list(range(n_classes)))
+
     probs_names = []
+    one_name = None
     for i, estimator in enumerate(op.estimators_):
         if estimator is None:
             continue
@@ -48,56 +51,71 @@ def convert_voting_classifier(scope, operator, container):
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(prob_name)
 
-        probs_names.append(prob_name.onnx_name)
+        if op.voting == 'hard':
+            if one_name is None:
+                shape_name = scope.get_unique_variable_name('shape')
+                container.add_node(
+                    'Shape', prob_name.onnx_name, shape_name,
+                    name=scope.get_unique_operator_name('Shape'))
+                zero_name = scope.get_unique_variable_name('zero')
+                container.add_node(
+                    'ConstantOfShape', shape_name, zero_name,
+                    name=scope.get_unique_operator_name('CoSA'),
+                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                                      (1, ), [0.]), op_version=9)
+                one_name = scope.get_unique_variable_name('one')
+                container.add_node(
+                    'ConstantOfShape', shape_name, one_name,
+                    name=scope.get_unique_operator_name('CoSB'),
+                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                                      (1, ), [1.]), op_version=9)
 
-    # concatenates outputs
-    conc_name = scope.get_unique_variable_name('concatenated')
-    apply_concat(scope, probs_names, [conc_name], container, axis=0)
+            argmax_output_name = scope.get_unique_variable_name(
+                'argmax_output')
+            container.add_node('ArgMax', prob_name.onnx_name,
+                               argmax_output_name,
+                               name=scope.get_unique_operator_name('ArgMax'),
+                               axis=1)
 
-    if op.weights is not None:
-        weights_name = scope.get_unique_variable_name('weights')
-        atype = onnx_proto.TensorProto.FLOAT
-        weights = (op.weights if isinstance(op.weights, list)
-                   else op.weights.flatten().tolist())
-        nbc = n_classes if n_classes > 1 else 2
-        values = np.zeros((len(weights), nbc))
-        alpha = len(probs_names) * 1.0 / sum(weights)
-        for i in range(values.shape[1]):
-            values[:, i] = weights
-            values[:, i] *= alpha
-        shape = values.shape
-        container.add_initializer(weights_name, atype, shape, values.flatten())
-        weighted_concatenated = scope.get_unique_variable_name(
-                                            'weighted_concatenated')
-        apply_mul(scope, [conc_name, weights_name],
-                  weighted_concatenated, container)
-        conc_name = weighted_concatenated
+            equal_name = scope.get_unique_variable_name('equal')
+            container.add_node('Equal', [argmax_output_name, classes_ind_name],
+                               equal_name,
+                               name=scope.get_unique_operator_name('Equal'))
 
-    # aggregation
-    if op.voting == 'hard':
-        op_name = 'ReduceMax'
-    elif op.voting == 'soft':
-        op_name = 'ReduceMean'
-    else:
-        raise RuntimeError("Unuspported voting kind '{}'. "
-                           "You may raise an issue at "
-                           "https://github.com/onnx/sklearn-onnx/issues"
-                           ".".format(op.voting))
+            max_proba_name = scope.get_unique_variable_name('probsmax')
+            container.add_node('Where', [equal_name, one_name, zero_name],
+                               max_proba_name,
+                               name=scope.get_unique_operator_name('Where'))
+            prob_name = max_proba_name
+        else:
+            prob_name = prob_name.onnx_name
+
+        if op.weights is not None:
+            val = op.weights[i] / op.weights.sum()
+        else:
+            val = 1. / len(op.estimators_)
+
+        weights_name = scope.get_unique_variable_name('w%d' % i)
+        container.add_initializer(
+            weights_name, onnx_proto.TensorProto.FLOAT, [1], [val])
+        wprob_name = scope.get_unique_variable_name('wprob_name')
+        apply_mul(scope, [prob_name, weights_name],
+                  wprob_name, container, broadcast=1)
+        probs_names.append(wprob_name)
 
     if op.flatten_transform in (False, None):
-        red_name = operator.outputs[1].full_name
-        container.add_node(
-            op_name, conc_name, red_name,
-            name=scope.get_unique_operator_name(op_name), axes=[0])
+        container.add_node('Sum', probs_names,
+                           operator.outputs[1].full_name,
+                           name=scope.get_unique_operator_name('Sum'))
     else:
-        raise NotImplementedError(
+        raise RuntimeError(
             "flatten_transform==True is not implemented yet. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
     # labels
     label_name = scope.get_unique_variable_name('label_name')
-    container.add_node('ArgMax', red_name, label_name,
+    container.add_node('ArgMax', operator.outputs[1].full_name, label_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
     _finalize_converter_classes(scope, label_name,
                                 operator.outputs[0].full_name, container,
