@@ -10,8 +10,6 @@ from ..common._apply_operation import (
     apply_reshape, apply_sub, apply_topk, apply_transpose, apply_identity)
 from ..common.data_types import Int64TensorType, FloatTensorType
 from ..common._registration import register_converter
-from ..common.tree_ensemble import add_tree_to_attribute_pairs
-from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..proto import onnx_proto
 from .._supported_operators import sklearn_operator_name_map
 
@@ -146,37 +144,30 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     proba_names_list = []
-    for tree_id in range(len(op.estimators_)):
-        attrs = get_default_tree_classifier_attribute_pairs()
 
-        label_name = scope.get_unique_variable_name('label')
-        proba_name = scope.get_unique_variable_name('proba')
+    for i_est, estimator in enumerate(op.estimators_):
+        label_name = scope.declare_local_variable('elab_name_%d' % i_est)
+        proba_name = scope.declare_local_variable('eprob_name_%d' % i_est)
 
-        attrs['name'] = scope.get_unique_operator_name(op_type)
+        op_type = sklearn_operator_name_map[type(estimator)]
 
-        if class_type == onnx_proto.TensorProto.INT32:
-            attrs['classlabels_int64s'] = classes
-        else:
-            attrs['classlabels_strings'] = classes
+        this_operator = scope.declare_local_operator(op_type)
+        this_operator.raw_operator = estimator
+        this_operator.inputs = operator.inputs
+        this_operator.outputs.extend([label_name, proba_name])
 
-        add_tree_to_attribute_pairs(attrs, True, op.estimators_[tree_id].tree_,
-                                    0, 1, 0, True, True, dtype=container.dtype)
-        container.add_node(
-            op_type, operator.input_full_names,
-            [label_name, proba_name],
-            op_domain='ai.onnx.ml', **attrs)
         if op.algorithm == 'SAMME.R':
-            cur_proba_name = _samme_proba(scope, container, proba_name,
-                                          op.n_classes_)
+            cur_proba_name = _samme_proba(
+                scope, container, proba_name.onnx_name, op.n_classes_)
         else:  # SAMME
             weight_name = scope.get_unique_variable_name('weight')
             samme_proba_name = scope.get_unique_variable_name('samme_proba')
 
             container.add_initializer(
                 weight_name, onnx_proto.TensorProto.FLOAT,
-                [], [op.estimator_weights_[tree_id]])
+                [], [op.estimator_weights_[i_est]])
 
-            apply_mul(scope, [proba_name, weight_name],
+            apply_mul(scope, [proba_name.onnx_name, weight_name],
                       samme_proba_name, container, broadcast=1)
             cur_proba_name = samme_proba_name
         proba_names_list.append(cur_proba_name)

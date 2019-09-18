@@ -7,7 +7,7 @@
 import unittest
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -30,7 +30,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "AdaBoost classification",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -45,6 +45,34 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_ada_boost_classifier_samme_r_logreg(self):
+        data = load_digits()
+        X, y = data.data, data.target
+        X_train, X_test, y_train, y_test = train_test_split(X,
+                                                            y,
+                                                            test_size=0.2,
+                                                            random_state=42)
+        model = AdaBoostClassifier(n_estimators=5, algorithm="SAMME.R",
+                                   base_estimator=LogisticRegression())
+        model.fit(X_train, y_train)
+        model_onnx = convert_sklearn(
+            model,
+            "AdaBoost classification",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test.astype("float32"),
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostClassifierSAMMERLogReg",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ada_boost_classifier_samme(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -52,12 +80,12 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = AdaBoostClassifier(n_estimators=15, algorithm="SAMME")
+        model = AdaBoostClassifier(n_estimators=5, algorithm="SAMME")
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
             "AdaBoost classification",
-            [("input", FloatTensorType(X_test.shape))],
+            [("input", FloatTensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -85,7 +113,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "AdaBoost classification",
-            [("input", Int64TensorType(X_test.shape))],
+            [("input", Int64TensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
