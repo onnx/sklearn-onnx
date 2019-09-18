@@ -427,7 +427,7 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
 
 def _apply_gather_elements(scope, container, inputs, output, axis,
                            dim, zero_type):
-    if container.target_opset >= 110:
+    if container.target_opset >= 11:
         container.add_node(
             'GatherElements', inputs, output, op_version=11, axis=axis,
             name=scope.get_unique_operator_name('GatherElements'))
