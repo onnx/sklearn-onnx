@@ -136,10 +136,19 @@ jobs:
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
+  - script: |
+      pip install onnxmltools --no-deps
+    displayName: 'intall onnxmltools'
+
+  - script: |
+      pytest tests_tests_onnxmltools
+    displayName: 'pytest-onnxmltools'
+
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
       flake8 skl2onnx tests
+      flake8 skl2onnx tests_onnxmltools
     displayName: 'flake8'
 
   - script: |

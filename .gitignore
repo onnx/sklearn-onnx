@@ -49,3 +49,6 @@ tests/Operators*.md
 docs/examples/*.pkl
 tests/debug_gp.onnx
 tests/test*.onnx
+tests_onnxmltools/*.pkl
+tests_onnxmltools/tests/*
+tests_onnxmltools/tests_dump/*

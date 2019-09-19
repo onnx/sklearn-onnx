@@ -61,6 +61,7 @@ jobs:
 
   - script: |
       flake8 skl2onnx tests
+      flake8 skl2onnx tests_onnxmltools
     displayName: 'flake8'
 
   - script: |
@@ -83,6 +84,14 @@ jobs:
   - script: |
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
+
+  - script: |
+      pip install onnxmltools --no-deps
+    displayName: 'intall onnxmltools'
+
+  - script: |
+      pytest tests_tests_onnxmltools
+    displayName: 'pytest-onnxmltools'
 
   - task: PublishTestResults@2
     inputs:
