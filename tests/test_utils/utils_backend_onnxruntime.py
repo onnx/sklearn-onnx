@@ -131,7 +131,8 @@ def compare_runtime(test,
                     "'{0}'\n{1}\nONNX\n{2}".format(
                         onx, e, smodel))
             raise OnnxRuntimeAssertionError(
-                "Unable to load onnx '{0}'\nONNX\n{1}".format(onx, smodel))
+                "Unable to load onnx '{0}'\nONNX\n{1}\n{2}".format(
+                    onx, smodel, e))
 
     input = load["data"]
     DF = options.pop('DF', False)
