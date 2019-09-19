@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -13,6 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
+import onnxruntime
 from test_utils import dump_data_and_model, fit_regression_model
 
 
@@ -85,17 +87,17 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         X, y = data.data, data.target
         X_train, X_test, y_train, y_test = train_test_split(X,
                                                             y,
-                                                            test_size=0.2,
+                                                            test_size=0.8,
                                                             random_state=42)
         model = AdaBoostClassifier(
-            n_estimators=5, algorithm="SAMME", random_state=42,
+            n_estimators=2, algorithm="SAMME", random_state=42,
             base_estimator=DecisionTreeClassifier(
-                max_depth=2, random_state=42))
+                max_depth=5, random_state=42))
 
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
-            "AdaBoost classification",
+            "AdaBoostClSamme",
             [("input", FloatTensorType((None, X_test.shape[1])))],
             target_opset=10,
         )
@@ -104,7 +106,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test.astype("float32"),
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierSAMME",
+            basename="SklearnAdaBoostClassifierSAMMEDT",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "< StrictVersion('0.5.0')",
@@ -231,6 +233,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf((StrictVersion(onnxruntime.__version__) <
+                      StrictVersion("0.5.5")),
+                     reason="not available")
     def test_ada_boost_regressor_lr11(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
@@ -246,7 +251,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorLR-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.7') or "
+            "< StrictVersion('0.5.5') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
             verbose=False
