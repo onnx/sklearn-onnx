@@ -9,6 +9,7 @@ from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -25,7 +26,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = AdaBoostClassifier(n_estimators=10, algorithm="SAMME.R")
+        model = AdaBoostClassifier(
+            n_estimators=10, algorithm="SAMME.R", random_state=42,
+            base_estimator=DecisionTreeClassifier(
+                max_depth=2, random_state=42))
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
@@ -83,7 +87,11 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                                             y,
                                                             test_size=0.2,
                                                             random_state=42)
-        model = AdaBoostClassifier(n_estimators=5, algorithm="SAMME")
+        model = AdaBoostClassifier(
+            n_estimators=5, algorithm="SAMME", random_state=42,
+            base_estimator=DecisionTreeClassifier(
+                max_depth=2, random_state=42))
+
         model.fit(X_train, y_train)
         model_onnx = convert_sklearn(
             model,
@@ -238,7 +246,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorLR-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "<= StrictVersion('0.5.0') or "
+            "<= StrictVersion('0.5.7') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
             verbose=False
