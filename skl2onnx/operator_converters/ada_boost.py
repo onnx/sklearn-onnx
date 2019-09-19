@@ -8,8 +8,8 @@ import numpy as np
 from onnx.helper import make_tensor
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
-    apply_reshape, apply_sub, apply_topk, apply_transpose, apply_identity)
-from ..common.data_types import Int64TensorType, FloatTensorType
+    apply_reshape, apply_sub, apply_topk, apply_transpose)
+from ..common.data_types import FloatTensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 from .._supported_operators import sklearn_operator_name_map
@@ -257,21 +257,10 @@ def _get_estimators_label(scope, operator, container, model):
     a tensor produced by concatenating the labels.
     """
     op_type = 'TreeEnsembleRegressor'
-
     concatenated_labels_name = scope.get_unique_variable_name(
         'concatenated_labels')
 
     input_name = operator.inputs
-    if type(operator.inputs[0].type) == Int64TensorType:
-        cast_input_name = scope.get_unique_variable_name('cast_input')
-        apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
-        estimator_i = scope.declare_local_variable(
-            'est_input', FloatTensorType())
-        apply_identity(scope, cast_input_name,
-                       estimator_i.onnx_name, container)
-        input_name = [estimator_i]
-
     estimators_results_list = []
     for i, estimator in enumerate(model.estimators_):
         estimator_label_name = scope.declare_local_variable(
@@ -335,6 +324,44 @@ def cum_sum(scope, container, rnn_input_name, sequence_length):
             name=scope.get_unique_operator_name('CumSum'),
             op_version=11)
         return weights_cdf_name
+
+
+def _apply_gather_elements(scope, container, inputs, output, axis,
+                           dim, zero_type, suffix):
+    if container.target_opset >= 11:
+        container.add_node(
+            'GatherElements', inputs, output, op_version=11, axis=axis,
+            name=scope.get_unique_operator_name('GatEls' + suffix))
+    else:
+        classes_ind_name = scope.get_unique_variable_name('classes_ind2')
+        container.add_initializer(
+            classes_ind_name, onnx_proto.TensorProto.INT64,
+            (1, dim), list(range(dim)))
+
+        shape_name = scope.get_unique_variable_name('shape')
+        container.add_node(
+            'Shape', inputs[0], shape_name,
+            name=scope.get_unique_operator_name('Shape'))
+        zero_name = scope.get_unique_variable_name('zero')
+        zero_val = (0 if zero_type == onnx_proto.TensorProto.INT64
+                    else 0.)
+        container.add_node(
+            'ConstantOfShape', shape_name, zero_name,
+            name=scope.get_unique_operator_name('CoSA'),
+            value=make_tensor("value", zero_type,
+                              (1, ), [zero_val]), op_version=9)
+
+        equal_name = scope.get_unique_variable_name('equal')
+        container.add_node('Equal', [inputs[1], classes_ind_name],
+                           equal_name,
+                           name=scope.get_unique_operator_name('Equal'))
+
+        selected = scope.get_unique_variable_name('selected')
+        container.add_node('Where', [equal_name, inputs[0], zero_name],
+                           selected,
+                           name=scope.get_unique_operator_name('Where'))
+        container.add_node('ReduceSum', selected, output, axes=[1],
+                           name=scope.get_unique_operator_name('Where'))
 
 
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
@@ -417,50 +444,12 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     _apply_gather_elements(
         scope, container, [sorted_indices_name, median_idx_name],
         median_estimators_name, axis=1, dim=len(op.estimators_),
-        zero_type=onnx_proto.TensorProto.INT64)
+        zero_type=onnx_proto.TensorProto.INT64, suffix="A")
     output_name = operator.output_full_names[0]
     _apply_gather_elements(
         scope, container, [concatenated_labels, median_estimators_name],
         output_name, axis=1, dim=len(op.estimators_),
-        zero_type=onnx_proto.TensorProto.FLOAT)
-
-
-def _apply_gather_elements(scope, container, inputs, output, axis,
-                           dim, zero_type):
-    if container.target_opset >= 11:
-        container.add_node(
-            'GatherElements', inputs, output, op_version=11, axis=axis,
-            name=scope.get_unique_operator_name('GatherElements'))
-    else:
-        classes_ind_name = scope.get_unique_variable_name('classes_ind2')
-        container.add_initializer(
-            classes_ind_name, onnx_proto.TensorProto.INT64,
-            (1, dim), list(range(dim)))
-
-        shape_name = scope.get_unique_variable_name('shape')
-        container.add_node(
-            'Shape', inputs[0], shape_name,
-            name=scope.get_unique_operator_name('Shape'))
-        zero_name = scope.get_unique_variable_name('zero')
-        zero_val = (0 if zero_type == onnx_proto.TensorProto.INT64
-                    else 0.)
-        container.add_node(
-            'ConstantOfShape', shape_name, zero_name,
-            name=scope.get_unique_operator_name('CoSA'),
-            value=make_tensor("value", zero_type,
-                              (1, ), [zero_val]), op_version=9)
-
-        equal_name = scope.get_unique_variable_name('equal')
-        container.add_node('Equal', [inputs[1], classes_ind_name],
-                           equal_name,
-                           name=scope.get_unique_operator_name('Equal'))
-
-        selected = scope.get_unique_variable_name('selected')
-        container.add_node('Where', [equal_name, inputs[0], zero_name],
-                           selected,
-                           name=scope.get_unique_operator_name('Where'))
-        container.add_node('ReduceSum', selected, output, axes=[1],
-                           name=scope.get_unique_operator_name('Where'))
+        zero_type=onnx_proto.TensorProto.FLOAT, suffix="B")
 
 
 register_converter('SklearnAdaBoostClassifier',

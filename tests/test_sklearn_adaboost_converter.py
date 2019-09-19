@@ -238,7 +238,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             basename="SklearnAdaBoostRegressorLR-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
-            "< StrictVersion('0.6.0') or "
+            "<= StrictVersion('0.5.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
             verbose=False
