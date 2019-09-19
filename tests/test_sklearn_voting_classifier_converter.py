@@ -89,7 +89,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
             model,
-            suffix="Hard-OneOffArray",
+            suffix="Hard",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
@@ -112,7 +112,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
             model,
-            suffix="WeightsHard-OneOffArray",
+            suffix="WeightsHard",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
@@ -131,7 +131,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_binary_classification(
             model,
-            suffix="Soft-OneOffArray",
+            suffix="Soft",
             comparable_outputs=[0, 1],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
@@ -151,7 +151,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_binary_classification(
             model,
-            suffix="WeightedSoft-OneOffArray",
+            suffix="WeightedSoft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
@@ -172,7 +172,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="Hard-OneOffArray",
+            suffix="Hard",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
@@ -195,7 +195,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="WeightedHard-OneOffArray",
+            suffix="WeightedHard",
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
@@ -214,7 +214,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="Soft-OneOffArray",
+            suffix="Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
@@ -233,7 +233,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="WeightedSoft-OneOffArray",
+            suffix="WeightedSoft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
@@ -254,7 +254,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="Weighted4Soft-OneOffArray",
+            suffix="Weighted4Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
@@ -275,7 +275,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         dump_multiple_classification(
             model,
-            suffix="Weighted42Soft-OneOffArray",
+            suffix="Weighted42Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )

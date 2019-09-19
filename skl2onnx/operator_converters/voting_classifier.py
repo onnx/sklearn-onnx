@@ -108,7 +108,7 @@ def convert_voting_classifier(scope, operator, container):
                            operator.outputs[1].full_name,
                            name=scope.get_unique_operator_name('Sum'))
     else:
-        raise RuntimeError(
+        raise NotImplementedError(
             "flatten_transform==True is not implemented yet. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
