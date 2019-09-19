@@ -61,7 +61,7 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
                    container, to=onnx_proto.TensorProto.FLOAT)
-        input_name = cast_input_name
+        input_name = [cast_input_name]
 
     container.add_node(op_type, input_name,
                        operator.output_full_names, op_domain='ai.onnx.ml',
