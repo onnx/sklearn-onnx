@@ -137,11 +137,12 @@ jobs:
     displayName: 'pytest'
 
   - script: |
+      pip install lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'intall onnxmltools'
 
   - script: |
-      pytest tests_tests_onnxmltools
+      pytest tests_onnxmltools
     displayName: 'pytest-onnxmltools'
 
   # Check flake8 after the tests to get more feedback.

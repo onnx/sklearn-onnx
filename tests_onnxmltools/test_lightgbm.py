@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import unittest
-import lightgbm
 from lightgbm import LGBMClassifier, LGBMRegressor
 from skl2onnx import update_registered_converter
 from skl2onnx.common.shape_calculator import (
@@ -33,11 +32,11 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         update_registered_converter(
-            lightgbm.LGBMClassifier, 'LgbmClassifier',
+            LGBMClassifier, 'LgbmClassifier',
             calculate_linear_classifier_output_shapes,
             convert_lightgbm)
         update_registered_converter(
-            lightgbm.LGBMRegressor, 'LgbmRegressor',
+            LGBMRegressor, 'LgbmRegressor',
             calculate_linear_regressor_output_shapes,
             convert_lightgbm)
 

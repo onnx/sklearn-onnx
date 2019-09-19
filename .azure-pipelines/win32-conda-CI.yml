@@ -90,7 +90,7 @@ jobs:
     displayName: 'intall onnxmltools'
 
   - script: |
-      pytest tests_tests_onnxmltools
+      pytest tests_onnxmltools
     displayName: 'pytest-onnxmltools'
 
   - task: PublishTestResults@2
