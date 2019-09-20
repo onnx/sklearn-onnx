@@ -53,6 +53,7 @@ from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from lightgbm import LGBMClassifier
+
 data = load_iris()
 X = data.data[:, :2]
 y = data.target
