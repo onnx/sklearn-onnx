@@ -13,7 +13,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
-from sklearn.preprocessing import FunctionTransformer
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -198,9 +197,8 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
     """
     # Output variable name of each transform. It's a list of string.
     transformed_result_names = []
-    input_indices = []
     # Encode each transform as our IR object
-    for name, _, column_indices in model.transformers:
+    for name, _, column_indices in model.transformers_:
         if isinstance(column_indices, slice):
             column_indices = list(range(
                 column_indices.start
@@ -210,8 +208,6 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         elif isinstance(column_indices, (int, str)):
             column_indices = [column_indices]
         names = get_column_indices(column_indices, inputs, multiple=True)
-        for _, inp_ind in names.items():
-            input_indices.extend(inp_ind)
         transform_inputs = []
         for onnx_var, onnx_is in names.items():
             tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
@@ -231,41 +227,30 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         model_obj = model.named_transformers_[name]
         if isinstance(model_obj, str):
             if model_obj == "passthrough":
-                model_obj = FunctionTransformer()
+                var_out = transform_inputs[0]
+            elif model_obj == "drop":
+                var_out = None
             else:
                 raise RuntimeError("Unknown operator alias "
                                    "'{0}'. These are specified in "
                                    "_supported_operators.py."
                                    "".format(model_obj))
-        var_out = parse_sklearn(
-            scope, model_obj,
-            transform_inputs, custom_parsers=custom_parsers)[0]
-        if (model.transformer_weights is not None and name in
-                model.transformer_weights):
-            # Create a Multiply ONNX node
-            multiply_operator = scope.declare_local_operator('SklearnMultiply')
-            multiply_operator.inputs.append(var_out)
-            multiply_operator.operand = model.transformer_weights[name]
-            var_out = scope.declare_local_variable(
-                'multiply_output', scope.tensor_type())
-            multiply_operator.outputs.append(var_out)
-        transformed_result_names.append(var_out)
-
-    if model.remainder == "passthrough":
-        input_indices = set(input_indices)
-        left_over = [i for i in range(len(inputs)) if i not in input_indices]
-        if len(left_over) > 0:
-            for i in sorted(left_over):
-                onnx_var, onnx_is = get_column_indices([i], inputs,
-                                                       multiple=False)
-                tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]],
-                                               onnx_is)
-                transform_inputs = tr_inputs
-                model_obj = FunctionTransformer()
-                var_out = parse_sklearn(
-                    scope, model_obj,
-                    transform_inputs, custom_parsers=custom_parsers)[0]
-                transformed_result_names.append(var_out)
+        else:
+            var_out = parse_sklearn(
+                scope, model_obj,
+                transform_inputs, custom_parsers=custom_parsers)[0]
+            if (model.transformer_weights is not None and name in
+                    model.transformer_weights):
+                # Create a Multiply ONNX node
+                multiply_operator = scope.declare_local_operator(
+                    'SklearnMultiply')
+                multiply_operator.inputs.append(var_out)
+                multiply_operator.operand = model.transformer_weights[name]
+                var_out = scope.declare_local_variable(
+                    'multiply_output', scope.tensor_type())
+                multiply_operator.outputs.append(var_out)
+        if var_out:
+            transformed_result_names.append(var_out)
 
     # Create a Concat ONNX node
     if len(transformed_result_names) > 1:
