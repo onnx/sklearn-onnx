@@ -12,6 +12,7 @@ from ..common._apply_operation import (
     apply_mul, apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
+from .._supported_operators import decision_function_classifiers
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -385,6 +386,14 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
                               [], [clf_length])
 
     for clf in op.calibrated_classifiers_:
+        if (hasattr(clf.base_estimator, 'decision_function') and
+                not isinstance(clf.base_estimator,
+                               decision_function_classifiers)):
+            raise NotImplementedError(
+                "'{0}' is not supported with CalibratedClassifierCV yet. "
+                "You may raise an issue at "
+                "https://github.com/onnx/sklearn-onnx/issues"
+                "".format(type(clf.base_estimator)))
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
             scope, operator, container, clf))
 

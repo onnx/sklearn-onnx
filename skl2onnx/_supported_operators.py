@@ -130,6 +130,11 @@ sklearn_classifier_list = [
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
 
+# Classifiers with converters supporting decision_function().
+decision_function_classifiers = (
+    SGDClassifier,
+)
+
 
 # Associate scikit-learn types with our operator names. If two
 # scikit-learn models share a single name, it means their are

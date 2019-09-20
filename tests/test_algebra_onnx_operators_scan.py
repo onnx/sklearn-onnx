@@ -14,6 +14,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxReduceSumSquare,
     OnnxSqueeze, OnnxShape
 )
+from skl2onnx.algebra.custom_ops import OnnxCDist
 try:
     from skl2onnx.algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
@@ -28,14 +29,15 @@ from skl2onnx.algebra.complex_functions import (
 )
 
 
-threshold = "0.4.0"
+THRESHOLD = "0.4.0"
+THRESHOLD2 = "0.5.0"
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
@@ -98,7 +100,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
@@ -128,7 +130,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -171,7 +173,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -202,7 +204,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0])
 
     @unittest.skipIf((OnnxConstantOfShape is None or
-                      StrictVersion(ort_version) <= StrictVersion(threshold)),
+                      StrictVersion(ort_version) <= StrictVersion(THRESHOLD)),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -228,7 +230,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(threshold),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -257,6 +259,96 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                       [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
         cop = OnnxAdd('input', 'input')
         cop2 = OnnxIdentity(onnx_cdist(cop, x, dtype=np.float32),
+                            output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType([None, None]))],
+            outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
+        assert_almost_equal(exp, res[0], decimal=4)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+                     reason="fails with onnxruntime 0.4.0")
+    def test_onnx_example_cdist_in_mink(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+        x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
+            np.float32).reshape((4, 2))
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(
+            onnx_cdist(cop, x2, dtype=np.float32,
+                       metric="minkowski", p=2),
+            output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType([None, None]))],
+            outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x2, metric="minkowski")
+        assert_almost_equal(exp, res[0], decimal=5)
+
+        x = np.array([[6.1, 2.8, 4.7, 1.2],
+                      [5.7, 3.8, 1.7, 0.3],
+                      [7.7, 2.6, 6.9, 2.3],
+                      [6.0, 2.9, 4.5, 1.5],
+                      [6.8, 2.8, 4.8, 1.4],
+                      [5.4, 3.4, 1.5, 0.4],
+                      [5.6, 2.9, 3.6, 1.3],
+                      [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(onnx_cdist(cop, x, dtype=np.float32),
+                            output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType([None, None]))],
+            outputs=[('cdist', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
+        assert_almost_equal(exp, res[0], decimal=4)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.5.0"),
+                     reason="only available for opset >= 10")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+                     reason="fails with onnxruntime 0.4.0")
+    def test_onnx_example_cdist_in_custom_ops(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+        x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
+            np.float32).reshape((4, 2))
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(OnnxCDist(cop, x2),
+                            output_names=['cdist'])
+
+        model_def = cop2.to_onnx(
+            inputs=[('input', FloatTensorType([None, None]))],
+            outputs=[('cdist', FloatTensorType())])
+
+        try:
+            sess = InferenceSession(model_def.SerializeToString())
+        except RuntimeError as e:
+            if "CDist is not a registered" in str(e):
+                return
+        res = sess.run(None, {'input': x})
+        exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
+        assert_almost_equal(exp, res[0], decimal=5)
+
+        x = np.array([[6.1, 2.8, 4.7, 1.2],
+                      [5.7, 3.8, 1.7, 0.3],
+                      [7.7, 2.6, 6.9, 2.3],
+                      [6.0, 2.9, 4.5, 1.5],
+                      [6.8, 2.8, 4.8, 1.4],
+                      [5.4, 3.4, 1.5, 0.4],
+                      [5.6, 2.9, 3.6, 1.3],
+                      [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
+        cop = OnnxAdd('input', 'input')
+        cop2 = OnnxIdentity(OnnxCDist(cop, x, dtype=np.float32),
                             output_names=['cdist'])
 
         model_def = cop2.to_onnx(
