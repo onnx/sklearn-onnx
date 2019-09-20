@@ -301,7 +301,10 @@ def compare_runtime(test,
                 type(input), len(inputs), list(sorted(inputs))))
         if verbose:
             run_options = onnxruntime.RunOptions()
-            run_options.run_log_verbosity_level = 5
+            if hasattr(run_options, 'run_log_verbosity_level'):
+                run_options.run_log_verbosity_level = 5
+            else:
+                run_options.log_verbosity_level = 5
         else:
             run_options = None
         try:
