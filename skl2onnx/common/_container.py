@@ -340,6 +340,9 @@ class ModelComponentContainer(ModelContainer):
         if name is None or not isinstance(
                 name, str) or name == '':
             name = "N%d" % len(self.nodes)
+        existing_names = set(n.name for n in self.nodes)
+        if name in existing_names:
+            name += "-N%d" % len(self.nodes)
 
         if op_domain is None:
             op_domain = get_domain()
