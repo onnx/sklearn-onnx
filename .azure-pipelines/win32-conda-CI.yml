@@ -93,7 +93,7 @@ jobs:
   - script: |
       pytest tests_onnxmltools
     displayName: 'pytest-onnxmltools'
-    condition: ne(variables['onnxrt.version'], '0.2.1')
+    condition: ne(variables['onnxrt.version'], '==0.2.1')
 
   - task: PublishTestResults@2
     inputs:

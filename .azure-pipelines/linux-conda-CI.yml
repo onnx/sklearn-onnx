@@ -144,7 +144,7 @@ jobs:
   - script: |
       pytest tests_onnxmltools
     displayName: 'pytest-onnxmltools'
-    condition: ne(variables['onnxrt.version'], '0.2.1')
+    condition: ne(variables['onnxrt.version'], '==0.2.1')
 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
