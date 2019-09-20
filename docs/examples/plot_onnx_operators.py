@@ -73,6 +73,7 @@ graph_def = helper.make_graph(
 
 # Create the model (ModelProto)
 model_def = helper.make_model(graph_def, producer_name='onnx-example')
+model_def.opset_import[0].version = 10
 
 print('The model is:\n{}'.format(model_def))
 onnx.checker.check_model(model_def)
@@ -90,9 +91,10 @@ from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
 pad = OnnxPad('X', output_names=['Y'],
               mode='constant', value=1.5,
-              pads=[0, 1, 0, 1])
+              pads=[0, 1, 0, 1],
+              op_version=2)
 
-model_def = pad.to_onnx({'X': X})
+model_def = pad.to_onnx({'X': X}, target_opset=10)
 
 print('The model is:\n{}'.format(model_def))
 onnx.checker.check_model(model_def)
@@ -102,9 +104,10 @@ print('The model is checked!')
 # Inputs and outputs can also be skipped.
 
 pad = OnnxPad(mode='constant', value=1.5,
-              pads=[0, 1, 0, 1])
+              pads=[0, 1, 0, 1], op_version=2)
 
-model_def = pad.to_onnx({pad.inputs[0].name: X})
+model_def = pad.to_onnx({pad.inputs[0]: X},
+                        target_opset=10)
 onnx.checker.check_model(model_def)
 
 ########################################
