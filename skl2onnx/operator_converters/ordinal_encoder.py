@@ -13,7 +13,7 @@ from ..proto import onnx_proto
 
 def convert_sklearn_ordinal_encoder(scope, operator, container):
     ordinal_op = operator.raw_operator
-    result, categories_len = [], 0
+    result = []
     concatenated_input_name = operator.inputs[0].full_name
     concat_result_name = scope.get_unique_variable_name('concat_result')
 
@@ -78,7 +78,7 @@ def convert_sklearn_ordinal_encoder(scope, operator, container):
     apply_concat(scope, result, concat_result_name,
                  container, axis=1)
     cast_type = (onnx_proto.TensorProto.FLOAT if np.issubdtype(
-                 ordinal_op.dtype, np.floating)
+        ordinal_op.dtype, np.floating)
                  else onnx_proto.TensorProto.INT64)
     apply_cast(scope, concat_result_name, operator.output_full_names,
                container, to=cast_type)
