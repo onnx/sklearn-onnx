@@ -23,6 +23,7 @@ from . import linear_regressor
 from . import mixture
 from . import nearest_neighbours
 from . import one_hot_encoder
+from . import ordinal_encoder
 from . import one_vs_rest_classifier
 from . import polynomial_features
 from . import scaler
@@ -51,6 +52,7 @@ __all__ = [
     mixture,
     nearest_neighbours,
     one_hot_encoder,
+    ordinal_encoder,
     one_vs_rest_classifier,
     polynomial_features,
     scaler,
