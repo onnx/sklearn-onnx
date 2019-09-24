@@ -168,15 +168,15 @@ with open("pipeline_tfidf.onnx", "wb") as f:
 
 sess = rt.InferenceSession("pipeline_tfidf.onnx")
 print('---', train_data[0])
-inputs = {'input': train_data[0]}
+inputs = {'input': train_data[:1]}
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1])
 
 ############################
 # With *scikit-learn*:
-print(pipeline.predict(train_data[0:1]))
-print(pipeline.predict_proba(train_data[0:1]))
+print(pipeline.predict(train_data[:1]))
+print(pipeline.predict_proba(train_data[:1]))
 
 ###############################
 # There are discrepencies for this model because

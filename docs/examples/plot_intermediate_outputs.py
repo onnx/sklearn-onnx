@@ -143,8 +143,8 @@ except Exception as e:
 
 X_train['pclass'] = X_train['pclass'].astype(str)
 X_test['pclass'] = X_test['pclass'].astype(str)
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
-           'name', 'body', 'home.dest', 'boat'}
+white_list = numeric_features + categorical_features
+to_drop = [c for c in X_train.columns if c not in white_list]
 inputs = convert_dataframe_schema(X_train, to_drop)
 
 model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
