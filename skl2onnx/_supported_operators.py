@@ -105,7 +105,7 @@ try:
     from sklearn.preprocessing import OrdinalEncoder
 except ImportError:
     # Not available in scikit-learn < 0.20.0
-    OrdinalEncoder=None
+    OrdinalEncoder = None
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
