@@ -1,7 +1,13 @@
 """Tests scikit-learn's OrdinalEncoder converter."""
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
-from sklearn.preprocessing import OrdinalEncoder
+import onnx
+from sklearn import __version__ as sklearn_version
+try:
+    from sklearn.preprocessing import OrdinalEncoder
+except ImportError:
+    pass
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     Int64TensorType,
@@ -10,7 +16,17 @@ from skl2onnx.common.data_types import (
 from test_utils import dump_data_and_model
 
 
+def ordinal_encoder_support():
+    # StrictVersion does not work with development versions
+    vers = '.'.join(sklearn_version.split('.')[:2])
+    return StrictVersion(vers) >= StrictVersion("0.20.0")
+
+
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
     def test_model_ordinal_encoder(self):
         model = OrdinalEncoder(dtype=np.int64)
         data = np.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
@@ -32,6 +48,13 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             "<= StrictVersion('0.5.0')",
         )
 
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
+    @unittest.skipIf(
+         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+         reason="Requires opset 9.")
     def test_ordinal_encoder_mixed_string_int_drop(self):
         data = [
             ["c0.4", "c0.2", 3],
@@ -61,6 +84,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             "<= StrictVersion('0.5.0')",
         )
 
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
     def test_ordinal_encoder_onecat(self):
         data = [["cat"], ["cat"]]
         model = OrdinalEncoder(categories="auto")
@@ -79,6 +106,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             "<= StrictVersion('0.5.0')",
         )
 
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
     def test_ordinal_encoder_twocats(self):
         data = [["cat2"], ["cat1"]]
         model = OrdinalEncoder(categories="auto")
@@ -97,6 +128,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             basename="SklearnOrdinalEncoderTwoStringCat",
         )
 
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
     def test_model_ordinal_encoder_cat_list(self):
         model = OrdinalEncoder(categories=[[0, 1, 4, 5],
                                            [1, 2, 3, 5],

@@ -101,7 +101,11 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import OrdinalEncoder
+try:
+    from sklearn.preprocessing import OrdinalEncoder
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    OrdinalEncoder=None
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
