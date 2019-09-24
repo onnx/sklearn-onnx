@@ -198,7 +198,9 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
     # Output variable name of each transform. It's a list of string.
     transformed_result_names = []
     # Encode each transform as our IR object
-    for name, _, column_indices in model.transformers_:
+    for name, op, column_indices in model.transformers_:
+        if op == 'drop':
+            continue
         if isinstance(column_indices, slice):
             column_indices = list(range(
                 column_indices.start

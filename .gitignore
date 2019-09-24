@@ -52,3 +52,7 @@ tests/test*.onnx
 tests_onnxmltools/*.pkl
 tests_onnxmltools/tests/*
 tests_onnxmltools/tests_dump/*
+docs/tests/*.dot*
+tests/*.dot*
+tests/*.onnx
+docs/tests/*.onnx
