@@ -339,8 +339,11 @@ class ModelComponentContainer(ModelContainer):
         """
         if name is None or not isinstance(
                 name, str) or name == '':
-            raise RuntimeError("Parameter name cannot be empty "
-                               "and must be a string.")
+            name = "N%d" % len(self.nodes)
+        existing_names = set(n.name for n in self.nodes)
+        if name in existing_names:
+            name += "-N%d" % len(self.nodes)
+
         if op_domain is None:
             op_domain = get_domain()
         self._check_operator(op_type)

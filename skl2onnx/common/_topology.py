@@ -556,8 +556,9 @@ class Topology:
                         # Throw an error if this variable has been treated as
                         # an output somewhere
                         if variable.is_fed:
-                            raise RuntimeError('One variable can only be '
-                                               'assigned once.')
+                            raise RuntimeError(
+                                'One variable can only be '
+                                'assigned once: {}.'.format(variable))
                         # Mark this variable as filled
                         variable.is_fed = True
                     # Make this operator as handled
