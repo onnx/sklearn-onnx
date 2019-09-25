@@ -2,14 +2,12 @@
 
 import unittest
 import numpy
-from sklearn import datasets
 from sklearn.linear_model import LinearRegression
 try:
     from sklearn.ensemble import VotingRegressor
 except ImportError:
     # New in 0.21
     VotingRegressor = None
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
