@@ -8,8 +8,10 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 from pandas import DataFrame
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import (
+    DecisionTreeClassifier, DecisionTreeRegressor,
+    ExtraTreeClassifier, ExtraTreeRegressor
+)
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -33,6 +35,25 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
                "for op Cast(9) (node Cast)")
     def test_decisiontree_classifier1(self):
         model = DecisionTreeClassifier(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(model, initial_types=initial_types)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict_proba(X)
+        if res[1][0][0] != pred[0, 0]:
+            raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(__version__) <= StrictVersion("0.3.0"),
+        reason="No suitable kernel definition found "
+               "for op Cast(9) (node Cast)")
+    def test_extratree_classifier1(self):
+        model = ExtraTreeClassifier(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
@@ -86,8 +107,48 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
                           " <= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_extra_tree_classifier(self):
+        model = ExtraTreeClassifier()
+        dump_one_class_classification(
+            model,
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+        dump_binary_classification(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+        dump_multiple_classification(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
     def test_decision_tree_regressor(self):
         model = DecisionTreeRegressor()
+        dump_single_regression(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+        dump_multiple_regression(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    def test_extra_tree_regressor(self):
+        model = ExtraTreeRegressor()
         dump_single_regression(
             model,
             allow_failure="StrictVersion(onnx.__version__)"

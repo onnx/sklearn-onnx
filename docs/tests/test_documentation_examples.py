@@ -52,7 +52,8 @@ class TestDocumentationExample(unittest.TestCase):
                             pass
                         else:
                             raise RuntimeError(
-                                "Example '{}' failed due to\n{}".format(name, st))
+                                "Example '{}' failed due to\n{}"
+                                "".format(name, st))
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")

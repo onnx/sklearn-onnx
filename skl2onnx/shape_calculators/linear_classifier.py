@@ -18,6 +18,8 @@ register_shape_calculator('SklearnDecisionTreeClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnRandomForestClassifier',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnExtraTreeClassifier',
+                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnExtraTreesClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnGradientBoostingClassifier',

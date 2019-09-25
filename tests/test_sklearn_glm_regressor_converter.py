@@ -373,6 +373,54 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_ardregression(self):
+        model, X = _fit_model(linear_model.ARDRegression())
+        model_onnx = convert_sklearn(
+            model, "lasso lars",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnARDRegression-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_theilsen(self):
+        model, X = _fit_model(linear_model.TheilSenRegressor())
+        model_onnx = convert_sklearn(
+            model, "lasso lars",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnTheilSen-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_bayesian_ridge(self):
+        model, X = _fit_model(linear_model.BayesianRidge())
+        model_onnx = convert_sklearn(
+            model, "lasso lars",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnBayesianRidge-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

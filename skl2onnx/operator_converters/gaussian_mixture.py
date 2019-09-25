@@ -15,7 +15,8 @@ from ..algebra.onnx_ops import (
 
 def convert_sklearn_gaussian_mixture(scope, operator, container):
     """
-    Converter for *GaussianMixture*.
+    Converter for *GaussianMixture*,
+    *BayesianGaussianMixture*.
     Parameters which change the prediction function:
 
     * *covariance_type*
@@ -145,3 +146,5 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
 
 register_converter('SklearnGaussianMixture', convert_sklearn_gaussian_mixture)
+register_converter('SklearnBayesianGaussianMixture',
+                   convert_sklearn_gaussian_mixture)

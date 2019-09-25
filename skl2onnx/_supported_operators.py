@@ -16,34 +16,41 @@ from sklearn.linear_model import Perceptron, SGDClassifier
 from sklearn.svm import LinearSVC
 
 # Linear regressors
-from sklearn.linear_model import ElasticNet, ElasticNetCV
-from sklearn.linear_model import Lars, LarsCV
-from sklearn.linear_model import Lasso, LassoCV
-from sklearn.linear_model import LassoLars, LassoLarsCV
-from sklearn.linear_model import LassoLarsIC
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge, RidgeCV
-from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import (
+    ARDRegression,
+    BayesianRidge,
+    ElasticNet, ElasticNetCV,
+    Lars, LarsCV,
+    Lasso, LassoCV,
+    LassoLars, LassoLarsCV,
+    LassoLarsIC,
+    LinearRegression,
+    Ridge, RidgeCV,
+    SGDRegressor,
+    TheilSenRegressor,
+)
 from sklearn.svm import LinearSVR
 
 # Mixture
-from sklearn.mixture import GaussianMixture
+from sklearn.mixture import (
+    GaussianMixture, BayesianGaussianMixture
+)
 
 # Multi-class
 from sklearn.multiclass import OneVsRestClassifier
 
 # Tree-based models
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import VotingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import (
+    AdaBoostClassifier, AdaBoostRegressor,
+    ExtraTreesClassifier, ExtraTreesRegressor,
+    GradientBoostingClassifier, GradientBoostingRegressor,
+    RandomForestClassifier, RandomForestRegressor,
+    VotingClassifier
+)
+from sklearn.tree import (
+    DecisionTreeClassifier, DecisionTreeRegressor,
+    ExtraTreeClassifier, ExtraTreeRegressor
+)
 
 # Gaussian processes
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -124,7 +131,7 @@ sklearn_classifier_list = [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
-    DecisionTreeClassifier,
+    DecisionTreeClassifier, ExtraTreeClassifier,
     ExtraTreesClassifier, BernoulliNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
@@ -149,6 +156,7 @@ def build_sklearn_operator_name_map():
                 AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
+                ExtraTreeClassifier, ExtraTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,
                 GradientBoostingClassifier, GradientBoostingRegressor,
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
@@ -168,8 +176,11 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
+                BayesianGaussianMixture,
     ] if k is not None}
     res.update({
+        ARDRegression: 'SklearnLinearRegressor',
+        BayesianRidge: 'SklearnLinearRegressor',
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
         GridSearchCV: 'SklearnGridSearchCV',
@@ -190,6 +201,7 @@ def build_sklearn_operator_name_map():
         RidgeCV: 'SklearnLinearRegressor',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
+        TheilSenRegressor: 'SklearnLinearRegressor',
     })
     return res
 

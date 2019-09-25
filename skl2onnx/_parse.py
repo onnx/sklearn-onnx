@@ -11,7 +11,7 @@ from sklearn.base import ClassifierMixin, ClusterMixin, is_classifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
-from sklearn.mixture import GaussianMixture
+from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
 try:
     from sklearn.compose import ColumnTransformer
@@ -114,7 +114,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
-    elif type(model) == GaussianMixture:
+    elif type(model) in {GaussianMixture, BayesianGaussianMixture}:
         label_variable = scope.declare_local_variable('label',
                                                       Int64TensorType())
         prob_variable = scope.declare_local_variable('probabilities',
