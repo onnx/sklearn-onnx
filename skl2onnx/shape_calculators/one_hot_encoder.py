@@ -6,6 +6,7 @@
 
 import numpy as np
 from ..common._registration import register_shape_calculator
+from ..common.data_types import FloatTensorType, Int64TensorType
 
 
 def calculate_sklearn_one_hot_encoder_output_shapes(operator):
@@ -17,7 +18,10 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
                           op.drop_idx_[index]])
         categories_len += len(categories)
     instances = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type.shape = [instances, categories_len]
+    if np.issubdtype(op.dtype, np.signedinteger):
+        operator.outputs[0].type = Int64TensorType([instances, categories_len])
+    else:
+        operator.outputs[0].type = FloatTensorType([instances, categories_len])
 
 
 register_shape_calculator('SklearnOneHotEncoder',
