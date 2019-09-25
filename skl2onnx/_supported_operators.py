@@ -42,6 +42,11 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import VotingClassifier
+try:
+    from sklearn.ensemble import VotingRegressor
+except ImportError:
+    # New in 0.21
+    VotingRegressor = None
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 
@@ -147,6 +152,7 @@ decision_function_classifiers = (
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
                 AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
+                VotingRegressor,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,
