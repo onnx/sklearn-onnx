@@ -257,6 +257,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOneHotEncoderIntDropFirst",
             verbose=False,
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
         )
 
 
