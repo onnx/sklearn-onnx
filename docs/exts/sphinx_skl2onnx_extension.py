@@ -34,7 +34,7 @@ def skl2onnx_version_role(role, rawtext, text, lineno, inliner, options=None, co
         version = 'v' + onnxruntime.__version__
     else:
         raise RuntimeError("skl2onnx_version_role cannot interpret content '{0}'.".format(text))
-    node = nodes.Text(version)
+    node = nodes.TextElement(version)
     return [node], []
 
 

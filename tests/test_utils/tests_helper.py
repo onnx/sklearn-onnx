@@ -414,7 +414,8 @@ def dump_binary_classification(
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False):
+        verbose=False,
+        label_string=True):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -425,7 +426,10 @@ def dump_binary_classification(
     """
     X = [[0, 1], [1, 1], [2, 0]]
     X = numpy.array(X, dtype=numpy.float32)
-    y = ["A", "B", "A"]
+    if label_string:
+        y = ["A", "B", "A"]
+    else:
+        y = [0, 1, 0]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "binary classifier",
                                        [("input", FloatTensorType([None, 2]))])

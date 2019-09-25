@@ -84,6 +84,11 @@ def get_column_index(i, inputs):
                 return (vi, i - pos)
             vi += 1
             pos = end
+            if vi >= len(inputs):
+                import pprint
+                raise RuntimeError(
+                    "Input {} (i={}, end={}) is not available in\n{}".format(
+                        vi, i, end, pprint.pformat(inputs)))
             rel_end = (inputs[vi].type.shape[1]
                        if isinstance(inputs[vi].type, TensorType) else 1)
             if rel_end is None:

@@ -101,6 +101,11 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
+try:
+    from sklearn.preprocessing import OrdinalEncoder
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    OrdinalEncoder = None
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
@@ -159,7 +164,7 @@ def build_sklearn_operator_name_map():
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
                 FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
                 Imputer, SimpleImputer, LabelBinarizer, LabelEncoder,
-                RobustScaler, OneHotEncoder, DictVectorizer,
+                RobustScaler, OneHotEncoder, DictVectorizer, OrdinalEncoder,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
@@ -190,7 +195,7 @@ def build_sklearn_operator_name_map():
 
 
 def update_registered_converter(model, alias, shape_fct, convert_fct,
-                                overwrite=True):
+                                overwrite=True, parser=None):
     """
     Registers or updates a converter for a new model so that
     it can be converted when inserted in a *scikit-learn* pipeline.
@@ -204,6 +209,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     :param convert_fct: function which converts a model
     :param overwrite: False to raise exception if a converter
         already exists
+    :param parser: overwrites the parser as well if not empty
 
     The alias is usually the library name followed by the model name.
     Example:
@@ -224,6 +230,9 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     sklearn_operator_name_map[model] = alias
     register_converter(alias, convert_fct, overwrite=overwrite)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
+    if parser is not None:
+        from ._parse import update_registered_parser
+        update_registered_parser(model, parser)
 
 
 def _get_sklearn_operator_name(model_type):

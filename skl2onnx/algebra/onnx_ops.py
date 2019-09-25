@@ -15,16 +15,18 @@ def ClassFactory(class_name, op_name, inputs, outputs,
 
     def __init__(self, *args, **kwargs):
 
-        if len(args) == 0 and input_range[0] == input_range[1]:
-            args = [_[0] for _ in self.__class__.expected_inputs]
-        if not (input_range[0] <= len(args) <= input_range[1]):
-            raise RuntimeError("Unexpected number of inputs, "
-                               "got {}, expecting {} for operator "
-                               "'{}'.".format(
-                                   len(args), len(inputs), op_name))
+        op_version = kwargs.pop('op_version', None)
+
+        if op_version is None:
+            if len(args) == 0 and input_range[0] == input_range[1]:
+                args = [_[0] for _ in self.__class__.expected_inputs]
+            if not (input_range[0] <= len(args) <= input_range[1]):
+                raise RuntimeError("Unexpected number of inputs, "
+                                   "got {}, expecting {} for operator "
+                                   "'{}'.".format(
+                                       len(args), len(inputs), op_name))
 
         attr_names = self.attr_names
-        op_version = kwargs.pop('op_version', None)
         if '_' in self.__class__.__name__:
             op_version_class = int(self.__class__.__name__.split('_')[-1])
             op_version = min(op_version, op_version_class)

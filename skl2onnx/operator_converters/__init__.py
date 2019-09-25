@@ -35,6 +35,7 @@ from . import nearest_neighbours
 from . import normaliser
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
+from . import ordinal_encoder
 from . import polynomial_features
 from . import random_forest
 from . import scaler_op
@@ -76,6 +77,7 @@ __all__ = [
     normaliser,
     one_hot_encoder,
     one_vs_rest_classifier,
+    ordinal_encoder,
     polynomial_features,
     random_forest,
     scaler_op,

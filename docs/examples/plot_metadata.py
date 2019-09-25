@@ -23,6 +23,7 @@ import numpy
 from onnxruntime import InferenceSession
 import onnx
 from onnxruntime.datasets import get_example
+
 example = get_example("logreg_iris.onnx")
 
 model = onnx.load(example)
