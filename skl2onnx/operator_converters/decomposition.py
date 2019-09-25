@@ -78,5 +78,6 @@ def convert_truncated_svd(scope, operator, container):
                 name=scope.get_unique_operator_name('MatMul'))
 
 
+register_converter('SklearnIncrementalPCA', convert_truncated_svd)
 register_converter('SklearnPCA', convert_truncated_svd)
 register_converter('SklearnTruncatedSVD', convert_truncated_svd)

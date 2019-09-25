@@ -48,25 +48,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(
-        StrictVersion(__version__) <= StrictVersion("0.3.0"),
-        reason="No suitable kernel definition found "
-               "for op Cast(9) (node Cast)")
-    def test_extratree_classifier1(self):
-        model = ExtraTreeClassifier(max_depth=2)
-        X, y = make_classification(10, n_features=4, random_state=42)
-        X = X[:, :2]
-        model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
-        model_onnx = convert_sklearn(model, initial_types=initial_types)
-        sess = InferenceSession(model_onnx.SerializeToString())
-        res = sess.run(None, {'input': X.astype(np.float32)})
-        pred = model.predict_proba(X)
-        if res[1][0][0] != pred[0, 0]:
-            raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
-
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_decisiontree_regressor0(self):
         model = DecisionTreeRegressor(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)

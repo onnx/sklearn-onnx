@@ -20,16 +20,19 @@ from sklearn.linear_model import (
     ARDRegression,
     BayesianRidge,
     ElasticNet, ElasticNetCV,
+    HuberRegressor,
     Lars, LarsCV,
     Lasso, LassoCV,
     LassoLars, LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
+    MultiTaskLasso, MultiTaskLassoCV,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor,
 )
 from sklearn.svm import LinearSVR
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 # Mixture
 from sklearn.mixture import (
@@ -51,6 +54,7 @@ from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
     ExtraTreeClassifier, ExtraTreeRegressor
 )
+
 
 # Gaussian processes
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -77,8 +81,9 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
-from sklearn.decomposition import PCA
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import (
+    PCA, IncrementalPCA, TruncatedSVD
+)
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -135,7 +140,7 @@ sklearn_classifier_list = [
     ExtraTreesClassifier, BernoulliNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
-    AdaBoostClassifier, MLPClassifier
+    AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
 ]
 
 # Clustering algorithms: produces two outputs, label and score for
@@ -167,7 +172,8 @@ def build_sklearn_operator_name_map():
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
-                KMeans, MiniBatchKMeans, PCA, TruncatedSVD,
+                KMeans, MiniBatchKMeans,
+                PCA, TruncatedSVD, IncrementalPCA,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
                 FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
@@ -184,6 +190,7 @@ def build_sklearn_operator_name_map():
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
         GridSearchCV: 'SklearnGridSearchCV',
+        HuberRegressor: 'SklearnLinearRegressor',
         LinearRegression: 'SklearnLinearRegressor',
         Lars: 'SklearnLinearRegressor',
         LarsCV: 'SklearnLinearRegressor',
@@ -192,8 +199,11 @@ def build_sklearn_operator_name_map():
         LassoLars: 'SklearnLinearRegressor',
         LassoLarsCV: 'SklearnLinearRegressor',
         LassoLarsIC: 'SklearnLinearRegressor',
+        LinearDiscriminantAnalysis: 'SklearnLinearClassifier',
         LogisticRegression: 'SklearnLinearClassifier',
         LogisticRegressionCV: 'SklearnLinearClassifier',
+        MultiTaskLasso: 'SklearnLinearRegressor',
+        MultiTaskLassoCV: 'SklearnLinearRegressor',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
         Perceptron: 'SklearnSGDClassifier',
