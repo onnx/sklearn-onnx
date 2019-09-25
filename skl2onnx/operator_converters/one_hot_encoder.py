@@ -75,7 +75,12 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
             categories_len += len(categories)
     apply_concat(scope, result,
                  concat_result_name, container, axis=2)
-    apply_reshape(scope, concat_result_name, operator.output_full_names,
+    reshape_input = concat_result_name
+    if np.issubdtype(ohe_op.dtype, np.signedinteger):
+        reshape_input = scope.get_unique_variable_name('cast')
+        apply_cast(scope, concat_result_name, reshape_input,
+                   container, to=onnx_proto.TensorProto.INT64)
+    apply_reshape(scope, reshape_input, operator.output_full_names,
                   container, desired_shape=(-1, categories_len))
 
 

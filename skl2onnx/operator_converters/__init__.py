@@ -45,6 +45,7 @@ from . import text_vectoriser
 from . import tfidf_transformer
 from . import tfidf_vectoriser
 from . import voting_classifier
+from . import voting_regressor
 from . import zip_map
 
 __all__ = [
@@ -87,5 +88,6 @@ __all__ = [
     tfidf_transformer,
     tfidf_vectoriser,
     voting_classifier,
+    voting_regressor,
     zip_map,
 ]
