@@ -24,7 +24,7 @@ def convert_voting_classifier(scope, operator, container):
     *scikit-learn* enables both modes, transformer and predictor
     for the voting classifier. *ONNX* does not make this
     distinction and always creates two outputs, labels
-    and probabiliries.
+    and probabilities.
     """
     op = operator.raw_operator
     n_classes = len(op.classes_)
