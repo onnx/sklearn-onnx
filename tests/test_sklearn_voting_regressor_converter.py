@@ -4,7 +4,11 @@ import unittest
 import numpy
 from sklearn import datasets
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import VotingRegressor
+try:
+    from sklearn.ensemble import VotingRegressor
+except ImportError:
+    # New in 0.21
+    VotingRegressor = None
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from skl2onnx import convert_sklearn
@@ -32,6 +36,9 @@ def model_to_test():
 
 
 class TestVotingRegressorConverter(unittest.TestCase):
+
+    @unittest.skipIf(VotingRegressor is None,
+                     reason="new in 0.21")
     def test_model_voting_regression(self):
         model, X = _fit_model(model_to_test())
         model_onnx = convert_sklearn(
@@ -49,6 +56,8 @@ class TestVotingRegressorConverter(unittest.TestCase):
             comparable_outputs=[0]
         )
 
+    @unittest.skipIf(VotingRegressor is None,
+                     reason="new in 0.21")
     def test_model_voting_regression_int(self):
         model, X = _fit_model(model_to_test(), is_int=True)
         model_onnx = convert_sklearn(

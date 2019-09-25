@@ -42,7 +42,11 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import VotingClassifier
-from sklearn.ensemble import VotingRegressor
+try:
+    from sklearn.ensemble import VotingRegressor
+except ImportError:
+    # New in 0.21
+    VotingRegressor = None
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 
