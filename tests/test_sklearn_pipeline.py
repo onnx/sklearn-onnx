@@ -2,6 +2,7 @@ import unittest
 from distutils.version import StrictVersion
 from io import StringIO
 import numpy
+from numpy.testing import assert_almost_equal
 import pandas
 from sklearn import __version__ as sklearn_version
 from sklearn import datasets
@@ -29,7 +30,7 @@ from skl2onnx.common.data_types import (
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, fit_classification_model
-from onnxruntime import __version__ as ort_version
+from onnxruntime import __version__ as ort_version, InferenceSession
 
 
 def check_scikit_version():
@@ -512,16 +513,15 @@ class TestSklearnPipeline(unittest.TestCase):
 
         pipe.fit(X_train)
         model_onnx = convert_sklearn(pipe, initial_types=init_types)
-        oinf = OnnxInference(model_onnx)
+        oinf = InferenceSession(model_onnx.SerializeToString())
 
         pred = pipe.transform(X_train)
         inputs = {c: X_train[c].values for c in X_train.columns}
         inputs = {c: v.reshape((v.shape[0], 1)) for c, v in inputs.items()}
-        onxp = oinf.run(inputs)
-        got = onxp['transformed_column']
-        self.assertEqualArray(pred, got)
+        onxp = oinf.run(None, inputs)
+        got = onxp[0]
+        assert_almost_equal(pred, got)
 
 
 if __name__ == "__main__":
-    TestSklearnPipeline().test_pipeline_dataframe()
     unittest.main()
