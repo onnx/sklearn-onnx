@@ -31,7 +31,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
     def test_model_one_hot_encoder(self):
-        model = OneHotEncoder()
+        model = OneHotEncoder(categories='auto')
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
         model.fit(data)
@@ -209,7 +209,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 3, 3],
         ]
         test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
-        model = OneHotEncoder(categories="auto", drop=[0, 1, 3])
+        model = OneHotEncoder(categories="auto", drop=[0, 1, 3],
+                              dtype=numpy.float32)
         model.fit(data)
         inputs = [
             ("input1", Int64TensorType([None, 3])),
@@ -240,7 +241,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 3, 3],
         ]
         test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
-        model = OneHotEncoder(categories="auto", drop='first')
+        model = OneHotEncoder(categories="auto", drop='first',
+                              dtype=numpy.int64)
         model.fit(data)
         inputs = [
             ("input1", Int64TensorType([None, 3])),
