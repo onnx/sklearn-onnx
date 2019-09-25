@@ -101,6 +101,11 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import OneHotEncoder
+try:
+    from sklearn.preprocessing import OrdinalEncoder
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    OrdinalEncoder = None
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
@@ -159,7 +164,7 @@ def build_sklearn_operator_name_map():
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
                 FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
                 Imputer, SimpleImputer, LabelBinarizer, LabelEncoder,
-                RobustScaler, OneHotEncoder, DictVectorizer,
+                RobustScaler, OneHotEncoder, DictVectorizer, OrdinalEncoder,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
