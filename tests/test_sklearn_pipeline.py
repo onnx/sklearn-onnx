@@ -470,6 +470,10 @@ class TestSklearnPipeline(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(
+        ColumnTransformer is None,
+        reason="ColumnTransformer not available in 0.19",
+    )
     def test_pipeline_dataframe(self):
         text = """
                 fixed_acidity,volatile_acidity,citric_acid,residual_sugar,chlorides,free_sulfur_dioxide,total_sulfur_dioxide,density,pH,sulphates,alcohol,quality,color
