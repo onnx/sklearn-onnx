@@ -5,6 +5,7 @@ import sklearn
 from sklearn import datasets
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -46,6 +47,26 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionBinary",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_linear_discriminant_analysis(self):
+        model, X = self._fit_model_binary_classification(
+            LinearDiscriminantAnalysis())
+        model_onnx = convert_sklearn(model, "linear model",
+                                     [("input", FloatTensorType([None, 3]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnLinearDiscriminantAnalysisBin-Dec3",
             # Operator cast-1 is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.3') or "

@@ -72,3 +72,7 @@ register_converter('SklearnDecisionTreeClassifier',
                    convert_sklearn_decision_tree_classifier)
 register_converter('SklearnDecisionTreeRegressor',
                    convert_sklearn_decision_tree_regressor)
+register_converter('SklearnExtraTreeClassifier',
+                   convert_sklearn_decision_tree_classifier)
+register_converter('SklearnExtraTreeRegressor',
+                   convert_sklearn_decision_tree_regressor)

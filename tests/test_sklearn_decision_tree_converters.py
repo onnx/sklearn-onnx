@@ -8,8 +8,10 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 from pandas import DataFrame
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import (
+    DecisionTreeClassifier, DecisionTreeRegressor,
+    ExtraTreeClassifier, ExtraTreeRegressor
+)
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -86,8 +88,48 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
                           " <= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_extra_tree_classifier(self):
+        model = ExtraTreeClassifier()
+        dump_one_class_classification(
+            model,
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+        dump_binary_classification(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+        dump_multiple_classification(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
     def test_decision_tree_regressor(self):
         model = DecisionTreeRegressor()
+        dump_single_regression(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+        dump_multiple_regression(
+            model,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+
+    def test_extra_tree_regressor(self):
+        model = ExtraTreeRegressor()
         dump_single_regression(
             model,
             allow_failure="StrictVersion(onnx.__version__)"
