@@ -136,8 +136,6 @@ class OnnxOperator:
     def __init__(self, *inputs, op_version=None, output_names=None,
                  domain=None, **kwargs):
 
-        if op_version is None:
-            raise RuntimeError("op_version must not be None")
         if output_names is None and self.__class__.__name__ in {
                 "OnnxScan"}:
             raise NotImplementedError(
