@@ -11,6 +11,11 @@ from ..common.utils import check_input_and_output_numbers
 
 def calculate_sklearn_concat(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
+    for i in range(len(operator.inputs)):
+        if len(operator.inputs[i].type.shape) != 2:
+            operator.outputs[0].type.shape = [None, None]
+            return
+
     N = operator.inputs[0].type.shape[0]
     C = 0
     seen_types = []

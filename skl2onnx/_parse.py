@@ -39,6 +39,7 @@ def _fetch_input_slice(scope, inputs, column_indices):
         raise RuntimeError("Operator ArrayFeatureExtractor does not support "
                            "multiple input tensors.")
     if (isinstance(inputs[0].type, TensorType) and
+            len(inputs[0].type.shape) == 2 and
             inputs[0].type.shape[1] == len(column_indices)):
         # No need to extract.
         return inputs
@@ -288,7 +289,12 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     classes = model.classes_
     label_type = Int64Type()
 
-    if np.issubdtype(model.classes_.dtype, np.floating):
+    if (isinstance(model.classes_, list) and
+            isinstance(model.classes_[0], np.ndarray)):
+        # multi-label problem
+        # this_operator.classlabels_int64s = list(range(0, len(classes)))
+        raise NotImplementedError("multi-label is not supported")
+    elif np.issubdtype(model.classes_.dtype, np.floating):
         classes = np.array(list(map(lambda x: int(x), classes)))
         if set(map(lambda x: float(x), classes)) != set(model.classes_):
             raise RuntimeError("skl2onnx implicitly converts float class "
