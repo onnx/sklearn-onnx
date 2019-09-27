@@ -11,7 +11,7 @@ from sklearn.base import ClassifierMixin, ClusterMixin, is_classifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
-from sklearn.mixture import GaussianMixture
+from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.svm import LinearSVC, NuSVC, SVC
 try:
     from sklearn.compose import ColumnTransformer
@@ -39,6 +39,7 @@ def _fetch_input_slice(scope, inputs, column_indices):
         raise RuntimeError("Operator ArrayFeatureExtractor does not support "
                            "multiple input tensors.")
     if (isinstance(inputs[0].type, TensorType) and
+            len(inputs[0].type.shape) == 2 and
             inputs[0].type.shape[1] == len(column_indices)):
         # No need to extract.
         return inputs
@@ -114,7 +115,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
-    elif type(model) == GaussianMixture:
+    elif type(model) in {GaussianMixture, BayesianGaussianMixture}:
         label_variable = scope.declare_local_variable('label',
                                                       Int64TensorType())
         prob_variable = scope.declare_local_variable('probabilities',
@@ -288,7 +289,12 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     classes = model.classes_
     label_type = Int64Type()
 
-    if np.issubdtype(model.classes_.dtype, np.floating):
+    if (isinstance(model.classes_, list) and
+            isinstance(model.classes_[0], np.ndarray)):
+        # multi-label problem
+        # this_operator.classlabels_int64s = list(range(0, len(classes)))
+        raise NotImplementedError("multi-label is not supported")
+    elif np.issubdtype(model.classes_.dtype, np.floating):
         classes = np.array(list(map(lambda x: int(x), classes)))
         if set(map(lambda x: float(x), classes)) != set(model.classes_):
             raise RuntimeError("skl2onnx implicitly converts float class "

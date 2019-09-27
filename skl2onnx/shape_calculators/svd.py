@@ -37,6 +37,8 @@ def calculate_sklearn_truncated_svd_output_shapes(operator):
     operator.outputs[0].type.shape = [N, K]
 
 
+register_shape_calculator('SklearnIncrementalPCA',
+                          calculate_sklearn_truncated_svd_output_shapes)
 register_shape_calculator('SklearnPCA',
                           calculate_sklearn_truncated_svd_output_shapes)
 register_shape_calculator('SklearnTruncatedSVD',

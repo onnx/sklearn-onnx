@@ -18,6 +18,8 @@ register_shape_calculator('SklearnDecisionTreeRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnRandomForestRegressor',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnExtraTreeRegressor',
+                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnExtraTreesRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnGradientBoostingRegressor',

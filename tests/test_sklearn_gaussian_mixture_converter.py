@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 from sklearn.datasets import load_iris
-from sklearn.mixture import GaussianMixture
+from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -40,6 +40,26 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinGaussianMixture",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_bayesian_mixture_binary_classification(self):
+        model, X = self._fit_model_binary_classification(
+            BayesianGaussianMixture(), load_iris())
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian_mixture",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinBayesianGaussianMixture",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )

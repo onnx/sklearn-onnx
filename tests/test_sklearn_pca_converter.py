@@ -7,7 +7,7 @@
 import unittest
 import numpy as np
 from sklearn.datasets import load_diabetes, load_digits
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, IncrementalPCA
 from sklearn.model_selection import train_test_split
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
@@ -36,6 +36,21 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPCADefault",
+        )
+
+    def test_incrementalpca_default(self):
+        model, X_test = _fit_model_pca(IncrementalPCA())
+        model_onnx = convert_sklearn(
+            model,
+            initial_types=[("input",
+                            FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnIncrementalPCADefault",
         )
 
     def test_pca_parameters_auto(self):
