@@ -72,7 +72,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     input_name = X
 
     if type(X.type) == Int64TensorType:
-        x_cast = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT)
+        x_cast = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT, op_version=opv)
         input_name = x_cast
 
     C2 = row_norms(C, squared=True)
@@ -82,7 +82,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     if isinstance(N, int):
         zeros = np.zeros((N, ))
     else:
-        zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
+        zeros = OnnxMul(rs, np.array([0], dtype=np.float32), op_version=opv)
 
     z = OnnxAdd(rs, OnnxGemm(input_name, C, zeros, alpha=-2.,
                              transB=1, op_version=opv),
