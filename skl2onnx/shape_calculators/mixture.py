@@ -32,3 +32,5 @@ def calculate_gaussian_mixture_output_shapes(operator):
 
 register_shape_calculator('SklearnGaussianMixture',
                           calculate_gaussian_mixture_output_shapes)
+register_shape_calculator('SklearnBayesianGaussianMixture',
+                          calculate_gaussian_mixture_output_shapes)

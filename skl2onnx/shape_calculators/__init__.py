@@ -32,6 +32,7 @@ from . import svm
 from . import text_vectorizer
 from . import tfidf_transformer
 from . import voting_classifier
+from . import voting_regressor
 from . import zip_map
 
 __all__ = [
@@ -61,5 +62,6 @@ __all__ = [
     text_vectorizer,
     tfidf_transformer,
     voting_classifier,
+    voting_regressor,
     zip_map,
 ]

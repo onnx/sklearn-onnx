@@ -4,7 +4,8 @@
 # license information.
 # --------------------------------------------------------------------------
 
-import numpy as np
+from onnx.helper import make_tensor
+from onnx import TensorProto
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_concat, apply_cast
 from ..common._registration import register_converter
@@ -18,14 +19,11 @@ def convert_sklearn_polynomial_features(scope, operator, container):
                                     op.interaction_only,
                                     op.include_bias)
 
+    unit_name = None
+    last_feat = None
     for i, comb in enumerate(combinations):
         if len(comb) == 0:
             unit_name = scope.get_unique_variable_name('unit')
-            array = np.ones((1, 1))
-
-            container.add_initializer(unit_name, onnx_proto.TensorProto.FLOAT,
-                                      array.shape, array.flatten())
-
             transformed_columns[i] = unit_name
         else:
             comb_name = scope.get_unique_variable_name('comb')
@@ -53,6 +51,15 @@ def convert_sklearn_polynomial_features(scope, operator, container):
                 'ReduceProd', reduce_prod_input, prod_name,
                 axes=[1], name=scope.get_unique_operator_name('ReduceProd'))
             transformed_columns[i] = prod_name
+            last_feat = prod_name
+
+    if unit_name is not None:
+        shape_name = scope.get_unique_variable_name('shape')
+        container.add_node('Shape', last_feat, shape_name)
+        container.add_node('ConstantOfShape', shape_name, unit_name,
+                           value=make_tensor(
+                                'ONE', TensorProto.FLOAT, [1], [1.]),
+                           op_version=9)
 
     if (operator.inputs[0].type._get_element_onnx_type()
             == onnx_proto.TensorProto.INT64):
