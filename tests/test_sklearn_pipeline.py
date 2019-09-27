@@ -1,6 +1,8 @@
 import unittest
 from distutils.version import StrictVersion
+from io import StringIO
 import numpy
+from numpy.testing import assert_almost_equal
 import pandas
 from sklearn import __version__ as sklearn_version
 from sklearn import datasets
@@ -28,7 +30,7 @@ from skl2onnx.common.data_types import (
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, fit_classification_model
-from onnxruntime import __version__ as ort_version
+from onnxruntime import __version__ as ort_version, InferenceSession
 
 
 def check_scikit_version():
@@ -467,6 +469,62 @@ class TestSklearnPipeline(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+
+    @unittest.skipIf(
+        ColumnTransformer is None,
+        reason="ColumnTransformer not available in 0.19",
+    )
+    def test_pipeline_dataframe(self):
+        text = """
+                fixed_acidity,volatile_acidity,citric_acid,residual_sugar,chlorides,free_sulfur_dioxide,total_sulfur_dioxide,density,pH,sulphates,alcohol,quality,color
+                7.4,0.7,0.0,1.9,0.076,11.0,34.0,0.9978,3.51,0.56,9.4,5,red
+                7.8,0.88,0.0,2.6,0.098,25.0,67.0,0.9968,3.2,0.68,9.8,5,red
+                7.8,0.76,0.04,2.3,0.092,15.0,54.0,0.997,3.26,0.65,9.8,5,red
+                11.2,0.28,0.56,1.9,0.075,17.0,60.0,0.998,3.16,0.58,9.8,6,red
+                """.replace("                ", "")
+        X_train = pandas.read_csv(StringIO(text))
+        for c in X_train.columns:
+            if c != 'color':
+                X_train[c] = X_train[c].astype(numpy.float32)
+        numeric_features = [c for c in X_train if c != 'color']
+
+        pipe = Pipeline([
+            ("prep", ColumnTransformer([
+                ("color", Pipeline([
+                    ('one', OneHotEncoder()),
+                    ('select', ColumnTransformer(
+                        [('sel1', 'passthrough', [0])]))
+                ]), ['color']),
+                ("others", "passthrough", numeric_features)
+            ])),
+        ])
+
+        init_types = [
+            ('fixed_acidity', FloatTensorType(shape=[None, 1])),
+            ('volatile_acidity', FloatTensorType(shape=[None, 1])),
+            ('citric_acid', FloatTensorType(shape=[None, 1])),
+            ('residual_sugar', FloatTensorType(shape=[None, 1])),
+            ('chlorides', FloatTensorType(shape=[None, 1])),
+            ('free_sulfur_dioxide', FloatTensorType(shape=[None, 1])),
+            ('total_sulfur_dioxide', FloatTensorType(shape=[None, 1])),
+            ('density', FloatTensorType(shape=[None, 1])),
+            ('pH', FloatTensorType(shape=[None, 1])),
+            ('sulphates', FloatTensorType(shape=[None, 1])),
+            ('alcohol', FloatTensorType(shape=[None, 1])),
+            ('quality', FloatTensorType(shape=[None, 1])),
+            ('color', StringTensorType(shape=[None, 1]))
+        ]
+
+        pipe.fit(X_train)
+        model_onnx = convert_sklearn(pipe, initial_types=init_types)
+        oinf = InferenceSession(model_onnx.SerializeToString())
+
+        pred = pipe.transform(X_train)
+        inputs = {c: X_train[c].values for c in X_train.columns}
+        inputs = {c: v.reshape((v.shape[0], 1)) for c, v in inputs.items()}
+        onxp = oinf.run(None, inputs)
+        got = onxp[0]
+        assert_almost_equal(pred, got)
 
 
 if __name__ == "__main__":
