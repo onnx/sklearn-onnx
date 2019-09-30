@@ -78,6 +78,10 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
+      pip install $(onnx.version)
+    displayName: 'install onnx'
+
+  - script: |
       pip install -e .
     displayName: 'install skl2onnx'
 
