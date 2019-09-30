@@ -23,7 +23,7 @@ def _check_onnx_version():
     min_required_version = pkg_resources.parse_version('1.0.1')
     current_version = pkg_resources.get_distribution('onnx').parsed_version
     assert current_version >= min_required_version, (
-        'ONNXMLTools requires ONNX version 1.0.1 or a newer one')
+        'skl2onnx requires ONNX version 1.2.1 or a newer one')
 
 
 _check_onnx_version()

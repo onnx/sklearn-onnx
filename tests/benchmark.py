@@ -37,11 +37,6 @@ def run_all_tests(folder=None, verbose=True):
     if verbose:
         print("[benchmark] look into '{0}'".format(folder))
 
-    try:
-        import onnxmltools  # noqa
-    except ImportError:
-        warnings.warn("Cannot import onnxmltools. Some tests won't work.")
-
     this = os.path.abspath(os.path.dirname(__file__))
     subs = [this]
     loader = unittest.TestLoader()

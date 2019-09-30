@@ -61,7 +61,7 @@ Every converter is tested with this backend.
     clr = RandomForestClassifier()
     clr.fit(X_train, y_train)
 
-    # Convert into ONNX format with onnxmltools
+    # Convert into ONNX format
     from skl2onnx import convert_sklearn
     from skl2onnx.common.data_types import FloatTensorType
     initial_type = [('float_input', FloatTensorType([None, 4]))]
@@ -79,9 +79,8 @@ Every converter is tested with this backend.
 
 **Related converters**
 
-*sklearn-onnx* only converts models from *scikit-learn*.
-It was initially part of `onnxmltools <https://github.com/onnx/onnxmltools>`_
-which can still be used to convert models for *xgboost* and *libsvm*.
+*sklearn-onnx* converts models from
+*scikit-learn*, *lightgbm* and *xgboost*.
 Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
 `torch.onnx <https://pytorch.org/docs/stable/onnx.html>`_,
 `ONNX-MXNet API <https://mxnet.incubator.apache.org/api/python/contrib/onnx.html>`_,

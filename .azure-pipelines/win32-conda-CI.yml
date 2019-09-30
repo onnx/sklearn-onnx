@@ -61,7 +61,7 @@ jobs:
 
   - script: |
       flake8 skl2onnx tests
-      flake8 skl2onnx tests_onnxmltools
+      flake8 skl2onnx tests_third_party_skl
     displayName: 'flake8'
 
   - script: |
@@ -87,12 +87,11 @@ jobs:
 
   - script: |
       pip install lightgbm xgboost
-      pip install onnxmltools --no-deps
-    displayName: 'install onnxmltools'
+    displayName: 'install lightgbm, xgboost'
 
   - script: |
-      pytest tests_onnxmltools
-    displayName: 'pytest-onnxmltools'
+      pytest tests_third_party_skl
+    displayName: 'pytest-third-party-skl'
     condition: ne(variables['onnxrt.version'], '==0.2.1')
 
   - script: |

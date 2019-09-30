@@ -103,7 +103,7 @@ jobs:
     displayName: 'pytest'
 
   - script: |
-      pip install onnxmltools openpyxl
+      pip install openpyxl
       coverage run --include=skl2onnx/** tests/benchmark.py
       coverage report -m
       coverage html

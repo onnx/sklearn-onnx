@@ -13,7 +13,7 @@ is deployed to production to keep track of which
 instance was used at a specific time.
 Let's see how to do that with a simple
 logistic regression model trained with
-*scikit-learn* and converted with *onnxmltools*.
+*scikit-learn*.
 """
 
 import skl2onnx

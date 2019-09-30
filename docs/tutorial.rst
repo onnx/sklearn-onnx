@@ -46,7 +46,7 @@ the machine learned model.
 It defines a set of commonly used operators to compose models.
 There are `tools <https://github.com/onnx/tutorials>`_
 to convert other model formats into ONNX. Here we will use
-`ONNXMLTools <https://github.com/onnx/onnxmltools>`_.
+`sklearn-onnx <https://github.com/onnx/sklearn-onnx>`_.
 
 ::
 
