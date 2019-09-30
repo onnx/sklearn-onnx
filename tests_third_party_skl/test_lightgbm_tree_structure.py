@@ -9,7 +9,6 @@ from logging import getLogger
 import copy
 import numpy
 from pandas import DataFrame
-from pyquickhelper.pycode import ExtTestCase
 from skl2onnx.common.data_types import FloatTensorType
 from sklearn.datasets import load_iris
 from skl2onnx.third_party_skl.operator_converters.conv_lightgbm import (
@@ -168,7 +167,7 @@ tree2 = {'average_output': False,
          'version': 'v2'}
 
 
-class TestLightGbmTreeStructur(ExtTestCase):
+class TestLightGbmTreeStructur(unittest.TestCase):
 
     def setUp(self):
         logger = getLogger('skl2onnx')
