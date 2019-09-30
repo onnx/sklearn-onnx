@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
+from onnx.defs import onnx_opset_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -36,6 +37,7 @@ class TestOp10(unittest.TestCase):
                             op.domain, target_opset))
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_logistic_regression(self):
         model, X = self._fit_model_binary_classification(
             linear_model.LogisticRegression())
@@ -46,6 +48,7 @@ class TestOp10(unittest.TestCase):
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_kmeans(self):
         model, X = self._fit_model_binary_classification(KMeans())
         target_opset = 10
@@ -55,6 +58,7 @@ class TestOp10(unittest.TestCase):
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_mixture(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture())
@@ -65,6 +69,7 @@ class TestOp10(unittest.TestCase):
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_bayesian_gaussian_mixture(self):
         model, X = self._fit_model_binary_classification(
             BayesianGaussianMixture())
@@ -75,6 +80,7 @@ class TestOp10(unittest.TestCase):
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_process_regressor(self):
         model, X = self._fit_model_binary_classification(
             GaussianProcessRegressor())
@@ -85,6 +91,7 @@ class TestOp10(unittest.TestCase):
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
+    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_voting_classifier(self):
         model = VotingClassifier(
                     voting="hard",
