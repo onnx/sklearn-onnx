@@ -44,8 +44,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
     @unittest.skipIf(OnnxAbs is None,
                      reason="shape inference fails for Normalizer")
     def test_algebra_normalizer(self):
-        op = OnnxNormalizer('I0', norm='L1', op_version=10)
+        op = OnnxNormalizer('I0', norm='L1', op_version=10,
+                            output_names=['Y'])
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)},
+                         outputs=[('Y', FloatTensorType())],
                          target_opset=10)
         assert onx is not None
         sonx = str(onx)
