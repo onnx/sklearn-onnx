@@ -27,7 +27,6 @@ Train a LightGBM classifier
 +++++++++++++++++++++++++++
 """
 import lightgbm
-import onnxmltools
 import skl2onnx
 import onnxruntime
 import onnx
@@ -38,9 +37,6 @@ from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from skl2onnx import convert_sklearn
 from skl2onnx import update_registered_converter
-from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes  # noqa
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
-import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
 import numpy
 from sklearn.datasets import load_iris
@@ -65,23 +61,9 @@ pipe.fit(X, y)
 # Register the converter for LGBMClassifier
 # +++++++++++++++++++++++++++++++++++++++++
 #
-# The converter is implemented in *onnxmltools*:
-# `onnxmltools...LightGbm.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
-# lightgbm/operator_converters/LightGbm.py>`_.
-# and the shape calculator:
-# `onnxmltools...Classifier.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
-# lightgbm/shape_calculators/Classifier.py>`_.
 
-##############################################
-# Then we import the converter and shape calculator.
-
-###########################
-# Let's register the new converter.
-update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
-                            calculate_linear_classifier_output_shapes,
-                            convert_lightgbm)
+from skl2onnx.third_party_skl import register_converters
+register_converters()
 
 ##################################
 # Convert again
@@ -137,5 +119,4 @@ print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
-print("onnxmltools: ", onnxmltools.__version__)
 print("lightgbm: ", lightgbm.__version__)
