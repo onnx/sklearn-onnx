@@ -69,7 +69,7 @@ class TestMetaOnnx(unittest.TestCase):
                     untested=untested, **tests)
             except Exception as e:
                 warnings.warn("Unable to handle operator '{}'".format(model))
-                excs.append((op_type, reason, e))
+                excs.append((model, 'noruntime', e))
         if __name__ == "__main__":
             if not success or len(excs) > 0:
                 import pprint
@@ -205,13 +205,13 @@ class TestMetaOnnx(unittest.TestCase):
             inp.name = 'I%d' % i
         op = op_class(*[inp.name for inp in inps],
                       output_names=[out.name for out in outs],
-                      **atts)
+                      op_version=10, **atts)
         st = StringIO()
         with contextlib.redirect_stdout(st):
             with contextlib.redirect_stderr(st):
                 ort_inputs = {'I%d' % i: inp for i, inp in enumerate(inps)}
                 try:
-                    onx2 = op.to_onnx(ort_inputs)
+                    onx2 = op.to_onnx(ort_inputs, target_version=10)
                 except (RuntimeError, NotImplementedError, TypeError) as e:
                     if node.op_type in untested:
                         return (node.op_type, False,
