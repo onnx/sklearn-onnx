@@ -21,14 +21,6 @@ jobs:
         scipy.version: 'scipy'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.21.3'
-      Py36-Onnx130-Rt021-Npy1170:
-        do.bench: '0'
-        python.version: '3.6.7'
-        onnx.version: 'onnx==1.3.0'
-        numpy.version: 'numpy==1.17.0'
-        scipy.version: 'scipy'
-        onnxrt.version: '==0.2.1'
-        sklearn.version: '==0.21.2'
     maxParallel: 3
 
   steps:
@@ -76,11 +68,6 @@ jobs:
   - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
-
-  - script: |
-      pip install https://files.pythonhosted.org/packages/cd/eb/9761255a96e988710aafdfde3d5698fd785845b981aba1f495150ffbf4b3/onnx-1.3.0-cp36-cp36m-win_amd64.whl
-    displayName: 'install onnx'
-    condition: eq(variables['onnx.version'], 'onnx==1.3.0')
 
   - script: |
       pip install -e .
