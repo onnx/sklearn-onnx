@@ -41,7 +41,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
     op = operator.raw_operator
     opv = container.target_opset
     if opv is None:
-        raise RuntimeError("container.target_opset must be None")
+        raise RuntimeError("container.target_opset must not be None")
 
     options = container.get_options(op, dict(return_cov=False,
                                              return_std=False,

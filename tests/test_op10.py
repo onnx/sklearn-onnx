@@ -1,5 +1,4 @@
 import unittest
-from sklearn import datasets
 from sklearn import linear_model
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
@@ -10,23 +9,10 @@ from onnx.defs import onnx_opset_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
+from test_utils.tests_helper import fit_classification_model
 
 
 class TestOp10(unittest.TestCase):
-    def _fit_model_binary_classification(self, model):
-        iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
-        y[y == 2] = 1
-        model.fit(X, y)
-        return model, X
-
-    def _fit_model_multiclass_classification(self, model):
-        iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
-        model.fit(X, y)
-        return model, X
 
     def check_domain(self, model, domain="", target_opset=10):
         for op in model.opset_import:
@@ -39,8 +25,8 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_logistic_regression(self):
-        model, X = self._fit_model_binary_classification(
-            linear_model.LogisticRegression())
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
@@ -50,7 +36,7 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_kmeans(self):
-        model, X = self._fit_model_binary_classification(KMeans())
+        model, X = fit_classification_model(KMeans(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
@@ -60,8 +46,7 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_mixture(self):
-        model, X = self._fit_model_binary_classification(
-            GaussianMixture())
+        model, X = fit_classification_model(GaussianMixture(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
@@ -71,8 +56,7 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_bayesian_gaussian_mixture(self):
-        model, X = self._fit_model_binary_classification(
-            BayesianGaussianMixture())
+        model, X = fit_classification_model(BayesianGaussianMixture(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
@@ -82,8 +66,7 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_process_regressor(self):
-        model, X = self._fit_model_binary_classification(
-            GaussianProcessRegressor())
+        model, X = fit_classification_model(GaussianProcessRegressor(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
@@ -101,7 +84,7 @@ class TestOp10(unittest.TestCase):
                         ("lr2", LogisticRegression(fit_intercept=False)),
                     ],
                 )
-        model, X = self._fit_model_binary_classification(model)
+        model, X = fit_classification_model(model, 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],
