@@ -26,6 +26,8 @@ register_shape_calculator('SklearnGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnBernoulliNB',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnGaussianNB',
+                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnMultinomialNB',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnKNeighborsClassifier',

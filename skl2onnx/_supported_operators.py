@@ -76,6 +76,7 @@ from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
 from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import MultinomialNB
 
 # Neural Networks
@@ -141,7 +142,7 @@ sklearn_classifier_list = [
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier,
-    ExtraTreesClassifier, BernoulliNB, MultinomialNB,
+    ExtraTreesClassifier, BernoulliNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
     AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
@@ -173,7 +174,7 @@ def build_sklearn_operator_name_map():
                 LinearSVC, LinearSVR, SVC, SVR,
                 LinearRegression,
                 MLPClassifier, MLPRegressor,
-                MultinomialNB, BernoulliNB,
+                MultinomialNB, BernoulliNB, GaussianNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
