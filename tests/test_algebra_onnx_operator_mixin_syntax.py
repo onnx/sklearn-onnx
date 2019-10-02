@@ -40,8 +40,11 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_
-        return OnnxDiv(OnnxSub(i0, W), S,
-                       output_names=outputs)
+        return OnnxDiv(
+            OnnxSub(
+                i0, W, op_version=onnx.defs.onnx_opset_version()),
+            S, output_names=outputs,
+            op_version=onnx.defs.onnx_opset_version())
 
 
 class TestOnnxOperatorMixinSyntax(unittest.TestCase):
@@ -201,20 +204,23 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip(
                 x, np.array([0], dtype=np.float32),
-                output_names=output_names),
+                output_names=output_names,
+                op_version=onnx.defs.onnx_opset_version()),
             lambda x: np.clip(x, 0, 1e5))
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip(
                 x, np.array([-1000], dtype=np.float32),
                 np.array([0], dtype=np.float32),
-                output_names=output_names),
+                output_names=output_names,
+                op_version=onnx.defs.onnx_opset_version()),
             lambda x: np.clip(x, -1e5, 0))
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip(
                 x,
                 np.array([0.1], dtype=np.float32),
                 np.array([2.1], dtype=np.float32),
-                output_names=output_names),
+                output_names=output_names,
+                op_version=onnx.defs.onnx_opset_version()),
             lambda x: np.clip(x, 0.1, 2.1))
 
     def test_onnx_clip_10(self):
