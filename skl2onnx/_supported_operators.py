@@ -77,10 +77,14 @@ from sklearn.neighbors import NearestNeighbors
 # Naive Bayes
 from sklearn.naive_bayes import (
     BernoulliNB,
-    ComplementNB,
     GaussianNB,
     MultinomialNB,
 )
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
+    # scikit-learn versions <= 0.19
+    ComplementNB = None
 
 # Neural Networks
 from sklearn.neural_network import MLPClassifier, MLPRegressor

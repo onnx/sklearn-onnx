@@ -4,10 +4,14 @@ import numpy as np
 import onnx
 from sklearn.naive_bayes import (
     BernoulliNB,
-    ComplementNB,
     GaussianNB,
     MultinomialNB,
 )
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
+    # scikit-learn versions <= 0.19
+    ComplementNB = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
@@ -353,6 +357,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_complement_nb_binary_classification(self):
@@ -374,6 +380,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_complement_nb_multiclass(self):
@@ -395,6 +403,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_complement_nb_binary_classification_int(self):
@@ -416,6 +426,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_complement_nb_multiclass_int(self):
