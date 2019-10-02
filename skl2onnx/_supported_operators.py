@@ -75,9 +75,12 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
-from sklearn.naive_bayes import BernoulliNB
-from sklearn.naive_bayes import GaussianNB
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import (
+    BernoulliNB,
+    ComplementNB,
+    GaussianNB,
+    MultinomialNB,
+)
 
 # Neural Networks
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -141,8 +144,8 @@ sklearn_classifier_list = [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
-    DecisionTreeClassifier, ExtraTreeClassifier,
-    ExtraTreesClassifier, BernoulliNB, GaussianNB, MultinomialNB,
+    DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
+    BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
     AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
@@ -163,8 +166,8 @@ decision_function_classifiers = (
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
-                VotingRegressor,
+                AdaBoostClassifier, AdaBoostRegressor,
+                BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreeClassifier, ExtraTreeRegressor,
@@ -174,10 +177,10 @@ def build_sklearn_operator_name_map():
                 LinearSVC, LinearSVR, SVC, SVR,
                 LinearRegression,
                 MLPClassifier, MLPRegressor,
-                MultinomialNB, BernoulliNB, GaussianNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
+                VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
                 PCA, TruncatedSVD, IncrementalPCA,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,

@@ -356,15 +356,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                    container, to=proto_type)
         input_name = cast_input_name
 
-    if operator.type == 'SklearnMultinomialNB':
-        matmul_result_name = scope.get_unique_variable_name('matmul_result')
-
-        container.add_node(
-            'MatMul', [input_name, feature_log_prob_name],
-            matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
-        apply_add(scope, [matmul_result_name, class_log_prior_name],
-                  sum_result_name, container, broadcast=1)
-    elif operator.type == 'SklearnBernoulliNB':
+    if operator.type == 'SklearnBernoulliNB':
         sum_result_name = _joint_log_likelihood_bernoulli(
             scope, container, input_name, feature_log_prob_name,
             class_log_prior_name, nb_op.binarize, nb_op.feature_count_,
@@ -373,6 +365,19 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         sum_result_name = _joint_log_likelihood_gaussian(
             scope, container, input_name, nb_op,
             proto_type, sum_result_name)
+    else:
+        # MultinomialNB or ComplementNB
+        matmul_result_name = (
+            scope.get_unique_variable_name('matmul_result')
+            if operator.type == 'SklearnMultinomialNB' or len(classes) == 1
+            else sum_result_name)
+
+        container.add_node(
+            'MatMul', [input_name, feature_log_prob_name],
+            matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
+        if operator.type == 'SklearnMultinomialNB' or len(classes) == 1:
+            apply_add(scope, [matmul_result_name, class_log_prior_name],
+                      sum_result_name, container, broadcast=1)
 
     container.add_node('ArgMax', sum_result_name,
                        argmax_output_name,
@@ -394,7 +399,6 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     apply_sub(scope, [sum_result_name, reshaped_log_prob_name], log_prob_name,
               container, broadcast=1)
     apply_exp(scope, log_prob_name, operator.outputs[1].full_name, container)
-
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, argmax_output_name],
         array_feature_extractor_result_name, op_domain='ai.onnx.ml',
@@ -417,5 +421,6 @@ def convert_sklearn_naive_bayes(scope, operator, container):
 
 
 register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes)
+register_converter('SklearnComplementNB', convert_sklearn_naive_bayes)
 register_converter('SklearnGaussianNB', convert_sklearn_naive_bayes)
 register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes)
