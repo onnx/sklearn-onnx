@@ -3,6 +3,7 @@ from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
@@ -47,7 +48,9 @@ class TestOnnxOperators(unittest.TestCase):
 
         def conv(scope, operator, container):
             W = operator.raw_operator.W
-            op = OnnxSub(operator.inputs[0], W, output_names=operator.outputs)
+            op = OnnxSub(
+                operator.inputs[0], W, output_names=operator.outputs,
+                op_version=onnx.defs.onnx_opset_version())
             op.add_to(scope, container)
             text = str(container)
             if 'name:"Su_Sub"' not in text:
@@ -104,7 +107,10 @@ class TestOnnxOperators(unittest.TestCase):
             S = operator.raw_operator.S
             X = operator.inputs[0]
             out = operator.outputs
-            op = OnnxDiv(OnnxSub(X, W), S, output_names=out)
+            op = OnnxDiv(
+                OnnxSub(X, W, op_version=onnx.defs.onnx_opset_version()),
+                S, output_names=out,
+                op_version=onnx.defs.onnx_opset_version())
             op.add_to(scope, container)
 
         def shape(operator):
@@ -131,18 +137,31 @@ class TestOnnxOperators(unittest.TestCase):
             C = op.cluster_centers_
             C2 = row_norms(C, squared=True)
 
-            rs = OnnxReduceSumSquare(X, axes=[1], keepdims=1)
+            rs = OnnxReduceSumSquare(
+                X, axes=[1], keepdims=1,
+                op_version=onnx.defs.onnx_opset_version())
 
             N = X.type.shape[0]
             if isinstance(N, int):
                 zeros = np.zeros((N, ))
             else:
-                zeros = OnnxMul(rs, np.array([0], dtype=np.float32))
+                zeros = OnnxMul(
+                    rs, np.array([0], dtype=np.float32),
+                    op_version=onnx.defs.onnx_opset_version())
 
-            z = OnnxAdd(rs, OnnxGemm(X, C, zeros, alpha=-2., transB=1))
-            y2 = OnnxAdd(C2, z)
-            lo = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1])
-            y2s = OnnxSqrt(y2, output_names=out[1:])
+            z = OnnxAdd(
+                rs,
+                OnnxGemm(
+                    X, C, zeros, alpha=-2., transB=1,
+                    op_version=onnx.defs.onnx_opset_version()),
+                op_version=onnx.defs.onnx_opset_version())
+            y2 = OnnxAdd(C2, z, op_version=onnx.defs.onnx_opset_version())
+            lo = OnnxArgMin(
+                y2, axis=1, keepdims=0, output_names=out[:1],
+                op_version=onnx.defs.onnx_opset_version())
+            y2s = OnnxSqrt(
+                y2, output_names=out[1:],
+                op_version=onnx.defs.onnx_opset_version())
 
             lo.add_to(scope, container)
             y2s.add_to(scope, container)
@@ -176,10 +195,18 @@ class TestOnnxOperators(unittest.TestCase):
         idi = np.identity(2)
         idi2 = np.identity(2) * 2
 
-        onx = OnnxAdd(OnnxAdd('X', idi), idi2, output_names=['Y'])
+        onx = OnnxAdd(
+            OnnxAdd('X', idi, op_version=onnx.defs.onnx_opset_version()),
+            idi2, output_names=['Y'],
+            op_version=onnx.defs.onnx_opset_version())
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         self.assertEqual(len(model_def.graph.output), 1)
-        onx = OnnxAdd(idi2, OnnxAdd('X', idi), output_names=['Y'])
+        onx = OnnxAdd(
+            idi2,
+            OnnxAdd(
+                'X', idi, op_version=onnx.defs.onnx_opset_version()),
+            output_names=['Y'],
+            op_version=onnx.defs.onnx_opset_version())
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
         self.assertEqual(onx.outputs, ['Y'])
@@ -212,8 +239,10 @@ class TestOnnxOperators(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
     def test_onnxt_array_feature_extractor(self):
-        onx = OnnxArrayFeatureExtractor('X', np.array([1], dtype=np.int64),
-                                        output_names=['Y'])
+        onx = OnnxArrayFeatureExtractor(
+            'X', np.array([1], dtype=np.int64),
+            output_names=['Y'],
+            op_version=onnx.defs.onnx_opset_version())
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([2]))])
