@@ -23,7 +23,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_abs(self):
 
-        op = OnnxAbs('I0')
+        op = OnnxAbs('I0', op_version=onnx.defs.onnx_opset_version())
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
 
@@ -41,11 +41,14 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
                      reason="not available")
-    @unittest.skipIf(True or OnnxAbs is None,
+    @unittest.skipIf(OnnxAbs is None,
                      reason="shape inference fails for Normalizer")
     def test_algebra_normalizer(self):
-        op = OnnxNormalizer('I0', norm='L1', op_version=1)
-        onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
+        op = OnnxNormalizer('I0', norm='L1', op_version=10,
+                            output_names=['Y'])
+        onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)},
+                         outputs=[('Y', FloatTensorType())],
+                         target_opset=10)
         assert onx is not None
         sonx = str(onx)
         assert "ai.onnx.ml" in sonx
@@ -104,7 +107,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin_named_output(self):
 
-        op = OnnxArgMin(OnnxNormalizer('I0', norm='L1', output_names=['Y']))
+        op = OnnxArgMin(
+            OnnxNormalizer('I0', norm='L1', output_names=['Y'],
+                           op_version=onnx.defs.onnx_opset_version()),
+            op_version=onnx.defs.onnx_opset_version())
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -123,7 +129,10 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin(self):
 
-        op = OnnxArgMin(OnnxNormalizer('I0', norm='L1'))
+        op = OnnxArgMin(
+            OnnxNormalizer(
+                'I0', norm='L1', op_version=onnx.defs.onnx_opset_version()),
+            op_version=onnx.defs.onnx_opset_version())
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -142,7 +151,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
 
-        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'])
+        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'],
+                       op_version=onnx.defs.onnx_opset_version())
         onx = op.to_onnx({'I0': numpy.arange(6, dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -170,11 +180,15 @@ class TestAlgebraSymbolic(unittest.TestCase):
             for i in range(nbnode - 1):
                 i2 = list(rand(1, dim).ravel())
                 matrices.append(i2)
-                node = OnnxScaler(i1, offset=i2, scale=scale)
+                node = OnnxScaler(
+                    i1, offset=i2, scale=scale,
+                    op_version=onnx.defs.onnx_opset_version())
                 i1 = node
             i2 = list(rand(1, dim).ravel())
             matrices.append(i2)
-            node = OnnxScaler(i1, offset=i2, scale=scale, output_names=['Y'])
+            node = OnnxScaler(
+                i1, offset=i2, scale=scale, output_names=['Y'],
+                op_version=onnx.defs.onnx_opset_version())
             onx = node.to_onnx([(input_name, FloatTensorType((None, dim)))],
                                outputs=[('Y', FloatTensorType((None, dim)))])
             return onx, matrices

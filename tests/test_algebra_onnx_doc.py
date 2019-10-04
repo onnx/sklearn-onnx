@@ -4,8 +4,6 @@ import sys
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
-from onnx import helper
-from onnx import TensorProto
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
 
@@ -14,20 +12,6 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
 
     def setUp(self):
         self._algebra = dynamic_class_creation()
-
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
-    def test_pad(self):
-        from skl2onnx.algebra.onnx_ops import OnnxPad
-
-        X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
-
-        pad = OnnxPad('X', output_names=['Y'],
-                      mode='constant', value=1.5,
-                      pads=[0, 1, 0, 1])
-
-        model_def = pad.to_onnx({'X': X})
-        onnx.checker.check_model(model_def)
 
     def predict_with_onnxruntime(self, model_def, *inputs):
         import onnxruntime as ort
@@ -43,8 +27,12 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     def test_transpose2(self):
         from skl2onnx.algebra.onnx_ops import OnnxTranspose
 
-        node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]),
-                             perm=[1, 0, 2], output_names=['Y'])
+        node = OnnxTranspose(
+            OnnxTranspose(
+                'X', perm=[1, 0, 2],
+                op_version=onnx.defs.onnx_opset_version()),
+            perm=[1, 0, 2], output_names=['Y'],
+            op_version=onnx.defs.onnx_opset_version())
         X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
         model_def = node.to_onnx({'X': X})
