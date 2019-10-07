@@ -1,8 +1,17 @@
-import onnx
+from distutils.version import StrictVersion
 import unittest
 import numpy as np
-from distutils.version import StrictVersion
-from sklearn.naive_bayes import MultinomialNB, BernoulliNB
+import onnx
+from sklearn.naive_bayes import (
+    BernoulliNB,
+    GaussianNB,
+    MultinomialNB,
+)
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
+    # scikit-learn versions <= 0.19
+    ComplementNB = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
@@ -260,6 +269,182 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMclBernoulliNBInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_nb_binary_classification(self):
+        model, X = fit_classification_model(
+            GaussianNB(), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian naive bayes",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinGaussianNB",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_nb_multiclass(self):
+        model, X = fit_classification_model(
+            GaussianNB(), 4)
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian naive bayes",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclGaussianNB",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_nb_binary_classification_int(self):
+        model, X = fit_classification_model(
+            GaussianNB(), 2, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian naive bayes",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinGaussianNBInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_nb_multiclass_int(self):
+        model, X = fit_classification_model(
+            GaussianNB(), 5, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian naive bayes",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclGaussianNBInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_complement_nb_binary_classification(self):
+        model, X = fit_classification_model(
+            ComplementNB(), 2, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "complement naive bayes",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinComplementNB-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_complement_nb_multiclass(self):
+        model, X = fit_classification_model(
+            ComplementNB(), 4, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "complement naive bayes",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclComplementNB-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_complement_nb_binary_classification_int(self):
+        model, X = fit_classification_model(
+            ComplementNB(), 2, is_int=True, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "complement naive bayes",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinComplementNBInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_complement_nb_multiclass_int(self):
+        model, X = fit_classification_model(
+            ComplementNB(), 5, is_int=True, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "complement naive bayes",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclComplementNBInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
