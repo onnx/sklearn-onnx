@@ -36,8 +36,8 @@ import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from skl2onnx import convert_sklearn
-from skl2onnx import update_registered_converter
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.third_party_skl import register_converters
 import numpy
 from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
@@ -62,7 +62,6 @@ pipe.fit(X, y)
 # +++++++++++++++++++++++++++++++++++++++++
 #
 
-from skl2onnx.third_party_skl import register_converters
 register_converters()
 
 ##################################

@@ -45,6 +45,9 @@ def _guess_type(given_type):
         return _guess_type_proto(ttype.elem_type, dims)
     elif isinstance(given_type, np.int64):
         return Int64Type()
+    elif given_type.__class__.__name__.endswith("Categorical"):
+        # pandas Categorical without important pandas
+        return Int64TensorType()
     else:
         raise NotImplementedError(
             "Unsupported type '{}'. You may raise an issue "

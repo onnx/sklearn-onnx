@@ -319,7 +319,7 @@ def convert_xgboost(scope, operator, container):
     """
     Converters for *XGBoost* models.
     """
-    from xgboost import XGBClassifier    
+    from xgboost import XGBClassifier
     xgb_node = operator.raw_operator
     if isinstance(xgb_node, XGBClassifier):
         cls = XGBClassifierConverter
