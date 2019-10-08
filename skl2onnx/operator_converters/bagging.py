@@ -79,12 +79,21 @@ def _calculate_proba(scope, operator, container, model):
     return final_proba_name
 
 
-def convert_sklearn_bagging(scope, operator, container):
+def convert_sklearn_bagging_classifier(scope, operator, container):
+    """
+    Converter for BaggingClassifier.
+    """
     bagging_op = operator.raw_operator
     if (not (isinstance(bagging_op.max_features, float) and
              bagging_op.max_features == 1.0)):
         raise NotImplementedError(
             "Not default values for max_features is "
+            "not supported with BaggingClassifier yet. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues")
+    if bagging_op.bootstrap_features:
+        raise NotImplementedError(
+            "bootstrap_features=True is "
             "not supported with BaggingClassifier yet. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues")
@@ -130,4 +139,46 @@ def convert_sklearn_bagging(scope, operator, container):
                       desired_shape=output_shape)
 
 
-register_converter('SklearnBaggingClassifier', convert_sklearn_bagging)
+def convert_sklearn_bagging_regressor(scope, operator, container):
+    """
+    Converter for BaggingRegressor.
+    """
+    bagging_op = operator.raw_operator
+    if (not (isinstance(bagging_op.max_features, float) and
+             bagging_op.max_features == 1.0)):
+        raise NotImplementedError(
+            "Not default values for max_features is "
+            "not supported with BaggingRegressor yet. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues")
+    if bagging_op.bootstrap_features:
+        raise NotImplementedError(
+            "bootstrap_features=True is "
+            "not supported with BaggingRegressor yet. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues")
+    proba_list = []
+    for index, estimator in enumerate(bagging_op.estimators_):
+        op_type = sklearn_operator_name_map[type(estimator)]
+        this_operator = scope.declare_local_operator(op_type)
+        this_operator.raw_operator = estimator
+        this_operator.inputs = operator.inputs
+        label_name = scope.declare_local_variable('label_%d' % index)
+        this_operator.outputs.append(label_name)
+        reshaped_proba_name = scope.get_unique_variable_name('reshaped_proba')
+        apply_reshape(scope, label_name.onnx_name, reshaped_proba_name,
+                      container, desired_shape=(1, -1, 1))
+        proba_list.append(reshaped_proba_name)
+    merged_proba_name = scope.get_unique_variable_name('merged_proba')
+    apply_concat(scope, proba_list,
+                 merged_proba_name, container, axis=0)
+    container.add_node('ReduceMean', merged_proba_name,
+                       operator.outputs[0].full_name,
+                       name=scope.get_unique_operator_name('ReduceMean'),
+                       axes=[0], keepdims=0)
+
+
+register_converter('SklearnBaggingClassifier',
+                   convert_sklearn_bagging_classifier)
+register_converter('SklearnBaggingRegressor',
+                   convert_sklearn_bagging_regressor)

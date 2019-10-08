@@ -6,11 +6,20 @@
 
 import unittest
 import numpy as np
-from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier
-from sklearn.linear_model import SGDClassifier
+from sklearn.ensemble import (
+    AdaBoostClassifier,
+    AdaBoostRegressor,
+    BaggingClassifier,
+    BaggingRegressor,
+)
+from sklearn.linear_model import SGDClassifier, SGDRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    fit_regression_model,
+)
 
 
 class TestSklearnBaggingConverter(unittest.TestCase):
@@ -162,6 +171,63 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBaggingClassifierAdaboostMulticlass",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_bagging_regressor_default(self):
+        model, X = fit_regression_model(
+            BaggingRegressor())
+        model_onnx = convert_sklearn(
+            model,
+            "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingRegressorDefault-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_bagging_regressor_sgd(self):
+        model, X = fit_regression_model(
+            BaggingRegressor(SGDRegressor()))
+        model_onnx = convert_sklearn(
+            model,
+            "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingRegressorSGD-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_bagging_regressor_adaboost(self):
+        model, X = fit_regression_model(
+            BaggingRegressor(AdaBoostRegressor()))
+        model_onnx = convert_sklearn(
+            model,
+            "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingRegressorAdaboost",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
