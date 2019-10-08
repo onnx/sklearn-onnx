@@ -7,10 +7,10 @@
 import unittest
 import numpy as np
 from sklearn.ensemble import (
-    AdaBoostClassifier,
-    AdaBoostRegressor,
     BaggingClassifier,
     BaggingRegressor,
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
 )
 from sklearn.linear_model import SGDClassifier, SGDRegressor
 from skl2onnx import convert_sklearn
@@ -137,9 +137,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
-    def test_bagging_classifier_adaboost_binary(self):
+    def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(AdaBoostClassifier()), 2)
+            BaggingClassifier(GradientBoostingClassifier()), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -151,14 +151,14 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierAdaboostBinary",
+            basename="SklearnBaggingClassifierGradientBoostingBinary",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
 
-    def test_bagging_classifier_adaboost_multiclass(self):
+    def test_bagging_classifier_gradient_boosting_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(AdaBoostClassifier()), 3)
+            BaggingClassifier(GradientBoostingClassifier()), 3)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -170,7 +170,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierAdaboostMulticlass",
+            basename="SklearnBaggingClassifierGradientBoostingMulticlass",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
@@ -213,9 +213,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
-    def test_bagging_regressor_adaboost(self):
+    def test_bagging_regressor_gradient_boosting(self):
         model, X = fit_regression_model(
-            BaggingRegressor(AdaBoostRegressor()))
+            BaggingRegressor(GradientBoostingRegressor()))
         model_onnx = convert_sklearn(
             model,
             "bagging regressor",
@@ -227,7 +227,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorAdaboost",
+            basename="SklearnBaggingRegressorGradientBoosting-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
