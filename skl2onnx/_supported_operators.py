@@ -45,7 +45,7 @@ from sklearn.multiclass import OneVsRestClassifier
 # Tree-based models
 from sklearn.ensemble import (
     AdaBoostClassifier, AdaBoostRegressor,
-    BaggingClassifier,
+    BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     RandomForestClassifier, RandomForestRegressor,
@@ -173,7 +173,7 @@ decision_function_classifiers = (
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
                 AdaBoostClassifier, AdaBoostRegressor,
-                BaggingClassifier,
+                BaggingClassifier, BaggingRegressor,
                 BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
