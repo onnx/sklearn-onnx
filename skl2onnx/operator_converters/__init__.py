@@ -8,6 +8,7 @@
 # import associated modules here.
 from . import ada_boost
 from . import array_feature_extractor
+from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
 from . import concat_op
@@ -51,6 +52,7 @@ from . import zip_map
 __all__ = [
     ada_boost,
     array_feature_extractor,
+    bagging,
     binariser,
     calibrated_classifier_cv,
     concat_op,
