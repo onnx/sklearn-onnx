@@ -9,7 +9,7 @@ import numpy as np
 from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_div, apply_exp,
-    apply_mul, apply_reshape, apply_sub)
+    apply_mul, apply_reshape, apply_sub, apply_clip)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import decision_function_classifiers
@@ -97,11 +97,10 @@ def _transform_isotonic(scope, container, model, T, k):
     if model.calibrators_[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
 
-        container.add_node(
-            'Clip', T, clipped_df_name,
-            name=scope.get_unique_operator_name('Clip'),
-            min=model.calibrators_[k].X_min_,
-            max=model.calibrators_[k].X_max_)
+        apply_clip(scope, T, clipped_df_name, container,
+                   operator_name=scope.get_unique_operator_name('Clip'),
+                   max=model.calibrators_[k].X_max_,
+                   min=model.calibrators_[k].X_min_)
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
