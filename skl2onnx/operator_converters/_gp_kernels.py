@@ -42,7 +42,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                 kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
             convert_kernel_diag(
                 kernel.k2, X, dtype=dtype, optim=optim, op_version=op_version),
-            output_names=output_names)
+            output_names=output_names, op_version=op_version)
 
     if isinstance(kernel, ConstantKernel):
         onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype,
@@ -99,7 +99,8 @@ def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
         raise ValueError("Unknown optimization '{}'.".format(optim))
     t_pi = py_make_float_array(pi, dtype=dtype)
     t_periodicity = py_make_float_array(periodicity, dtype)
-    arg = OnnxMul(OnnxDiv(dists, t_periodicity, op_version=op_version), t_pi)
+    arg = OnnxMul(OnnxDiv(dists, t_periodicity, op_version=op_version),
+                  t_pi, op_version=op_version)
     sin_of_arg = OnnxSin(arg, op_version=op_version)
     t_2 = py_make_float_array(2, dtype=dtype)
     t__2 = py_make_float_array(-2, dtype=dtype)
@@ -158,6 +159,8 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
 def convert_kernel(kernel, X, output_names=None,
                    x_train=None, dtype=None, optim=None,
                    op_version=None):
+    if op_version is None:
+        raise RuntimeError("op_version must not be None.")
     if isinstance(kernel, Sum):
         clop = OnnxAdd
     elif isinstance(kernel, Product):
@@ -170,7 +173,7 @@ def convert_kernel(kernel, X, output_names=None,
                            optim=optim, op_version=op_version),
             convert_kernel(kernel.k2, X, x_train=x_train, dtype=dtype,
                            optim=optim, op_version=op_version),
-            output_names=output_names)
+            output_names=output_names, op_version=op_version)
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
@@ -227,7 +230,9 @@ def convert_kernel(kernel, X, output_names=None,
                 raise ValueError("Unknown optimization '{}'.".format(optim))
 
         tensor_value = py_make_float_array(-0.5, dtype=dtype, as_tensor=True)
-        cst5 = OnnxConstantOfShape(OnnxShape(zerov), value=tensor_value)
+        cst5 = OnnxConstantOfShape(
+            OnnxShape(zerov, op_version=op_version),
+            value=tensor_value, op_version=op_version)
 
         # K = np.exp(-.5 * dists)
         exp = OnnxExp(OnnxMul(dist, cst5, op_version=op_version),

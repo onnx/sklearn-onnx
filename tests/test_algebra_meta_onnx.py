@@ -28,7 +28,10 @@ class TestMetaOnnx(unittest.TestCase):
     def test_mul(self):
         from skl2onnx.algebra.onnx_ops import OnnxMul
         assert OnnxMul.operator_name == 'Mul'
-        assert isinstance(OnnxMul('a', 'b'), OnnxOperator)
+        assert isinstance(
+            OnnxMul(
+                'a', 'b', op_version=onnx.defs.onnx_opset_version()),
+            OnnxOperator)
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
                      reason="too unstable with older versions")
@@ -68,8 +71,9 @@ class TestMetaOnnx(unittest.TestCase):
                 op_type, success, reason = self._check_algebra_onnxruntime(
                     untested=untested, **tests)
             except Exception as e:
-                warnings.warn("Unable to handle operator '{}'".format(model))
-                excs.append((op_type, reason, e))
+                reason = "Unable to handle operator '{}'".format(model)
+                warnings.warn(reason)
+                excs.append((model.__class__.__name__, reason, e))
         if __name__ == "__main__":
             if not success or len(excs) > 0:
                 import pprint

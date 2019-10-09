@@ -26,6 +26,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     op = operator.raw_operator
     n_features = X.type.shape[1]
     n_components = op.means_.shape[0]
+    opv = container.target_opset
 
     # All comments come from scikit-learn code and tells
     # which functions is being onnxified.
@@ -51,10 +52,10 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         for c in range(n_components):
             prec_chol = op.precisions_cholesky_[c, :, :]
             cst = - np.dot(op.means_[c, :], prec_chol)
-            y = OnnxGemm(X, prec_chol, cst, alpha=1., beta=1.)
-            y2s = OnnxReduceSumSquare(y, axes=[1])
+            y = OnnxGemm(X, prec_chol, cst, alpha=1., beta=1., op_version=opv)
+            y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
-        log_prob = OnnxConcat(*ys, axis=1)
+        log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
     elif op.covariance_type == 'tied':
         # shape(op.means_) = (n_components, n_features)
@@ -70,10 +71,11 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         ys = []
         for f in range(n_components):
             cst = - np.dot(op.means_[f, :], precisions_chol)
-            y = OnnxGemm(X, precisions_chol, cst, alpha=1., beta=1.)
-            y2s = OnnxReduceSumSquare(y, axes=[1])
+            y = OnnxGemm(X, precisions_chol, cst,
+                         alpha=1., beta=1., op_version=opv)
+            y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
-        log_prob = OnnxConcat(*ys, axis=1)
+        log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
     elif op.covariance_type == 'diag':
         # shape(op.means_) = (n_components, n_features)
@@ -89,9 +91,12 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         mp = np.sum((op.means_ ** 2 * precisions), 1)
         zeros = np.zeros((n_components, ))
         xmp = OnnxGemm(X, (op.means_ * precisions).T, zeros,
-                       alpha=-2., beta=0.)
-        term = OnnxGemm(OnnxMul(X, X), precisions.T, zeros, alpha=1., beta=0.)
-        log_prob = OnnxAdd(OnnxAdd(mp, xmp), term)
+                       alpha=-2., beta=0., op_version=opv)
+        term = OnnxGemm(OnnxMul(X, X, op_version=opv),
+                        precisions.T, zeros, alpha=1., beta=0.,
+                        op_version=opv)
+        log_prob = OnnxAdd(OnnxAdd(mp, xmp, op_version=opv),
+                           term, op_version=opv)
 
     elif op.covariance_type == 'spherical':
         # shape(op.means_) = (n_components, n_features)
@@ -104,13 +109,14 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
         zeros = np.zeros((n_components, ))
         precisions = op.precisions_cholesky_ ** 2
-        normX = OnnxReduceSumSquare(X, axes=[1])
+        normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
         outer = OnnxGemm(normX, precisions[np.newaxis, :], zeros,
-                         alpha=1., beta=1.)
+                         alpha=1., beta=1., op_version=opv)
         xmp = OnnxGemm(X, (op.means_.T * precisions), zeros,
-                       alpha=-2., beta=0.)
+                       alpha=-2., beta=0., op_version=opv)
         mp = np.sum(op.means_ ** 2, 1) * precisions
-        log_prob = OnnxAdd(mp, OnnxAdd(xmp, outer))
+        log_prob = OnnxAdd(mp, OnnxAdd(xmp, outer, op_version=opv),
+                           op_version=opv)
     else:
         raise RuntimeError("Unknown op.covariance_type='{}'. Upgrade "
                            "to a mroe recent version of skearn-onnx "
@@ -118,14 +124,16 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
     # -.5 * (cst + log_prob) + log_det
     cst = np.array([n_features * np.log(2 * np.pi)])
-    add = OnnxAdd(cst, log_prob)
-    mul = OnnxMul(add, np.array([-0.5]))
+    add = OnnxAdd(cst, log_prob, op_version=opv)
+    mul = OnnxMul(add, np.array([-0.5]), op_version=opv)
     if isinstance(log_det, float):
         log_det = np.array([log_det])
-    weighted_log_prob = OnnxAdd(OnnxAdd(mul, log_det), log_weights)
+    weighted_log_prob = OnnxAdd(OnnxAdd(mul, log_det, op_version=opv),
+                                log_weights, op_version=opv)
 
     # labels
-    labels = OnnxArgMax(weighted_log_prob, axis=1, output_names=out[:1])
+    labels = OnnxArgMax(weighted_log_prob, axis=1,
+                        output_names=out[:1], op_version=opv)
 
     # def _estimate_log_prob_resp():
     # np.exp(log_resp)
@@ -134,11 +142,12 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     # with np.errstate(under='ignore'):
     #    log_resp = weighted_log_prob - log_prob_norm[:, np.newaxis]
 
-    log_prob_norm = OnnxReduceLogSumExp(weighted_log_prob, axes=[1])
-    log_resp = OnnxSub(weighted_log_prob, log_prob_norm)
+    log_prob_norm = OnnxReduceLogSumExp(
+        weighted_log_prob, axes=[1], op_version=opv)
+    log_resp = OnnxSub(weighted_log_prob, log_prob_norm, op_version=opv)
 
     # probabilities
-    probs = OnnxExp(log_resp, output_names=out[1:])
+    probs = OnnxExp(log_resp, output_names=out[1:], op_version=opv)
 
     # final
     labels.add_to(scope, container)
