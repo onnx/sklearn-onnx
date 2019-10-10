@@ -8,8 +8,8 @@ import numpy as np
 
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_abs, apply_add, apply_cast, apply_concat, apply_div, apply_exp,
-    apply_mul, apply_reshape, apply_sub, apply_clip)
+    apply_abs, apply_add, apply_cast, apply_concat, apply_clip
+    apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import decision_function_classifiers
