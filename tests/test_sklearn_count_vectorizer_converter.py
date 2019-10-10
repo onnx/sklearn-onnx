@@ -26,7 +26,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 1))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -50,7 +50,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(2, 2))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -74,7 +74,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 2))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -98,7 +98,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 3))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -122,7 +122,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(binary=True)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
