@@ -78,7 +78,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         model_onnx = convert_sklearn(
             tfi,
             "tfidf",
-            initial_types=[("input", StringTensorType([1, 1]))],
+            initial_types=[("input", StringTensorType([1]))],
             options=extra,
         )
         dump_data_and_model(
