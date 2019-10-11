@@ -25,12 +25,12 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn normalizer",
-            [("input", FloatTensorType([None, 1]))],
+            [("input", FloatTensorType([None, 3]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
         dump_data_and_model(
-            numpy.array([[1, 1]], dtype=numpy.float32),
+            numpy.array([[1, 1, 3], [3, 1, 2]], dtype=numpy.float32),
             model,
             model_onnx,
             basename="SklearnNormalizerL2-SkipDim1",

@@ -51,7 +51,7 @@ class PipeConcatenateInput:
             dim = inp[keys[0]].shape[0], len(keys)
             x2 = numpy.zeros(dim)
             for i in range(x2.shape[1]):
-                x2[:, i: i+1] = inp[keys[i]]
+                x2[:, i] = inp[keys[i]].ravel()
             res = self.pipe.transform(x2)
             return res
         else:
@@ -94,7 +94,10 @@ class TestSklearnPipeline(unittest.TestCase):
         )
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
         self.assertTrue(model_onnx is not None)
-        data = {"input1": data[:, :1], "input2": data[:, 1:]}
+        data = {
+            "input1": data[:, 0].reshape((-1, 1)),
+            "input2": data[:, 1].reshape((-1, 1)),
+        }
         dump_data_and_model(
             data,
             PipeConcatenateInput(model),
@@ -131,14 +134,16 @@ class TestSklearnPipeline(unittest.TestCase):
         )
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
         self.assertTrue(model_onnx is not None)
-        data = {"input1": data[:, :1], "input2": data[:, 1:]}
+        data = {
+            "input1": data[:, 0].reshape((-1, 1)),
+            "input2": data[:, 1].reshape((-1, 1)),
+        }
         dump_data_and_model(
             data,
             PipeConcatenateInput(model),
             model_onnx,
             basename="SklearnPipelineScaler11Union",
         )
-
     def test_combine_inputs_floats_ints(self):
         data = [[0, 0.0], [0, 0.0], [1, 1.0], [1, 1.0]]
         scaler = StandardScaler()
@@ -157,8 +162,8 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         data = numpy.array(data)
         data = {
-            "input1": data[:, :1].astype(numpy.int64),
-            "input2": data[:, 1:].astype(numpy.float32),
+            "input1": data[:, 0].reshape((-1, 1)).astype(numpy.int64),
+            "input2": data[:, 1].reshape((-1, 1)).astype(numpy.float32),
         }
         dump_data_and_model(
             data,
