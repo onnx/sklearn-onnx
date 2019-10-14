@@ -35,7 +35,7 @@ class TestMetaOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
                      reason="too unstable with older versions")
-    @unittest.skipIf(StrictVersion(onnxruntime.__version__) <
+    @unittest.skipIf(StrictVersion(onnxruntime.__version__) <=
                      StrictVersion("0.5.0"),
                      reason="too unstable with older versions")
     def test_onnx_spec(self):
