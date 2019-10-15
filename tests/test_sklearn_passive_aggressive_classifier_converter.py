@@ -17,7 +17,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             PassiveAggressiveClassifier(random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn PassiveAggressiveClassifier binary classifier",
+            "scikit-learn PassiveAggressiveClassifier binary",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
@@ -39,7 +39,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             PassiveAggressiveClassifier(random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn PassiveAggressiveClassifier multi-class classifier",
+            "scikit-learn PassiveAggressiveClassifier multi-class",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
@@ -61,7 +61,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             PassiveAggressiveClassifier(random_state=42), 2, is_int=True)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn PassiveAggressiveClassifier binary classifier",
+            "scikit-learn PassiveAggressiveClassifier binary",
             [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
@@ -83,7 +83,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             PassiveAggressiveClassifier(random_state=42), 5, is_int=True)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn PassiveAggressiveClassifier multi-class classifier",
+            "scikit-learn PassiveAggressiveClassifier multi-class",
             [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
