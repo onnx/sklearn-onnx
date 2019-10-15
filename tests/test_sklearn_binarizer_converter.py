@@ -12,9 +12,9 @@ from test_utils import dump_data_and_model
 
 class TestSklearnBinarizer(unittest.TestCase):
     def test_model_binarizer(self):
-        data = np.array([[ 1., -1., 2.],
-                         [ 2., 0., 0.],
-                         [ 0., 1., -1.]], dtype=np.float32)
+        data = np.array([[1., -1., 2.],
+                         [2., 0., 0.],
+                         [0., 1., -1.]], dtype=np.float32)
         model = Binarizer(threshold=0.5)
         model_onnx = convert_sklearn(
             model,
