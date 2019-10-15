@@ -100,7 +100,7 @@ def make_attribute(
         attr.type = AttributeProto.INT
     elif isinstance(value, np.int64):
         attr.i = value
-        attr.type = AttributeProto.INT64
+        attr.type = AttributeProto.INT
     elif isinstance(value, numbers.Integral):
         attr.i = value
         attr.type = AttributeProto.INT
