@@ -159,8 +159,7 @@ jobs:
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
-      flake8 skl2onnx tests
-      flake8 skl2onnx tests_onnxmltools
+      flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
 
   - script: |

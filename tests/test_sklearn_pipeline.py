@@ -144,6 +144,7 @@ class TestSklearnPipeline(unittest.TestCase):
             model_onnx,
             basename="SklearnPipelineScaler11Union",
         )
+
     def test_combine_inputs_floats_ints(self):
         data = [[0, 0.0], [0, 0.0], [1, 1.0], [1, 1.0]]
         scaler = StandardScaler()
