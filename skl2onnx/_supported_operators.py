@@ -11,8 +11,11 @@ from .common._registration import register_converter, register_shape_calculator
 from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import Perceptron, SGDClassifier
+from sklearn.linear_model import (
+    LogisticRegression, LogisticRegressionCV,
+    PassiveAggressiveClassifier,
+    Perceptron, SGDClassifier,
+)
 from sklearn.svm import LinearSVC
 
 # Linear regressors
@@ -150,6 +153,7 @@ from sklearn.preprocessing import FunctionTransformer
 # the list.
 sklearn_classifier_list = [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
+    PassiveAggressiveClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
@@ -227,6 +231,7 @@ def build_sklearn_operator_name_map():
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
         OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
+        PassiveAggressiveClassifier: 'SklearnSGDClassifier',
         PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
