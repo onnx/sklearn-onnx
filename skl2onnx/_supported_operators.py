@@ -11,8 +11,11 @@ from .common._registration import register_converter, register_shape_calculator
 from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import Perceptron, SGDClassifier
+from sklearn.linear_model import (
+    LogisticRegression, LogisticRegressionCV,
+    PassiveAggressiveClassifier,
+    Perceptron, SGDClassifier,
+)
 from sklearn.svm import LinearSVC
 
 # Linear regressors
@@ -26,7 +29,10 @@ from sklearn.linear_model import (
     LassoLars, LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
+    MultiTaskElasticNet,
     MultiTaskLasso, MultiTaskLassoCV,
+    OrthogonalMatchingPursuit,
+    PassiveAggressiveRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor,
@@ -45,6 +51,7 @@ from sklearn.multiclass import OneVsRestClassifier
 # Tree-based models
 from sklearn.ensemble import (
     AdaBoostClassifier, AdaBoostRegressor,
+    BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     RandomForestClassifier, RandomForestRegressor,
@@ -146,9 +153,11 @@ from sklearn.preprocessing import FunctionTransformer
 # the list.
 sklearn_classifier_list = [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
+    PassiveAggressiveClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
+    BaggingClassifier,
     BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
@@ -171,6 +180,7 @@ decision_function_classifiers = (
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
                 AdaBoostClassifier, AdaBoostRegressor,
+                BaggingClassifier, BaggingRegressor,
                 BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
@@ -215,10 +225,14 @@ def build_sklearn_operator_name_map():
         LinearDiscriminantAnalysis: 'SklearnLinearClassifier',
         LogisticRegression: 'SklearnLinearClassifier',
         LogisticRegressionCV: 'SklearnLinearClassifier',
+        MultiTaskElasticNet: 'SklearnLinearRegressor',
         MultiTaskLasso: 'SklearnLinearRegressor',
         MultiTaskLassoCV: 'SklearnLinearRegressor',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
+        PassiveAggressiveClassifier: 'SklearnSGDClassifier',
+        PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',

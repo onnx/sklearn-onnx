@@ -158,9 +158,8 @@ jobs:
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
-      flake8 skl2onnx tests
-      flake8 skl2onnx tests_third_party_skl
-    displayName: 'tests_third_party_skl'
+      flake8 skl2onnx tests tests_third_party_skl
+    displayName: 'flake8'
 
   - script: |
       if [ '$(do.bench)' == '1' ]

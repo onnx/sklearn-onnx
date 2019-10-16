@@ -52,8 +52,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
-      flake8 skl2onnx tests
-      flake8 skl2onnx tests_third_party_skl
+      flake8 skl2onnx tests tests_third_party_skl
     displayName: 'flake8'
 
   - script: |

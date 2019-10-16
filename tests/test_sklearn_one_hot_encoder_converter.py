@@ -133,7 +133,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
                               categories='auto')
         model.fit(data)
         inputs = [
-            ("input1", StringTensorType([None, 2])),
+            ("input1", StringTensorType([None, 1])),
+            ("input2", StringTensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(
             model, "one-hot encoder", inputs)
@@ -208,7 +209,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 4, 0],
             [0, 3, 3],
         ]
-        test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
+        test = numpy.array([[2, 2, 1], [4, 2, 1]], dtype=numpy.int64)
         model = OneHotEncoder(categories="auto", drop=[0, 1, 3],
                               dtype=numpy.float32)
         model.fit(data)
@@ -240,7 +241,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             [0, 4, 0],
             [0, 3, 3],
         ]
-        test = numpy.array([[2, 2, 1]], dtype=numpy.int64)
+        test = numpy.array([[2, 2, 1], [1, 3, 3]], dtype=numpy.int64)
         model = OneHotEncoder(categories="auto", drop='first',
                               dtype=numpy.int64)
         model.fit(data)
