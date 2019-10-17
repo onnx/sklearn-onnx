@@ -165,7 +165,7 @@ class TestCustomTransformer(unittest.TestCase):
             Xd.astype(numpy.float32)[:7],
             ptsne_knn,
             model_onnx,
-            basename="CustomTransformerTSNEkNN",
+            basename="CustomTransformerTSNEkNN-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
                           "<= StrictVersion('1.5')",
         )
@@ -189,7 +189,7 @@ class TestCustomTransformer(unittest.TestCase):
             Xd.astype(numpy.float32)[:7],
             ptsne_knn,
             model_onnx,
-            basename="CustomTransformerTSNEkNNCustomParser",
+            basename="CustomTransformerTSNEkNNCustomParser-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
             "<= StrictVersion('1.5')",
         )
