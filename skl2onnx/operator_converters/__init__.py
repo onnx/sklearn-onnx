@@ -39,6 +39,7 @@ from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import polynomial_features
 from . import random_forest
+from . import ransac_regressor
 from . import scaler_op
 from . import sgd_classifier
 from . import support_vector_machines
@@ -83,6 +84,7 @@ __all__ = [
     ordinal_encoder,
     polynomial_features,
     random_forest,
+    ransac_regressor,
     scaler_op,
     sgd_classifier,
     support_vector_machines,
