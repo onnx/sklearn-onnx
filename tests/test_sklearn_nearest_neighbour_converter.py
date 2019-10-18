@@ -43,7 +43,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model,
             model_onnx,
-            basename="SklearnKNeighborsRegressor-OneOffArray",
+            basename="SklearnKNeighborsRegressor",
             allow_failure="StrictVersion(onnxruntime.__version__) "
             "<= StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
@@ -59,7 +59,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:2],
             model,
             model_onnx,
-            basename="SklearnKNeighborsRegressor2-OneOffArray",
+            basename="SklearnKNeighborsRegressor2",
             allow_failure="StrictVersion(onnxruntime.__version__) "
             "<= StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
@@ -75,7 +75,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:2],
             model,
             model_onnx,
-            basename="SklearnKNeighborsRegressor2-OneOffArray",
+            basename="SklearnKNeighborsRegressor2",
             allow_failure="StrictVersion(onnxruntime.__version__) "
             "<= StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
@@ -90,7 +90,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model,
             model_onnx,
-            basename="SklearnKNeighborsRegressorWeightsDistance-OneOffArray",
+            basename="SklearnKNeighborsRegressorWeightsDistance-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
             "StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
@@ -105,7 +105,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model,
             model_onnx,
-            basename="SklearnKNeighborsRegressorMetricCityblock-OneOffArray",
+            basename="SklearnKNeighborsRegressorMetricCityblock",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
             "StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
@@ -126,7 +126,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32),
             model,
             model_onnx,
-            basename="SklearnKNeighborsClassifierBinary-OneOffArray",
+            basename="SklearnKNeighborsClassifierBinary",
             allow_failure="StrictVersion(onnx.__version__) "
             "== StrictVersion('1.1.2') or "
             "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
@@ -148,7 +148,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32),
             model,
             model_onnx,
-            basename="SklearnKNeighborsClassifierMulti-OneOffArray",
+            basename="SklearnKNeighborsClassifierMulti",
             allow_failure="StrictVersion(onnx.__version__) "
             "== StrictVersion('1.1.2') or "
             "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
@@ -163,7 +163,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
-            basename="SklearnKNeighborsClassifierWeightsDistance-OneOffArray",
+            basename="SklearnKNeighborsClassifierWeightsDistance",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
             "StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
@@ -176,7 +176,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
-            basename="SklearnKNeighborsClassifierMetricCityblock-OneOffArray",
+            basename="SklearnKNeighborsClassifierMetricCityblock",
             allow_failure="StrictVersion(onnxruntime.__version__) <= "
             "StrictVersion('0.2.1') or "
             "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
@@ -194,11 +194,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingRegressionInt-OneOffArray",
+            basename="SklearnGradientBoostingRegressionInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )
 
 
 if __name__ == "__main__":
+    TestNearestNeighbourConverter().test_model_knn_regressor_int()
     unittest.main()

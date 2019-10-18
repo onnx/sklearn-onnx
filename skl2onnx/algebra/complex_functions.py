@@ -87,6 +87,9 @@ def onnx_cdist(X, Y, metric='sqeuclidean', dtype=None,
             X, Y, dtype=dtype, op_version=op_version, p=p)
         return OnnxPow(res, np.array([1. / p], dtype=dtype),
                        op_version=op_version, **kwargs)
+    elif metric in ('manhattan', 'cityblock'):
+        return _onnx_cdist_manhattan(
+            X, Y, dtype=dtype, op_version=op_version, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
@@ -132,6 +135,36 @@ def _onnx_cdist_minkowski(X, Y, dtype=None, op_version=None, p=2, **kwargs):
                            'next_out'], op_version=op_version)
     diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
                        np.array([p], dtype=dtype), op_version=op_version)
+    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
+                         'norm'], keepdims=0, op_version=op_version)
+    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
+    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
+    id_next.set_onnx_name_prefix('cdistmink')
+    scan_body = id_next.to_onnx(
+        OrderedDict([('next_in', tensor_type()),
+                     ('next', tensor_type())]),
+        outputs=[('next_out', tensor_type()),
+                 ('scan_out', tensor_type())],
+        other_outputs=[flat],
+        dtype=dtype, target_opset=op_version)
+
+    node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
+                    num_scan_inputs=1, body=scan_body.graph,
+                    op_version=op_version)
+    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
+                         **kwargs)
+
+
+def _onnx_cdist_manhattan(X, Y, dtype=None, op_version=None, **kwargs):
+    """
+    Returns the ONNX graph which computes the Minkowski distance
+    or ``minkowski(X, Y, p)``.
+    """
+    diff = OnnxSub('next_in', 'next', output_names=[
+                   'diff'], op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=[
+                           'next_out'], op_version=op_version)
+    diff_pow = OnnxAbs(diff, op_version=op_version)
     norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
                          'norm'], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)

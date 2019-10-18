@@ -4,140 +4,18 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from collections import OrderedDict
 import numpy as np
-from ..common.data_types import FloatTensorType, DoubleTensorType
+from ..common.data_types import Int64TensorType
 from ..algebra.onnx_ops import (
-    OnnxTopK, OnnxMul, OnnxArrayFeatureExtractor, OnnxReduceMean,
-    OnnxFlatten, OnnxShape, OnnxReshape,
-    OnnxConcat, OnnxTranspose, OnnxSub,
-    OnnxIdentity, OnnxReduceSumSquare,
-    OnnxScan, OnnxSqrt, OnnxReciprocal,
-    OnnxPow, OnnxReduceSum, OnnxAbs,
-    OnnxMax, OnnxDiv, OnnxArgMax,
-    OnnxEqual, OnnxCast
+    OnnxTopK, OnnxMul, OnnxArrayFeatureExtractor,
+    OnnxReduceMean, OnnxFlatten, OnnxShape,
+    OnnxReshape, OnnxConcat, OnnxTranspose,
+    OnnxIdentity, OnnxReciprocal,
+    OnnxReduceSum, OnnxMax, OnnxDiv,
+    OnnxArgMax, OnnxEqual, OnnxCast
 )
+from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
-
-
-def onnx_cdist(X, Y, metric='sqeuclidean', dtype=None, op_version=None, **kwargs):
-    """
-    Returns the ONNX graph which computes
-    ``cdist(X, Y, metric=metric)``.
-
-    :param X: array or *OnnxOperatorMixin*
-    :param Y: array or *OnnxOperatorMixin*
-    :param metric: distance type
-    :param dtype: *np.float32* or *np.float64*
-    :param op_version: opset version
-    :param kwargs: addition parameter
-    :return: OnnxOperatorMixin
-    """
-    if metric == 'sqeuclidean':
-        return _onnx_cdist_sqeuclidean(
-            X, Y, dtype=dtype, op_version=op_version, **kwargs)
-    elif metric == 'euclidean':
-        res = _onnx_cdist_sqeuclidean(X, Y, dtype=dtype, op_version=op_version)
-        return OnnxSqrt(res, op_version=op_version, **kwargs)
-    elif metric == 'minkowski':
-        p = kwargs.pop('p')
-        res = _onnx_cdist_minkowski(
-            X, Y, dtype=dtype, op_version=op_version, p=p)
-        return OnnxPow(res, np.array([1. / p], dtype=dtype),
-                       op_version=op_version, **kwargs)
-    elif metric == 'manhattan':
-        return _onnx_cdist_manhattan(
-            X, Y, dtype=dtype, op_version=op_version, **kwargs)
-    else:
-        raise NotImplementedError("metric='{}' is not implemented.".format(
-            metric))
-
-
-def _onnx_cdist_sqeuclidean(X, Y, dtype=None, op_version=None, **kwargs):
-    """
-    Returns the ONNX graph which computes
-    ``cdist(X, metric='sqeuclidean')``.
-    """
-    diff = OnnxSub('next_in', 'next', output_names=[
-                   'diff'], op_version=op_version)
-    id_next = OnnxIdentity('next_in', output_names=[
-                           'next_out'], op_version=op_version)
-    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[
-                               1], keepdims=0, op_version=op_version)
-    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistsqe')
-    scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', tensor_type()),
-                     ('next', tensor_type())]),
-        outputs=[('next_out', tensor_type()),
-                 ('scan_out', tensor_type())],
-        other_outputs=[flat],
-        dtype=dtype, target_opset=op_version)
-
-    node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
-                    num_scan_inputs=1, body=scan_body.graph, op_version=op_version)
-    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
-                         **kwargs)
-
-
-def _onnx_cdist_minkowski(X, Y, dtype=None, op_version=None, p=2, **kwargs):
-    """
-    Returns the ONNX graph which computes the Minkowski distance
-    or ``minkowski(X, Y, p)``.
-    """
-    diff = OnnxSub('next_in', 'next', output_names=[
-                   'diff'], op_version=op_version)
-    id_next = OnnxIdentity('next_in', output_names=[
-                           'next_out'], op_version=op_version)
-    diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
-                       np.array([p], dtype=dtype), op_version=op_version)
-    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
-                         'norm'], keepdims=0, op_version=op_version)
-    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistmink')
-    scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', tensor_type()),
-                     ('next', tensor_type())]),
-        outputs=[('next_out', tensor_type()),
-                 ('scan_out', tensor_type())],
-        other_outputs=[flat],
-        dtype=dtype, target_opset=op_version)
-
-    node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
-                    num_scan_inputs=1, body=scan_body.graph, op_version=op_version)
-    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
-                         **kwargs)
-
-
-def _onnx_cdist_manhattan(X, Y, dtype=None, op_version=None, **kwargs):
-    """
-    Returns the ONNX graph which computes the Minkowski distance
-    or ``minkowski(X, Y, p)``.
-    """
-    diff = OnnxSub('next_in', 'next', output_names=[
-                   'diff'], op_version=op_version)
-    id_next = OnnxIdentity('next_in', output_names=[
-                           'next_out'], op_version=op_version)
-    diff_pow = OnnxAbs(diff, op_version=op_version)
-    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
-                         'norm'], keepdims=0, op_version=op_version)
-    flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistmink')
-    scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', tensor_type()),
-                     ('next', tensor_type())]),
-        outputs=[('next_out', tensor_type()),
-                 ('scan_out', tensor_type())],
-        other_outputs=[flat],
-        dtype=dtype, target_opset=op_version)
-
-    node = OnnxScan(X, Y, output_names=['scan0_{idself}', 'scan1_{idself}'],
-                    num_scan_inputs=1, body=scan_body.graph, op_version=op_version)
-    return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
-                         **kwargs)
 
 
 def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
@@ -203,6 +81,9 @@ def _convert_nearest_neighbors(scope, operator, container):
     opv = container.target_opset
     dtype = container.dtype
 
+    if X.type.__class__ == Int64TensorType:
+        X = OnnxCast(X, to=container.proto_dtype, op_version=opv)
+
     options = container.get_options(op, dict(optim=None))
 
     single_reg = (not hasattr(op, '_y') or len(op._y.shape) == 1 or
@@ -244,7 +125,7 @@ def _convert_nearest_neighbors(scope, operator, container):
             # shape = (ntargets, ) + shape
             training_labels = training_labels.T
             shape = OnnxConcat(np.array([ndim], dtype=np.int64),
-                               shape, op_version=opv)
+                               shape, op_version=opv, axis=0)
             axis = 2
         else:
             training_labels = training_labels.ravel()
