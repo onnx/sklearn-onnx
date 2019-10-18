@@ -2,9 +2,11 @@
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+import onnxruntime
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -34,6 +36,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -41,14 +46,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsRegressor",
-            allow_failure="StrictVersion(onnxruntime.__version__) "
-            "<= StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressor")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor2_1(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
@@ -57,14 +60,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2],
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsRegressor2",
-            allow_failure="StrictVersion(onnxruntime.__version__) "
-            "<= StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressor2")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2),
                                    n_targets=2)
@@ -73,14 +74,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2],
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsRegressor2",
-            allow_failure="StrictVersion(onnxruntime.__version__) "
-            "<= StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressor2")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor_weights_distance(self):
         model, X = self._fit_model(KNeighborsRegressor(weights="distance"))
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -88,14 +87,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsRegressorWeightsDistance-Dec3",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-            "StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressorWeightsDistance-Dec3")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor_metric_cityblock(self):
         model, X = self._fit_model(KNeighborsRegressor(metric="cityblock"))
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -103,16 +100,14 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsRegressorMetricCityblock",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-            "StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressorMetricCityblock")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(
             KNeighborsClassifier())
@@ -124,17 +119,14 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsClassifierBinary",
-            allow_failure="StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.1.2') or "
-            "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
-            "or StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsClassifierBinary")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_classifier_multi_class(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier())
@@ -146,15 +138,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
-            model,
-            model_onnx,
-            basename="SklearnKNeighborsClassifierMulti",
-            allow_failure="StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.1.2') or "
-            "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
-            "or StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            model, model_onnx,
+            basename="SklearnKNeighborsClassifierMulti")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_classifier_weights_distance(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(weights='distance'))
@@ -163,11 +152,11 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
-            basename="SklearnKNeighborsClassifierWeightsDistance",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-            "StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+            basename="SklearnKNeighborsClassifierWeightsDistance")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_classifier_metric_cityblock(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(metric='cityblock'))
@@ -176,11 +165,11 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
-            basename="SklearnKNeighborsClassifierMetricCityblock",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-            "StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')")
+            basename="SklearnKNeighborsClassifierMetricCityblock")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor_int(self):
         model, X = self._fit_model(KNeighborsRegressor())
         X = X.astype(numpy.int64)
@@ -194,9 +183,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingRegressionInt-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
+            basename="SklearnGradientBoostingRegressionInt-Dec4"
         )
 
 
