@@ -3,13 +3,13 @@ Tests scikit-learn's CalibratedClassifierCV converters
 """
 
 import unittest
-
+from distutils.version import StrictVersion
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
-
+import onnxruntime
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -63,6 +63,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_calibrated_classifier_cv_isotonic_float(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -78,11 +81,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnCalibratedClassifierCVIsotonicFloat-OneOffArray",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            basename="SklearnCalibratedClassifierCVIsotonicFloat")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -109,6 +108,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_calibrated_classifier_cv_isotonic_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -125,11 +127,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnCalibratedClassifierCVIsotonicBinary-OneOffArray",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1') or "
-            "StrictVersion(onnx.__version__) == StrictVersion('1.4.1')",
-        )
+            basename="SklearnCalibratedClassifierCVIsotonicBinary")
 
 
 if __name__ == "__main__":
