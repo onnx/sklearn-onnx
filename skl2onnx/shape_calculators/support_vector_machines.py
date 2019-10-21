@@ -37,7 +37,10 @@ def calculate_sklearn_svm_output_shapes(operator):
     tensor_type = operator.tensor_type
 
     N = operator.inputs[0].type.shape[0]
-    if operator.type in ['SklearnSVC'] or isinstance(op, (SVC, NuSVC)):
+    if operator.type in ['SklearnOneClassSVM']:
+        operator.outputs[0].type = Int64TensorType([N, 1])
+        operator.outputs[1].type = tensor_type([N, 1])
+    elif operator.type in ['SklearnSVC'] or isinstance(op, (SVC, NuSVC)):
         number_of_classes = len(op.classes_)
         check_input_and_output_numbers(operator, input_count_range=[1, None],
                                        output_count_range=[1, 2])
@@ -55,12 +58,18 @@ def calculate_sklearn_svm_output_shapes(operator):
                                'all integers. C++ backends do not support '
                                'mixed types.')
 
-    if operator.type in ['SklearnSVR']:
+    elif operator.type in ['SklearnSVR']:
         check_input_and_output_numbers(operator, input_count_range=[1, None],
                                        output_count_range=1)
 
         operator.outputs[0].type = tensor_type([N, 1])
+    else:
+        raise RuntimeError(
+            "New kind of SVM, no shape calculer exist for '{}'.".format(
+                operator.type))
 
 
+register_shape_calculator(
+    'SklearnOneClassSVM', calculate_sklearn_svm_output_shapes)
 register_shape_calculator('SklearnSVC', calculate_sklearn_svm_output_shapes)
 register_shape_calculator('SklearnSVR', calculate_sklearn_svm_output_shapes)

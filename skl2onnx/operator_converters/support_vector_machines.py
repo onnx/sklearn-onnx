@@ -7,7 +7,7 @@
 import numbers
 import numpy as np
 import six
-from sklearn.svm import SVC, NuSVC, SVR, NuSVR
+from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
 from ..common._apply_operation import apply_cast
 from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
@@ -24,7 +24,9 @@ def convert_sklearn_svm(scope, operator, container):
     `NuSVC <https://scikit-learn.org/stable/modules/
     generated/sklearn.svm.NuSVC.html>`_,
     `NuSVR <https://scikit-learn.org/stable/modules/
-    generated/sklearn.svm.NuSVR.html>`_.
+    generated/sklearn.svm.NuSVR.html>`_,
+    `OneClassSVM <https://scikit-learn.org/stable/
+    modules/generated/sklearn.svm.OneClassSVM.html>`_.
     The converted model in ONNX produces the same results as the
     original model except when probability=False:
     *onnxruntime* and *scikit-learn* do not return the same raw
@@ -109,10 +111,33 @@ def convert_sklearn_svm(scope, operator, container):
         container.add_node(op_type, input_name,
                            operator.output_full_names,
                            op_domain='ai.onnx.ml', **svm_attrs)
+    elif (operator.type in ['SklearnOneClassSVM'] or
+          isinstance(op, OneClassSVM)):
+        op_type = 'SVMRegressor'
+        svm_attrs['post_transform'] = 'NONE'
+        svm_attrs['n_supports'] = len(op.support_)
+
+        input_name = operator.input_full_names
+        if type(operator.inputs[0].type) == Int64TensorType:
+            cast_input_name = scope.get_unique_variable_name('cast_input')
+
+            apply_cast(scope, operator.input_full_names, cast_input_name,
+                       container, to=onnx_proto.TensorProto.FLOAT)
+            input_name = cast_input_name
+
+        svm_out = operator.output_full_names[1]
+        container.add_node(op_type, input_name, svm_out,
+                           op_domain='ai.onnx.ml', **svm_attrs)
+
+        pred = scope.get_unique_variable_name('float_prediction')
+        container.add_node('Sign', svm_out, pred, op_version=9)
+        apply_cast(scope, pred, operator.output_full_names[0],
+                   container, to=onnx_proto.TensorProto.INT64)
     else:
         raise ValueError("Unknown support vector machine model type found "
                          "'{0}'.".format(operator.type))
 
 
+register_converter('SklearnOneClassSVM', convert_sklearn_svm)
 register_converter('SklearnSVC', convert_sklearn_svm)
 register_converter('SklearnSVR', convert_sklearn_svm)

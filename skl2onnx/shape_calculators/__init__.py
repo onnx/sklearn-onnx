@@ -28,7 +28,7 @@ from . import one_vs_rest_classifier
 from . import polynomial_features
 from . import scaler
 from . import svd
-from . import svm
+from . import support_vector_machines
 from . import text_vectorizer
 from . import tfidf_transformer
 from . import voting_classifier
@@ -58,7 +58,7 @@ __all__ = [
     polynomial_features,
     scaler,
     svd,
-    svm,
+    support_vector_machines,
     text_vectorizer,
     tfidf_transformer,
     voting_classifier,

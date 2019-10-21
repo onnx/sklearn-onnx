@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from .common._registration import register_converter, register_shape_calculator
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
@@ -16,7 +15,7 @@ from sklearn.linear_model import (
     PassiveAggressiveClassifier,
     Perceptron, SGDClassifier,
 )
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, OneClassSVM
 
 # Linear regressors
 from sklearn.linear_model import (
@@ -145,6 +144,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import FunctionTransformer
 
+from .common._registration import register_converter, register_shape_calculator
+
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
 # predicted label and the other one is the probabilities of all
@@ -173,6 +174,10 @@ cluster_list = [KMeans, MiniBatchKMeans]
 decision_function_classifiers = (
     SGDClassifier,
 )
+
+# Outlier detection algorithms:
+# produces two outputs, label and scores
+outlier_list = [OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -206,7 +211,7 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
-                BayesianGaussianMixture,
+                BayesianGaussianMixture, OneClassSVM
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',

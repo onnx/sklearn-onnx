@@ -5,13 +5,15 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from sklearn.datasets import load_iris
-from sklearn.svm import SVC, SVR, NuSVC, NuSVR
+from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
 from sklearn import __version__ as sk__version__
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.operator_converters.support_vector_machines import (
     convert_sklearn_svm)
-from skl2onnx.shape_calculators.svm import calculate_sklearn_svm_output_shapes
+from skl2onnx.shape_calculators.support_vector_machines import (
+    calculate_sklearn_svm_output_shapes
+)
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
 
@@ -58,6 +60,12 @@ class TestSklearnSVM(unittest.TestCase):
         y[y == 2] = 1
         model.fit(X, y)
         return model, X[:5].astype(numpy.float32)
+
+    def _fit_one_class_svm(self, model):
+        iris = load_iris()
+        X = iris.data[:, :3]
+        model.fit(X)
+        return model, X[10:15].astype(numpy.float32)
 
     def _fit_multi_classification(self, model, nbclass=4):
         iris = load_iris()
@@ -464,6 +472,19 @@ class TestSklearnSVM(unittest.TestCase):
             basename="SklearnNuSVRInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
+        )
+
+    def test_convert_oneclasssvm(self):
+        model, X = self._fit_one_class_svm(OneClassSVM())
+        model_onnx = convert_sklearn(
+            model, "OCSVM", [("input", FloatTensorType([None, X.shape[1]]))])
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinOneClassSVM",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " < StrictVersion('0.5.0')"
         )
 
 
