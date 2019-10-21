@@ -14,6 +14,7 @@ from skl2onnx.operator_converters.support_vector_machines import (
 from skl2onnx.shape_calculators.support_vector_machines import (
     calculate_sklearn_svm_output_shapes
 )
+import onnx
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
 
@@ -474,6 +475,9 @@ class TestSklearnSVM(unittest.TestCase):
                           " <= StrictVersion('0.2.1')"
         )
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="operator sign available since opset 9")
     def test_convert_oneclasssvm(self):
         model, X = self._fit_one_class_svm(OneClassSVM())
         model_onnx = convert_sklearn(
