@@ -8,9 +8,15 @@ import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import (
-    ClassifierMixin, ClusterMixin, is_classifier,
-    OutlierMixin
+    ClassifierMixin, ClusterMixin, is_classifier
 )
+try:
+    from sklearn.base import OutlierMixin
+except ImportError:
+    # scikit-learn <= 0.19
+    class OutlierMixin:
+        pass
+
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
