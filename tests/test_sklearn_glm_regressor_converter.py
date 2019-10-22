@@ -568,6 +568,42 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_multi_task_elasticnet_cv(self):
+        model, X = fit_regression_model(linear_model.MultiTaskElasticNetCV(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(
+            model, "multi-task elasticnet cv",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnMultiTaskElasticNetCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_orthogonal_matching_pursuit_cv(self):
+        model, X = fit_regression_model(
+            linear_model.OrthogonalMatchingPursuitCV())
+        model_onnx = convert_sklearn(
+            model, "orthogonal matching pursuit cv",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnOrthogonalMatchingPursuitCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
