@@ -44,7 +44,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
     def test_model_logistic_linear_discriminant_analysis(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
-        X_test = np.array([[-0.8, -1]], dtype=np.float32)
+        X_test = np.array([[-0.8, -1], [-2, -1]], dtype=np.float32)
         model = LinearDiscriminantAnalysis().fit(X, y)
         model_onnx = convert_sklearn(
             model, "linear model",
