@@ -1,5 +1,6 @@
 from distutils.version import StrictVersion
 import unittest
+import numpy as np
 import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -41,14 +42,16 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_linear_discriminant_analysis(self):
-        model, X = fit_classification_model(
-            LinearDiscriminantAnalysis(), 3)
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array([1, 1, 1, 2, 2, 2])
+        X_test = np.array([[-0.8, -1]], dtype=np.float32)
+        model = LinearDiscriminantAnalysis().fit(X, y)
         model_onnx = convert_sklearn(
             model, "linear model",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X_test.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X_test,
             model,
             model_onnx,
             basename="SklearnLinearDiscriminantAnalysisBin-Dec3",
