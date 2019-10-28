@@ -5,7 +5,11 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
+try:
+    from sklearn.mixture._gaussian_mixture import _compute_log_det_cholesky    
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
