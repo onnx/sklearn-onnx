@@ -6,7 +6,7 @@
 
 import numpy as np
 try:
-    from sklearn.mixture._gaussian_mixture import _compute_log_det_cholesky    
+    from sklearn.mixture._gaussian_mixture import _compute_log_det_cholesky
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
