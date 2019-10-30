@@ -8,6 +8,7 @@ import onnx
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
+import onnxruntime as ort
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -21,6 +22,8 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         # issue with encoding
         reason="https://github.com/onnx/onnx/pull/1734")
+    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.2.1"),
+                     reason="sparse not supported")
     def test_model_tfidf_transform_bug(self):
         categories = [
             "alt.atheism",
