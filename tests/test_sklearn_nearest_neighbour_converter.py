@@ -123,10 +123,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
+            X.astype(numpy.float32),
             model,
             model_onnx,
-            basename="SklearnKNeighborsClassifierBinary",
+            basename="SklearnKNeighborsClassifierBinary-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
             "== StrictVersion('1.1.2') or "
             "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "
@@ -145,10 +145,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            numpy.atleast_2d(X[0]).astype(numpy.float32)[:7],
+            X.astype(numpy.float32),
             model,
             model_onnx,
-            basename="SklearnKNeighborsClassifierMulti",
+            basename="SklearnKNeighborsClassifierMulti-OneOffArray",
             allow_failure="StrictVersion(onnx.__version__) "
             "== StrictVersion('1.1.2') or "
             "StrictVersion(onnxruntime.__version__) <= StrictVersion('0.2.1') "

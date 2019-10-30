@@ -385,6 +385,13 @@ class ModelComponentContainer(ModelContainer):
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
         self.nodes.append(node)
+        if (self.target_opset is not None and
+                op_version is not None and
+                op_version > self.target_opset):
+            raise RuntimeError(
+                "Opset number {} is higher than targeted opset {} for "
+                "node '{}'.".format(
+                    op_version, self.target_opset, node.op_type))
 
     def get_options(self, model, default_values=None):
         """

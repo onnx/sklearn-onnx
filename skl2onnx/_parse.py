@@ -7,7 +7,16 @@
 import numpy as np
 
 from sklearn import pipeline
-from sklearn.base import ClassifierMixin, ClusterMixin, is_classifier
+from sklearn.base import (
+    ClassifierMixin, ClusterMixin, is_classifier
+)
+try:
+    from sklearn.base import OutlierMixin
+except ImportError:
+    # scikit-learn <= 0.19
+    class OutlierMixin:
+        pass
+
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
@@ -19,7 +28,9 @@ except ImportError:
     # ColumnTransformer was introduced in 0.20.
     ColumnTransformer = None
 
-from ._supported_operators import _get_sklearn_operator_name, cluster_list
+from ._supported_operators import (
+    _get_sklearn_operator_name, cluster_list, outlier_list
+)
 from ._supported_operators import sklearn_classifier_list
 from .common._container import SklearnModelContainerNode
 from .common._topology import Topology
@@ -100,6 +111,15 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         # the other one for scores of all classes. Notice that their
         # types here are not necessarily correct and they will be fixed
         # in shape inference phase
+        label_variable = scope.declare_local_variable(
+            'label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable(
+            'scores', scope.tensor_type())
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
+    elif type(model) in outlier_list or isinstance(model, OutlierMixin):
+        # For clustering, we may have two outputs, one for label and
+        # the other one for scores.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
         score_tensor_variable = scope.declare_local_variable(

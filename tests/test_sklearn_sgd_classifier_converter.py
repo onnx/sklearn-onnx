@@ -195,28 +195,6 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_binary_class_modified_huber(self):
-        model, X = fit_classification_model(
-            SGDClassifier(loss='modified_huber', random_state=42), 2)
-        model_onnx = convert_sklearn(
-            model,
-            "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-        )
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnSGDClassifierBinaryModifiedHuber-Dec4",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.6.0')",
-        )
-
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_squared_hinge(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='squared_hinge', random_state=42), 2)
@@ -283,7 +261,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_sgd_multi_class_preceptron(self):
+    def test_model_sgd_multi_class_perceptron(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='perceptron', random_state=42), 5)
         model_onnx = convert_sklearn(

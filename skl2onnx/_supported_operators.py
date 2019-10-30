@@ -5,15 +5,18 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from .common._registration import register_converter, register_shape_calculator
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import Perceptron, SGDClassifier
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import (
+    LogisticRegression, LogisticRegressionCV,
+    PassiveAggressiveClassifier,
+    Perceptron, SGDClassifier,
+    RidgeClassifier, RidgeClassifierCV,
+)
+from sklearn.svm import LinearSVC, OneClassSVM
 
 # Linear regressors
 from sklearn.linear_model import (
@@ -26,7 +29,11 @@ from sklearn.linear_model import (
     LassoLars, LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
+    MultiTaskElasticNet, MultiTaskElasticNetCV,
     MultiTaskLasso, MultiTaskLassoCV,
+    OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
+    PassiveAggressiveRegressor,
+    RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor,
@@ -45,6 +52,7 @@ from sklearn.multiclass import OneVsRestClassifier
 # Tree-based models
 from sklearn.ensemble import (
     AdaBoostClassifier, AdaBoostRegressor,
+    BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     RandomForestClassifier, RandomForestRegressor,
@@ -75,8 +83,16 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import NearestNeighbors
 
 # Naive Bayes
-from sklearn.naive_bayes import BernoulliNB
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import (
+    BernoulliNB,
+    GaussianNB,
+    MultinomialNB,
+)
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
+    # scikit-learn versions <= 0.19
+    ComplementNB = None
 
 # Neural Networks
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -129,6 +145,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import FunctionTransformer
 
+from .common._registration import register_converter, register_shape_calculator
+
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
 # predicted label and the other one is the probabilities of all
@@ -138,10 +156,12 @@ from sklearn.preprocessing import FunctionTransformer
 # the list.
 sklearn_classifier_list = [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
+    PassiveAggressiveClassifier,
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
-    DecisionTreeClassifier, ExtraTreeClassifier,
-    ExtraTreesClassifier, BernoulliNB, MultinomialNB,
+    DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
+    BaggingClassifier,
+    BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
     AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
@@ -156,14 +176,19 @@ decision_function_classifiers = (
     SGDClassifier,
 )
 
+# Outlier detection algorithms:
+# produces two outputs, label and scores
+outlier_list = [OneClassSVM]
+
 
 # Associate scikit-learn types with our operator names. If two
 # scikit-learn models share a single name, it means their are
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                AdaBoostClassifier, AdaBoostRegressor, VotingClassifier,
-                VotingRegressor,
+                AdaBoostClassifier, AdaBoostRegressor,
+                BaggingClassifier, BaggingRegressor,
+                BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
                 CalibratedClassifierCV,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreeClassifier, ExtraTreeRegressor,
@@ -171,12 +196,12 @@ def build_sklearn_operator_name_map():
                 GradientBoostingClassifier, GradientBoostingRegressor,
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
-                LinearRegression,
+                LinearRegression, RANSACRegressor,
                 MLPClassifier, MLPRegressor,
-                MultinomialNB, BernoulliNB,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
+                VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
                 PCA, TruncatedSVD, IncrementalPCA,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,
@@ -187,7 +212,7 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
-                BayesianGaussianMixture,
+                BayesianGaussianMixture, OneClassSVM
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
@@ -207,13 +232,21 @@ def build_sklearn_operator_name_map():
         LinearDiscriminantAnalysis: 'SklearnLinearClassifier',
         LogisticRegression: 'SklearnLinearClassifier',
         LogisticRegressionCV: 'SklearnLinearClassifier',
+        MultiTaskElasticNet: 'SklearnLinearRegressor',
+        MultiTaskElasticNetCV: 'SklearnLinearRegressor',
         MultiTaskLasso: 'SklearnLinearRegressor',
         MultiTaskLassoCV: 'SklearnLinearRegressor',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
+        OrthogonalMatchingPursuitCV: 'SklearnLinearRegressor',
+        PassiveAggressiveClassifier: 'SklearnSGDClassifier',
+        PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
+        RidgeClassifier: 'SklearnLinearClassifier',
+        RidgeClassifierCV: 'SklearnLinearClassifier',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
         TheilSenRegressor: 'SklearnLinearRegressor',

@@ -8,6 +8,7 @@
 # import associated modules here.
 from . import ada_boost
 from . import array_feature_extractor
+from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
 from . import concat_op
@@ -38,6 +39,7 @@ from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import polynomial_features
 from . import random_forest
+from . import ransac_regressor
 from . import scaler_op
 from . import sgd_classifier
 from . import support_vector_machines
@@ -51,6 +53,7 @@ from . import zip_map
 __all__ = [
     ada_boost,
     array_feature_extractor,
+    bagging,
     binariser,
     calibrated_classifier_cv,
     concat_op,
@@ -81,6 +84,7 @@ __all__ = [
     ordinal_encoder,
     polynomial_features,
     random_forest,
+    ransac_regressor,
     scaler_op,
     sgd_classifier,
     support_vector_machines,
