@@ -7,7 +7,12 @@
 import numbers
 import numpy as np
 import six
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import (
+    LogisticRegression,
+    RidgeClassifier,
+    RidgeClassifierCV,
+)
+from sklearn.svm import LinearSVC
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -45,7 +50,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     classifier_attrs['coefficients'] = coefficients
     classifier_attrs['intercepts'] = intercepts
     classifier_attrs['multi_class'] = 1 if multi_class == 2 else 0
-    if op.__class__.__name__ == 'LinearSVC':
+    if isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV)):
         classifier_attrs['post_transform'] = 'NONE'
     elif isinstance(op, LogisticRegression):
         ovr = (op.multi_class in ["ovr", "warn"] or
@@ -69,7 +74,8 @@ def convert_sklearn_linear_classifier(scope, operator, container):
 
     label_name = operator.outputs[0].full_name
 
-    if op.__class__.__name__ == 'LinearSVC' and op.classes_.shape[0] <= 2:
+    if (isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))
+            and op.classes_.shape[0] <= 2):
         raw_scores_tensor_name = scope.get_unique_variable_name(
                                                         'raw_scores_tensor')
         positive_class_index_name = scope.get_unique_variable_name(
@@ -88,7 +94,8 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     else:
         # Make sure the probability sum is 1 over all classes
-        if multi_class > 0 and op.__class__.__name__ != 'LinearSVC':
+        if multi_class > 0 and not isinstance(
+                op, (LinearSVC, RidgeClassifier, RidgeClassifierCV)):
             probability_tensor_name = scope.get_unique_variable_name(
                                                     'probability_tensor')
             container.add_node(classifier_type, operator.inputs[0].full_name,

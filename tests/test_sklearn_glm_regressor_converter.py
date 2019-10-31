@@ -4,6 +4,8 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from sklearn import linear_model
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
@@ -505,6 +507,98 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model_onnx,
             verbose=False,
             basename="SklearnPassiveAggressiveRegressor-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_ransac_regressor_default(self):
+        model, X = fit_regression_model(
+            linear_model.RANSACRegressor())
+        model_onnx = convert_sklearn(
+            model, "ransac regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnRANSACRegressor-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_ransac_regressor_mlp(self):
+        model, X = fit_regression_model(
+            linear_model.RANSACRegressor(
+                base_estimator=MLPRegressor(solver='lbfgs')))
+        model_onnx = convert_sklearn(
+            model, "ransac regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnRANSACRegressorMLP-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_ransac_regressor_tree(self):
+        model, X = fit_regression_model(
+            linear_model.RANSACRegressor(
+                base_estimator=GradientBoostingRegressor()))
+        model_onnx = convert_sklearn(
+            model, "ransac regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnRANSACRegressorTree-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_multi_task_elasticnet_cv(self):
+        model, X = fit_regression_model(linear_model.MultiTaskElasticNetCV(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(
+            model, "multi-task elasticnet cv",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnMultiTaskElasticNetCV-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_orthogonal_matching_pursuit_cv(self):
+        model, X = fit_regression_model(
+            linear_model.OrthogonalMatchingPursuitCV())
+        model_onnx = convert_sklearn(
+            model, "orthogonal matching pursuit cv",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnOrthogonalMatchingPursuitCV-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",

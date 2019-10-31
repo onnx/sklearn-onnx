@@ -1,15 +1,14 @@
 from distutils.version import StrictVersion
 import unittest
-import numpy
+import numpy as np
 import sklearn
-from sklearn import datasets
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_classification_model
 
 
 def _sklearn_version():
@@ -19,31 +18,17 @@ def _sklearn_version():
 
 
 class TestGLMClassifierConverter(unittest.TestCase):
-    def _fit_model_binary_classification(self, model):
-        iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
-        y[y == 2] = 1
-        model.fit(X, y)
-        return model, X
-
-    def _fit_model_multiclass_classification(self, model):
-        iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
-        model.fit(X, y)
-        return model, X
-
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class(self):
-        model, X = self._fit_model_binary_classification(
-            linear_model.LogisticRegression())
-        model_onnx = convert_sklearn(model, "logistic regression",
-                                     [("input", FloatTensorType([None, 3]))])
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 2)
+        model_onnx = convert_sklearn(
+            model, "logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionBinary",
@@ -57,13 +42,16 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_linear_discriminant_analysis(self):
-        model, X = self._fit_model_binary_classification(
-            LinearDiscriminantAnalysis())
-        model_onnx = convert_sklearn(model, "linear model",
-                                     [("input", FloatTensorType([None, 3]))])
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array([1, 1, 1, 2, 2, 2])
+        X_test = np.array([[-0.8, -1], [-2, -1]], dtype=np.float32)
+        model = LinearDiscriminantAnalysis().fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "linear model",
+            [("input", FloatTensorType([None, X_test.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X_test,
             model,
             model_onnx,
             basename="SklearnLinearDiscriminantAnalysisBin-Dec3",
@@ -77,13 +65,14 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_binary_class(self):
-        model, X = self._fit_model_binary_classification(
-            linear_model.LogisticRegressionCV())
-        model_onnx = convert_sklearn(model, "logistic regression cv",
-                                     [("input", FloatTensorType([None, 3]))])
+        model, X = fit_classification_model(
+            linear_model.LogisticRegressionCV(), 2)
+        model_onnx = convert_sklearn(
+            model, "logistic regression cv",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticCVRegressionBinary",
@@ -97,13 +86,14 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_nointercept(self):
-        model, X = self._fit_model_binary_classification(
-            linear_model.LogisticRegression(fit_intercept=False))
-        model_onnx = convert_sklearn(model, "logistic regression",
-                                     [("input", FloatTensorType([None, 3]))])
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(fit_intercept=False), 2)
+        model_onnx = convert_sklearn(
+            model, "logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionBinaryNoIntercept",
@@ -117,16 +107,16 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class(self):
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression())
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 4)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMulti",
@@ -139,16 +129,16 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_ovr(self):
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(multi_class='ovr'))
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(multi_class='ovr'), 3)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMulti",
@@ -161,17 +151,17 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_multinomial(self):
-        model, X = self._fit_model_multiclass_classification(
+        model, X = fit_classification_model(
             linear_model.LogisticRegression(
-                multi_class="multinomial", solver="lbfgs"))
+                multi_class="multinomial", solver="lbfgs"), 4)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMulti",
@@ -184,16 +174,16 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_no_intercept(self):
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(fit_intercept=False))
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(fit_intercept=False), 3)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMultiNoIntercept",
@@ -210,16 +200,17 @@ class TestGLMClassifierConverter(unittest.TestCase):
             'l2'
             if _sklearn_version() < StrictVersion('0.21.0')
             else 'none')
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(solver='lbfgs', penalty=penalty))
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(solver='lbfgs', penalty=penalty),
+            5)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMultiLbfgs",
@@ -232,16 +223,17 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_liblinear_l1(self):
-        model, X = self._fit_model_multiclass_classification(
-            linear_model.LogisticRegression(solver='liblinear', penalty='l1'))
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(solver='liblinear', penalty='l1'),
+            4)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMultiLiblinearL1",
@@ -255,20 +247,20 @@ class TestGLMClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
         if _sklearn_version() < StrictVersion('0.21.0'):
-            model, X = self._fit_model_multiclass_classification(
-                linear_model.LogisticRegression(solver='saga'))
+            model, X = fit_classification_model(
+                linear_model.LogisticRegression(solver='saga'), 3)
         else:
-            model, X = self._fit_model_multiclass_classification(
+            model, X = fit_classification_model(
                 linear_model.LogisticRegression(
-                    solver='saga', penalty='elasticnet', l1_ratio=0.1))
+                    solver='saga', penalty='elasticnet', l1_ratio=0.1), 3)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLogitisticRegressionMultiSagaElasticnet",
@@ -281,12 +273,13 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_binary_class(self):
-        model, X = self._fit_model_binary_classification(LinearSVC())
-        model_onnx = convert_sklearn(model, "linear SVC",
-                                     [("input", FloatTensorType([None, 3]))])
+        model, X = fit_classification_model(LinearSVC(), 2)
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLinearSVCBinary-NoProb",
@@ -297,18 +290,96 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_multi_class(self):
-        model, X = self._fit_model_multiclass_classification(LinearSVC())
+        model, X = fit_classification_model(LinearSVC(), 5)
         model_onnx = convert_sklearn(
             model,
             "multi-class linear SVC",
-            [("input", FloatTensorType([None, 3]))],
+            [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
             basename="SklearnLinearSVCMulti",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_binary(self):
+        model, X = fit_classification_model(linear_model.RidgeClassifier(), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_multi_class(self):
+        model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierMulti",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_cv_binary(self):
+        model, X = fit_classification_model(
+            linear_model.RidgeClassifierCV(), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "binary ridge classifier cv",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierCVBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_cv_multi_class(self):
+        model, X = fit_classification_model(
+            linear_model.RidgeClassifierCV(), 5)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class ridge classifier cv",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierCVMulti",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )

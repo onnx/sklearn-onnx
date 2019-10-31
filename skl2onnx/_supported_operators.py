@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from .common._registration import register_converter, register_shape_calculator
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
@@ -15,8 +14,9 @@ from sklearn.linear_model import (
     LogisticRegression, LogisticRegressionCV,
     PassiveAggressiveClassifier,
     Perceptron, SGDClassifier,
+    RidgeClassifier, RidgeClassifierCV,
 )
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, OneClassSVM
 
 # Linear regressors
 from sklearn.linear_model import (
@@ -29,10 +29,11 @@ from sklearn.linear_model import (
     LassoLars, LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
-    MultiTaskElasticNet,
+    MultiTaskElasticNet, MultiTaskElasticNetCV,
     MultiTaskLasso, MultiTaskLassoCV,
-    OrthogonalMatchingPursuit,
+    OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
     PassiveAggressiveRegressor,
+    RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor,
@@ -144,6 +145,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import FunctionTransformer
 
+from .common._registration import register_converter, register_shape_calculator
+
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
 # predicted label and the other one is the probabilities of all
@@ -173,6 +176,10 @@ decision_function_classifiers = (
     SGDClassifier,
 )
 
+# Outlier detection algorithms:
+# produces two outputs, label and scores
+outlier_list = [OneClassSVM]
+
 
 # Associate scikit-learn types with our operator names. If two
 # scikit-learn models share a single name, it means their are
@@ -189,7 +196,7 @@ def build_sklearn_operator_name_map():
                 GradientBoostingClassifier, GradientBoostingRegressor,
                 KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
                 LinearSVC, LinearSVR, SVC, SVR,
-                LinearRegression,
+                LinearRegression, RANSACRegressor,
                 MLPClassifier, MLPRegressor,
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
@@ -205,7 +212,7 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
-                BayesianGaussianMixture,
+                BayesianGaussianMixture, OneClassSVM
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
@@ -226,16 +233,20 @@ def build_sklearn_operator_name_map():
         LogisticRegression: 'SklearnLinearClassifier',
         LogisticRegressionCV: 'SklearnLinearClassifier',
         MultiTaskElasticNet: 'SklearnLinearRegressor',
+        MultiTaskElasticNetCV: 'SklearnLinearRegressor',
         MultiTaskLasso: 'SklearnLinearRegressor',
         MultiTaskLassoCV: 'SklearnLinearRegressor',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
         OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
+        OrthogonalMatchingPursuitCV: 'SklearnLinearRegressor',
         PassiveAggressiveClassifier: 'SklearnSGDClassifier',
         PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
+        RidgeClassifier: 'SklearnLinearClassifier',
+        RidgeClassifierCV: 'SklearnLinearClassifier',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
         TheilSenRegressor: 'SklearnLinearRegressor',

@@ -384,7 +384,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         cop = OnnxAdd(
             'input', 'input', op_version=onnx.defs.onnx_opset_version())
         cop2 = OnnxIdentity(
-            OnnxCDist(cop, x, dtype=np.float32,
+            OnnxCDist(cop, x,
                       op_version=onnx.defs.onnx_opset_version()),
             output_names=['cdist'],
             op_version=onnx.defs.onnx_opset_version())

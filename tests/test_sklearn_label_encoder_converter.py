@@ -4,7 +4,11 @@ import unittest
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import StringTensorType
+from skl2onnx.common.data_types import (
+    FloatTensorType,
+    Int64TensorType,
+    StringTensorType,
+)
 from test_utils import dump_data_and_model
 
 
@@ -16,7 +20,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label encoder",
-            [("input", StringTensorType([None, 1]))],
+            [("input", StringTensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
@@ -32,12 +36,12 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
 
     def test_model_label_encoder_float(self):
         model = LabelEncoder()
-        data = np.array([1.2, 3.4, 5.4, 1.2])
+        data = np.array([1.2, 3.4, 5.4, 1.2], dtype=np.float32)
         model.fit(data)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label encoder",
-            [("input", StringTensorType([1, 1]))],
+            [("input", FloatTensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
@@ -53,12 +57,12 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
 
     def test_model_label_encoder_int(self):
         model = LabelEncoder()
-        data = np.array([10, 3, 5, -34, 0])
+        data = np.array([10, 3, 5, -34, 0], dtype=np.int64)
         model.fit(data)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn label encoder",
-            [("input", StringTensorType([1, 1]))],
+            [("input", Int64TensorType([None]))],
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
