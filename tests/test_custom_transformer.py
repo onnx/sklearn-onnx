@@ -10,7 +10,7 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn import datasets
-import onnxruntime
+import onnxruntime as ort
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common._registration import get_shape_calculator
@@ -139,9 +139,8 @@ def predictable_tsne_converter(scope, operator, container):
 
 class TestCustomTransformer(unittest.TestCase):
 
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.4.0"),
-        reason="not available")
+    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.2.1"),
+                     reason="TopK is failing.")
     def test_custom_pipeline_scaler(self):
 
         digits = datasets.load_digits(n_class=6)

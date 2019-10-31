@@ -562,7 +562,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             verbose=False,
-            basename="SklearnRANSACRegressorTree-Dec4",
+            basename="SklearnRANSACRegressorTree-Dec3",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
