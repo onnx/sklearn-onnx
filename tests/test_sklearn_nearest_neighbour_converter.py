@@ -188,5 +188,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestNearestNeighbourConverter().test_model_knn_regressor_int()
+    # TestNearestNeighbourConverter().test_model_knn_regressor_int()
     unittest.main()
