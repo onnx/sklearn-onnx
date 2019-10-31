@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from ..common._apply_operation import apply_cast
+from ..common._apply_operation import apply_cast, apply_reshape
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -209,6 +209,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "https://github.com/onnx/sklearn-onnx/issues.")
 
     if op.lowercase or op.stop_words_:
+
+        if len(operator.input_full_names) != 1:
+            raise RuntimeError("Only one input is allowed, found {}.".format(
+                operator.input_full_names))
+        flatten = scope.get_unique_variable_name('flattened')
+        apply_reshape(scope, operator.input_full_names[0],
+                      flatten, container,
+                      desired_shape=(-1, ))
+
         # StringNormalizer
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
@@ -230,7 +239,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
-        container.add_node(op_type, operator.input_full_names,
+        container.add_node(op_type, flatten,
                            normalized, op_version=op_version,
                            op_domain=domain, **attrs)
     else:
