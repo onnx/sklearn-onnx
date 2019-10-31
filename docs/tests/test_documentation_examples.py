@@ -50,6 +50,10 @@ class TestDocumentationExample(unittest.TestCase):
                             # dot not installed, this part
                             # is tested in onnx framework
                             pass
+                        elif '"dot" not found in path.' in st:
+                            # dot not installed, this part
+                            # is tested in onnx framework
+                            pass
                         else:
                             raise RuntimeError(
                                 "Example '{}' failed due to\n{}"
