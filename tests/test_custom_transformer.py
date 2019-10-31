@@ -139,7 +139,7 @@ def predictable_tsne_converter(scope, operator, container):
 
 class TestCustomTransformer(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.2.1"),
+    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.3.0"),
                      reason="TopK is failing.")
     def test_custom_pipeline_scaler(self):
 
