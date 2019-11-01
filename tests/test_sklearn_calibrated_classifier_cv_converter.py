@@ -122,12 +122,16 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
-        self.assertTrue(model_onnx is not None)
-        dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnCalibratedClassifierCVIsotonicBinary")
+        try:
+            self.assertTrue(model_onnx is not None)
+            dump_data_and_model(
+                X.astype(np.float32),
+                model,
+                model_onnx,
+                basename="SklearnCalibratedClassifierCVIsotonicBinary")
+        except Exception as e:
+            raise AssertionError("Issue with model\n{}".format(
+                str(model_onnx))) from e
 
 
 if __name__ == "__main__":
