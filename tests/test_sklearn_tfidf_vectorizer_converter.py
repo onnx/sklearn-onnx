@@ -27,6 +27,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -56,7 +59,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
         reason="Requires new onnxruntime.")
-    @unittest.skipIf(ColumnTransformer is None,
+    @unittest.skipIf(
+        ColumnTransformer is None,
         reason="Requires newer scikit-learn")
     def test_model_tfidf_vectorizer11_compose(self):
         corpus = numpy.array([
