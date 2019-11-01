@@ -6,10 +6,15 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    # Old scikit-learn
+    ColumnTransformer = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 import onnx
+import onnxruntime
 from onnxruntime import InferenceSession
 from test_utils import dump_data_and_model
 
@@ -49,8 +54,10 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert res.shape == (4, 9)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Requires new onnxruntime.")
+    @unittest.skipIf(ColumnTransformer is None,
+        reason="Requires newer scikit-learn")
     def test_model_tfidf_vectorizer11_compose(self):
         corpus = numpy.array([
             "This is the first document.",
