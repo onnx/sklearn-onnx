@@ -331,7 +331,7 @@ class OnnxOperator:
             if hasattr(self, 'output_names_'):
                 outputs = self.output_names_
             elif self.output_names:
-                if not isinstance(self.output_names, list):
+                if not isinstance(self.output_names, (list, tuple) ):
                     louts = [self.output_names]
                 else:
                     louts = self.output_names
