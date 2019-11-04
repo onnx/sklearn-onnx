@@ -57,6 +57,38 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert res.shape == (4, 9)
 
     @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0"),
+        reason="Requires opset 9.")
+    def test_model_tfidf_vectorizer11_nolowercase(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, lowercase=False)
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType())],
+                                     options=self.get_options())
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11NoL-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
+        )
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': corpus.ravel()})[0]
+        assert res.shape == (4, 11)
+
+    @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
         reason="Requires new onnxruntime.")
     @unittest.skipIf(
