@@ -78,7 +78,7 @@ def make_attribute(
     if doc_string:
         attr.doc_string = doc_string
 
-    is_iterable = isinstance(value, collections.Iterable)
+    is_iterable = isinstance(value, collections.abc.Iterable)
     bytes_or_false = _to_bytes_or_false(value)
 
     use_float64 = dtype == np.float64 and domain not in ('', 'ai.onnx.ml')
