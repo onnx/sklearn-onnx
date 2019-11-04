@@ -172,7 +172,7 @@ The following lines shows what these four elements are for a random forest:
 
 ::
 
-    from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
+    from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
     from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
     from skl2onnx import update_registered_converter
     update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
