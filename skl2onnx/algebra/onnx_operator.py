@@ -143,12 +143,6 @@ class OnnxOperator:
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
 
-        if output_names is not None and isinstance(output_names, list):
-            output_names = output_names.copy()
-            for i in range(len(output_names)):
-                if isinstance(output_names[i], str):
-                    output_names[i] = output_names[i].format(idself=id(self))
-
         self.op_version = op_version or get_opset_number_from_onnx()
         self.since_version = self.__class__.since_version
 
@@ -333,7 +327,11 @@ class OnnxOperator:
             if hasattr(self, 'output_names_'):
                 outputs = self.output_names_
             elif self.output_names:
-                outputs = self.output_names
+                outputs = []
+                for name in self.output_names:
+                    if name.startswith('u(') and name[-1] == ')':
+                        name = scope.get_unique_variable_name(name[2:-1])
+                    outputs.append(name)
                 self.output_names_ = outputs
             else:
                 outputs = []
