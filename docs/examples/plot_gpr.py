@@ -51,7 +51,7 @@ print(gpr)
 # The documentation suggests the following way to
 # convert a model into ONNX.
 
-initial_type = [('X', FloatTensorType([1, X_train.shape[1]]))]
+initial_type = [('X', FloatTensorType([None, X_train.shape[1]]))]
 onx = convert_sklearn(gpr, initial_types=initial_type)
 
 sess = rt.InferenceSession(onx.SerializeToString())
