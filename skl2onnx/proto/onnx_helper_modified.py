@@ -17,7 +17,7 @@ try:
     from onnx.helper import make_sparse_tensor # noqa
 except ImportError:
     # onnx is too old.
-    pass
+    SparseTensorProto = None
 
 from onnx.numpy_helper import from_array  # noqa
 from typing import (
@@ -121,7 +121,8 @@ def make_attribute(
     elif isinstance(value, TensorProto):
         attr.t.CopyFrom(value)
         attr.type = AttributeProto.TENSOR
-    elif isinstance(value, SparseTensorProto):
+    elif (SparseTensorProto is not None and
+            isinstance(value, SparseTensorProto)):
         attr.sparse_tensor.CopyFrom(value)
         attr.type = AttributeProto.SPARSE_TENSOR
     elif isinstance(value, GraphProto):
@@ -176,7 +177,8 @@ def make_attribute(
         elif all(isinstance(v, TensorProto) for v in value):
             attr.tensors.extend(value)
             attr.type = AttributeProto.TENSORS
-        elif all(isinstance(v, SparseTensorProto) for v in value):
+        elif (SparseTensorProto is not None and
+                all(isinstance(v, SparseTensorProto) for v in value)):
             attr.sparse_tensors.extend(value)
             attr.type = AttributeProto.SPARSE_TENSORS
         elif all(isinstance(v, GraphProto) for v in value):
