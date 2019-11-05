@@ -7,12 +7,23 @@
 import numpy as np
 from ..common.data_types import Int64TensorType
 from ..algebra.onnx_ops import (
-    OnnxTopK, OnnxMul, OnnxArrayFeatureExtractor,
-    OnnxReduceMean, OnnxFlatten, OnnxShape,
-    OnnxReshape, OnnxConcat, OnnxTranspose,
-    OnnxIdentity, OnnxReciprocal,
-    OnnxReduceSum, OnnxMax, OnnxDiv,
-    OnnxArgMax, OnnxEqual, OnnxCast
+    OnnxArgMax,
+    OnnxArrayFeatureExtractor,
+    OnnxCast,
+    OnnxConcat,
+    OnnxDiv,
+    OnnxEqual,
+    OnnxFlatten,
+    OnnxIdentity,
+    OnnxMax,
+    OnnxMul,
+    OnnxReciprocal,
+    OnnxReduceMean,
+    OnnxReduceSum,
+    OnnxReshape,
+    OnnxShape,
+    OnnxTopK,
+    OnnxTranspose,
 )
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
@@ -81,7 +92,7 @@ def _convert_nearest_neighbors(scope, operator, container):
     opv = container.target_opset
     dtype = container.dtype
 
-    if X.type.__class__ == Int64TensorType:
+    if isinstance(X.type, Int64TensorType):
         X = OnnxCast(X, to=container.proto_dtype, op_version=opv)
 
     options = container.get_options(op, dict(optim=None))
