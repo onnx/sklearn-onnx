@@ -24,6 +24,11 @@ import sklearn
 import onnxruntime as rt
 import numpy
 from onnxruntime.datasets import get_example
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
+except ImportError:
+    # onnxruntime <= 0.5
+    InvalidArgument = RuntimeError
 
 example2 = get_example("logreg_iris.onnx")
 sess = rt.InferenceSession(example2)
@@ -37,7 +42,8 @@ output_name = sess.get_outputs()[0].name
 # and cannot handle any other kind of floats.
 
 try:
-    x = numpy.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=numpy.float64)
+    x = numpy.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]],
+                    dtype=numpy.float64)
     sess.run([output_name], {input_name: x})
 except Exception as e:
     print("Unexpected type")
@@ -86,7 +92,7 @@ for x in [
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))
-    except RuntimeError as e:
+    except (RuntimeError, InvalidArgument) as e:
         print("Shape={0} and error={1}".format(x.shape, e))
 
 for x in [
@@ -99,7 +105,7 @@ for x in [
         r = sess.run(None, {input_name: x})
         print("Shape={0} and predicted probabilities={1}".format(
             x.shape, r[1]))
-    except RuntimeError as e:
+    except (RuntimeError, InvalidArgument) as e:
         print("Shape={0} and error={1}".format(x.shape, e))
 
 #########################
@@ -113,7 +119,7 @@ for x in [
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))
-    except RuntimeError as e:
+    except (RuntimeError, InvalidArgument) as e:
         print("Shape={0} and error={1}".format(x.shape, e))
 
 #################################

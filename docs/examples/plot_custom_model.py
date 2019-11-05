@@ -80,7 +80,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
             the output of the *t-SNE* and applies that same
             normalization to he prediction of the estimator
         :param keep_tsne_output: if True, keep raw outputs of
-            :epkg:`TSNE` is stored in member *tsne_outputs_*
+            *TSNE* is stored in member *tsne_outputs_*
         :param kwargs: sent to :meth:`set_params <mlinsights.mlmodel.
             tsne_transformer.PredictableTSNE.set_params>`, see its
             documentation to understand how to specify parameters
@@ -130,7 +130,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         mean_: average of the *t-SNE* output on each dimension
         inv_std_: inverse of the standard deviation of the *t-SNE*
             output on each dimension
-        loss_: loss (:epkg:`sklearn:metrics:mean_squared_error`)
+        loss_: loss (*mean_squared_error*)
         between the predictions and the outputs of t-SNE
         """
         params = dict(y=y, sample_weight=sample_weight)
