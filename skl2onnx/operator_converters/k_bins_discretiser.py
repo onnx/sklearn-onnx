@@ -72,7 +72,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
             container.add_initializer(
                 zero_float, onnx_proto.TensorProto.FLOAT,
                 [1], np.zeros(1))
-            apply_mul(scope, [column_name, zero_float], zero_column,
+            apply_mul(scope, [cast_column_name, zero_float], zero_column,
                       container, broadcast=1)
             apply_add(scope, [zero_column, one_float], last_column_name,
                       container, broadcast=1)
@@ -93,7 +93,7 @@ def convert_sklearn_k_bins_discretiser(scope, operator, container):
                 cats_int64s=list(range(op.n_bins_[i])),
                 op_domain='ai.onnx.ml')
             apply_reshape(scope, onehot_result_name, digitised_output_name[i],
-                          container, desired_shape=(1, op.n_bins_[i]))
+                          container, desired_shape=(-1, op.n_bins_[i]))
         else:
             apply_cast(scope, argmax_output_name, digitised_output_name[i],
                        container, to=onnx_proto.TensorProto.FLOAT)
