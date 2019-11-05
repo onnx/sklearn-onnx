@@ -384,6 +384,29 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           " <= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_binary_class_decision_function(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 2)
+        model_onnx = convert_sklearn(
+            model, "logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={linear_model.LogisticRegression: {'raw_scores': True}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[:5],
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionBinaryRawScore",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function_binary'],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

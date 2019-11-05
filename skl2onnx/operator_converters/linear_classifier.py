@@ -23,6 +23,9 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     number_of_classes = len(classes)
     coefficients = op.coef_.flatten().astype(float).tolist()
 
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+
     if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
         # fit_intercept = False
         intercepts = ([0.0] * number_of_classes if number_of_classes != 2 else
@@ -50,7 +53,8 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     classifier_attrs['coefficients'] = coefficients
     classifier_attrs['intercepts'] = intercepts
     classifier_attrs['multi_class'] = 1 if multi_class == 2 else 0
-    if isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV)):
+    if (use_raw_scores or
+            isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))):
         classifier_attrs['post_transform'] = 'NONE'
     elif isinstance(op, LogisticRegression):
         ovr = (op.multi_class in ["ovr", "warn"] or
@@ -74,7 +78,11 @@ def convert_sklearn_linear_classifier(scope, operator, container):
 
     label_name = operator.outputs[0].full_name
 
-    if (isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))
+    if use_raw_scores:
+        container.add_node(classifier_type, operator.inputs[0].full_name,
+                           [label_name, operator.outputs[1].full_name],
+                           op_domain='ai.onnx.ml', **classifier_attrs)
+    elif (isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))
             and op.classes_.shape[0] <= 2):
         raw_scores_tensor_name = scope.get_unique_variable_name(
                                                         'raw_scores_tensor')
