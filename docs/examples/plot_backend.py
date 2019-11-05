@@ -32,7 +32,9 @@ name = datasets.get_example("logreg_iris.onnx")
 model = load(name)
 
 rep = backend.prepare(model, 'CPU')
-x = np.array([[-1.0, -2.0], [-1.0, -2.0], [-1.0, -2.0]],
+x = np.array([[-1.0, -2.0, 5.0, 6.0],
+              [-1.0, -2.0, -3.0, -4.0],
+              [-1.0, -2.0, 7.0, 8.0]],
              dtype=np.float32)
 label, proba = rep.run(x)
 print("label={}".format(label))
@@ -48,7 +50,9 @@ print(get_device())
 # without using *onnx*.
 
 rep = backend.prepare(name, 'CPU')
-x = np.array([[-1.0, -2.0], [-1.0, -2.0], [-1.0, -2.0]],
+x = np.array([[-1.0, -2.0, -3.0, -4.0],
+              [-1.0, -2.0, -3.0, -4.0],
+              [-1.0, -2.0, -3.0, -4.0]],
              dtype=np.float32)
 label, proba = rep.run(x)
 print("label={}".format(label))
