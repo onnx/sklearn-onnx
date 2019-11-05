@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from scipy.sparse import coo_matrix
 from ..proto import TensorProto
 from ..common._topology import Variable, Scope
 from ..common._container import ModelComponentContainer
@@ -192,7 +193,7 @@ class OnnxOperator:
                 elif isinstance(inp, (OnnxOperator, Variable,
                                       OnnxOperatorItem)):
                     self.inputs.append(inp)
-                elif isinstance(inp, (np.ndarray, TensorProto)):
+                elif isinstance(inp, (np.ndarray, TensorProto, coo_matrix)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
                                       OnnxOperator.ConstantVariable)):

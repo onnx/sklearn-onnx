@@ -11,12 +11,20 @@ import sys
 import traceback
 import warnings
 import numpy as np
+from scipy.sparse import coo_matrix
 from onnx import onnx_pb as onnx_proto
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
 from ..proto.onnx_helper_modified import (
     make_node, ValueInfoProto, make_tensor, make_attribute
 )
+try:
+    from ..proto import SparseTensorProto
+    from ..proto.onnx_helper_modified import make_sparse_tensor
+except ImportError:
+    # onnx is too old.
+    SparseTensorProto = None
+    make_sparse_tensor = None
 from .interface import ModelContainer
 from .utils import get_domain
 
@@ -267,11 +275,14 @@ class ModelComponentContainer(ModelContainer):
             to cast the constant
         :return: created tensor
         """
-        if (can_cast and isinstance(content, np.ndarray) and
+        if (can_cast and isinstance(content, (np.ndarray, coo_matrix)) and
                 onnx_type in (TensorProto.FLOAT, TensorProto.DOUBLE) and
                 onnx_type != self.proto_dtype):
             content = content.astype(self.dtype)
             onnx_type = self.proto_dtype
+
+        sparse_tensor = None
+        tensor = None
 
         if isinstance(content, TensorProto):
             tensor = TensorProto()
@@ -279,14 +290,41 @@ class ModelComponentContainer(ModelContainer):
             tensor.name = name
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
+        elif (SparseTensorProto is not None and
+                isinstance(content, SparseTensorProto)):
+            raise NotImplementedError("Not implemented yet.")
         elif shape is None:
             tensor = make_attribute(name, content)
+        elif isinstance(content, coo_matrix):
+            if SparseTensorProto is None:
+                raise RuntimeError(
+                    "Sparse matrices require SparseTensorProto. Update onnx.")
+            values_tensor = make_tensor(
+                name + "_v", data_type=onnx_type,
+                dims=(len(content.data), ), vals=content.data)
+            indices = [i * content.shape[1] + j
+                       for i, j in zip(content.row, content.col)]
+            indices_tensor = make_tensor(
+                name=name + "_i", data_type=TensorProto.INT64,
+                dims=(len(indices), ), vals=indices)
+            dense_shape = list(content.shape)
+            sparse_tensor = make_sparse_tensor(
+                values_tensor, indices_tensor, dense_shape)
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None')
             tensor = make_tensor(name, onnx_type, shape, content)
-        self.initializers.append(tensor)
-        return tensor
+
+        if tensor is not None:
+            self.initializers.append(tensor)
+            return tensor
+        elif sparse_tensor is not None:
+            self.add_node('Constant', [], [name], sparse_value=sparse_tensor,
+                          op_version=11, name=name + '_op')
+            return sparse_tensor
+        else:
+            raise RuntimeError(
+                "Either tensor or sparse_tensor should be defined.")
 
     def add_value_info(self, variable):
         self.value_info.append(self._make_value_info(variable))

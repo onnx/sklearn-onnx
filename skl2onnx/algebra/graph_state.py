@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from scipy.sparse import coo_matrix
 from onnx import AttributeProto
 from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
@@ -75,23 +76,21 @@ class GraphState:
                                "".format(type(var)))
 
     def _add_constant(self, cst, can_cast=True):
-        if isinstance(cst, np.ndarray):
-            shape = cst.shape
-            name = self.scope.get_unique_variable_name(
-                self.onnx_prefix + 'cst')
-            if cst.dtype == np.float32:
+
+        def _ty_astype(dtype):
+            if dtype == np.float32:
                 ty = onnx_proto.TensorProto.FLOAT
                 astype = np.float64
-            elif cst.dtype == np.float64:
+            elif dtype == np.float64:
                 ty = onnx_proto.TensorProto.DOUBLE
                 astype = np.float64
-            elif cst.dtype == np.int64:
+            elif dtype == np.int64:
                 ty = onnx_proto.TensorProto.INT64
                 astype = np.int64
-            elif cst.dtype == np.int32:
+            elif dtype == np.int32:
                 ty = onnx_proto.TensorProto.INT32
                 astype = np.int64
-            elif cst.dtype == np.bool:
+            elif dtype == np.bool:
                 ty = onnx_proto.TensorProto.BOOL
                 astype = np.bool
             else:
@@ -99,9 +98,25 @@ class GraphState:
                     "Unable to guess ONNX type from type {}. "
                     "You may raise an issue at https://github.com/onnx/"
                     "sklearn-onnx/issues.".format(
-                        cst.dtype))
+                        dtype))
+            return ty, astype
+
+        if isinstance(cst, np.ndarray):
+            shape = cst.shape
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty, astype = _ty_astype(cst.dtype)
             self.container.add_initializer(
                 name, ty, shape, cst.astype(astype).flatten(),
+                can_cast=can_cast)
+            return name
+        elif isinstance(cst, coo_matrix):
+            shape = cst.shape
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty, astype = _ty_astype(cst.dtype)
+            self.container.add_initializer(
+                name, ty, shape, cst.astype(astype),
                 can_cast=can_cast)
             return name
         elif isinstance(cst, TensorProto):
