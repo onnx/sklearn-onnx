@@ -94,6 +94,9 @@ class TestSklearnDocumentation(unittest.TestCase):
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         train = fetch_20newsgroups(random_state=1,
