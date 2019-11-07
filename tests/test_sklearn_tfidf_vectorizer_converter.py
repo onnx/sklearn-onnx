@@ -28,7 +28,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0"),
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
@@ -60,7 +60,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0"),
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_nolowercase(self):
         corpus = numpy.array([

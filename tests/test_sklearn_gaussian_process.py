@@ -607,24 +607,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
-    @unittest.skipIf(True, "needs to convert cho_solve")
-    def test_gpr_rbf_fitted_return_cov(self):
-
-        gp = GaussianProcessRegressor(alpha=1.,
-                                      n_restarts_optimizer=15,
-                                      normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
-
-        # return_cov=True, return_std=False
-        options = {GaussianProcessRegressor: {"return_cov": True}}
-        model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType([None, None]))],
-            options=options)
-        self.assertTrue(model_onnx is not None)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
-                           predict_attributes=options[
-                             GaussianProcessRegressor])
-
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
