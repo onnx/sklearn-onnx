@@ -5,8 +5,10 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from sklearn import datasets
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 import onnxruntime
+from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
@@ -222,6 +224,27 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnGradientBoostingRegressionInt-Dec4"
         )
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_regressor_equal(self):
+        X, y = datasets.make_regression(
+            n_samples=1000, n_features=100, random_state=42)
+        X = X.astype(numpy.int64)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.5, random_state=42)
+        model = KNeighborsRegressor().fit(X_train, y_train)
+        model_onnx = convert_sklearn(
+            model, 'knn',
+            [('input', Int64TensorType([None, X_test.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': numpy.array(X_test)})[0]
+        exp = model.predict(X_test)
+        acc = numpy.sum(numpy.abs(exp - res) <= 1e-4)
+        ratio = acc * 1.0 / res.shape[0]
+        assert ratio >= 0.7
+        # assert_almost_equal(exp, res)
 
 
 if __name__ == "__main__":

@@ -550,7 +550,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0")
+            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec4")
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
