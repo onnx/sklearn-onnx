@@ -66,13 +66,12 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array(
             [-1], dtype=dtype), op_version=op_version)
-        node = OnnxTopK_1(neg_dist, np.array([k], dtype=np.int64),
-                          op_version=1, **kwargs)
+        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs)
     elif op_version < 11:
         neg_dist = OnnxMul(dist, np.array(
             [-1], dtype=dtype), op_version=op_version)
-        node = OnnxTopK_1(neg_dist, np.array([k], dtype=np.int64),
-                          op_version=10, **kwargs)
+        node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
+                           op_version=10, **kwargs)
     else:
         node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
                            largest=0, sorted=1,
