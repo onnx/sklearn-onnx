@@ -22,9 +22,17 @@ from ..algebra.onnx_ops import (
     OnnxReduceSum,
     OnnxReshape,
     OnnxShape,
-    OnnxTopK,
+    OnnxTopK_1,
     OnnxTranspose,
 )
+try:
+    from ..algebra.onnx_ops import OnnxTopK_10
+except ImportError:
+    OnnxTopK_10 = None
+try:
+    from ..algebra.onnx_ops import OnnxTopK_11
+except ImportError:
+    OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
 
@@ -55,10 +63,20 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
                           op_version=op_version, **kwargs)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
-    neg_dist = OnnxMul(dist, np.array(
-        [-1], dtype=dtype), op_version=op_version)
-    node = OnnxTopK(neg_dist, np.array([k], dtype=np.int64),
-                    op_version=op_version, **kwargs)
+    if op_version < 10:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_1(neg_dist, np.array([k], dtype=np.int64),
+                          op_version=1, **kwargs)
+    elif op_version < 11:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_1(neg_dist, np.array([k], dtype=np.int64),
+                          op_version=10, **kwargs)
+    else:
+        node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
+                           largest=0, sorted=1,
+                           op_version=11, **kwargs)
     if keep_distances:
         return (node[1], OnnxMul(node[0], np.array(
                     [-1], dtype=dtype), op_version=op_version))
@@ -169,6 +187,12 @@ def _convert_nearest_neighbors(scope, operator, container):
 def convert_nearest_neighbors_regressor(scope, operator, container):
     """
     Converts *KNeighborsRegressor* into *ONNX*.
+    The converted model may return different predictions depending
+    on how the runtime select the topk element.
+    *sciki-learn* uses function `argpartition
+    <https://docs.scipy.org/doc/numpy/reference/
+    generated/numpy.argpartition.html>`_ which keeps the
+    original order of the elements.
     """
     many = _convert_nearest_neighbors(scope, operator, container)
     _, top_distances, reshaped, wei, norm, axis = many
@@ -192,6 +216,12 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
 def convert_nearest_neighbors_classifier(scope, operator, container):
     """
     Converts *KNeighborsClassifier* into *ONNX*.
+    The converted model may return different predictions depending
+    on how the runtime select the topk element.
+    *sciki-learn* uses function `argpartition
+    <https://docs.scipy.org/doc/numpy/reference/
+    generated/numpy.argpartition.html>`_ which keeps the
+    original order of the elements.
     """
     many = _convert_nearest_neighbors(scope, operator, container)
     _, __, reshaped, wei, ___, axis = many
