@@ -176,13 +176,15 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     opv = container.target_opset
     out = operator.outputs
 
+    reshaped_cast = OnnxCast(
+        reshaped, to=container.proto_dtype, op_version=opv)
     if top_distances is not None:
-        weighted = OnnxMul(reshaped, wei, op_version=opv)
+        weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
         res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
                             keepdims=0)
         res = OnnxDiv(res, norm, op_version=opv, output_names=out)
     else:
-        res = OnnxReduceMean(reshaped, axes=[axis], op_version=opv,
+        res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
                              keepdims=0, output_names=out)
     res.add_to(scope, container)
 
@@ -221,9 +223,20 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     probas = OnnxDiv(all_together, sum_prob, op_version=opv,
                      output_names=out[1:])
     res = OnnxArgMax(all_together, axis=axis, op_version=opv,
-                     keepdims=0, output_names=out[:1])
+                     keepdims=0)
 
-    res.add_to(scope, container)
+    if np.issubdtype(op.classes_.dtype, np.floating):
+        classes = op.classes_.astype(np.int32)
+    elif np.issubdtype(op.classes_.dtype, np.signedinteger):
+        classes = op.classes_
+    else:
+        classes = op.classes_
+
+    res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
+    out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
+                             output_names=out[:1], op_version=opv)
+
+    out_labels.add_to(scope, container)
     probas.add_to(scope, container)
 
 

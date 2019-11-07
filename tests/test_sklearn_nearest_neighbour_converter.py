@@ -22,17 +22,21 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X
 
-    def _fit_model_multiclass_classification(self, model):
+    def _fit_model_multiclass_classification(self, model, use_string=False):
         iris = datasets.load_iris()
         X = iris.data[:, :3]
         y = iris.target
+        if use_string:
+            y = numpy.array(["cl%d" % _ for _ in y])
         model.fit(X, y)
         return model, X
 
-    def _fit_model(self, model, n_targets=1):
+    def _fit_model(self, model, n_targets=1, label_int=False):
         X, y = datasets.make_regression(n_features=4,
                                         random_state=0,
                                         n_targets=n_targets)
+        if label_int:
+            y = y.astype(numpy.int64)
         model.fit(X, y)
         return model, X
 
@@ -48,6 +52,20 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model, model_onnx,
             basename="SklearnKNeighborsRegressor")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_regressor_yint(self):
+        model, X = self._fit_model(
+            KNeighborsRegressor(n_neighbors=2), label_int=True)
+        model_onnx = convert_sklearn(model, "KNN regressor",
+                                     [("input", FloatTensorType([None, 4]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7],
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressorYInt")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -141,6 +159,25 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsClassifierMulti")
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_classifier_multi_class_string(self):
+        model, X = self._fit_model_multiclass_classification(
+            KNeighborsClassifier(), use_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "KNN classifier multi-class",
+            [("input", FloatTensorType([None, 3]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model, model_onnx,
+            basename="SklearnKNeighborsClassifierMulti")
+
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
@@ -188,5 +225,4 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestNearestNeighbourConverter().test_model_knn_regressor_int()
     unittest.main()

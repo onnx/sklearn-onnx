@@ -57,6 +57,28 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_sgd_multi_class_hinge_string(self):
+        model, X = fit_classification_model(
+            SGDClassifier(loss='hinge', random_state=42), 5, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD multi-class classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiHinge-Out0",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_sgd_binary_class_log(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='log', random_state=42), 2)
