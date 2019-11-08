@@ -283,7 +283,7 @@ class ModelComponentContainer(ModelContainer):
             tensor = make_attribute(name, content)
         else:
             if any(d is None for d in shape):
-                raise ValueError('Shape of initializer cannot contain None')
+                raise ValueError('Shape of initializer cannot contain None.')
             tensor = make_tensor(name, onnx_type, shape, content)
         self.initializers.append(tensor)
         return tensor
