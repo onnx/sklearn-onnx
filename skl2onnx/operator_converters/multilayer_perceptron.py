@@ -113,11 +113,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type,
                               classes.shape, classes)
 
-    container.add_node(
-        'ArrayFeatureExtractor', [classes_name, argmax_output_name],
-        array_feature_extractor_result_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-
     if len(classes) == 2:
         unity_name = scope.get_unique_variable_name('unity')
         negative_class_proba_name = scope.get_unique_variable_name(
@@ -133,23 +128,32 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
         apply_identity(scope, y_pred,
                        operator.outputs[1].full_name, container)
 
-    container.add_node('ArgMax', operator.outputs[1].full_name,
-                       argmax_output_name, axis=1,
-                       name=scope.get_unique_operator_name('ArgMax'))
-
-    if class_type == onnx_proto.TensorProto.INT32:
-        reshaped_result_name = scope.get_unique_variable_name(
-            'reshaped_result')
-
-        apply_reshape(scope, array_feature_extractor_result_name,
-                      reshaped_result_name, container,
-                      desired_shape=(-1,))
-        apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name,
-                   container, to=onnx_proto.TensorProto.INT64)
+    if mlp_op._label_binarizer.y_type_ == 'multilabel-indicator':
+        container.add_node('Binarizer', y_pred, operator.outputs[0].full_name,
+                           threshold=0.5, op_domain='ai.onnx.ml')
     else:
-        apply_reshape(scope, array_feature_extractor_result_name,
-                      operator.outputs[0].full_name, container,
-                      desired_shape=(-1,))
+        container.add_node('ArgMax', operator.outputs[1].full_name,
+                           argmax_output_name, axis=1,
+                           name=scope.get_unique_operator_name('ArgMax'))
+        container.add_node(
+            'ArrayFeatureExtractor', [classes_name, argmax_output_name],
+            array_feature_extractor_result_name, op_domain='ai.onnx.ml',
+            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+
+        if class_type == onnx_proto.TensorProto.INT32:
+            reshaped_result_name = scope.get_unique_variable_name(
+                'reshaped_result')
+
+            apply_reshape(scope, array_feature_extractor_result_name,
+                          reshaped_result_name, container,
+                          desired_shape=(-1,))
+            apply_cast(
+                scope, reshaped_result_name, operator.outputs[0].full_name,
+                container, to=onnx_proto.TensorProto.INT64)
+        else:
+            apply_reshape(scope, array_feature_extractor_result_name,
+                          operator.outputs[0].full_name, container,
+                          desired_shape=(-1,))
 
 
 def convert_sklearn_mlp_regressor(scope, operator, container):
