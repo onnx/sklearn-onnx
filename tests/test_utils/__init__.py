@@ -17,6 +17,7 @@ from .tests_helper import (  # noqa
     dump_single_regression,
     convert_model,
     fit_classification_model,
+    fit_multilabel_classification_model,
     fit_regression_model,
 )
 

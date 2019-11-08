@@ -4,28 +4,24 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 
 import unittest
 
-import numpy as np
-from sklearn.datasets import load_diabetes, load_digits, load_iris
-from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    fit_multilabel_classification_model,
+    fit_regression_model,
+)
 
 
 class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_binary(self):
-        data = load_iris()
-        X, y = data.data, data.target
-        y[y > 1] = 1
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPClassifier(random_state=42).fit(X_train, y_train)
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -33,7 +29,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
             model,
             model_onnx,
             basename="SklearnMLPClassifierBinary",
@@ -44,13 +40,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_default(self):
-        data = load_iris()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPClassifier(random_state=42).fit(X_train, y_train)
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42), 4)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -58,7 +49,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
             model,
             model_onnx,
             basename="SklearnMLPClassifierMultiClass",
@@ -66,14 +57,29 @@ class TestSklearnMLPConverters(unittest.TestCase):
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_mlp_classifier_multilabel_default(self):
+        model, X_test = fit_multilabel_classification_model(
+            MLPClassifier(random_state=42))
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPClassifierMultiLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
     def test_model_mlp_regressor_default(self):
-        data = load_diabetes()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPRegressor(random_state=42).fit(X_train, y_train)
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42))
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
@@ -81,10 +87,10 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
             model,
             model_onnx,
-            basename="SklearnMLPRegressor",
+            basename="SklearnMLPRegressor-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
@@ -92,14 +98,9 @@ class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_identity(self):
-        data = load_digits()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPClassifier(random_state=42, activation="identity").fit(
-            X_train, y_train)
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42, activation="identity"), 3,
+            is_int=True)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -107,7 +108,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.int64),
+            X_test,
             model,
             model_onnx,
             basename="SklearnMLPClassifierMultiClassIdentityActivation",
@@ -115,15 +116,30 @@ class TestSklearnMLPConverters(unittest.TestCase):
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_mlp_classifier_multilabel_identity(self):
+        model, X_test = fit_multilabel_classification_model(
+            MLPClassifier(random_state=42, activation="identity"),
+            is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPClassifier",
+            [("input", Int64TensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPClassifierMultiLabelIdentityActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
     def test_model_mlp_regressor_identity(self):
-        data = load_diabetes()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPRegressor(random_state=42, activation="identity").fit(
-            X_train.astype(np.int64), y_train)
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42, activation="identity"), is_int=True)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
@@ -131,10 +147,10 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.int64),
+            X_test,
             model,
             model_onnx,
-            basename="SklearnMLPRegressorIdentityActivation",
+            basename="SklearnMLPRegressorIdentityActivation-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
@@ -142,14 +158,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_mlp_classifier_multiclass_logistic(self):
-        data = load_iris()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPClassifier(random_state=42, activation="logistic").fit(
-            X_train, y_train)
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42, activation="logistic"), 5)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -157,7 +167,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
             model,
             model_onnx,
             basename="SklearnMLPClassifierMultiClassLogisticActivation",
@@ -167,41 +177,9 @@ class TestSklearnMLPConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_mlp_regressor_logistic(self):
-        data = load_diabetes()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPRegressor(random_state=42, activation="logistic").fit(
-            X_train, y_train)
-        model_onnx = convert_sklearn(
-            model,
-            "scikit-learn MLPRegressor",
-            [("input", FloatTensorType([None, X_test.shape[1]]))],
-        )
-        self.assertTrue(model_onnx is not None)
-        dump_data_and_model(
-            X_test.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressorLogisticActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
-
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    def test_model_mlp_classifier_multiclass_tanh(self):
-        data = load_iris()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPClassifier(random_state=42, activation="tanh").fit(
-            X_train, y_train)
+    def test_model_mlp_classifier_multilabel_logistic(self):
+        model, X_test = fit_multilabel_classification_model(
+            MLPClassifier(random_state=42, activation="logistic"), n_classes=4)
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPClassifier",
@@ -209,23 +187,19 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
             model,
             model_onnx,
-            basename="SklearnMLPClassifierMultiClassTanhActivation",
+            basename="SklearnMLPClassifierMultiLabelLogisticActivation",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
-    def test_model_mlp_regressor_tanh(self):
-        data = load_diabetes()
-        X, y = data.data, data.target
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            test_size=0.2,
-                                                            random_state=42)
-        model = MLPRegressor(random_state=42, activation="tanh").fit(
-            X_train, y_train)
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_mlp_regressor_logistic(self):
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42, activation="logistic"))
         model_onnx = convert_sklearn(
             model,
             "scikit-learn MLPRegressor",
@@ -233,7 +207,65 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float32),
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPRegressorLogisticActivation-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_mlp_classifier_multiclass_tanh(self):
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42, activation="tanh"), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPClassifierMultiClassTanhActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_mlp_classifier_multilabel_tanh(self):
+        model, X_test = fit_multilabel_classification_model(
+            MLPClassifier(random_state=42, activation="tanh"), n_labels=3)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPClassifierMultiLabelTanhActivation",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_mlp_regressor_tanh(self):
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42, activation="tanh"))
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPRegressor",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
             model,
             model_onnx,
             basename="SklearnMLPRegressorTanhActivation-Dec4",
