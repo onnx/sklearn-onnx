@@ -188,7 +188,7 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     Converts *KNeighborsRegressor* into *ONNX*.
     The converted model may return different predictions depending
     on how the runtime select the topk element.
-    *sciki-learn* uses function `argpartition
+    *scikit-learn* uses function `argpartition
     <https://docs.scipy.org/doc/numpy/reference/
     generated/numpy.argpartition.html>`_ which keeps the
     original order of the elements.
@@ -217,7 +217,7 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     Converts *KNeighborsClassifier* into *ONNX*.
     The converted model may return different predictions depending
     on how the runtime select the topk element.
-    *sciki-learn* uses function `argpartition
+    *scikit-learn* uses function `argpartition
     <https://docs.scipy.org/doc/numpy/reference/
     generated/numpy.argpartition.html>`_ which keeps the
     original order of the elements.
@@ -256,8 +256,6 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
 
     if np.issubdtype(op.classes_.dtype, np.floating):
         classes = op.classes_.astype(np.int32)
-    elif np.issubdtype(op.classes_.dtype, np.signedinteger):
-        classes = op.classes_
     else:
         classes = op.classes_
 
