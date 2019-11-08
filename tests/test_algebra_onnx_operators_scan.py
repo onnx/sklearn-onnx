@@ -293,6 +293,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
+        assert "u_scan0_" not in str(model_def)
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
