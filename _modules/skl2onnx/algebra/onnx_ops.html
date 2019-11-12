@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>skl2onnx.algebra.onnx_ops &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for skl2onnx.algebra.onnx_ops</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Place holder for all ONNX operators.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">onnx</span>
+<span class="kn">from</span> <span class="nn">.automation</span> <span class="k">import</span> <span class="n">get_rst_doc</span>
+
+
+<span class="k">def</span> <span class="nf">ClassFactory</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span>
+                 <span class="n">input_range</span><span class="p">,</span> <span class="n">output_range</span><span class="p">,</span>
+                 <span class="n">domain</span><span class="p">,</span> <span class="n">attr_names</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span>
+                 <span class="n">deprecated</span><span class="p">,</span> <span class="n">since_version</span><span class="p">,</span>
+                 <span class="n">past_version</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="k">import</span> <span class="n">OnnxOperator</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">op_version</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">input_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">input_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">expected_inputs</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">input_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">input_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unexpected number of inputs, &quot;</span>
+                                   <span class="s2">&quot;got </span><span class="si">{}</span><span class="s2">, expecting </span><span class="si">{}</span><span class="s2"> for operator &quot;</span>
+                                   <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="n">op_name</span><span class="p">))</span>
+
+        <span class="n">attr_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_names</span>
+        <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">op_version_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">op_version</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="n">op_version_class</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">op_version_class</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># attr_names refers to the most recent version of</span>
+            <span class="c1"># this operator. We may need an older one.</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_version</span><span class="p">:</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+                    <span class="n">attr_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_version</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attr_names</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">op_version_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">found</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="n">found</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">op_version_class</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;op_version=</span><span class="si">{}</span><span class="s2"> does not refer to the same opset as the class &quot;</span>
+                <span class="s2">&quot;name (&#39;</span><span class="si">{}</span><span class="s2">&#39;).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;output_names&#39;</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">}:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;</span><span class="si">%s</span><span class="s2">&#39; not valid for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">op_name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;op_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_version</span>
+        <span class="n">OnnxOperator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">newclass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="p">(</span><span class="n">OnnxOperator</span><span class="p">,),</span>
+                    <span class="p">{</span><span class="s2">&quot;__init__&quot;</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="p">,</span>
+                     <span class="s1">&#39;expected_inputs&#39;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
+                     <span class="s1">&#39;expected_outputs&#39;</span><span class="p">:</span> <span class="n">outputs</span><span class="p">,</span>
+                     <span class="s1">&#39;operator_name&#39;</span><span class="p">:</span> <span class="n">op_name</span><span class="p">,</span>
+                     <span class="s1">&#39;input_range&#39;</span><span class="p">:</span> <span class="n">input_range</span><span class="p">,</span>
+                     <span class="s1">&#39;output_range&#39;</span><span class="p">:</span> <span class="n">output_range</span><span class="p">,</span>
+                     <span class="s1">&#39;domain&#39;</span><span class="p">:</span> <span class="n">domain</span><span class="p">,</span>
+                     <span class="s1">&#39;is_deprecated&#39;</span><span class="p">:</span> <span class="n">deprecated</span><span class="p">,</span>
+                     <span class="s1">&#39;since_version&#39;</span><span class="p">:</span> <span class="n">since_version</span><span class="p">,</span>
+                     <span class="s1">&#39;past_version&#39;</span><span class="p">:</span> <span class="n">past_version</span><span class="p">,</span>
+                     <span class="s1">&#39;attr_names&#39;</span><span class="p">:</span> <span class="n">attr_names</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">newclass</span>
+
+
+<span class="k">def</span> <span class="nf">dynamic_class_creation</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatically generates classes for each of the operators</span>
+<span class="sd">    module *onnx* defines and described at</span>
+<span class="sd">    `Operators</span>
+<span class="sd">    &lt;https://github.com/onnx/onnx/blob/master/docs/Operators.md&gt;`_</span>
+<span class="sd">    and `Operators</span>
+<span class="sd">    &lt;https://github.com/onnx/onnx/blob/master/docs/</span>
+<span class="sd">    Operators-ml.md&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">onnx</span><span class="o">.</span><span class="n">defs</span><span class="o">.</span><span class="n">get_all_schemas_with_history</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">schema</span><span class="o">.</span><span class="n">support_level</span> <span class="o">==</span> <span class="n">schema</span><span class="o">.</span><span class="n">SupportType</span><span class="o">.</span><span class="n">EXPERIMENTAL</span><span class="p">:</span>
+            <span class="c1"># Skips experimental operators.</span>
+            <span class="k">continue</span>
+        <span class="c1"># Multiple version can coexist. The last one is kept.</span>
+        <span class="k">if</span> <span class="n">schema</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">schema</span><span class="o">.</span><span class="n">since_version</span> <span class="o">&gt;</span> <span class="n">res</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">since_version</span><span class="p">:</span>
+                <span class="c1"># We keep the most recent one.</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">since_version</span><span class="p">)]</span> <span class="o">=</span> <span class="n">schema</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_c</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">label</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">tys</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">typeStr</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tys</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">get_rst_doc</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_c</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">inputs</span><span class="p">)]</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_c</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">outputs</span><span class="p">)]</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">attributes</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;Onnx&quot;</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;Onnx&quot;</span> <span class="o">+</span> <span class="n">schema</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="n">cl</span> <span class="o">=</span> <span class="n">ClassFactory</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span>
+                          <span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">min_input</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">max_input</span><span class="p">],</span>
+                          <span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">min_output</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">max_output</span><span class="p">],</span>
+                          <span class="n">schema</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span>
+                          <span class="s2">&quot;**Version**&quot;</span> <span class="o">+</span> <span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;**Version**&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="nb">getattr</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                          <span class="n">schema</span><span class="o">.</span><span class="n">since_version</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cl</span>
+
+    <span class="c1"># Retrieves past classes.</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">main</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">[</span><span class="n">main</span><span class="p">]</span>
+        <span class="n">last</span><span class="o">.</span><span class="n">past_version</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="bp">cls</span>
+
+
+<span class="k">def</span> <span class="nf">_update_module</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamically updates the module with operators defined</span>
+<span class="sd">    by *ONNX*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">dynamic_class_creation</span><span class="p">()</span>
+    <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+
+<span class="n">_update_module</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/logo_main.png" alt="Logo"/>
+            </a></p><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation index</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../skl2onnx.html">skl2onnx</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2019, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+  </div>
+  
+  </body>
+</html>

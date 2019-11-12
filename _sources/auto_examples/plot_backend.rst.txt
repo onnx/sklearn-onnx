@@ -7,7 +7,6 @@
 .. _sphx_glr_auto_examples_plot_backend.py:
 
 
-
 .. _l-example-backend-api:
 
 ONNX Runtime Backend for ONNX
@@ -15,16 +14,21 @@ ONNX Runtime Backend for ONNX
 
 .. index:: backend
 
-*ONNX Runtime* extends the 
-`onnx backend API <https://github.com/onnx/onnx/blob/master/docs/ImplementingAnOnnxBackend.md>`_
+*ONNX Runtime* extends the
+`onnx backend API <https://github.com/onnx/onnx/blob/master/docs/
+ImplementingAnOnnxBackend.md>`_
 to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 
+.. code-block:: default
 
-
-.. code-block:: python
-
+    import skl2onnx
+    import onnxruntime
+    import onnx
+    import sklearn
+    import numpy
+    from onnxruntime import get_device
     import numpy as np
     from onnxruntime import datasets
     import onnxruntime.backend as backend
@@ -34,7 +38,10 @@ of a simple logistic regression model.
     model = load(name)
 
     rep = backend.prepare(model, 'CPU')
-    x = np.array([[-1.0, -2.0]], dtype=np.float32)
+    x = np.array([[-1.0, -2.0, 5.0, 6.0],
+                  [-1.0, -2.0, -3.0, -4.0],
+                  [-1.0, -2.0, 7.0, 8.0]],
+                 dtype=np.float32)
     label, proba = rep.run(x)
     print("label={}".format(label))
     print("probabilities={}".format(proba))
@@ -49,18 +56,16 @@ of a simple logistic regression model.
 
  .. code-block:: none
 
-    label=[1]
-    probabilities=[{0: 0.02731134556233883, 1: 0.5175684094429016, 2: 0.4551202654838562}]
+    label=[2 0 2]
+    probabilities=[{0: 2.6998525637367266e-10, 1: 6.870588009633138e-08, 2: 0.9999999403953552}, {0: 0.9999974370002747, 1: 2.5871079287753673e-06, 2: 6.67297780009494e-20}, {0: 7.274464534807741e-17, 1: 1.7157689114963293e-12, 2: 1.0}]
 
 
 The device depends on how the package was compiled,
 GPU or CPU.
 
 
+.. code-block:: default
 
-.. code-block:: python
-
-    from onnxruntime import get_device
     print(get_device())
 
 
@@ -73,19 +78,21 @@ GPU or CPU.
 
  .. code-block:: none
 
-    CPU-MKL-DNN
+    CPU
 
 
 The backend can also directly load the model
 without using *onnx*.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     rep = backend.prepare(name, 'CPU')
-    x = np.array([[-1.0, -2.0]], dtype=np.float32)
+    x = np.array([[-1.0, -2.0, -3.0, -4.0],
+                  [-1.0, -2.0, -3.0, -4.0],
+                  [-1.0, -2.0, -3.0, -4.0]],
+                 dtype=np.float32)
     label, proba = rep.run(x)
     print("label={}".format(label))
     print("probabilities={}".format(proba))
@@ -100,26 +107,22 @@ without using *onnx*.
 
  .. code-block:: none
 
-    label=[1]
-    probabilities=[{0: 0.02731134556233883, 1: 0.5175684094429016, 2: 0.4551202654838562}]
+    label=[0 0 0]
+    probabilities=[{0: 0.9999974370002747, 1: 2.5871079287753673e-06, 2: 6.67297780009494e-20}, {0: 0.9999974370002747, 1: 2.5871079287753673e-06, 2: 6.67297780009494e-20}, {0: 0.9999974370002747, 1: 2.5871079287753673e-06, 2: 6.67297780009494e-20}]
 
 
 The backend API is implemented by other frameworks
 and makes it easier to switch between multiple runtimes
 with the same API.
 
-
 **Versions used for this example**
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    import numpy, sklearn
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -133,14 +136,17 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 1.16.1
-    scikit-learn: 0.20.2
-    onnx:  1.4.1
-    onnxruntime:  0.2.1
-    skl2onnx:  1.4.2
+    numpy: 1.17.0
+    scikit-learn: 0.22.dev0
+    onnx:  1.6.32
+    onnxruntime:  1.0.991
+    skl2onnx:  1.6.0
 
 
-**Total running time of the script:** ( 0 minutes  2.256 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.106 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:

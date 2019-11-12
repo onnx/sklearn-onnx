@@ -13,7 +13,8 @@ Convert a pipeline with ColumnTransformer
 =========================================
 
 *scikit-learn* recently shipped
-`ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_
+`ColumnTransformer <https://scikit-learn.org/stable/modules/
+generated/sklearn.compose.ColumnTransformer.html>`_
 which lets the user define complex pipeline where each
 column may be preprocessed with a different transformer.
 *sklearn-onnx* still works in this case as shown in Section
@@ -30,14 +31,27 @@ We reuse the pipeline implemented in example
 `Column Transformer with Mixed Types
 <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
 There is one change because
-`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
+`ONNX-ML Imputer
+<https://github.com/onnx/onnx/blob/master/docs/
+Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
+.. code-block:: default
 
-
-.. code-block:: python
-
+    import skl2onnx
+    import onnxruntime
+    import onnx
+    import sklearn
+    import matplotlib.pyplot as plt
+    import os
+    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+    import numpy
+    import onnxruntime as rt
+    from skl2onnx import convert_sklearn
+    import pprint
+    from skl2onnx.common.data_types import FloatTensorType, StringTensorType
+    from skl2onnx.common.data_types import Int64TensorType
     import pandas as pd
     import numpy as np
     from sklearn.compose import ColumnTransformer
@@ -53,7 +67,8 @@ and must be removed. Look for comment starting with ``---`` below.
     X = data.drop('survived', axis=1)
     y = data['survived']
 
-    # SimpleImputer on string is not available for string in ONNX-ML specifications.
+    # SimpleImputer on string is not available for
+    # string in ONNX-ML specifications.
     # So we do it beforehand.
     for cat in ['embarked', 'sex', 'pclass']:
         X[cat].fillna('missing', inplace=True)
@@ -67,7 +82,7 @@ and must be removed. Look for comment starting with ``---`` below.
 
     categorical_features = ['embarked', 'sex', 'pclass']
     categorical_transformer = Pipeline(steps=[
-        # --- SimpleImputer is not available for strings in ONNX-ML specifications. 
+        # --- SimpleImputer is not available for strings in ONNX-ML specifications.
         # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
         ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
@@ -75,7 +90,7 @@ and must be removed. Look for comment starting with ``---`` below.
         transformers=[
             ('num', numeric_transformer, numeric_features),
             ('cat', categorical_transformer, categorical_features),
-            ])
+        ])
 
     clf = Pipeline(steps=[('preprocessor', preprocessor),
                           ('classifier', LogisticRegression(solver='lbfgs'))])
@@ -97,8 +112,7 @@ but it needs to know which feature has which name.
 We simply reuse the dataframe column definition.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     print(X_train.dtypes)
 
@@ -131,10 +145,9 @@ We simply reuse the dataframe column definition.
 After conversion.
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-    from skl2onnx.common.data_types import FloatTensorType, StringTensorType, Int64TensorType
 
     def convert_dataframe_schema(df, drop=None):
         inputs = []
@@ -142,17 +155,17 @@ After conversion.
             if drop is not None and k in drop:
                 continue
             if v == 'int64':
-                t = Int64TensorType([1, 1])
+                t = Int64TensorType([None, 1])
             elif v == 'float64':
-                t = FloatTensorType([1, 1])
+                t = FloatTensorType([None, 1])
             else:
-                t = StringTensorType([1, 1])
+                t = StringTensorType([None, 1])
             inputs.append((k, t))
         return inputs
-    
+
+
     inputs = convert_dataframe_schema(X_train)
 
-    import pprint
     pprint.pprint(inputs)
 
 
@@ -165,40 +178,37 @@ After conversion.
 
  .. code-block:: none
 
-    [('pclass', Int64TensorType(shape=[1, 1])),
-     ('name', StringTensorType(shape=[1, 1])),
-     ('sex', StringTensorType(shape=[1, 1])),
-     ('age', FloatTensorType(shape=[1, 1])),
-     ('sibsp', Int64TensorType(shape=[1, 1])),
-     ('parch', Int64TensorType(shape=[1, 1])),
-     ('ticket', StringTensorType(shape=[1, 1])),
-     ('fare', FloatTensorType(shape=[1, 1])),
-     ('cabin', StringTensorType(shape=[1, 1])),
-     ('embarked', StringTensorType(shape=[1, 1])),
-     ('boat', StringTensorType(shape=[1, 1])),
-     ('body', FloatTensorType(shape=[1, 1])),
-     ('home.dest', StringTensorType(shape=[1, 1]))]
+    [('pclass', Int64TensorType(shape=[None, 1])),
+     ('name', StringTensorType(shape=[None, 1])),
+     ('sex', StringTensorType(shape=[None, 1])),
+     ('age', FloatTensorType(shape=[None, 1])),
+     ('sibsp', Int64TensorType(shape=[None, 1])),
+     ('parch', Int64TensorType(shape=[None, 1])),
+     ('ticket', StringTensorType(shape=[None, 1])),
+     ('fare', FloatTensorType(shape=[None, 1])),
+     ('cabin', StringTensorType(shape=[None, 1])),
+     ('embarked', StringTensorType(shape=[None, 1])),
+     ('boat', StringTensorType(shape=[None, 1])),
+     ('body', FloatTensorType(shape=[None, 1])),
+     ('home.dest', StringTensorType(shape=[None, 1]))]
 
 
-Merging single column into vectors is not 
+Merging single column into vectors is not
 the most efficient way to compute the prediction.
 It could be done before converting the pipeline into a graph.
-
 
 Convert the pipeline into ONNX
 ++++++++++++++++++++++++++++++
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    from skl2onnx import convert_sklearn
     try:
         model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
     except Exception as e:
         print(e)
-    
+
 
 
 
@@ -209,11 +219,10 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Columns must have the same type.
-    Inputs:
-    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[1, 1]))
-    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[1, 1]))
-    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[1, 1]))
+    Columns must have the same type. C++ backends do not support mixed types. Inputs:
+    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[None, 1]))
+    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[None, 1]))
+    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[None, 1]))
 
 
 Predictions are more efficient if the graph is small.
@@ -221,11 +230,11 @@ That's why the converter checks that there is no unused input.
 They need to be removed from the graph inputs.
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    to_drop = {'parch', 'sibsp', 'cabin', 'ticket', 'name', 'body', 'home.dest', 'boat'}
+    to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
+               'name', 'body', 'home.dest', 'boat'}
     inputs = convert_dataframe_schema(X_train, to_drop)
     try:
         model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
@@ -242,11 +251,10 @@ They need to be removed from the graph inputs.
 
  .. code-block:: none
 
-    Columns must have the same type.
-    Inputs:
-    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[1, 1]))
-    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[1, 1]))
-    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[1, 1]))
+    Columns must have the same type. C++ backends do not support mixed types. Inputs:
+    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[None, 1]))
+    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[None, 1]))
+    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[None, 1]))
 
 
 *scikit-learn* does implicit conversions when it can.
@@ -254,8 +262,7 @@ They need to be removed from the graph inputs.
 must be applied on columns of the same type.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     X_train['pclass'] = X_train['pclass'].astype(str)
@@ -283,8 +290,7 @@ produces the same predictions, labels and probabilities.
 Let's start with *scikit-learn*.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     print("predict", clf.predict(X_test[:5]))
@@ -300,8 +306,8 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 0 0 0 0]
-    predict_proba [[0.78231522 0.21768478]]
+    predict [0 1 0 1 0]
+    predict_proba [[0.86980035 0.13019965]]
 
 
 Predictions with onnxruntime.
@@ -315,8 +321,7 @@ but as a matrix of one column which explains the last line
 with the *reshape*.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     X_test2 = X_test.drop(to_drop, axis=1)
@@ -325,7 +330,7 @@ with the *reshape*.
         inputs[c] = inputs[c].astype(np.float32)
     for k in inputs:
         inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
-    
+
 
 
 
@@ -335,12 +340,9 @@ with the *reshape*.
 We are ready to run *onnxruntime*.
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    import onnxruntime as rt
-    import numpy
     sess = rt.InferenceSession("pipeline_titanic.onnx")
     pred_onx = sess.run(None, inputs)
     print("predict", pred_onx[0][:5])
@@ -356,8 +358,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 0 0 0 0]
-    predict_proba [{0: 0.782315194606781, 1: 0.217684805393219}]
+    predict [0 1 0 1 0]
+    predict_proba [{0: 0.8698002696037292, 1: 0.13019973039627075}]
 
 
 .. _l-plot-complex-pipeline-graph:
@@ -368,20 +370,19 @@ Display the ONNX graph
 Finally, let's see the graph converted with *sklearn-onnx*.
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-                                node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                                                fillcolor="yellow", style="filled"))
+    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name,
+                                rankdir="TB",
+                                node_producer=GetOpNodeProducer("docstring",
+                                                                color="yellow",
+                                                                fillcolor="yellow",
+                                                                style="filled"))
     pydot_graph.write_dot("pipeline_titanic.dot")
 
-    import os
     os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic.dot')
 
-    import matplotlib.pyplot as plt
     image = plt.imread("pipeline_titanic.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
@@ -399,14 +400,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 **Versions used for this example**
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    import numpy, sklearn
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import onnx, onnxruntime, skl2onnx, onnxmltools, lightgbm
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -420,14 +418,17 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.16.1
-    scikit-learn: 0.20.2
-    onnx:  1.4.1
-    onnxruntime:  0.2.1
-    skl2onnx:  1.4.2
+    numpy: 1.17.0
+    scikit-learn: 0.22.dev0
+    onnx:  1.6.32
+    onnxruntime:  1.0.991
+    skl2onnx:  1.5.2
 
 
-**Total running time of the script:** ( 0 minutes  6.907 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  9.042 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:

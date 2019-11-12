@@ -1,85 +1,46 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-  <title>skl2onnx.helpers.onnx_helper</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>skl2onnx.helpers.onnx_helper &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
-  <link rel="stylesheet" href="../../../_static/sphinx-modern-theme-modified.css" type="text/css"/>
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
-</head>
-<body>
-<div class="container">
-  <div class="row" style="margin-top: 1rem;">
-    <div id="sidebar" class="col-xs-12 col-sm-3">
-      <a href="../../../index.html">
-        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="../../../_static/logo_main.png"/>
-      </a>
-      <div id="searchbox" style="display: none" role="search">
-        <form class="form-inline" action="../../../search.html" method="get">
-          <div class="form-group">
-            <label class="sr-only" for="searchInput">Search</label>
-            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
-          <input type="hidden" name="check_keywords" value="yes"/>
-          <input type="hidden" name="area" value="default"/>
-        </form>
-      </div>
+  </head><body>
+  
+  
 
-      <hr>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+      </ul>
+    </div>  
 
-        <div id="toc">
-        <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_summary.html">API Summary</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#registered-functions">Registered functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#parsers">Parsers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#utils-for-contributors">Utils for contributors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api_summary.html#concepts">Concepts</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_metadata.html">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../supported.html">Supported Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pipeline.html">Convert a pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#titanic-example">Titanic example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../parameterized.html">Converters with options</a></li>
-</ul>
-
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-9">
-      <h1>Source code for skl2onnx.helpers.onnx_helper</h1><div class="highlight"><pre>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for skl2onnx.helpers.onnx_helper</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -------------------------------------------------------------------------</span>
 <span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
 <span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
@@ -88,7 +49,13 @@
 
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
 <span class="kn">import</span> <span class="nn">onnx</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="k">import</span> <span class="n">helper</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="k">import</span> <span class="n">shape_inference</span>
+<span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">make_node</span><span class="p">,</span> <span class="n">make_tensor_value_info</span><span class="p">,</span> <span class="n">make_graph</span><span class="p">,</span>
+    <span class="n">make_model</span><span class="p">,</span> <span class="n">ValueInfoProto</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="k">import</span> <span class="n">onnx_pb</span> <span class="k">as</span> <span class="n">onnx_proto</span>
+<span class="kn">from</span> <span class="nn">..common._topology</span> <span class="k">import</span> <span class="n">Variable</span>
 
 
 <div class="viewcode-block" id="load_onnx_model"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.helpers.onnx_helper.load_onnx_model">[docs]</a><span class="k">def</span> <span class="nf">load_onnx_model</span><span class="p">(</span><span class="n">onnx_file_or_bytes</span><span class="p">):</span>
@@ -126,16 +93,36 @@
     <span class="k">return</span> <span class="n">content</span></div>
 
 
-<div class="viewcode-block" id="enumerate_model_node_outputs"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs">[docs]</a><span class="k">def</span> <span class="nf">enumerate_model_node_outputs</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="enumerate_model_node_outputs"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs">[docs]</a><span class="k">def</span> <span class="nf">enumerate_model_node_outputs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">add_node</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enumerates all the node of a model.</span>
+<span class="sd">    Enumerates all the nodes of a model.</span>
+
+<span class="sd">    :param model: ONNX graph</span>
+<span class="sd">    :param add_node: if False, the function enumerates</span>
+<span class="sd">        all output names from every node, otherwise, it</span>
+<span class="sd">        enumerates tuple (output name, node)</span>
+<span class="sd">    :return: enumerator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;*model* is not an *ONNX* model but &quot;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Parameter model is not an ONNX model but &quot;</span>
                         <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)))</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">out</span></div>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="k">if</span> <span class="n">add_node</span> <span class="k">else</span> <span class="n">out</span></div>
+
+
+<span class="k">def</span> <span class="nf">enumerate_model_initializers</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">add_node</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enumerates all the initializers of a model.</span>
+
+<span class="sd">    :param model: ONNX graph</span>
+<span class="sd">    :param add_node: if False, the function enumerates</span>
+<span class="sd">        all output names from every node, otherwise, it</span>
+<span class="sd">        enumerates tuple (output name, node)</span>
+<span class="sd">    :return: enumerator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">initializer</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="k">if</span> <span class="n">add_node</span> <span class="k">else</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span>
 
 
 <div class="viewcode-block" id="select_model_inputs_outputs"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.helpers.onnx_helper.select_model_inputs_outputs">[docs]</a><span class="k">def</span> <span class="nf">select_model_inputs_outputs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -150,9 +137,9 @@
 <span class="sd">    The function removes unneeded files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Inputs cannot be changed yet.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Parameter inputs cannot be empty.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;outputs and inputs are None&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Parameter outputs cannot be None.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">outputs</span><span class="p">]</span>
 
@@ -189,7 +176,7 @@
 
             <span class="n">nb</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">mark_var</span><span class="p">[</span><span class="n">inp</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mark_var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">mark_var</span><span class="p">[</span><span class="n">inp</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="n">nb</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -199,12 +186,12 @@
 
     <span class="n">var_out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
-        <span class="n">value_info</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">ValueInfoProto</span><span class="p">()</span>
+        <span class="n">value_info</span> <span class="o">=</span> <span class="n">ValueInfoProto</span><span class="p">()</span>
         <span class="n">value_info</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">out</span>
         <span class="n">var_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_info</span><span class="p">)</span>
-    <span class="n">graph</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_graph</span><span class="p">(</span><span class="n">keep_nodes</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-                              <span class="n">var_out</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">initializer</span><span class="p">)</span>
-    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span><span class="n">keep_nodes</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                       <span class="n">var_out</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">initializer</span><span class="p">)</span>
+    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">ir_version</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">producer_name</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">producer_version</span>
@@ -216,23 +203,118 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Input mismatch </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">input</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">onnx_model</span></div>
-</pre></div>
-    </div>
-  </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
-        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
-        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
-        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
-        crossorigin="anonymous"></script>
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
-<script src="../../../_static/searchtools.js"></script>
-<script>$('#searchbox').show(0)</script>
-</body>
+
+<span class="k">def</span> <span class="nf">infer_outputs</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">atts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Infers outputs type and shapes given an ONNX operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">required_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;onnx_name&#39;</span><span class="p">):</span>
+                    <span class="n">required_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">required_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unable to require output </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">make_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">],</span>
+                         <span class="n">required_outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">atts</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="s1">&#39;nodes&#39;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">op_type</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to build ONNX nodes from type </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">op_type</span><span class="p">)))</span>
+
+    <span class="n">input_init</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">initializer</span><span class="p">:</span>
+        <span class="n">input_init</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">initializer</span><span class="p">)</span>
+    <span class="n">onnx_inputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="n">input_init</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+            <span class="n">onnx_type</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_onnx_type</span><span class="p">()</span>
+            <span class="n">tensor_type</span> <span class="o">=</span> <span class="n">onnx_type</span><span class="o">.</span><span class="n">tensor_type</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">tensor_type</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">dim</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dim_value</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tensor_type</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">dim</span><span class="p">))]</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">make_tensor_value_info</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">,</span>
+                                         <span class="n">tensor_type</span><span class="o">.</span><span class="n">elem_type</span><span class="p">,</span>
+                                         <span class="nb">tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span>
+            <span class="n">onnx_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">TensorProto</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">make_tensor_value_info</span><span class="p">(</span>
+                <span class="nb">input</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">real</span><span class="p">,</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
+            <span class="n">onnx_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">AttributeProto</span><span class="p">):</span>
+            <span class="n">value_info</span> <span class="o">=</span> <span class="n">ValueInfoProto</span><span class="p">()</span>
+            <span class="n">value_info</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">onnx_type</span> <span class="o">=</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TypeProto</span><span class="p">()</span>
+            <span class="n">onnx_type</span><span class="o">.</span><span class="n">tensor_type</span><span class="o">.</span><span class="n">elem_type</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">type</span>
+            <span class="n">value_info</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">onnx_type</span><span class="p">)</span>
+            <span class="n">onnx_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_info</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">onnx_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s1">&#39;infer_shapes&#39;</span><span class="p">,</span>
+                       <span class="n">onnx_inputs</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">original_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">producer_name</span><span class="o">=</span><span class="s1">&#39;skl2onnx&#39;</span><span class="p">)</span>
+    <span class="n">domains</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+        <span class="n">domains</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">domain</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">domains</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                <span class="nb">getattr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">domains</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">op_set</span> <span class="o">=</span> <span class="n">original_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">op_set</span> <span class="o">=</span> <span class="n">original_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">inferred_model</span> <span class="o">=</span> <span class="n">shape_inference</span><span class="o">.</span><span class="n">infer_shapes</span><span class="p">(</span><span class="n">original_model</span><span class="p">)</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_pb</span><span class="p">(</span><span class="n">inferred_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">value_info</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Shape inference fails.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                           <span class="s2">&quot;*Inputs*</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">*Model*</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">onnx_inputs</span><span class="p">,</span> <span class="n">original_model</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">shapes</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/logo_main.png" alt="Logo"/>
+            </a></p><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation index</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../skl2onnx.html">skl2onnx</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2019, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+  </div>
+  
+  </body>
 </html>

@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Custom Operator for NMF Decomposition &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark a pipeline" href="plot_benchmark_pipeline.html" />
+    <link rel="prev" title="Convert a pipeline with a LightGbm model" href="plot_pipeline_lightgbm.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="plot_benchmark_pipeline.html" title="Benchmark a pipeline"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot_pipeline_lightgbm.html" title="Convert a pipeline with a LightGbm model"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Gallery of examples</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-nmf-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="custom-operator-for-nmf-decomposition">
+<span id="sphx-glr-auto-examples-plot-nmf-py"></span><h1>Custom Operator for NMF Decomposition<a class="headerlink" href="#custom-operator-for-nmf-decomposition" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.NMF.html">NMF</a> factorizes an input matrix
+into two matrices <em>W, H</em> of rank <em>k</em> so that <img class="math" src="../_images/math/bc4c4399c4280cf7ff3fe7bbb34f2fcdcc734acc.png" alt="WH \sim M"/>.
+<img class="math" src="../_images/math/b3ae6faea2ec4f72d72a625e9beca9cb903a4ea4.png" alt="M=(m_{ij})"/> may be a binary matrix where <em>i</em> is a user
+and <em>j</em> a product he bought. The prediction
+function depends on whether or not the user needs a
+recommandation for an existing user or a new user.
+This example addresses the first case.</p>
+<p>The second case is more complex as it theoretically
+requires the estimation of a new matrix <em>W</em> with a
+gradient descent.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#building-a-simple-model" id="id2">Building a simple model</a></p></li>
+<li><p><a class="reference internal" href="#conversion-into-onnx" id="id3">Conversion into ONNX</a></p></li>
+</ul>
+</div>
+<div class="section" id="building-a-simple-model">
+<h2><a class="toc-backref" href="#id2">Building a simple model</a><a class="headerlink" href="#building-a-simple-model" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">skl2onnx</span>
+<span class="kn">import</span> <span class="nn">onnxruntime</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">NMF</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="k">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
+<span class="kn">import</span> <span class="nn">onnx</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_ops</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">OnnxArrayFeatureExtractor</span><span class="p">,</span> <span class="n">OnnxMul</span><span class="p">,</span> <span class="n">OnnxReduceSum</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="k">import</span> <span class="n">FloatTensorType</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="k">import</span> <span class="n">InferenceSession</span>
+
+
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">mat</span><span class="p">[:</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">mod</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">components_</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;original predictions&quot;</span><span class="p">)</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>original predictions
+[(0, 0, 1.894026723010214), (0, 1, 0.10917444511058898), (0, 2, 0.3072496472670789), (0, 3, 0.3072496472670789), (1, 0, 1.0146841034217697), (1, 1, 0.984872329246054), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.106628446917871), (2, 1, 0.0), (2, 2, 0.19085159419807027), (2, 3, 0.19085159419807027), (3, 0, 1.106628446917871), (3, 1, 0.0), (3, 2, 0.19085159419807027), (3, 3, 0.19085159419807027), (4, 0, 0.947013361505107), (4, 1, 0.05458722255529449), (4, 2, 0.15362482363353944), (4, 3, 0.15362482363353944)]
+</pre></div>
+</div>
+<p>Let’s rewrite the prediction in a way it is closer
+to the function we need to convert into ONNX.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">row_index</span><span class="p">,</span> <span class="n">col_index</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">row_index</span><span class="p">,</span> <span class="p">:],</span> <span class="n">H</span><span class="p">[:,</span> <span class="n">col_index</span><span class="p">])</span>
+
+
+<span class="n">got</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">got</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">got</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(0, 0, 1.894026723010214), (0, 1, 0.10917444511058898), (0, 2, 0.3072496472670789), (0, 3, 0.3072496472670789), (1, 0, 1.0146841034217697), (1, 1, 0.984872329246054), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.106628446917871), (2, 1, 0.0), (2, 2, 0.19085159419807027), (2, 3, 0.19085159419807027), (3, 0, 1.106628446917871), (3, 1, 0.0), (3, 2, 0.19085159419807027), (3, 3, 0.19085159419807027), (4, 0, 0.947013361505107), (4, 1, 0.05458722255529449), (4, 2, 0.15362482363353944), (4, 3, 0.15362482363353944)]
+</pre></div>
+</div>
+</div>
+<div class="section" id="conversion-into-onnx">
+<h2><a class="toc-backref" href="#id3">Conversion into ONNX</a><a class="headerlink" href="#conversion-into-onnx" title="Permalink to this headline">¶</a></h2>
+<p>There is no implemented converter for
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.NMF.html">NMF</a> as the function we plan
+to convert is not transformer or a predictor.
+The following converter does not need to be registered,
+it just creates an ONNX graph equivalent to function
+<em>predict</em> implemented above.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">nmf_to_onnx</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The function converts a NMF described by matrices</span>
+<span class="sd">    *W*, *H* (*WH* approximate training data *M*).</span>
+<span class="sd">    into a function which takes two indices *(i, j)*</span>
+<span class="sd">    and returns the predictions for it. It assumes</span>
+<span class="sd">    these indices applies on the training data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">OnnxArrayFeatureExtractor</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="s1">&#39;col&#39;</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">OnnxArrayFeatureExtractor</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;row&#39;</span><span class="p">)</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="n">OnnxMul</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">OnnxReduceSum</span><span class="p">(</span><span class="n">dot</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="s2">&quot;rec&quot;</span><span class="p">)</span>
+    <span class="n">indices_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">onx</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;col&#39;</span><span class="p">:</span> <span class="n">indices_type</span><span class="p">,</span>
+                              <span class="s1">&#39;row&#39;</span><span class="p">:</span> <span class="n">indices_type</span><span class="p">},</span>
+                      <span class="n">outputs</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;rec&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))])</span>
+    <span class="k">return</span> <span class="n">onx</span>
+
+
+<span class="n">model_onnx</span> <span class="o">=</span> <span class="n">nmf_to_onnx</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_onnx</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ir_version: 6
+producer_name: &quot;skl2onnx&quot;
+producer_version: &quot;1.5.2&quot;
+domain: &quot;ai.onnx&quot;
+model_version: 0
+graph {
+  node {
+    input: &quot;Ar_ArrayFeatureExtractorcst&quot;
+    input: &quot;col&quot;
+    output: &quot;Ar_Z0&quot;
+    name: &quot;Ar_ArrayFeatureExtractor&quot;
+    op_type: &quot;ArrayFeatureExtractor&quot;
+    domain: &quot;ai.onnx.ml&quot;
+  }
+  node {
+    input: &quot;Ar_ArrayFeatureExtractorcst1&quot;
+    input: &quot;row&quot;
+    output: &quot;Ar_Z01&quot;
+    name: &quot;Ar_ArrayFeatureExtractor1&quot;
+    op_type: &quot;ArrayFeatureExtractor&quot;
+    domain: &quot;ai.onnx.ml&quot;
+  }
+  node {
+    input: &quot;Ar_Z0&quot;
+    input: &quot;Ar_Z01&quot;
+    output: &quot;Mu_C0&quot;
+    name: &quot;Mu_Mul&quot;
+    op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;Mu_C0&quot;
+    output: &quot;rec&quot;
+    name: &quot;Re_ReduceSum&quot;
+    op_type: &quot;ReduceSum&quot;
+    domain: &quot;&quot;
+  }
+  name: &quot;OnnxReduceSum&quot;
+  initializer {
+    dims: 2
+    dims: 4
+    data_type: 1
+    float_data: 1.6038050651550293
+    float_data: 0.0
+    float_data: 0.2765957713127136
+    float_data: 0.2765957713127136
+    float_data: 0.6532432436943054
+    float_data: 0.634050726890564
+    float_data: 0.0
+    float_data: 0.0
+    name: &quot;Ar_ArrayFeatureExtractorcst&quot;
+  }
+  initializer {
+    dims: 2
+    dims: 5
+    data_type: 1
+    float_data: 1.110825538635254
+    float_data: 0.0
+    float_data: 0.6900018453598022
+    float_data: 0.6900018453598022
+    float_data: 0.555412769317627
+    float_data: 0.17218567430973053
+    float_data: 1.5533021688461304
+    float_data: 0.0
+    float_data: 0.0
+    float_data: 0.08609283715486526
+    name: &quot;Ar_ArrayFeatureExtractorcst1&quot;
+  }
+  input {
+    name: &quot;col&quot;
+    type {
+      tensor_type {
+        elem_type: 7
+        shape {
+          dim {
+          }
+        }
+      }
+    }
+  }
+  input {
+    name: &quot;row&quot;
+    type {
+      tensor_type {
+        elem_type: 7
+        shape {
+          dim {
+          }
+        }
+      }
+    }
+  }
+  output {
+    name: &quot;rec&quot;
+    type {
+      tensor_type {
+        elem_type: 1
+        shape {
+          dim {
+          }
+          dim {
+            dim_value: 1
+          }
+        }
+      }
+    }
+  }
+}
+opset_import {
+  domain: &quot;ai.onnx.ml&quot;
+  version: 11
+}
+opset_import {
+  domain: &quot;&quot;
+  version: 11
+}
+</pre></div>
+</div>
+<p>Let’s compute prediction with it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">predict_onnx</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">col_indices</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="p">{</span><span class="s1">&#39;col&#39;</span><span class="p">:</span> <span class="n">col_indices</span><span class="p">,</span>
+                    <span class="s1">&#39;row&#39;</span><span class="p">:</span> <span class="n">row_indices</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="n">onnx_preds</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">row_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">col_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">j</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">predict_onnx</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">col_indices</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">onnx_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">onnx_preds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(0, 0, 1.8940268), (0, 1, 0.10917445), (0, 2, 0.30724964), (0, 3, 0.30724964), (1, 0, 1.0146842), (1, 1, 0.98487234), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066284), (2, 1, 0.0), (2, 2, 0.1908516), (2, 3, 0.1908516), (3, 0, 1.1066284), (3, 1, 0.0), (3, 2, 0.1908516), (3, 3, 0.1908516), (4, 0, 0.9470134), (4, 1, 0.054587226), (4, 2, 0.15362482), (4, 3, 0.15362482)]
+</pre></div>
+</div>
+<p>The ONNX graph looks like the following.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydot_graph</span> <span class="o">=</span> <span class="n">GetPydotGraph</span><span class="p">(</span>
+    <span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">rankdir</span><span class="o">=</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">node_producer</span><span class="o">=</span><span class="n">GetOpNodeProducer</span><span class="p">(</span><span class="s2">&quot;docstring&quot;</span><span class="p">))</span>
+<span class="n">pydot_graph</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="s2">&quot;graph_nmf.dot&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;dot -O -Tpng graph_nmf.dot&#39;</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">&quot;graph_nmf.dot.png&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_nmf_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_nmf_001.png" />
+<p><strong>Versions used for this example</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numpy: 1.17.0
+scikit-learn: 0.22.dev0
+onnx:  1.6.32
+onnxruntime:  1.0.991
+skl2onnx:  1.5.2
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.449 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-nmf-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/ef8e5a6b53cf057c1a68c3072197dfe9/plot_nmf.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_nmf.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/57a8ccd194c8105a37c828c842f46a32/plot_nmf.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_nmf.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Custom Operator for NMF Decomposition</a><ul>
+<li><a class="reference internal" href="#building-a-simple-model">Building a simple model</a></li>
+<li><a class="reference internal" href="#conversion-into-onnx">Conversion into ONNX</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="index.html">Gallery of examples</a><ul>
+      <li>Previous: <a href="plot_pipeline_lightgbm.html" title="previous chapter">Convert a pipeline with a LightGbm model</a></li>
+      <li>Next: <a href="plot_benchmark_pipeline.html" title="next chapter">Benchmark a pipeline</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_examples/plot_nmf.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2019, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+  </div>
+  
+  </body>
+</html>
