@@ -77,7 +77,8 @@ class GraphState:
 
     def _add_constant(self, cst, can_cast=True):
 
-        def _ty_astype(dtype):
+        def _ty_astype(cst):
+            dtype = cst.dtype
             if dtype == np.float32:
                 ty = onnx_proto.TensorProto.FLOAT
                 astype = np.float64
@@ -94,7 +95,7 @@ class GraphState:
                 ty = onnx_proto.TensorProto.BOOL
                 astype = np.bool
             else:
-                st = str(cst.dtype).lower()
+                st = str(dtype).lower()
                 if st.startswith('u') or st.startswith("<u"):
                     ty = onnx_proto.TensorProto.STRING
                     astype = None
@@ -105,13 +106,13 @@ class GraphState:
                         "You may raise an issue at https://github.com/onnx/"
                         "sklearn-onnx/issues.".format(
                             cst.dtype))
-            return ty, astype
+            return cst, ty, astype
 
         if isinstance(cst, np.ndarray):
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty, astype = _ty_astype(cst.dtype)
+            cst, ty, astype = _ty_astype(cst)
             if astype is not None:
                 cst = cst.astype(astype)
             self.container.add_initializer(
@@ -122,7 +123,7 @@ class GraphState:
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty, astype = _ty_astype(cst.dtype)
+            cst, ty, astype = _ty_astype(cst)
             self.container.add_initializer(
                 name, ty, shape, cst.astype(astype),
                 can_cast=can_cast)
