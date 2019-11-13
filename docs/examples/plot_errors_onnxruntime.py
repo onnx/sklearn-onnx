@@ -22,15 +22,22 @@ import onnxruntime
 import onnx
 import sklearn
 import onnxruntime as rt
-import numpy
-from onnxruntime.datasets import get_example
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
     # onnxruntime <= 0.5
     InvalidArgument = RuntimeError
 
-example2 = get_example("logreg_iris.onnx")
+data = load_iris()
+clr = LogisticRegression().fit(data.data[:, :2], data.target)
+with open("logreg_iris.onnx", "wb") as f:
+    f.write(skl2onnx.to_onnx(
+        clr, data.data[:, :2].astype(np.float32)).SerializeToString())
+
+example2 = "logreg_iris.onnx"
 sess = rt.InferenceSession(example2)
 
 input_name = sess.get_inputs()[0].name
@@ -42,8 +49,8 @@ output_name = sess.get_outputs()[0].name
 # and cannot handle any other kind of floats.
 
 try:
-    x = numpy.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]],
-                    dtype=numpy.float64)
+    x = np.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]],
+                 dtype=np.float64)
     sess.run([output_name], {input_name: x})
 except Exception as e:
     print("Unexpected type")
@@ -54,7 +61,7 @@ except Exception as e:
 # is misspelled.
 
 try:
-    x = numpy.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=numpy.float32)
+    x = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float32)
     sess.run(["misspelled"], {input_name: x})
 except Exception as e:
     print("Misspelled output name")
@@ -64,7 +71,7 @@ except Exception as e:
 # The output name is optional, it can be replaced by *None*
 # and *onnxruntime* will then return all the outputs.
 
-x = numpy.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=numpy.float32)
+x = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float32)
 res = sess.run(None, {input_name: x})
 print("All outputs")
 print(res)
@@ -73,7 +80,7 @@ print(res)
 # The same goes if the input name is misspelled.
 
 try:
-    x = numpy.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=numpy.float32)
+    x = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float32)
     sess.run([output_name], {"misspelled": x})
 except Exception as e:
     print("Misspelled input name")
@@ -84,11 +91,11 @@ except Exception as e:
 # dimension is a multiple of the expected input dimension.
 
 for x in [
-        numpy.array([1.0, 2.0, 3.0, 4.0], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0, 3.0, 4.0]], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0], [3.0, 4.0]], dtype=numpy.float32),
-        numpy.array([1.0, 2.0, 3.0], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0, 3.0]], dtype=numpy.float32)]:
+        np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
+        np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
+        np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
+        np.array([1.0, 2.0, 3.0], dtype=np.float32),
+        np.array([[1.0, 2.0, 3.0]], dtype=np.float32)]:
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))
@@ -96,11 +103,11 @@ for x in [
         print("Shape={0} and error={1}".format(x.shape, e))
 
 for x in [
-        numpy.array([1.0, 2.0, 3.0, 4.0], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0, 3.0, 4.0]], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0], [3.0, 4.0]], dtype=numpy.float32),
-        numpy.array([1.0, 2.0, 3.0], dtype=numpy.float32),
-        numpy.array([[1.0, 2.0, 3.0]], dtype=numpy.float32)]:
+        np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
+        np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
+        np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
+        np.array([1.0, 2.0, 3.0], dtype=np.float32),
+        np.array([[1.0, 2.0, 3.0]], dtype=np.float32)]:
     try:
         r = sess.run(None, {input_name: x})
         print("Shape={0} and predicted probabilities={1}".format(
@@ -113,9 +120,9 @@ for x in [
 # is higher than expects but produces a warning.
 
 for x in [
-        numpy.array([[[1.0, 2.0], [3.0, 4.0]]], dtype=numpy.float32),
-        numpy.array([[[1.0, 2.0, 3.0]]], dtype=numpy.float32),
-        numpy.array([[[1.0, 2.0]], [[3.0, 4.0]]], dtype=numpy.float32)]:
+        np.array([[[1.0, 2.0], [3.0, 4.0]]], dtype=np.float32),
+        np.array([[[1.0, 2.0, 3.0]]], dtype=np.float32),
+        np.array([[[1.0, 2.0]], [[3.0, 4.0]]], dtype=np.float32)]:
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))
@@ -125,7 +132,7 @@ for x in [
 #################################
 # **Versions used for this example**
 
-print("numpy:", numpy.__version__)
+print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
