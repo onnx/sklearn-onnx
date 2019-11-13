@@ -2,6 +2,7 @@
 Tests examples from the documentation.
 """
 import unittest
+from distutils.version import StrictVersion
 import os
 import sys
 import importlib
