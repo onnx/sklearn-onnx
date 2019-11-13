@@ -400,7 +400,7 @@ class Topology:
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None,
                  target_opset=None, custom_conversion_functions=None,
-                 custom_shape_calculators=None, metadata_props=None):
+                 custom_shape_calculators=None):
         """
         Initializes a *Topology* object, which is an intermediate
         representation of a computational graph.
@@ -435,7 +435,6 @@ class Topology:
                     reserved_operator_names
                     if reserved_operator_names is not None else set())
         self.initial_types = initial_types if initial_types else list()
-        self.metadata_props = metadata_props if metadata_props else dict()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
         self.custom_conversion_functions = (
