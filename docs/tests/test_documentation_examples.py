@@ -2,10 +2,12 @@
 Tests examples from the documentation.
 """
 import unittest
+from distutils.version import StrictVersion
 import os
 import sys
 import importlib
 import subprocess
+import onnxruntime
 
 
 def import_source(module_file_path, module_name):
@@ -31,6 +33,10 @@ class TestDocumentationExample(unittest.TestCase):
         tested = 0
         for name in found:
             if name.startswith("plot_") and name.endswith(".py"):
+                if (name == "plot_pipeline_lightgbm.py" and
+                        StrictVersion(onnxruntime.__version__) <
+                            StrictVersion('1.0.0')):
+                    continue
                 print("run %r" % name)
                 try:
                     mod = import_source(fold, os.path.splitext(name)[0])

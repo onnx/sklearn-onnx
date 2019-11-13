@@ -94,11 +94,17 @@ class GraphState:
                 ty = onnx_proto.TensorProto.BOOL
                 astype = np.bool
             else:
-                raise NotImplementedError(
-                    "Unable to guess ONNX type from type {}. "
-                    "You may raise an issue at https://github.com/onnx/"
-                    "sklearn-onnx/issues.".format(
-                        dtype))
+                st = str(cst.dtype).lower()
+                if st.startswith('u') or st.startswith("<u"):
+                    ty = onnx_proto.TensorProto.STRING
+                    astype = None
+                    cst = np.array([s.encode('utf-8') for s in cst])
+                else:
+                    raise NotImplementedError(
+                        "Unable to guess ONNX type from type {}. "
+                        "You may raise an issue at https://github.com/onnx/"
+                        "sklearn-onnx/issues.".format(
+                            cst.dtype))
             return ty, astype
 
         if isinstance(cst, np.ndarray):
@@ -106,8 +112,10 @@ class GraphState:
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             ty, astype = _ty_astype(cst.dtype)
+            if astype is not None:
+                cst = cst.astype(astype)
             self.container.add_initializer(
-                name, ty, shape, cst.astype(astype).flatten(),
+                name, ty, shape, cst.flatten(),
                 can_cast=can_cast)
             return name
         elif isinstance(cst, coo_matrix):
