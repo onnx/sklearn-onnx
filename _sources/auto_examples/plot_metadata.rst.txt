@@ -16,19 +16,23 @@ ONNX format contains metadata related to how the
 model was produced. It is useful when the model
 is deployed to production to keep track of which
 instance was used at a specific time.
-Let's see how to do that with a simple 
+Let's see how to do that with a simple
 logistic regression model trained with
-*scikit-learn* and converted with *onnxmltools*.
+*scikit-learn*.
+
+.. code-block:: default
 
 
-
-.. code-block:: python
-
-
+    import skl2onnx
+    import onnxruntime
+    import sklearn
+    import numpy
+    from onnxruntime import InferenceSession
+    import onnx
     from onnxruntime.datasets import get_example
+
     example = get_example("logreg_iris.onnx")
 
-    import onnx
     model = onnx.load(example)
 
     print("doc_string={}".format(model.doc_string))
@@ -50,22 +54,20 @@ logistic regression model trained with
  .. code-block:: none
 
     doc_string=
-    domain=onnxml
-    ir_version=3
+    domain=ai.onnx
+    ir_version=6
     metadata_props=[]
     model_version=0
-    producer_name=OnnxMLTools
-    producer_version=1.2.0.0116
+    producer_name=skl2onnx
+    producer_version=1.5.99999
 
 
 With *ONNX Runtime*:
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    from onnxruntime import InferenceSession
     sess = InferenceSession(example)
     meta = sess.get_modelmeta()
 
@@ -88,23 +90,20 @@ With *ONNX Runtime*:
 
     custom_metadata_map={}
     description=
-    domain=onnxml
-    graph_name=3c59201b940f410fa29dc71ea9d5767d
-    producer_name=OnnxMLTools
+    domain=ai.onnx
+    graph_name=ae2e315b7646412da2e021fac7b2e3db
+    producer_name=skl2onnx
     version=0
 
 
 **Versions used for this example**
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    import numpy, sklearn
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import onnx, onnxruntime, skl2onnx
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -118,14 +117,17 @@ With *ONNX Runtime*:
 
  .. code-block:: none
 
-    numpy: 1.16.1
-    scikit-learn: 0.20.2
-    onnx:  1.4.1
-    onnxruntime:  0.2.1
-    skl2onnx:  1.4.2
+    numpy: 1.17.0
+    scikit-learn: 0.22.dev0
+    onnx:  1.6.32
+    onnxruntime:  1.0.991
+    skl2onnx:  1.5.2
 
 
-**Total running time of the script:** ( 0 minutes  0.004 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.061 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metadata.py:

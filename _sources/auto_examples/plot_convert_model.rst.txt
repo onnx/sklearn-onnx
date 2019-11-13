@@ -28,11 +28,18 @@ Train a model
 A very basic example using random forest and
 the iris dataset.
 
+.. code-block:: default
 
 
-.. code-block:: python
-
-
+    import skl2onnx
+    import onnxruntime
+    import onnx
+    import sklearn
+    from sklearn.linear_model import LogisticRegression
+    import numpy
+    import onnxruntime as rt
+    from skl2onnx.common.data_types import FloatTensorType
+    from skl2onnx import convert_sklearn
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.ensemble import RandomForestClassifier
@@ -53,26 +60,24 @@ the iris dataset.
 
  .. code-block:: none
 
-    RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
-                max_depth=None, max_features='auto', max_leaf_nodes=None,
-                min_impurity_decrease=0.0, min_impurity_split=None,
-                min_samples_leaf=1, min_samples_split=2,
-                min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=None,
-                oob_score=False, random_state=None, verbose=0,
-                warm_start=False)
+    RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
+                           criterion='gini', max_depth=None, max_features='auto',
+                           max_leaf_nodes=None, max_samples=None,
+                           min_impurity_decrease=0.0, min_impurity_split=None,
+                           min_samples_leaf=1, min_samples_split=2,
+                           min_weight_fraction_leaf=0.0, n_estimators=100,
+                           n_jobs=None, oob_score=False, random_state=None,
+                           verbose=0, warm_start=False)
 
 
 Convert a model into ONNX
 +++++++++++++++++++++++++
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    from skl2onnx import convert_sklearn
-    from skl2onnx.common.data_types import FloatTensorType
-    initial_type = [('float_input', FloatTensorType([1, 4]))]
+    initial_type = [('float_input', FloatTensorType([None, 4]))]
     onx = convert_sklearn(clr, initial_types=initial_type)
 
     with open("rf_iris.onnx", "wb") as f:
@@ -88,15 +93,13 @@ Compute the prediction with ONNX Runtime
 ++++++++++++++++++++++++++++++++++++++++
 
 
+.. code-block:: default
 
-.. code-block:: python
-
-    import onnxruntime as rt
-    import numpy
     sess = rt.InferenceSession("rf_iris.onnx")
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run(
+        [label_name], {input_name: X_test.astype(numpy.float32)})[0]
     print(pred_onx)
 
 
@@ -109,21 +112,19 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [1 0 1 1 2 1 1 0 1 2 0 2 0 0 1 0 2 2 0 1 2 0 2 0 2 1 0 0 1 2 2 0 1 1 1 1 2
-     1]
+    [0 0 0 2 0 0 2 0 0 1 2 2 1 0 1 2 2 2 2 0 2 0 1 2 2 2 1 0 2 2 0 0 0 1 1 2 0
+     2]
 
 
 Full example with a logistic regression
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    from sklearn.linear_model import LogisticRegression
     clr = LogisticRegression()
     clr.fit(X_train, y_train)
-    initial_type = [('float_input', FloatTensorType([1, X_train.shape[1]]))]
+    initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
     onx = convert_sklearn(clr, initial_types=initial_type)
     with open("logreg_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
@@ -131,7 +132,8 @@ Full example with a logistic regression
     sess = rt.InferenceSession("logreg_iris.onnx")
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run([label_name],
+                        {input_name: X_test.astype(numpy.float32)})[0]
     print(pred_onx)
 
 
@@ -145,21 +147,18 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    [2 0 2 1 2 1 1 0 1 2 0 2 0 0 1 0 2 2 0 1 2 0 2 0 2 1 0 0 1 2 2 0 1 1 1 1 2
-     1]
+    [0 0 0 2 0 0 2 0 0 1 2 2 1 0 1 2 2 2 2 0 2 0 1 2 2 2 1 0 2 2 0 0 0 1 1 2 0
+     2]
 
 
 **Versions used for this example**
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    import numpy, sklearn
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import onnx, onnxruntime, skl2onnx
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -173,14 +172,17 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    numpy: 1.16.1
-    scikit-learn: 0.20.2
-    onnx:  1.4.1
-    onnxruntime:  0.2.1
-    skl2onnx:  1.4.2
+    numpy: 1.17.0
+    scikit-learn: 0.22.dev0
+    onnx:  1.6.32
+    onnxruntime:  1.0.991
+    skl2onnx:  1.5.2
 
 
-**Total running time of the script:** ( 0 minutes  0.258 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.343 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:

@@ -1,85 +1,50 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-  <title>sklearn-onnx: Convert your scikit-learn model into ONNX</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>sklearn-onnx: Convert your scikit-learn model into ONNX &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
-  <link rel="stylesheet" href="_static/sphinx-modern-theme-modified.css" type="text/css"/>
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
-</head>
-<body>
-<div class="container">
-  <div class="row" style="margin-top: 1rem;">
-    <div id="sidebar" class="col-xs-12 col-sm-3">
-      <a href="#">
-        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="_static/logo_main.png"/>
-      </a>
-      <div id="searchbox" style="display: none" role="search">
-        <form class="form-inline" action="search.html" method="get">
-          <div class="form-group">
-            <label class="sr-only" for="searchInput">Search</label>
-            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
-          <input type="hidden" name="check_keywords" value="yes"/>
-          <input type="hidden" name="area" value="default"/>
-        </form>
-      </div>
+  </head><body>
+  
+  
+  <div class="indexwrapper">
+  
 
-      <hr>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">sklearn-onnx 1.6.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
-        <div id="toc">
-        <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-1-train-a-model-using-your-favorite-framework">Step 1: Train a model using your favorite framework</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-2-convert-or-export-the-model-into-onnx-format">Step 2: Convert or export the model into ONNX format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#step-3-load-and-run-the-model-using-onnx-runtime">Step 3: Load and run the model using ONNX Runtime</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#converters">Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#manipulate-onnx-graphs">Manipulate ONNX graphs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#registered-functions">Registered functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#parsers">Parsers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#utils-for-contributors">Utils for contributors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_summary.html#concepts">Concepts</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_metadata.html">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_errors_pipeline.html">Errors while converting a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_transfer_learning.html">Transfer learning with ONNX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#convert-complex-pipelines">Convert complex pipelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#parser-shape-calculator-converter">Parser, shape calculator, converter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#new-converters-in-a-pipeline">New converters in a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#titanic-example">Titanic example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#parameterize-the-conversion">Parameterize the conversion</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="parameterized.html">Converters with options</a></li>
-</ul>
-
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-9">
-      <div class="section" id="sklearn-onnx-convert-your-scikit-learn-model-into-onnx">
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sklearn-onnx-convert-your-scikit-learn-model-into-onnx">
 <h1>sklearn-onnx: Convert your scikit-learn model into ONNX<a class="headerlink" href="#sklearn-onnx-convert-your-scikit-learn-model-into-onnx" title="Permalink to this headline">¶</a></h1>
 <p><em>sklearn-onnx</em> enables you to convert models from
 <a class="reference external" href="https://scikit-learn.org/stable/">sklearn-learn</a>
@@ -89,9 +54,9 @@ toolkits into <a class="reference external" href="https://onnx.ai">ONNX</a>.</p>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameterized.html">Converters with options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported scikit-learn Models</a></li>
 </ul>
 </div>
 <p><strong>Issues, questions</strong></p>
@@ -120,13 +85,13 @@ Every converter is tested with this backend.</p>
 <span class="n">clr</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
 <span class="n">clr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-<span class="c1"># Convert into ONNX format with onnxmltools</span>
+<span class="c1"># Convert into ONNX format</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="k">import</span> <span class="n">convert_sklearn</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="k">import</span> <span class="n">FloatTensorType</span>
-<span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;float_input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))]</span>
+<span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;float_input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))]</span>
 <span class="n">onx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">)</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;rf_iris.onnx&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
 
 <span class="c1"># Compute the prediction with ONNX Runtime</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
@@ -139,8 +104,8 @@ Every converter is tested with this backend.</p>
 </div>
 <p><strong>Related converters</strong></p>
 <p><em>sklearn-onnx</em> only converts models from <em>scikit-learn</em>.
-It was initially part of <a class="reference external" href="https://github.com/onnx/onnxmltools">onnxmltools</a>
-which can still be used to convert models for <em>xgboost</em> and <em>libsvm</em>.
+<a class="reference external" href="https://github.com/onnx/onnxmltools">onnxmltools</a>
+can be used to convert models for <em>libsvm</em>, <em>lightgbm</em>, <em>xgboost</em>.
 Other converters can be found on <a class="reference external" href="https://github.com/onnx/">github/onnx</a>,
 <a class="reference external" href="https://pytorch.org/docs/stable/onnx.html">torch.onnx</a>,
 <a class="reference external" href="https://mxnet.incubator.apache.org/api/python/contrib/onnx.html">ONNX-MXNet API</a>,
@@ -155,22 +120,47 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.</p>
 <p>It is licensed with <a class="reference external" href="../LICENSE">MIT License</a>.</p>
 </div>
 
-    </div>
-  </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
-        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
-        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
-        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
-        crossorigin="anonymous"></script>
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
-<script src="_static/searchtools.js"></script>
-<script>$('#searchbox').show(0)</script>
-</body>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/logo_main.png" alt="Logo"/>
+            </a></p><h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation index</a><ul>
+      <li>Next: <a href="tutorial.html" title="next chapter">Tutorial</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2019, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+  </div>
+  
+  </div>
+  
+  </body>
 </html>
