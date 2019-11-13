@@ -11,6 +11,14 @@ from onnx.helper import (  # noqa
     make_tensor, make_model, make_graph, _to_bytes_or_false,
     make_tensor_value_info, ValueInfoProto
 )
+
+try:
+    from onnx import SparseTensorProto
+    from onnx.helper import make_sparse_tensor # noqa
+except ImportError:
+    # onnx is too old.
+    SparseTensorProto = None
+
 from onnx.numpy_helper import from_array  # noqa
 from typing import (
     Text, Sequence, Any, Optional,
@@ -42,6 +50,7 @@ def make_node(
         **kwargs (dict): the attributes of the node.  The acceptable values
             are documented in :func:`make_attribute`.
     """
+
     node = NodeProto()
     node.op_type = op_type
     node.input.extend(inputs)
@@ -104,13 +113,18 @@ def make_attribute(
     elif isinstance(value, numbers.Integral):
         attr.i = value
         attr.type = AttributeProto.INT
-    elif bytes_or_false:
+    # string
+    elif bytes_or_false is not False:
         assert isinstance(bytes_or_false, bytes)
         attr.s = bytes_or_false
         attr.type = AttributeProto.STRING
     elif isinstance(value, TensorProto):
         attr.t.CopyFrom(value)
         attr.type = AttributeProto.TENSOR
+    elif (SparseTensorProto is not None and
+            isinstance(value, SparseTensorProto)):
+        attr.sparse_tensor.CopyFrom(value)
+        attr.type = AttributeProto.SPARSE_TENSOR
     elif isinstance(value, GraphProto):
         attr.g.CopyFrom(value)
         attr.type = AttributeProto.GRAPH
@@ -156,12 +170,17 @@ def make_attribute(
             # Turn np.int32/64 into Python built-in int.
             attr.ints.extend(int(v) for v in value)
             attr.type = AttributeProto.INTS
-        elif all(byte_array):
+        elif all(map(lambda bytes_or_false: bytes_or_false is not False,
+                     byte_array)):
             attr.strings.extend(cast(List[bytes], byte_array))
             attr.type = AttributeProto.STRINGS
         elif all(isinstance(v, TensorProto) for v in value):
             attr.tensors.extend(value)
             attr.type = AttributeProto.TENSORS
+        elif (SparseTensorProto is not None and
+                all(isinstance(v, SparseTensorProto) for v in value)):
+            attr.sparse_tensors.extend(value)
+            attr.type = AttributeProto.SPARSE_TENSORS
         elif all(isinstance(v, GraphProto) for v in value):
             attr.graphs.extend(value)
             attr.type = AttributeProto.GRAPHS
@@ -179,27 +198,25 @@ def make_attribute(
 
 
 def get_attribute_value(attr):  # type: (AttributeProto) -> Any
-    if attr.HasField('f'):
+    if attr.type == AttributeProto.FLOAT:
         return attr.f
-    elif attr.HasField('i'):
+    elif attr.type == AttributeProto.INT:
         return attr.i
-    elif attr.HasField('s'):
+    elif attr.type == AttributeProto.STRING:
         return attr.s
-    elif attr.HasField('t'):
+    elif attr.type == AttributeProto.TENSOR:
         return attr.t
-    elif attr.HasField('g'):
+    elif attr.type == AttributeProto.GRAPH:
         return attr.g
-    elif len(attr.floats):
+    elif attr.type == AttributeProto.FLOATS:
         return list(attr.floats)
-    elif len(attr.double):
-        return list(attr.doubles)
-    elif len(attr.ints):
+    elif attr.type == AttributeProto.INTS:
         return list(attr.ints)
-    elif len(attr.strings):
+    elif attr.type == AttributeProto.STRINGS:
         return list(attr.strings)
-    elif len(attr.tensors):
+    elif attr.type == AttributeProto.TENSORS:
         return list(attr.tensors)
-    elif len(attr.graphs):
+    elif attr.type == AttributeProto.GRAPHS:
         return list(attr.graphs)
     else:
         raise ValueError("Unsupported ONNX attribute: {}".format(attr))

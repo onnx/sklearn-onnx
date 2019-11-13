@@ -15,6 +15,11 @@ from onnx import onnx_pb as onnx_proto # noqa
 # (string tensor get assigned twice)
 from onnx import mapping
 from onnx.onnx_pb import TensorProto, ValueInfoProto # noqa
+try:
+    from onnx.onnx_pb import SparseTensorProto # noqa
+except ImportError:
+    # onnx is too old.
+    pass
 from onnx.helper import split_complex_to_pairs
 
 
