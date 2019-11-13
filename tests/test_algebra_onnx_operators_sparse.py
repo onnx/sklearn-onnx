@@ -16,7 +16,7 @@ from skl2onnx.algebra.onnx_ops import OnnxAdd
 try:
     from skl2onnx.algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
-    # onnx is too old
+    # onnx is too old.
     OnnxConstantOfShape = None
 from onnx import __version__ as onnx__version__
 
