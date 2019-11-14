@@ -5,8 +5,11 @@ import numpy
 from onnxruntime import __version__ as ort_version
 from sklearn import __version__ as sklearn_version
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import RobustScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
+    Int32TensorType,
     Int64TensorType,
     StringTensorType,
 )
@@ -47,6 +50,49 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOneHotEncoderInt64-SkipDim1",
         )
+
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
+    def test_model_one_hot_encoder_int32(self):
+        model = OneHotEncoder(categories='auto')
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int32)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int32TensorType([None, 3]))],
+        )
+        str_model_onnx = str(model_onnx)
+        assert "int64_data" in str_model_onnx
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data, model, model_onnx,
+            basename="SklearnOneHotEncoderInt32-SkipDim1")
+
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
+    def test_model_one_hot_encoder_int32_scaler(self):
+        model = make_pipeline(OneHotEncoder(categories='auto', sparse=False),
+                              RobustScaler())
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int32)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int32TensorType([None, 3]))],
+        )
+        str_model_onnx = str(model_onnx)
+        assert "int64_data" in str_model_onnx
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data, model, model_onnx,
+            basename="SklearnOneHotEncoderInt32Scaler-SkipDim1")
 
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")

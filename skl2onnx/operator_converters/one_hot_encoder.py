@@ -42,6 +42,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
 
         apply_concat(scope, input_names,
                      concatenated_input_name, container, axis=1)
+
     for index, categories in enumerate(ohe_op.categories_):
         attrs = {'name': scope.get_unique_operator_name('OneHotEncoder')}
         attrs['zeros'] = 1 if ohe_op.handle_unknown == 'ignore' else 0
@@ -70,11 +71,20 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                 feature_column_name, op_domain='ai.onnx.ml',
                 name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
+            if 'cats_int64s' in attrs:
+                # Let's cast this input in int64.
+                cast_feature = scope.get_unique_variable_name('castohe')
+                apply_cast(scope, feature_column_name, cast_feature,
+                           container, to=onnx_proto.TensorProto.INT64)
+                feature_column_name = cast_feature
+
             container.add_node('OneHotEncoder', feature_column_name,
                                result[-1], op_domain='ai.onnx.ml', **attrs)
             categories_len += len(categories)
+
     apply_concat(scope, result,
                  concat_result_name, container, axis=2)
+
     reshape_input = concat_result_name
     if np.issubdtype(ohe_op.dtype, np.signedinteger):
         reshape_input = scope.get_unique_variable_name('cast')
