@@ -15,6 +15,11 @@ from ..proto import onnx_proto
 
 
 def convert_sklearn_one_hot_encoder(scope, operator, container):
+    """
+    Converts *OneHotEncoder* into ONNX.
+    It supports multiple inputs of types
+    string or int64.
+    """
     ohe_op = operator.raw_operator
 
     if len(operator.inputs) > 1:
