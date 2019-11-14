@@ -35,7 +35,6 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
         index_inputs = 0
 
         for index, cats in enumerate(ohe_op.categories_):
-
             while sum(all_shapes[:index_inputs+1]) <= index:
                 index_inputs += 1
             index_in_input = index - sum(all_shapes[:index_inputs])
@@ -66,6 +65,8 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
     result, categories_len = [], 0
     for index, enum_c in enumerate(enum_cats):
         afeat, index_in, name, categories, inp_type = enum_c
+        if len(categories) == 0:
+            continue
         if afeat:
             index_name = scope.get_unique_variable_name(
                 name + str(index_in))

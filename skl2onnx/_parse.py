@@ -254,7 +254,6 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
         if merged_cols:
             # Many ONNX operators expect one input vector,
             # the default behaviour is to merge columns.
-            print("+++", op)
             ty = transform_inputs[0].type.__class__([None, None])
 
             conc_op = scope.declare_local_operator('SklearnConcat')
