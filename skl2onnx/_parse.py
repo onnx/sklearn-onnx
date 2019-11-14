@@ -21,6 +21,8 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC, NuSVC, SVC
 try:
     from sklearn.compose import ColumnTransformer
@@ -38,6 +40,11 @@ from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
 from .common.data_types import Int64Type, StringType, TensorType
 from .common.utils import get_column_indices
+
+
+do_not_merge_columns = tuple(
+    filter(lambda op: op is not None,
+           [OneHotEncoder, ColumnTransformer]))
 
 
 def _fetch_input_slice(scope, inputs, column_indices):
@@ -236,9 +243,18 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
             tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
             transform_inputs.extend(tr_inputs)
 
+        merged_cols = False
         if len(transform_inputs) > 1:
+            if isinstance(op, Pipeline):
+                if not isinstance(op.steps[0][1], do_not_merge_columns):
+                    merged_cols = True
+            elif not isinstance(op, do_not_merge_columns):
+                merged_cols = True
+
+        if merged_cols:
             # Many ONNX operators expect one input vector,
             # the default behaviour is to merge columns.
+            print("+++", op)
             ty = transform_inputs[0].type.__class__([None, None])
 
             conc_op = scope.declare_local_operator('SklearnConcat')

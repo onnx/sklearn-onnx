@@ -116,17 +116,12 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input1", StringTensorType([None, 2])),
             ("input2", Int64TensorType([None, 1])),
         ]
-        model_onnx = convert_sklearn(model,
-                                     "one-hot encoder",
-                                     inputs)
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test,
-            model,
-            model_onnx,
-            basename="SklearnOneHotEncoderMixedStringIntDrop",
-            verbose=False,
-        )
+            test, model, model_onnx, verbose=False,
+            basename="SklearnOneHotEncoderMixedStringIntDrop")
 
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
