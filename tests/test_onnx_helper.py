@@ -60,8 +60,10 @@ class TestOnnxHelper(unittest.TestCase):
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
     def test_onnx_helper_load_save_init(self):
-        model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
-                              StandardScaler())
+        model = make_pipeline(
+            Binarizer(),
+            OneHotEncoder(sparse=False, handle_unknown='ignore'),
+            StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
