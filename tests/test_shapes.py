@@ -12,7 +12,9 @@ import numpy
 
 class TestSahpes(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
+                     reason="not available")
+    @unittest.skipIf(StrictVersion(rt.__version__) < StrictVersion("1.0.0"),
                      reason="not available")
     def test_onnxruntime_shapes_reg(self):
         iris = load_iris()
