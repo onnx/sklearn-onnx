@@ -5,8 +5,11 @@ import numpy
 from onnxruntime import __version__ as ort_version
 from sklearn import __version__ as sklearn_version
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import RobustScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
+    Int32TensorType,
     Int64TensorType,
     StringTensorType,
 )
@@ -26,6 +29,8 @@ def one_hot_encoder_supports_drop():
 
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder did not have categories_ before 0.20",
@@ -51,6 +56,53 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
+    def test_model_one_hot_encoder_int32(self):
+        model = OneHotEncoder(categories='auto')
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int32)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int32TensorType([None, 3]))],
+        )
+        str_model_onnx = str(model_onnx)
+        assert "int64_data" in str_model_onnx
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data, model, model_onnx,
+            basename="SklearnOneHotEncoderInt32-SkipDim1")
+
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20",
+    )
+    def test_model_one_hot_encoder_int32_scaler(self):
+        model = make_pipeline(OneHotEncoder(categories='auto', sparse=False),
+                              RobustScaler())
+        data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
+                           dtype=numpy.int32)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn one-hot encoder",
+            [("input", Int32TensorType([None, 3]))],
+        )
+        str_model_onnx = str(model_onnx)
+        assert "int64_data" in str_model_onnx
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data, model, model_onnx,
+            basename="SklearnOneHotEncoderInt32Scaler-SkipDim1")
+
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
+    @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
         reason="OneHotEncoder does not support drop in scikit versions < 0.21",
     )
@@ -70,18 +122,15 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input1", StringTensorType([None, 2])),
             ("input2", Int64TensorType([None, 1])),
         ]
-        model_onnx = convert_sklearn(model,
-                                     "one-hot encoder",
-                                     inputs)
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test,
-            model,
-            model_onnx,
-            basename="SklearnOneHotEncoderMixedStringIntDrop",
-            verbose=False,
-        )
+            test, model, model_onnx, verbose=False,
+            basename="SklearnOneHotEncoderMixedStringIntDrop")
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
@@ -101,6 +150,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderOneStringCat",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support strings in 0.19",
@@ -146,6 +197,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderStringDropFirst",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support this in 0.19",
@@ -171,6 +224,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderCatSparse-SkipDim1",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder does not support this in 0.19",
@@ -196,6 +251,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             basename="SklearnOneHotEncoderCatDense-SkipDim1",
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
         reason="OneHotEncoder does not support drop in scikit versions < 0.21",
@@ -228,6 +285,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             verbose=False,
         )
 
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
         reason="OneHotEncoder does not support drop in scikit versions < 0.21",
