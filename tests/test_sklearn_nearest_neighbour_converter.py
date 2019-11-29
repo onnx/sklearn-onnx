@@ -260,8 +260,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         assert ratio >= 0.7
         # assert_almost_equal(exp, res)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
             KNeighborsClassifier(),

@@ -408,7 +408,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
         dump_data_and_model(
-            X, model, model_onnx, classes=model.classes_,
+            X[6:8], model, model_onnx, classes=model.classes_,
             basename="SklearnSGDMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
