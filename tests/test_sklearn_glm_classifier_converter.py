@@ -143,7 +143,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
-            basename="SklearnLogitisticRegressionMulti",
+            basename="SklearnLogitisticRegressionMultiNoCl",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"

@@ -87,12 +87,11 @@ Raw scores
 ----------
 
 Almost all classifiers are converted in order to get probabilities
-and not raw scores. That's the default behaviour. In cab deactivated
-by using options:
+and not raw scores. That's the default behaviour. It can be deactivated
+by using option:
 
 ::
 
     options={type(model): {'raw_scores': True}}
 
 It is implemented by PR `308 <https://github.com/onnx/sklearn-onnx/pull/308>`_.
-

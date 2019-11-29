@@ -10,6 +10,7 @@ from ..common._apply_operation import (
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
 from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
@@ -166,7 +167,7 @@ def _predict_proba_modified_huber(scope, operator, container,
 def convert_sklearn_sgd_classifier(scope, operator, container):
     """Converter for SGDClassifier."""
     sgd_op = operator.raw_operator
-    classes = sgd_op.classes_
+    classes = get_label_classes(scope, sgd_op)
     class_type = onnx_proto.TensorProto.STRING
 
     if np.issubdtype(classes.dtype, np.floating):

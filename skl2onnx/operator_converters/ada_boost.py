@@ -154,6 +154,10 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     the probability score for the final result. Label is
     calculated by simply doing an argmax of the probability scores.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
     classes = op.classes_
