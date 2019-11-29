@@ -128,6 +128,29 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 4,
+            label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnLogitisticRegressionMulti",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_ovr(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(multi_class='ovr'), 3)

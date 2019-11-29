@@ -71,7 +71,8 @@ def compare_backend(backend,
                     verbose=False,
                     context=None,
                     comparable_outputs=None,
-                    intermediate_steps=False):
+                    intermediate_steps=False,
+                    classes=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -91,6 +92,7 @@ def compare_backend(backend,
         more information on the standard output
     :param intermediate_steps: displays intermediate steps
         in case of an error
+    :param classes: classes names (if option 'nocl' is used)
 
     The function does not return anything but raises an error
     if the comparison failed.
@@ -106,7 +108,8 @@ def compare_backend(backend,
                                options=options,
                                verbose=verbose,
                                comparable_outputs=comparable_outputs,
-                               intermediate_steps=intermediate_steps)
+                               intermediate_steps=intermediate_steps,
+                               classes=classes)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
 

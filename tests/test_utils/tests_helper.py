@@ -102,7 +102,8 @@ def dump_data_and_model(
         comparable_outputs=None,
         intermediate_steps=False,
         fail_evenif_notimplemented=False,
-        verbose=False):
+        verbose=False,
+        classes=None):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -147,6 +148,8 @@ def dump_data_and_model(
     :param fail_evenif_notimplemented: the test is considered as failing
         even if the error is due to onnxuntime missing the implementation
         of a new operator defiend in ONNX.
+    :param classes: classes names
+        (only for classifier, mandatory if option 'nocl' is used)
     :return: the created files
 
     Some convention for the name,
@@ -326,14 +329,12 @@ def dump_data_and_model(
             else:
                 try:
                     output, lambda_onnx = compare_backend(
-                        b,
-                        runtime_test,
+                        b, runtime_test,
                         options=extract_options(basename),
-                        context=context,
-                        verbose=verbose,
+                        context=context, verbose=verbose,
                         comparable_outputs=comparable_outputs,
                         intermediate_steps=intermediate_steps,
-                    )
+                        classes=classes)
                 except OnnxRuntimeMissingNewOnnxOperatorException as e:
                     if fail_evenif_notimplemented:
                         raise e
