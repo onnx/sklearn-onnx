@@ -7,6 +7,8 @@ import numpy
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 import onnxruntime
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
@@ -259,6 +261,22 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         ratio = acc * 1.0 / res.shape[0]
         assert ratio >= 0.7
         # assert_almost_equal(exp, res)
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_regressor2_2_pipee(self):
+        pipe = make_pipeline(StandardScaler(),
+                             KNeighborsClassifier())
+        model, X = self._fit_model_binary_classification(pipe)
+        model_onnx = convert_sklearn(
+            model, "KNN pipe",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:2],
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressorPipe2")
 
 
 if __name__ == "__main__":

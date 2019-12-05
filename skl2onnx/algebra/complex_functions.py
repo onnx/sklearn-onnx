@@ -62,7 +62,8 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
 
 
 def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
-               op_version=None, **kwargs):
+               op_version=None, dim_in=None, dim_out=None,
+               **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(XA, XB, metric=metric)``.
@@ -72,25 +73,33 @@ def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
     :param metric: distance type
     :param dtype: *np.float32* or *np.float64*
     :param op_version: opset version
+    :param dim_in: dimension of the input vectorial space
+        (if known)
+    :param dim_out: dimension of the output vectorial space
+        (if known)
     :param kwargs: addition parameter
     :return: OnnxOperatorMixin
     """
     if metric == 'sqeuclidean':
         return _onnx_cdist_sqeuclidean(
-            XA, XB, dtype=dtype, op_version=op_version, **kwargs)
+            XA, XB, dtype=dtype, op_version=op_version,
+            dim_in=dim_in, dim_out=dim_out, **kwargs)
     elif metric == 'euclidean':
         res = _onnx_cdist_sqeuclidean(XA, XB, dtype=dtype,
-                                      op_version=op_version)
+                                      op_version=op_version,
+                                      dim_in=dim_in, dim_out=dim_out)
         return OnnxSqrt(res, op_version=op_version, **kwargs)
     elif metric == 'minkowski':
         p = kwargs.pop('p')
         res = _onnx_cdist_minkowski(
-            XA, XB, dtype=dtype, op_version=op_version, p=p)
+            XA, XB, dtype=dtype, op_version=op_version, p=p,
+            dim_in=dim_in, dim_out=dim_out)
         return OnnxPow(res, np.array([1. / p], dtype=dtype),
                        op_version=op_version, **kwargs)
     elif metric in ('manhattan', 'cityblock'):
         return _onnx_cdist_manhattan(
-            XA, XB, dtype=dtype, op_version=op_version, **kwargs)
+            XA, XB, dtype=dtype, op_version=op_version,
+            dim_in=dim_in, dim_out=dim_out, **kwargs)
     else:
         raise NotImplementedError("metric='{}' is not implemented.".format(
             metric))
@@ -104,11 +113,14 @@ def _onnx_cdist_begin(op_version):
     return diff, id_next
 
 
-def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version, **kwargs):
+def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
+                    dim_in=None, dim_out=None, **kwargs):
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     id_next.set_onnx_name_prefix('cdistd')
+    shape_in = (tensor_type() if dim_in is None
+                else tensor_type([None, dim_in]))
     scan_body = id_next.to_onnx(
-        OrderedDict([('next_in', tensor_type()),
+        OrderedDict([('next_in', shape_in),
                      ('next', tensor_type())]),
         outputs=[('next_out', tensor_type()),
                  ('scan_out', tensor_type())],
@@ -122,7 +134,8 @@ def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version, **kwargs):
                          **kwargs)
 
 
-def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None, **kwargs):
+def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None,
+                            dim_in=None, dim_out=None, **kwargs):
     """
     Returns the ONNX graph which computes
     ``cdist(X, metric='sqeuclidean')``.
@@ -131,10 +144,12 @@ def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None, **kwargs):
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[
                                1], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version, **kwargs)
+    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
+                           dim_in=dim_in, dim_out=dim_out, **kwargs)
 
 
-def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2, **kwargs):
+def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2,
+                          dim_in=None, dim_out=None, **kwargs):
     """
     Returns the ONNX graph which computes the Minkowski distance
     or ``minkowski(XA, XB, p)``.
@@ -145,10 +160,12 @@ def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2, **kwargs):
     norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
                          'norm'], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version, **kwargs)
+    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
+                           dim_in=dim_in, dim_out=dim_out, **kwargs)
 
 
-def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None, **kwargs):
+def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None,
+                          dim_in=None, dim_out=None, **kwargs):
     """
     Returns the ONNX graph which computes the Manhattan distance
     or ``Manhattan(X, Y)``.
@@ -158,4 +175,5 @@ def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None, **kwargs):
     norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
                          'norm'], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
-    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version, **kwargs)
+    return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
+                           dim_in=dim_in, dim_out=dim_out, **kwargs)
