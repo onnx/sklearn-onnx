@@ -320,6 +320,9 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
             scope, model, inputs, custom_parsers=custom_parsers)
     if model.__class__ in [NuSVC, SVC] and not model.probability:
         return probability_tensor
+    options = scope.get_options(model, dict(zipmap=True))
+    if not options['zipmap']:
+        return probability_tensor
     this_operator = scope.declare_local_operator('SklearnZipMap')
     this_operator.inputs = probability_tensor
     label_type = Int64Type()

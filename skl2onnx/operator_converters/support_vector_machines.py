@@ -76,17 +76,14 @@ def convert_sklearn_svm(scope, operator, container):
         label_name = operator.outputs[0].full_name
         probability_tensor_name = operator.outputs[1].full_name
 
-        zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
         if all(isinstance(i, (numbers.Real, bool, np.bool_))
                 for i in op.classes_):
             labels = [int(i) for i in op.classes_]
             svm_attrs['classlabels_ints'] = labels
-            zipmap_attrs['classlabels_int64s'] = labels
         elif all(isinstance(i, (six.text_type, six.string_types))
                  for i in op.classes_):
             labels = [str(i) for i in op.classes_]
             svm_attrs['classlabels_strings'] = labels
-            zipmap_attrs['classlabels_strings'] = labels
         else:
             raise RuntimeError("Invalid class label type '%s'." % op.classes_)
 

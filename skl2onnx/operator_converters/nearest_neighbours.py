@@ -60,8 +60,12 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
         dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
                          **kwargs)
     elif optim is None:
+        dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
+        dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
         dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
-                          op_version=op_version, **kwargs)
+                          op_version=op_version,
+                          dim_in=dim_in, dim_out=dim_out,
+                          **kwargs)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
     if op_version < 10:
