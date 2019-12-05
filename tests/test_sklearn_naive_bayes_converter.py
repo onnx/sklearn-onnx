@@ -101,8 +101,13 @@ class TestNaiveBayesConverter(unittest.TestCase):
             dtype=np.float32,
         )
         self.assertIsNotNone(model_onnx)
+        pp = model.predict_proba(X)
+        col = pp.shape[1]
+        pps = np.sort(pp, axis=1)
+        diff = pps[:, col-1] - pps[:, col-2]
+        ind = diff >= 1e-4
         dump_data_and_model(
-            X,
+            X[ind],
             model,
             model_onnx,
             basename="SklearnMclMultinomialNBParams-Dec4",
