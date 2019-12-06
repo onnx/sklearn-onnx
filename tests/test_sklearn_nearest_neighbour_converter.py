@@ -286,6 +286,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor2_2_pipee(self):
         pipe = make_pipeline(StandardScaler(),
                              KNeighborsClassifier())
