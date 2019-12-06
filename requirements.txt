@@ -3,5 +3,5 @@ numpy>=1.15
 scipy>=1.0
 protobuf
 onnx>=1.2.1
-scikit-learn>=0.19
+scikit-learn>=0.19,<0.22
 onnxconverter-common>=1.5.1
