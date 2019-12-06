@@ -231,6 +231,10 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     #                           |                        |
     #                           V                        |
     #                        class_prob_tensor [M, C] <--'
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]

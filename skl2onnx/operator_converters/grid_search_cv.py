@@ -15,6 +15,10 @@ def convert_sklearn_grid_search_cv(scope, operator, container):
     """
     Converter for scikit-learn's GridSearchCV.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     grid_search_op = operator.raw_operator
     best_estimator = grid_search_op.best_estimator_
     op_type = sklearn_operator_name_map[type(best_estimator)]

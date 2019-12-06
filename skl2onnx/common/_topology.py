@@ -133,7 +133,7 @@ class Operator(OperatorBase):
     """
 
     def __init__(self, onnx_name, scope, type, raw_operator,
-                 target_opset, dtype):
+                 target_opset, dtype, scope_inst):
         """
         :param onnx_name: A unique ID, which is a string
         :param scope: The name of the scope where this operator is
@@ -147,6 +147,7 @@ class Operator(OperatorBase):
                              a CoreML Normalizer.
         :param dtype: preferred output type
         :param target_opset: The target opset number for the converted model.
+        :param scope_inst: :class:`Scope` instance the operator belongs to
         """
         if isinstance(raw_operator, str):
             raise RuntimeError("Parameter raw_operator must be an object not "
@@ -162,6 +163,7 @@ class Operator(OperatorBase):
         self.is_abandoned = False
         self.target_opset = target_opset
         self.dtype = dtype
+        self.scope_inst = scope_inst
 
     @property
     def full_name(self):
@@ -349,7 +351,8 @@ class Scope:
         """
         onnx_name = self.get_unique_operator_name(str(type))
         operator = Operator(onnx_name, self.name, type, raw_model,
-                            self.target_opset, self.dtype)
+                            self.target_opset, self.dtype,
+                            scope_inst=self)
         self.operators[onnx_name] = operator
         return operator
 

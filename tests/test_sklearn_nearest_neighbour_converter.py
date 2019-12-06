@@ -14,7 +14,7 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_classification_model
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
@@ -261,6 +261,30 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         ratio = acc * 1.0 / res.shape[0]
         assert ratio >= 0.7
         # assert_almost_equal(exp, res)
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            KNeighborsClassifier(),
+            2, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class nocl",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnNaiveMultiNoCl", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
