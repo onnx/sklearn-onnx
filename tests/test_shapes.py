@@ -1,0 +1,75 @@
+import unittest
+from distutils.version import StrictVersion
+import onnx
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+import onnxruntime as rt
+import numpy
+
+
+class TestSahpes(unittest.TestCase):
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
+                     reason="not available")
+    @unittest.skipIf(StrictVersion(rt.__version__) < StrictVersion("1.0.0"),
+                     reason="not available")
+    def test_onnxruntime_shapes_reg(self):
+        iris = load_iris()
+        X, y = iris.data, iris.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        clr = RandomForestRegressor(max_depth=1)
+        clr.fit(X_train, y_train)
+        initial_type = [('float_input', FloatTensorType([None, 4]))]
+        onx = convert_sklearn(clr, initial_types=initial_type)
+        sess = rt.InferenceSession(onx.SerializeToString())
+        input_name = sess.get_inputs()[0].name
+        pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
+        shape1 = sess.get_inputs()[0].shape
+        shape2 = sess.get_outputs()[0].shape
+        ishape = onnx.shape_inference.infer_shapes(onx)
+        dims = ishape.graph.output[0].type.tensor_type.shape.dim
+        oshape = [d.dim_value for d in dims]
+        assert shape1 == [None, 4]
+        assert shape2 == [None, 1]
+        assert oshape == [0, 1]
+        assert pred_onx[0].shape[1] == shape2[1]
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
+                     reason="not available")
+    @unittest.skipIf(StrictVersion(rt.__version__) <= StrictVersion("1.0.0"),
+                     reason="not available")
+    def test_onnxruntime_shapes_clr(self):
+        iris = load_iris()
+        X, y = iris.data, iris.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        clr = RandomForestClassifier(max_depth=1)
+        clr.fit(X_train, y_train)
+        initial_type = [('float_input', FloatTensorType([None, 4]))]
+        onx = convert_sklearn(clr, initial_types=initial_type)
+        sess = rt.InferenceSession(onx.SerializeToString())
+        input_name = sess.get_inputs()[0].name
+        pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
+        shape1 = sess.get_inputs()[0].shape
+        shape2 = sess.get_outputs()[0].shape
+        assert shape1 == [None, 4]
+        assert shape2 == [None, 1]
+        assert pred_onx[0].shape[1] == shape2[1]
+
+        try:
+            ishape = onnx.shape_inference.infer_shapes(onx)
+        except RuntimeError:
+            # Shape inference does not work?
+            ishape = None
+        if ishape is None:
+            oshape = None
+        else:
+            dims = ishape.graph.output[0].type.tensor_type.shape.dim
+            oshape = [d.dim_value for d in dims]
+        assert oshape in (None, [0, 1])
+
+
+if __name__ == "__main__":
+    unittest.main()
