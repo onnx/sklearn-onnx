@@ -8,6 +8,7 @@
 # import associated modules here.
 from . import array_feature_extractor
 from . import concat
+from . import cross_decomposition
 from . import dict_vectorizer
 from . import flatten
 from . import function_transformer
@@ -38,6 +39,7 @@ from . import zip_map
 __all__ = [
     array_feature_extractor,
     concat,
+    cross_decomposition,
     dict_vectorizer,
     flatten,
     function_transformer,

@@ -204,10 +204,10 @@ class OnnxOperator:
                 elif isinstance(inp, (int, )):
                     self.inputs.append(np.int64(inp))
                 else:
-                    raise TypeError("Unable to interpret the "
-                                    "input name for type {} in "
-                                    "operator '{}'.".format(
-                                        type(inp), self.__class__.__name__))
+                    raise TypeError(
+                        "Unable to interpret the input name for type {} in "
+                        "operator '{}' (value={}).".format(
+                            type(inp), self.__class__.__name__, inp))
 
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or

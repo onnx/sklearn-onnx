@@ -13,14 +13,17 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, ExtraTreesRegressor
 )
 from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
+from skl2onnx import convert_sklearn
 from test_utils import (
     dump_one_class_classification,
     dump_binary_classification,
     dump_multiple_classification,
     convert_model,
     dump_data_and_model,
+    fit_classification_model,
+    dump_multiple_regression,
+    dump_single_regression,
 )
-from test_utils import dump_multiple_regression, dump_single_regression
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
@@ -159,8 +162,30 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         dump_multiple_regression(
             model,
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(random_state=42),
+            2, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class nocl",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnRFMultiNoCl", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

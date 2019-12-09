@@ -101,16 +101,20 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import (
-    PCA, IncrementalPCA, TruncatedSVD
+    PCA, IncrementalPCA, TruncatedSVD,
 )
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV
-from sklearn.feature_selection import SelectFdr, SelectFpr, SelectFromModel
-from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile
-from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_extraction.text import (
+    CountVectorizer, TfidfTransformer, TfidfVectorizer
+)
+from sklearn.feature_selection import (
+    GenericUnivariateSelect, RFE, RFECV,
+    SelectFdr, SelectFpr, SelectFromModel,
+    SelectFwe, SelectKBest, SelectPercentile,
+    VarianceThreshold
+)
 try:
     # 0.20
     from sklearn.impute import SimpleImputer
@@ -129,21 +133,21 @@ except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
     pass
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import (
+    LabelBinarizer, LabelEncoder,
+    Normalizer, OneHotEncoder
+)
 try:
     from sklearn.preprocessing import OrdinalEncoder
 except ImportError:
     # Not available in scikit-learn < 0.20.0
     OrdinalEncoder = None
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.preprocessing import RobustScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import (
+    MinMaxScaler, MaxAbsScaler,
+    FunctionTransformer,
+    PolynomialFeatures, RobustScaler,
+    StandardScaler,
+)
 
 from .common._registration import register_converter, register_shape_calculator
 
@@ -212,7 +216,8 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
-                BayesianGaussianMixture, OneClassSVM
+                BayesianGaussianMixture, OneClassSVM,
+                PLSRegression
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',

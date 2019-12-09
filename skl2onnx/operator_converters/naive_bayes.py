@@ -12,6 +12,7 @@ from ..common._apply_operation import (
 )
 from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 
 
 def _joint_log_likelihood_bernoulli(
@@ -299,7 +300,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     proto_type = container.proto_dtype
 
     nb_op = operator.raw_operator
-    classes = nb_op.classes_
+    classes = get_label_classes(scope, nb_op)
     output_shape = (-1,)
 
     sum_result_name = scope.get_unique_variable_name('sum_result')
@@ -314,10 +315,10 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         'array_feature_extractor_result')
 
     class_type = onnx_proto.TensorProto.STRING
-    if np.issubdtype(nb_op.classes_.dtype, np.floating):
+    if np.issubdtype(classes.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(nb_op.classes_.dtype, np.signedinteger):
+    elif np.issubdtype(classes.dtype, np.signedinteger):
         class_type = onnx_proto.TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])

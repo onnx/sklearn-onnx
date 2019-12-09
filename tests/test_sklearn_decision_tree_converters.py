@@ -16,14 +16,17 @@ from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
+from onnxruntime import InferenceSession, __version__
 from test_utils import (
     dump_one_class_classification,
     dump_binary_classification,
     dump_multiple_classification,
+    dump_data_and_model,
+    dump_multiple_regression,
+    dump_single_regression,
+    fit_regression_model,
+    fit_classification_model,
 )
-from test_utils import dump_data_and_model, fit_regression_model
-from test_utils import dump_multiple_regression, dump_single_regression
-from onnxruntime import InferenceSession, __version__
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
@@ -156,8 +159,30 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model_onnx,
             basename="SklearnDecisionTreeRegressionInt",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            DecisionTreeClassifier(),
+            4, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class nocl",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnDTMultiNoCl",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

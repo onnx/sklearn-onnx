@@ -83,6 +83,11 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
     """
     Converter for BaggingClassifier.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
+
     bagging_op = operator.raw_operator
     if (not (isinstance(bagging_op.max_features, float) and
              bagging_op.max_features == 1.0)):

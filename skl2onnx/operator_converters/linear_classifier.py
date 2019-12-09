@@ -14,14 +14,15 @@ from sklearn.linear_model import (
 )
 from sklearn.svm import LinearSVC
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
 def convert_sklearn_linear_classifier(scope, operator, container):
     op = operator.raw_operator
-    classes = op.classes_
-    number_of_classes = len(classes)
     coefficients = op.coef_.flatten().astype(float).tolist()
+    classes = get_label_classes(scope, op)
+    number_of_classes = len(classes)
 
     if isinstance(op.intercept_, (float, np.float32)) and op.intercept_ == 0:
         # fit_intercept = False

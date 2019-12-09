@@ -13,6 +13,7 @@ from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
@@ -23,7 +24,8 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
     attrs = get_default_tree_classifier_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
 
-    classes = op.classes_
+    classes = get_label_classes(scope, op)
+
     if all(isinstance(i, np.ndarray) for i in classes):
         classes = np.concatenate(classes)
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
