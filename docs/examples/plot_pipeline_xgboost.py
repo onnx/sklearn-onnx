@@ -26,26 +26,25 @@ and explained in :ref:`errors-pipeline`.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
-import xgboost
-import onnxmltools
-import skl2onnx
-import onnxruntime
-import onnx
-import sklearn
-import matplotlib.pyplot as plt
 import os
+import numpy
+import matplotlib.pyplot as plt
+import onnx
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
-from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost  # noqa
-import onnxmltools.convert.common.data_types
-from skl2onnx.common.data_types import FloatTensorType
-import numpy
+import sklearn
 from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import xgboost
 from xgboost import XGBClassifier
+import skl2onnx
+from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
+import onnxmltools
+from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost  # noqa
+import onnxmltools.convert.common.data_types
 
 data = load_iris()
 X = data.data[:, :2]
@@ -150,7 +149,7 @@ ax.axis('off')
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
 print("onnxmltools: ", onnxmltools.__version__)
 print("xgboost: ", xgboost.__version__)
