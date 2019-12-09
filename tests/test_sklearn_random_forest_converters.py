@@ -6,7 +6,7 @@
 
 import unittest
 import numpy
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
@@ -24,6 +24,15 @@ from test_utils import (
     dump_multiple_regression,
     dump_single_regression,
 )
+try:
+    from sklearn.experimental import enable_hist_gradient_boosting  # noqa
+    from sklearn.ensemble import (
+        HistGradientBoostingClassifier,
+        HistGradientBoostingRegressor
+    )
+except ImportError:
+    HistGradientBoostingClassifier = None
+    HistGradientBoostingRegressor = None
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
@@ -186,6 +195,41 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
+
+    def common_test_model_hgb_regressor(self, add_nan=False):
+        model = HistGradientBoostingRegressor(max_iter=1, max_depth=2)
+        X, y = make_regression(n_features=10, n_samples=1000,
+                               n_targets=1, random_state=42)
+        if add_nan:
+            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            X[rows, cols] = numpy.nan
+
+        X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                       random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        X_test = X_test.astype(numpy.float32)[:5]
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnHGBRegressor", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(HistGradientBoostingRegressor is None,
+                     reason="scikit-learn 0.22 + manuel activation")
+    def test_model_hgb_regressor_nonan(self):
+        self.common_test_model_hgb_regressor(False)
+
+    @unittest.skipIf(HistGradientBoostingRegressor is None,
+                     reason="scikit-learn 0.22 + manuel activation")
+    def test_model_hgb_regressor_nan(self):
+        self.common_test_model_hgb_regressor(True)
 
 
 if __name__ == "__main__":

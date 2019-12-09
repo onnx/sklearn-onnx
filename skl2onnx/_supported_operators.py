@@ -149,6 +149,23 @@ from sklearn.preprocessing import (
     StandardScaler,
 )
 
+try:
+    from sklearn.ensemble import (
+        HistGradientBoostingClassifier,
+        HistGradientBoostingRegressor
+    )
+except ImportError:
+    # Second verification as these models still require
+    # manual activation.
+    try:
+        from sklearn.ensemble._hist_gradient_boosting.gradient_boosting import (  # noqa
+            HistGradientBoostingClassifier,
+            HistGradientBoostingRegressor
+        )
+    except ImportError:
+        HistGradientBoostingRegressor = None
+        HistGradientBoostingClassifier = None
+
 from .common._registration import register_converter, register_shape_calculator
 
 # In most cases, scikit-learn operator produces only one output.
@@ -158,7 +175,7 @@ from .common._registration import register_converter, register_shape_calculator
 # classifiers. In the parsing stage, we produce two outputs for objects
 # included in the following list and one output for everything not in
 # the list.
-sklearn_classifier_list = [
+sklearn_classifier_list = list(filter(lambda m: m is not None, [
     LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
     PassiveAggressiveClassifier,
     LinearSVC, SVC, NuSVC,
@@ -168,8 +185,9 @@ sklearn_classifier_list = [
     BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
-    AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
-]
+    AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis,
+    HistGradientBoostingClassifier
+]))
 
 # Clustering algorithms: produces two outputs, label and score for
 # each cluster in most cases.
@@ -216,8 +234,8 @@ def build_sklearn_operator_name_map():
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
-                BayesianGaussianMixture, OneClassSVM,
-                PLSRegression
+                BayesianGaussianMixture, OneClassSVM, PLSRegression,
+                HistGradientBoostingClassifier, HistGradientBoostingRegressor
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
