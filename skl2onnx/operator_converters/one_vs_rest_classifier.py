@@ -18,6 +18,10 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     """
     Converts a *OneVsRestClassifier* into *ONNX* format.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
     probs_names = []
     for i, estimator in enumerate(op.estimators_):

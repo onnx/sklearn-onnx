@@ -14,6 +14,7 @@ from .data_types import (
     FloatTensorType, Int64TensorType, StringTensorType, DoubleTensorType
 )
 from .utils import check_input_and_output_numbers, check_input_and_output_types
+from .utils_classifier import get_label_classes
 
 
 def calculate_linear_classifier_output_shapes(operator):
@@ -36,8 +37,9 @@ def calculate_linear_classifier_output_shapes(operator):
         raise RuntimeError('Inputs must be a [N, C]-tensor.')
 
     N = operator.inputs[0].type.shape[0]
+    op = operator.raw_operator
+    class_labels = get_label_classes(operator.scope_inst, op)
 
-    class_labels = operator.raw_operator.classes_
     number_of_classes = len(class_labels)
     if all(isinstance(i, np.ndarray) for i in class_labels):
         class_labels = np.concatenate(class_labels)

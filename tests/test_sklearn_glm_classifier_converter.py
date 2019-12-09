@@ -128,6 +128,29 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 4,
+            label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnLogitisticRegressionMultiNoCl",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_ovr(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(multi_class='ovr'), 3)
@@ -321,6 +344,41 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnRidgeClassifierBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_binary_nozipmap(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 2)
+
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        assert 'zipmap' in str(model_onnx).lower()
+
+        options = {id(model): {'zipmap': True}}
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options)
+        assert 'zipmap' in str(model_onnx).lower()
+
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options)
+        assert 'zipmap' not in str(model_onnx).lower()
+
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierNZMBin",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )

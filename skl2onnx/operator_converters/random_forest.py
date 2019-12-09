@@ -13,6 +13,7 @@ from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
@@ -30,7 +31,7 @@ def _num_estimators(op):
 def convert_sklearn_random_forest_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
-    classes = op.classes_
+    classes = get_label_classes(scope, op)
 
     if all(isinstance(i, np.ndarray) for i in classes):
         classes = np.concatenate(classes)

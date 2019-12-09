@@ -29,7 +29,16 @@ def ClassFactory(class_name, op_name, inputs, outputs,
         attr_names = self.attr_names
         if '_' in self.__class__.__name__:
             op_version_class = int(self.__class__.__name__.split('_')[-1])
-            op_version = min(op_version, op_version_class)
+            try:
+                op_version = min(op_version, op_version_class)
+            except TypeError:
+                raise TypeError(
+                    "Could not compare versions {} ? {} for "
+                    "class '{}' since_version {}. Parameter 'op_version' "
+                    "is probably missing when the class "
+                    "is instantiated.".format(
+                        op_version, op_version_class, class_name,
+                        since_version))
         else:
             op_version_class = None
 

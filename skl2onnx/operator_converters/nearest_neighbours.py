@@ -35,6 +35,7 @@ except ImportError:
     OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 
 
 def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
@@ -59,8 +60,12 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
         dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
                          **kwargs)
     elif optim is None:
+        dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
+        dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
         dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
-                          op_version=op_version, **kwargs)
+                          op_version=op_version,
+                          dim_in=dim_in, dim_out=dim_out,
+                          **kwargs)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
     if op_version < 10:
@@ -254,10 +259,9 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     res = OnnxArgMax(all_together, axis=axis, op_version=opv,
                      keepdims=0)
 
-    if np.issubdtype(op.classes_.dtype, np.floating):
-        classes = op.classes_.astype(np.int32)
-    else:
-        classes = op.classes_
+    classes = get_label_classes(scope, op)
+    if np.issubdtype(classes.dtype, np.floating):
+        classes = classes.astype(np.int32)
 
     res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
     out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
