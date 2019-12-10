@@ -35,6 +35,12 @@ except ImportError:
     HistGradientBoostingRegressor = None
 
 
+def _sklearn_version():
+    # Remove development version 0.22.dev0 becomes 0.22.
+    v = ".".join(sklearn.__version__.split('.')[:2])
+    return StrictVersion(v)
+
+
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -221,11 +227,15 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
 
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
 
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nan(self):
