@@ -5,7 +5,9 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
+import sklearn
 from sklearn.datasets import load_iris, make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
