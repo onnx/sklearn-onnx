@@ -83,11 +83,16 @@ def convert_sklearn_random_forest_regressor_converter(scope,
     except AttributeError:
         # HistGradientBoostingRegressor
         attrs['n_targets'] = op.n_trees_per_iteration_
+    try:
+        estimator_count = len(op.estimators_)
+        tree_weight = 1. / estimator_count
+    except AttributeError:
+        # HistGradientBoosting
+        estimator_count = len(op._predictors)
+        tree_weight = 1.
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.
-    estimator_count = _num_estimators(op)
-    tree_weight = 1. / estimator_count
     for tree_id in range(estimator_count):
         if hasattr(op, 'estimators_'):
             tree = op.estimators_[tree_id].tree_
@@ -102,7 +107,10 @@ def convert_sklearn_random_forest_regressor_converter(scope,
                 False, dtype=container.dtype)
 
     if hasattr(op, '_baseline_prediction'):
-        attrs['base_values'] = [op._baseline_prediction]
+        if isinstance(op._baseline_prediction, np.ndarray):
+            attrs['base_values'] = list(op._baseline_prediction)
+        else:
+            attrs['base_values'] = [op._baseline_prediction]
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:

@@ -197,7 +197,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           " <= StrictVersion('0.2.1')")
 
     def common_test_model_hgb_regressor(self, add_nan=False):
-        model = HistGradientBoostingRegressor(max_iter=1, max_depth=2)
+        model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
                                n_targets=1, random_state=42)
         if add_nan:
@@ -222,12 +222,12 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           " <= StrictVersion('0.2.1')")
 
     @unittest.skipIf(HistGradientBoostingRegressor is None,
-                     reason="scikit-learn 0.22 + manuel activation")
+                     reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
 
     @unittest.skipIf(HistGradientBoostingRegressor is None,
-                     reason="scikit-learn 0.22 + manuel activation")
+                     reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
 
