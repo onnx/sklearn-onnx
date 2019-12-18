@@ -86,7 +86,8 @@ def predict(model, scope, operator, container, op_type):
     proba_output_name = scope.get_unique_variable_name('proba_output')
     cast_result_name = scope.get_unique_variable_name('cast_result')
     value = model.tree_.value.transpose(1, 2, 0)
-    attrs = populate_tree_attributes(model, scope.get_unique_operator_name(op_type))
+    attrs = populate_tree_attributes(
+        model, scope.get_unique_operator_name(op_type))
 
     container.add_initializer(
         values_name, onnx_proto.TensorProto.FLOAT,
