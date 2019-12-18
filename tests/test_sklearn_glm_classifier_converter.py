@@ -8,7 +8,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    fit_multilabel_classification_model,
+)
 
 
 def _sklearn_version():
@@ -440,6 +444,28 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnRidgeClassifierCVMulti",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skip(
+        reason="Scikit-learn doesn't return multi-label output.")
+    def test_model_ridge_classifier_cv_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            linear_model.RidgeClassifierCV(random_state=42))
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn RidgeClassifierCV",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierCVMultiLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
 
