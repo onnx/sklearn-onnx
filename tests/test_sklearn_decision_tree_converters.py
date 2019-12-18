@@ -20,12 +20,13 @@ from onnxruntime import InferenceSession, __version__
 from test_utils import (
     dump_one_class_classification,
     dump_binary_classification,
-    dump_multiple_classification,
     dump_data_and_model,
+    dump_multiple_classification,
     dump_multiple_regression,
     dump_single_regression,
-    fit_regression_model,
     fit_classification_model,
+    fit_multilabel_classification_model,
+    fit_regression_model,
 )
 
 
@@ -183,6 +184,29 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_decision_tree_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            DecisionTreeClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn DecisionTreeClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
 
 
 if __name__ == "__main__":

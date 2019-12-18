@@ -45,7 +45,9 @@ def calculate_linear_classifier_output_shapes(operator):
         class_labels = np.concatenate(class_labels)
     if all(isinstance(i, (six.string_types, six.text_type))
            for i in class_labels):
-        operator.outputs[0].type = StringTensorType(shape=[N])
+        shape = ([N, op.n_outputs_]
+                 if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1 else [N])
+        operator.outputs[0].type = StringTensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             operator.outputs[1].type.shape = [N, number_of_classes]
         else:
@@ -54,7 +56,9 @@ def calculate_linear_classifier_output_shapes(operator):
             operator.outputs[1].type.shape = [N, 1]
     elif all(isinstance(i, (numbers.Real, bool, np.bool_))
              for i in class_labels):
-        operator.outputs[0].type = Int64TensorType(shape=[N])
+        shape = ([N, op.n_outputs_]
+                 if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1 else [N])
+        operator.outputs[0].type = Int64TensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             operator.outputs[1].type.shape = [N, number_of_classes]
         else:
