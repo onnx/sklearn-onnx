@@ -208,6 +208,29 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_extra_tree_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            ExtraTreeClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ExtraTreeClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreeClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
