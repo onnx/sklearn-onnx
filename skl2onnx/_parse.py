@@ -331,8 +331,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     if (isinstance(model.classes_, list) and
             isinstance(model.classes_[0], np.ndarray)):
         # multi-label problem
-        # this_operator.classlabels_int64s = list(range(0, len(classes)))
-        raise NotImplementedError("multi-label is not supported")
+        pass
     elif np.issubdtype(classes.dtype, np.floating):
         classes = np.array(list(map(lambda x: int(x), classes)))
         if set(map(lambda x: float(x), classes)) != set(model.classes_):
