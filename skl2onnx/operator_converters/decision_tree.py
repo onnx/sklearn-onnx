@@ -75,7 +75,7 @@ def populate_tree_attributes(model, name):
     return attrs
 
 
-def predict(model, scope, operator, container, op_type):
+def predict(model, scope, operator, container, op_type, is_ensemble=False):
     """Predict target and calculate probability scores."""
     indices_name = scope.get_unique_variable_name('indices')
     dummy_proba_name = scope.get_unique_variable_name('dummy_proba')
@@ -102,14 +102,20 @@ def predict(model, scope, operator, container, op_type):
         [values_name, indices_name],
         out_values_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    apply_transpose(scope, out_values_name, transposed_result_name,
-                    container, perm=(2, 1, 0))
     apply_transpose(scope, out_values_name, proba_output_name,
                     container, perm=(0, 2, 1))
     apply_cast(scope, proba_output_name, cast_result_name,
                container, to=onnx_proto.TensorProto.BOOL)
+    if is_ensemble:
+        proba_result_name = scope.get_unique_variable_name('proba_result')
+
+        apply_cast(scope, cast_result_name, proba_result_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        return proba_result_name
     apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
                container, to=onnx_proto.TensorProto.FLOAT)
+    apply_transpose(scope, out_values_name, transposed_result_name,
+                    container, perm=(2, 1, 0))
     return transposed_result_name
 
 
@@ -119,7 +125,6 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)
-
         classes = get_label_classes(scope, op)
 
         if all(isinstance(i, np.ndarray) for i in classes):
