@@ -466,7 +466,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function_binary'],
+            methods=['predict', 'decision_function_binary'])
 
     @unittest.skip(
         reason="Scikit-learn doesn't return multi-label output.")
