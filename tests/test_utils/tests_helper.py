@@ -49,13 +49,27 @@ def _has_transform_model(model):
 
 
 def fit_classification_model(model, n_classes, is_int=False,
-                             pos_features=False):
+                             pos_features=False, label_string=False):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
                                random_state=42, n_informative=7)
+    if label_string:
+        y = numpy.array(['cl%d' % cl for cl in y])
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
     if pos_features:
         X = numpy.abs(X)
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                   random_state=42)
+    model.fit(X_train, y_train)
+    return model, X_test
+
+
+def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
+                                        is_int=False):
+    X, y = make_multilabel_classification(
+        n_classes=n_classes, n_labels=n_labels, n_features=100,
+        n_samples=1000, random_state=42)
+    X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
     X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                    random_state=42)
     model.fit(X_train, y_train)
@@ -88,7 +102,8 @@ def dump_data_and_model(
         comparable_outputs=None,
         intermediate_steps=False,
         fail_evenif_notimplemented=False,
-        verbose=False):
+        verbose=False,
+        classes=None):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -133,6 +148,8 @@ def dump_data_and_model(
     :param fail_evenif_notimplemented: the test is considered as failing
         even if the error is due to onnxuntime missing the implementation
         of a new operator defiend in ONNX.
+    :param classes: classes names
+        (only for classifier, mandatory if option 'nocl' is used)
     :return: the created files
 
     Some convention for the name,
@@ -333,14 +350,12 @@ def dump_data_and_model(
             else:
                 try:
                     output, lambda_onnx = compare_backend(
-                        b,
-                        runtime_test,
+                        b, runtime_test,
                         options=extract_options(basename),
-                        context=context,
-                        verbose=verbose,
+                        context=context, verbose=verbose,
                         comparable_outputs=comparable_outputs,
                         intermediate_steps=intermediate_steps,
-                    )
+                        classes=classes)
                 except OnnxRuntimeMissingNewOnnxOperatorException as e:
                     if fail_evenif_notimplemented:
                         raise e

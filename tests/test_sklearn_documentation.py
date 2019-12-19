@@ -95,7 +95,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         reason="ColumnTransformer introduced in 0.20",
     )
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]
@@ -151,7 +151,7 @@ class TestSklearnDocumentation(unittest.TestCase):
             pipeline,
             model_onnx,
             verbose=False,
-            basename="SklearnDocumentationTfIdfUnion1-OneOff-Dec2",
+            basename="SklearnDocumentationTfIdfUnion1",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')",
         )

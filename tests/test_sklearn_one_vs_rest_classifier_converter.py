@@ -1,6 +1,11 @@
 import unittest
+from sklearn.ensemble import (
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+)
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -92,6 +97,126 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_float_binary(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(LogisticRegression()), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationFloatBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_int_binary(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(LogisticRegression()), 2, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationIntBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_float_mlp(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(MLPClassifier()), 5)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationFloatMLP",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_int_ensemble(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(GradientBoostingClassifier()), 5, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationIntEnsemble",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_float_binary_ensemble(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(GradientBoostingClassifier()), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationFloatBinEnsemble",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_int_binary_mlp(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(MLPClassifier()), 2, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationIntBinMLP",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ovr_regression_float(self):
         model, X = fit_classification_model(
             OneVsRestClassifier(LinearRegression()), 10)
@@ -126,6 +251,46 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOVRRegressionInt-Out0",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_regression_float_mlp(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(MLPRegressor()), 7)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRRegressionFloatMLP-Out0",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_ovr_regression_int_ensemble(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(GradientBoostingRegressor()), 4, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "ovr regression",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRRegressionIntEnsemble-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )

@@ -5,498 +5,291 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-
-from ..common._apply_operation import apply_abs, apply_cast, apply_mul
-from ..common._apply_operation import apply_add, apply_div
-from ..common._apply_operation import apply_reshape, apply_sub, apply_topk
-from ..common._apply_operation import apply_pow, apply_concat, apply_transpose
 from ..common.data_types import Int64TensorType
+from ..algebra.onnx_ops import (
+    OnnxArgMax,
+    OnnxArrayFeatureExtractor,
+    OnnxCast,
+    OnnxConcat,
+    OnnxDiv,
+    OnnxEqual,
+    OnnxFlatten,
+    OnnxIdentity,
+    OnnxMax,
+    OnnxMul,
+    OnnxReciprocal,
+    OnnxReduceMean,
+    OnnxReduceSum,
+    OnnxReshape,
+    OnnxShape,
+    OnnxTopK_1,
+    OnnxTranspose,
+)
+try:
+    from ..algebra.onnx_ops import OnnxTopK_10
+except ImportError:
+    OnnxTopK_10 = None
+try:
+    from ..algebra.onnx_ops import OnnxTopK_11
+except ImportError:
+    OnnxTopK_11 = None
+from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
-from ..proto import onnx_proto
+from ..common.utils_classifier import get_label_classes
 
 
-def _calculate_distance(scope, container, sub_results_name, metric,
-                        distance_power):
+def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
+                                   op_version=None, keep_distances=False,
+                                   optim=None, **kwargs):
     """
-    Calculate distance based on distance metric.
+    Retrieves the nearest neigbours *ONNX*.
+    :param X: features or *OnnxOperatorMixin*
+    :param Y: neighbours or *OnnxOperatorMixin*
+    :param k: number of neighbours to retrieve
+    :param metric: requires metric
+    :param dtype: numerical type
+    :param op_version: opset version
+    :param keep_distance: returns the distances as well (second position)
+    :param optim: implements specific optimisations,
+        ``'cdist'`` replaces *Scan* operator by operator *CDist*
+    :param kwargs: additional parameters for function @see fn onnx_cdist
+    :return: top indices
     """
-    if metric in (
-            'cityblock', 'euclidean', 'l1',
-            'l2', 'manhattan', 'minkowski',
-    ):
-        distance_power_name = scope.get_unique_variable_name('distance_power')
-        abs_results_name = scope.get_unique_variable_name('abs_result')
-        distance_name = scope.get_unique_variable_name('distance')
-        reduced_sum_name = scope.get_unique_variable_name('reduced_sum')
-        reshaped_result_name = scope.get_unique_variable_name('reduced_result')
-
-        container.add_initializer(distance_power_name,
-                                  onnx_proto.TensorProto.FLOAT,
-                                  [], [distance_power])
-
-        apply_abs(scope, sub_results_name, abs_results_name, container)
-        apply_pow(scope, [abs_results_name, distance_power_name],
-                  distance_name, container)
-        container.add_node('ReduceSum', distance_name, reduced_sum_name,
-                           name=scope.get_unique_operator_name('ReduceSum'),
-                           axes=[1])
-        apply_reshape(scope, reduced_sum_name, reshaped_result_name, container,
-                      desired_shape=[1, -1])
-        return reshaped_result_name
-    raise NotImplementedError(
-        "Metric '{0}' is not supported yet. You "
-        "may raise an issue at "
-        "https://github.com/onnx/sklearn-onnx/issues.".format(metric))
-
-
-def _calculate_weights(scope, container, unity, distance):
-    """
-    weights = 1 / distance
-    Handle divide by 0.
-    """
-    weights_name = scope.get_unique_variable_name('weights')
-    ceil_result_name = scope.get_unique_variable_name('ceil_result')
-    floor_result_name = scope.get_unique_variable_name('floor_result')
-    mask_sum_name = scope.get_unique_variable_name('mask_sum')
-    bool_mask_sum_name = scope.get_unique_variable_name('bool_mask_sum')
-    ceil_floor_sum_name = scope.get_unique_variable_name('ceil_floor_sum')
-    distance_without_zero_name = scope.get_unique_variable_name(
-        'distance_without_zero')
-    not_ceil_floor_sum_name = scope.get_unique_variable_name(
-        'not_ceil_floor_sum')
-    bool_ceil_floor_sum_name = scope.get_unique_variable_name(
-        'bool_ceil_floor_sum')
-    bool_not_ceil_floor_sum_name = scope.get_unique_variable_name(
-        'bool_not_ceil_floor_sum')
-    mask_sum_complement_name = scope.get_unique_variable_name(
-        'mask_sum_complement')
-    mask_sum_complement_float_name = scope.get_unique_variable_name(
-        'mask_sum_complement_float')
-    masked_weights_name = scope.get_unique_variable_name('masked_weights')
-    final_weights_name = scope.get_unique_variable_name('final_weights')
-
-    container.add_node('Ceil', distance, ceil_result_name,
-                       name=scope.get_unique_operator_name('Ceil'))
-    container.add_node('Floor', distance, floor_result_name,
-                       name=scope.get_unique_operator_name('Floor'))
-    apply_add(scope, [ceil_result_name, floor_result_name],
-              ceil_floor_sum_name, container, broadcast=0)
-    apply_cast(scope, ceil_floor_sum_name, bool_ceil_floor_sum_name, container,
-               to=onnx_proto.TensorProto.BOOL)
-    container.add_node('Not', bool_ceil_floor_sum_name,
-                       bool_not_ceil_floor_sum_name,
-                       name=scope.get_unique_operator_name('Not'))
-    apply_cast(scope, bool_not_ceil_floor_sum_name, not_ceil_floor_sum_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
-    apply_add(scope, [distance, not_ceil_floor_sum_name],
-              distance_without_zero_name, container, broadcast=0)
-    apply_div(scope, [unity, distance_without_zero_name],
-              weights_name, container, broadcast=1)
-    container.add_node('ReduceSum', not_ceil_floor_sum_name,
-                       mask_sum_name, axes=[1],
-                       name=scope.get_unique_operator_name('ReduceSum'))
-    apply_cast(scope, mask_sum_name, bool_mask_sum_name, container,
-               to=onnx_proto.TensorProto.BOOL)
-    container.add_node('Not', bool_mask_sum_name,
-                       mask_sum_complement_name,
-                       name=scope.get_unique_operator_name('Not'))
-    apply_cast(scope, mask_sum_complement_name, mask_sum_complement_float_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
-    apply_mul(scope, [weights_name, mask_sum_complement_float_name],
-              masked_weights_name, container, broadcast=1)
-    apply_add(scope, [masked_weights_name, not_ceil_floor_sum_name],
-              final_weights_name, container, broadcast=0)
-    return final_weights_name
-
-
-def _get_weights(scope, container, topk_values_name, distance_power):
-    """
-    Get the weights from an array of distances.
-    """
-    unity_name = scope.get_unique_variable_name('unity')
-    root_power_name = scope.get_unique_variable_name('root_power')
-    nearest_distance_name = scope.get_unique_variable_name(
-        'nearest_distance')
-    actual_distance_name = scope.get_unique_variable_name(
-        'actual_distance')
-
-    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
-                              [], [1])
-    container.add_initializer(root_power_name,
-                              onnx_proto.TensorProto.FLOAT,
-                              [], [1 / distance_power])
-
-    apply_abs(scope, topk_values_name, nearest_distance_name,
-              container)
-    apply_pow(scope, [nearest_distance_name, root_power_name],
-              actual_distance_name, container)
-    weights_name = _calculate_weights(scope, container, unity_name,
-                                      actual_distance_name)
-    return weights_name
-
-
-def _get_probability_score(scope, container, operator, weights,
-                           topk_values_name, distance_power, topk_labels_name,
-                           classes):
-    """
-    Calculate the class probability scores, update the second output of
-    KNeighboursClassifier converter with the probability scores and
-    return it.
-    """
-    labels_name = [None] * len(classes)
-    output_label_name = [None] * len(classes)
-    output_cast_label_name = [None] * len(classes)
-    output_label_reduced_name = [None] * len(classes)
-
-    for i in range(len(classes)):
-        labels_name[i] = scope.get_unique_variable_name(
-            'class_labels_{}'.format(i))
-        container.add_initializer(labels_name[i],
-                                  onnx_proto.TensorProto.INT32, [], [i])
-        output_label_name[i] = scope.get_unique_variable_name(
-            'output_label_{}'.format(i))
-        output_cast_label_name[i] = scope.get_unique_variable_name(
-            'output_cast_label_{}'.format(i))
-        output_label_reduced_name[i] = scope.get_unique_variable_name(
-            'output_label_reduced_{}'.format(i))
-    if weights == 'distance':
-        weights_val = _get_weights(
-            scope, container, topk_values_name, distance_power)
-        for i in range(len(classes)):
-            weighted_distance_name = scope.get_unique_variable_name(
-                'weighted_distance')
-
-            container.add_node('Equal', [labels_name[i], topk_labels_name],
-                               output_label_name[i],
-                               name=scope.get_unique_operator_name('Equal'))
-            apply_cast(scope, output_label_name[i], output_cast_label_name[i],
-                       container, to=onnx_proto.TensorProto.FLOAT)
-            apply_mul(scope, [output_cast_label_name[i], weights_val],
-                      weighted_distance_name, container, broadcast=0)
-            container.add_node('ReduceSum', weighted_distance_name,
-                               output_label_reduced_name[i], axes=[1],
-                               name=scope.get_unique_operator_name(
-                                   'ReduceSum'))
+    if optim == 'cdist':
+        from skl2onnx.algebra.custom_ops import OnnxCDist
+        dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
+                         **kwargs)
+    elif optim is None:
+        dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
+        dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
+        dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
+                          op_version=op_version,
+                          dim_in=dim_in, dim_out=dim_out,
+                          **kwargs)
     else:
-        for i in range(len(classes)):
-            container.add_node('Equal', [labels_name[i], topk_labels_name],
-                               output_label_name[i],
-                               name=scope.get_unique_operator_name('Equal'))
-            apply_cast(scope, output_label_name[i], output_cast_label_name[i],
-                       container, to=onnx_proto.TensorProto.INT32)
-            container.add_node('ReduceSum', output_cast_label_name[i],
-                               output_label_reduced_name[i], axes=[1],
-                               name=scope.get_unique_operator_name(
-                                   'ReduceSum'))
-
-    concat_labels_name = scope.get_unique_variable_name('concat_labels')
-    cast_concat_labels_name = scope.get_unique_variable_name(
-        'cast_concat_labels')
-    normaliser_name = scope.get_unique_variable_name('normaliser')
-
-    apply_concat(scope, output_label_reduced_name,
-                 concat_labels_name, container, axis=1)
-    apply_cast(scope, concat_labels_name, cast_concat_labels_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
-    container.add_node('ReduceSum', cast_concat_labels_name,
-                       normaliser_name, axes=[1],
-                       name=scope.get_unique_operator_name('ReduceSum'))
-    apply_div(scope, [cast_concat_labels_name, normaliser_name],
-              operator.outputs[1].full_name, container, broadcast=1)
-    return operator.outputs[1].full_name
-
-
-def _convert_k_neighbours_classifier(scope, container, operator, classes,
-                                     class_type, training_labels,
-                                     topk_values_name, topk_indices_name,
-                                     distance_power, weights):
-    """
-    Convert KNeighboursClassifier model to onnx format.
-    """
-    classes_name = scope.get_unique_variable_name('classes')
-    predicted_label_name = scope.get_unique_variable_name(
-        'predicted_label')
-    final_label_name = scope.get_unique_variable_name('final_label')
-    training_labels_name = scope.get_unique_variable_name(
-        'training_labels')
-    topk_labels_name = scope.get_unique_variable_name('topk_labels')
-
-    container.add_initializer(classes_name, class_type,
-                              classes.shape, classes)
-    container.add_initializer(
-        training_labels_name, onnx_proto.TensorProto.INT32,
-        training_labels.shape, training_labels.ravel())
-
-    container.add_node(
-        'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
-        topk_labels_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    proba = _get_probability_score(scope, container, operator,
-                                   weights, topk_values_name, distance_power,
-                                   topk_labels_name, classes)
-    container.add_node('ArgMax', proba,
-                       predicted_label_name,
-                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
-    container.add_node(
-        'ArrayFeatureExtractor', [classes_name, predicted_label_name],
-        final_label_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    if class_type == onnx_proto.TensorProto.INT32:
-        reshaped_final_label_name = scope.get_unique_variable_name(
-            'reshaped_final_label')
-
-        apply_reshape(scope, final_label_name, reshaped_final_label_name,
-                      container, desired_shape=(-1,))
-        apply_cast(scope, reshaped_final_label_name,
-                   operator.outputs[0].full_name, container,
-                   to=onnx_proto.TensorProto.INT64)
+        raise ValueError("Unknown optimisation '{}'.".format(optim))
+    if op_version < 10:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs)
+    elif op_version < 11:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
+                           op_version=10, **kwargs)
     else:
-        apply_reshape(scope, final_label_name,
-                      operator.outputs[0].full_name, container,
-                      desired_shape=(-1,))
+        node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
+                           largest=0, sorted=1,
+                           op_version=11, **kwargs)
+    if keep_distances:
+        return (node[1], OnnxMul(node[0], np.array(
+                    [-1], dtype=dtype), op_version=op_version))
+    else:
+        return node[1]
 
 
-def _convert_k_neighbours_regressor(scope, container, new_training_labels,
-                                    new_training_labels_shape,
-                                    topk_values_name, topk_indices_name,
-                                    distance_power, weights):
+def _convert_nearest_neighbors(scope, operator, container):
     """
-    Convert KNeighboursRegressor model to onnx format.
+    Common parts to regressor and classifier. Let's denote
+    *N* as the number of observations, *k*
+    the number of neighbours. It returns
+    the following intermediate results:
+
+    top_indices: [N, k] (int64), best indices for
+        every observation
+    top_distances: [N, k] (dtype), float distances
+        for every observation, it can be None
+        if the weights are uniform
+    top_labels: [N, k] (label type), labels
+        associated to every top index
+    weights: [N, k] (dtype), if top_distances is not None,
+        returns weights
+    norm: [N, k] (dtype), if top_distances is not None,
+        returns normalized weights
+    axis: 1 if there is one dimension only, 2 if
+        this is a multi-regression or a multi classification
     """
-    training_labels_name = scope.get_unique_variable_name(
-        'training_labels')
-    topk_labels_name = scope.get_unique_variable_name('topk_labels')
+    X = operator.inputs[0]
+    op = operator.raw_operator
+    opv = container.target_opset
+    dtype = container.dtype
 
-    container.add_initializer(
-        training_labels_name, onnx_proto.TensorProto.FLOAT,
-        new_training_labels_shape,
-        new_training_labels.ravel().astype(float))
+    if isinstance(X.type, Int64TensorType):
+        X = OnnxCast(X, to=container.proto_dtype, op_version=opv)
 
-    container.add_node(
-        'ArrayFeatureExtractor', [training_labels_name, topk_indices_name],
-        topk_labels_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    weighted_labels = topk_labels_name
-    final_op_type = 'ReduceMean'
-    if weights == 'distance':
-        weighted_distance_name = scope.get_unique_variable_name(
-            'weighted_distance')
-        reduced_weights_name = scope.get_unique_variable_name(
-            'reduced_weights')
-        weighted_labels_name = scope.get_unique_variable_name(
-            'weighted_labels')
+    options = container.get_options(op, dict(optim=None))
 
-        weights_val = _get_weights(
-            scope, container, topk_values_name, distance_power)
-        apply_mul(scope, [topk_labels_name, weights_val],
-                  weighted_distance_name, container, broadcast=0)
-        container.add_node(
-            'ReduceSum', weights_val, reduced_weights_name,
-            name=scope.get_unique_operator_name('ReduceSum'), axes=[1])
-        apply_div(scope, [weighted_distance_name, reduced_weights_name],
-                  weighted_labels_name, container, broadcast=1)
-        weighted_labels = weighted_labels_name
-        final_op_type = 'ReduceSum'
-    return final_op_type, weighted_labels
+    single_reg = (not hasattr(op, '_y') or len(op._y.shape) == 1 or
+                  len(op._y.shape) == 2 and op._y.shape[1] == 1)
+    ndim = 1 if single_reg else op._y.shape[1]
 
-
-def convert_sklearn_knn(scope, operator, container):
-    """
-    Converter for KNN models to onnx format.
-    """
-    # Computational graph:
-    #
-    # In the following graph, variable names are in lower case characters only
-    # and operator names are in upper case characters. We borrow operator names
-    # from the official ONNX spec:
-    # https://github.com/onnx/onnx/blob/master/docs/Operators.md
-    # All variables are followed by their shape in [].
-    # Note that KNN regressor and classifier share the same computation graphs
-    # until the top-k nearest examples' labels (aka `topk_labels` in the graph
-    # below) are found.
-    #
-    # Symbols:
-    # M: Number of training set instances
-    # N: Number of features
-    # C: Number of classes
-    # input: input
-    # output: output
-    # output_prob (for KNN Classifier): class probabilities
-    #
-    # Graph:
-    #
-    #   input [1, N] --> SUB <---- training_examples [M, N]
-    #                     |
-    #                     V
-    #           sub_results [M, N] ----> POW <---- distance_power [1]
-    #                                     |
-    #                                     V
-    #  reduced_sum [M] <-- REDUCESUM <-- distance [M, N]
-    #            |
-    #            V
-    # length -> RESHAPE -> reshaped_result [1, M]
-    #                       |
-    #                       V
-    # n_neighbors [1] ----> TOPK
-    #                       |
-    #                      / \
-    #                     /   \
-    #                     |    |
-    #                     V    V
-    #       topk_indices [K]   topk_values [K]
-    #               |
-    #               V
-    #   ARRAYFEATUREEXTRACTOR <- training_labels [M]
-    #           |
-    #           V                   (KNN Regressor)
-    #          topk_labels [K] ---------------------> REDUCEMEAN --> output [1]
-    #                    |
-    #                    |
-    #                    | (KNN Classifier)
-    #                    |
-    #                    |------------------------------------------------.
-    #                   /|\                (probability calculation)      |
-    #                  / | \                                              |
-    #                 /  |  \ (label prediction)                          V
-    #                /   |   \                                          CAST
-    #               /    |    \__                                         |
-    #               |    |       |                                        V
-    #               V    V       V                       cast_pred_label [K, 1]
-    # label0 -> EQUAL  EQUAL ... EQUAL <- label(C-1)                      |
-    #            |       |          |                                     |
-    #            V       V          V                                     |
-    # output_label_0 [C] ...       output_label_(C-1) [C]                 |
-    #            |       |          |                                     V
-    #            V       V          V           pred_label_shape [2] -> RESHAPE
-    #          CAST    CAST    ... CAST                                   |
-    #            |       |          |                                     V
-    #            V       V          V                reshaped_pred_label [K, 1]
-    # output_cast_label_0 [C] ...  output_cast_label_(C-1) [C]            |
-    #            |       |          |                                     |
-    #            V       V          V                                     |
-    #      REDUCESUM  REDUCESUM ... REDUCESUM                             |
-    #            |       |          |                                     |
-    #            V       V          V                                     |
-    # output_label_reduced_0 [1] ... output_label_reduced_(C-1) [1]       |
-    #           \        |           /                                    |
-    #            \____   |      ____/                                     |
-    #                 \  |  ___/                                          |
-    #                  \ | /                                              |
-    #                   \|/                                               |
-    #                    V                                                |
-    #                 CONCAT --> concat_labels [C]                        |
-    #                               |                                     |
-    #                               V                                     |
-    #                           ARGMAX --> predicted_label [1]            |
-    #                                       |                             |
-    #                                       V                             |
-    #            output [1] <--- ARRAYFEATUREEXTRACTOR <- classes [C]     |
-    #                                                                     |
-    #                                                                     |
-    #                                                                     |
-    #   ohe_model --> ONEHOTENCODER <-------------------------------------'
-    #                   |
-    #                   V
-    #  ohe_result [n_neighbors, C] -> REDUCEMEAN -> reduced_prob [1, C]
-    #                                                |
-    #                                                V
-    #               output_probability [1, C]  <-  ZipMap
-
-    knn = operator.raw_operator
-    training_examples = knn._fit_X.astype(float)
-    distance_power = knn.p if knn.metric == 'minkowski' else (
-        2 if knn.metric in ('euclidean', 'l2') else 1)
-
-    if operator.type != 'SklearnNearestNeighbors':
-        training_labels = knn._y
-
-    training_examples_name = scope.get_unique_variable_name(
-        'training_examples')
-    sub_results_name = scope.get_unique_variable_name('sub_results')
-    topk_values_name = scope.get_unique_variable_name('topk_values')
-    topk_indices_name = scope.get_unique_variable_name('topk_indices')
-    negate_name = scope.get_unique_variable_name('negate')
-    negated_reshaped_result_name = scope.get_unique_variable_name(
-        'negated_reshaped_result')
-
-    container.add_initializer(
-        training_examples_name, onnx_proto.TensorProto.FLOAT,
-        training_examples.shape, training_examples.flatten())
-    container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
-                              [], [-1])
-
-    input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == Int64TensorType:
-        cast_input_name = scope.get_unique_variable_name('cast_input')
-
-        apply_cast(scope, operator.inputs[0].full_name, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
-        input_name = cast_input_name
-
-    apply_sub(scope, [input_name, training_examples_name],
-              sub_results_name, container, broadcast=1)
-    distance_result = _calculate_distance(scope, container, sub_results_name,
-                                          knn.metric, distance_power)
-    apply_mul(scope, [distance_result, negate_name],
-              negated_reshaped_result_name, container, broadcast=1)
-    apply_topk(scope, negated_reshaped_result_name,
-               [topk_values_name, topk_indices_name], container,
-               k=knn.n_neighbors)
-
-    if operator.type == 'SklearnKNeighborsClassifier':
-        classes = knn.classes_
-        class_type = onnx_proto.TensorProto.STRING
-
-        if np.issubdtype(knn.classes_.dtype, np.floating):
-            class_type = onnx_proto.TensorProto.INT32
-            classes = classes.astype(np.int32)
-        elif np.issubdtype(knn.classes_.dtype, np.signedinteger):
-            class_type = onnx_proto.TensorProto.INT32
+    metric = op.effective_metric_
+    neighb = op._fit_X.astype(container.dtype)
+    k = op.n_neighbors
+    training_labels = op._y if hasattr(op, '_y') else None
+    distance_kwargs = {}
+    if metric == 'minkowski':
+        if op.p != 2:
+            distance_kwargs['p'] = op.p
         else:
-            classes = np.array([s.encode('utf-8') for s in classes])
+            metric = "euclidean"
 
-        _convert_k_neighbours_classifier(
-            scope, container, operator, classes, class_type, training_labels,
-            topk_values_name, topk_indices_name, distance_power,
-            knn.weights)
-    elif operator.type == 'SklearnKNeighborsRegressor':
-        multi_reg = (len(training_labels.shape) > 1 and
-                     (len(training_labels.shape) > 2 or
-                      training_labels.shape[1] > 1))
-        if multi_reg:
-            shape = training_labels.shape
-            irange = tuple(range(len(shape)))
-            new_shape = (shape[-1],) + shape[:-1]
-            perm = irange[-1:] + irange[:-1]
-            new_training_labels = training_labels.transpose(perm)
-            perm = irange[1:] + (0,)
-            shape = new_shape
+    weights = op.weights if hasattr(op, 'weights') else 'distance'
+    if weights == 'uniform':
+        top_indices = onnx_nearest_neighbors_indices(
+            X, neighb, k, metric=metric, dtype=dtype,
+            op_version=opv, optim=options.get('optim', None),
+            **distance_kwargs)
+        top_distances = None
+    elif weights == 'distance':
+        top_indices, top_distances = onnx_nearest_neighbors_indices(
+            X, neighb, k, metric=metric, dtype=dtype,
+            op_version=opv, keep_distances=True,
+            optim=options.get('optim', None),
+            **distance_kwargs)
+    else:
+        raise RuntimeError(
+            "Unable to convert KNeighborsRegressor when weights is callable.")
+
+    shape = OnnxShape(top_indices, op_version=opv)
+    flattened = OnnxFlatten(top_indices, op_version=opv)
+    if training_labels is not None:
+        if ndim > 1:
+            # shape = (ntargets, ) + shape
+            training_labels = training_labels.T
+            shape = OnnxConcat(np.array([ndim], dtype=np.int64),
+                               shape, op_version=opv, axis=0)
+            axis = 2
         else:
-            shape = training_labels.shape
-            new_training_labels = training_labels
+            training_labels = training_labels.ravel()
+            axis = 1
 
-        final_op_type, weighted_labels = _convert_k_neighbours_regressor(
-            scope, container, new_training_labels, shape,
-            topk_values_name, topk_indices_name, distance_power, knn.weights)
-        if multi_reg:
-            means_name = scope.get_unique_variable_name('means')
-            container.add_node(
-                final_op_type, weighted_labels, means_name,
-                name=scope.get_unique_operator_name(final_op_type), axes=[1])
-            apply_transpose(scope, means_name, operator.output_full_names,
-                            container, perm=perm)
-        else:
-            container.add_node(
-                final_op_type, weighted_labels, operator.output_full_names,
-                name=scope.get_unique_operator_name(final_op_type), axes=[1])
-    elif operator.type == 'SklearnNearestNeighbors':
-        container.add_node(
-            'Identity', topk_indices_name, operator.outputs[0].full_name,
-            name=scope.get_unique_operator_name('Identity'))
-        apply_abs(scope, topk_values_name, operator.outputs[1].full_name,
-                  container)
+        if training_labels.dtype == np.int32:
+            training_labels = training_labels.astype(np.int64)
+        extracted = OnnxArrayFeatureExtractor(
+            training_labels, flattened, op_version=opv)
+        reshaped = OnnxReshape(extracted, shape, op_version=opv)
+
+        if ndim > 1:
+            reshaped = OnnxTranspose(reshaped, op_version=opv, perm=[1, 0, 2])
+    else:
+        reshaped = None
+        axis = 1
+
+    if top_distances is not None:
+        modified = OnnxMax(top_distances, np.array([1e-6], dtype=dtype),
+                           op_version=opv)
+        wei = OnnxReciprocal(modified, op_version=opv)
+        norm = OnnxReduceSum(wei, op_version=opv, axes=[1], keepdims=0)
+    else:
+        norm = None
+        wei = None
+
+    return top_indices, top_distances, reshaped, wei, norm, axis
 
 
-register_converter('SklearnKNeighborsClassifier', convert_sklearn_knn)
-register_converter('SklearnKNeighborsRegressor', convert_sklearn_knn)
-register_converter('SklearnNearestNeighbors', convert_sklearn_knn)
+def convert_nearest_neighbors_regressor(scope, operator, container):
+    """
+    Converts *KNeighborsRegressor* into *ONNX*.
+    The converted model may return different predictions depending
+    on how the runtime select the topk element.
+    *scikit-learn* uses function `argpartition
+    <https://docs.scipy.org/doc/numpy/reference/
+    generated/numpy.argpartition.html>`_ which keeps the
+    original order of the elements.
+    """
+    many = _convert_nearest_neighbors(scope, operator, container)
+    _, top_distances, reshaped, wei, norm, axis = many
+
+    opv = container.target_opset
+    out = operator.outputs
+
+    reshaped_cast = OnnxCast(
+        reshaped, to=container.proto_dtype, op_version=opv)
+    if top_distances is not None:
+        weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
+        res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
+                            keepdims=0)
+        res = OnnxDiv(res, norm, op_version=opv, output_names=out)
+    else:
+        res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
+                             keepdims=0, output_names=out)
+    res.add_to(scope, container)
+
+
+def convert_nearest_neighbors_classifier(scope, operator, container):
+    """
+    Converts *KNeighborsClassifier* into *ONNX*.
+    The converted model may return different predictions depending
+    on how the runtime select the topk element.
+    *scikit-learn* uses function `argpartition
+    <https://docs.scipy.org/doc/numpy/reference/
+    generated/numpy.argpartition.html>`_ which keeps the
+    original order of the elements.
+    """
+    many = _convert_nearest_neighbors(scope, operator, container)
+    _, __, reshaped, wei, ___, axis = many
+
+    opv = container.target_opset
+    out = operator.outputs
+    op = operator.raw_operator
+    nb_classes = len(op.classes_)
+
+    if axis == 0:
+        raise RuntimeError(
+            "Binary classification not implemented in scikit-learn. "
+            "Check this code is not reused for other libraries.")
+
+    conc = []
+    for cl in range(nb_classes):
+        cst = np.array([cl], dtype=np.int64)
+        mat_cast = OnnxCast(
+            OnnxEqual(reshaped, cst, op_version=opv),
+            op_version=opv,
+            to=container.proto_dtype)
+        if wei is not None:
+            mat_cast = OnnxMul(mat_cast, wei, op_version=opv)
+        wh = OnnxReduceSum(mat_cast, axes=[1], op_version=opv)
+        conc.append(wh)
+    all_together = OnnxConcat(*conc, axis=1, op_version=opv)
+    sum_prob = OnnxReduceSum(
+        all_together, axes=[1], op_version=opv, keepdims=1)
+    probas = OnnxDiv(all_together, sum_prob, op_version=opv,
+                     output_names=out[1:])
+    res = OnnxArgMax(all_together, axis=axis, op_version=opv,
+                     keepdims=0)
+
+    classes = get_label_classes(scope, op)
+    if np.issubdtype(classes.dtype, np.floating):
+        classes = classes.astype(np.int32)
+
+    res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
+    out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
+                             output_names=out[:1], op_version=opv)
+
+    out_labels.add_to(scope, container)
+    probas.add_to(scope, container)
+
+
+def convert_nearest_neighbors_transform(scope, operator, container):
+    """
+    Converts *NearestNeighbors* into *ONNX*.
+    """
+    many = _convert_nearest_neighbors(scope, operator, container)
+    top_indices, top_distances = many[:2]
+
+    out = operator.outputs
+
+    ind = OnnxIdentity(top_indices, output_names=out[:1])
+    dist = OnnxIdentity(top_distances, output_names=out[1:])
+
+    dist.add_to(scope, container)
+    ind.add_to(scope, container)
+
+
+register_converter(
+    'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier)
+register_converter(
+    'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor)
+register_converter(
+    'SklearnNearestNeighbors', convert_nearest_neighbors_transform)

@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from scipy.sparse import coo_matrix
 from ..proto import TensorProto, ValueInfoProto
 from ..common._topology import Variable
 from ..common.data_types import (
@@ -23,7 +24,7 @@ def _guess_type(given_type):
     """
     Returns the proper type of an input.
     """
-    if isinstance(given_type, np.ndarray):
+    if isinstance(given_type, (np.ndarray, coo_matrix)):
         shape = list(given_type.shape)
         shape[0] = None
         return _guess_numpy_type(given_type.dtype, shape)

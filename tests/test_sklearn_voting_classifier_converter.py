@@ -221,6 +221,24 @@ class TestVotingClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_voting_soft_multi_string(self):
+        model = VotingClassifier(
+            voting="soft",
+            flatten_transform=False,
+            estimators=[
+                ("lr", LogisticRegression()),
+                ("lr2", LogisticRegression()),
+            ],
+        )
+        dump_multiple_classification(
+            model, label_string=True,
+            suffix="Soft",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi_weighted(self):
         model = VotingClassifier(
             voting="soft",

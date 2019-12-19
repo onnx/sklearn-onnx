@@ -12,12 +12,13 @@ from ..common._apply_operation import (
 )
 from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 
 
 def _joint_log_likelihood_bernoulli(
         scope, container, input_name, feature_log_prob_name,
         class_log_prior_name, binarize, feature_count, proto_type,
-        sum_op_version, sum_result_name):
+        sum_result_name):
     """
     Calculate joint log likelihood for Bernoulli Naive Bayes model.
     """
@@ -73,14 +74,11 @@ def _joint_log_likelihood_bernoulli(
     container.add_node(
         'MatMul', [input_name, difference_matrix_name],
         dot_prod_name, name=scope.get_unique_operator_name('MatMul'))
-    container.add_node(
-        'Sum', [sum_neg_prob_name, dot_prod_name],
-        partial_sum_result_name, op_version=sum_op_version,
-        name=scope.get_unique_operator_name('Sum'))
-    container.add_node(
-        'Sum', [partial_sum_result_name, class_log_prior_name],
-        sum_result_name, name=scope.get_unique_operator_name('Sum'),
-        op_version=sum_op_version)
+
+    apply_add(scope, [dot_prod_name, sum_neg_prob_name],
+              partial_sum_result_name, container)
+    apply_add(scope, [partial_sum_result_name, class_log_prior_name],
+              sum_result_name, container)
     return sum_result_name
 
 
@@ -176,7 +174,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #        matmul_result [M, C] -> CAST <- proto_type
     #                                |
     #                                V
-    #                    cast_result [M, C] -> SUM <- class_log_prior [1, C]
+    #                    cast_result [M, C] -> ADD <- class_log_prior [1, C]
     #                                          |
     #                        .-----------------'
     #                        |
@@ -232,10 +230,10 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #  |    input [M, N] -> MATMUL -> dot_product [M, C]
     #  |                                       |
     #  |                                       V
-    #  '------------------------------------> SUM
+    #  '------------------------------------> ADD
     #                                          |
     #                                          V
-    #  class_log_prior [1, C] -> SUM <- partial_sum_result [M, C]
+    #  class_log_prior [1, C] -> ADD <- partial_sum_result [M, C]
     #                            |
     #                            V
     #                   sum_result [M, C] -> ARGMAX -> argmax_output [M, 1]
@@ -299,7 +297,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     proto_type = container.proto_dtype
 
     nb_op = operator.raw_operator
-    classes = nb_op.classes_
+    classes = get_label_classes(scope, nb_op)
     output_shape = (-1,)
 
     sum_result_name = scope.get_unique_variable_name('sum_result')
@@ -314,10 +312,10 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         'array_feature_extractor_result')
 
     class_type = onnx_proto.TensorProto.STRING
-    if np.issubdtype(nb_op.classes_.dtype, np.floating):
+    if np.issubdtype(classes.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(nb_op.classes_.dtype, np.signedinteger):
+    elif np.issubdtype(classes.dtype, np.signedinteger):
         class_type = onnx_proto.TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
@@ -341,13 +339,6 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             class_log_prior_name, proto_type,
             class_log_prior.shape, class_log_prior.flatten())
 
-    if container.target_opset < 6:
-        sum_op_version = 1
-    elif container.target_opset < 8:
-        sum_op_version = 6
-    else:
-        sum_op_version = 8
-
     input_name = operator.inputs[0].full_name
     if type(operator.inputs[0].type) == Int64TensorType:
         cast_input_name = scope.get_unique_variable_name('cast_input')
@@ -360,7 +351,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         sum_result_name = _joint_log_likelihood_bernoulli(
             scope, container, input_name, feature_log_prob_name,
             class_log_prior_name, nb_op.binarize, nb_op.feature_count_,
-            proto_type, sum_op_version, sum_result_name)
+            proto_type, sum_result_name)
     elif operator.type == 'SklearnGaussianNB':
         sum_result_name = _joint_log_likelihood_gaussian(
             scope, container, input_name, nb_op,

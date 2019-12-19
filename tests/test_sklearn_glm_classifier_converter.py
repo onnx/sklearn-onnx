@@ -8,7 +8,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    fit_multilabel_classification_model,
+)
 
 
 def _sklearn_version():
@@ -125,6 +129,29 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 4,
+            label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnLogitisticRegressionMultiNoCl",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -327,6 +354,41 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_ridge_classifier_binary_nozipmap(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 2)
+
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        assert 'zipmap' in str(model_onnx).lower()
+
+        options = {id(model): {'zipmap': True}}
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options)
+        assert 'zipmap' in str(model_onnx).lower()
+
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "binary ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options)
+        assert 'zipmap' not in str(model_onnx).lower()
+
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierNZMBin",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_multi_class(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
         model_onnx = convert_sklearn(
@@ -405,6 +467,25 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'],
+
+    @unittest.skip(
+        reason="Scikit-learn doesn't return multi-label output.")
+    def test_model_ridge_classifier_cv_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            linear_model.RidgeClassifierCV(random_state=42))
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn RidgeClassifierCV",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnRidgeClassifierCVMultiLabel",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
 

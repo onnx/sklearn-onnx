@@ -133,7 +133,13 @@ def _transform_isotonic(scope, container, model, T, k):
         [calibrator_y_name, nearest_x_index_name],
         nearest_y_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    return nearest_y_name
+
+    nearest_y_name_reshaped = scope.get_unique_variable_name(
+        'nearest_y_name_reshaped')
+    apply_reshape(scope, nearest_y_name,
+                  nearest_y_name_reshaped, container,
+                  desired_shape=(-1, 1))
+    return nearest_y_name_reshaped
 
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container,
@@ -225,6 +231,10 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     #                           |                        |
     #                           V                        |
     #                        class_prob_tensor [M, C] <--'
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]

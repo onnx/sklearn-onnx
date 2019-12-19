@@ -49,16 +49,19 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         X = data.data[:, :2]
         y = data.target
         data = pandas.DataFrame(X, columns=["X1", "X2"], dtype=np.int64)
+        # Adding y to avoid having discrepencies on the label
+        # due to equal probabilities
+        # behaviour is different accross versions of scikit-learn.
+        data["X3"] = (y + 1).astype(np.int64)
 
         pipe = Pipeline(steps=[
-            (
-                "select",
-                ColumnTransformer([("id", FunctionTransformer(),
-                                    ["X1", "X2"])]),
-            ),
-            ("logreg", LogisticRegression()),
+            ("select",
+             ColumnTransformer(
+                [("id", FunctionTransformer(validate=True),
+                  ["X1", "X2", "X3"])])),
+            ("logreg", LogisticRegression(max_iter=1400)),
         ])
-        pipe.fit(data[["X1", "X2"]], y)
+        pipe.fit(data[["X1", "X2", "X3"]], y)
 
         inputs = convert_dataframe_schema(data)
         model_onnx = convert_sklearn(pipe, "scikit-learn function_transformer",

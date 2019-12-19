@@ -12,6 +12,7 @@ from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
 from . import concat_op
+from . import cross_decomposition
 from . import decision_tree
 from . import decomposition
 from . import dict_vectoriser
@@ -57,6 +58,7 @@ __all__ = [
     binariser,
     calibrated_classifier_cv,
     concat_op,
+    cross_decomposition,
     decision_tree,
     decomposition,
     dict_vectoriser,
