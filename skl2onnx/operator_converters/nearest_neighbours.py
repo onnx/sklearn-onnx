@@ -83,12 +83,11 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
                            op_version=11, **kwargs)
     if keep_distances:
         return (node[1], OnnxMul(node[0], np.array(
-                    [-1], dtype=dtype), op_version=op_version))
-    else:
-        return node[1]
+            [-1], dtype=dtype), op_version=op_version))
+    return node[1]
 
 
-def _convert_nearest_neighbors(scope, operator, container):
+def _convert_nearest_neighbors(operator, container):
     """
     Common parts to regressor and classifier. Let's denote
     *N* as the number of observations, *k*
@@ -198,7 +197,7 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     generated/numpy.argpartition.html>`_ which keeps the
     original order of the elements.
     """
-    many = _convert_nearest_neighbors(scope, operator, container)
+    many = _convert_nearest_neighbors(operator, container)
     _, top_distances, reshaped, wei, norm, axis = many
 
     opv = container.target_opset
@@ -217,29 +216,12 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     res.add_to(scope, container)
 
 
-def convert_nearest_neighbors_classifier(scope, operator, container):
+def get_proba_and_label(container, nb_classes, reshaped,
+                        wei, axis, opv):
     """
-    Converts *KNeighborsClassifier* into *ONNX*.
-    The converted model may return different predictions depending
-    on how the runtime select the topk element.
-    *scikit-learn* uses function `argpartition
-    <https://docs.scipy.org/doc/numpy/reference/
-    generated/numpy.argpartition.html>`_ which keeps the
-    original order of the elements.
+    This function calculates the label by choosing majority label
+    amongst the nearest neighbours.
     """
-    many = _convert_nearest_neighbors(scope, operator, container)
-    _, __, reshaped, wei, ___, axis = many
-
-    opv = container.target_opset
-    out = operator.outputs
-    op = operator.raw_operator
-    nb_classes = len(op.classes_)
-
-    if axis == 0:
-        raise RuntimeError(
-            "Binary classification not implemented in scikit-learn. "
-            "Check this code is not reused for other libraries.")
-
     conc = []
     for cl in range(nb_classes):
         cst = np.array([cl], dtype=np.int64)
@@ -254,28 +236,85 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     all_together = OnnxConcat(*conc, axis=1, op_version=opv)
     sum_prob = OnnxReduceSum(
         all_together, axes=[1], op_version=opv, keepdims=1)
-    probas = OnnxDiv(all_together, sum_prob, op_version=opv,
-                     output_names=out[1:])
     res = OnnxArgMax(all_together, axis=axis, op_version=opv,
                      keepdims=0)
+    return all_together, sum_prob, res
 
+
+def convert_nearest_neighbors_classifier(scope, operator, container):
+    """
+    Converts *KNeighborsClassifier* into *ONNX*.
+    The converted model may return different predictions depending
+    on how the runtime select the topk element.
+    *scikit-learn* uses function `argpartition
+    <https://docs.scipy.org/doc/numpy/reference/
+    generated/numpy.argpartition.html>`_ which keeps the
+    original order of the elements.
+    """
+    many = _convert_nearest_neighbors(operator, container)
+    _, __, reshaped, wei, ___, axis = many
+
+    opv = container.target_opset
+    out = operator.outputs
+    op = operator.raw_operator
+    nb_classes = len(op.classes_)
+
+    if axis == 0:
+        raise RuntimeError(
+            "Binary classification not implemented in scikit-learn. "
+            "Check this code is not reused for other libraries.")
     classes = get_label_classes(scope, op)
-    if np.issubdtype(classes.dtype, np.floating):
+    if hasattr(classes, 'dtype') and np.issubdtype(classes.dtype, np.floating):
         classes = classes.astype(np.int32)
-
-    res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
-    out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
-                             output_names=out[:1], op_version=opv)
-
-    out_labels.add_to(scope, container)
-    probas.add_to(scope, container)
+    if (isinstance(op.classes_, list)
+            and isinstance(op.classes_[0], np.ndarray)):
+        # Multi-label
+        out_labels, out_probas = [], []
+        for index, cur_class in enumerate(op.classes_):
+            transpose_result = OnnxTranspose(
+                reshaped, op_version=opv, perm=[0, 2, 1])
+            extracted_name = OnnxArrayFeatureExtractor(
+                transpose_result, np.array([index], dtype=np.int64),
+                op_version=opv)
+            reshaped_extracted_name = OnnxReshape(
+                extracted_name, np.array([-1, op.n_neighbors], dtype=np.int64),
+                op_version=opv)
+            all_together, sum_prob, res = get_proba_and_label(
+                container, len(cur_class), reshaped_extracted_name,
+                wei, 1, opv)
+            probas = OnnxDiv(all_together, sum_prob, op_version=opv)
+            res_name = OnnxArrayFeatureExtractor(
+                cur_class, res, op_version=opv)
+            reshaped_labels = OnnxReshape(
+                res_name, np.array([-1, 1], dtype=np.int64), op_version=opv)
+            reshaped_probas = OnnxReshape(
+                probas, np.array([1, -1, len(cur_class)], dtype=np.int64),
+                op_version=opv)
+            out_labels.append(reshaped_labels)
+            out_probas.append(reshaped_probas)
+        final_label = OnnxConcat(
+            *out_labels, axis=1, output_names=out[:1], op_version=opv)
+        final_proba = OnnxConcat(
+            *out_probas, axis=0, output_names=out[1:], op_version=opv)
+        final_label.add_to(scope, container)
+        final_proba.add_to(scope, container)
+    else:
+        all_together, sum_prob, res = get_proba_and_label(
+            container, nb_classes, reshaped, wei, axis, opv)
+        probas = OnnxDiv(all_together, sum_prob, op_version=opv,
+                         output_names=out[1:])
+        res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
+        out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
+                                 output_names=out[:1], op_version=opv)
+        out_labels.add_to(scope, container)
+        probas.add_to(scope, container)
 
 
 def convert_nearest_neighbors_transform(scope, operator, container):
     """
     Converts *NearestNeighbors* into *ONNX*.
     """
-    many = _convert_nearest_neighbors(scope, operator, container)
+    many = _convert_nearest_neighbors(operator, container)
     top_indices, top_distances = many[:2]
 
     out = operator.outputs
