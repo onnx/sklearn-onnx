@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from ..common.data_types import Int64TensorType
 from ..algebra.onnx_ops import (
     OnnxArgMax,
     OnnxArrayFeatureExtractor,
@@ -35,6 +34,7 @@ except ImportError:
     OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
+from ..common.data_types import Int64TensorType
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
