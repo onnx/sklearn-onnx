@@ -213,10 +213,31 @@ def dump_data_and_model(
     else:
         dataone = data
 
+    def _raw_score_binary_classification(model, X):
+        scores = model.decision_function(X)
+        if len(scores.shape) == 1:
+            scores = scores.reshape(-1, 1)
+        if len(scores.shape) != 2 or scores.shape[1] != 1:
+            raise RuntimeError(
+                "Unexpected shape {} for a binary classifiation".format(
+                    scores.shape))
+        return numpy.hstack([-scores, scores])
+
     if methods is not None:
         prediction = []
         for method in methods:
-            call = getattr(model, method)
+            if callable(method):
+                call = lambda X, model=model: method(model, X)  # noqa
+            else:
+                try:
+                    call = getattr(model, method)
+                except AttributeError as e:
+                    if method == 'decision_function_binary':
+                        call = (
+                            lambda X, model=model:
+                                _raw_score_binary_classification(model, X))
+                    else:
+                        raise e
             if callable(call):
                 prediction.append(call(data))
                 # we only take the last one for benchmark
