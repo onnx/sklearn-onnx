@@ -16,6 +16,7 @@ from skl2onnx.common.shape_calculator import (
 from skl2onnx.common.data_types import (
     SequenceType, DictionaryType, Int64TensorType, StringTensorType
 )
+from onnxmltools.convert.lightgbm._parse import WrappedBooster
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm  # noqa
 )
@@ -38,6 +39,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     def setUpClass(self):
 
         def custom_parser(scope, model, inputs, custom_parsers=None):
+            assert WrappedBooster is not None
             if custom_parsers is not None and model in custom_parsers:
                 return custom_parsers[model](
                     scope, model, inputs, custom_parsers=custom_parsers)
