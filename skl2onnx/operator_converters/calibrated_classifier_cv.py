@@ -243,6 +243,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = base_model
+    container.add_options(id(base_model), {'raw_score': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
     df_name = scope.declare_local_variable('probability_tensor',

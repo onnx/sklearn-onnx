@@ -36,7 +36,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                                                       FloatTensorType())
             this_operator.outputs.append(score_name)
 
-            if len(estimator.coef_.shape) == 2:
+            if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
                 raise RuntimeError("OneVsRestClassifier accepts "
                                    "regressor with only one target.")
             p1 = score_name.raw_name
@@ -84,6 +84,20 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         # concatenates outputs
         conc_name = scope.get_unique_variable_name('concatenated')
         apply_concat(scope, probs_names, conc_name, container, axis=1)
+        if len(op.estimators_) == 1:
+            zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
+            merged_prob_name = scope.get_unique_variable_name('merged_prob')
+            unit_float_tensor_name = scope.get_unique_variable_name(
+                'unit_float_tensor')
+
+            container.add_initializer(unit_float_tensor_name,
+                                      onnx_proto.TensorProto.FLOAT, [], [1.0])
+
+            apply_sub(scope, [unit_float_tensor_name, conc_name],
+                      zeroth_col_name, container, broadcast=1)
+            apply_concat(scope, [zeroth_col_name, conc_name],
+                         merged_prob_name, container, axis=1)
+            conc_name = merged_prob_name
 
         # normalizes the outputs
         apply_normalization(scope, conc_name, operator.outputs[1].full_name,

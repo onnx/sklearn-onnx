@@ -17,14 +17,15 @@ from sklearn.ensemble import (
 from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
 from skl2onnx import convert_sklearn
 from test_utils import (
+    convert_model,
     dump_one_class_classification,
     dump_binary_classification,
-    dump_multiple_classification,
-    convert_model,
     dump_data_and_model,
-    fit_classification_model,
+    dump_multiple_classification,
     dump_multiple_regression,
     dump_single_regression,
+    fit_classification_model,
+    fit_multilabel_classification_model,
 )
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
@@ -242,6 +243,52 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_random_forest_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            RandomForestClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn RandomForestClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_extra_trees_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            ExtraTreesClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ExtraTreesClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
 
 
 if __name__ == "__main__":
