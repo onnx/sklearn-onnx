@@ -14,7 +14,11 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    fit_multilabel_classification_model,
+)
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
@@ -210,6 +214,31 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
             basename="SklearnKNeighborsClassifierMetricCityblock")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            KNeighborsClassifier(), n_classes=7, n_labels=3,
+            n_samples=100, n_features=10)
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn KNN Classifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnKNNClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
