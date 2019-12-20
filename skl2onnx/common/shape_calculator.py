@@ -45,12 +45,13 @@ def calculate_linear_classifier_output_shapes(operator):
         class_labels = np.concatenate(class_labels)
     if all(isinstance(i, (six.string_types, six.text_type))
            for i in class_labels):
-        shape = ([N, op.n_outputs_]
-                 if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1 else [N])
+        shape = ([N, len(op.classes_)]
+                 if isinstance(op.classes_, list)
+                 and isinstance(op.classes_[0], np.ndarray) else [N])
         operator.outputs[0].type = StringTensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            shape = ([op.n_outputs_, N, len(op.classes_[0])]
-                     if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1
+            shape = ([len(op.classes_), N, len(op.classes_[0])]
+                     if isinstance(op.classes_, list)
                      and isinstance(op.classes_[0], np.ndarray)
                      else [N, number_of_classes])
             operator.outputs[1].type.shape = shape
@@ -60,12 +61,13 @@ def calculate_linear_classifier_output_shapes(operator):
             operator.outputs[1].type.shape = [N, 1]
     elif all(isinstance(i, (numbers.Real, bool, np.bool_))
              for i in class_labels):
-        shape = ([N, op.n_outputs_]
-                 if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1 else [N])
+        shape = ([N, len(op.classes_)]
+                 if isinstance(op.classes_, list)
+                 and isinstance(op.classes_[0], np.ndarray) else [N])
         operator.outputs[0].type = Int64TensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            shape = ([op.n_outputs_, N, len(op.classes_[0])]
-                     if hasattr(op, 'n_outputs_') and op.n_outputs_ > 1
+            shape = ([len(op.classes_), N, len(op.classes_[0])]
+                     if isinstance(op.classes_, list)
                      and isinstance(op.classes_[0], np.ndarray)
                      else [N, number_of_classes])
             operator.outputs[1].type.shape = shape
