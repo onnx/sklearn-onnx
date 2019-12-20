@@ -36,6 +36,7 @@ except ImportError:
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
+from ..proto import onnx_proto
 
 
 def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
@@ -276,11 +277,8 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
             extracted_name = OnnxArrayFeatureExtractor(
                 transpose_result, np.array([index], dtype=np.int64),
                 op_version=opv)
-            reshaped_extracted_name = OnnxReshape(
-                extracted_name, np.array([-1, op.n_neighbors], dtype=np.int64),
-                op_version=opv)
             all_together, sum_prob, res = get_proba_and_label(
-                container, len(cur_class), reshaped_extracted_name,
+                container, len(cur_class), extracted_name,
                 wei, 1, opv)
             probas = OnnxDiv(all_together, sum_prob, op_version=opv)
             res_name = OnnxArrayFeatureExtractor(
@@ -292,10 +290,13 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
                 op_version=opv)
             out_labels.append(reshaped_labels)
             out_probas.append(reshaped_probas)
-        final_label = OnnxConcat(
-            *out_labels, axis=1, output_names=out[:1], op_version=opv)
+        concatenated_labels = OnnxConcat(
+            *out_labels, axis=1, op_version=opv)
         final_proba = OnnxConcat(
             *out_probas, axis=0, output_names=out[1:], op_version=opv)
+        final_label = OnnxCast(
+            concatenated_labels, to=onnx_proto.TensorProto.INT64,
+            output_names=out[:1], op_version=opv)
         final_label.add_to(scope, container)
         final_proba.add_to(scope, container)
     else:
