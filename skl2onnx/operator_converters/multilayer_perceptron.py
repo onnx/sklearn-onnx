@@ -129,8 +129,14 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
                        operator.outputs[1].full_name, container)
 
     if mlp_op._label_binarizer.y_type_ == 'multilabel-indicator':
-        container.add_node('Binarizer', y_pred, operator.outputs[0].full_name,
+        binariser_output_name = scope.get_unique_variable_name(
+            'binariser_output')
+
+        container.add_node('Binarizer', y_pred, binariser_output_name,
                            threshold=0.5, op_domain='ai.onnx.ml')
+        apply_cast(
+            scope, binariser_output_name, operator.outputs[0].full_name,
+            container, to=onnx_proto.TensorProto.INT64)
     else:
         container.add_node('ArgMax', operator.outputs[1].full_name,
                            argmax_output_name, axis=1,
