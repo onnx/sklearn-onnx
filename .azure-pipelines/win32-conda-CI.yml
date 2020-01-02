@@ -114,18 +114,8 @@ jobs:
     displayName: 'install onnxmltools'
 
   - script: |
-      pytest tests_onnxmltools
-    displayName: 'pytest-onnxmltools'
-    condition: ne(variables['onnxrt.version'], '==0.2.1')
-
-  - script: |
       pip install matplotlib pydot
     displayName: 'install modules for examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
-
-  - script: |
-      pytest docs/tests
-    displayName: 'pytest-examples'
     condition: eq(variables['onnxrt.version'], '==0.5.0')
 
   - task: PublishTestResults@2

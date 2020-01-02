@@ -65,10 +65,11 @@ def fit_classification_model(model, n_classes, is_int=False,
 
 
 def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
+                                        n_samples=1000, n_features=100,
                                         is_int=False):
     X, y = make_multilabel_classification(
-        n_classes=n_classes, n_labels=n_labels, n_features=100,
-        n_samples=1000, random_state=42)
+        n_classes=n_classes, n_labels=n_labels, n_features=n_features,
+        n_samples=n_samples, random_state=42)
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
     X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                    random_state=42)
