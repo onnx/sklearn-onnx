@@ -34,11 +34,13 @@ def _num_estimators(op):
     #       ...
     #       classifier.fit(X_tmp, y_tmp)
     #       classifier.n_estimators += 30
-    try:
+    if hasattr(op, 'estimators_'):
         return len(op.estimators_)
-    except AttributeError:
+    elif hasattr(op, '_predictors'):
         # HistGradientBoosting
         return len(op._predictors)
+    raise NotImplementedError(
+        "Model should have attribute 'estimators_' or '_predictors'.")
 
 
 def _calculate_labels(scope, container, model, proba):
@@ -153,18 +155,26 @@ def convert_sklearn_random_forest_regressor_converter(scope,
     op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
-    try:
+
+    if hasattr(op, 'n_outputs_'):
         attrs['n_targets'] = int(op.n_outputs_)
-    except AttributeError:
+    elif hasattr(op, 'n_trees_per_iteration_'):
         # HistGradientBoostingRegressor
         attrs['n_targets'] = op.n_trees_per_iteration_
-    try:
+    else:
+        raise NotImplementedError(
+            "Model should have attribute 'n_outputs_' or 'n_trees_per_iteration_'.")
+
+    if hasattr(op, 'estimators_'):
         estimator_count = len(op.estimators_)
         tree_weight = 1. / estimator_count
-    except AttributeError:
+    elif hasattr(op, '_predictors'):
         # HistGradientBoosting
         estimator_count = len(op._predictors)
         tree_weight = 1.
+    else:
+        raise NotImplementedError(
+            "Model should have attribute 'estimators_' or '_predictors'.")
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.
