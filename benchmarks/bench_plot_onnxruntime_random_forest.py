@@ -17,7 +17,12 @@ from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils.testing import ignore_warnings
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
