@@ -19,7 +19,7 @@ import pandas
 from sklearn.linear_model import LogisticRegression
 try:
     # scikit-learn >= 0.22
-    from sklearn.utils import ignore_warnings
+    from sklearn.utils._testing import ignore_warnings
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
