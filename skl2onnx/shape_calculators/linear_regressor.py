@@ -32,3 +32,5 @@ register_shape_calculator('SklearnMLPRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnRANSACRegressor',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnHistGradientBoostingRegressor',
+                          calculate_linear_regressor_output_shapes)
