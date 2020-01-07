@@ -86,6 +86,7 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
         'transposed_result')
     proba_output_name = scope.get_unique_variable_name('proba_output')
     cast_result_name = scope.get_unique_variable_name('cast_result')
+    reshaped_indices_name = scope.get_unique_variable_name('reshaped_indices')
     value = model.tree_.value.transpose(1, 2, 0)
     container.add_initializer(
         values_name, onnx_proto.TensorProto.FLOAT,
@@ -103,26 +104,21 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
         zero_matrix_name = scope.get_unique_variable_name('zero_matrix')
         reduced_zero_matrix_name = scope.get_unique_variable_name(
             'reduced_zero_matrix')
-        cast_zero_matrix_name = scope.get_unique_variable_name(
-            'cast_zero_matrix')
 
         container.add_initializer(
-            #zero_name, container.proto_dtype, [], [0])
-            indices_name, container.proto_dtype, [], [0]*5)
-        """
+            zero_name, container.proto_dtype, [], [0])
         apply_mul(scope, [operator.inputs[0].full_name, zero_name],
                   zero_matrix_name, container, broadcast=1)
         container.add_node(
             'ReduceSum', zero_matrix_name, reduced_zero_matrix_name, axes=[1],
             name=scope.get_unique_operator_name('ReduceSum'))
-        apply_cast(scope, reduced_zero_matrix_name, cast_zero_matrix_name,
+        apply_cast(scope, reduced_zero_matrix_name, indices_name,
                    container, to=onnx_proto.TensorProto.INT64)
-        apply_reshape(scope, cast_zero_matrix_name, indices_name,
-                      container, desired_shape=(1, -1))
-        """
+    apply_reshape(scope, indices_name, reshaped_indices_name,
+                  container, desired_shape=[1, -1])
     container.add_node(
         'ArrayFeatureExtractor',
-        [values_name, indices_name],
+        [values_name, reshaped_indices_name],
         out_values_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     apply_transpose(scope, out_values_name, proba_output_name,
