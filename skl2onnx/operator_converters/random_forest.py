@@ -15,9 +15,12 @@ from ..common._apply_operation import (
 )
 from ..common.data_types import Int64TensorType
 from ..common._registration import register_converter
-from ..common.tree_ensemble import add_tree_to_attribute_pairs
-from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
-from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..common.tree_ensemble import (
+    add_tree_to_attribute_pairs,
+    add_tree_to_attribute_pairs_hist_gradient_boosting,
+    get_default_tree_classifier_attribute_pairs,
+    get_default_tree_regressor_attribute_pairs
+)
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 from .decision_tree import predict
@@ -31,7 +34,13 @@ def _num_estimators(op):
     #       ...
     #       classifier.fit(X_tmp, y_tmp)
     #       classifier.n_estimators += 30
-    return len(op.estimators_)
+    if hasattr(op, 'estimators_'):
+        return len(op.estimators_)
+    elif hasattr(op, '_predictors'):
+        # HistGradientBoosting
+        return len(op._predictors)
+    raise NotImplementedError(
+        "Model should have attribute 'estimators_' or '_predictors'.")
 
 
 def _calculate_labels(scope, container, model, proba):
@@ -147,17 +156,48 @@ def convert_sklearn_random_forest_regressor_converter(scope,
     op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
-    attrs['n_targets'] = int(op.n_outputs_)
+
+    if hasattr(op, 'n_outputs_'):
+        attrs['n_targets'] = int(op.n_outputs_)
+    elif hasattr(op, 'n_trees_per_iteration_'):
+        # HistGradientBoostingRegressor
+        attrs['n_targets'] = op.n_trees_per_iteration_
+    else:
+        raise NotImplementedError(
+            "Model should have attribute 'n_outputs_' or "
+            "'n_trees_per_iteration_'.")
+
+    if hasattr(op, 'estimators_'):
+        estimator_count = len(op.estimators_)
+        tree_weight = 1. / estimator_count
+    elif hasattr(op, '_predictors'):
+        # HistGradientBoosting
+        estimator_count = len(op._predictors)
+        tree_weight = 1.
+    else:
+        raise NotImplementedError(
+            "Model should have attribute 'estimators_' or '_predictors'.")
 
     # random forest calculate the final score by averaging over all trees'
     # outcomes, so all trees' weights are identical.
-    estimtator_count = _num_estimators(op)
-    tree_weight = 1. / estimtator_count
-    for tree_id in range(estimtator_count):
-        tree = op.estimators_[tree_id].tree_
-        add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
-                                    tree_weight, 0, False, True,
-                                    dtype=container.dtype)
+    for tree_id in range(estimator_count):
+        if hasattr(op, 'estimators_'):
+            tree = op.estimators_[tree_id].tree_
+            add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
+                                        tree_weight, 0, False, True,
+                                        dtype=container.dtype)
+        else:
+            # HistGradientBoostRegressor
+            tree = op._predictors[tree_id][0]
+            add_tree_to_attribute_pairs_hist_gradient_boosting(
+                attrs, False, tree, tree_id, tree_weight, 0, False,
+                False, dtype=container.dtype)
+
+    if hasattr(op, '_baseline_prediction'):
+        if isinstance(op._baseline_prediction, np.ndarray):
+            attrs['base_values'] = list(op._baseline_prediction)
+        else:
+            attrs['base_values'] = [op._baseline_prediction]
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == Int64TensorType:
@@ -179,4 +219,8 @@ register_converter('SklearnRandomForestRegressor',
 register_converter('SklearnExtraTreesClassifier',
                    convert_sklearn_random_forest_classifier)
 register_converter('SklearnExtraTreesRegressor',
+                   convert_sklearn_random_forest_regressor_converter)
+register_converter('SklearnHistGradientBoostingClassifier',
+                   convert_sklearn_random_forest_classifier)
+register_converter('SklearnHistGradientBoostingRegressor',
                    convert_sklearn_random_forest_regressor_converter)
