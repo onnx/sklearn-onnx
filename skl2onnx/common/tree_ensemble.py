@@ -113,7 +113,8 @@ def sklearn_threshold(dy, dtype, mode):
 def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
              feature_id, mode, value, true_child_id, false_child_id,
              weights, weight_id_bias, leaf_weights_are_counts,
-             adjust_threshold_for_sklearn, dtype):
+             adjust_threshold_for_sklearn, dtype,
+             nodes_missing_value_tracks_true=False):
     attr_pairs['nodes_treeids'].append(tree_id)
     attr_pairs['nodes_nodeids'].append(node_id)
     attr_pairs['nodes_featureids'].append(feature_id)
@@ -125,7 +126,8 @@ def add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
         attr_pairs['nodes_values'].append(value)
     attr_pairs['nodes_truenodeids'].append(true_child_id)
     attr_pairs['nodes_falsenodeids'].append(false_child_id)
-    attr_pairs['nodes_missing_value_tracks_true'].append(False)
+    attr_pairs['nodes_missing_value_tracks_true'].append(
+        nodes_missing_value_tracks_true)
     attr_pairs['nodes_hitrates'].append(1.)
 
     # Add leaf information for making prediction
@@ -184,3 +186,35 @@ def add_tree_to_attribute_pairs(attr_pairs, is_classifier, tree, tree_id,
                  weight, weight_id_bias, leaf_weights_are_counts,
                  adjust_threshold_for_sklearn=adjust_threshold_for_sklearn,
                  dtype=dtype)
+
+
+def add_tree_to_attribute_pairs_hist_gradient_boosting(
+        attr_pairs, is_classifier, tree, tree_id,
+        tree_weight, weight_id_bias,
+        leaf_weights_are_counts,
+        adjust_threshold_for_sklearn=False,
+        dtype=None):
+    for i, node in enumerate(tree.nodes):
+        node_id = i
+        weight = node['value']
+
+        if node['is_leaf']:
+            mode = 'LEAF'
+            feat_id = 0
+            threshold = 0.
+            left_child_id = 0
+            right_child_id = 0
+            missing = False
+        else:
+            mode = 'BRANCH_LEQ'
+            feat_id = node['feature_idx']
+            threshold = node['threshold']
+            left_child_id = node['left']
+            right_child_id = node['right']
+            missing = node['missing_go_to_left']
+
+        add_node(attr_pairs, is_classifier, tree_id, tree_weight, node_id,
+                 feat_id, mode, threshold, left_child_id, right_child_id,
+                 weight, weight_id_bias, leaf_weights_are_counts,
+                 adjust_threshold_for_sklearn=adjust_threshold_for_sklearn,
+                 dtype=dtype, nodes_missing_value_tracks_true=missing)
