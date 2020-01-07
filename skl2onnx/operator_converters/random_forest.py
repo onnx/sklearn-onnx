@@ -163,7 +163,8 @@ def convert_sklearn_random_forest_regressor_converter(scope,
         attrs['n_targets'] = op.n_trees_per_iteration_
     else:
         raise NotImplementedError(
-            "Model should have attribute 'n_outputs_' or 'n_trees_per_iteration_'.")
+            "Model should have attribute 'n_outputs_' or "
+            "'n_trees_per_iteration_'.")
 
     if hasattr(op, 'estimators_'):
         estimator_count = len(op.estimators_)
