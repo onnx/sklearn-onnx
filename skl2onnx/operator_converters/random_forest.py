@@ -135,7 +135,8 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
                 est, scope, operator, container, op_type, is_ensemble=True)
             apply_reshape(
                 scope, est_proba, reshaped_est_proba_name, container,
-                desired_shape=(1, op.n_outputs_, -1, len(op.classes_[0])))
+                desired_shape=(
+                    1, op.n_outputs_, -1, max([len(x) for x in op.classes_])))
             proba.append(reshaped_est_proba_name)
         apply_concat(scope, proba, concatenated_proba_name,
                      container, axis=0)
