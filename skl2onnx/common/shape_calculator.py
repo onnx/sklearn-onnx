@@ -50,7 +50,7 @@ def calculate_linear_classifier_output_shapes(operator):
                  and isinstance(op.classes_[0], np.ndarray) else [N])
         operator.outputs[0].type = StringTensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            shape = ([len(op.classes_), N, len(op.classes_[0])]
+            shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]
                      if isinstance(op.classes_, list)
                      and isinstance(op.classes_[0], np.ndarray)
                      else [N, number_of_classes])
@@ -66,7 +66,7 @@ def calculate_linear_classifier_output_shapes(operator):
                  and isinstance(op.classes_[0], np.ndarray) else [N])
         operator.outputs[0].type = Int64TensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
-            shape = ([len(op.classes_), N, len(op.classes_[0])]
+            shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]
                      if isinstance(op.classes_, list)
                      and isinstance(op.classes_[0], np.ndarray)
                      else [N, number_of_classes])
