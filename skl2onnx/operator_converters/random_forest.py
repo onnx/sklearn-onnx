@@ -37,7 +37,7 @@ def _num_estimators(op):
     if hasattr(op, 'estimators_'):
         return len(op.estimators_)
     elif hasattr(op, '_predictors'):
-        # HistGradientBoosting
+        # HistGradientBoosting*
         return len(op._predictors)
     raise NotImplementedError(
         "Model should have attribute 'estimators_' or '_predictors'.")
@@ -90,7 +90,18 @@ def _calculate_labels(scope, container, model, proba):
 def convert_sklearn_random_forest_classifier(scope, operator, container):
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
-    if op.n_outputs_ == 1:
+
+    if hasattr(op, 'n_outputs_'):
+        n_outputs = int(op.n_outputs_)
+    elif hasattr(op, 'n_trees_per_iteration_'):
+        # HistGradientBoostingClassifier
+        n_outputs = op.n_trees_per_iteration_
+    else:
+        raise NotImplementedError(
+            "Model should have attribute 'n_outputs_' or "
+            "'n_trees_per_iteration_'.")
+
+    if n_outputs == 1 or hasattr(op, 'loss_'):
         classes = get_label_classes(scope, op)
 
         if all(isinstance(i, np.ndarray) for i in classes):
@@ -111,14 +122,55 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
 
         # random forest calculate the final score by averaging over all trees'
         # outcomes, so all trees' weights are identical.
-        estimtator_count = _num_estimators(op)
-        tree_weight = 1. / estimtator_count
+        if hasattr(op, 'estimators_'):
+            estimator_count = len(op.estimators_)
+            tree_weight = 1. / estimator_count
+        elif hasattr(op, '_predictors'):
+            # HistGradientBoostingRegressor
+            estimator_count = len(op._predictors)
+            tree_weight = 1.
+        else:
+            raise NotImplementedError(
+                "Model should have attribute 'estimators_' or '_predictors'.")
 
-        for tree_id in range(estimtator_count):
-            tree = op.estimators_[tree_id].tree_
-            add_tree_to_attribute_pairs(attr_pairs, True, tree, tree_id,
-                                        tree_weight, 0, True, True,
-                                        dtype=container.dtype)
+        for tree_id in range(estimator_count):
+
+            if hasattr(op, 'estimators_'):
+                tree = op.estimators_[tree_id].tree_
+                add_tree_to_attribute_pairs(
+                    attr_pairs, True, tree, tree_id,
+                    tree_weight, 0, True, True,
+                    dtype=container.dtype)
+            else:
+                # HistGradientBoostClassifier
+                if len(op._predictors[tree_id]) == 1:
+                    tree = op._predictors[tree_id][0]
+                    add_tree_to_attribute_pairs_hist_gradient_boosting(
+                        attr_pairs, True, tree, tree_id, tree_weight, 0,
+                        False, False, dtype=container.dtype)
+                else:
+                    for cl, tree in enumerate(op._predictors[tree_id]):
+                        add_tree_to_attribute_pairs_hist_gradient_boosting(
+                            attr_pairs, True, tree, tree_id * n_outputs + cl,
+                            tree_weight, cl, False, False,
+                            dtype=container.dtype)
+
+        if hasattr(op, '_baseline_prediction'):
+            if isinstance(op._baseline_prediction, np.ndarray):
+                attr_pairs['base_values'] = list(
+                    op._baseline_prediction.ravel())
+            else:
+                attr_pairs['base_values'] = [op._baseline_prediction]
+
+        if hasattr(op, 'loss_'):
+            if op.loss_.__class__.__name__ == "BinaryCrossEntropy":
+                attr_pairs['post_transform'] = "LOGISTIC"
+            elif op.loss_.__class__.__name__ == "CategoricalCrossEntropy":
+                attr_pairs['post_transform'] = "SOFTMAX"
+            else:
+                raise NotImplementedError(
+                    "There is no corresponding post_transform for "
+                    "'{}'.".format(op.loss_.__class__.__name__))
 
         container.add_node(
             op_type, operator.input_full_names,
@@ -136,7 +188,7 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
             apply_reshape(
                 scope, est_proba, reshaped_est_proba_name, container,
                 desired_shape=(
-                    1, op.n_outputs_, -1, max([len(x) for x in op.classes_])))
+                    1, n_outputs, -1, max([len(x) for x in op.classes_])))
             proba.append(reshaped_est_proba_name)
         apply_concat(scope, proba, concatenated_proba_name,
                      container, axis=0)
@@ -171,7 +223,7 @@ def convert_sklearn_random_forest_regressor_converter(scope,
         estimator_count = len(op.estimators_)
         tree_weight = 1. / estimator_count
     elif hasattr(op, '_predictors'):
-        # HistGradientBoosting
+        # HistGradientBoostingRegressor
         estimator_count = len(op._predictors)
         tree_weight = 1.
     else:
@@ -187,7 +239,11 @@ def convert_sklearn_random_forest_regressor_converter(scope,
                                         tree_weight, 0, False, True,
                                         dtype=container.dtype)
         else:
-            # HistGradientBoostRegressor
+            # HistGradientBoostingRegressor
+            if len(op._predictors[tree_id]) != 1:
+                raise NotImplementedError(
+                    "The converter does not work when the number of trees "
+                    "is not 1 but {}.".format(len(op._predictors[tree_id])))
             tree = op._predictors[tree_id][0]
             add_tree_to_attribute_pairs_hist_gradient_boosting(
                 attrs, False, tree, tree_id, tree_weight, 0, False,
