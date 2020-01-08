@@ -8,7 +8,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 import sklearn
-from sklearn.datasets import load_iris, make_regression
+from sklearn.datasets import load_iris, make_regression, make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
@@ -243,6 +243,61 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="scikit-learn 0.22 + manual activation")
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
+
+    def common_test_model_hgb_classifier(self, add_nan=False, n_classes=2):
+        model = HistGradientBoostingClassifier(max_iter=5, max_depth=2)
+        X, y = make_classification(n_features=10, n_samples=1000,
+                                   n_informative=4, n_classes=n_classes,
+                                   random_state=42)
+        if add_nan:
+            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            X[rows, cols] = numpy.nan
+
+        X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                       random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        X_test = X_test.astype(numpy.float32)[:5]
+
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnHGBClassifier", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nonan(self):
+        self.common_test_model_hgb_classifier(False)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nan(self):
+        self.common_test_model_hgb_classifier(True)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nonan_multi(self):
+        self.common_test_model_hgb_classifier(False, n_classes=3)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nan_multi(self):
+        self.common_test_model_hgb_classifier(True, n_classes=3)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
