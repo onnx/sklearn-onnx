@@ -13,17 +13,17 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx160-nightlyRT-Npy1172:
+      Py37-Onnx160-nightlyRT-Npy1180-Sk0221:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
-        numpy.version: 'numpy==1.17.2'
+        numpy.version: 'numpy==1.18.0'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
-      Py37-Onnx150-nightlyRT-Npy1163:
+        sklearn.version: '==0.22.1'
+      Py37-Onnx150-nightlyRT-Npy1180-Sk0213:
         python.version: '3.7'
-        onnx.version: 'onnx==1.6.0'
-        numpy.version: 'numpy==1.16.3'
+        onnx.version: 'onnx==1.5.0'
+        numpy.version: 'numpy==1.18.0'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
