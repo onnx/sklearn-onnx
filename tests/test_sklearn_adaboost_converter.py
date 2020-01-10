@@ -7,6 +7,7 @@
 import unittest
 from distutils.version import StrictVersion
 import onnx
+from onnx.defs import onnx_opset_version
 import onnxruntime
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -242,6 +243,14 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     def test_ada_boost_regressor_lr11(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
+        if onnx_opset_version() < 11:
+            try:
+                convert_sklearn(
+                    model, "AdaBoost regression",
+                    [("input", FloatTensorType([None, X.shape[1]]))],
+                    target_opset=11)
+            except RuntimeError:
+                return
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
