@@ -116,7 +116,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnSGDClassifierBinaryLogDecisionFunction-Dec4",
+            basename="SklearnSGDClassifierBinaryLogDecisionFunction-Dec3",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
