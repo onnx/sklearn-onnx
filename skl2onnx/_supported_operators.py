@@ -56,6 +56,7 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     RandomForestClassifier, RandomForestRegressor,
+    StackingClassifier,
     VotingClassifier
 )
 try:
@@ -181,7 +182,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
-    BaggingClassifier,
+    BaggingClassifier, StackingClassifier,
     BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
@@ -223,6 +224,7 @@ def build_sklearn_operator_name_map():
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
+                StackingClassifier,
                 VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
                 PCA, TruncatedSVD, IncrementalPCA,

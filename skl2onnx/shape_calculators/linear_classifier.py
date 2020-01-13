@@ -44,3 +44,5 @@ register_shape_calculator('SklearnSGDClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnHistGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnStackingClassifier',
+                          calculate_linear_classifier_output_shapes)
