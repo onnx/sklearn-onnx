@@ -101,7 +101,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
     def test_bagging_classifier_sgd_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier()), 2)
+            BaggingClassifier(
+                SGDClassifier(loss='modified_huber', random_state=42),
+                              random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -120,7 +122,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
     def test_bagging_classifier_sgd_binary_decision_function(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier()), 2)
+            BaggingClassifier(SGDClassifier(random_state=42),
+                              random_state=42), 2)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model,
@@ -131,7 +134,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:5],
             model,
             model_onnx,
             basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
@@ -142,7 +145,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier()), 5)
+            BaggingClassifier(
+                SGDClassifier(loss='modified_huber', random_state=42),
+                              random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -151,10 +156,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:10],
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierSGDMulticlass",
+            basename="SklearnBaggingClassifierSGDMulticlass-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
@@ -173,7 +178,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:10],
             model,
             model_onnx,
             basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
