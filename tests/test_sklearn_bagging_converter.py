@@ -103,7 +103,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         model, X = fit_classification_model(
             BaggingClassifier(
                 SGDClassifier(loss='modified_huber', random_state=42),
-                              random_state=42), 2)
+                random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -147,7 +147,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         model, X = fit_classification_model(
             BaggingClassifier(
                 SGDClassifier(loss='modified_huber', random_state=42),
-                              random_state=42), 5)
+                random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",

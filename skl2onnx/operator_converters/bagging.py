@@ -25,7 +25,8 @@ def _calculate_proba(scope, operator, container, model):
     options = container.get_options(model, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
     has_proba = (hasattr(model.estimators_[0], 'predict_proba')
-                 or hasattr(model.estimators_[0], 'decision_function'))
+                 or (use_raw_scores and hasattr(
+                     model.estimators_[0], 'decision_function')))
     for index, estimator in enumerate(model.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
