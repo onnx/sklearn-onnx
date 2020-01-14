@@ -31,7 +31,7 @@ def _calculate_proba(scope, operator, container, model):
 
         this_operator = scope.declare_local_operator(op_type)
         this_operator.raw_operator = estimator
-        container.add_options(id(estimator), {'raw_score': use_raw_scores})
+        container.add_options(id(estimator), {'raw_scores': use_raw_scores})
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % index)
