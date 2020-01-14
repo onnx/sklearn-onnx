@@ -178,7 +178,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:10],
+            X[:5],
             model,
             model_onnx,
             basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
