@@ -2,18 +2,18 @@
 # Licensed under the MIT License.
 
 """
-.. _l-rf-example-zipmap:
+.. _l-rf-example-decision-function:
 
-Probabilities as a vector or as a ZipMap
-========================================
+Probabilities or raw scores
+===========================
 
 A classifier usually returns a matrix of probabilities.
-By default, *sklearn-onnx* converts that matrix
-into a list of dictionaries where each probabilies is mapped
-to its class id or name. That mechanism retains the class names.
-This conversion increases the prediction time and is not
-always needed. Let's see how to deactivate this behaviour
-on the Iris example.
+By default, *sklearn-onnx* creates an ONNX graph
+which returns probabilities but it may skip that
+step and return raw scores if the model implements
+the method *decision_function*. Option ``'raw_scores'``
+is used to change the default behaviour. Let's see
+that on a simple example.
 
 .. contents::
     :local:
@@ -22,7 +22,6 @@ Train a model and convert it.
 +++++++++++++++++++++++++++++
 
 """
-from timeit import repeat
 import numpy
 import sklearn
 from sklearn.datasets import load_iris
@@ -53,45 +52,22 @@ onx = convert_sklearn(clr, initial_types=initial_type)
 
 sess = rt.InferenceSession(onx.SerializeToString())
 res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
-print(res[1][:2])
-print("probabilities type:", type(res[1]))
-print("type for the first observations:", type(res[1][0]))
+print("skl", clr.predict_proba(X_test[:1]))
+print("onnx", res[1][:2])
 
 ###################################
-# Without ZipMap
-# ++++++++++++++
+# Raw scores and decision_function
+# ++++++++++++++++++++++++++++++++
 #
-# Let's remove the ZipMap operator.
 
 initial_type = [('float_input', FloatTensorType([None, 4]))]
-options = {id(clr): {'zipmap': False}}
+options = {id(clr): {'raw_scores': True}}
 onx2 = convert_sklearn(clr, initial_types=initial_type, options=options)
 
 sess2 = rt.InferenceSession(onx2.SerializeToString())
 res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
-print(res2[1][:2])
-print("probabilities type:", type(res2[1]))
-print("type for the first observations:", type(res2[1][0]))
-
-###################################
-# Let's compare prediction time
-# +++++++++++++++++++++++++++++
-
-X32 = X_test.astype(numpy.float32)
-
-print("Time with ZipMap:")
-print(repeat(lambda: sess.run(None, {'float_input': X32}),
-             number=100, repeat=3))
-
-print("Time without ZipMap:")
-print(repeat(lambda: sess2.run(None, {'float_input': X32}),
-             number=100, repeat=3))
-
-# The prediction is much faster on this example.
-# The optimisation is even faster when the classes
-# are described with strings and not integers
-# as the final result (list of dictionaries) may copy
-# many times the same information with onnxruntime.
+print("skl", clr.decision_function(X_test[:1]))
+print("onnx", res2[1][:2])
 
 #################################
 # **Versions used for this example**
