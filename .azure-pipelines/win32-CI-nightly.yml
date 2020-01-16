@@ -89,13 +89,13 @@ jobs:
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
-  - script: |
-      call activate py$(python.version)
-      pip install onnxmltools openpyxl
-      coverage run --include=skl2onnx/** tests/benchmark.py
-      coverage report -m
-      coverage html
-    displayName: 'coverage'
+#  - script: |
+#      call activate py$(python.version)
+#      pip install openpyxl
+#      coverage run --include=skl2onnx/** tests/benchmark.py
+#      coverage report -m
+#      coverage html
+#    displayName: 'coverage'
 
   - script: |
       call activate py$(python.version)
