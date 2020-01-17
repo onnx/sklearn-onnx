@@ -250,7 +250,7 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
                 scope, container, proba_name.onnx_name, len(classes))
         else:
             # SAMME
-            if _scikit_learn_before_022():
+            if _scikit_learn_before_022() and not use_raw_scores:
                 weight_name = scope.get_unique_variable_name('weight')
                 samme_proba_name = scope.get_unique_variable_name(
                     'samme_proba')
