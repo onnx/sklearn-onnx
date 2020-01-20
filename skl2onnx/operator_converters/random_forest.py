@@ -101,6 +101,9 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
             "Model should have attribute 'n_outputs_' or "
             "'n_trees_per_iteration_'.")
 
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+
     if n_outputs == 1 or hasattr(op, 'loss_'):
         classes = get_label_classes(scope, op)
 
@@ -163,7 +166,9 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
                 attr_pairs['base_values'] = [op._baseline_prediction]
 
         if hasattr(op, 'loss_'):
-            if op.loss_.__class__.__name__ == "BinaryCrossEntropy":
+            if use_raw_scores:
+                attr_pairs['post_transform'] = "NONE"
+            elif op.loss_.__class__.__name__ == "BinaryCrossEntropy":
                 attr_pairs['post_transform'] = "LOGISTIC"
             elif op.loss_.__class__.__name__ == "CategoricalCrossEntropy":
                 attr_pairs['post_transform'] = "SOFTMAX"
@@ -171,12 +176,21 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
                 raise NotImplementedError(
                     "There is no corresponding post_transform for "
                     "'{}'.".format(op.loss_.__class__.__name__))
+        elif use_raw_scores:
+            raise RuntimeError(
+                "The converter cannot implement decision_function for "
+                "'{}'.".format(type(op)))
 
         container.add_node(
             op_type, operator.input_full_names,
-            [operator.outputs[0].full_name, operator.outputs[1].full_name],
+            [operator.outputs[0].full_name,
+             operator.outputs[1].full_name],
             op_domain='ai.onnx.ml', **attr_pairs)
     else:
+        if use_raw_scores:
+            raise RuntimeError(
+                "The converter cannot implement decision_function for "
+                "'{}'.".format(type(op)))
         concatenated_proba_name = scope.get_unique_variable_name(
             'concatenated_proba')
         proba = []
