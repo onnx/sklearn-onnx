@@ -16,10 +16,6 @@ from skl2onnx.common.shape_calculator import (
 from skl2onnx.common.data_types import (
     SequenceType, DictionaryType, Int64TensorType, StringTensorType
 )
-import onnxmltools  # noqa
-import onnxmltools.convert  # noqa
-import onnxmltools.convert.lightgbm  # noqa
-import onnxmltools.convert.lightgbm._parse  # noqa
 from onnxmltools.convert.lightgbm._parse import WrappedBooster  # noqa
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm  # noqa
