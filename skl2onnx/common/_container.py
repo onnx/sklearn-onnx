@@ -53,6 +53,10 @@ def _get_operation_list():
                     found = g.groups()[0]
                     break
             if found is None:
+                if 'squeeze' in k:
+                    # implementation of apply_squeeze, apply_unsqueeze
+                    # does not follow the same schema
+                    continue
                 warnings.warn("Unable to find an ONNX name in function "
                               "'{0}', source=\n{1}".format(k, source))
             res[found] = v

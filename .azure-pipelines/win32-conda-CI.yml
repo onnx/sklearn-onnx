@@ -105,7 +105,7 @@ jobs:
     displayName: 'install skl2onnx'
 
   - script: |
-      pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |

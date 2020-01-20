@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
-from sklearn.datasets import load_iris
+import sklearn
+from sklearn.datasets import load_iris, make_regression, make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
@@ -25,6 +27,21 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
 )
+try:
+    from sklearn.experimental import enable_hist_gradient_boosting  # noqa
+    from sklearn.ensemble import (
+        HistGradientBoostingClassifier,
+        HistGradientBoostingRegressor
+    )
+except ImportError:
+    HistGradientBoostingClassifier = None
+    HistGradientBoostingRegressor = None
+
+
+def _sklearn_version():
+    # Remove development version 0.22.dev0 becomes 0.22.
+    v = ".".join(sklearn.__version__.split('.')[:2])
+    return StrictVersion(v)
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
@@ -188,6 +205,100 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
 
+    def common_test_model_hgb_regressor(self, add_nan=False):
+        model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
+        X, y = make_regression(n_features=10, n_samples=1000,
+                               n_targets=1, random_state=42)
+        if add_nan:
+            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            X[rows, cols] = numpy.nan
+
+        X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                       random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        X_test = X_test.astype(numpy.float32)[:5]
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnHGBRegressor", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
+    @unittest.skipIf(HistGradientBoostingRegressor is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_regressor_nonan(self):
+        self.common_test_model_hgb_regressor(False)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
+    @unittest.skipIf(HistGradientBoostingRegressor is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_regressor_nan(self):
+        self.common_test_model_hgb_regressor(True)
+
+    def common_test_model_hgb_classifier(self, add_nan=False, n_classes=2):
+        model = HistGradientBoostingClassifier(max_iter=5, max_depth=2)
+        X, y = make_classification(n_features=10, n_samples=1000,
+                                   n_informative=4, n_classes=n_classes,
+                                   random_state=42)
+        if add_nan:
+            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            X[rows, cols] = numpy.nan
+
+        X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
+                                                       random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        X_test = X_test.astype(numpy.float32)[:5]
+
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnHGBClassifier", verbose=False,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nonan(self):
+        self.common_test_model_hgb_classifier(False)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nan(self):
+        self.common_test_model_hgb_classifier(True)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="missing_go_to_left is missing")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nonan_multi(self):
+        self.common_test_model_hgb_classifier(False, n_classes=3)
+
+    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+                     reason="NaN not allowed")
+    @unittest.skipIf(HistGradientBoostingClassifier is None,
+                     reason="scikit-learn 0.22 + manual activation")
+    def test_model_hgb_classifier_nan_multi(self):
+        self.common_test_model_hgb_classifier(True, n_classes=3)
+
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_random_forest_classifier_multilabel(self):
@@ -213,6 +324,29 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_random_forest_classifier_multilabel_low_samples(self):
+        model, X_test = fit_multilabel_classification_model(
+            RandomForestClassifier(random_state=42), n_samples=4)
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn RandomForestClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestClassifierMultiLabelLowSamples-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_extra_trees_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             ExtraTreesClassifier(random_state=42))
@@ -230,6 +364,29 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnExtraTreesClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_extra_trees_classifier_multilabel_low_samples(self):
+        model, X_test = fit_multilabel_classification_model(
+            ExtraTreesClassifier(random_state=42), n_samples=10)
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ExtraTreesClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesClassifierMultiLabelLowSamples-Out0",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )
