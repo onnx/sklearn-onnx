@@ -187,10 +187,12 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
                               classes.shape, classes)
 
     scores = _decision_function(scope, operator, container, sgd_op)
-    if sgd_op.loss == 'log':
+    options = container.get_options(sgd_op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+    if sgd_op.loss == 'log' and not use_raw_scores:
         proba = _predict_proba_log(scope, operator, container, scores,
                                    len(classes))
-    elif sgd_op.loss == 'modified_huber':
+    elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
         proba = _predict_proba_modified_huber(
             scope, operator, container, scores, len(classes))
     else:
