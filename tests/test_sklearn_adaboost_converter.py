@@ -55,6 +55,36 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf((StrictVersion(onnx.__version__) <
                       StrictVersion("1.5.0")),
                      reason="not available")
+    def test_ada_boost_classifier_samme_r_decision_function(self):
+        model, X_test = fit_classification_model(AdaBoostClassifier(
+            n_estimators=10, algorithm="SAMME.R", random_state=42,
+            base_estimator=DecisionTreeClassifier(
+                max_depth=2, random_state=42)), 4)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "AdaBoost classification",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+            target_opset=10,
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostClassifierSAMMERDecisionFunction",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function'],
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf((StrictVersion(onnx.__version__) <
+                      StrictVersion("1.5.0")),
+                     reason="not available")
     def test_ada_boost_classifier_samme_r_logreg(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME.R",
@@ -102,6 +132,36 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "< StrictVersion('0.5.0')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf((StrictVersion(onnx.__version__) <
+                      StrictVersion("1.5.0")),
+                     reason="not available")
+    def test_ada_boost_classifier_samme_decision_function(self):
+        model, X_test = fit_classification_model(AdaBoostClassifier(
+            n_estimators=5, algorithm="SAMME", random_state=42,
+            base_estimator=DecisionTreeClassifier(
+                max_depth=6, random_state=42)), 2)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "AdaBoostClSamme",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+            target_opset=10,
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostClassifierSAMMEDTDecisionFunction",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "< StrictVersion('0.5.0')",
+            methods=['predict', 'decision_function_binary'],
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
