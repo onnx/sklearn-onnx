@@ -60,11 +60,12 @@ jobs:
     displayName: Install Anaconda packages
 
   - script: |
+      python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
-      pip install $(numpy.version)
-      pip install $(scipy.version)
+      conda install $(numpy.version)
+      conda install $(scipy.version)
+      conda install pandas
       pip install $(onnx.version)
-      pip install pandas
     displayName: 'Install numpy, scipy, onnx, pandas'
 
   - script: |
