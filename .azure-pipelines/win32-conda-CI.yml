@@ -59,11 +59,6 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      conda install --yes --quiet --name skl2onnxEnvironment
-    displayName: Install Anaconda packages
-
-  - script: |
-      call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
       pip install $(onnx.version)
