@@ -78,7 +78,11 @@ jobs:
     displayName: 'Install numpy, scipy, onnx, pandas'
 
   - script: |
-      python -m pip freeze
+      conda install $(numpy.version)
+    displayName: 'Install numpy only'
+
+  - script: |
+      python -m pip show numpy
     displayName: 'pip freeze'
 
   - script: |
