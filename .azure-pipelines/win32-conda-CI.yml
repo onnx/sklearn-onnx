@@ -34,7 +34,7 @@ jobs:
         scipy.version: 'scipy'
         onnxrt.version: '==0.5.0'
         sklearn.version: '==0.21.3'
-      Py37-Onnx141-Rt040:
+      Py36-Onnx141-Rt040:
         python.version: '3.6'
         onnx.version: 'onnx==1.4.1'
         numpy.version: 'numpy>=1.17.0'

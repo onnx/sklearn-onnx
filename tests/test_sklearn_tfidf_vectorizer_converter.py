@@ -25,7 +25,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         return {TfidfVectorizer: {"tokenexp": None}}
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
@@ -57,7 +57,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert res.shape == (4, 9)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
@@ -117,7 +117,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert_almost_equal(res, exp)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
         corpus = numpy.array([
@@ -143,7 +143,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case2(self):
         corpus = numpy.array([
@@ -169,7 +169,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
@@ -200,7 +200,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
@@ -225,7 +225,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer21(self):
         corpus = numpy.array(["AA AA", "AA AA BB"]).reshape((2, 1))
@@ -245,7 +245,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
@@ -270,7 +270,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
@@ -294,7 +294,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
@@ -319,7 +319,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
@@ -344,7 +344,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
         corpus = numpy.array([
@@ -381,7 +381,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
@@ -433,7 +433,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.4.0')")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer_binary(self):
         corpus = numpy.array([
