@@ -63,13 +63,14 @@ jobs:
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
       conda install $(numpy.version)
+      python -c "import numpy"
       conda install $(scipy.version)
       conda install pandas
       pip install $(onnx.version)
     displayName: 'Install numpy, scipy, onnx, pandas'
 
   - script: |
-      pip install scikit-learn$(sklearn.version)
+      conda install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |
