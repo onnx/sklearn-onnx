@@ -79,6 +79,10 @@ jobs:
 
   - script: |
       python -m pip freeze
+    displayName: 'pip freeze'
+
+  - script: |
+      python -m pip freeze
       python -c "import numpy"
     displayName: 'check numpy'
 
