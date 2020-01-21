@@ -70,16 +70,32 @@ jobs:
     displayName: 'Install numpy, scipy, onnx, pandas'
 
   - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
       conda install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
+
+  - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
 
   - script: |
       pip install flake8
     displayName: 'install flake8'
 
   - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
+
+  - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
 
   - script: |
       pip install -r requirements.txt
@@ -91,12 +107,24 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
   - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
       pip install -e .
     displayName: 'install skl2onnx'
+
+  - script: |
+      python -c "import numpy"
+    displayName: 'check numpy'
 
   - script: |
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml

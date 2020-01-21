@@ -58,7 +58,7 @@ jobs:
       Py35-Onnx150-Rt021-Skl019:
         do.bench: '0'
         python.version: '3.5'
-        numpy.version: '==1.15.4'
+        numpy.version: '<=1.16.5'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.19.2'
@@ -78,13 +78,13 @@ jobs:
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no
-      conda install -c conda-forge numpy$(numpy.version)
+      conda install -c conda-forge "numpy$(numpy.version)"
       conda install protobuf
       python -m pip install --upgrade pip
     displayName: 'Install environment'
 
   - script: |
-      conda install numpy$(numpy.version)
+      conda install "numpy$(numpy.version)"
     displayName: 'install numpy'
 
   - script: |
