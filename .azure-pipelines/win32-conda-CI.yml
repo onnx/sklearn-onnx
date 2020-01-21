@@ -62,7 +62,7 @@ jobs:
   - script: |
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
-      conda install $(numpy.version)
+      pip install $(numpy.version)
       conda install $(scipy.version)
       conda install pandas
       pip install $(onnx.version)
