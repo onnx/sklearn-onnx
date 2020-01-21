@@ -13,35 +13,35 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx160-Rt100-Npy1173:
+      Py37-Onnx160-Rt100-Npy1181:
         do.bench: '1'
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
-        numpy.version: 'numpy==1.17.3'
+        numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.0.0'
         sklearn.version: '==0.21.3'
-      Py37-Onnx150-Rt050-Npy1172:
+      Py37-Onnx150-Rt050-Npy1181:
         do.bench: '1'
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.17.2'
+        numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==0.5.0'
         sklearn.version: '==0.21.3'
-      Py37-Onnx150-Rt040-Npy1170:
+      Py37-Onnx150-Rt040-Npy1175:
         do.bench: '1'
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.17.0'
+        numpy.version: 'numpy==1.17.5'
         scipy.version: 'scipy'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.21.3'
-      Py36-Onnx130-Rt021-Npy1170:
+      Py36-Onnx130-Rt021-Npy1175:
         do.bench: '0'
         python.version: '3.6.7'
         onnx.version: 'onnx==1.3.0'
-        numpy.version: 'numpy==1.17.0'
+        numpy.version: 'numpy==1.17.5'
         scipy.version: 'scipy'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'        
