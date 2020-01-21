@@ -54,7 +54,7 @@ jobs:
   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
     displayName: Add conda to PATH
 
-  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) $(scipy.version) pandas python=$(python.version)
+  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) $(scipy.version) pandas python=$(python.version) pytest
     displayName: Create Anaconda environment
 
   - script: |
@@ -64,7 +64,7 @@ jobs:
       pip install $(onnx.version)
       pip install onnxruntime$(onnxrt.version)
       pip install pytest
-    displayName: 'Install onnx onnxruntime pytest'
+    displayName: 'Install onnx onnxruntime'
 
   - script: |
       call activate skl2onnxEnvironment
