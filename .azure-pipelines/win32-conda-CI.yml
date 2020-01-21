@@ -61,10 +61,17 @@ jobs:
       call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
-      pip install $(onnx.version)
-      pip install onnxruntime$(onnxrt.version)
-      pip install pytest
-    displayName: 'Install onnx onnxruntime'
+    displayName: 'Install protobuf'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      python -m pip install $(onnx.version)
+    displayName: 'Install onnx'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      python -m pip install onnxruntime$(onnxrt.version)
+    displayName: 'Install onnxruntime'
 
   - script: |
       call activate skl2onnxEnvironment
@@ -97,17 +104,12 @@ jobs:
       cd onnxconverter-common
       pip install -e .
       cd ..
-    displayName: 'install requirements'
+    displayName: 'install onnxconverter-common'
 
   - script: |
       call activate skl2onnxEnvironment
       pip install -r requirements.txt
     displayName: 'install requirements'
-
-  - script: |
-      call activate skl2onnxEnvironment
-      python -c "import numpy"
-    displayName: 'check numpy'
 
   - script: |
       call activate skl2onnxEnvironment
