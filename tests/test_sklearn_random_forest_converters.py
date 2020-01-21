@@ -270,11 +270,34 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
         dump_data_and_model(
             X_test, model, model_onnx,
-            basename="SklearnHGBClassifier", verbose=False,
+            basename="SklearnHGBClassifier%s%d" % (
+                "nan" if add_nan else '', n_classes),
+            verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
+
+        if n_classes == 2:
+            model_onnx = convert_sklearn(
+                model, "unused",
+                [("input", FloatTensorType([None, X.shape[1]]))],
+                options={model.__class__: {'raw_scores': True}})
+            self.assertIsNotNone(model_onnx)
+            X_test = X_test.astype(numpy.float32)[:5]
+
+            # There is a bug in onnxruntime <= 1.1.0.
+            # Raw scores are always positive.
+            dump_data_and_model(
+                X_test, model, model_onnx,
+                basename="SklearnHGBClassifierRaw%s%d" % (
+                    "nan" if add_nan else '', n_classes),
+                verbose=False,
+                allow_failure="StrictVersion(onnx.__version__)"
+                              " < StrictVersion('1.2') or "
+                              "StrictVersion(onnxruntime.__version__)"
+                              " < StrictVersion('1.2.0')",
+                methods=['predict', 'decision_function_binary'])
 
     @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
                      reason="missing_go_to_left is missing")
