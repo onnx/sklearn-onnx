@@ -77,6 +77,7 @@ jobs:
     displayName: 'install scikit-learn'
 
   - script: |
+      call activate skl2onnxEnvironment
       python -c "import numpy"
     displayName: 'check numpy'
 
@@ -104,26 +105,32 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
+      call activate skl2onnxEnvironment
       python -c "import numpy"
     displayName: 'check numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       python -c "import numpy"
     displayName: 'check numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install -e .
     displayName: 'install skl2onnx'
 
   - script: |
+      call activate skl2onnxEnvironment
       python -c "import numpy"
     displayName: 'check numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
