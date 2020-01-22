@@ -331,6 +331,7 @@ register_converter(
     'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier,
     options={'zipmap': [True, False],
              'nocl': [True, False],
+             'raw_scores': [True, False],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,

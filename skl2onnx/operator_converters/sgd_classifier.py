@@ -238,4 +238,5 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
 register_converter('SklearnSGDClassifier',
                    convert_sklearn_sgd_classifier,
                    options={'zipmap': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})

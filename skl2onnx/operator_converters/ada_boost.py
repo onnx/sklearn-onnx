@@ -525,6 +525,7 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
 register_converter('SklearnAdaBoostClassifier',
                    convert_sklearn_ada_boost_classifier,
                    options={'zipmap': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
 register_converter('SklearnAdaBoostRegressor',
                    convert_sklearn_ada_boost_regressor)

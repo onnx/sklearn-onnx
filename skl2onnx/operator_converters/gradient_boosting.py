@@ -134,6 +134,8 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
 
 register_converter('SklearnGradientBoostingClassifier',
                    convert_sklearn_gradient_boosting_classifier,
-                   options={'zipmap': [True, False]})
+                   options={'zipmap': [True, False],
+                            'raw_scores': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnGradientBoostingRegressor',
                    convert_sklearn_gradient_boosting_regressor)
