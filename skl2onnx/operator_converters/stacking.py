@@ -8,23 +8,21 @@ import numpy as np
 
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_cast, apply_concat,
-    apply_identity, apply_reshape,
+    apply_cast,
+    apply_concat,
+    apply_reshape,
 )
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
-from .._supported_operators import decision_function_classifiers
 from .._supported_operators import sklearn_operator_name_map
 
 
 def _fetch_scores(scope, container, model, inputs, output_proba=None,
-                  method='predict_proba'):
+                  raw_scores=False):
     op_type = sklearn_operator_name_map[type(model)]
     this_operator = scope.declare_local_operator(op_type)
-    print(scope.onnx_operator_names)
     this_operator.raw_operator = model
-    raw_score = method != 'predict_proba'
-    container.add_options(id(model), {'raw_score': raw_score})
+    container.add_options(id(model), {'raw_scores': raw_scores})
     this_operator.inputs.append(inputs)
     label_name = scope.declare_local_variable('label')
     if output_proba is None:
@@ -32,29 +30,29 @@ def _fetch_scores(scope, container, model, inputs, output_proba=None,
             'probability_tensor', FloatTensorType())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(output_proba)
-    print(output_proba)
-    return output_proba.onnx_name
+    return output_proba.full_name
 
 
-def _transform(scope, operator, container, model):
-    predictions = [
-        _fetch_scores(scope, container, est, operator.inputs[0], method=meth)
-        for est, meth in zip(model.estimators_, model.stack_method_)
-        if est != 'drop'
-    ]
+def _transform(scope, operator, container, model, raw_scores=False):
     merged_prob_tensor = scope.declare_local_variable(
         'merged_probability_tensor', FloatTensorType())
 
+    predictions = [
+        _fetch_scores(scope, container, est, operator.inputs[0],
+                      raw_scores=meth == 'decision_function')
+        for est, meth in zip(model.estimators_, model.stack_method_)
+        if est != 'drop'
+    ]
     apply_concat(
         scope, predictions, merged_prob_tensor.full_name, container, axis=1)
     return merged_prob_tensor
-    # concatenate_predictions(
-    # scope, operator, container, model, predictions)
 
 
 def convert_sklearn_stacking_classifier(scope, operator, container):
     stacking_op = operator.raw_operator
     classes = stacking_op.classes_
+    options = container.get_options(stacking_op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
     class_type = onnx_proto.TensorProto.STRING
     if np.issubdtype(stacking_op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
@@ -72,13 +70,13 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
 
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
-    merged_proba_tensor = _transform(scope, operator, container, stacking_op)
-    prob = _fetch_scores(scope, container, stacking_op.final_estimator_,
-                         merged_proba_tensor)
-    # output_proba=operator.outputs[1])
-    apply_identity(scope, prob,
-                   operator.outputs[1].full_name, container)
-    container.add_node('ArgMax', operator.outputs[1].full_name,
+    merged_proba_tensor = _transform(
+        scope, operator, container, stacking_op,
+        raw_scores=use_raw_scores)
+    prob = _fetch_scores(
+        scope, container, stacking_op.final_estimator_, merged_proba_tensor,
+        output_proba=operator.outputs[1], raw_scores=use_raw_scores)
+    container.add_node('ArgMax', prob,
                        argmax_output_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
     container.add_node(
