@@ -89,7 +89,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert res.shape == (4, 11)
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.4.1"),
         reason="Requires new onnxruntime.")
     @unittest.skipIf(
         ColumnTransformer is None,
