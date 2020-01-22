@@ -33,7 +33,7 @@ def _fetch_scores(scope, container, model, inputs, output_proba=None,
     return output_proba.full_name
 
 
-def _transform(scope, operator, container, model)
+def _transform(scope, operator, container, model):
     merged_prob_tensor = scope.declare_local_variable(
         'merged_probability_tensor', FloatTensorType())
 
