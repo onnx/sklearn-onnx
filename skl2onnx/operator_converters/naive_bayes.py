@@ -411,7 +411,15 @@ def convert_sklearn_naive_bayes(scope, operator, container):
                       desired_shape=output_shape)
 
 
-register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes)
-register_converter('SklearnComplementNB', convert_sklearn_naive_bayes)
-register_converter('SklearnGaussianNB', convert_sklearn_naive_bayes)
-register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes)
+register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
+register_converter('SklearnComplementNB', convert_sklearn_naive_bayes,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
+register_converter('SklearnGaussianNB', convert_sklearn_naive_bayes,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
+register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})

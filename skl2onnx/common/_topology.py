@@ -238,7 +238,7 @@ class Scope:
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 dtype=np.float32):
+                 dtype=np.float32, registered_models=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -258,6 +258,7 @@ class Scope:
         :param dtype: select the computation for real type,
             by default it is float but double is sometime needed
         :param options: see :ref:`l-conv-options`
+        :param registered_models: registered models
         """
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
@@ -296,6 +297,9 @@ class Scope:
 
         # Additional options given to converters.
         self.options = options
+
+        # Registered models
+        self.registered_models = registered_models
 
     def get_shape_calculator(self, model_type):
         """
@@ -378,6 +382,16 @@ class Scope:
         self.variable_name_mapping[raw_name].remove(onnx_name)
         del self.variables[onnx_name]
 
+    def _get_allowed_options(self, model):
+        if self.registered_models is not None:
+            alias = self.registered_models['aliases'][type(model)]
+            conv = self.registered_models['conv'][alias]
+            allowed = conv.get_allowed_options()
+            return allowed
+        raise NotImplementedError(
+            "No registered models, no known allowed options "
+            "for model '{}'.".format(model.__class__.__name__))
+
     def get_options(self, model, default_values=None):
         """
         Returns additional options for a model.
@@ -387,7 +401,9 @@ class Scope:
                                the function)
         :return: dictionary
         """
-        return _build_options(model, self.options, default_values)
+        return _build_options(
+            model, self.options, default_values,
+            self._get_allowed_options(model))
 
 
 class Topology:
@@ -403,7 +419,7 @@ class Topology:
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None,
                  target_opset=None, custom_conversion_functions=None,
-                 custom_shape_calculators=None):
+                 custom_shape_calculators=None, registered_models=None):
         """
         Initializes a *Topology* object, which is an intermediate
         representation of a computational graph.
@@ -427,6 +443,7 @@ class Topology:
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying the
                                         user customized shape calculator
+        :param registered_models: registered models
         """
         self.scopes = []
         self.raw_model = model
@@ -471,6 +488,11 @@ class Topology:
         for mtype in all_model_types:
             alias = "{}_{}".format(mtype.__name__, id(self))
             self.model_aliases[mtype] = alias
+
+        # Registered models
+        if registered_models is None:
+            raise AssertionError()
+        self.registered_models = registered_models
 
     @staticmethod
     def _generate_unique_name(seed, existing_names):
@@ -517,7 +539,8 @@ class Topology:
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options, dtype=dtype)
+            options=options, dtype=dtype,
+            registered_models=self.registered_models)
         self.scopes.append(scope)
         return scope
 
@@ -868,7 +891,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     topology._initialize_graph_status_for_traversing()
 
     container = ModelComponentContainer(
-        target_opset, options=options, dtype=dtype)
+        target_opset, options=options, dtype=dtype,
+        registered_models=topology.registered_models)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.

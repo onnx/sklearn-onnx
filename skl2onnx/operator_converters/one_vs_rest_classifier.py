@@ -124,4 +124,6 @@ def convert_one_vs_rest_classifier(scope, operator, container):
 
 
 register_converter('SklearnOneVsRestClassifier',
-                   convert_one_vs_rest_classifier)
+                   convert_one_vs_rest_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})

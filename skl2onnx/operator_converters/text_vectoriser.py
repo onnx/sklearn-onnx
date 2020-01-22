@@ -341,4 +341,5 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                    container, to=onnx_proto.TensorProto.FLOAT)
 
 
-register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
+register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
+                   options={'tokenexp': None, 'separators': None})

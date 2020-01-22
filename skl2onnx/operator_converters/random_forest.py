@@ -283,14 +283,20 @@ def convert_sklearn_random_forest_regressor_converter(scope,
 
 
 register_converter('SklearnRandomForestClassifier',
-                   convert_sklearn_random_forest_classifier)
+                   convert_sklearn_random_forest_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnRandomForestRegressor',
                    convert_sklearn_random_forest_regressor_converter)
 register_converter('SklearnExtraTreesClassifier',
-                   convert_sklearn_random_forest_classifier)
+                   convert_sklearn_random_forest_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnExtraTreesRegressor',
                    convert_sklearn_random_forest_regressor_converter)
 register_converter('SklearnHistGradientBoostingClassifier',
-                   convert_sklearn_random_forest_classifier)
+                   convert_sklearn_random_forest_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnHistGradientBoostingRegressor',
                    convert_sklearn_random_forest_regressor_converter)

@@ -231,10 +231,14 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
 
 
 register_converter('SklearnDecisionTreeClassifier',
-                   convert_sklearn_decision_tree_classifier)
+                   convert_sklearn_decision_tree_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnDecisionTreeRegressor',
                    convert_sklearn_decision_tree_regressor)
 register_converter('SklearnExtraTreeClassifier',
-                   convert_sklearn_decision_tree_classifier)
+                   convert_sklearn_decision_tree_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnExtraTreeRegressor',
                    convert_sklearn_decision_tree_regressor)

@@ -126,4 +126,7 @@ def convert_voting_classifier(scope, operator, container):
                                 op.classes_)
 
 
-register_converter('SklearnVotingClassifier', convert_voting_classifier)
+register_converter('SklearnVotingClassifier',
+                   convert_voting_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
