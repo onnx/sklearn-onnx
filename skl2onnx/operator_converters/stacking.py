@@ -33,7 +33,7 @@ def _fetch_scores(scope, container, model, inputs, output_proba=None,
     return output_proba.full_name
 
 
-def _transform(scope, operator, container, model, raw_scores=False):
+def _transform(scope, operator, container, model)
     merged_prob_tensor = scope.declare_local_variable(
         'merged_probability_tensor', FloatTensorType())
 
@@ -71,8 +71,7 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     merged_proba_tensor = _transform(
-        scope, operator, container, stacking_op,
-        raw_scores=use_raw_scores)
+        scope, operator, container, stacking_op)
     prob = _fetch_scores(
         scope, container, stacking_op.final_estimator_, merged_proba_tensor,
         output_proba=operator.outputs[1], raw_scores=use_raw_scores)
