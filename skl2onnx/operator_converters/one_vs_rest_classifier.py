@@ -5,7 +5,11 @@
 # --------------------------------------------------------------------------
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_concat, apply_identity
+from ..common._apply_operation import (
+    apply_concat,
+    apply_identity,
+    apply_mul,
+)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
@@ -93,12 +97,18 @@ def convert_one_vs_rest_classifier(scope, operator, container):
             merged_prob_name = scope.get_unique_variable_name('merged_prob')
             unit_float_tensor_name = scope.get_unique_variable_name(
                 'unit_float_tensor')
-
-            container.add_initializer(unit_float_tensor_name,
-                                      onnx_proto.TensorProto.FLOAT, [], [1.0])
-
-            apply_sub(scope, [unit_float_tensor_name, conc_name],
-                      zeroth_col_name, container, broadcast=1)
+            if use_raw_scores:
+                container.add_initializer(
+                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
+                    [], [-1.0])
+                apply_mul(scope, [unit_float_tensor_name, conc_name],
+                          zeroth_col_name, container, broadcast=1)
+            else:
+                container.add_initializer(
+                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
+                    [], [1.0])
+                apply_sub(scope, [unit_float_tensor_name, conc_name],
+                          zeroth_col_name, container, broadcast=1)
             apply_concat(scope, [zeroth_col_name, conc_name],
                          merged_prob_name, container, axis=1)
             conc_name = merged_prob_name
