@@ -90,8 +90,11 @@ from sklearn.naive_bayes import (
     MultinomialNB,
 )
 try:
+    from sklearn.naive_bayes import CategoricalNB
     from sklearn.naive_bayes import ComplementNB
 except ImportError:
+    # scikit-learn versions <= 0.21
+    CategoricalNB = None
     # scikit-learn versions <= 0.19
     ComplementNB = None
 
@@ -183,7 +186,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
     BaggingClassifier, StackingClassifier,
-    BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
+    BernoulliNB, CategoricalNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
     AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis,
@@ -213,6 +216,7 @@ def build_sklearn_operator_name_map():
                 BaggingClassifier, BaggingRegressor,
                 BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
                 CalibratedClassifierCV,
+                CategoricalNB,
                 DecisionTreeClassifier, DecisionTreeRegressor,
                 ExtraTreeClassifier, ExtraTreeRegressor,
                 ExtraTreesClassifier, ExtraTreesRegressor,

@@ -13,21 +13,27 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx160:
+      Py37-Onnx160-Sk0221:
         python.version: '3.7'
-        numpy.version: '==1.17.2'
+        numpy.version: '==1.18.0'
+        onnx.version: '==1.6.0'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.22.1'
+      Py37-Onnx160-Sk0213:
+        python.version: '3.7'
+        numpy.version: '==1.18.0'
         onnx.version: '==1.6.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
       Py37-Onnx150:
         python.version: '3.7'
-        numpy.version: '==1.16.3'
+        numpy.version: '==1.18.0'
         onnx.version: '==1.6.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
       Py37-Onnxgit:
         python.version: '3.7'
-        numpy.version: '==1.17.1'
+        numpy.version: '==1.18.0'
         onnx.version: 'git'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
@@ -52,7 +58,8 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
-      pip install numpy$(numpy.version)
+      conda install numpy$(numpy.version)
+      pip install openpyxl
     displayName: 'install numpy'
 
   - script: |
@@ -105,15 +112,8 @@ jobs:
     displayName: 'version'
 
   - script: |
-      pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
-
-  - script: |
-      pip install onnxmltools openpyxl
-      coverage run --include=skl2onnx/** tests/benchmark.py
-      coverage report -m
-      coverage html
-    displayName: 'coverage'
 
   - script: |
       python tests/benchmark.py

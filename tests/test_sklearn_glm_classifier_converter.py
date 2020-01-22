@@ -68,6 +68,52 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_linear_discriminant_analysis_decfunc(self):
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array([1, 1, 1, 2, 2, 2])
+        X_test = np.array([[-0.8, -1], [0, 1]], dtype=np.float32)
+        model = LinearDiscriminantAnalysis().fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "linear model",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options={id(model): {'raw_scores': True}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnLinearDiscriminantAnalysisBinRawScore-Out0",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function']
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_linear_discriminant_analysis_decfunc3(self):
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array([1, 1, 1, 2, 2, 3])
+        X_test = np.array([[-0.8, -1], [0, 1]], dtype=np.float32)
+        model = LinearDiscriminantAnalysis().fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "linear model",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options={id(model): {'raw_scores': True}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnLinearDiscriminantAnalysisBinRawScore3-Out0",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function']
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_binary_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegressionCV(), 2)

@@ -101,6 +101,31 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_sgd_binary_class_log_decision_function(self):
+        model, X = fit_classification_model(
+            SGDClassifier(loss='log', random_state=42), 2)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD binary classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryLogDecisionFunction-Dec3",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function_binary'],
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_sgd_multi_class_log(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='log', random_state=42), 5)
@@ -120,6 +145,31 @@ class TestSGDClassifierConverter(unittest.TestCase):
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_sgd_multi_class_log_decision_function(self):
+        model, X = fit_classification_model(
+            SGDClassifier(loss='log', random_state=42), 3)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD multi-class classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiLogDecisionFunction-Dec3",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function'],
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),

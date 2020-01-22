@@ -8,8 +8,11 @@ from sklearn.naive_bayes import (
     MultinomialNB,
 )
 try:
+    from sklearn.naive_bayes import CategoricalNB
     from sklearn.naive_bayes import ComplementNB
 except ImportError:
+    # scikit-learn versions <= 0.21
+    CategoricalNB = None
     # scikit-learn versions <= 0.19
     ComplementNB = None
 from skl2onnx import convert_sklearn
@@ -430,6 +433,28 @@ class TestNaiveBayesConverter(unittest.TestCase):
             basename="SklearnMclComplementNBInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(CategoricalNB is None,
+                     reason="new in scikit version 0.22")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_categorical_nb(self):
+        model, X = fit_classification_model(
+            CategoricalNB(), 3, is_int=True, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "categorical naive bayes",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[10:13],
+            model,
+            model_onnx,
+            basename="SklearnCategoricalNB",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")

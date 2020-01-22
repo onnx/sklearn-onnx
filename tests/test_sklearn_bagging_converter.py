@@ -101,7 +101,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
     def test_bagging_classifier_sgd_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier()), 2)
+            BaggingClassifier(
+                SGDClassifier(loss='modified_huber', random_state=42),
+                random_state=42), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -118,9 +120,34 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_bagging_classifier_sgd_binary_decision_function(self):
+        model, X = fit_classification_model(
+            BaggingClassifier(SGDClassifier(random_state=42),
+                              random_state=42), 2)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[:5],
+            model,
+            model_onnx,
+            basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function_binary'],
+        )
+
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier()), 5)
+            BaggingClassifier(
+                SGDClassifier(loss='modified_huber', random_state=42),
+                random_state=42), 5)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -129,12 +156,35 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:5],
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierSGDMulticlass",
+            basename="SklearnBaggingClassifierSGDMulticlass-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
+        )
+
+    def test_bagging_classifier_sgd_multiclass_decision_function(self):
+        model, X = fit_classification_model(
+            BaggingClassifier(GradientBoostingClassifier(random_state=42),
+                              random_state=42), 4)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[:5],
+            model,
+            model_onnx,
+            basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function'],
         )
 
     def test_bagging_classifier_gradient_boosting_binary(self):

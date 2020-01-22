@@ -21,7 +21,7 @@ def _scikit_learn_before_022():
     return StrictVersion(__version__.split(".dev")[0]) < StrictVersion("0.22")
 
 
-def _samme_proba(scope, container, proba_name, n_classes, weight,
+def _samme_proba(scope, container, proba_name, weight,
                  zero_name, classes_ind_name, one_name):
     weight_name = scope.get_unique_variable_name('weight')
     container.add_initializer(
@@ -147,6 +147,51 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     return operator.outputs[1].full_name
 
 
+def _generate_raw_scores(scope, container, operator, proba_names_list, model):
+    summation_prob_name = scope.get_unique_variable_name('summation_proba')
+    est_weights_sum_name = scope.get_unique_variable_name('est_weights')
+
+    container.add_initializer(
+        est_weights_sum_name, container.proto_dtype,
+        [], [model.estimator_weights_.sum()])
+
+    container.add_node(
+        'Sum', proba_names_list, summation_prob_name,
+        name=scope.get_unique_operator_name('Sum'))
+    if len(model.classes_) == 2:
+        div_res_name = scope.get_unique_variable_name('div_res')
+        operand_name = scope.get_unique_variable_name('operand')
+        neg_name = scope.get_unique_variable_name('neg')
+        mul_res_name = scope.get_unique_variable_name('mul_res')
+        pos_class_scores_name = scope.get_unique_variable_name(
+            'pos_class_scores')
+        neg_class_scores_name = scope.get_unique_variable_name(
+            'neg_class_scores')
+        container.add_initializer(
+            operand_name, container.proto_dtype,
+            [2], [-1, 1])
+        container.add_initializer(
+            neg_name, container.proto_dtype,
+            [], [-1])
+
+        apply_div(scope, [summation_prob_name, est_weights_sum_name],
+                  div_res_name, container, broadcast=1)
+        apply_mul(scope, [div_res_name, operand_name],
+                  mul_res_name, container, broadcast=1)
+        container.add_node(
+            'ReduceSum', mul_res_name, pos_class_scores_name, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+        apply_mul(scope, [pos_class_scores_name, neg_name],
+                  neg_class_scores_name, container, broadcast=1)
+        apply_concat(
+            scope, [neg_class_scores_name, pos_class_scores_name],
+            operator.outputs[1].full_name, container, axis=1)
+    else:
+        apply_div(scope, [summation_prob_name, est_weights_sum_name],
+                  operator.outputs[1].full_name, container, broadcast=1)
+    return operator.outputs[1].full_name
+
+
 def convert_sklearn_ada_boost_classifier(scope, operator, container):
     """
     Converter for AdaBoost classifier.
@@ -164,6 +209,8 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
                 operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
     classes = op.classes_
     class_type = onnx_proto.TensorProto.STRING
     if np.issubdtype(classes.dtype, np.floating):
@@ -203,7 +250,7 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
                 scope, container, proba_name.onnx_name, len(classes))
         else:
             # SAMME
-            if _scikit_learn_before_022():
+            if _scikit_learn_before_022() and not use_raw_scores:
                 weight_name = scope.get_unique_variable_name('weight')
                 samme_proba_name = scope.get_unique_variable_name(
                     'samme_proba')
@@ -244,14 +291,16 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
                             (1, ), [1.]))
 
                 cur_proba_name = _samme_proba(
-                    scope, container, proba_name.onnx_name, classes,
+                    scope, container, proba_name.onnx_name,
                     op.estimator_weights_[i_est], zero_name,
                     classes_ind_name, one_name)
 
         proba_names_list.append(cur_proba_name)
 
-    class_prob_name = _normalise_probability(scope, container, operator,
-                                             proba_names_list, op)
+    function = (_generate_raw_scores if use_raw_scores
+                else _normalise_probability)
+    class_prob_name = function(scope, container, operator,
+                               proba_names_list, op)
     container.add_node('ArgMax', class_prob_name,
                        argmax_output_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
@@ -382,7 +431,7 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
                            selected,
                            name=scope.get_unique_operator_name('Where'))
         container.add_node('ReduceSum', selected, output, axes=[1],
-                           name=scope.get_unique_operator_name('Where'))
+                           name=scope.get_unique_operator_name('ReduceSum'))
 
 
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
