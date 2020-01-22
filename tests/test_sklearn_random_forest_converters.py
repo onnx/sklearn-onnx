@@ -8,14 +8,19 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 import sklearn
-from sklearn.datasets import load_iris, make_regression, make_classification
+from sklearn.datasets import (
+    load_iris, make_regression, make_classification,
+    load_boston
+)
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor
 )
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
 from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
     convert_model,
     dump_one_class_classification,
@@ -410,6 +415,29 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnExtraTreesClassifierMultiLabelLowSamples-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_boston_pca_rf(self):
+        data = load_boston()
+        X, y = data.data, data.target
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, random_state=0)
+        pipe = Pipeline([
+            ('acp', PCA(n_components=7)),
+            ('rf', RandomForestRegressor())
+        ])
+        pipe.fit(X_train, y_train)
+        X32 = X_test.astype(numpy.float32)
+        model_onnx = to_onnx(pipe, X32[:1])
+
+        dump_data_and_model(
+            X32, pipe,
+            model_onnx, methods=['predict'],
+            basename="SklearnBostonPCARF-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )
