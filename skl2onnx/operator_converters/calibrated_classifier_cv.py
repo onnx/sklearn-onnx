@@ -12,7 +12,6 @@ from ..common._apply_operation import (
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
-from .._supported_operators import decision_function_classifiers
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -243,7 +242,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = base_model
-    container.add_options(id(base_model), {'raw_score': True})
+    container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
     df_name = scope.declare_local_variable('probability_tensor',
@@ -396,14 +395,6 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
                               [], [clf_length])
 
     for clf in op.calibrated_classifiers_:
-        if (hasattr(clf.base_estimator, 'decision_function') and
-                not isinstance(clf.base_estimator,
-                               decision_function_classifiers)):
-            raise NotImplementedError(
-                "'{0}' is not supported with CalibratedClassifierCV yet. "
-                "You may raise an issue at "
-                "https://github.com/onnx/sklearn-onnx/issues"
-                "".format(type(clf.base_estimator)))
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
             scope, operator, container, clf))
 

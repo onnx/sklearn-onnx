@@ -7,6 +7,7 @@ from distutils.version import StrictVersion
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
+from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 import onnxruntime
@@ -26,7 +27,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn CalibratedClassifierCV",
+            "scikit-learn CalibratedClassifierCVMNB",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
@@ -48,7 +49,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn CalibratedClassifierCV",
+            "scikit-learn CalibratedClassifierCVMNB",
             [("input", Int64TensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
@@ -73,7 +74,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = CalibratedClassifierCV(clf, cv=2, method="isotonic").fit(X, y)
         model_onnx = convert_sklearn(
             model,
-            "scikit-learn CalibratedClassifierCV",
+            "scikit-learn CalibratedClassifierCVKNN",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
         self.assertTrue(model_onnx is not None)
@@ -101,7 +102,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnCalibratedClassifierCVBinary",
+            basename="SklearnCalibratedClassifierCVBinaryMNB",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
@@ -122,16 +123,37 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
         )
-        try:
-            self.assertTrue(model_onnx is not None)
-            dump_data_and_model(
-                X.astype(np.float32),
-                model,
-                model_onnx,
-                basename="SklearnCalibratedClassifierCVIsotonicBinary")
-        except Exception as e:
-            raise AssertionError("Issue with model\n{}".format(
-                str(model_onnx))) from e
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnCalibratedClassifierCVIsotonicBinaryKNN")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_calibrated_classifier_cv_logistic_regression(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        y[y > 1] = 1
+        model = CalibratedClassifierCV(
+            base_estimator=LogisticRegression(), method='sigmoid').fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "unused",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnCalibratedClassifierCVBinaryLogReg",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
 
 
 if __name__ == "__main__":

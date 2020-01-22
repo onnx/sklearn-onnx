@@ -193,11 +193,6 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
 
-# Classifiers with converters supporting decision_function().
-decision_function_classifiers = (
-    SGDClassifier,
-)
-
 # Outlier detection algorithms:
 # produces two outputs, label and scores
 outlier_list = [OneClassSVM]
