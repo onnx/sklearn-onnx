@@ -100,6 +100,29 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_decision_function_binary(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(LogisticRegression()), 2)
+        options = {id(model): {'raw_scores': True}}
+        model_onnx = convert_sklearn(
+            model,
+            "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationDecisionFunctionBinary",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function_binary'],
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ovr_classification_int(self):
         model, X = fit_classification_model(
             OneVsRestClassifier(LogisticRegression()), 5, is_int=True)
