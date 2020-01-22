@@ -56,12 +56,14 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     RandomForestClassifier, RandomForestRegressor,
-    StackingClassifier,
     VotingClassifier
 )
 try:
+    from sklearn.ensemble import StackingClassifier
     from sklearn.ensemble import VotingRegressor
 except ImportError:
+    # New in 0.22
+    StackingClassifier = None
     # New in 0.21
     VotingRegressor = None
 from sklearn.tree import (
