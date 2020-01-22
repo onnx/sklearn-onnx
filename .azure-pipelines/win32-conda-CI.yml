@@ -13,35 +13,38 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx160-Rt100-Npy1173:
-        do.bench: '1'
+      Py37-Onnx160-Rt110:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
-        numpy.version: 'numpy==1.17.3'
+        numpy.version: 'numpy>=1.17.0'
+        scipy.version: 'scipy'
+        onnxrt.version: '==1.1.0'
+        sklearn.version: '==0.21.3'
+      Py37-Onnx160-Rt100:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.6.0'
+        numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==1.0.0'
         sklearn.version: '==0.21.3'
-      Py37-Onnx150-Rt050-Npy1172:
-        do.bench: '1'
+      Py37-Onnx150-Rt050:
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.17.2'
+        numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.5.0'
         sklearn.version: '==0.21.3'
-      Py37-Onnx150-Rt040-Npy1170:
-        do.bench: '1'
-        python.version: '3.7'
-        onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.17.0'
+      Py36-Onnx141-Rt040:
+        python.version: '3.6'
+        onnx.version: 'onnx==1.4.1'
+        numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.21.3'
-      Py36-Onnx130-Rt021-Npy1170:
-        do.bench: '0'
-        python.version: '3.6.7'
+      Py36-Onnx130-Rt021:
+        python.version: '3.6'
         onnx.version: 'onnx==1.3.0'
-        numpy.version: 'numpy==1.17.0'
+        numpy.version: 'numpy>=1.16.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'        
@@ -51,69 +54,92 @@ jobs:
   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
     displayName: Add conda to PATH
 
-  - script: conda create --yes --quiet --name skl2onnxEnvironment
+  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) $(scipy.version) pandas python=$(python.version) pytest
     displayName: Create Anaconda environment
 
   - script: |
       call activate skl2onnxEnvironment
-      conda install --yes --quiet --name skl2onnxEnvironment python=$(python.version)
-    displayName: Install Anaconda packages
-
-  - script: |
+      python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
-      pip install $(numpy.version)
-      pip install $(scipy.version)
-      pip install $(onnx.version)
-      pip install pandas
-    displayName: 'Install numpy, scipy, onnx, pandas'
+    displayName: 'Install protobuf'
 
   - script: |
-      pip install scikit-learn$(sklearn.version)
+      call activate skl2onnxEnvironment
+      python -m pip install $(onnx.version)
+    displayName: 'Install onnx'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      python -m pip install onnxruntime$(onnxrt.version)
+    displayName: 'Install onnxruntime'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      conda install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |
+      call activate skl2onnxEnvironment
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
+      call activate skl2onnxEnvironment
       pip install flake8
     displayName: 'install flake8'
 
   - script: |
+      call activate skl2onnxEnvironment
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
 
   - script: |
-      pip install -r requirements.txt
+      call activate skl2onnxEnvironment
       git clone https://github.com/microsoft/onnxconverter-common
       cd onnxconverter-common
       pip install -e .
       cd ..
-      pip install pytest
+    displayName: 'install onnxconverter-common'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      pip install -r requirements.txt
     displayName: 'install requirements'
 
   - script: |
-      pip install onnxruntime$(onnxrt.version)
-    displayName: 'install onnxruntime'
+      call activate skl2onnxEnvironment
+      python -c "import numpy"
+    displayName: 'check numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install -e .
     displayName: 'install skl2onnx'
 
   - script: |
-      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      call activate skl2onnxEnvironment
+      python -c "import numpy"
+    displayName: 'check numpy'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
-
-  - script: |
-      pip install matplotlib pydot
-    displayName: 'install modules for examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
 
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'
       testCoverageFiles: 'htmlcov/**'
-      testBenchmarkFiles: 'TESTDUMP/*.xlsx'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()

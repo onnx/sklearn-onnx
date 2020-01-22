@@ -14,7 +14,7 @@ from test_utils import dump_data_and_model
 class TestSklearnCountVectorizerBug(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer_custom_tokenizer(self):
         corpus = numpy.array([
@@ -49,7 +49,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
                           "StrictVersion('0.4.0')")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer_wrong_ngram(self):
         corpus = numpy.array([

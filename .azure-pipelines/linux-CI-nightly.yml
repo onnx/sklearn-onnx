@@ -58,7 +58,8 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
-      pip install numpy$(numpy.version)
+      conda install numpy$(numpy.version)
+      pip install openpyxl
     displayName: 'install numpy'
 
   - script: |

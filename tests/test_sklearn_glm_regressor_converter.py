@@ -368,7 +368,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnARDRegression-Dec4",
+            basename="SklearnARDRegression-Dec3",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
