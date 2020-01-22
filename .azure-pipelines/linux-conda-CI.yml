@@ -16,49 +16,49 @@ jobs:
       Py37-Onnx160-Rt100-Skl022:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.17.4'
+        numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '==1.0.0'
         sklearn.version: '==0.22.0'
       Py37-Onnx160-Rt100-Skl021:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.17.3'
+        numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '==1.0.0'
         sklearn.version: '==0.21.3'
       Py37-Onnx150-Rt050-Skl021:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.17.0'
+        numpy.version: '==1.17.4'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.5.0'
         sklearn.version: '==0.21.3'
       Py37-Onnx150-Rt040-Skl020:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.17.0'
+        numpy.version: '==1.17.4'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.4.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx141-Rt030-Skl020:
         do.bench: '0'
         python.version: '3.6'
-        numpy.version: '==1.16.3'
+        numpy.version: '==1.16.5'
         onnx.version: '==1.4.1'
         onnxrt.version: '==0.3.0'
         sklearn.version: '==0.20.3'
       Py36-Onnx130-Rt021-Skl020:
         do.bench: '0'
         python.version: '3.6'
-        numpy.version: '==1.16.3'
+        numpy.version: '==1.16.5'
         onnx.version: '==1.3.0'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.20.3'
       Py35-Onnx150-Rt021-Skl019:
         do.bench: '0'
         python.version: '3.5'
-        numpy.version: '==1.16.3'
+        numpy.version: '<=1.16.5'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.2.1'
         sklearn.version: '==0.19.2'
@@ -78,13 +78,13 @@ jobs:
   - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no
-      conda install -c conda-forge numpy$(numpy.version)
+      conda install -c conda-forge "numpy$(numpy.version)"
       conda install protobuf
       python -m pip install --upgrade pip
     displayName: 'Install environment'
 
   - script: |
-      pip install numpy$(numpy.version)
+      conda install "numpy$(numpy.version)"
     displayName: 'install numpy'
 
   - script: |
