@@ -589,7 +589,10 @@ class Topology:
                     known_outputs = {}
                     for op in self.unordered_operator_iterator():
                         for out in op.outputs:
-                            known_outputs[out.onnx_name] = out
+                            if hasattr(out, 'onnx_name'):
+                                known_outputs[out.onnx_name] = out
+                            else:
+                                known_outputs[out] = out
                     for variable in self.unordered_variable_iterator():
                         if variable.is_fed:
                             continue
