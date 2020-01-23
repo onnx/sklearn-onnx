@@ -17,17 +17,15 @@ from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
 
-def _fetch_scores(scope, container, model, inputs, output_proba=None,
-                  raw_scores=False):
+def _fetch_scores(scope, container, model, inputs, raw_scores=False):
     op_type = sklearn_operator_name_map[type(model)]
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = model
     container.add_options(id(model), {'raw_scores': raw_scores})
     this_operator.inputs.append(inputs)
     label_name = scope.declare_local_variable('label')
-    if output_proba is None:
-        output_proba = scope.declare_local_variable(
-            'probability_tensor', FloatTensorType())
+    output_proba = scope.declare_local_variable(
+        'probability_tensor', FloatTensorType())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(output_proba)
     return output_proba.full_name
@@ -43,6 +41,26 @@ def _transform(scope, operator, container, model):
         for est, meth in zip(model.estimators_, model.stack_method_)
         if est != 'drop'
     ]
+
+    op = operator.raw_operator
+    select_lact_column = (len(op.classes_) == 2 and all(
+        op.stack_method_[est_idx] == 'predict_proba'
+        for est_idx in range(0, len(op.estimators_))))
+    if select_lact_column:
+        column_index_name = scope.get_unique_variable_name('column_index')
+        container.add_initializer(column_index_name,
+                                  onnx_proto.TensorProto.INT64, [], [1])
+        new_predictions = []
+        for pred in predictions:
+            prob1 = scope.declare_local_variable('prob1')
+            container.add_node(
+                'ArrayFeatureExtractor',
+                [pred, column_index_name], prob1.onnx_name,
+                name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
+                op_domain='ai.onnx.ml')
+            new_predictions.append(prob1.onnx_name)
+        predictions = new_predictions
+
     apply_concat(
         scope, predictions, merged_prob_tensor.full_name, container, axis=1)
     return merged_prob_tensor
@@ -74,7 +92,7 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
         scope, operator, container, stacking_op)
     prob = _fetch_scores(
         scope, container, stacking_op.final_estimator_, merged_proba_tensor,
-        output_proba=None, raw_scores=use_raw_scores)
+        raw_scores=use_raw_scores)
     container.add_node('Identity', prob, operator.outputs[1].onnx_name,
                        name=scope.get_unique_operator_name('OpProb'))
     container.add_node('ArgMax', prob,
