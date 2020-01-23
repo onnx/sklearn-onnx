@@ -7,52 +7,14 @@ import numpy
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
 from sklearn import __version__ as sk__version__
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from skl2onnx.operator_converters.support_vector_machines import (
-    convert_sklearn_svm)
-from skl2onnx.shape_calculators.support_vector_machines import (
-    calculate_sklearn_svm_output_shapes
-)
 import onnx
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
 
 
-class SVC_raw(SVC):
-
-    def decision_function(self, X):
-        return self._decision_function(X)
-
-    def predict(self, X):
-        p = self._dense_predict(X.astype(numpy.float64))
-        return p
-
-
-class NuSVC_raw(NuSVC):
-
-    def decision_function(self, X):
-        return self._decision_function(X)
-
-    def predict(self, X):
-        p = self._dense_predict(X.astype(numpy.float64))
-        return p
-
-
 class TestSklearnSVM(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        update_registered_converter(
-            SVC_raw,
-            "SVC_raw",
-            calculate_sklearn_svm_output_shapes,
-            convert_sklearn_svm)
-        update_registered_converter(
-            NuSVC_raw,
-            "NuSVC_raw",
-            calculate_sklearn_svm_output_shapes,
-            convert_sklearn_svm)
 
     def _fit_binary_classification(self, model):
         iris = load_iris()
@@ -107,7 +69,9 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svc_binary_linear_pfalse(self):
         model, X = self._fit_binary_classification(
-            SVC(kernel="linear", probability=False))
+            SVC(kernel="linear", probability=False,
+                decision_function_shape='ovo'))
+
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -133,10 +97,24 @@ class TestSklearnSVM(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')"
         )
+        model_onnx = convert_sklearn(
+            model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'zipmap': False}})
+        nodes = model_onnx.graph.node
+        self.assertIsNotNone(nodes)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinSVCLinearPF-NoProbOpp",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " < StrictVersion('0.5.0')"
+        )
 
     def test_convert_svc_binary_linear_ptrue(self):
         model, X = self._fit_binary_classification(
             SVC(kernel="linear", probability=True))
+
         model_onnx = convert_sklearn(
             model, "SVC", [("input",
                             FloatTensorType([None, X.shape[1]]))])
@@ -166,7 +144,8 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svc_multi_linear_pfalse(self):
         model, X = self._fit_multi_classification(
-            SVC_raw(kernel="linear", probability=False))
+            SVC(kernel="linear", probability=False,
+                decision_function_shape='ovo'))
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -193,9 +172,20 @@ class TestSklearnSVM(unittest.TestCase):
                           " < StrictVersion('0.5.0')"
         )
 
+    def test_convert_svc_multi_linear_pfalse_ovr(self):
+        model, X = self._fit_multi_classification(
+            SVC(kernel="linear", probability=False,
+                decision_function_shape='ovr'))
+        try:
+            convert_sklearn(
+                model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
+            raise AssertionError('not implemented')
+        except RuntimeError:
+            pass
+
     def test_convert_svc_multi_linear_ptrue(self):
         model, X = self._fit_multi_classification(
-            SVC_raw(kernel="linear", probability=False))
+            SVC(kernel="linear", probability=True))
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -245,7 +235,8 @@ class TestSklearnSVM(unittest.TestCase):
                             basename="SklearnRegSVRLinear-Dec3")
 
     def test_convert_nusvc_binary_pfalse(self):
-        model, X = self._fit_binary_classification(NuSVC(probability=False))
+        model, X = self._fit_binary_classification(
+            NuSVC(probability=False, decision_function_shape='ovo'))
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -305,7 +296,8 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_nusvc_multi_pfalse(self):
         model, X = self._fit_multi_classification(
-            NuSVC_raw(probability=False, nu=0.1))
+            NuSVC(probability=False, nu=0.1,
+                  decision_function_shape='ovo'))
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -334,7 +326,8 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svc_multi_pfalse_4(self):
         model, X = self._fit_multi_classification(
-            SVC_raw(probability=False), 4)
+            SVC(probability=False,
+                decision_function_shape='ovo'), 4)
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
@@ -354,9 +347,9 @@ class TestSklearnSVM(unittest.TestCase):
         reason="break_ties introduced after 0.22.dev")
     def test_convert_svc_multi_pfalse_4_break_ties(self):
         model, X = self._fit_multi_classification(
-            SVC_raw(probability=False, break_ties=True), 4)
+            SVC(probability=True, break_ties=True), 4)
         model_onnx = convert_sklearn(
-            model, "SVC_raw", [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         dump_data_and_model(
@@ -493,4 +486,5 @@ class TestSklearnSVM(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestSklearnSVM().test_convert_svc_multi_linear_pfalse_ovr()
     unittest.main()
