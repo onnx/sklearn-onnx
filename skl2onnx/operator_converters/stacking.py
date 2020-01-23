@@ -74,7 +74,9 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
         scope, operator, container, stacking_op)
     prob = _fetch_scores(
         scope, container, stacking_op.final_estimator_, merged_proba_tensor,
-        output_proba=operator.outputs[1], raw_scores=use_raw_scores)
+        output_proba=None, raw_scores=use_raw_scores)
+    container.add_node('Identity', prob, operator.outputs[1].onnx_name,
+                       name=scope.get_unique_operator_name('OpProb'))
     container.add_node('ArgMax', prob,
                        argmax_output_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
