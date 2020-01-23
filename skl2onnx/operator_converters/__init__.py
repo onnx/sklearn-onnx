@@ -43,6 +43,7 @@ from . import random_forest
 from . import ransac_regressor
 from . import scaler_op
 from . import sgd_classifier
+from . import stacking
 from . import support_vector_machines
 from . import text_vectoriser
 from . import tfidf_transformer
@@ -89,6 +90,7 @@ __all__ = [
     ransac_regressor,
     scaler_op,
     sgd_classifier,
+    stacking,
     support_vector_machines,
     text_vectoriser,
     tfidf_transformer,

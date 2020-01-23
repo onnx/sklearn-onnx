@@ -59,8 +59,11 @@ from sklearn.ensemble import (
     VotingClassifier
 )
 try:
+    from sklearn.ensemble import StackingClassifier
     from sklearn.ensemble import VotingRegressor
 except ImportError:
+    # New in 0.22
+    StackingClassifier = None
     # New in 0.21
     VotingRegressor = None
 from sklearn.tree import (
@@ -184,7 +187,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     LinearSVC, SVC, NuSVC,
     GradientBoostingClassifier, RandomForestClassifier,
     DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
-    BaggingClassifier,
+    BaggingClassifier, StackingClassifier,
     BernoulliNB, CategoricalNB, ComplementNB, GaussianNB, MultinomialNB,
     KNeighborsClassifier,
     CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
@@ -227,6 +230,7 @@ def build_sklearn_operator_name_map():
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
+                StackingClassifier,
                 VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
                 PCA, TruncatedSVD, IncrementalPCA,
