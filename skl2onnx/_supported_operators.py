@@ -59,13 +59,15 @@ from sklearn.ensemble import (
     VotingClassifier
 )
 try:
-    from sklearn.ensemble import StackingClassifier
     from sklearn.ensemble import VotingRegressor
+except ImportError:
+    # New in 0.21
+    VotingRegressor = None
+try:
+    from sklearn.ensemble import StackingClassifier
 except ImportError:
     # New in 0.22
     StackingClassifier = None
-    # New in 0.21
-    VotingRegressor = None
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
     ExtraTreeClassifier, ExtraTreeRegressor
