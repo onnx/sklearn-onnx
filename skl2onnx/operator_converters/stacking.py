@@ -17,18 +17,37 @@ from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
 
-def _fetch_scores(scope, container, model, inputs, raw_scores=False):
+def _fetch_scores(scope, container, model, inputs, raw_scores=False,
+                  is_regressor=False):
     op_type = sklearn_operator_name_map[type(model)]
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = model
     container.add_options(id(model), {'raw_scores': raw_scores})
     this_operator.inputs.append(inputs)
     label_name = scope.declare_local_variable('label')
-    output_proba = scope.declare_local_variable(
-        'probability_tensor', FloatTensorType())
     this_operator.outputs.append(label_name)
-    this_operator.outputs.append(output_proba)
+    if is_regressor:
+        output_proba = label_name
+    else:
+        output_proba = scope.declare_local_variable(
+            'probability_tensor', FloatTensorType())
+        this_operator.outputs.append(output_proba)
     return output_proba.full_name
+
+
+def _transform_regressor(scope, operator, container, model):
+    merged_prob_tensor = scope.declare_local_variable(
+        'merged_probability_tensor', FloatTensorType())
+
+    predictions = [
+        _fetch_scores(
+            scope, container, est, operator.inputs[0], is_regressor=True)
+        for est in model.estimators_
+    ]
+
+    apply_concat(
+        scope, predictions, merged_prob_tensor.full_name, container, axis=1)
+    return merged_prob_tensor
 
 
 def _transform(scope, operator, container, model):
@@ -67,6 +86,11 @@ def _transform(scope, operator, container, model):
 
 
 def convert_sklearn_stacking_classifier(scope, operator, container):
+    """
+    Converter for StackingClassifier. It invokes converters for each
+    estimator, concatenating their results before calling converter
+    for the final estimator on the concatenated score.
+    """
     stacking_op = operator.raw_operator
     classes = stacking_op.classes_
     options = container.get_options(stacking_op, dict(raw_scores=False))
@@ -115,8 +139,27 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
                       desired_shape=(-1,))
 
 
+def convert_sklearn_stacking_regressor(scope, operator, container):
+    """
+    Converter for StackingRegressor. It invokes converters for each
+    estimator, concatenating their results before calling converter
+    for the final estimator on the concatenated score.
+    """
+    stacking_op = operator.raw_operator
+
+    merged_proba_tensor = _transform_regressor(
+        scope, operator, container, stacking_op)
+    prob = _fetch_scores(
+        scope, container, stacking_op.final_estimator_, merged_proba_tensor,
+        is_regressor=True)
+    container.add_node('Identity', prob, operator.outputs[0].full_name,
+                       name=scope.get_unique_operator_name('Identity'))
+
+
 register_converter('SklearnStackingClassifier',
                    convert_sklearn_stacking_classifier,
                    options={'zipmap': [True, False],
                             'nocl': [True, False],
                             'raw_scores': [True, False]})
+register_converter('SklearnStackingRegressor',
+                   convert_sklearn_stacking_regressor)

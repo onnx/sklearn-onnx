@@ -64,7 +64,7 @@ except ImportError:
     # New in 0.21
     VotingRegressor = None
 try:
-    from sklearn.ensemble import StackingClassifier
+    from sklearn.ensemble import StackingClassifier, StackingRegressor
 except ImportError:
     # New in 0.22
     StackingClassifier = None
@@ -232,7 +232,7 @@ def build_sklearn_operator_name_map():
                 OneVsRestClassifier,
                 RandomForestClassifier, RandomForestRegressor,
                 SGDClassifier,
-                StackingClassifier,
+                StackingClassifier, StackingRegressor,
                 VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
                 PCA, TruncatedSVD, IncrementalPCA,
