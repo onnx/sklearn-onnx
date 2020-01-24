@@ -328,8 +328,14 @@ def convert_nearest_neighbors_transform(scope, operator, container):
 
 
 register_converter(
-    'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier)
+    'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier,
+    options={'zipmap': [True, False],
+             'nocl': [True, False],
+             'raw_scores': [True, False],
+             'optim': [None, 'cdist']})
 register_converter(
-    'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor)
+    'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,
+    options={'optim': [None, 'cdist']})
 register_converter(
-    'SklearnNearestNeighbors', convert_nearest_neighbors_transform)
+    'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
+    options={'optim': [None, 'cdist']})

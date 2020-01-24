@@ -85,9 +85,9 @@ def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
             XA, XB, dtype=dtype, op_version=op_version,
             dim_in=dim_in, dim_out=dim_out, **kwargs)
     elif metric == 'euclidean':
-        res = _onnx_cdist_sqeuclidean(XA, XB, dtype=dtype,
-                                      op_version=op_version,
-                                      dim_in=dim_in, dim_out=dim_out)
+        res = _onnx_cdist_sqeuclidean(
+            XA, XB, dtype=dtype, op_version=op_version,
+            dim_in=dim_in, dim_out=dim_out)
         return OnnxSqrt(res, op_version=op_version, **kwargs)
     elif metric == 'minkowski':
         p = kwargs.pop('p')

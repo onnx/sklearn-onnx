@@ -425,4 +425,6 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
 
 register_converter('SklearnCalibratedClassifierCV',
-                   convert_sklearn_calibrated_classifier_cv)
+                   convert_sklearn_calibrated_classifier_cv,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})

@@ -189,6 +189,9 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
 
 
 register_converter('SklearnBaggingClassifier',
-                   convert_sklearn_bagging_classifier)
+                   convert_sklearn_bagging_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
 register_converter('SklearnBaggingRegressor',
                    convert_sklearn_bagging_regressor)
