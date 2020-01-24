@@ -116,4 +116,7 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
 
 
 register_converter('SklearnStackingClassifier',
-                   convert_sklearn_stacking_classifier)
+                   convert_sklearn_stacking_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})

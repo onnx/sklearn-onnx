@@ -405,7 +405,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 [("input", StringTensorType([None, 1]))],
                 options=extra,
             )
-        except RuntimeError:
+        except (RuntimeError, NameError):
             pass
 
         extra = {

@@ -157,5 +157,10 @@ def convert_sklearn_linear_classifier(scope, operator, container):
 
 
 register_converter('SklearnLinearClassifier',
-                   convert_sklearn_linear_classifier)
-register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier)
+                   convert_sklearn_linear_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
+register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier,
+                   options={'nocl': [True, False],
+                            'raw_scores': [True, False]})

@@ -452,7 +452,8 @@ class OnnxOperator:
 
         if target_opset is None:
             target_opset = get_opset_number_from_onnx()
-        container = ModelComponentContainer(target_opset, dtype=dtype)
+        container = ModelComponentContainer(
+            target_opset, dtype=dtype)
         if container.target_opset < 9 and self.domain in ('', None):
             raise RuntimeError("The operator cannot be converted into ONNX."
                                " It requires ONNX op_set >= 9 (={}, "

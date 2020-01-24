@@ -37,4 +37,5 @@ def convert_sklearn_tfidf_vectoriser(scope, operator, container):
                    operator.outputs[0].full_name, container)
 
 
-register_converter('SklearnTfidfVectorizer', convert_sklearn_tfidf_vectoriser)
+register_converter('SklearnTfidfVectorizer', convert_sklearn_tfidf_vectoriser,
+                   options={'tokenexp': None, 'separators': None})

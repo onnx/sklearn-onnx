@@ -33,8 +33,11 @@ except ImportError:
 from ._supported_operators import (
     _get_sklearn_operator_name, cluster_list, outlier_list
 )
-from ._supported_operators import sklearn_classifier_list
+from ._supported_operators import (
+    sklearn_classifier_list, sklearn_operator_name_map
+)
 from .common._container import SklearnModelContainerNode
+from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology
 from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
@@ -448,7 +451,10 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
             raw_model_container, initial_types=initial_types,
             target_opset=target_opset,
             custom_conversion_functions=custom_conversion_functions,
-            custom_shape_calculators=custom_shape_calculators)
+            custom_shape_calculators=custom_shape_calculators,
+            registered_models=dict(
+                conv=_converter_pool, shape=_shape_calculator_pool,
+                aliases=sklearn_operator_name_map))
 
     # Declare an object to provide variables' and operators' naming mechanism.
     # In contrast to CoreML, one global scope

@@ -140,5 +140,7 @@ def convert_sklearn_svm(scope, operator, container):
 
 
 register_converter('SklearnOneClassSVM', convert_sklearn_svm)
-register_converter('SklearnSVC', convert_sklearn_svm)
+register_converter('SklearnSVC', convert_sklearn_svm,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnSVR', convert_sklearn_svm)

@@ -216,6 +216,35 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             "== StrictVersion('1.4.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_grid_search_binary_float_nozipmap(self):
+        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        clf = GridSearchCV(
+            LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
+                               multi_class='ovr'),
+            tuned_parameters, cv=5, iid=False)
+        model, X = fit_classification_model(clf, n_classes=2)
+        model_onnx = convert_sklearn(
+            model,
+            "GridSearchCV",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(clf): {'zipmap': False, 'raw_scores': True}}
+        )
+        self.assertIsNotNone(model_onnx)
+        assert "zipmap" not in str(model_onnx).lower()
+        assert '"LOGISTIC"' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGridSearchBinaryFloat-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function']
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
