@@ -559,15 +559,52 @@ class Topology:
                         # an output somewhere
                         if variable.is_fed:
                             raise RuntimeError(
-                                'One variable can only be '
-                                'assigned once: {}.'.format(variable))
+                                "A variable is already assigned ({}) "
+                                "for operator '{}' (name='{}'). This "
+                                "may still happen if a converter is a "
+                                "combination of sub-operators and one of "
+                                "of them is producing this output. "
+                                "In that case, an identity node must be "
+                                "added.".format(
+                                    variable, operator.type,
+                                    operator.onnx_name))
                         # Mark this variable as filled
                         variable.is_fed = True
                     # Make this operator as handled
                     operator.is_evaluated = True
                     is_evaluation_happened = True
+
                     # Send out an operator
                     yield operator
+
+                    # This step may create new nodes if the
+                    # the converter is called while looping on
+                    # the nodes. The outputs of an operator
+                    # are not necessary the inputs of the next
+                    # one and but can processed by other ONNX nodes
+                    # inserted in the container. As a result, some
+                    # variables never have is_fed set to True which
+                    # is updated now unless they are an operator
+                    # output.
+                    known_outputs = {}
+                    for op in self.unordered_operator_iterator():
+                        for out in op.outputs:
+                            if hasattr(out, 'onnx_name'):
+                                known_outputs[out.onnx_name] = out
+                            else:
+                                known_outputs[out] = out
+                    for variable in self.unordered_variable_iterator():
+                        if variable.is_fed:
+                            continue
+                        if variable.onnx_name in known_outputs:
+                            continue
+                        update = (False if self.root_names and
+                                  variable.onnx_name not in self.root_names
+                                  else True)
+                        if update:
+                            variable.is_fed = True
+                            is_evaluation_happened = True
+
             # After scanning through the whole computational graph, at
             # least one operator should be evaluated. If not, we need
             # to terminate this procedure to avoid dead lock.

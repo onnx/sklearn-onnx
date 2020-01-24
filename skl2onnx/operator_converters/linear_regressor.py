@@ -3,8 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
-import collections
+try:
+    import collections.abc as cabc
+except ImportError:
+    import collections as cabc
 import numpy as np
 from ..common._apply_operation import apply_cast
 from ..common.data_types import Int64TensorType
@@ -19,7 +21,7 @@ def convert_sklearn_linear_regressor(scope, operator, container):
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs['coefficients'] = op.coef_.astype(dtype).ravel()
     attrs['intercepts'] = (op.intercept_.astype(dtype)
-                           if isinstance(op.intercept_, collections.Iterable)
+                           if isinstance(op.intercept_, cabc.Iterable)
                            else np.array([op.intercept_], dtype=dtype))
     if len(op.coef_.shape) == 2:
         attrs['targets'] = op.coef_.shape[0]
