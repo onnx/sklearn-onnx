@@ -68,6 +68,7 @@ try:
 except ImportError:
     # New in 0.22
     StackingClassifier = None
+    StackingRegressor = None
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
     ExtraTreeClassifier, ExtraTreeRegressor
