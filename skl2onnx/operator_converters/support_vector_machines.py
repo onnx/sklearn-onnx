@@ -67,6 +67,10 @@ def convert_sklearn_svm(scope, operator, container):
 
         if len(op.probA_) > 0:
             svm_attrs['prob_a'] = op.probA_
+        elif op.decision_function_shape == 'ovr':
+            raise RuntimeError(
+                "decision_function_shape == 'ovr' is not supported. "
+                "Please raise an issue if you need to be implemented.")
         if len(op.probB_) > 0:
             svm_attrs['prob_b'] = op.probB_
 
