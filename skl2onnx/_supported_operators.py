@@ -288,7 +288,7 @@ def build_sklearn_operator_name_map():
 
 
 def update_registered_converter(model, alias, shape_fct, convert_fct,
-                                overwrite=True, parser=None):
+                                overwrite=True, parser=None, options=None):
     """
     Registers or updates a converter for a new model so that
     it can be converted when inserted in a *scikit-learn* pipeline.
@@ -303,25 +303,29 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     :param overwrite: False to raise exception if a converter
         already exists
     :param parser: overwrites the parser as well if not empty
+    :param options: registered options for this converter
 
     The alias is usually the library name followed by the model name.
     Example:
 
     ::
 
-        from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
+        from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
         from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
         from skl2onnx import update_registered_converter
         update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                     calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier)
+                                    convert_sklearn_random_forest_classifier,
+                                    options={'zipmap': [True, False],
+                                             'raw_scores': [True, False]})
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
             and alias != sklearn_operator_name_map[model]):
         warnings.warn("Model '{0}' was already registered under alias "
                       "'{1}'.".format(model, sklearn_operator_name_map[model]))
     sklearn_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite)
+    register_converter(alias, convert_fct, overwrite=overwrite,
+                       options=options)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
     if parser is not None:
         from ._parse import update_registered_parser

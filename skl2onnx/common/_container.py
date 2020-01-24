@@ -63,11 +63,28 @@ def _get_operation_list():
     return res
 
 
-def _build_options(model, defined_options, default_values):
+def _build_options(model, defined_options, default_values, allowed_options):
     opts = {} if default_values is None else default_values
     if defined_options is not None:
         opts.update(defined_options.get(type(model), {}))
         opts.update(defined_options.get(id(model), {}))
+    if allowed_options not in (None, 'passthrough'):
+        for k, v in opts.items():
+            if k not in allowed_options:
+                raise NameError(
+                    "Option '{}' not in {} for class '{}'.".format(
+                        k, list(sorted(allowed_options)),
+                        model.__class__.__name__))
+            allowed = allowed_options[k]
+            if allowed is not None and v not in allowed:
+                raise ValueError(
+                    "Unexpected value for option '{}' (it must be in {}) for "
+                    "model '{}'.".format(
+                        k, allowed, model.__class__.__name__))
+    elif len(opts) != 0 and allowed_options != 'passthrough':
+        raise RuntimeError(
+            "Options {} are not registerd for model '{}'.".format(
+                list(sorted(opts)), model.__class__.__name__))
     return opts
 
 
@@ -163,12 +180,14 @@ class ModelComponentContainer(ModelContainer):
     *ONNX* *ModelProto*.
     """
 
-    def __init__(self, target_opset, options=None, dtype=None):
+    def __init__(self, target_opset, options=None, dtype=None,
+                 registered_models=None):
         """
         :param target_opset: number, for example, 7 for *ONNX 1.2*, and
                              8 for *ONNX 1.3*.
         :param dtype: float type to be used for every float coefficient
         :param options: see :ref:`l-conv-options`
+        :param registered_models: registered models
         """
         if dtype is None:
             raise ValueError("dtype must be specified, it should be either "
@@ -194,6 +213,8 @@ class ModelComponentContainer(ModelContainer):
         self.target_opset = target_opset
         # Additional options given to converters.
         self.options = options
+        # All registered models.
+        self.registered_models = registered_models
 
         self.dtype = dtype
         if dtype == np.float32:
@@ -455,6 +476,20 @@ class ModelComponentContainer(ModelContainer):
                 "node '{}'.".format(
                     op_version, self.target_opset, node.op_type))
 
+    def _get_allowed_options(self, model):
+        if self.registered_models is not None:
+            alias = self.registered_models['aliases'][type(model)]
+            conv = self.registered_models['conv'][alias]
+            allowed = conv.get_allowed_options()
+            if allowed is None:
+                raise AssertionError(
+                    "No option is registered for model '{}'.".format(
+                        model.__class__.__name__))
+            return allowed
+        raise NotImplementedError(
+            "No registered models, no known allowed options "
+            "for model '{}'.".format(model.__class__.__name__))
+
     def get_options(self, model, default_values=None):
         """
         Returns additional options for a model.
@@ -464,4 +499,6 @@ class ModelComponentContainer(ModelContainer):
                                the function)
         :return: dictionary
         """
-        return _build_options(model, self.options, default_values)
+        return _build_options(
+            model, self.options, default_values,
+            self._get_allowed_options(model))

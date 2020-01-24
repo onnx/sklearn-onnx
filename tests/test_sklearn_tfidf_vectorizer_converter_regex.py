@@ -291,7 +291,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             convert_sklearn(vect, 'TfidfVectorizer',
                             [('input', StringTensorType([1]))],
                             options=extra)
-        except RuntimeError:
+        except (RuntimeError, NameError):
             pass
 
         extra = {id(vect): {"separators": [
