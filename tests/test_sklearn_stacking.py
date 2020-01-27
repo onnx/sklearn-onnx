@@ -1,7 +1,6 @@
-"""Tests VotingRegressor converter."""
+"""Tests StackingClassifier and StackingRegressor converter."""
 
 import unittest
-import numpy
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 try:
@@ -40,37 +39,37 @@ class TestStackingConverter(unittest.TestCase):
 
     @unittest.skipIf(StackingRegressor is None,
                      reason="new in 0.22")
-    def _test_model_stacking_regression(self):
+    def test_model_stacking_regression(self):
         model, X = fit_regression_model(model_to_test_reg())
         model_onnx = convert_sklearn(
-            model, "voting regression",
+            model, "stacking regressor",
             [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
-            basename="SklearnStackingRegressor",
+            basename="SklearnStackingRegressor-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
             comparable_outputs=[0]
         )
 
-    @unittest.skipIf(StackingRegressor is None,
+    @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
     def test_model_stacking_classifier(self):
         model, X = fit_classification_model(
             model_to_test_cl(), n_classes=2)
         model_onnx = convert_sklearn(
-            model, "voting regression",
+            model, "stacking classifier",
             [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32),
+            X,
             model,
             model_onnx,
-            basename="SklearnStackingRegressor",
+            basename="SklearnStackingClassifier",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
