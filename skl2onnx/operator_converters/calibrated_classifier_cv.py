@@ -236,10 +236,6 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                 operator.raw_operator.__class__.__name__))
 
     base_model = model.base_estimator
-    if not hasattr(base_model, "predict_proba"):
-        raise NotImplementedError(
-            "Converter is not implemented (no method decision_function) "
-            "for base_estimator={}".format(base_model))
     op_type = sklearn_operator_name_map[type(base_model)]
     n_classes = len(model.classes_)
     prob_name = [None] * n_classes

@@ -195,8 +195,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                 [("input", FloatTensorType([None, X.shape[1]]))])
             raise AssertionError(
                 "SVC has no decision_function for ovr")
-        except NotImplementedError as e:
-            assert "Converter is not implemented" in str(e)
+        except RuntimeError as e:
+            assert "'ovr' is not supported" in str(e)
 
 
 if __name__ == "__main__":
