@@ -321,7 +321,8 @@ def convert_nearest_neighbors_transform(scope, operator, container):
     out = operator.outputs
 
     ind = OnnxIdentity(top_indices, output_names=out[:1])
-    dist = OnnxIdentity(top_distances, output_names=out[1:])
+    dist = OnnxMul(top_distances, np.array([-1], dtype=container.dtype),
+                   output_names=out[1:])
 
     dist.add_to(scope, container)
     ind.add_to(scope, container)
