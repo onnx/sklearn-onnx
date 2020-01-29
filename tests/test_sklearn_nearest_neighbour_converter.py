@@ -4,14 +4,21 @@ Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 import unittest
 from distutils.version import StrictVersion
 import numpy
+from numpy.testing import assert_almost_equal
+from pandas import DataFrame
+from onnx.defs import onnx_opset_version
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+from sklearn.neighbors import (
+    KNeighborsRegressor,
+    KNeighborsClassifier,
+    NearestNeighbors
+)
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import onnxruntime
 from onnxruntime import InferenceSession
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
@@ -150,7 +157,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsClassifierBinary")
 
-    @unittest.skipIf(True, reason="later")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
@@ -330,6 +336,31 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:2],
             model, model_onnx,
             basename="SklearnKNeighborsRegressorPipe2")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_onnx_test_knn_transform(self):
+        iris = datasets.load_iris()
+        X, _ = iris.data, iris.target
+
+        X_train, X_test = train_test_split(X, random_state=11)
+        clr = NearestNeighbors(n_neighbors=3)
+        clr.fit(X_train)
+
+        for to in (9, 10, 11):
+            if to > onnx_opset_version():
+                break
+            model_def = to_onnx(clr, X_train.astype(numpy.float32),
+                                target_opset=to)
+            oinf = InferenceSession(model_def.SerializeToString())
+
+            X_test = X_test[:3]
+            y = oinf.run(None, {'X': X_test.astype(numpy.float32)})
+            dist, ind = clr.kneighbors(X_test)
+
+            assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
+            assert_almost_equal(ind, y[0])
 
 
 if __name__ == "__main__":

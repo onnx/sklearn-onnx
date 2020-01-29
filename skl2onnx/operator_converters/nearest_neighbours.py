@@ -82,9 +82,11 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
         node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
                            largest=0, sorted=1,
                            op_version=11, **kwargs)
+        if keep_distances:
+            return (node[1], OnnxMul(node[0], np.array(
+                [-1], dtype=dtype), op_version=op_version))
     if keep_distances:
-        return (node[1], OnnxMul(node[0], np.array(
-            [-1], dtype=dtype), op_version=op_version))
+        return (node[1], node[0])
     return node[1]
 
 
@@ -320,9 +322,11 @@ def convert_nearest_neighbors_transform(scope, operator, container):
 
     out = operator.outputs
 
-    ind = OnnxIdentity(top_indices, output_names=out[:1])
-    dist = OnnxMul(top_distances, np.array([-1], dtype=container.dtype),
-                   output_names=out[1:])
+    ind = OnnxIdentity(top_indices, output_names=out[:1],
+                       op_version=container.target_opset)
+    dist = OnnxMul(
+        top_distances, np.array([-1], dtype=container.dtype),
+        output_names=out[1:], op_version=container.target_opset)
 
     dist.add_to(scope, container)
     ind.add_to(scope, container)
