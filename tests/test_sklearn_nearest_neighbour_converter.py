@@ -347,15 +347,17 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         clr = NearestNeighbors(n_neighbors=3)
         clr.fit(X_train)
 
-        model_def = to_onnx(clr, X_train.astype(numpy.float32))
-        oinf = InferenceSession(model_def.SerializeToString())
+        for to in (9, 10, 11):
+            model_def = to_onnx(clr, X_train.astype(numpy.float32),
+                                target_opset=to)
+            oinf = InferenceSession(model_def.SerializeToString())
 
-        X_test = X_test[:3]
-        y = oinf.run(None, {'X': X_test.astype(numpy.float32)})
-        dist, ind = clr.kneighbors(X_test)
+            X_test = X_test[:3]
+            y = oinf.run(None, {'X': X_test.astype(numpy.float32)})
+            dist, ind = clr.kneighbors(X_test)
 
-        assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
-        assert_almost_equal(ind, y[0])
+            assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
+            assert_almost_equal(ind, y[0])
 
 
 if __name__ == "__main__":
