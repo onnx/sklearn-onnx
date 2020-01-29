@@ -151,7 +151,7 @@ jobs:
     displayName: 'pytest'
 
   - script: |
-      pip install lightgbm xgboost
+      conda install -c conda-forge lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
 
