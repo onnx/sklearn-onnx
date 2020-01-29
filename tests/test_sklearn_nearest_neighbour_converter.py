@@ -6,6 +6,7 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
+from onnx.defs import onnx_opset_version
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
@@ -348,6 +349,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         clr.fit(X_train)
 
         for to in (9, 10, 11):
+            if to > onnx_opset_version():
+                break
             model_def = to_onnx(clr, X_train.astype(numpy.float32),
                                 target_opset=to)
             oinf = InferenceSession(model_def.SerializeToString())
