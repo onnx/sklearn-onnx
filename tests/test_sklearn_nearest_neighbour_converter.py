@@ -12,14 +12,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
     KNeighborsRegressor,
     KNeighborsClassifier,
-    NearestNeighbors
+    NearestNeighbors,
+    NeighborhoodComponentsAnalysis,
 )
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import onnxruntime
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn, to_onnx
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    DoubleTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
@@ -361,6 +366,74 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
             assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
             assert_almost_equal(ind, y[0])
+
+    def test_sklearn_nca_default(self):
+        model, X_test = fit_classification_model(
+            NeighborhoodComponentsAnalysis(random_state=42), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "NCA ",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnNCADefault",
+        )
+
+    def test_sklearn_nca_identity(self):
+        model, X_test = fit_classification_model(
+            NeighborhoodComponentsAnalysis(
+                init='identity', max_iter=4, random_state=42), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "NCA ",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnNCAIdentity",
+        )
+
+    def test_sklearn_nca_double(self):
+        model, X_test = fit_classification_model(
+            NeighborhoodComponentsAnalysis(
+                n_components=2, max_iter=4, random_state=42), 3)
+        X_test = X_test.astype(numpy.float64)
+        model_onnx = convert_sklearn(
+            model,
+            "NCA ",
+            [("input", DoubleTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnNCADouble",
+        )
+
+    def test_sklearn_nca_int(self):
+        model, X_test = fit_classification_model(
+            NeighborhoodComponentsAnalysis(
+                init='pca', max_iter=4, random_state=42), 3, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "NCA ",
+            [("input", Int64TensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnNCAInt",
+        )
 
 
 if __name__ == "__main__":

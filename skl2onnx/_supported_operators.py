@@ -84,9 +84,12 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import (
+    KNeighborsClassifier,
+    KNeighborsRegressor,
+    NearestNeighbors,
+    NeighborhoodComponentsAnalysis,
+)
 
 # Naive Bayes
 from sklearn.naive_bayes import (
@@ -231,6 +234,7 @@ def build_sklearn_operator_name_map():
                 StackingClassifier, StackingRegressor,
                 VotingClassifier, VotingRegressor,
                 KMeans, MiniBatchKMeans,
+                NeighborhoodComponentsAnalysis,
                 PCA, TruncatedSVD, IncrementalPCA,
                 Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
