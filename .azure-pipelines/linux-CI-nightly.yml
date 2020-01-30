@@ -116,6 +116,7 @@ jobs:
     displayName: 'pytest'
 
   - script: |
+      python -m pip install openpyxl
       python tests/benchmark.py
     displayName: 'benchmark'
 
