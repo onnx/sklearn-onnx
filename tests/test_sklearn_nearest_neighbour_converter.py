@@ -367,6 +367,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
             assert_almost_equal(ind, y[0])
 
+    @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
+                     reason="new in 0.22")
     def test_sklearn_nca_default(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(random_state=42), 3)
@@ -383,6 +385,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnNCADefault",
         )
 
+    @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
+                     reason="new in 0.22")
     def test_sklearn_nca_identity(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(
@@ -400,6 +404,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnNCAIdentity",
         )
 
+    @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
+                     reason="new in 0.22")
     def test_sklearn_nca_double(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(
@@ -418,6 +424,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnNCADouble",
         )
 
+    @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
+                     reason="new in 0.22")
     def test_sklearn_nca_int(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(

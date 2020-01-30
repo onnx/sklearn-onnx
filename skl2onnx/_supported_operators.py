@@ -88,8 +88,14 @@ from sklearn.neighbors import (
     KNeighborsClassifier,
     KNeighborsRegressor,
     NearestNeighbors,
-    NeighborhoodComponentsAnalysis,
 )
+try:
+    from sklearn.neighbors import (
+        NeighborhoodComponentsAnalysis,
+    )
+except ImportError:
+    # New in 0.22
+    NeighborhoodComponentsAnalysis = None
 
 # Naive Bayes
 from sklearn.naive_bayes import (
