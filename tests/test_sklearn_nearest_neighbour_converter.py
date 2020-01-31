@@ -13,8 +13,14 @@ from sklearn.neighbors import (
     KNeighborsRegressor,
     KNeighborsClassifier,
     NearestNeighbors,
-    NeighborhoodComponentsAnalysis,
 )
+try:
+    from sklearn.neighbors import (
+        NeighborhoodComponentsAnalysis,
+    )
+except ImportError:
+    # New in 0.22
+    NeighborhoodComponentsAnalysis = None
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import onnxruntime
