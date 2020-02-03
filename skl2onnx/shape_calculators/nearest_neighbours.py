@@ -12,6 +12,23 @@ from ..common.utils import check_input_and_output_numbers
 from ..common.utils import check_input_and_output_types
 
 
+def calculate_sklearn_neighbours_transformer(operator):
+    check_input_and_output_numbers(operator, input_count_range=1,
+                                   output_count_range=1)
+    check_input_and_output_types(
+        operator, good_input_types=[
+            FloatTensorType, Int64TensorType, DoubleTensorType])
+
+    N = operator.inputs[0].type.shape[0]
+    n_samples_fit = operator.raw_operator.n_samples_fit_
+    output_type = (
+        DoubleTensorType
+        if isinstance(operator.inputs[0].type, DoubleTensorType)
+        else FloatTensorType
+    )
+    operator.outputs[0].type = output_type([N, n_samples_fit])
+
+
 def calculate_sklearn_nearest_neighbours(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=[1, 2])
@@ -42,6 +59,8 @@ def calculate_sklearn_nca(operator):
     operator.outputs[0].type = output_type([N, n_components])
 
 
+register_shape_calculator('SklearnKNeighborsTransformer',
+                          calculate_sklearn_neighbours_transformer)
 register_shape_calculator('SklearnNearestNeighbors',
                           calculate_sklearn_nearest_neighbours)
 register_shape_calculator(
