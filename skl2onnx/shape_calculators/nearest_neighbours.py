@@ -25,5 +25,24 @@ def calculate_sklearn_nearest_neighbours(operator):
     operator.outputs[1].type.shape = [N, neighbours]
 
 
+def calculate_sklearn_nca(operator):
+    check_input_and_output_numbers(operator, input_count_range=1,
+                                   output_count_range=1)
+    check_input_and_output_types(
+        operator, good_input_types=[
+            FloatTensorType, Int64TensorType, DoubleTensorType])
+
+    N = operator.inputs[0].type.shape[0]
+    output_type = (
+        DoubleTensorType
+        if isinstance(operator.inputs[0].type, DoubleTensorType)
+        else FloatTensorType
+    )
+    n_components = operator.raw_operator.components_.shape[0]
+    operator.outputs[0].type = output_type([N, n_components])
+
+
 register_shape_calculator('SklearnNearestNeighbors',
                           calculate_sklearn_nearest_neighbours)
+register_shape_calculator(
+    'SklearnNeighborhoodComponentsAnalysis', calculate_sklearn_nca)
