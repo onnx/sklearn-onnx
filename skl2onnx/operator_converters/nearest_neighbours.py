@@ -14,6 +14,7 @@ from ..algebra.onnx_ops import (
     OnnxEqual,
     OnnxFlatten,
     OnnxIdentity,
+    OnnxMatMul,
     OnnxMax,
     OnnxMul,
     OnnxReciprocal,
@@ -34,7 +35,7 @@ except ImportError:
     OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist
 from ..common._registration import register_converter
-from ..common.data_types import Int64TensorType
+from ..common.data_types import DoubleTensorType, Int64TensorType
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
@@ -332,6 +333,28 @@ def convert_nearest_neighbors_transform(scope, operator, container):
     ind.add_to(scope, container)
 
 
+def convert_nca(scope, operator, container):
+    """
+    Converts *NeighborhoodComponentsAnalysis* into *ONNX*.
+    """
+    X = operator.inputs[0]
+    nca_op = operator.raw_operator
+    op_version = container.target_opset
+    out = operator.outputs
+    components = nca_op.components_.T
+
+    if isinstance(X.type, Int64TensorType):
+        X = OnnxCast(X, to=container.proto_dtype, op_version=op_version)
+    elif isinstance(X.type, DoubleTensorType):
+        components = OnnxCast(
+            components, to=onnx_proto.TensorProto.DOUBLE,
+            op_version=op_version)
+    res = OnnxMatMul(
+        X, components,
+        output_names=out[:1], op_version=op_version)
+    res.add_to(scope, container)
+
+
 register_converter(
     'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier,
     options={'zipmap': [True, False],
@@ -344,3 +367,5 @@ register_converter(
 register_converter(
     'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
     options={'optim': [None, 'cdist']})
+register_converter(
+    'SklearnNeighborhoodComponentsAnalysis', convert_nca)
