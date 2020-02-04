@@ -42,7 +42,7 @@ from ..proto import onnx_proto
 
 def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
                                    op_version=None, keep_distances=False,
-                                   optim=None, **kwargs):
+                                   optim=None, largest0=True, **kwargs):
     """
     Retrieves the nearest neigbours *ONNX*.
     :param X: features or *OnnxOperatorMixin*
@@ -54,6 +54,8 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
     :param keep_distance: returns the distances as well (second position)
     :param optim: implements specific optimisations,
         ``'cdist'`` replaces *Scan* operator by operator *CDist*
+    :param largest0: True to use ``TopK(-X, ...)``
+        instead of ``TopK(X, largest=0, ...)``
     :param kwargs: additional parameters for function @see fn onnx_cdist
     :return: top indices
     """
@@ -70,6 +72,7 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
                           **kwargs)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
+
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array(
             [-1], dtype=dtype), op_version=op_version)
@@ -79,13 +82,19 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
             [-1], dtype=dtype), op_version=op_version)
         node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
                            op_version=10, **kwargs)
-    else:
+    elif largest0:
         node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
                            largest=0, sorted=1,
                            op_version=11, **kwargs)
         if keep_distances:
             return (node[1], OnnxMul(node[0], np.array(
                 [-1], dtype=dtype), op_version=op_version))
+    else:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_11(neg_dist, np.array([k], dtype=np.int64),
+                           largest=1, sorted=1,
+                           op_version=11, **kwargs)
     if keep_distances:
         return (node[1], node[0])
     return node[1]
@@ -120,7 +129,8 @@ def _convert_nearest_neighbors(operator, container):
     if isinstance(X.type, Int64TensorType):
         X = OnnxCast(X, to=container.proto_dtype, op_version=opv)
 
-    options = container.get_options(op, dict(optim=None))
+    options = container.get_options(
+        op, dict(optim=None, largest0=True))
 
     single_reg = (not hasattr(op, '_y') or len(op._y.shape) == 1 or
                   len(op._y.shape) == 2 and op._y.shape[1] == 1)
@@ -142,6 +152,7 @@ def _convert_nearest_neighbors(operator, container):
         top_indices = onnx_nearest_neighbors_indices(
             X, neighb, k, metric=metric, dtype=dtype,
             op_version=opv, optim=options.get('optim', None),
+            largest0=options.get('largest0', True),
             **distance_kwargs)
         top_distances = None
     elif weights == 'distance':
@@ -149,6 +160,7 @@ def _convert_nearest_neighbors(operator, container):
             X, neighb, k, metric=metric, dtype=dtype,
             op_version=opv, keep_distances=True,
             optim=options.get('optim', None),
+            largest0=options.get('largest0', True),
             **distance_kwargs)
     else:
         raise RuntimeError(
@@ -357,15 +369,14 @@ def convert_nca(scope, operator, container):
 
 register_converter(
     'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier,
-    options={'zipmap': [True, False],
-             'nocl': [True, False],
-             'raw_scores': [True, False],
+    options={'zipmap': [True, False], 'nocl': [True, False],
+             'raw_scores': [True, False], 'largest0': [True, False],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,
-    options={'optim': [None, 'cdist']})
+    options={'optim': [None, 'cdist'], 'largest0': [True, False]})
 register_converter(
     'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
-    options={'optim': [None, 'cdist']})
+    options={'optim': [None, 'cdist'], 'largest0': [True, False]})
 register_converter(
     'SklearnNeighborhoodComponentsAnalysis', convert_nca)

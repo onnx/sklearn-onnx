@@ -370,8 +370,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             y = oinf.run(None, {'X': X_test.astype(numpy.float32)})
             dist, ind = clr.kneighbors(X_test)
 
-            assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
             assert_almost_equal(ind, y[0])
+            assert_almost_equal(dist, DataFrame(y[1]).values, decimal=5)
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
@@ -448,6 +448,98 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnNCAInt",
         )
+
+    def onnx_test_knn_single_classreg(
+            self, dtype, n_targets=1, debug=False, add_noise=False,
+            target_opset=None, optim=None, kind='reg',
+            level=1, largest0=True, **kwargs):
+        iris = datasets.load_iris()
+        X, y = iris.data, iris.target
+        if add_noise:
+            X += numpy.random.randn(X.shape[0], X.shape[1]) * 10
+        if kind == 'reg':
+            y = y.astype(dtype)
+        elif kind == 'bin':
+            y = (y % 2).astype(numpy.int64)
+        elif kind == 'mcl':
+            y = y.astype(numpy.int64)
+        else:
+            raise AssertionError("unknown '{}'".format(kind))
+
+        if n_targets != 1:
+            yn = numpy.empty((y.shape[0], n_targets), dtype=dtype)
+            for i in range(n_targets):
+                yn[:, i] = y + i
+            y = yn
+        X_train, X_test, y_train, _ = train_test_split(X, y, random_state=11)
+        X_test = X_test.astype(dtype)
+        if kind in ('bin', 'mcl'):
+            clr = KNeighborsClassifier(**kwargs)
+        elif kind == 'reg':
+            clr = KNeighborsRegressor(**kwargs)
+        clr.fit(X_train, y_train)
+
+        if optim is None:
+            options = None
+        else:
+            options = {clr.__class__: {'optim': 'cdist'}}
+        if not largest0:
+            if options is None:
+                options = {}
+            if clr.__class__ not in options:
+                options[clr.__class__] = {}
+            options[clr.__class__].update({'largest0': largest0})
+
+        model_def = to_onnx(clr, X_train.astype(dtype),
+                            dtype=dtype, target_opset=target_opset,
+                            options=options)
+        sess = InferenceSession(model_def.SerializeToString())
+
+        if debug:
+            y = sess.run(None, {'X': X_test}, verbose=level, fLOG=print)
+        else:
+            y = sess.run(None, {'X': X_test})
+
+        lexp = clr.predict(X_test)
+        if kind == 'reg':
+            if dtype == numpy.float32:
+                assert_almost_equal(lexp, y[0], decimal=5)
+            else:
+                assert_almost_equal(lexp, y[0])
+        else:
+            assert_almost_equal(lexp, y[0])
+            lprob = clr.predict_proba(X_test)
+            assert_almost_equal(lprob, DataFrame(y[1]).values, decimal=4)
+
+    def test_onnx_test_knn_single_weights_mcl32_9(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=False, target_opset=9, n_neighbors=3)
+
+    def test_onnx_test_knn_single_weights_mcl32_10(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=False, target_opset=10, n_neighbors=3)
+
+    def test_onnx_test_knn_single_weights_mcl32_11(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=False, target_opset=11, n_neighbors=3)
+
+    def test_onnx_test_knn_single_weights_mcl32_9T(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=True, target_opset=9, n_neighbors=3)
+
+    def test_onnx_test_knn_single_weights_mcl32_10T(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=True, target_opset=10, n_neighbors=3)
+
+    def test_onnx_test_knn_single_weights_mcl32_11T(self):
+        self.onnx_test_knn_single_classreg(
+            numpy.float32, kind='mcl', weights='distance',
+            largest0=True, target_opset=11, n_neighbors=3)
 
 
 if __name__ == "__main__":
