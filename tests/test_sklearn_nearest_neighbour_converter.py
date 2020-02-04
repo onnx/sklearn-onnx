@@ -16,10 +16,12 @@ from sklearn.neighbors import (
 )
 try:
     from sklearn.neighbors import (
+        KNeighborsTransformer,
         NeighborhoodComponentsAnalysis,
     )
 except ImportError:
     # New in 0.22
+    KNeighborsTransformer = None
     NeighborhoodComponentsAnalysis = None
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -380,7 +382,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             NeighborhoodComponentsAnalysis(random_state=42), 3)
         model_onnx = convert_sklearn(
             model,
-            "NCA ",
+            "NCA",
             [("input", FloatTensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
@@ -399,7 +401,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 init='identity', max_iter=4, random_state=42), 3)
         model_onnx = convert_sklearn(
             model,
-            "NCA ",
+            "NCA",
             [("input", FloatTensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
@@ -419,7 +421,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         X_test = X_test.astype(numpy.float64)
         model_onnx = convert_sklearn(
             model,
-            "NCA ",
+            "NCA",
             [("input", DoubleTensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
@@ -438,7 +440,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 init='pca', max_iter=4, random_state=42), 3, is_int=True)
         model_onnx = convert_sklearn(
             model,
-            "NCA ",
+            "NCA",
             [("input", Int64TensorType((None, X_test.shape[1])))],
         )
         self.assertIsNotNone(model_onnx)
@@ -447,6 +449,44 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnNCAInt",
+        )
+
+    @unittest.skipIf(KNeighborsTransformer is None,
+                     reason="new in 0.22")
+    def test_sklearn_k_neighbours_transformer_distance(self):
+        model, X_test = fit_classification_model(
+            KNeighborsTransformer(
+                n_neighbors=4, mode='distance'), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "KNN transformer",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnKNNTransformerDistance",
+        )
+
+    @unittest.skipIf(KNeighborsTransformer is None,
+                     reason="new in 0.22")
+    def test_sklearn_k_neighbours_transformer_connectivity(self):
+        model, X_test = fit_classification_model(
+            KNeighborsTransformer(
+                n_neighbors=3, mode='connectivity'), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "KNN transformer",
+            [("input", FloatTensorType((None, X_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnKNNTransformerConnectivity",
         )
 
 

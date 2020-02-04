@@ -91,7 +91,7 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
     return node[1]
 
 
-def _convert_nearest_neighbors(operator, container):
+def _convert_nearest_neighbors(operator, container, k=None):
     """
     Common parts to regressor and classifier. Let's denote
     *N* as the number of observations, *k*
@@ -128,7 +128,7 @@ def _convert_nearest_neighbors(operator, container):
 
     metric = op.effective_metric_
     neighb = op._fit_X.astype(container.dtype)
-    k = op.n_neighbors
+    k = op.n_neighbors if k is None else k
     training_labels = op._y if hasattr(op, '_y') else None
     distance_kwargs = {}
     if metric == 'minkowski':
@@ -333,6 +333,44 @@ def convert_nearest_neighbors_transform(scope, operator, container):
     ind.add_to(scope, container)
 
 
+def convert_k_neighbours_transformer(scope, operator, container):
+    """
+    Converts *KNeighborsTransformer* into *ONNX*.
+    """
+    transformer_op = operator.raw_operator
+    op_version = container.target_opset
+    k = (transformer_op.n_neighbors + 1 if transformer_op.mode == 'distance'
+         else transformer_op.n_neighbors)
+    out = operator.outputs
+
+    many = _convert_nearest_neighbors(
+        operator, container, k=k)
+    top_indices, top_dist = many[:2]
+    top_dist = (
+        OnnxReshape(
+            OnnxMul(top_dist, np.array([-1], dtype=container.dtype),
+                    op_version=op_version),
+            np.array([-1, 1, k], dtype=np.int64),
+            op_version=op_version)
+        if transformer_op.mode == 'distance' else None)
+    fit_samples_indices = np.array(
+        np.arange(transformer_op.n_samples_fit_).reshape((1, -1, 1)),
+        dtype=np.int64)
+    reshaped_ind = OnnxReshape(
+        top_indices, np.array([-1, 1, k], dtype=np.int64),
+        op_version=op_version)
+    comparison_res = OnnxCast(
+        OnnxEqual(fit_samples_indices, reshaped_ind, op_version=op_version),
+        op_version=op_version,
+        to=container.proto_dtype)
+    if top_dist:
+        comparison_res = OnnxMul(
+            comparison_res, top_dist, op_version=op_version)
+    res = OnnxReduceSum(comparison_res, op_version=op_version, axes=[2],
+                        keepdims=0, output_names=out[:1])
+    res.add_to(scope, container)
+
+
 def convert_nca(scope, operator, container):
     """
     Converts *NeighborhoodComponentsAnalysis* into *ONNX*.
@@ -363,6 +401,9 @@ register_converter(
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,
+    options={'optim': [None, 'cdist']})
+register_converter(
+    'SklearnKNeighborsTransformer', convert_k_neighbours_transformer,
     options={'optim': [None, 'cdist']})
 register_converter(
     'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
