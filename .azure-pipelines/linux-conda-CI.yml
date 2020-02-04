@@ -162,17 +162,18 @@ jobs:
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
 
-  - script: |
-      pip install matplotlib pydot
-      python docs/tests/test_documentation_examples.py
-    displayName: 'run examples'
-    condition: eq(variables['run.examples'], '1')
-
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
+
+  - script: |
+      conda install matplotlib
+      pip install pydot
+      python docs/tests/test_documentation_examples.py
+    displayName: 'run examples'
+    condition: eq(variables['run.examples'], '1')
 
   - script: |
       if [ '$(do.bench)' == '1' ]
