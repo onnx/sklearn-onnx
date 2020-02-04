@@ -163,6 +163,11 @@ jobs:
     displayName: 'install onnxmltools'
 
   - script: |
+      conda install -c conda-forge xgboost
+    displayName: 'install xgboost'
+    condition: eq(variables['run.example'], '1')
+
+  - script: |
       pip install matplotlib pydot
     displayName: 'install modules for examples'
     condition: eq(variables['run.example'], '1')
