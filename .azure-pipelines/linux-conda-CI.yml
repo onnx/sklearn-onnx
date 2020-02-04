@@ -169,7 +169,8 @@ jobs:
     displayName: 'flake8'
 
   - script: |
-      conda install matplotlib xgboost
+      conda install matplotlib
+      conda install -c conda-forge xgboost
       pip install pydot
       python docs/tests/test_documentation_examples.py
     displayName: 'run examples'
