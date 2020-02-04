@@ -91,10 +91,12 @@ from sklearn.neighbors import (
 )
 try:
     from sklearn.neighbors import (
+        KNeighborsTransformer,
         NeighborhoodComponentsAnalysis,
     )
 except ImportError:
     # New in 0.22
+    KNeighborsTransformer = None
     NeighborhoodComponentsAnalysis = None
 
 # Naive Bayes
@@ -246,6 +248,7 @@ def build_sklearn_operator_name_map():
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
                 FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
                 Imputer, SimpleImputer, LabelBinarizer, LabelEncoder,
+                KNeighborsTransformer,
                 RobustScaler, OneHotEncoder, DictVectorizer, OrdinalEncoder,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
