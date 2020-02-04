@@ -76,13 +76,11 @@ jobs:
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
-  - task: CondaEnvironment@1
-    inputs:
-      createCustomEnvironment: true
-      environmentName: 'py$(python.version)'
-      packageSpecs: 'python=$(python.version)'
+  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) $(scipy.version) pandas python=$(python.version) pytest
+    displayName: Create Anaconda environment
 
   - script: |
+      call activate skl2onnxEnvironment
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge "numpy$(numpy.version)"
@@ -91,10 +89,12 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
+      call activate skl2onnxEnvironment
       conda install "numpy$(numpy.version)"
     displayName: 'install numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       if [ '$(sklearn.version)' == 'git' ]
         then
           git clone https://github.com/scikit-learn/scikit-learn.git --recursive
@@ -105,6 +105,7 @@ jobs:
     displayName: 'install scikit-learn'
 
   - script: |
+      call activate skl2onnxEnvironment
       if [ '$(onnx.version)' == 'git' ]
         then
           git clone https://github.com/onnx/onnx.git --recursive
@@ -118,14 +119,17 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install flake8
     displayName: 'install flake8'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install onnxruntime$(onnxrt.version)
     displayName: 'install onnxruntime'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install -r requirements.txt
       git clone https://github.com/microsoft/onnxconverter-common
       cd onnxconverter-common
@@ -136,10 +140,12 @@ jobs:
     displayName: 'install requirements'
 
   - script: |
+      call activate skl2onnxEnvironment
       pip install -e .
     displayName: 'install'
 
   - script: |
+      call activate skl2onnxEnvironment
       echo "---------------"
       pip show numpy
       echo "---------------"
@@ -154,10 +160,12 @@ jobs:
     displayName: 'version'
 
   - script: |
+      call activate skl2onnxEnvironment
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
+      call activate skl2onnxEnvironment
       conda install -c conda-forge lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
@@ -165,10 +173,12 @@ jobs:
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
+      call activate skl2onnxEnvironment
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
 
   - script: |
+      call activate skl2onnxEnvironment
       conda install matplotlib
       conda install -c conda-forge xgboost
       pip install pydot
@@ -177,6 +187,7 @@ jobs:
     condition: eq(variables['run.examples'], '1')
 
   - script: |
+      call activate skl2onnxEnvironment
       if [ '$(do.bench)' == '1' ]
         then
           pip install onnxmltools openpyxl
@@ -187,6 +198,7 @@ jobs:
     displayName: 'coverage'
 
   - script: |
+      call activate skl2onnxEnvironment
       if [ '$(do.bench)' == '1' ]
         then
           python tests/benchmark.py
