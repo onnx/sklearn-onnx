@@ -63,7 +63,7 @@ class TestDocumentationExample(unittest.TestCase):
                             # xgboost not installed on CI
                             pass
                         elif ("cannot import name 'LightGbmModelContainer' from "
-                                "'onnxmltools.convert.common._container'") in st):
+                                "'onnxmltools.convert.common._container'") in st:
                             # onnxmltools not recent enough
                             pass
                         else:
