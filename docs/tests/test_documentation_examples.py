@@ -61,8 +61,9 @@ class TestDocumentationExample(unittest.TestCase):
                             pass
                         else:
                             raise RuntimeError(
-                                "Example '{}' (cmd: {}) failed due to\n{}"
-                                "".format(name, cmds, st))
+                                "Example '{}' (cmd: {} - exec_prefix='{}') "
+                                "failed due to\n{}"
+                                "".format(name, cmds, sys.exec_prefix, st))
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")
