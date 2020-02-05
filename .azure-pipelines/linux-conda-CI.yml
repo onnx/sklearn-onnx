@@ -163,7 +163,7 @@ jobs:
     displayName: 'install onnxmltools'
 
   - script: |
-      conda install -c conda-forge xgboost
+      conda install -c conda-forge xgboost --no-deps
     displayName: 'install xgboost'
     condition: eq(variables['run.example'], '1')
 
