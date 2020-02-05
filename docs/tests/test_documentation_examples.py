@@ -43,11 +43,10 @@ class TestDocumentationExample(unittest.TestCase):
                     assert mod is not None
                 except FileNotFoundError:
                     # try another way
+                    cmds = [sys.executable, "-u",
+                            os.path.join(fold, name)]
                     p = subprocess.Popen(
-                        [sys.executable, "-u",
-                            os.path.join(fold, name)],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE)
+                        cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     res = p.communicate()
                     out, err = res
                     st = err.decode('ascii', errors='ignore')
@@ -62,8 +61,8 @@ class TestDocumentationExample(unittest.TestCase):
                             pass
                         else:
                             raise RuntimeError(
-                                "Example '{}' failed due to\n{}"
-                                "".format(name, st))
+                                "Example '{}' (cmd: {}) failed due to\n{}"
+                                "".format(name, cmds, st))
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")
