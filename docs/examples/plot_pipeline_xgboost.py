@@ -93,9 +93,10 @@ except Exception as e:
 
 ###########################
 # Let's register the new converter.
-update_registered_converter(XGBClassifier, 'XGBoostXGBClassifier',
-                            calculate_linear_classifier_output_shapes,
-                            convert_xgboost)
+update_registered_converter(
+    XGBClassifier, 'XGBoostXGBClassifier',
+    calculate_linear_classifier_output_shapes, convert_xgboost,
+    options={'nocl': [True, False], 'zipmap': [True, False]})
 
 ##################################
 # Convert again
