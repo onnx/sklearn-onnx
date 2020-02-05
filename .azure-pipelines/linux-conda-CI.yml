@@ -158,18 +158,18 @@ jobs:
     displayName: 'pytest'
 
   - script: |
-      conda install -c conda-forge lightgbm xgboost
+      conda install -c conda-forge lightgbm xgboost --no-deps
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
 
   - script: |
-      conda install -c conda-forge xgboost --no-deps
-    displayName: 'install xgboost'
+      pip install matplotlib pydot
+    displayName: 'install modules for examples'
     condition: eq(variables['run.example'], '1')
 
   - script: |
-      pip install matplotlib pydot
-    displayName: 'install modules for examples'
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+    displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 
   # Check flake8 after the tests to get more feedback.
@@ -181,7 +181,7 @@ jobs:
   - script: |
       if [ '$(do.bench)' == '1' ]
         then
-          pip install onnxmltools openpyxl
+          pip install openpyxl
           coverage run --include=skl2onnx/** tests/benchmark.py
           coverage report -m
           coverage html
@@ -194,11 +194,6 @@ jobs:
           python tests/benchmark.py
       fi
     displayName: 'benchmark'
-
-  - script: |
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation examples'
-    condition: eq(variables['run.example'], '1')
 
   - task: PublishTestResults@2
     inputs:
