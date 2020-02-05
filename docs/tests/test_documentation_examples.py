@@ -62,6 +62,10 @@ class TestDocumentationExample(unittest.TestCase):
                         elif "No module named 'xgboost'" in st:
                             # xgboost not installed on CI
                             pass
+                        elif ("cannot import name 'LightGbmModelContainer' from "
+                                "'onnxmltools.convert.common._container'") in st):
+                            # onnxmltools not recent enough
+                            pass
                         else:
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
