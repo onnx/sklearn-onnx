@@ -167,11 +167,6 @@ jobs:
     displayName: 'install modules for examples'
     condition: eq(variables['run.example'], '1')
 
-  - script: |
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation examples'
-    condition: eq(variables['run.example'], '1')
-
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
@@ -187,6 +182,11 @@ jobs:
           coverage html
       fi
     displayName: 'coverage'
+
+  - script: |
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+    displayName: 'run documentation examples'
+    condition: eq(variables['run.example'], '1')
 
   - script: |
       if [ '$(do.bench)' == '1' ]

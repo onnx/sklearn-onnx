@@ -59,6 +59,9 @@ class TestDocumentationExample(unittest.TestCase):
                             # dot not installed, this part
                             # is tested in onnx framework
                             pass
+                        elif "No module named 'xgboost'" in st:
+                            # xgboost not installed on CI
+                            pass
                         else:
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
