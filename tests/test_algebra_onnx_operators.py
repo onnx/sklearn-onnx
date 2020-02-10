@@ -25,14 +25,17 @@ from onnx import (
 from test_utils import dump_data_and_model
 
 
+TARGET_OPSET = 11
+
+
 class TestOnnxOperators(unittest.TestCase):
 
     def test_sub(self):
 
         class CustomOpTransformer(BaseEstimator, TransformerMixin):
 
-            def __init__(self):
-                pass
+            def __init__(self, op_version=None):
+                self.op_version = op_version
 
             def fit(self, X, y=None):
                 self.W = np.mean(X, axis=0)
@@ -42,7 +45,7 @@ class TestOnnxOperators(unittest.TestCase):
                 return X - self.W
 
         mat = np.array([[0., 1.], [1., 2.], [3., 4.]])
-        tr = CustomOpTransformer()
+        tr = CustomOpTransformer(op_version=TARGET_OPSET)
         tr.fit(mat)
         z = tr.transform(mat)
 
@@ -50,7 +53,7 @@ class TestOnnxOperators(unittest.TestCase):
             W = operator.raw_operator.W
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=TARGET_OPSET)
             op.add_to(scope, container)
             text = str(container)
             if 'name:"Su_Sub"' not in text:
@@ -108,9 +111,9 @@ class TestOnnxOperators(unittest.TestCase):
             X = operator.inputs[0]
             out = operator.outputs
             op = OnnxDiv(
-                OnnxSub(X, W, op_version=onnx.defs.onnx_opset_version()),
+                OnnxSub(X, W, op_version=container.target_opset),
                 S, output_names=out,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=container.target_opset)
             op.add_to(scope, container)
 
         def shape(operator):
@@ -121,7 +124,8 @@ class TestOnnxOperators(unittest.TestCase):
         model_onnx = convert_sklearn(
             tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
-            custom_conversion_functions={CustomOpTransformer: conv})
+            custom_conversion_functions={CustomOpTransformer: conv},
+            target_opset=TARGET_OPSET)
 
         sess = InferenceSession(model_onnx.SerializeToString())
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
@@ -139,7 +143,7 @@ class TestOnnxOperators(unittest.TestCase):
 
             rs = OnnxReduceSumSquare(
                 X, axes=[1], keepdims=1,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=container.target_opset)
 
             N = X.type.shape[0]
             if isinstance(N, int):
@@ -147,21 +151,21 @@ class TestOnnxOperators(unittest.TestCase):
             else:
                 zeros = OnnxMul(
                     rs, np.array([0], dtype=np.float32),
-                    op_version=onnx.defs.onnx_opset_version())
+                    op_version=container.target_opset)
 
             z = OnnxAdd(
                 rs,
                 OnnxGemm(
                     X, C, zeros, alpha=-2., transB=1,
-                    op_version=onnx.defs.onnx_opset_version()),
-                op_version=onnx.defs.onnx_opset_version())
-            y2 = OnnxAdd(C2, z, op_version=onnx.defs.onnx_opset_version())
+                    op_version=container.target_opset),
+                op_version=container.target_opset)
+            y2 = OnnxAdd(C2, z, op_version=container.target_opset)
             lo = OnnxArgMin(
                 y2, axis=1, keepdims=0, output_names=out[:1],
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=container.target_opset)
             y2s = OnnxSqrt(
                 y2, output_names=out[1:],
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=container.target_opset)
 
             lo.add_to(scope, container)
             y2s.add_to(scope, container)
@@ -173,7 +177,8 @@ class TestOnnxOperators(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, 'a-kmeans',
             [('input', FloatTensorType([None, X.shape[1]]))],
-            custom_conversion_functions={KMeans: conv})
+            custom_conversion_functions={KMeans: conv},
+            target_opset=TARGET_OPSET)
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")
@@ -241,8 +246,7 @@ class TestOnnxOperators(unittest.TestCase):
     def test_onnxt_array_feature_extractor(self):
         onx = OnnxArrayFeatureExtractor(
             'X', np.array([1], dtype=np.int64),
-            output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            output_names=['Y'], op_version=1)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([2]))])

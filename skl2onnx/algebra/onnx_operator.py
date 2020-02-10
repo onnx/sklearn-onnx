@@ -6,7 +6,7 @@
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
-from ..common._topology import Variable, Scope
+from ..common._topology import Variable, Scope, _update_domain_version
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..proto import get_opset_number_from_onnx, onnx_proto
@@ -144,10 +144,17 @@ class OnnxOperator:
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
 
-        self.op_version = op_version or get_opset_number_from_onnx()
+        if op_version is None:
+            if domain == '':
+                self.op_version = get_opset_number_from_onnx()
+            else:
+                self.op_version = None
+        else:
+            self.op_version = op_version
         self.since_version = self.__class__.since_version
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
             self.expected_inputs = schema.expected_inputs
@@ -160,7 +167,8 @@ class OnnxOperator:
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             raise RuntimeError(
                 "Operator '{}': requested version {} < "
                 "{} schema version.".format(
@@ -505,18 +513,7 @@ class OnnxOperator:
         onnx_model = make_model(graph)
 
         # domains
-        domains = {}
-        version = target_opset
-        for n in container.nodes:
-            domains[n.domain] = max(domains.get(n.domain, version),
-                                    getattr(n, 'op_version', version))
-        for i, (k, v) in enumerate(domains.items()):
-            if i == 0 and len(onnx_model.opset_import) == 1:
-                op_set = onnx_model.opset_import[0]
-            else:
-                op_set = onnx_model.opset_import.add()
-            op_set.domain = k
-            op_set.version = domains.get(k, version)
+        _update_domain_version(container, onnx_model)
 
         # metadata
         onnx_model.ir_version = onnx_proto.IR_VERSION

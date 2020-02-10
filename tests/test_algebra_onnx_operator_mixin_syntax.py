@@ -4,7 +4,6 @@ from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.pipeline import make_pipeline
-import onnx
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from skl2onnx.common.data_types import FloatTensorType
@@ -16,9 +15,10 @@ from test_utils import dump_data_and_model
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
                           OnnxOperatorMixin):
 
-    def __init__(self):
+    def __init__(self, op_version=11):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
+        self.op_version = op_version
 
     def fit(self, X, y=None):
         self.W_ = np.mean(X, axis=0)
@@ -41,9 +41,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         S = self.S_
         return OnnxDiv(
             OnnxSub(
-                i0, W, op_version=onnx.defs.onnx_opset_version()),
-            S, output_names=outputs,
-            op_version=onnx.defs.onnx_opset_version())
+                i0, W, op_version=self.op_version),
+            S, output_names=outputs, op_version=self.op_version)
 
 
 class TestOnnxOperatorMixinSyntax(unittest.TestCase):
@@ -162,8 +161,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
         X = np.arange(20).reshape(10, 2)
         try:
-            tr = wrap_as_onnx_mixin(make_pipeline(
-                CustomOpTransformer(), KMeans(n_clusters=2)))
+            tr = wrap_as_onnx_mixin(
+                make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)))
         except KeyError as e:
             assert "SklearnGaussianProcessRegressor" in str(e)
             return

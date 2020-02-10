@@ -1069,6 +1069,21 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Create model
     onnx_model = make_model(graph)
 
+    # Update domain version
+    _update_domain_version(container, onnx_model)
+
+    # Add extra information
+    onnx_model.ir_version = onnx_proto.IR_VERSION
+    onnx_model.producer_name = utils.get_producer()
+    onnx_model.producer_version = utils.get_producer_version()
+    onnx_model.domain = utils.get_domain()
+    onnx_model.model_version = utils.get_model_version()
+    onnx_model.doc_string = doc_string
+
+    return onnx_model
+
+
+def _update_domain_version(container, onnx_model):
     # Merge operator sets for the same domain, the largest version
     # number would be kept
     purified_operator_set = dict()
@@ -1082,6 +1097,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Fill operator sets
     i = 0
     for op_domain, op_version in purified_operator_set.items():
+        if op_version is None:
+            continue
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
             # make_model(...)
@@ -1096,13 +1113,3 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             raise RuntimeError(('The specified opset %d is too low to convert '
                                 'this model, which requires at least opset '
                                 '%d.') % (container.target_opset, op_version))
-
-    # Add extra information
-    onnx_model.ir_version = onnx_proto.IR_VERSION
-    onnx_model.producer_name = utils.get_producer()
-    onnx_model.producer_version = utils.get_producer_version()
-    onnx_model.domain = utils.get_domain()
-    onnx_model.model_version = utils.get_model_version()
-    onnx_model.doc_string = doc_string
-
-    return onnx_model
