@@ -39,7 +39,7 @@ from test_utils import (
 )
 
 
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+TARGET_OPSET = min(11, onnx_opset_version())
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
