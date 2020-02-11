@@ -5,16 +5,11 @@
 # --------------------------------------------------------------------------
 
 import unittest
-import numbers
-import numpy as np
 from lightgbm import LGBMClassifier, LGBMRegressor
 from skl2onnx import update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,  # noqa
     calculate_linear_regressor_output_shapes,
-)
-from skl2onnx.common.data_types import (
-    SequenceType, DictionaryType, Int64TensorType, StringTensorType
 )
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm  # noqa
