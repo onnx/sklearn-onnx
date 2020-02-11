@@ -204,11 +204,11 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         got = oinf.run(None, {'X': X})[0]
         assert_almost_equal(np_fct(X), got, decimal=6)
 
+    @unittest.skipIf(onnx.defs.onnx_opset_version() < 10, "irrelevant")
     def test_onnx_clip_10(self):
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip_6(
-                x, min=1e-5, max=1e5, output_names=output_names,
-                op_version=10),
+                x, min=1e-5, max=1e5, output_names=output_names),
             lambda x: np.clip(x, 1e-5, 1e5),
             op_version=10)
         self.common_test_onnxt_runtime_unary(
