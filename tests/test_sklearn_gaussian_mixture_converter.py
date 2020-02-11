@@ -1,5 +1,6 @@
-import numpy as np
 import unittest
+import numpy as np
+import onnx
 from sklearn.datasets import load_iris
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from skl2onnx import convert_sklearn
@@ -8,7 +9,7 @@ from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model
 
 
-TARGET_OPSET = 11
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestGaussianMixtureConverter(unittest.TestCase):

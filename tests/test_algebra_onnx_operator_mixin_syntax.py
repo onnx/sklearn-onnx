@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.pipeline import make_pipeline
@@ -12,7 +13,7 @@ from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
 from test_utils import dump_data_and_model
 
 
-TARGET_OPSET = 11
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
