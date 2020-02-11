@@ -324,14 +324,24 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     output = (scope.get_unique_variable_name('output')
               if op.binary else operator.output_full_names)
 
+    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+        output_tf = scope.get_unique_variable_name('cast_result')
+    else:
+        output_tf = output
+
     if container.target_opset < 9:
         op_type = 'Ngram'
-        container.add_node(op_type, tokenized, output,
+        container.add_node(op_type, tokenized, output_tf,
                            op_domain='com.microsoft', **attrs)
     else:
         op_type = 'TfIdfVectorizer'
-        container.add_node(op_type, tokenized, output, op_domain='',
+        container.add_node(op_type, tokenized, output_tf, op_domain='',
                            op_version=9, **attrs)
+
+    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+        apply_cast(scope, output_tf, output,
+                   container, to=container.proto_dtype)
+
     if op.binary:
         cast_result_name = scope.get_unique_variable_name('cast_result')
 
