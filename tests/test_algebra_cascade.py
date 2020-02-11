@@ -173,7 +173,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             res_out = ort.run(None, {'input': X_test})
             assert len(res_out) == 1
             res = res_out[0]
-            assert_almost_equal(exp.ravel(), res.ravel(), decimal=5)
+            assert_almost_equal(exp.ravel(), res.ravel(), decimal=4)
 
 
 if __name__ == "__main__":
