@@ -13,7 +13,7 @@ import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
 from onnx import onnx_pb as onnx_proto
-from onnx.defs import onnx_opset_version
+from onnx.defs import onnx_opset_version, get_all_schemas_with_history
 import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
@@ -400,7 +400,7 @@ class ModelComponentContainer(ModelContainer):
                     "'{1}' in submodule _apply_operation.".format(
                         op_type, fct.__name__))
 
-    def add_node(self, op_type, inputs, outputs, op_domain='', op_version=1,
+    def add_node(self, op_type, inputs, outputs, op_domain='', op_version=None,
                  name=None, **attrs):
         """
         Adds a *NodeProto* into the node list of the final ONNX model.
@@ -432,6 +432,8 @@ class ModelComponentContainer(ModelContainer):
         if op_domain is None:
             op_domain = get_domain()
         self._check_operator(op_type)
+        if op_version is None:
+            op_version = self._get_op_version(op_domain, op_type)
 
         if isinstance(inputs, (six.string_types, six.text_type)):
             inputs = [inputs]
@@ -500,6 +502,43 @@ class ModelComponentContainer(ModelContainer):
     @property
     def target_opset_onnx(self):
         return self.target_opset_any_domain('')
+
+    def _get_op_version(self, domain, op_type):
+        """
+        Determines the highest version of operator
+        *op_type* below or equal to *target_opset*.
+        """
+        if not hasattr(self, '_op_versions'):
+            self._build_op_version()
+        key = domain, op_type
+        vers = self._op_versions.get(key, None)
+        if vers is None:
+            raise RuntimeError(
+                "Unable to find operator '{}' in domain '{}' in ONNX.".format(
+                    op_type, domain))
+        highest = self.target_opset_any_domain(domain)
+        pos = len(vers) - 1
+        while pos >= 0:
+            if vers[pos] <= highest:
+                return vers[pos]
+            pos -= 1
+        raise RuntimeError(
+            "Unable to find a suitable version for operator '{}' "
+            "in domain '{}'. Available versions: {}.".format(
+                op_type, domain, vers))
+
+    def _build_op_version(self):
+        res = {}
+        for schema in get_all_schemas_with_history():
+            dom = schema.domain
+            name = schema.name
+            vers = schema.since_version
+            if (dom, name) not in res:
+                res[dom, name] = set()
+            res[dom, name].add(vers)
+        self._op_versions = {}
+        for k, v in res.items():
+            self._op_versions[k] = list(sorted(v))
 
     def _get_allowed_options(self, model):
         if self.registered_models is not None:
