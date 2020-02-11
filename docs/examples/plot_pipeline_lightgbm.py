@@ -78,9 +78,11 @@ pipe.fit(X, y)
 
 ###########################
 # Let's register the new converter.
-update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
-                            calculate_linear_classifier_output_shapes,
-                            convert_lightgbm)
+update_registered_converter(
+    LGBMClassifier, 'LightGbmLGBMClassifier',
+    calculate_linear_classifier_output_shapes,
+    convert_lightgbm, options={
+        'zipmap': [True, False], 'nocl': [True, False]})
 
 ##################################
 # Convert again

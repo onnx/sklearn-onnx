@@ -37,32 +37,12 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     @classmethod
     def setUpClass(self):
 
-        def custom_parser(scope, model, inputs, custom_parsers=None):
-            if custom_parsers is not None and model in custom_parsers:
-                return custom_parsers[model](
-                    scope, model, inputs, custom_parsers=custom_parsers)
-            if all(isinstance(i, (numbers.Real, bool, np.bool_))
-                   for i in model.classes_):
-                label_type = Int64TensorType()
-            else:
-                label_type = StringTensorType()
-            output_label = scope.declare_local_variable(
-                'output_label', label_type)
-
-            this_operator = scope.declare_local_operator(
-                'LgbmClassifier', model)
-            this_operator.inputs = inputs
-            probability_map_variable = scope.declare_local_variable(
-                'output_probability', SequenceType(DictionaryType(
-                    label_type, scope.tensor_type())))
-            this_operator.outputs.append(output_label)
-            this_operator.outputs.append(probability_map_variable)
-            return this_operator.outputs
-
         update_registered_converter(
-            LGBMClassifier, 'LgbmClassifier',
+            LGBMClassifier, 'LightGbmLGBMClassifier',
             calculate_linear_classifier_output_shapes,
-            convert_lightgbm, parser=custom_parser)
+            convert_lightgbm, options={
+                'zipmap': [True, False], 'nocl': [True, False]})
+
         update_registered_converter(
             LGBMRegressor, 'LgbmRegressor',
             calculate_linear_regressor_output_shapes,

@@ -49,7 +49,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 try:
                     ort = InferenceSession(as_string)
                 except InvalidGraph as e:
-                    if opv == onnx_opset_version():
+                    if opv >= onnx_opset_version():
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
@@ -100,7 +100,9 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 try:
                     ort = InferenceSession(as_string)
                 except InvalidGraph as e:
-                    if opv in (3, 10):
+                    if opv in (3, ):
+                        continue
+                    if opv >= onnx_opset_version():
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
@@ -133,6 +135,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             try:
                 ort = InferenceSession(as_string)
             except InvalidGraph as e:
+                if opv > onnx_opset_version():
+                    continue
                 raise AssertionError(
                     "Unable to load opv={}\n---\n{}\n---".format(
                         opv, onx)) from e
@@ -148,6 +152,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             try:
                 ort = InferenceSession(as_string)
             except InvalidGraph as e:
+                if opv > onnx_opset_version():
+                    continue
                 raise AssertionError(
                     "Unable to load opv={}\n---\n{}\n---".format(
                         opv, onx)) from e
@@ -170,6 +176,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 ort = InferenceSession(as_string)
             except (RuntimeError, InvalidGraph, Fail) as e:
                 if opv in (1, 2):
+                    continue
+                if opv > onnx_opset_version():
                     continue
                 raise AssertionError(
                     "Unable to load opv={}\n---\n{}\n---".format(
