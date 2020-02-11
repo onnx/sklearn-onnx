@@ -130,7 +130,13 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         exp = st.transform(X)
 
         for opv in (1, 2, 10, 11, None, onnx_opset_version()):
-            onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
+            try:
+                onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
+            except RuntimeError as e:
+                if ("is higher than the number of the "
+                        "installed onnx package") in str(e):
+                    continue
+                raise e
             as_string = onx.SerializeToString()
             try:
                 ort = InferenceSession(as_string)
@@ -167,17 +173,23 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             MLPRegressor(random_state=42))
         exp = model.predict(X_test)
         for opv in (1, 2, 7, 8, 9, 10, 11, None, onnx_opset_version()):
-            onx = convert_sklearn(
-                model, "scikit-learn MLPRegressor",
-                [("input", FloatTensorType([None, X_test.shape[1]]))],
-                target_opset=opv)
+            try:
+                onx = convert_sklearn(
+                    model, "scikit-learn MLPRegressor",
+                    [("input", FloatTensorType([None, X_test.shape[1]]))],
+                    target_opset=opv)
+            except RuntimeError as e:
+                if ("is higher than the number of the "
+                        "installed onnx package") in str(e):
+                    continue
+                raise e
             as_string = onx.SerializeToString()
             try:
                 ort = InferenceSession(as_string)
             except (RuntimeError, InvalidGraph, Fail) as e:
                 if opv in (1, 2):
                     continue
-                if opv > onnx_opset_version():
+                if opv >= onnx_opset_version():
                     continue
                 raise AssertionError(
                     "Unable to load opv={}\n---\n{}\n---".format(
