@@ -31,6 +31,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
         attr_names = self.attr_names
         if '_' in self.__class__.__name__:
             op_version_class = int(self.__class__.__name__.split('_')[-1])
+            if op_version is None:
+                op_version = op_version_class
             try:
                 op_version = min(op_version, op_version_class)
             except TypeError:

@@ -513,9 +513,11 @@ class ModelComponentContainer(ModelContainer):
         key = domain, op_type
         vers = self._op_versions.get(key, None)
         if vers is None:
-            raise RuntimeError(
-                "Unable to find operator '{}' in domain '{}' in ONNX.".format(
+            warnings.warn(
+                "Unable to find operator '{}' in domain '{}' in ONNX, "
+                "op_version is forced to 1.".format(
                     op_type, domain))
+            vers = [1]
         highest = self.target_opset_any_domain(domain)
         pos = len(vers) - 1
         while pos >= 0:
