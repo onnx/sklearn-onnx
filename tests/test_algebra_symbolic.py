@@ -5,7 +5,11 @@ import onnx
 import numpy
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
-from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+except ImportError:
+    InvalidGraph = RuntimeError
+    Fail = RuntimeError
 from skl2onnx.common.data_types import FloatTensorType
 try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin

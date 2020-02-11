@@ -5,7 +5,11 @@ from numpy.testing import assert_almost_equal
 import onnx
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
-from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+except ImportError:
+    InvalidGraph = RuntimeError
+    Fail = RuntimeError
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
 from skl2onnx.common.data_types import FloatTensorType

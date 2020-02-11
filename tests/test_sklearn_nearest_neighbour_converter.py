@@ -39,6 +39,9 @@ from test_utils import (
 )
 
 
+TARGET_OPSET = 11
+
+
 class TestNearestNeighbourConverter(unittest.TestCase):
     def _fit_model_binary_classification(self, model):
         iris = datasets.load_iris()
@@ -161,6 +164,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "KNN classifier binary",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -180,6 +184,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "KNN classifier multi-class",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -199,6 +204,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "KNN classifier multi-class",
             [("input", FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -213,7 +219,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(weights='distance'))
         model_onnx = convert_sklearn(
-            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))])
+            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
@@ -226,7 +233,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(metric='cityblock'))
         model_onnx = convert_sklearn(
-            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))])
+            model, 'KNN classifier', [('input', FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7], model, model_onnx,
@@ -245,6 +253,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             "scikit-learn KNN Classifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -316,10 +325,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             KNeighborsClassifier(),
             2, label_string=True)
         model_onnx = convert_sklearn(
-            model,
-            "multi-class nocl",
+            model, "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True}})
+            options={id(model): {'nocl': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
@@ -341,7 +350,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_binary_classification(pipe)
         model_onnx = convert_sklearn(
             model, "KNN pipe",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:2],
