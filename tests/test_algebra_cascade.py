@@ -3,10 +3,16 @@ from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
+from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
-from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph
+from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPRegressor
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxScaler
+from skl2onnx import to_onnx
+from skl2onnx import convert_sklearn
+from test_utils import fit_regression_model
 
 
 class TestOnnxOperatorsCascade(unittest.TestCase):
@@ -32,13 +38,15 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.array([[42., 42., 42., 42., 42.]]),
                np.array([[93., 93., 93., 93., 93.]]),
                np.array([[100100., 100100., 100100., 100100., 100100.]])]
-        for opv in (9, 10, 11):
+        for opv in ({'': 10}, None, 9, 10, 11, onnx_opset_version()):
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
                 try:
                     ort = InferenceSession(as_string)
                 except InvalidGraph as e:
+                    if opv == onnx_opset_version():
+                        continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
@@ -81,14 +89,14 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.zeros((1, 5)),
                np.zeros((1, 5)),
                np.zeros((1, 5))]
-        for opv in (1, 2, None, 11):
+        for opv in (1, 2, 3, None):
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
                 try:
                     ort = InferenceSession(as_string)
                 except InvalidGraph as e:
-                    if opv == 11:
+                    if opv in (3, 10):
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
@@ -109,7 +117,64 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         res = res_out[0]
         assert res.shape[1] == dim
 
+    def test_scaler_converted(self):
+        st = StandardScaler()
+        X = np.array([[0, 1.5], [6.1, 2.3]])
+        st.fit(X)
+        exp = st.transform(X)
+
+        for opv in (1, 2, 10, 11, None, onnx_opset_version()):
+            onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
+            as_string = onx.SerializeToString()
+            try:
+                ort = InferenceSession(as_string)
+            except InvalidGraph as e:
+                raise AssertionError(
+                    "Unable to load opv={}\n---\n{}\n---".format(
+                        opv, onx)) from e
+            res_out = ort.run(None, {'X': X.astype(np.float32)})
+            assert len(res_out) == 1
+            res = res_out[0]
+            assert_almost_equal(exp, res)
+
+        for opv in (1, 2, 10, 11, None, onnx_opset_version()):
+            onx = to_onnx(st, X.astype(np.float32),
+                          target_opset={'ai.onnx.ml': opv})
+            as_string = onx.SerializeToString()
+            try:
+                ort = InferenceSession(as_string)
+            except InvalidGraph as e:
+                raise AssertionError(
+                    "Unable to load opv={}\n---\n{}\n---".format(
+                        opv, onx)) from e
+            res_out = ort.run(None, {'X': X.astype(np.float32)})
+            assert len(res_out) == 1
+            res = res_out[0]
+            assert_almost_equal(exp, res)
+
+    def test_model_mlp_regressor_default(self):
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42))
+        exp = model.predict(X_test)
+        for opv in (1, 2, 7, 8, 9, 10, 11, None, onnx_opset_version()):
+            onx = convert_sklearn(
+                model, "scikit-learn MLPRegressor",
+                [("input", FloatTensorType([None, X_test.shape[1]]))],
+                target_opset=opv)
+            as_string = onx.SerializeToString()
+            try:
+                ort = InferenceSession(as_string)
+            except (RuntimeError, InvalidGraph, Fail) as e:
+                if opv in (1, 2):
+                    continue
+                raise AssertionError(
+                    "Unable to load opv={}\n---\n{}\n---".format(
+                        opv, onx)) from e
+            res_out = ort.run(None, {'input': X_test})
+            assert len(res_out) == 1
+            res = res_out[0]
+            assert_almost_equal(exp.ravel(), res.ravel(), decimal=5)
+
 
 if __name__ == "__main__":
-    TestOnnxOperatorsCascade().test_cascade_scaler()
     unittest.main()

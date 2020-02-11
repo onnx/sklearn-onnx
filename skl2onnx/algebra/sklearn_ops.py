@@ -90,6 +90,8 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     :class:`OnnxSubGraphOperatorMixin`.
     """
     def __init__(self, op_version=None):
+        Pipeline.__init__(self)
+        OnnxSubGraphOperatorMixin.__init__(self)
         self.op_version = op_version
 
 

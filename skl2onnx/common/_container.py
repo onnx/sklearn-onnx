@@ -13,6 +13,8 @@ import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
 from onnx import onnx_pb as onnx_proto
+from onnx.defs import onnx_opset_version
+import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
 from ..proto.onnx_helper_modified import (
@@ -470,11 +472,34 @@ class ModelComponentContainer(ModelContainer):
         self.nodes.append(node)
         if (self.target_opset is not None and
                 op_version is not None and
-                op_version > self.target_opset):
+                op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
                 "Opset number {} is higher than targeted opset {} for "
                 "node '{}'.".format(
                     op_version, self.target_opset, node.op_type))
+
+    def target_opset_any_domain(self, domain):
+        if isinstance(self.target_opset, dict):
+            if domain in self.target_opset:
+                to = self.target_opset[domain]
+            else:
+                to = None
+            if to is None and domain == '':
+                to = onnx_opset_version()
+            if to is None:
+                smap = C.schema_version_map()
+                if domain in smap:
+                    to = smap[domain][1]
+            if to is not None:
+                return to
+            # The domain is not registered in onnx, it is probably
+            # a custom domain. We assume the version is one.
+            return 1
+        return self.target_opset
+
+    @property
+    def target_opset_onnx(self):
+        return self.target_opset_any_domain('')
 
     def _get_allowed_options(self, model):
         if self.registered_models is not None:

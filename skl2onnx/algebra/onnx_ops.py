@@ -16,6 +16,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
     def __init__(self, *args, **kwargs):
 
         op_version = kwargs.pop('op_version', None)
+        if isinstance(op_version, dict):
+            op_version = op_version.get(domain, None)
 
         if op_version is None:
             if len(args) == 0 and input_range[0] == input_range[1]:
@@ -41,6 +43,11 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                         since_version))
         else:
             op_version_class = None
+
+        # By default, the op_version is None.
+        # None means the latest available.
+        if op_version is None:
+            op_version = since_version
 
         found = None
         if op_version is not None:

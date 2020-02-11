@@ -166,6 +166,7 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
+            self.op_version = self.since_version
 
         if (self.op_version is not None and
                 self.op_version < self.since_version):
@@ -425,9 +426,24 @@ class OnnxOperator:
             node
         :param dtype: force the use of a specific float type,
             either `np.float32` or `np.float64`, it must be specified
-        :param target_opset: target opset, None for the default one
+        :param target_opset: dictionary with target opset per domain,
+            None for the default one
         :param domain: domain of the operator
         """
+        if isinstance(target_opset, dict):
+            target_opset = target_opset.get(self.domain, None)
+        elif isinstance(target_opset, int):
+            if self.domain == '':
+                pass
+            else:
+                # The target_opset is for the domain ''
+                # We ignore it.
+                target_opset = None
+        elif target_opset is not None:
+            raise TypeError(
+                "target_opset must be a dictionary {domain: "
+                "target_opset} not %r for operator %r." % (
+                    target_opset, self.__class__.__name__))
         if (self.op_version is not None and target_opset is not None and
                 self.op_version > target_opset):
             raise RuntimeError(

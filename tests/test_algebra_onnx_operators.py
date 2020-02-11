@@ -25,7 +25,8 @@ from onnx import (
 from test_utils import dump_data_and_model
 
 
-TARGET_OPSET = 11
+TARGET_OPSET = None
+TARGET_OPSET_11 = 11
 
 
 class TestOnnxOperators(unittest.TestCase):
@@ -127,7 +128,11 @@ class TestOnnxOperators(unittest.TestCase):
             custom_conversion_functions={CustomOpTransformer: conv},
             target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString())
+        except RuntimeError as e:
+            raise AssertionError(
+                "Cannot load model\n---\n{}\n---".format(model_onnx)) from e
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
         assert_almost_equal(z, z2)
 
@@ -178,7 +183,7 @@ class TestOnnxOperators(unittest.TestCase):
             model, 'a-kmeans',
             [('input', FloatTensorType([None, X.shape[1]]))],
             custom_conversion_functions={KMeans: conv},
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET_11)
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")
