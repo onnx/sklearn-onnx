@@ -5,25 +5,32 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from onnx.helper import make_tensor
 from ..algebra.onnx_ops import (
+    OnnxAdd,
     OnnxArgMax,
     OnnxArrayFeatureExtractor,
     OnnxCast,
     OnnxConcat,
+    OnnxConstantOfShape,
     OnnxDiv,
     OnnxEqual,
     OnnxFlatten,
     OnnxIdentity,
+    OnnxIsNaN,
     OnnxMatMul,
     OnnxMax,
     OnnxMul,
+    OnnxNot,
     OnnxReciprocal,
     OnnxReduceMean,
     OnnxReduceSum,
     OnnxReshape,
     OnnxShape,
+    OnnxSub,
     OnnxTopK_1,
     OnnxTranspose,
+    OnnxWhere,
 )
 try:
     from ..algebra.onnx_ops import OnnxTopK_10
@@ -33,7 +40,7 @@ try:
     from ..algebra.onnx_ops import OnnxTopK_11
 except ImportError:
     OnnxTopK_11 = None
-from ..algebra.complex_functions import onnx_cdist
+from ..algebra.complex_functions import onnx_cdist, _onnx_cdist_sqeuclidean
 from ..common._registration import register_converter
 from ..common.data_types import DoubleTensorType, Int64TensorType
 from ..common.utils_classifier import get_label_classes
@@ -126,7 +133,8 @@ def _convert_nearest_neighbors(operator, container, k=None):
                   len(op._y.shape) == 2 and op._y.shape[1] == 1)
     ndim = 1 if single_reg else op._y.shape[1]
 
-    metric = op.effective_metric_
+    metric = (op.effective_metric_ if hasattr(op, 'effective_metric_') else
+              op.metric)
     neighb = op._fit_X.astype(container.dtype)
     k = op.n_neighbors if k is None else k
     training_labels = op._y if hasattr(op, '_y') else None
@@ -371,6 +379,121 @@ def convert_k_neighbours_transformer(scope, operator, container):
     res.add_to(scope, container)
 
 
+def _nan_euclidean_distance(container, model, input_name, op_version):
+    training_data = model._fit_X.astype(container.dtype)
+    shape = OnnxShape(input_name, op_version=op_version)
+    zero = OnnxConstantOfShape(
+        shape, value=make_tensor(
+            "value", onnx_proto.TensorProto.FLOAT, (1, ), [0]),
+        op_version=op_version)
+    missing_input_name = OnnxIsNaN(input_name, op_version=op_version)
+    masked_input_name = OnnxWhere(missing_input_name, zero, input_name,
+                                  op_version=op_version)
+    missing_y = np.isnan(training_data, op_version=op_version)
+    training_data[missing_y] = 0
+    d_in = training_data.shape[1] if hasattr(training_data, 'shape') else None
+    d_out = training_data.shape[0] if hasattr(training_data, 'shape') else None
+    dist = _onnx_cdist_sqeuclidean(
+        masked_input_name, training_data, dtype=np.float32,
+        op_version=container.target_opset, dim_in=d_in, dim_out=d_out)
+    dist1 = OnnxMatMul(
+        OnnxMul(masked_input_name, masked_input_name, op_version=op_version),
+        missing_y.T.astype(np.float32), op_version=op_version)
+    dist2 = OnnxMatMul(
+        OnnxCast(missing_input_name, to=onnx_proto.TensorProto.FLOAT,
+                 op_version=op_version),
+        (training_data * training_data).T, op_version=op_version)
+    distances = OnnxSub(dist, OnnxAdd(dist1, dist2), op_version=op_version)
+    present_x = OnnxSub(
+        np.array([1], dtype=np.float32),
+        OnnxCast(missing_input_name, to=onnx_proto.TensorProto.FLOAT,
+                 op_version=op_version),
+        op_version=op_version)
+    present_y = (1. - missing_y).astype(np.float32)
+    present_count = OnnxMatMul(present_x, present_y.T, op_version=op_version)
+    present_count = OnnxMax(np.array([1], dtype=np.float32), present_count,
+                            op_version=op_version)
+    dist = OnnxDiv(distances, present_count, op_version=op_version)
+    return OnnxMul(
+        dist, np.array([d_in], dtype=np.float32),
+        op_version=op_version), missing_input_name
+
+
+def _nearest_neighbours(container, model, input_name,
+                        op_version, **kwargs):
+    dist, missing_input_name = _nan_euclidean_distance(
+        container, model, input_name, op_version)
+    dtype = container.dtype
+    if op_version < 10:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_1(
+            neg_dist, k=model.n_neighbors, op_version=1, **kwargs)
+    elif op_version < 11:
+        neg_dist = OnnxMul(dist, np.array(
+            [-1], dtype=dtype), op_version=op_version)
+        node = OnnxTopK_10(
+            neg_dist, np.array([model.n_neighbors], dtype=np.int64),
+            op_version=10, **kwargs)
+    else:
+        node = OnnxTopK_11(
+            dist, np.array([model.n_neighbors], dtype=np.int64),
+            largest=0, sorted=1, op_version=11, **kwargs)
+    return node[1], missing_input_name
+
+
+def convert_knn_imputer(scope, operator, container):
+    """
+    Converts *KNNImputer* into *ONNX*.
+    """
+    knn_op = operator.raw_operator
+    if knn_op.metric != 'nan_euclidean':
+        raise RuntimeError(
+            "Unable to convert KNNImputer when metric is callable.")
+    if knn_op.metric not in ('uniform', 'distance'):
+        raise RuntimeError(
+            "Unable to convert KNNImputer when weights is callable.")
+    if knn_op.metric == 'distance':
+        raise NotImplementedError(
+            'KNNImputer with distance as metric is not supported, '
+            'you may raise an issue at '
+            'https://github.com/onnx/sklearn-onnx/issues.')
+    op_version = container.target_opset
+    input_name = operator.inputs[0]
+    training_data = knn_op._fit_X.astype(container.dtype)
+    training_data[np.isnan(training_data)] = 0
+    out = operator.outputs
+    top_indices, missing_input_name = _nearest_neighbours(
+        container, knn_op, input_name, op_version)
+    flattened = OnnxFlatten(top_indices, op_version=op_version)
+    extracted = OnnxArrayFeatureExtractor(
+        training_data.T, flattened, op_version=op_version)
+    reshaped = OnnxReshape(
+        extracted, np.array([training_data.shape[1], -1, knn_op.n_neighbors],
+                            dtype=np.int64),
+        op_version=op_version)
+    transpose_result = OnnxTranspose(
+        reshaped, op_version=op_version, perm=[1, 2, 0])
+    reduced = OnnxReduceSum(
+        transpose_result, op_version=op_version, axes=[1], keepdims=0)
+    cast_res = OnnxCast(
+        OnnxCast(transpose_result, to=onnx_proto.TensorProto.BOOL,
+                 op_version=op_version),
+        to=onnx_proto.TensorProto.FLOAT, op_version=op_version)
+    deno = OnnxReduceSum(cast_res, op_version=op_version, axes=[1], keepdims=0)
+    deno_updated = OnnxAdd(
+        deno, OnnxCast(
+            OnnxNot(OnnxCast(deno, to=onnx_proto.TensorProto.BOOL,
+                             op_version=op_version), op_version=op_version),
+            to=onnx_proto.TensorProto.FLOAT, op_version=op_version),
+        op_version=op_version)
+    imputed_out = OnnxWhere(
+        missing_input_name,
+        OnnxDiv(reduced, deno_updated, op_version=op_version), input_name,
+        output_names=out[:1], op_version=op_version)
+    imputed_out.add_to(scope, container)
+
+
 def convert_nca(scope, operator, container):
     """
     Converts *NeighborhoodComponentsAnalysis* into *ONNX*.
@@ -408,5 +531,7 @@ register_converter(
 register_converter(
     'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
     options={'optim': [None, 'cdist']})
+register_converter(
+    'SklearnKNNImputer', convert_knn_imputer)
 register_converter(
     'SklearnNeighborhoodComponentsAnalysis', convert_nca)

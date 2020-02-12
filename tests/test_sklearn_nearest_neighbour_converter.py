@@ -15,12 +15,14 @@ from sklearn.neighbors import (
     NearestNeighbors,
 )
 try:
+    from sklearn.imputer import KNNImputer
     from sklearn.neighbors import (
         KNeighborsTransformer,
         NeighborhoodComponentsAnalysis,
     )
 except ImportError:
     # New in 0.22
+    KNNImputer = None
     KNeighborsTransformer = None
     NeighborhoodComponentsAnalysis = None
 from sklearn.pipeline import make_pipeline
@@ -487,6 +489,29 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnKNNTransformerConnectivity",
+        )
+
+    @unittest.skipIf(KNNImputer is None,
+                     reason="new in 0.22")
+    def test_sklearn_knn_imputer(self):
+        x_train = numpy.array(
+            [[1, 2, numpy.nan, 12], [3, numpy.nan, 3, 13],
+             [1, 4, numpy.nan, 1], [numpy.nan, 4, 3, 12]], dtype=numpy.float32)
+        x_test = numpy.array(
+            [[1.3, 2.4, numpy.nan, 1], [-1.3, numpy.nan, 3.1, numpy.nan]],
+            dtype=numpy.float32)
+        model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
+        model_onnx = convert_sklearn(
+            model,
+            "KNN imputer",
+            [("input", FloatTensorType((None, x_test.shape[1])))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            x_test,
+            model,
+            model_onnx,
+            basename="SklearnKNNImputer",
         )
 
 

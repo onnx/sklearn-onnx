@@ -148,6 +148,11 @@ except ImportError:
     # removed in 0.21
     Imputer = None
 try:
+    from sklearn.impute import KNNImputer
+except ImportError:
+    # New in 0.22
+    KNNImputer = None
+try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
     # not available in 0.19
@@ -248,7 +253,7 @@ def build_sklearn_operator_name_map():
                 CountVectorizer, TfidfVectorizer, TfidfTransformer,
                 FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
                 Imputer, SimpleImputer, LabelBinarizer, LabelEncoder,
-                KNeighborsTransformer,
+                KNeighborsTransformer, KNNImputer,
                 RobustScaler, OneHotEncoder, DictVectorizer, OrdinalEncoder,
                 GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
