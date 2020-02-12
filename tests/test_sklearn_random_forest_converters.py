@@ -7,6 +7,7 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy
+import onnx
 import sklearn
 from sklearn.datasets import (
     load_iris, make_regression, make_classification,
@@ -41,6 +42,9 @@ try:
 except ImportError:
     HistGradientBoostingClassifier = None
     HistGradientBoostingRegressor = None
+
+
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 def _sklearn_version():
@@ -338,6 +342,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -361,6 +366,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -384,6 +390,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -407,6 +414,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()

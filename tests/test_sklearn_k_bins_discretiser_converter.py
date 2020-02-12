@@ -4,6 +4,7 @@ Tests scikit-learn's KBinsDiscretiser converter.
 
 import unittest
 import numpy as np
+import onnx
 try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
@@ -12,6 +13,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
+
+
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestSklearnKBinsDiscretiser(unittest.TestCase):
@@ -29,6 +33,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -60,6 +65,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -90,6 +96,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -116,6 +123,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -146,6 +154,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -176,6 +185,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -200,6 +210,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -228,6 +239,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -254,6 +266,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -278,6 +291,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -302,6 +316,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -330,6 +345,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
             model,
             "scikit-learn KBinsDiscretiser",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

@@ -7,6 +7,7 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
+import onnx
 from pandas import DataFrame
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
@@ -28,6 +29,9 @@ from test_utils import (
     fit_multilabel_classification_model,
     fit_regression_model,
 )
+
+
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
@@ -196,6 +200,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             "scikit-learn DecisionTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -219,6 +224,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             "scikit-learn ExtraTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()

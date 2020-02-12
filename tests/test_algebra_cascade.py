@@ -192,7 +192,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 if opv >= onnx_opset_version():
                     continue
                 if ("No suitable kernel definition found for "
-                    "op Cast(9)") in str(e):
+                        "op Cast(9)") in str(e):
                     # too old onnxruntime
                     continue
                 raise AssertionError(

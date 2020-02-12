@@ -3,7 +3,7 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
 
 import unittest
-
+import onnx
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -16,6 +16,9 @@ from test_utils import (
 )
 
 
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+
+
 class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -26,6 +29,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -46,6 +50,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -105,6 +110,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -164,6 +170,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -224,6 +231,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

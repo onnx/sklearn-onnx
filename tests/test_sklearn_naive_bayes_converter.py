@@ -23,6 +23,9 @@ from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, fit_classification_model
 
 
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+
+
 class TestNaiveBayesConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -35,6 +38,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -60,6 +64,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -81,6 +86,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -102,6 +108,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         pp = model.predict_proba(X)
@@ -132,6 +139,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -157,6 +165,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -178,6 +187,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "multinomial naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -203,6 +213,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "bernoulli naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -224,6 +235,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "multinomial naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -248,6 +260,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -269,6 +282,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "gaussian naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -290,6 +304,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "gaussian naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -311,6 +326,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "gaussian naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -332,6 +348,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "gaussian naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -355,6 +372,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "complement naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -378,6 +396,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "complement naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -386,7 +405,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnMclComplementNB-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
+            "<= StrictVersion('0.2.1')"
         )
 
     @unittest.skipIf(ComplementNB is None,
@@ -401,6 +420,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "complement naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -409,7 +429,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnBinComplementNBInt-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
+            "<= StrictVersion('0.2.1')"
         )
 
     @unittest.skipIf(ComplementNB is None,
@@ -424,6 +444,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "complement naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -445,6 +466,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "categorical naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -466,7 +488,8 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True}})
+            options={id(model): {'nocl': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx

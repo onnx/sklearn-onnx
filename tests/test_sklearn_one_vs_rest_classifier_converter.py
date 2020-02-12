@@ -1,4 +1,5 @@
 import unittest
+import onnx
 from sklearn.ensemble import (
     GradientBoostingClassifier,
     GradientBoostingRegressor,
@@ -19,6 +20,9 @@ from test_utils import (
 )
 
 
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+
+
 class TestOneVsRestClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -28,6 +32,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -40,6 +45,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             suffix="F2",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -64,6 +70,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -86,6 +93,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -109,6 +117,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -130,6 +139,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -150,6 +160,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -170,6 +181,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -190,6 +202,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -210,6 +223,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -230,6 +244,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -250,6 +265,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr classification",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -270,6 +286,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -290,6 +307,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr regression",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -310,6 +328,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -330,6 +349,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             "ovr regression",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
