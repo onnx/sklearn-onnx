@@ -166,7 +166,7 @@ from sklearn.preprocessing import (
     MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
     PolynomialFeatures, RobustScaler,
-    StandardScaler,
+    StandardScaler, PowerTransformer,
 )
 
 try:
@@ -254,7 +254,8 @@ def build_sklearn_operator_name_map():
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
                 BayesianGaussianMixture, OneClassSVM, PLSRegression,
-                HistGradientBoostingClassifier, HistGradientBoostingRegressor
+                HistGradientBoostingClassifier, HistGradientBoostingRegressor,
+                PowerTransformer,
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',

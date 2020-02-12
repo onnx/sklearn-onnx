@@ -27,6 +27,7 @@ from . import one_hot_encoder
 from . import ordinal_encoder
 from . import one_vs_rest_classifier
 from . import polynomial_features
+from . import powertransformer
 from . import scaler
 from . import svd
 from . import support_vector_machines
@@ -58,6 +59,7 @@ __all__ = [
     ordinal_encoder,
     one_vs_rest_classifier,
     polynomial_features,
+    powertransformer,
     scaler,
     svd,
     support_vector_machines,
