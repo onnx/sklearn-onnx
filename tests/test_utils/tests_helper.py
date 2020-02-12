@@ -49,10 +49,12 @@ def _has_transform_model(model):
 
 
 def fit_classification_model(model, n_classes, is_int=False,
-                             pos_features=False, label_string=False):
+                             pos_features=False, label_string=False,
+                             random_state=42):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
-                               random_state=42, n_informative=7)
+                               random_state=random_state,
+                               n_informative=7)
     if label_string:
         y = numpy.array(['cl%d' % cl for cl in y])
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)

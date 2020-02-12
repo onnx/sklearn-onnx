@@ -278,8 +278,14 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_ovr_regression_float(self):
+        """The test is unstable, some observations
+        are equidistant to more than one class,
+        the chosen is difficult to predict. So we
+        check only probabilities."""
+        rs = 11
         model, X = fit_classification_model(
-            OneVsRestClassifier(LinearRegression()), 3)
+            OneVsRestClassifier(
+                LinearRegression()), 3, random_state=rs)
         model_onnx = convert_sklearn(
             model,
             "ovr regression",
