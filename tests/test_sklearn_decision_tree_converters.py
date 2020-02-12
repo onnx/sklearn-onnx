@@ -7,7 +7,6 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
-import onnx
 from pandas import DataFrame
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
@@ -28,10 +27,8 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):

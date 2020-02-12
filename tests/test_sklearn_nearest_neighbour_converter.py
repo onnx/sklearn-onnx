@@ -38,10 +38,8 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx_opset_version())
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):

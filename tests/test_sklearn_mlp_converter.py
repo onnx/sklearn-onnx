@@ -3,7 +3,6 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
 
 import unittest
-import onnx
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -13,10 +12,8 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestSklearnMLPConverters(unittest.TestCase):

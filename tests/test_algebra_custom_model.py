@@ -14,7 +14,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.convert import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxDiv, OnnxSub
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
@@ -56,9 +56,6 @@ class CustomOpTransformerShape(CustomOpTransformer):
 
 class CustomOpScaler(StandardScaler, OnnxOperatorMixin):
     pass
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestCustomModelAlgebra(unittest.TestCase):

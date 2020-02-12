@@ -4,7 +4,6 @@ Tests scikit-learn's KBinsDiscretiser converter.
 
 import unittest
 import numpy as np
-import onnx
 try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
@@ -12,10 +11,7 @@ except ImportError:
     KBinsDiscretizer = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnKBinsDiscretiser(unittest.TestCase):

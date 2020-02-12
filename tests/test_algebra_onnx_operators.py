@@ -22,11 +22,11 @@ from onnx import (
     helper, TensorProto, load_model,
     __version__ as onnx__version__
 )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET as TO11
 
 
 TARGET_OPSET = None
-TARGET_OPSET_11 = min(11, onnx.defs.onnx_opset_version())
+TARGET_OPSET_11 = TO11
 
 
 class TestOnnxOperators(unittest.TestCase):

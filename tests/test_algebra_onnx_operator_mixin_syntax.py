@@ -10,10 +10,7 @@ from skl2onnx import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxClip, OnnxClip_6
 from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
-from test_utils import dump_data_and_model
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class CustomOpTransformer(BaseEstimator, TransformerMixin,

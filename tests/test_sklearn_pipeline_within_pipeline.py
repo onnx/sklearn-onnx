@@ -4,7 +4,6 @@ Tests pipeline within pipelines.
 
 import numpy as np
 import unittest
-import onnx
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -23,10 +22,7 @@ from sklearn.preprocessing import RobustScaler, StandardScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnPipelineWithinPipeline(unittest.TestCase):

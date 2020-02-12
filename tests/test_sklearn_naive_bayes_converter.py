@@ -20,10 +20,11 @@ from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    TARGET_OPSET
+)
 
 
 class TestNaiveBayesConverter(unittest.TestCase):

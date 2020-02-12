@@ -1,7 +1,6 @@
 """Tests StackingClassifier and StackingRegressor converter."""
 
 import unittest
-import onnx
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 try:
@@ -14,11 +13,8 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import (
     dump_data_and_model, fit_regression_model,
-    fit_classification_model
+    fit_classification_model, TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 def model_to_test_reg():

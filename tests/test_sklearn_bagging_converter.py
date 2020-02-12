@@ -6,7 +6,6 @@
 
 import unittest
 import numpy as np
-import onnx
 from sklearn.ensemble import (
     BaggingClassifier,
     BaggingRegressor,
@@ -20,10 +19,8 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestSklearnBaggingConverter(unittest.TestCase):

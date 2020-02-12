@@ -15,10 +15,8 @@ from test_utils import (
     dump_multiple_classification,
     dump_binary_classification,
     dump_data_and_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class CustomTransform(BaseEstimator, TransformerMixin):

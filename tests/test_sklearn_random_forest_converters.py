@@ -7,7 +7,6 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy
-import onnx
 import sklearn
 from sklearn.datasets import (
     load_iris, make_regression, make_classification,
@@ -32,6 +31,7 @@ from test_utils import (
     dump_single_regression,
     fit_classification_model,
     fit_multilabel_classification_model,
+    TARGET_OPSET
 )
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
@@ -42,9 +42,6 @@ try:
 except ImportError:
     HistGradientBoostingClassifier = None
     HistGradientBoostingRegressor = None
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 def _sklearn_version():

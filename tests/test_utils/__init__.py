@@ -4,7 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-
+import onnx
 from .tests_helper import dump_data_and_model  # noqa
 from .tests_helper import (  # noqa
     dump_one_class_classification,
@@ -29,3 +29,6 @@ def create_tensor(N, C, H=None, W=None):
         return np.random.rand(N, C, H, W).astype(np.float32, copy=False)
     else:
         raise ValueError('This function only produce 2-D or 4-D tensor.')
+
+
+TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())

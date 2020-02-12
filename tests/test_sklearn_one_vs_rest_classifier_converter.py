@@ -1,5 +1,4 @@
 import unittest
-import onnx
 from sklearn.ensemble import (
     GradientBoostingClassifier,
     GradientBoostingRegressor,
@@ -17,10 +16,8 @@ from test_utils import (
     dump_data_and_model,
     dump_multiple_classification,
     fit_classification_model,
+    TARGET_OPSET
 )
-
-
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
 
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
