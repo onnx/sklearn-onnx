@@ -293,7 +293,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRRegressionFloat-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
+            "<= StrictVersion('1.1.0')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -361,5 +361,4 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOneVsRestClassifierConverter().test_ovr_regression_float()
     unittest.main()
