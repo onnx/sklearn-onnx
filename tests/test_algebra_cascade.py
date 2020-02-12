@@ -187,7 +187,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             try:
                 ort = InferenceSession(as_string)
             except (RuntimeError, InvalidGraph, Fail) as e:
-                if opv in (1, 2):
+                if opv in (None, 1, 2):
                     continue
                 if opv >= onnx_opset_version():
                     continue
