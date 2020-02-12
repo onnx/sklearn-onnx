@@ -166,8 +166,14 @@ from sklearn.preprocessing import (
     MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
     PolynomialFeatures, RobustScaler,
-    StandardScaler, PowerTransformer,
+    StandardScaler,
 )
+
+try:
+    from sklearn.preprocessing import PowerTransformer
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    PowerTransformer = None
 
 try:
     from sklearn.ensemble import (
