@@ -59,13 +59,14 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             suffix="String",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_ovr_classification_float(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(LogisticRegression()), 5)
+            OneVsRestClassifier(LogisticRegression(solver='liblinear')), 3)
         model_onnx = convert_sklearn(
             model,
             "ovr classification",
@@ -281,7 +282,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_ovr_regression_float(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(LinearRegression()), 10)
+            OneVsRestClassifier(LinearRegression()), 5)
         model_onnx = convert_sklearn(
             model,
             "ovr regression",
