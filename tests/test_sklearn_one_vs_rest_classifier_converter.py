@@ -279,7 +279,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_ovr_regression_float(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(LinearRegression()), 5)
+            OneVsRestClassifier(LinearRegression()), 3)
         model_onnx = convert_sklearn(
             model,
             "ovr regression",
@@ -361,4 +361,5 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestOneVsRestClassifierConverter().test_ovr_regression_float()
     unittest.main()
