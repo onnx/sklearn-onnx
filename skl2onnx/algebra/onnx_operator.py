@@ -478,13 +478,7 @@ class OnnxOperator:
             target_opset = get_opset_number_from_onnx()
         container = ModelComponentContainer(
             target_opset, dtype=dtype)
-        if container.target_opset < 9 and self.domain in ('', None):
-            raise RuntimeError("The operator cannot be converted into ONNX."
-                               " It requires ONNX op_set >= 9 (={}, "
-                               "name='{}', domain='{}')"
-                               ".".format(container.target_opset,
-                                          self.__class__.__name__,
-                                          self.domain))
+
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,
                       variable_name_set=set(_[0] for _ in inputs))
