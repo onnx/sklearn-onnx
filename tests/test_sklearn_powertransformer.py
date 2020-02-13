@@ -25,8 +25,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -38,8 +37,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -51,8 +49,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -64,8 +61,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -77,8 +73,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -90,8 +85,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -103,8 +97,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -116,8 +109,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
@@ -129,8 +121,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         model = pt.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
                                      [("input_float",
-                                       FloatTensorType([data.shape[0],
-                                                        data.shape[1]]))])
+                                       FloatTensorType([None, None]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
