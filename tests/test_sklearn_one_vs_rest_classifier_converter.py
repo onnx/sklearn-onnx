@@ -294,7 +294,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:5],
             model,
             model_onnx,
             basename="SklearnOVRRegressionFloat-Out0",
