@@ -170,6 +170,12 @@ from sklearn.preprocessing import (
 )
 
 try:
+    from sklearn.preprocessing import PowerTransformer
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    PowerTransformer = None
+
+try:
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
         HistGradientBoostingRegressor
@@ -254,7 +260,8 @@ def build_sklearn_operator_name_map():
                 SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
                 VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
                 BayesianGaussianMixture, OneClassSVM, PLSRegression,
-                HistGradientBoostingClassifier, HistGradientBoostingRegressor
+                HistGradientBoostingClassifier, HistGradientBoostingRegressor,
+                PowerTransformer,
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
