@@ -38,12 +38,12 @@ or submit a new one. Sources are available on
 .. index:: target_opset, opset version
 
 The converter can convert a model for a specific version of ONNX.
-Every ONNX release is labelled with a opset number
+Every ONNX release is labelled with an opset number
 returned by function `onnx_opset_version
 <https://github.com/onnx/onnx/blob/master/onnx/defs/__init__.py#L22>`_.
 This function returns the default value for parameter
 target opset (parameter *target_opset*) if it is not specified
-when converter the model. Every operator is versioned.
+when converting the model. Every operator is versioned.
 The library chooses the most recent version below or equal
 to the targetted opset number for every operator.
 The ONNX model has one opset number for every operator domain,
