@@ -36,14 +36,10 @@ def convert_powertransformer(scope, operator, container):
                             to=getattr(TensorProto, 'FLOAT'))
 
     # logical masks for lambdas
-    lambda_zero_mask = OnnxCast((lambdas == 0),
-                                to=getattr(TensorProto, 'FLOAT'))
-    lambda_nonzero_mask = OnnxCast((lambdas != 0),
-                                   to=getattr(TensorProto, 'FLOAT'))
-    lambda_two_mask = OnnxCast((lambdas == 2),
-                               to=getattr(TensorProto, 'FLOAT'))
-    lambda_nontwo_mask = OnnxCast((lambdas != 2),
-                                  to=getattr(TensorProto, 'FLOAT'))
+    lambda_zero_mask = numpy.float32(lambdas == 0)
+    lambda_nonzero_mask = numpy.float32(lambdas != 0)
+    lambda_two_mask = numpy.float32(lambdas == 2)
+    lambda_nontwo_mask = numpy.float32(lambdas != 2)
 
     if 'yeo-johnson' in op.method:
         y0 = OnnxAdd(op_in, ones_)  # For positive input
