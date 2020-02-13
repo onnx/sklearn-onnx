@@ -31,10 +31,10 @@ from ..algebra.onnx_ops import (
 )
 try:
     from ..algebra.onnx_ops import (
-    OnnxConstantOfShape,
-    OnnxIsNaN,
-    OnnxWhere,
-)
+        OnnxConstantOfShape,
+        OnnxIsNaN,
+        OnnxWhere,
+    )
 except ImportError:
     OnnxConstantOfShape = None
     OnnxIsNaN = None
