@@ -64,8 +64,7 @@ def calculate_sklearn_knn_imputer(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
     check_input_and_output_types(
-        operator, good_input_types=[
-            FloatTensorType, DoubleTensorType])
+        operator, good_input_types=[FloatTensorType])
 
     operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
     operator.outputs[0].type.shape = operator.inputs[0].type.shape

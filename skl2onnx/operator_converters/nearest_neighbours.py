@@ -384,38 +384,38 @@ def _nan_euclidean_distance(container, model, input_name, op_version):
     shape = OnnxShape(input_name, op_version=op_version)
     zero = OnnxConstantOfShape(
         shape, value=make_tensor(
-            "value", onnx_proto.TensorProto.FLOAT, (1, ), [0]),
+            "value", container.proto_dtype, (1, ), [0]),
         op_version=op_version)
     missing_input_name = OnnxIsNaN(input_name, op_version=op_version)
     masked_input_name = OnnxWhere(missing_input_name, zero, input_name,
                                   op_version=op_version)
-    missing_y = np.isnan(training_data, op_version=op_version)
+    missing_y = np.isnan(training_data)
     training_data[missing_y] = 0
     d_in = training_data.shape[1] if hasattr(training_data, 'shape') else None
     d_out = training_data.shape[0] if hasattr(training_data, 'shape') else None
     dist = _onnx_cdist_sqeuclidean(
-        masked_input_name, training_data, dtype=np.float32,
+        masked_input_name, training_data, dtype=container.dtype,
         op_version=container.target_opset, dim_in=d_in, dim_out=d_out)
     dist1 = OnnxMatMul(
         OnnxMul(masked_input_name, masked_input_name, op_version=op_version),
-        missing_y.T.astype(np.float32), op_version=op_version)
+        missing_y.T.astype(container.dtype), op_version=op_version)
     dist2 = OnnxMatMul(
-        OnnxCast(missing_input_name, to=onnx_proto.TensorProto.FLOAT,
+        OnnxCast(missing_input_name, to=container.proto_dtype,
                  op_version=op_version),
         (training_data * training_data).T, op_version=op_version)
     distances = OnnxSub(dist, OnnxAdd(dist1, dist2), op_version=op_version)
     present_x = OnnxSub(
-        np.array([1], dtype=np.float32),
-        OnnxCast(missing_input_name, to=onnx_proto.TensorProto.FLOAT,
+        np.array([1], dtype=container.dtype),
+        OnnxCast(missing_input_name, to=container.proto_dtype,
                  op_version=op_version),
         op_version=op_version)
-    present_y = (1. - missing_y).astype(np.float32)
+    present_y = (1. - missing_y).astype(container.dtype)
     present_count = OnnxMatMul(present_x, present_y.T, op_version=op_version)
-    present_count = OnnxMax(np.array([1], dtype=np.float32), present_count,
-                            op_version=op_version)
+    present_count = OnnxMax(np.array([1], dtype=container.dtype),
+                            present_count, op_version=op_version)
     dist = OnnxDiv(distances, present_count, op_version=op_version)
     return OnnxMul(
-        dist, np.array([d_in], dtype=np.float32),
+        dist, np.array([d_in], dtype=container.dtype),
         op_version=op_version), missing_input_name
 
 
@@ -450,10 +450,10 @@ def convert_knn_imputer(scope, operator, container):
     if knn_op.metric != 'nan_euclidean':
         raise RuntimeError(
             "Unable to convert KNNImputer when metric is callable.")
-    if knn_op.metric not in ('uniform', 'distance'):
+    if knn_op.weights not in ('uniform', 'distance'):
         raise RuntimeError(
             "Unable to convert KNNImputer when weights is callable.")
-    if knn_op.metric == 'distance':
+    if knn_op.weights == 'distance':
         raise NotImplementedError(
             'KNNImputer with distance as metric is not supported, '
             'you may raise an issue at '
@@ -479,13 +479,13 @@ def convert_knn_imputer(scope, operator, container):
     cast_res = OnnxCast(
         OnnxCast(transpose_result, to=onnx_proto.TensorProto.BOOL,
                  op_version=op_version),
-        to=onnx_proto.TensorProto.FLOAT, op_version=op_version)
+        to=container.proto_dtype, op_version=op_version)
     deno = OnnxReduceSum(cast_res, op_version=op_version, axes=[1], keepdims=0)
     deno_updated = OnnxAdd(
         deno, OnnxCast(
             OnnxNot(OnnxCast(deno, to=onnx_proto.TensorProto.BOOL,
                              op_version=op_version), op_version=op_version),
-            to=onnx_proto.TensorProto.FLOAT, op_version=op_version),
+            to=container.proto_dtype, op_version=op_version),
         op_version=op_version)
     imputed_out = OnnxWhere(
         missing_input_name,
