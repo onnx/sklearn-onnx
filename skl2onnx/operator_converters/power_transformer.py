@@ -20,20 +20,23 @@ def convert_powertransformer(scope, operator, container):
     op_in = operator.inputs[0]
     op_out = operator.outputs[0].full_name
     op = operator.raw_operator
+    opv = container.target_opset
     lambdas = op.lambdas_
 
     # tensors of units and zeros
-    ones_ = OnnxDiv(op_in, op_in)
-    zeros_ = OnnxSub(op_in, op_in)
+    ones_ = OnnxDiv(op_in, op_in, op_version=opv)
+    zeros_ = OnnxSub(op_in, op_in, op_version=opv)
 
     # logical masks for input
-    less_than_zero = OnnxLess(op_in, zeros_)
+    less_than_zero = OnnxLess(op_in, zeros_, op_version=opv)
     less_mask = OnnxCast(less_than_zero,
-                         to=getattr(TensorProto, 'FLOAT'))
+                         to=getattr(TensorProto, 'FLOAT'),
+                         op_version=opv)
 
-    greater_than_zero = OnnxNot(less_than_zero)
+    greater_than_zero = OnnxNot(less_than_zero, op_version=opv)
     greater_mask = OnnxCast(greater_than_zero,
-                            to=getattr(TensorProto, 'FLOAT'))
+                            to=getattr(TensorProto, 'FLOAT'),
+                            op_version=opv)
 
     # logical masks for lambdas
     lambda_zero_mask = numpy.float32(lambdas == 0)
@@ -42,69 +45,80 @@ def convert_powertransformer(scope, operator, container):
     lambda_nontwo_mask = numpy.float32(lambdas != 2)
 
     if 'yeo-johnson' in op.method:
-        y0 = OnnxAdd(op_in, ones_)  # For positive input
-        y1 = OnnxSub(ones_, op_in)  # For negative input
+        y0 = OnnxAdd(op_in, ones_, op_version=opv)  # For positive input
+        y1 = OnnxSub(ones_, op_in, op_version=opv)  # For negative input
 
         # positive input, lambda != 0
-        y_gr0_l_ne0 = OnnxPow(y0, lambdas)
-        y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_)
-        y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas)
+        y_gr0_l_ne0 = OnnxPow(y0, lambdas, op_version=opv)
+        y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_, op_version=opv)
+        y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas, op_version=opv)
         y_gr0_l_ne0 = OnnxImputer(y_gr0_l_ne0,
                                   imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.inf)
-        y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask)
+                                  replaced_value_float=numpy.inf,
+                                  op_version=opv)
+        y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask,
+                              op_version=opv)
 
         # positive input, lambda == 0
-        y_gr0_l_eq0 = OnnxLog(y0)
-        y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask)
+        y_gr0_l_eq0 = OnnxLog(y0, op_version=opv)
+        y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask,
+                              op_version=opv)
 
         # positive input, an arbitrary lambda
-        y_gr0 = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0)
+        y_gr0 = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0, op_version=opv)
         y_gr0 = OnnxImputer(y_gr0, imputed_value_floats=[0.0],
-                            replaced_value_float=numpy.NAN)
-        y_gr0 = OnnxMul(y_gr0, greater_mask)
+                            replaced_value_float=numpy.NAN,
+                            op_version=opv)
+        y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
 
         # negative input, lambda != 2
-        y_le0_l_ne2 = OnnxPow(y1, 2-lambdas)
-        y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2)
-        y_le0_l_ne2 = OnnxDiv(y_le0_l_ne2, 2-lambdas)
+        y_le0_l_ne2 = OnnxPow(y1, 2-lambdas, op_version=opv)
+        y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2, op_version=opv)
+        y_le0_l_ne2 = OnnxDiv(y_le0_l_ne2, 2-lambdas, op_version=opv)
         y_le0_l_ne2 = OnnxImputer(y_le0_l_ne2,
                                   imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.inf)
-        y_le0_l_ne2 = OnnxMul(y_le0_l_ne2, lambda_nontwo_mask)
+                                  replaced_value_float=numpy.inf,
+                                  op_version=opv)
+        y_le0_l_ne2 = OnnxMul(y_le0_l_ne2, lambda_nontwo_mask, op_version=opv)
 
         # negative input, lambda == 2
-        y_le0_l_eq2 = OnnxNeg(OnnxLog(y1))
+        y_le0_l_eq2 = OnnxNeg(OnnxLog(y1, op_version=opv), op_version=opv)
         y_le0_l_eq2 = OnnxMul(y_le0_l_eq2, lambda_two_mask)
 
         # negative input, an arbitrary lambda
         y_le0 = OnnxAdd(y_le0_l_ne2, y_le0_l_eq2)
         y_le0 = OnnxImputer(y_le0, imputed_value_floats=[0.0],
-                            replaced_value_float=numpy.NAN)
+                            replaced_value_float=numpy.NAN,
+                            op_version=opv)
         y_le0 = OnnxMul(y_le0, less_mask)
 
         # Arbitrary input and lambda
-        y = OnnxAdd(y_gr0, y_le0, output_names='tmp')
+        y = OnnxAdd(y_gr0, y_le0, output_names='tmp', op_version=opv)
 
     elif 'box-cox' in op.method:
         # positive input, lambda != 0
-        y_gr0_l_ne0 = OnnxPow(op_in, lambdas)
-        y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_)
-        y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas)
+        y_gr0_l_ne0 = OnnxPow(op_in, lambdas, op_version=opv)
+        y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_, op_version=opv)
+        y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas, op_version=opv)
         y_gr0_l_ne0 = OnnxImputer(y_gr0_l_ne0,
                                   imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.inf)
-        y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask)
+                                  replaced_value_float=numpy.inf,
+                                  op_version=opv)
+        y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask,
+                              op_version=opv)
 
         # positive input, lambda == 0
         y_gr0_l_eq0 = OnnxLog(op_in)
         y_gr0_l_eq0 = OnnxImputer(y_gr0_l_eq0,
                                   imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.NAN)
-        y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask)
+                                  replaced_value_float=numpy.NAN,
+                                  op_version=opv)
+        y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask, op_version=opv)
 
         # positive input, arbitrary lambda
-        y = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0, output_names='tmp')
+        y = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0,
+                    output_names='tmp',
+                    op_version=opv)
 
         # negative input
         # PowerTransformer(method='box-cox').fit(negative_data)

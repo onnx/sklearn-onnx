@@ -39,7 +39,7 @@ from . import one_hot_encoder
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import polynomial_features
-from . import powertransformer
+from . import power_transformer
 from . import random_forest
 from . import ransac_regressor
 from . import scaler_op
@@ -87,7 +87,7 @@ __all__ = [
     one_vs_rest_classifier,
     ordinal_encoder,
     polynomial_features,
-    powertransformer,
+    power_transformer,
     random_forest,
     ransac_regressor,
     scaler_op,
