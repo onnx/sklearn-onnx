@@ -12,12 +12,10 @@ from ..algebra.onnx_ops import (
     OnnxArrayFeatureExtractor,
     OnnxCast,
     OnnxConcat,
-    OnnxConstantOfShape,
     OnnxDiv,
     OnnxEqual,
     OnnxFlatten,
     OnnxIdentity,
-    OnnxIsNaN,
     OnnxMatMul,
     OnnxMax,
     OnnxMul,
@@ -30,8 +28,17 @@ from ..algebra.onnx_ops import (
     OnnxSub,
     OnnxTopK_1,
     OnnxTranspose,
+)
+try:
+    from ..algebra.onnx_ops import (
+    OnnxConstantOfShape,
+    OnnxIsNaN,
     OnnxWhere,
 )
+except ImportError:
+    OnnxConstantOfShape = None
+    OnnxIsNaN = None
+    OnnxWhere = None
 try:
     from ..algebra.onnx_ops import OnnxTopK_10
 except ImportError:

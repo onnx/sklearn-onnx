@@ -5,6 +5,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from pandas import DataFrame
 from onnx.defs import onnx_opset_version
 from sklearn import datasets
@@ -493,6 +494,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")
+    @unittest.skipIf((StrictVersion(onnx.__version__) <
+                      StrictVersion("1.4.1")),
+                     reason="ConstantOfShape op not available")
     def test_sklearn_knn_imputer(self):
         x_train = numpy.array(
             [[1, 2, numpy.nan, 12], [3, numpy.nan, 3, 13],
