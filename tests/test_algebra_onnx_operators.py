@@ -22,11 +22,7 @@ from onnx import (
     helper, TensorProto, load_model,
     __version__ as onnx__version__
 )
-from test_utils import dump_data_and_model, TARGET_OPSET as TO11
-
-
-TARGET_OPSET = None
-TARGET_OPSET_11 = TO11
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestOnnxOperators(unittest.TestCase):
@@ -46,7 +42,7 @@ class TestOnnxOperators(unittest.TestCase):
                 return X - self.W
 
         mat = np.array([[0., 1.], [1., 2.], [3., 4.]])
-        tr = CustomOpTransformer(op_version=TARGET_OPSET)
+        tr = CustomOpTransformer(op_version=None)
         tr.fit(mat)
         z = tr.transform(mat)
 
@@ -54,7 +50,7 @@ class TestOnnxOperators(unittest.TestCase):
             W = operator.raw_operator.W
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
-                op_version=TARGET_OPSET)
+                op_version=None)
             op.add_to(scope, container)
             text = str(container)
             if 'name:"Su_Sub"' not in text:
@@ -126,7 +122,7 @@ class TestOnnxOperators(unittest.TestCase):
             tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv},
-            target_opset=TARGET_OPSET)
+            target_opset=None)
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
@@ -183,7 +179,7 @@ class TestOnnxOperators(unittest.TestCase):
             model, 'a-kmeans',
             [('input', FloatTensorType([None, X.shape[1]]))],
             custom_conversion_functions={KMeans: conv},
-            target_opset=TARGET_OPSET_11)
+            target_opset=TARGET_OPSET)
 
         dump_data_and_model(X.astype(np.float32)[40:60], model, model_onnx,
                             basename="SklearnKMeansCustom-Dec4")

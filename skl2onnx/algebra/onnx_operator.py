@@ -433,9 +433,7 @@ class OnnxOperator:
         if isinstance(target_opset, dict):
             target_opset = target_opset.get(self.domain, None)
         elif isinstance(target_opset, int):
-            if self.domain == '':
-                pass
-            else:
+            if self.domain != '':
                 # The target_opset is for the domain ''
                 # We ignore it.
                 target_opset = None
