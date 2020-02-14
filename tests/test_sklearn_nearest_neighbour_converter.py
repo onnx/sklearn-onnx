@@ -505,18 +505,20 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             [[1.3, 2.4, numpy.nan, 1], [-1.3, numpy.nan, 3.1, numpy.nan]],
             dtype=numpy.float32)
         model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
-        model_onnx = convert_sklearn(
-            model,
-            "KNN imputer",
-            [("input", FloatTensorType((None, x_test.shape[1])))],
-        )
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            x_test,
-            model,
-            model_onnx,
-            basename="SklearnKNNImputer",
-        )
+        for opset in [9, 10, 11]:
+            model_onnx = convert_sklearn(
+                model,
+                "KNN imputer",
+                [("input", FloatTensorType((None, x_test.shape[1])))],
+                target_opset=opset,
+            )
+            self.assertIsNotNone(model_onnx)
+            dump_data_and_model(
+                x_test,
+                model,
+                model_onnx,
+                basename="SklearnKNNImputer",
+            )
 
 
 if __name__ == "__main__":
