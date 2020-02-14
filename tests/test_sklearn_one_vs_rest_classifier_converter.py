@@ -299,7 +299,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRRegressionFloat-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('1.1.0')",
+            "<= StrictVersion('0.2.1')",
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
