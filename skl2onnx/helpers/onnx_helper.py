@@ -162,6 +162,12 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     if len(onnx_model.graph.input) != len(model.graph.input):
         raise RuntimeError("Input mismatch {} != {}".format(
                         len(onnx_model.input), len(model.input)))
+
+    # fix opset import
+    for oimp in model.opset_import:
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = oimp.domain
+        op_set.version = oimp.version
     return onnx_model
 
 

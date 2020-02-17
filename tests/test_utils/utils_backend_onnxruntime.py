@@ -456,6 +456,14 @@ def _compare_expected(expected,
                 expected = expected[:1]
                 output = output[:1]
                 del kwargs['Out0']
+            elif 'Out1' in kwargs:
+                print('----------')
+                print(expected)
+                print(output)
+                print('----------')
+                expected = expected[1:2]
+                output = output[1:2]
+                del kwargs['Out1']
             if 'Reshape' in kwargs:
                 del kwargs['Reshape']
                 output = numpy.hstack(output).ravel()

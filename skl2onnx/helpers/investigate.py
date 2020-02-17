@@ -235,8 +235,8 @@ def collect_intermediate_steps(model, *args, **kwargs):
     from ..helpers.onnx_helper import select_model_inputs_outputs
     from ..common import MissingShapeCalculator, MissingConverter
     try:
-        model_onnx, topology = convert_sklearn(model, *args, intermediate=True,
-                                               **kwargs)
+        model_onnx, topology = convert_sklearn(
+            model, *args, intermediate=True, **kwargs)
     except (MissingShapeCalculator, MissingConverter):
         # The model cannot be converted.
         raise

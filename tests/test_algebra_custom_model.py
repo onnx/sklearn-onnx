@@ -14,15 +14,17 @@ from skl2onnx import convert_sklearn
 from skl2onnx.convert import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxDiv, OnnxSub
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
                           OnnxOperatorMixin):
 
-    def __init__(self):
+    def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
+        OnnxOperatorMixin.__init__(self)
+        self.op_version = op_version
 
     def fit(self, X, y=None):
         self.W_ = np.mean(X, axis=0)
@@ -40,8 +42,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         S = self.S_
         # case if there are multiple output nodes
 
-        return OnnxDiv(OnnxSub(i0, W), S,
-                       output_names=outputs)
+        return OnnxDiv(OnnxSub(i0, W, op_version=self.op_version), S,
+                       output_names=outputs, op_version=self.op_version)
 
 
 class CustomOpTransformerShape(CustomOpTransformer):
@@ -63,14 +65,14 @@ class TestCustomModelAlgebra(unittest.TestCase):
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
         model.fit(data)
         try:
-            model_onnx = convert_sklearn(model)
+            model_onnx = convert_sklearn(model, target_opset=TARGET_OPSET)
             assert model_onnx is not None
         except RuntimeError as e:
             assert "Method enumerate_initial_types is missing" in str(e)
 
     def test_custom_scaler(self):
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
-        tr = CustomOpTransformerShape()
+        tr = CustomOpTransformerShape(op_version=TARGET_OPSET)
         tr.fit(mat)
         z = tr.transform(mat)
         assert z is not None
@@ -115,7 +117,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
         matf = mat.astype(np.float32)
 
         try:
-            model_onnx = to_onnx(pipe, matf)
+            model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
         except RuntimeError as e:
             assert "cannot be infered" in str(e)
 

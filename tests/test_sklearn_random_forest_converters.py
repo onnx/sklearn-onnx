@@ -31,6 +31,7 @@ from test_utils import (
     dump_single_regression,
     fit_classification_model,
     fit_multilabel_classification_model,
+    TARGET_OPSET
 )
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
@@ -338,6 +339,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -361,6 +363,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -384,6 +387,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -407,6 +411,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()

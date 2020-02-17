@@ -1,11 +1,14 @@
 """Tests scikit-learn's Passive Aggressive Classifier converter."""
-
 import unittest
 from sklearn.linear_model import PassiveAggressiveClassifier
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model,
+    fit_classification_model,
+    TARGET_OPSET
+)
 
 
 class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
@@ -19,6 +22,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             model,
             "scikit-learn PassiveAggressiveClassifier binary",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -41,6 +45,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             model,
             "scikit-learn PassiveAggressiveClassifier multi-class",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -63,6 +68,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             model,
             "scikit-learn PassiveAggressiveClassifier binary",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -85,6 +91,7 @@ class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
             model,
             "scikit-learn PassiveAggressiveClassifier multi-class",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(

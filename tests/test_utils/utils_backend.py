@@ -198,7 +198,8 @@ def extract_options(name):
         for opt in opts[1:]:
             if opt in ("SkipDim1", "OneOff", "NoProb", "NoProbOpp",
                        "Dec4", "Dec3", "Dec2", 'Svm',
-                       'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
+                       'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray',
+                       'Out1'):
                 res[opt] = True
             else:
                 raise NameError("Unable to parse option '{}'".format(opts[1:]))

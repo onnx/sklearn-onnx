@@ -904,8 +904,10 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                        returned model. The string "model_name" would be
                        assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for
-                         ONNX 1.3.
+    :param target_opset: number or dictionary,
+        for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
+        a dictionary is used to indicate different opset for
+        different domains
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
     :param options: see :ref:`l-conv-options`
@@ -917,13 +919,18 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     if target_opset is None:
         target_opset = get_opset_number_from_onnx()
-    elif target_opset > get_opset_number_from_onnx():
+    if isinstance(target_opset, dict):
+        onnx_target_opset = target_opset.get('', get_opset_number_from_onnx())
+    else:
+        onnx_target_opset = target_opset
+    if onnx_target_opset > get_opset_number_from_onnx():
         found = get_opset_number_from_onnx()
         raise RuntimeError(
             "Parameter target_opset {} > {} is higher than the "
             "number of the installed onnx package. See "
-            "https://github.com/onnx/onnx/blob/master/docs/Versioning.md#released-versions" # noqa
-            ".".format(target_opset, found))
+            "https://github.com/onnx/onnx/blob/master/docs/"
+            "Versioning.md#released-versions"
+            ".".format(onnx_target_opset, found))
 
     topology._initialize_graph_status_for_traversing()
 
@@ -1026,7 +1033,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         conv(scope, operator, container)
 
     # Create a graph from its main components
-    if container.target_opset < 9:
+    if container.target_opset_onnx < 9:
         # When calling ModelComponentContainer's add_initializer(...),
         # nothing is added into the input list. However, for ONNX target
         # opset < 9, initializers should also be a part of model's
@@ -1069,6 +1076,21 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Create model
     onnx_model = make_model(graph)
 
+    # Update domain version
+    _update_domain_version(container, onnx_model)
+
+    # Add extra information
+    onnx_model.ir_version = onnx_proto.IR_VERSION
+    onnx_model.producer_name = utils.get_producer()
+    onnx_model.producer_version = utils.get_producer_version()
+    onnx_model.domain = utils.get_domain()
+    onnx_model.model_version = utils.get_model_version()
+    onnx_model.doc_string = doc_string
+
+    return onnx_model
+
+
+def _update_domain_version(container, onnx_model):
     # Merge operator sets for the same domain, the largest version
     # number would be kept
     purified_operator_set = dict()
@@ -1082,6 +1104,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Fill operator sets
     i = 0
     for op_domain, op_version in purified_operator_set.items():
+        if op_version is None:
+            continue
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
             # make_model(...)
@@ -1092,17 +1116,10 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         op_set.domain = op_domain
         op_set.version = op_version
         i += 1
-        if container.target_opset < op_version:
-            raise RuntimeError(('The specified opset %d is too low to convert '
-                                'this model, which requires at least opset '
-                                '%d.') % (container.target_opset, op_version))
-
-    # Add extra information
-    onnx_model.ir_version = onnx_proto.IR_VERSION
-    onnx_model.producer_name = utils.get_producer()
-    onnx_model.producer_version = utils.get_producer_version()
-    onnx_model.domain = utils.get_domain()
-    onnx_model.model_version = utils.get_model_version()
-    onnx_model.doc_string = doc_string
-
-    return onnx_model
+        if container.target_opset_any_domain(op_domain) < op_version:
+            raise RuntimeError(
+                'The specified opset %d is too low to convert '
+                'this model, which requires at least opset '
+                '%d.' % (
+                    container.target_opset_any_domain(op_domain),
+                    op_version))

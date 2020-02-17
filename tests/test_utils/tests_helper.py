@@ -49,10 +49,12 @@ def _has_transform_model(model):
 
 
 def fit_classification_model(model, n_classes, is_int=False,
-                             pos_features=False, label_string=False):
+                             pos_features=False, label_string=False,
+                             random_state=42):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
-                               random_state=42, n_informative=7)
+                               random_state=random_state,
+                               n_informative=7)
     if label_string:
         y = numpy.array(['cl%d' % cl for cl in y])
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
@@ -396,7 +398,7 @@ def dump_data_and_model(
     return names
 
 
-def convert_model(model, name, input_types):
+def convert_model(model, name, input_types, target_opset=None):
     """
     Runs the appropriate conversion method.
 
@@ -406,7 +408,9 @@ def convert_model(model, name, input_types):
     """
     from skl2onnx import convert_sklearn
 
-    model, prefix = convert_sklearn(model, name, input_types), "Sklearn"
+    model, prefix = (
+        convert_sklearn(model, name, input_types, target_opset=target_opset),
+        "Sklearn")
     if model is None:
         raise RuntimeError("Unable to convert model of type '{0}'.".format(
             type(model)))
@@ -419,7 +423,8 @@ def dump_one_class_classification(
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False):
+        verbose=False,
+        target_opset=None):
     """
     Trains and dumps a model for a One Class outlier problem.
     The function trains a model and calls
@@ -432,8 +437,9 @@ def dump_one_class_classification(
     X = numpy.array(X, dtype=numpy.float32)
     y = [1, 1, 1]
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, "one_class",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "one_class", [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,
@@ -453,7 +459,8 @@ def dump_binary_classification(
         allow_failure=None,
         comparable_outputs=None,
         verbose=False,
-        label_string=True):
+        label_string=True,
+        target_opset=None):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -469,8 +476,9 @@ def dump_binary_classification(
     else:
         y = [0, 1, 0]
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, "binary classifier",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "binary classifier", [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,
@@ -486,7 +494,8 @@ def dump_binary_classification(
     X = X[:, :2]
     model.fit(X, y)
     model_onnx, prefix = convert_model(model, "binary classifier",
-                                       [("input", FloatTensorType([None, 2]))])
+                                       [("input", FloatTensorType([None, 2]))],
+                                       target_opset=target_opset)
     dump_data_and_model(
         X.astype(numpy.float32),
         model,
@@ -507,7 +516,8 @@ def dump_multiple_classification(
         verbose=False,
         label_string=False,
         first_class=0,
-        comparable_outputs=None):
+        comparable_outputs=None,
+        target_opset=None):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -526,8 +536,10 @@ def dump_multiple_classification(
     if verbose:
         print("[dump_multiple_classification] model '{}'".format(
             model.__class__.__name__))
-    model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "multi-class classifier",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
@@ -549,7 +561,8 @@ def dump_multiple_classification(
         print("[dump_multiple_classification] model '{}'".format(
             model.__class__.__name__))
     model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([None, 2]))])
+                                       [("input", FloatTensorType([None, 2]))],
+                                       target_opset=target_opset)
     if verbose:
         print("[dump_multiple_classification] model was converted")
     dump_data_and_model(
@@ -572,7 +585,8 @@ def dump_multilabel_classification(
         verbose=False,
         label_string=False,
         first_class=0,
-        comparable_outputs=None):
+        comparable_outputs=None,
+        target_opset=None):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
@@ -594,8 +608,10 @@ def dump_multilabel_classification(
     if verbose:
         print("[make_multilabel_classification] model '{}'".format(
             model.__class__.__name__))
-    model_onnx, prefix = convert_model(model, "multi-class classifier",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "multi-class classifier",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     if verbose:
         print("[make_multilabel_classification] model was converted")
     dump_data_and_model(
@@ -638,7 +654,8 @@ def dump_multiple_regression(
         folder=None,
         allow_failure=None,
         comparable_outputs=None,
-        verbose=False):
+        verbose=False,
+        target_opset=None):
     """
     Trains and dumps a model for a multi regression problem.
     The function trains a model and calls
@@ -651,8 +668,9 @@ def dump_multiple_regression(
     X = numpy.array(X, dtype=numpy.float32)
     y = numpy.array([[100, 50], [100, 49], [100, 99]], dtype=numpy.float32)
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, "multi-regressor",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "multi-regressor", [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,
@@ -669,7 +687,8 @@ def dump_single_regression(model,
                            suffix="",
                            folder=None,
                            allow_failure=None,
-                           comparable_outputs=None):
+                           comparable_outputs=None,
+                           target_opset=None):
     """
     Trains and dumps a model for a regression problem.
     The function trains a model and calls
@@ -682,8 +701,9 @@ def dump_single_regression(model,
     X = numpy.array(X, dtype=numpy.float32)
     y = numpy.array([100, -10, 50], dtype=numpy.float32)
     model.fit(X, y)
-    model_onnx, prefix = convert_model(model, "single regressor",
-                                       [("input", FloatTensorType([None, 2]))])
+    model_onnx, prefix = convert_model(
+        model, "single regressor", [("input", FloatTensorType([None, 2]))],
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,

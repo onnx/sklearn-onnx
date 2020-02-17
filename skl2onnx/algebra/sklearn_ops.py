@@ -21,7 +21,8 @@ def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc):
                      '_fct_converter': conv,
                      '_fct_shape_calc': shape_calc,
                      'input_range': [1, 1e9],
-                     'output_range': [1, 1e9]})
+                     'output_range': [1, 1e9],
+                     'op_version': None})
     return newclass
 
 
@@ -88,7 +89,10 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.Pipeline.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
-    pass
+    def __init__(self, op_version=None):
+        Pipeline.__init__(self)
+        OnnxSubGraphOperatorMixin.__init__(self)
+        self.op_version = op_version
 
 
 if ColumnTransformer is not None:
@@ -101,7 +105,9 @@ if ColumnTransformer is not None:
         sklearn.compose.ColumnTransformer.html>`_ and
         :class:`OnnxSubGraphOperatorMixin`.
         """
-        pass
+
+        def __init__(self, op_version=None):
+            self.op_version = op_version
 
 
 class OnnxSklearnFeatureUnion(FeatureUnion, OnnxSubGraphOperatorMixin):
@@ -111,7 +117,9 @@ class OnnxSklearnFeatureUnion(FeatureUnion, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.FeatureUnion.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
-    pass
+
+    def __init__(self, op_version=None):
+        self.op_version = op_version
 
 
 _update_module()

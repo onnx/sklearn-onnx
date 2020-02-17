@@ -8,7 +8,8 @@ from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
 class TestOnnxOperatorsOpset(unittest.TestCase):
 
-    def test_pad_opset(self):
+    @unittest.skipIf(onnx.defs.onnx_opset_version() < 10, "irrelevant")
+    def test_pad_opset_10(self):
 
         pad = OnnxPad('X', output_names=['Y'],
                       mode='constant', value=1.5,

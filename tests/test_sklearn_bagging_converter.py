@@ -19,6 +19,7 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -31,6 +32,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -50,6 +52,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -69,6 +72,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -88,6 +92,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -109,6 +114,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -131,6 +137,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -153,6 +160,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -176,6 +184,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -197,6 +206,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -217,6 +227,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -236,6 +247,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
             dtype=np.float32,
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
