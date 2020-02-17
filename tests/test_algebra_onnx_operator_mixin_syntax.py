@@ -1,24 +1,25 @@
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.pipeline import make_pipeline
-import onnx
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxClip, OnnxClip_6
 from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
                           OnnxOperatorMixin):
 
-    def __init__(self):
+    def __init__(self, op_version=TARGET_OPSET):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
+        self.op_version = op_version
 
     def fit(self, X, y=None):
         self.W_ = np.mean(X, axis=0)
@@ -41,9 +42,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         S = self.S_
         return OnnxDiv(
             OnnxSub(
-                i0, W, op_version=onnx.defs.onnx_opset_version()),
-            S, output_names=outputs,
-            op_version=onnx.defs.onnx_opset_version())
+                i0, W, op_version=self.op_version),
+            S, output_names=outputs, op_version=self.op_version)
 
 
 class TestOnnxOperatorMixinSyntax(unittest.TestCase):
@@ -55,7 +55,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
+            target_opset=TARGET_OPSET)
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -67,7 +68,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr = KMeans(n_clusters=2)
         tr.fit(X)
 
-        onx = to_onnx(tr, X.astype(np.float32))
+        onx = to_onnx(tr, X.astype(np.float32),
+                      target_opset=TARGET_OPSET)
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -80,7 +82,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         try:
-            tr_mixin = wrap_as_onnx_mixin(tr)
+            tr_mixin = wrap_as_onnx_mixin(tr, target_opset=TARGET_OPSET)
         except KeyError as e:
             assert "SklearnGaussianProcessRegressor" in str(e)
             return
@@ -99,7 +101,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
         X = np.arange(20).reshape(10, 2)
         try:
-            tr = wrap_as_onnx_mixin(KMeans(n_clusters=2))
+            tr = wrap_as_onnx_mixin(KMeans(n_clusters=2),
+                                    target_opset=TARGET_OPSET)
         except KeyError as e:
             assert "SklearnGaussianProcessRegressor" in str(e)
             return
@@ -118,7 +121,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = convert_sklearn(
-            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
+            tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
+            target_opset=TARGET_OPSET)
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -130,7 +134,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
         tr.fit(X)
 
-        onx = to_onnx(tr, X.astype(np.float32))
+        onx = to_onnx(tr, X.astype(np.float32), target_opset=TARGET_OPSET)
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -143,7 +147,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         try:
-            tr_mixin = wrap_as_onnx_mixin(tr)
+            tr_mixin = wrap_as_onnx_mixin(tr, target_opset=TARGET_OPSET)
         except KeyError as e:
             assert "SklearnGaussianProcessRegressor" in str(e)
             return
@@ -162,8 +166,9 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
         X = np.arange(20).reshape(10, 2)
         try:
-            tr = wrap_as_onnx_mixin(make_pipeline(
-                CustomOpTransformer(), KMeans(n_clusters=2)))
+            tr = wrap_as_onnx_mixin(
+                make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)),
+                target_opset=TARGET_OPSET)
         except KeyError as e:
             assert "SklearnGaussianProcessRegressor" in str(e)
             return
@@ -196,11 +201,11 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         got = oinf.run(None, {'X': X})[0]
         assert_almost_equal(np_fct(X), got, decimal=6)
 
+    @unittest.skipIf(onnx.defs.onnx_opset_version() < 10, "irrelevant")
     def test_onnx_clip_10(self):
         self.common_test_onnxt_runtime_unary(
             lambda x, output_names=None: OnnxClip_6(
-                x, min=1e-5, max=1e5, output_names=output_names,
-                op_version=10),
+                x, min=1e-5, max=1e5, output_names=output_names),
             lambda x: np.clip(x, 1e-5, 1e5),
             op_version=10)
         self.common_test_onnxt_runtime_unary(

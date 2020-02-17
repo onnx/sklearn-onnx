@@ -32,9 +32,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
     def test_onnx_init_dense(self):
         X = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
-        node = OnnxAdd(
-            'X', X, output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+        node = OnnxAdd('X', X, output_names=['Y'])
 
         model_def = node.to_onnx({'X': X},
                                  outputs=[('Y', FloatTensorType())])

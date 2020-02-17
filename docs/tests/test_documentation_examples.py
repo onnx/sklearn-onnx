@@ -62,11 +62,13 @@ class TestDocumentationExample(unittest.TestCase):
                         elif "No module named 'xgboost'" in st:
                             # xgboost not installed on CI
                             pass
-                        elif ("cannot import name 'LightGbmModelContainer' from "
-                                "'onnxmltools.convert.common._container'") in st:
+                        elif ("cannot import name 'LightGbmModelContainer' "
+                                "from 'onnxmltools.convert.common."
+                                "_container'") in st:
                             # onnxmltools not recent enough
                             pass
-                        elif 'Please fix either the inputs or the model.' in st:
+                        elif ('Please fix either the inputs or '
+                                'the model.') in st:
                             # onnxruntime datasets changed in master branch,
                             # still the same in released version on pypi
                             pass

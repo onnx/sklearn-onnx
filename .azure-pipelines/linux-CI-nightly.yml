@@ -15,26 +15,20 @@ jobs:
     matrix:
       Py37-Onnx160-Sk0221:
         python.version: '3.7'
-        numpy.version: '==1.18.0'
+        numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.22.1'
       Py37-Onnx160-Sk0213:
         python.version: '3.7'
-        numpy.version: '==1.18.0'
+        numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
       Py37-Onnx150:
         python.version: '3.7'
-        numpy.version: '==1.18.0'
+        numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
-      Py37-Onnxgit:
-        python.version: '3.7'
-        numpy.version: '==1.18.0'
-        onnx.version: 'git'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
     maxParallel: 3

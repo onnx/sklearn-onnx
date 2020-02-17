@@ -97,8 +97,8 @@ print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
 # an smaller ONNX graph for every operator.
 
 
-steps = collect_intermediate_steps(pipe, "pipeline",
-                                   initial_types)
+steps = collect_intermediate_steps(
+    pipe, "pipeline", initial_types, target_opset=11)
 
 assert len(steps) == 2
 

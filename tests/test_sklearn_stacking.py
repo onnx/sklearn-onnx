@@ -13,7 +13,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import (
     dump_data_and_model, fit_regression_model,
-    fit_classification_model
+    fit_classification_model, TARGET_OPSET
 )
 
 
@@ -63,7 +63,8 @@ class TestStackingConverter(unittest.TestCase):
             model_to_test_cl(), n_classes=2)
         model_onnx = convert_sklearn(
             model, "stacking classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
