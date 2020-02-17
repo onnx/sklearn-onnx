@@ -86,6 +86,13 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         )
 
         model_def = helper.make_model(graph_def, producer_name='onnx-example')
+        op_set = model_def.opset_import.add()
+        op_set.domain = ''
+        op_set.version = 11
+
+        # By default, if not specified, the opset version for the
+        # main domain which may be higher than the onnx version embedded
+        # in onnxruntime.
 
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))

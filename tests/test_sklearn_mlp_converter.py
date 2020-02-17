@@ -3,7 +3,6 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
 
 import unittest
-
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
@@ -13,6 +12,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -26,6 +26,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -46,6 +47,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -105,6 +107,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -164,6 +167,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -224,6 +228,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

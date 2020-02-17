@@ -168,7 +168,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             warnings.warn("Converter for TfidfVectorizer will use "
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
-                          DeprecationWarning)
+                          UserWarning)
             default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:

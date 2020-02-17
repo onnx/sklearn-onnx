@@ -27,6 +27,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -196,6 +197,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             "scikit-learn DecisionTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
@@ -219,6 +221,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             "scikit-learn ExtraTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
             options=options,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()

@@ -5,6 +5,11 @@ import onnx
 import numpy
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+except ImportError:
+    InvalidGraph = RuntimeError
+    Fail = RuntimeError
 from skl2onnx.common.data_types import FloatTensorType
 try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
@@ -23,7 +28,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_abs(self):
 
-        op = OnnxAbs('I0', op_version=onnx.defs.onnx_opset_version())
+        op = OnnxAbs('I0')
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
 
@@ -44,11 +49,11 @@ class TestAlgebraSymbolic(unittest.TestCase):
     @unittest.skipIf(OnnxAbs is None,
                      reason="shape inference fails for Normalizer")
     def test_algebra_normalizer(self):
-        op = OnnxNormalizer('I0', norm='L1', op_version=10,
+        op = OnnxNormalizer('I0', norm='L1', op_version=1,
                             output_names=['Y'])
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)},
                          outputs=[('Y', FloatTensorType())],
-                         target_opset=10)
+                         target_opset={'': 10})
         assert onx is not None
         sonx = str(onx)
         assert "ai.onnx.ml" in sonx
@@ -108,9 +113,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
     def test_algebra_normalizer_argmin_named_output(self):
 
         op = OnnxArgMin(
-            OnnxNormalizer('I0', norm='L1', output_names=['Y'],
-                           op_version=onnx.defs.onnx_opset_version()),
-            op_version=onnx.defs.onnx_opset_version())
+            OnnxNormalizer('I0', norm='L1', output_names=['Y']),
+            op_version=onnx.defs.onnx_opset_version() - 1)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -131,8 +135,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
         op = OnnxArgMin(
             OnnxNormalizer(
-                'I0', norm='L1', op_version=onnx.defs.onnx_opset_version()),
-            op_version=onnx.defs.onnx_opset_version())
+                'I0', norm='L1'),
+            op_version=onnx.defs.onnx_opset_version() - 1)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -151,8 +155,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
 
-        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'],
-                       op_version=onnx.defs.onnx_opset_version())
+        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'])
         onx = op.to_onnx({'I0': numpy.arange(6, dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -180,15 +183,12 @@ class TestAlgebraSymbolic(unittest.TestCase):
             for i in range(nbnode - 1):
                 i2 = list(rand(1, dim).ravel())
                 matrices.append(i2)
-                node = OnnxScaler(
-                    i1, offset=i2, scale=scale,
-                    op_version=onnx.defs.onnx_opset_version())
+                node = OnnxScaler(i1, offset=i2, scale=scale)
                 i1 = node
             i2 = list(rand(1, dim).ravel())
             matrices.append(i2)
             node = OnnxScaler(
-                i1, offset=i2, scale=scale, output_names=['Y'],
-                op_version=onnx.defs.onnx_opset_version())
+                i1, offset=i2, scale=scale, output_names=['Y'])
             onx = node.to_onnx([(input_name, FloatTensorType((None, dim)))],
                                outputs=[('Y', FloatTensorType((None, dim)))])
             return onx, matrices
@@ -200,8 +200,9 @@ class TestAlgebraSymbolic(unittest.TestCase):
             X = rand(1, dim)
             try:
                 sess = ort.InferenceSession(onx.SerializeToString())
-            except RuntimeError as e:
-                raise RuntimeError("Loading error:\n{}\n{}".format(e, onx))
+            except InvalidGraph as e:
+                raise AssertionError(
+                    "Loading error:\n{}\n{}".format(e, onx)) from e
             try:
                 Y = sess.run(None, {'X1': X.astype(numpy.float32)})[0]
             except RuntimeError as e:
@@ -210,4 +211,5 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestAlgebraSymbolic().test_algebra_normalizer()
     unittest.main()

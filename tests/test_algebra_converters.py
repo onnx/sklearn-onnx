@@ -4,6 +4,7 @@ from distutils.version import StrictVersion
 import onnx
 import numpy
 from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 from sklearn.preprocessing import StandardScaler
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxExp, OnnxAdd, OnnxDiv
 try:
@@ -83,6 +84,19 @@ class TestAlgebraConverters(unittest.TestCase):
         self.assertEqual(len(nin), 0)
         self.assertEqual(len(nno), 3)
         self.assertEqual(len(nva), 0)
+
+    def test_add(self):
+        idi = numpy.identity(2)
+        onx = OnnxAdd('X', idi, output_names=['Y'])
+        model_def = onx.to_onnx({'X': idi.astype(numpy.float32)},
+                                target_opset=12)
+        X = numpy.array([[1, 2], [3, 4]], dtype=numpy.float32)
+        sess = InferenceSession(model_def.SerializeToString())
+        got = sess.run(None, {'X': X})
+        exp = idi + X
+        self.assertEqual(exp.shape, got[0].shape)
+        self.assertEqual(list(exp.ravel()), list(got[0].ravel()))
+        self.assertIn("version: 7", str(model_def))
 
 
 if __name__ == "__main__":

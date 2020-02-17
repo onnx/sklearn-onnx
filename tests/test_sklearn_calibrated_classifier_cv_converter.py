@@ -16,7 +16,7 @@ import onnxruntime
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
@@ -31,6 +31,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model,
             "scikit-learn CalibratedClassifierCVMNB",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -53,6 +54,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model,
             "scikit-learn CalibratedClassifierCVMNB",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -78,13 +80,18 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model,
             "scikit-learn CalibratedClassifierCVKNN",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnCalibratedClassifierCVIsotonicFloat")
+        try:
+            dump_data_and_model(
+                X.astype(np.float32),
+                model,
+                model_onnx,
+                basename="SklearnCalibratedClassifierCVIsotonicFloat")
+        except Exception as e:
+            raise AssertionError("Issue with model\n{}".format(
+                model_onnx)) from e
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -98,6 +105,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model,
             "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -124,6 +132,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model,
             "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -146,6 +155,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "unused",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
