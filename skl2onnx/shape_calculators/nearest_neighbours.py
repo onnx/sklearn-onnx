@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 
+import copy
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
@@ -59,6 +60,18 @@ def calculate_sklearn_nca(operator):
     operator.outputs[0].type = output_type([N, n_components])
 
 
+def calculate_sklearn_knn_imputer(operator):
+    check_input_and_output_numbers(operator, input_count_range=1,
+                                   output_count_range=1)
+    check_input_and_output_types(
+        operator, good_input_types=[FloatTensorType])
+
+    operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
+    operator.outputs[0].type.shape = operator.inputs[0].type.shape
+
+
+register_shape_calculator('SklearnKNNImputer',
+                          calculate_sklearn_knn_imputer)
 register_shape_calculator('SklearnKNeighborsTransformer',
                           calculate_sklearn_neighbours_transformer)
 register_shape_calculator('SklearnNearestNeighbors',
