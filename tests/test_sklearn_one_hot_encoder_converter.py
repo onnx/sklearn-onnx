@@ -307,9 +307,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         inputs = [
             ("input1", Int64TensorType([None, 3])),
         ]
-        model_onnx = convert_sklearn(model,
-                                     "one-hot encoder",
-                                     inputs)
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test,
