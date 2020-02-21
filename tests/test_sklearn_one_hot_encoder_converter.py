@@ -307,9 +307,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         inputs = [
             ("input1", Int64TensorType([None, 3])),
         ]
-        model_onnx = convert_sklearn(model,
-                                     "one-hot encoder",
-                                     inputs)
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test,
@@ -319,6 +318,29 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             verbose=False,
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+                     reason="issues with shapes")
+    @unittest.skipIf(
+        not one_hot_encoder_supports_drop(),
+        reason="OneHotEncoder does not support drop in scikit versions < 0.21",
+    )
+    def test_one_hot_encoder_string_drop_first_2(self):
+        data = [['Male', 'First'], ['Female', 'First'], ['Female', 'Second']]
+        model = OneHotEncoder(drop='first')
+        model.fit(data)
+        inputs = [
+            ("input", StringTensorType([None, 2])),
+        ]
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOneHotEncoderStringDropFirst2",
         )
 
 
