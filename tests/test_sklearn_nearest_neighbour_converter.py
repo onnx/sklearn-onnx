@@ -285,7 +285,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingRegressionInt-Dec4"
+            basename="SklearnKNNRegressorInt-Dec4"
         )
 
     @unittest.skipIf(
@@ -323,12 +323,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    def test_model_multi_class_nocl(self):
+    def test_model_knn_multi_class_nocl(self):
         model, X = fit_classification_model(
             KNeighborsClassifier(),
             2, label_string=True)
         model_onnx = convert_sklearn(
-            model, "multi-class nocl",
+            model, "KNN multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'nocl': True}},
             target_opset=TARGET_OPSET)
@@ -338,7 +338,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
-            basename="SklearnNaiveMultiNoCl", verbose=False,
+            basename="SklearnKNNMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
