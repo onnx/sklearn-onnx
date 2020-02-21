@@ -87,9 +87,6 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
 
         attrs = {'name': scope.get_unique_operator_name('OneHotEncoder')}
         attrs['zeros'] = 1 if ohe_op.handle_unknown == 'ignore' else 0
-        if hasattr(ohe_op, 'drop_idx_') and ohe_op.drop_idx_ is not None:
-            categories = (categories[np.arange(len(categories)) !=
-                                     ohe_op.drop_idx_[index]])
 
         if isinstance(inp_type, (Int64TensorType, Int32TensorType)):
             attrs['cats_int64s'] = categories.astype(np.int64)
@@ -98,7 +95,6 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
                 [str(s).encode('utf-8') for s in categories])
 
         ohe_output = scope.get_unique_variable_name(name + 'out')
-        result.append(ohe_output)
 
         if 'cats_int64s' in attrs:
             # Let's cast this input in int64.
@@ -110,7 +106,23 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
         container.add_node('OneHotEncoder', name,
                            ohe_output, op_domain='ai.onnx.ml',
                            **attrs)
+        if hasattr(ohe_op, 'drop_idx_') and ohe_op.drop_idx_ is not None:
+            extracted_outputs_name = scope.get_unique_variable_name(
+                'extracted_outputs')
+            indices_to_keep_name = scope.get_unique_variable_name(
+                'indices_to_keep')
+            indices_to_keep = np.delete(
+                np.arange(len(categories)), ohe_op.drop_idx_[index])
+            container.add_initializer(
+                indices_to_keep_name, onnx_proto.TensorProto.INT64,
+                indices_to_keep.shape, indices_to_keep)
+            container.add_node(
+                'ArrayFeatureExtractor', [ohe_output, indices_to_keep_name],
+                extracted_outputs_name, op_domain='ai.onnx.ml',
+                name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+            ohe_output, categories = extracted_outputs_name, indices_to_keep
 
+        result.append(ohe_output)
         categories_len += len(categories)
 
     concat_result_name = scope.get_unique_variable_name('concat_result')
