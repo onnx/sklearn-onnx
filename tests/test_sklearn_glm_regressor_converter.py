@@ -352,7 +352,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             verbose=False,
-            basename="SklearnLinearRegression-Dec4",
+            basename="SklearnMultiLinearRegression-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
