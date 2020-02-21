@@ -481,13 +481,13 @@ class TestNaiveBayesConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_multi_class_nocl(self):
+    def test_model_gaussian_nb_multi_class_nocl(self):
         model, X = fit_classification_model(
             GaussianNB(),
             2, label_string=True)
         model_onnx = convert_sklearn(
             model,
-            "multi-class nocl",
+            "GaussianNB multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'nocl': True}},
             target_opset=TARGET_OPSET)
@@ -497,7 +497,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
-            basename="SklearnNaiveMultiNoCl", verbose=False,
+            basename="SklearnGaussianNBMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
