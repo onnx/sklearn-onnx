@@ -8,7 +8,7 @@ import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
@@ -31,7 +31,7 @@ def _decision_function(scope, operator, container, model):
                               model.intercept_.shape, model.intercept_)
 
     input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
