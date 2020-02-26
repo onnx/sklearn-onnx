@@ -485,7 +485,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnSVRBool",
+            basename="SklearnSVRBool-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )
