@@ -19,7 +19,12 @@ from sklearn.ensemble import (
 )
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
-from skl2onnx.common.data_types import onnx_built_with_ml, FloatTensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+    onnx_built_with_ml,
+)
 from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
     convert_model,
@@ -31,6 +36,7 @@ from test_utils import (
     dump_single_regression,
     fit_classification_model,
     fit_multilabel_classification_model,
+    fit_regression_model,
     TARGET_OPSET
 )
 try:
@@ -443,6 +449,82 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X32, pipe,
             model_onnx, methods=['predict'],
             basename="SklearnBostonPCARF-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_random_forest_regressor_int(self):
+        model, X = fit_regression_model(
+            RandomForestRegressor(n_estimators=5, random_state=42),
+            is_int=True)
+        model_onnx = convert_sklearn(
+            model, "random forest regression",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_extra_trees_regressor_int(self):
+        model, X = fit_regression_model(
+            ExtraTreesRegressor(n_estimators=5, random_state=42),
+            is_int=True)
+        model_onnx = convert_sklearn(
+            model, "extra trees regression",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_random_forest_regressor_bool(self):
+        model, X = fit_regression_model(
+            RandomForestRegressor(n_estimators=5, random_state=42),
+            is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "random forest regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestRegressorBool-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_extra_trees_regressor_bool(self):
+        model, X = fit_regression_model(
+            ExtraTreesRegressor(n_estimators=5, random_state=42),
+            is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "extra trees regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesRegressorBool-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )

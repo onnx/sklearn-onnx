@@ -5,7 +5,11 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 import unittest
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
@@ -274,6 +278,24 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMLPRegressorTanhActivation-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_mlp_regressor_bool(self):
+        model, X_test = fit_regression_model(
+            MLPRegressor(random_state=42), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPRegressor",
+            [("input", BooleanTensorType([None, X_test.shape[1]]))],
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnMLPRegressorBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
