@@ -2,6 +2,7 @@ import unittest
 import inspect
 import numpy as np
 from numpy.testing import assert_almost_equal
+from onnx.defs import onnx_opset_version
 from sklearn.base import BaseEstimator, ClassifierMixin, clone
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
@@ -10,12 +11,12 @@ from onnxruntime import InferenceSession
 from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity, OnnxCast, OnnxReduceMax, OnnxGreater
 )
-from test_utils import TARGET_OPSET
 from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
+from test_utils import TARGET_OPSET
 
 
 class ValidatorClassifier(BaseEstimator, ClassifierMixin):
@@ -115,6 +116,9 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
 
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
+    @unittests.skipIf(
+        onnx_opset_version() <= 9,
+        reason="Cast not available.")
     def test_sub_estimator(self):
         data = load_iris()
         X, y = data.data, data.target
