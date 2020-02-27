@@ -5,6 +5,7 @@ import unittest
 from sklearn.datasets import load_iris
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
+from onnx.defs import onnx_opset_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.helpers.onnx_rare_helper import upgrade_opset_number
@@ -23,6 +24,8 @@ class TestOnnxRareHelper(unittest.TestCase):
         model8 = upgrade_opset_number(model_onnx, 8)
         assert "version: 8" in str(model8)
 
+    @unittest.skipIf(onnx_opset_version() <= 11,
+                     reason="Needs opset >= 11")
     def test_knn_upgrade(self):
         iris = load_iris()
         X, _ = iris.data, iris.target
