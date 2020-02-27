@@ -116,7 +116,7 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
 
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
-    @unittests.skipIf(
+    @unittest.skipIf(
         onnx_opset_version() <= 9,
         reason="Cast not available.")
     def test_sub_estimator(self):
