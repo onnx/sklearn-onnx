@@ -328,7 +328,7 @@ def predictable_tsne_converter(scope, operator, container):
 
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
-    # operator
+    # operator.
     model = op.estimator_
     alias = get_model_alias(type(model))
     knn_op = scope.declare_local_operator(alias, model)
