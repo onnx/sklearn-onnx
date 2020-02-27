@@ -16,7 +16,9 @@ __model_version__ = 0
 
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin # noqa
-from ._supported_operators import update_registered_converter # noqa
+from ._supported_operators import ( # noqa
+    update_registered_converter, get_model_alias
+)
 from ._parse import update_registered_parser # noqa
 
 

@@ -53,8 +53,7 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import convert_sklearn
-from skl2onnx._parse import _get_sklearn_operator_name
+from skl2onnx import convert_sklearn, get_model_alias
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx.common.data_types import FloatTensorType
 from matplotlib import offsetbox
@@ -331,7 +330,7 @@ def predictable_tsne_converter(scope, operator, container):
     # we reuse existing converter and declare it as local
     # operator
     model = op.estimator_
-    alias = _get_sklearn_operator_name(type(model))
+    alias = get_model_alias(type(model))
     knn_op = scope.declare_local_operator(alias, model)
     knn_op.inputs = operator.inputs
 
