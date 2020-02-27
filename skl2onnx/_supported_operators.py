@@ -368,5 +368,22 @@ def _get_sklearn_operator_name(model_type):
     return sklearn_operator_name_map[model_type]
 
 
+def get_model_alias(model_type):
+    """
+    Get alias model. Raise an exception if not found.
+
+    :param model_type:  A scikit-learn object (e.g., SGDClassifier
+                        and Binarizer)
+    :return: A string which stands for the type of the input model in
+             our conversion framework
+    """
+    res = _get_sklearn_operator_name(model_type)
+    if res is None:
+        raise RuntimeError("Unable to find alias for model '{}'. "
+                           "The converter is likely missing."
+                           "".format(type(model_type)))
+    return res
+
+
 # registered converters
 sklearn_operator_name_map = build_sklearn_operator_name_map()
