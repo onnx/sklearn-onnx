@@ -53,7 +53,22 @@ class OnnxOperatorItem:
         """
         Returns the outputs of the node.
         """
-        return self.onx_op.outputs[self.index:self.index + 1]
+        if self.onx_op is None:
+            raise RuntimeError(
+                "self.onx_op cannot be None, type(self)={}".format(
+                    type(self)))
+        if self.index is None:
+            raise RuntimeError(
+                "self.index cannot be None, type(self)={}".format(
+                    type(self)))
+        outputs = self.onx_op.outputs
+        if outputs is None:
+            raise RuntimeError(
+                "self.onx_op.outputs cannot be None, "
+                "type(self)={}, type(self.onx_op)={}, "
+                "type(self.onx_op.state)={}".format(
+                    type(self), type(self.onx_op), type(self.onx_op.state)))
+        return outputs[self.index:self.index + 1]
 
 
 class OnnxOperator:
@@ -347,6 +362,8 @@ class OnnxOperator:
                     louts = self.output_names
                 outputs = []
                 for name in louts:
+                    if name is None:
+                        continue
                     if name.startswith('u(') and name[-1] == ')':
                         name = scope.get_unique_variable_name(name[2:-1])
                     outputs.append(name)
@@ -463,7 +480,9 @@ class OnnxOperator:
                 ty = _guess_type(obj[1])
                 new_inputs.append((obj[0], ty))
             else:
-                raise TypeError("Unexpected type {}.".format(type(obj)))
+                raise TypeError("Inputs must be Variable or "
+                                "tuple(name, type) not {}."
+                                "".format(type(obj)))
         inputs = new_inputs
         for name, typ in inputs:
             if typ is None:
@@ -498,7 +517,11 @@ class OnnxOperator:
                 if isinstance(o, Variable):
                     shapes.append(o)
                 elif isinstance(o, tuple):
-                    shapes.append(Variable(o[0], o[0], None, o[1]))
+                    if isinstance(o[1], np.ndarray):
+                        type_shape = _guess_type(o[1])
+                    else:
+                        type_shape = o[1]
+                    shapes.append(Variable(o[0], o[0], None, type_shape))
                 else:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
@@ -571,3 +594,95 @@ class OnnxOperator:
                 name = input.name
                 typ = node.expected_inputs[i]
                 yield (name, typ)
+
+
+class OnnxSubEstimator(OnnxOperator):
+    """
+    This operator is used to call the converter of a model
+    while converting another one.
+    See :ref:`l-custom-parser-alternative`.
+    """
+
+    since_version = 1
+    expected_inputs = None
+    expected_outputs = None
+    input_range = [1, 1e9]
+    output_range = [1, 1e9]
+
+    def __init__(self, skl_op, *inputs, op_version=None,
+                 output_names=None,
+                 domain=None, **kwargs):
+        OnnxOperator.__init__(
+            self, *inputs, op_version=op_version,
+            output_names=output_names, domain=domain, **kwargs)
+        self.operator_instance = skl_op
+
+    def add_to(self, scope, container, operator=None):
+        """
+        Adds outputs to the container if not already added,
+        registered the outputs if the node is not final.
+
+        :param scope: scope
+        :param container: container
+        :param operator: overwrite inputs
+        """
+        if self.state is None:
+            if self.kwargs.get('op_version', '') is None:
+                kwargs = self.kwargs.copy()
+                del kwargs['op_version']
+            else:
+                kwargs = self.kwargs
+
+            if hasattr(self, 'output_names_'):
+                outputs = self.output_names_
+            elif self.output_names:
+                if not isinstance(self.output_names, (list, tuple)):
+                    louts = [self.output_names]
+                else:
+                    louts = self.output_names
+                outputs = []
+                for name in louts:
+                    if name.startswith('u(') and name[-1] == ')':
+                        name = scope.get_unique_variable_name(name[2:-1])
+                    outputs.append(name)
+                self.output_names_ = outputs
+            else:
+                outputs = None
+                self.output_names_ = None
+
+            inputs = []
+            for input in self.inputs:
+                if isinstance(input, OnnxOperator.OnnxOperatorVariable):
+                    if operator is None:
+                        raise RuntimeError("A placeholder cannot be replaced "
+                                           "as an operator is not specified.")
+                    if len(operator.inputs) == 0:
+                        raise RuntimeError("No input variable in {}.".format(
+                            operator))
+                    # The inputs must be looked into the graph.
+                    for i in operator.inputs:
+                        if i.raw_name == input.name:
+                            inputs.append(i)
+                            break
+                    else:
+                        vars = ', '.join(map(lambda o: "'%s'" % o.raw_name,
+                                             operator.inputs))
+                        raise RuntimeError("Unable to find variable "
+                                           "{} in {}.".format(input, vars))
+                else:
+                    inputs.append(input)
+            self.state = GraphState(
+                inputs, self.output_names_, self.operator_instance,
+                scope, container, None, op_version=self.op_version,
+                op_domain=None, onnx_prefix_name=self.onnx_prefix,
+                **self.kwargs)
+            self.state.run(operator=operator)
+
+    @property
+    def outputs(self):
+        """
+        Returns the outputs of the node.
+        """
+        if self.state is None:
+            raise RuntimeError("Method add_to was not called.")
+        return self.state.outputs

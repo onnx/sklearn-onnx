@@ -2,10 +2,15 @@
 # Licensed under the MIT License.
 
 """
-.. _l-custom-parser:
+.. _l-custom-parser-alternative:
 
-When a custom model has is nor a classifier neither a regressor
-===============================================================
+When a custom model has is nor a classifier neither a regressor (alternative)
+=============================================================================
+
+.. note::
+    This example rewrites :ref:`l-custom-parser` by using
+    the syntax proposed in example :ref:`l-onnx-operators`
+    to write the custom converter, shape calculator and parser.
 
 *scikit-learn*'s API specifies a regressor produces one
 outputs, the prediction and a classifier produces two
@@ -38,13 +43,13 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from onnxconverter_common.onnx_ops import (
-    apply_identity, apply_cast, apply_greater
-)
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
-from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.algebra.onnx_ops import (
+    OnnxGreater, OnnxCast, OnnxReduceMax, OnnxIdentity
+)
+from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 import matplotlib.pyplot as plt
 
 
@@ -135,47 +140,32 @@ def validator_classifier_shape_calculator(operator):
 
 
 def validator_classifier_converter(scope, operator, container):
-    # input = operator.inputs[0]  # input in ONNX graph
+    input = operator.inputs[0]      # input in ONNX graph
     outputs = operator.outputs      # outputs in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+    opv = opv = container.target_opset
 
     # We reuse existing converter and declare it as local
     # operator.
     model = op.estimator_
-    alias = get_model_alias(type(model))
-    val_op = scope.declare_local_operator(alias, model)
-    val_op.inputs = operator.inputs
+    onnx_op = OnnxSubEstimator(model, input, op_version=opv)
 
-    # We add an intermediate outputs.
-    val_label = scope.declare_local_variable('val_label', Int64TensorType())
-    val_prob = scope.declare_local_variable('val_prob', FloatTensorType())
-    val_op.outputs.append(val_label)
-    val_op.outputs.append(val_prob)
+    rmax = OnnxReduceMax(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
+    great = OnnxGreater(rmax, np.array([op.threshold], dtype=np.float32),
+                        op_version=opv)
+    valid = OnnxCast(great, to=onnx_proto.TensorProto.INT64,
+                     op_version=opv)
 
-    # We adjust the output of the submodel.
-    shape_calc = get_shape_calculator(alias)
-    shape_calc(val_op)
+    r1 = OnnxIdentity(onnx_op[0], output_names=[outputs[0].full_name],
+                      op_version=opv)
+    r2 = OnnxIdentity(onnx_op[1], output_names=[outputs[1].full_name],
+                      op_version=opv)
+    r3 = OnnxIdentity(valid, output_names=[outputs[2].full_name],
+                      op_version=opv)
 
-    # We now handle the validation.
-    val_max = scope.get_unique_variable_name('val_max')
-    container.add_node('ReduceMax', val_prob.full_name, val_max,
-                       name=scope.get_unique_operator_name('ReduceMax'),
-                       axes=[1], keepdims=0)
-
-    th_name = scope.get_unique_variable_name('threshold')
-    container.add_initializer(
-        th_name, onnx_proto.TensorProto.FLOAT, [1], [op.threshold])
-    val_bin = scope.get_unique_variable_name('val_bin')
-    apply_greater(scope, [val_max, th_name], val_bin, container)
-
-    val_val = scope.get_unique_variable_name('validate')
-    apply_cast(scope, val_bin, val_val, container,
-               to=onnx_proto.TensorProto.INT64)
-
-    # We finally link the intermediate output to the shared converter.
-    apply_identity(scope, val_label.full_name, outputs[0].full_name, container)
-    apply_identity(scope, val_prob.full_name, outputs[1].full_name, container)
-    apply_identity(scope, val_val, outputs[2].full_name, container)
+    r1.add_to(scope, container)
+    r2.add_to(scope, container)
+    r3.add_to(scope, container)
 
 
 ##########################

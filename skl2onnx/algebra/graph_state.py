@@ -19,7 +19,14 @@ class GraphState:
                  **attrs):
         self.inputs = inputs
         self.scope = scope
-        self.operator_name = operator_name
+        if hasattr(operator_name, 'fit'):
+            from .. import get_model_alias
+            self.operator_instance = operator_name
+            self.is_model = True
+            self.operator_name = get_model_alias(type(operator_name))
+        else:
+            self.operator_name = operator_name
+            self.is_model = False
         self.container = container
         self.converter = converter
         self.expected_outputs = outputs
@@ -31,17 +38,17 @@ class GraphState:
                             "Variable not tuple.")
         elif not isinstance(self.inputs, list):
             self.inputs = [self.inputs]
-        if self.expected_outputs is None:
+        if self.expected_outputs is None and not self.is_model:
             raise ValueError("Parameter outputs must not be empty.")
-        if not isinstance(self.expected_outputs, list):
+        if (not isinstance(self.expected_outputs, list) and
+                self.expected_outputs is not None):
             self.expected_outputs = [self.expected_outputs]
 
     @property
     def onnx_prefix(self):
         if self.onnx_prefix_name is None:
             return self.operator_name
-        else:
-            return self.onnx_prefix_name + "_" + self.operator_name
+        return self.onnx_prefix_name + "_" + self.operator_name
 
     @property
     def outputs(self):
@@ -178,7 +185,7 @@ class GraphState:
 
     def run(self, operator=None):
         if self.computed_outputs is None:
-            if self.expected_outputs is None:
+            if self.expected_outputs is not None:
                 eoli = [self._get_var_name(o, True, operator=operator)
                         for o in self.expected_outputs]
                 self.expected_outputs = eoli
@@ -188,8 +195,32 @@ class GraphState:
                 if v is not None:
                     inputs.append(v)
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
-            outputs = [self._get_output_name(o)
-                       for o in self.expected_outputs]
-            self.container.add_node(self.operator_name, inputs, outputs,
-                                    name=name, **self.attrs)
+            if self.is_model:
+                # a model is converted into a subgraph
+                sub_op = self.scope.declare_local_operator(
+                    self.operator_name, self.operator_instance)
+                sub_op.inputs = self.inputs
+                if self.expected_outputs is None:
+                    # output are not defined, we need to call a parser.
+                    from .._parse import parse_sklearn
+                    self.expected_outputs = parse_sklearn(
+                        self.scope, self.operator_instance, self.inputs)
+                    if (self.expected_outputs is None or
+                            None in self.expected_outputs):
+                        raise RuntimeError(
+                            "Wrong result when parsing model {}.".format(
+                                type(self.operator_instance)))
+                    self.expected_outputs = [
+                        Variable(v.raw_name,
+                                 self.scope.get_unique_variable_name(
+                                    v.raw_name),
+                                 self.scope, v.type)
+                        for v in self.expected_outputs]
+                sub_op.outputs = self.expected_outputs
+            else:
+                # only one node is added
+                outputs = [self._get_output_name(o)
+                           for o in self.expected_outputs]
+                self.container.add_node(self.operator_name, inputs, outputs,
+                                        name=name, **self.attrs)
             self.computed_outputs = self.expected_outputs
