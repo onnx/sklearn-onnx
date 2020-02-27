@@ -1,5 +1,6 @@
 import unittest
 import inspect
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnx.defs import onnx_opset_version
@@ -7,7 +8,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin, clone
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity, OnnxCast, OnnxReduceMax, OnnxGreater
 )
@@ -117,7 +118,7 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
     @unittest.skipIf(
-        onnx_opset_version() <= 9,
+        StrictVersion(ort_version) < StrictVersion("1.0"),
         reason="Cast not available.")
     def test_sub_estimator(self):
         data = load_iris()
