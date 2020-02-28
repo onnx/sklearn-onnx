@@ -4,21 +4,20 @@
 """
 .. _l-custom-parser-alternative:
 
-When a custom model has is nor a classifier neither a regressor (alternative)
-=============================================================================
+When a custom model is nor a classifier neither a regressor (alternative)
+=========================================================================
 
 .. note::
     This example rewrites :ref:`l-custom-parser` by using
     the syntax proposed in example :ref:`l-onnx-operators`
     to write the custom converter, shape calculator and parser.
 
-*scikit-learn*'s API specifies a regressor produces one
-outputs, the prediction and a classifier produces two
-outputs, predicted labels and probabilities. In some cases,
-a custom needs to produce different outputs. The goal here is
-to add a third results which tells if the probability is
-above a given threshold which somehow tells the classifier
-valides the answer.
+*scikit-learn*'s API specifies that a regressor produces one
+outputs and a classifier produces two
+outputs, predicted labels and probabilities. The goal here is
+to add a third result which tells if the probability is
+above a given threshold. That's implemented in method
+*validate*.
 
 .. contents::
     :local:
@@ -26,8 +25,8 @@ valides the answer.
 Iris and scoring
 ++++++++++++++++
 
-To do that, we implement a new estimator which is identical
-which trains whichever classifier we need.
+A new class is created, it trains any classifier and implements
+the method *validate* mentioned above.
 """
 import inspect
 import numpy as np
@@ -93,7 +92,7 @@ model.fit(X_train, y_train)
 
 ##############################
 # Let's now measure the indicator which tells
-# the probability of the prediction is above
+# if the probability of a prediction is above
 # a threshold.
 
 print(model.validate(X_test))
@@ -103,7 +102,7 @@ print(model.validate(X_test))
 # +++++++++++++++++++
 #
 # The conversion fails for a new model because
-# the library does not any converter associated
+# the library does not know any converter associated
 # to this new model.
 
 try:
@@ -122,31 +121,31 @@ except RuntimeError as e:
 
 def validator_classifier_shape_calculator(operator):
 
-    input = operator.inputs[0]  # inputs in ONNX graph
-    outputs = operator.outputs  # outputs in ONNX graph
-    op = operator.raw_operator  # scikit-learn model (mmust be fitted)
+    input0 = operator.inputs[0]     # first input in ONNX graph
+    outputs = operator.outputs      # outputs in ONNX graph
+    op = operator.raw_operator      # scikit-learn model (mmust be fitted)
     if len(outputs) != 3:
         raise RuntimeError("3 outputs expected not {}.".format(len(outputs)))
 
-    N = input.type.shape[0]                 # number of observations
-    C = op.estimator_.classes_.shape[0]     # dimension of outputs
+    N = input0.type.shape[0]                    # number of observations
+    C = op.estimator_.classes_.shape[0]         # dimension of outputs
 
-    outputs[0].type = Int64TensorType([N])     # label
-    outputs[1].type = FloatTensorType([N, C])  # probabilities
-    outputs[2].type = Int64TensorType([C])     # validation
+    outputs[0].type = Int64TensorType([N])      # label
+    outputs[1].type = FloatTensorType([N, C])   # probabilities
+    outputs[2].type = Int64TensorType([C])      # validation
 
 #############################
 # Then the converter.
 
 
 def validator_classifier_converter(scope, operator, container):
-    input = operator.inputs[0]      # input in ONNX graph
-    outputs = operator.outputs      # outputs in ONNX graph
-    op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+    input0 = operator.inputs[0]         # first input in ONNX graph
+    outputs = operator.outputs          # outputs in ONNX graph
+    op = operator.raw_operator          # scikit-learn model (mmust be fitted)
     opv = opv = container.target_opset
 
-    # We reuse existing converter and declare it as local
-    # operator.
+    # The model calls another one. The class `OnnxSubEstimator`
+    # calls the converter for this operator.
     model = op.estimator_
     onnx_op = OnnxSubEstimator(model, input, op_version=opv)
 
