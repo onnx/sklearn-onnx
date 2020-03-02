@@ -4,7 +4,7 @@
 """
 .. _l-custom-parser:
 
-When a custom model is nor a classifier neither a regressor
+When a custom model is neither a classifier nor a regressor
 ===========================================================
 
 *scikit-learn*'s API specifies that a regressor produces one

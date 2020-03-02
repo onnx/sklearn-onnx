@@ -4,7 +4,7 @@
 """
 .. _l-custom-parser-alternative:
 
-When a custom model is nor a classifier neither a regressor (alternative)
+When a custom model is neither a classifier nor a regressor (alternative)
 =========================================================================
 
 .. note::
