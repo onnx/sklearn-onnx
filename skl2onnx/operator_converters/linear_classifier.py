@@ -15,6 +15,7 @@ from sklearn.linear_model import (
 from sklearn.svm import LinearSVC
 from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
+from ..common.data_types import BooleanTensorType
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
@@ -78,9 +79,16 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                            'tensor.')
 
     label_name = operator.outputs[0].full_name
+    input_name = operator.inputs[0].full_name
+    if type(operator.inputs[0].type) == BooleanTensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, input_name, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
 
     if use_raw_scores:
-        container.add_node(classifier_type, operator.inputs[0].full_name,
+        container.add_node(classifier_type, input_name,
                            [label_name, operator.outputs[1].full_name],
                            op_domain='ai.onnx.ml', **classifier_attrs)
     elif (isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))
@@ -99,7 +107,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             binarised_label_name = scope.get_unique_variable_name(
                 'binarised_label')
 
-            container.add_node(classifier_type, operator.inputs[0].full_name,
+            container.add_node(classifier_type, input_name,
                                [y_pred_name, raw_scores_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
             container.add_node(
@@ -109,7 +117,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                 scope, binarised_label_name, label_name,
                 container, to=onnx_proto.TensorProto.INT64)
         else:
-            container.add_node(classifier_type, operator.inputs[0].full_name,
+            container.add_node(classifier_type, input_name,
                                [label_name, raw_scores_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
         container.add_node(
@@ -123,7 +131,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                 op, (LinearSVC, RidgeClassifier, RidgeClassifierCV)):
             probability_tensor_name = scope.get_unique_variable_name(
                 'probability_tensor')
-            container.add_node(classifier_type, operator.inputs[0].full_name,
+            container.add_node(classifier_type, input_name,
                                [label_name, probability_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
             normalizer_type = 'Normalizer'
@@ -141,7 +149,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                 'binarised_label')
 
             container.add_node(
-                classifier_type, operator.inputs[0].full_name,
+                classifier_type, input_name,
                 [y_pred_name, operator.outputs[1].full_name],
                 op_domain='ai.onnx.ml', **classifier_attrs)
             container.add_node(
@@ -151,7 +159,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                 scope, binarised_label_name, label_name,
                 container, to=onnx_proto.TensorProto.INT64)
         else:
-            container.add_node(classifier_type, operator.inputs[0].full_name,
+            container.add_node(classifier_type, input_name,
                                [label_name, operator.outputs[1].full_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
 
