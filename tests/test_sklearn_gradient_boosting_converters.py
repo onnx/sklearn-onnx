@@ -156,6 +156,48 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_gradient_boosting_int(self):
+        model, X = fit_classification_model(
+            GradientBoostingClassifier(n_estimators=4), 5, is_int=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gradient boosting classifier",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gradient_boosting_bool(self):
+        model, X = fit_classification_model(
+            GradientBoostingClassifier(n_estimators=4), 5, is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gradient boosting classifier",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingBool",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_multiclass_decision_function(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5)

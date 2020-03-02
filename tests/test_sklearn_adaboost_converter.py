@@ -199,6 +199,32 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf((StrictVersion(onnx.__version__) <
                       StrictVersion("1.5.0")),
                      reason="not available")
+    def test_ada_boost_classifier_bool(self):
+        model, X_test = fit_classification_model(
+            AdaBoostClassifier(random_state=42), 3,
+            is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "AdaBoost classification",
+            [("input", BooleanTensorType((None, X_test.shape[1])))],
+            target_opset=10,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnAdaBoostClassifierBool",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf((StrictVersion(onnx.__version__) <
+                      StrictVersion("1.5.0")),
+                     reason="not available")
     def test_ada_boost_regressor(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5))

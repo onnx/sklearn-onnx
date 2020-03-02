@@ -92,11 +92,18 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
         values_name, onnx_proto.TensorProto.FLOAT,
         value.shape, value.ravel())
 
+    input_name = operator.input_full_names
+    if type(operator.inputs[0].type) == BooleanTensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, input_name, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
     if model.tree_.node_count > 1:
         attrs = populate_tree_attributes(
             model, scope.get_unique_operator_name(op_type))
         container.add_node(
-            op_type, operator.input_full_names,
+            op_type, input_name,
             [indices_name, dummy_proba_name],
             op_domain='ai.onnx.ml', **attrs)
     else:
@@ -107,7 +114,7 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
 
         container.add_initializer(
             zero_name, container.proto_dtype, [], [0])
-        apply_mul(scope, [operator.inputs[0].full_name, zero_name],
+        apply_mul(scope, [input_name[0], zero_name],
                   zero_matrix_name, container, broadcast=1)
         container.add_node(
             'ReduceSum', zero_matrix_name, reduced_zero_matrix_name, axes=[1],
@@ -160,8 +167,15 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
 
         add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True,
                                     True, dtype=container.dtype)
+        input_name = operator.input_full_names
+        if type(operator.inputs[0].type) == BooleanTensorType:
+            cast_input_name = scope.get_unique_variable_name('cast_input')
+
+            apply_cast(scope, input_name, cast_input_name,
+                       container, to=onnx_proto.TensorProto.FLOAT)
+            input_name = cast_input_name
         container.add_node(
-            op_type, operator.input_full_names,
+            op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain='ai.onnx.ml', **attrs)
     else:

@@ -217,6 +217,82 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
 
+    def test_random_forest_classifier_int(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(n_estimators=5, random_state=42),
+            3, is_int=True)
+        model_onnx = convert_sklearn(
+            model, "random forest classifier",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestClassifierInt",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_extra_trees_classifier_int(self):
+        model, X = fit_classification_model(
+            ExtraTreesClassifier(n_estimators=5, random_state=42),
+            4, is_int=True)
+        model_onnx = convert_sklearn(
+            model, "extra trees classifier",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesClassifierInt",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_random_forest_classifier_bool(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(n_estimators=5, random_state=42),
+            3, is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "random forest classifier",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRandomForestClassifierBool",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_extra_trees_classifier_bool(self):
+        model, X = fit_classification_model(
+            ExtraTreesClassifier(n_estimators=5, random_state=42),
+            2, is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "extra trees regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreesClassifierBool",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
     def common_test_model_hgb_regressor(self, add_nan=False):
         model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
