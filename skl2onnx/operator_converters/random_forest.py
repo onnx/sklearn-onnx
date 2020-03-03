@@ -13,7 +13,7 @@ from ..common._apply_operation import (
     apply_reshape,
     apply_transpose,
 )
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..common.tree_ensemble import (
     add_tree_to_attribute_pairs,
@@ -181,8 +181,15 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
                 "The converter cannot implement decision_function for "
                 "'{}'.".format(type(op)))
 
+        input_name = operator.input_full_names
+        if type(operator.inputs[0].type) == BooleanTensorType:
+            cast_input_name = scope.get_unique_variable_name('cast_input')
+
+            apply_cast(scope, input_name, cast_input_name,
+                       container, to=onnx_proto.TensorProto.FLOAT)
+            input_name = cast_input_name
         container.add_node(
-            op_type, operator.input_full_names,
+            op_type, input_name,
             [operator.outputs[0].full_name,
              operator.outputs[1].full_name],
             op_domain='ai.onnx.ml', **attr_pairs)
@@ -270,7 +277,7 @@ def convert_sklearn_random_forest_regressor_converter(scope,
             attrs['base_values'] = [op._baseline_prediction]
 
     input_name = operator.input_full_names
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,

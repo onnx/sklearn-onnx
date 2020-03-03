@@ -11,7 +11,7 @@ from ..common._apply_operation import (
     apply_log, apply_mul, apply_pow, apply_sub, apply_reshape,
     apply_transpose,
 )
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
 
@@ -392,7 +392,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
             class_log_prior.shape, class_log_prior.flatten())
 
     input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,

@@ -50,16 +50,18 @@ def _has_transform_model(model):
 
 def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
-                             random_state=42):
+                             random_state=42, is_bool=False):
     X, y = make_classification(n_classes=n_classes, n_features=100,
                                n_samples=1000,
                                random_state=random_state,
                                n_informative=7)
     if label_string:
         y = numpy.array(['cl%d' % cl for cl in y])
-    X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
+    X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
     if pos_features:
         X = numpy.abs(X)
+    if is_bool:
+        X = X.astype(bool)
     X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                    random_state=42)
     model.fit(X_train, y_train)
@@ -79,10 +81,12 @@ def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
     return model, X_test
 
 
-def fit_regression_model(model, is_int=False, n_targets=1):
+def fit_regression_model(model, is_int=False, n_targets=1, is_bool=False):
     X, y = make_regression(n_features=10, n_samples=1000,
                            n_targets=n_targets, random_state=42)
-    X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
+    X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
+    if is_bool:
+        X = X.astype(bool)
     X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                    random_state=42)
     model.fit(X_train, y_train)

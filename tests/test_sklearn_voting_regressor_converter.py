@@ -11,7 +11,9 @@ except ImportError:
 from sklearn.tree import DecisionTreeRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
-    FloatTensorType, Int64TensorType
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
 )
 from test_utils import dump_data_and_model, fit_regression_model
 
@@ -57,6 +59,25 @@ class TestVotingRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnVotingRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            comparable_outputs=[0]
+        )
+
+    @unittest.skipIf(VotingRegressor is None,
+                     reason="new in 0.21")
+    def test_model_voting_regression_bool(self):
+        model, X = fit_regression_model(model_to_test(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "voting regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnVotingRegressorBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",

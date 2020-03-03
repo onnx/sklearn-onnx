@@ -14,7 +14,11 @@ from sklearn.tree import (
 )
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from skl2onnx import convert_sklearn
 from onnxruntime import InferenceSession, __version__
 from test_utils import (
@@ -233,6 +237,40 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )
+
+    def test_decision_tree_regressor_bool(self):
+        model, X = fit_regression_model(
+            DecisionTreeRegressor(random_state=42), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "decision tree regressor",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeRegressionBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    def test_extra_tree_regressor_bool(self):
+        model, X = fit_regression_model(
+            ExtraTreeRegressor(random_state=42), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "extra tree regressor",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreeRegressionBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":
