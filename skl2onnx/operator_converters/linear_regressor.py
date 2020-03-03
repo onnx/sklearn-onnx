@@ -9,7 +9,7 @@ except ImportError:
     import collections as cabc
 import numpy as np
 from ..common._apply_operation import apply_cast
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -27,7 +27,7 @@ def convert_sklearn_linear_regressor(scope, operator, container):
         attrs['targets'] = op.coef_.shape[0]
 
     input_name = operator.input_full_names
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,

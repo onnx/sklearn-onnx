@@ -9,7 +9,10 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
-    FloatTensorType, Int64TensorType, DoubleTensorType
+    BooleanTensorType,
+    DoubleTensorType,
+    FloatTensorType,
+    Int64TensorType,
 )
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
@@ -77,6 +80,23 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_linear_regression_bool(self):
+        model, X = fit_regression_model(
+            linear_model.LinearRegression(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "linear regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLinearRegressionBool",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     def test_model_linear_svr(self):
         model, X = fit_regression_model(LinearSVR())
         model_onnx = convert_sklearn(
@@ -104,6 +124,22 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLinearSvrInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_linear_svr_bool(self):
+        model, X = fit_regression_model(LinearSVR(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "linear SVR",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLinearSVRBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
@@ -141,6 +177,22 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_ridge_bool(self):
+        model, X = fit_regression_model(linear_model.Ridge(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "ridge regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnRidgeBool",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     def test_model_sgd_regressor(self):
         model, X = fit_regression_model(linear_model.SGDRegressor())
         model_onnx = convert_sklearn(
@@ -171,6 +223,23 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_sgd_regressor_bool(self):
+        model, X = fit_regression_model(
+            linear_model.SGDRegressor(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "SGD regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnSGDRegressorBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
@@ -223,6 +292,23 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnElasticNetRegressorInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_elastic_net_regressor_bool(self):
+        model, X = fit_regression_model(
+            linear_model.ElasticNet(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "elastic net regression",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnElasticNetRegressorBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
@@ -335,6 +421,23 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnLassoLarsInt-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    def test_model_lasso_lars_bool(self):
+        model, X = fit_regression_model(
+            linear_model.LassoLars(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model, "lasso lars",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLassoLarsBool",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
