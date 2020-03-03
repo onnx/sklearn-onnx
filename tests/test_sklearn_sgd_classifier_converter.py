@@ -4,7 +4,11 @@ import unittest
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
@@ -435,6 +439,29 @@ class TestSGDClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSGDClassifierBinaryLogInt",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_sgd_binary_class_log_bool(self):
+        model, X = fit_classification_model(
+            SGDClassifier(loss='log', random_state=42), 2, is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD binary classifier",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryLogBool",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"

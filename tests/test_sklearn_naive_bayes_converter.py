@@ -17,7 +17,9 @@ except ImportError:
     ComplementNB = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
-    FloatTensorType, Int64TensorType,
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
@@ -200,6 +202,28 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multinomial_nb_binary_classification_bool(self):
+        model, X = fit_classification_model(
+            MultinomialNB(), 2, is_bool=True, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multinomial naive bayes",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinMultinomialNBBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.3"),
         reason="Requires opset 9.",
@@ -222,6 +246,32 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnBinBernoulliNBInt",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.3"),
+        reason="Requires opset 9.",
+    )
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_bernoulli_nb_binary_classification_bool(self):
+        model, X = fit_classification_model(
+            BernoulliNB(), 2, is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "bernoulli naive bayes",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBinBernoulliNBBool",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
@@ -361,6 +411,28 @@ class TestNaiveBayesConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_gaussian_nb_multiclass_bool(self):
+        model, X = fit_classification_model(
+            GaussianNB(), 5, is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "gaussian naive bayes",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclGaussianNBBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     @unittest.skipIf(ComplementNB is None,
                      reason="new in scikit version 0.20")
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -453,6 +525,29 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnMclComplementNBInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(ComplementNB is None,
+                     reason="new in scikit version 0.20")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_complement_nb_multiclass_bool(self):
+        model, X = fit_classification_model(
+            ComplementNB(), 5, is_bool=True, pos_features=True)
+        model_onnx = convert_sklearn(
+            model,
+            "complement naive bayes",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            dtype=np.float32,
+            target_opset=TARGET_OPSET
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnMclComplementNBBool-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')")
 

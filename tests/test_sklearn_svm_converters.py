@@ -8,7 +8,11 @@ from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
 from sklearn import __version__ as sk__version__
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 import onnx
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
@@ -464,6 +468,42 @@ class TestSklearnSVM(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnNuSVRInt-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
+
+    def test_convert_svr_bool(self):
+        model, X = fit_regression_model(
+            SVR(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "SVR",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnSVRBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')"
+        )
+
+    def test_convert_nusvr_bool(self):
+        model, X = fit_regression_model(
+            NuSVR(), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "NuSVR",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnNuSVRBool",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )
