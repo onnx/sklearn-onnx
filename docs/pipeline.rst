@@ -187,9 +187,9 @@ Titanic example
 
 The first example was a simplified pipeline coming from *scikit-learn*'s documentation:
 `Column Transformer with Mixed Types <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
-The full story is available in a runable exemple: :ref:`example-complex-pipeline`
+The full story is available in a runnable example: :ref:`example-complex-pipeline`
 which also shows up some mistakes that a user could come accross
-when trying to convert his pipeline.
+when trying to convert a pipeline.
 
 Parameterize the conversion
 ===========================
