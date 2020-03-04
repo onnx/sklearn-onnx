@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+from .utils_checking import check_signature
 
 # This dictionary defines the converters which can be invoked in the
 # conversion framework defined in _topology.py. A key in this dictionary
@@ -50,6 +51,10 @@ def register_converter(operator_name, conversion_function, overwrite=False,
     if not overwrite and operator_name in _converter_pool:
         raise ValueError('We do not overwrite registered converter '
                          'by default')
+    if len(_converter_pool) > 0:
+        key = next(iter(_converter_pool))
+        check_signature(conversion_function, _converter_pool[key]._fct,
+                        skip=('operator', ))
     _converter_pool[operator_name] = RegisteredConverter(
         conversion_function, options)
 
@@ -77,6 +82,10 @@ def register_shape_calculator(operator_name, calculator_function,
     if not overwrite and operator_name in _shape_calculator_pool:
         raise ValueError('We do not overwrite registrated shape calculator '
                          'by default')
+    if len(_shape_calculator_pool) > 0:
+        key = next(iter(_shape_calculator_pool))
+        check_signature(calculator_function, _shape_calculator_pool[key],
+                        skip=('operator', ))
     _shape_calculator_pool[operator_name] = calculator_function
 
 
