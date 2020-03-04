@@ -24,7 +24,6 @@ does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import numpy
@@ -131,5 +130,5 @@ for i, step in enumerate(steps):
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

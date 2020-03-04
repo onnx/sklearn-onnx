@@ -26,7 +26,6 @@ the method *validate* mentioned above.
 import inspect
 import numpy as np
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 from sklearn.base import ClassifierMixin, BaseEstimator, clone
@@ -280,5 +279,5 @@ ax.axis('off')
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

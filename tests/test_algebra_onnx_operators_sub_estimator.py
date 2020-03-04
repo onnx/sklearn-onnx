@@ -114,7 +114,94 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
+def dummy1_parser(scope, model, inputs):
+    pass
+
+
+def dummy2_parser(scope, model, input, custom_parsers):
+    pass
+
+
+def dummy_val_2(op, c):
+    pass
+
+
+def dummy_conv_1(scope, op, cont):
+    pass
+
+
+def dummy_conv_2(scope, operator):
+    pass
+
+
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.0"),
+        reason="Cast not available.")
+    def test_sub_estimator_exc(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+        model = ValidatorClassifier()
+        model.fit(X_train, y_train)
+
+        # parser
+
+        try:
+            update_registered_converter(
+                ValidatorClassifier, 'CustomValidatorClassifier',
+                validator_classifier_shape_calculator,
+                validator_classifier_converter,
+                parser=dummy1_parser)
+            raise AssertionError("exception not raised")
+        except TypeError:
+            pass
+
+        try:
+            update_registered_converter(
+                ValidatorClassifier, 'CustomValidatorClassifier',
+                validator_classifier_shape_calculator,
+                validator_classifier_converter,
+                parser=dummy1_parser)
+            raise AssertionError("exception not raised")
+        except TypeError:
+            pass
+
+        # shape
+
+        try:
+            update_registered_converter(
+                ValidatorClassifier, 'CustomValidatorClassifier',
+                dummy_val_2,
+                validator_classifier_converter,
+                parser=validator_classifier_parser)
+            raise AssertionError("exception not raised")
+        except TypeError:
+            pass
+
+        # conv
+
+        try:
+            update_registered_converter(
+                ValidatorClassifier, 'CustomValidatorClassifier',
+                validator_classifier_shape_calculator,
+                dummy_conv_1,
+                parser=validator_classifier_parser)
+            raise AssertionError("exception not raised")
+        except NameError:
+            pass
+
+        try:
+            update_registered_converter(
+                ValidatorClassifier, 'CustomValidatorClassifier',
+                validator_classifier_shape_calculator,
+                dummy_conv_2,
+                parser=validator_classifier_parser)
+            raise AssertionError("exception not raised")
+        except TypeError:
+            pass
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.0"),
