@@ -25,7 +25,6 @@ the iris dataset.
 """
 
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 from sklearn.linear_model import LogisticRegression
@@ -87,5 +86,5 @@ print(pred_onx)
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

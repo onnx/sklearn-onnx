@@ -43,6 +43,7 @@ from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
 from .common.data_types import Int64Type, StringType, TensorType
 from .common.utils import get_column_indices
+from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
 
 
@@ -511,6 +512,7 @@ def update_registered_parser(model, parser_fct):
     :param parser_fct: parser, signature is the same as
         :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`
     """
+    check_signature(parser_fct, _parse_sklearn_classifier)
     sklearn_parsers_map[model] = parser_fct
 
 

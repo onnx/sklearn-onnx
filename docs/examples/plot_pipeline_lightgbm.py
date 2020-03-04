@@ -29,7 +29,6 @@ Train a LightGBM classifier
 import lightgbm
 import onnxmltools
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import matplotlib.pyplot as plt
@@ -135,7 +134,7 @@ ax.axis('off')
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
 print("onnxmltools: ", onnxmltools.__version__)
 print("lightgbm: ", lightgbm.__version__)

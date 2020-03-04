@@ -18,7 +18,6 @@ trained on *Iris* datasets. The model takes
 a vector of dimension 2 and returns a class among three.
 """
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import onnxruntime as rt
@@ -135,5 +134,5 @@ for x in [
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

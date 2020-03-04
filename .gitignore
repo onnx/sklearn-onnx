@@ -56,3 +56,5 @@ docs/tests/*.dot*
 tests/*.dot*
 tests/*.onnx
 docs/tests/*.onnx
+docs/examples/validator_classifier.dot.png
+docs/examples/validator_classifier.dot

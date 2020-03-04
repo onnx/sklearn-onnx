@@ -46,7 +46,6 @@ And to predict on a test set:
 """
 
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 from skl2onnx import update_registered_converter
@@ -328,7 +327,7 @@ def predictable_tsne_converter(scope, operator, container):
 
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
-    # operator
+    # operator.
     model = op.estimator_
     alias = get_model_alias(type(model))
     knn_op = scope.declare_local_operator(alias, model)
@@ -424,5 +423,5 @@ ax.axis('off')
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
