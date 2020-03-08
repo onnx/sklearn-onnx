@@ -6,13 +6,13 @@ from distutils.version import StrictVersion
 import numpy
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
-from sklearn import __version__ as sk__version__
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
     Int64TensorType,
 )
+from skl2onnx.operator_converters.ada_boost import _scikit_learn_before_022
 import onnx
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model
@@ -345,10 +345,8 @@ class TestSklearnSVM(unittest.TestCase):
                           " < StrictVersion('0.5.0')"
         )
 
-    @unittest.skipIf(
-        StrictVersion(sk__version__.split('dev')[0].strip('.'))
-        < StrictVersion("0.22.0"),
-        reason="break_ties introduced after 0.22.dev")
+    @unittest.skipIf(_scikit_learn_before_022(),
+                     reason="break_ties introduced after 0.22")
     def test_convert_svc_multi_pfalse_4_break_ties(self):
         model, X = self._fit_multi_classification(
             SVC(probability=True, break_ties=True), 4)
