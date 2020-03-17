@@ -7,11 +7,161 @@
 import numbers
 import numpy as np
 import six
-from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
-from ..common._apply_operation import apply_cast
+from sklearn.svm import SVC, NuSVC, OneClassSVM
+from ..common._apply_operation import (
+    apply_add,
+    apply_cast,
+    apply_exp,
+    apply_mul,
+    apply_pow,
+    apply_reshape,
+    apply_sub,
+    apply_tanh,
+)
 from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
+
+
+def _kernel_linear(scope, container, model, input_name):
+    support_vectors_name = scope.get_unique_variable_name('support_vectors')
+    matmul_result_name = scope.get_unique_variable_name('matmul_result')
+
+    container.add_initializer(
+        support_vectors_name, container.proto_dtype,
+        model.support_vectors_.T.shape, model.support_vectors_.T.ravel())
+
+    container.add_node(
+        'MatMul', [input_name, support_vectors_name],
+        matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
+    return matmul_result_name
+
+
+def _kernel_poly_sigmoid(scope, container, model, input_name):
+    gamma_name = scope.get_unique_variable_name('gamma')
+    coef0_name = scope.get_unique_variable_name('coef0')
+    degree_name = scope.get_unique_variable_name('degree')
+    prod_result_name = scope.get_unique_variable_name('product_result')
+    prod_coef0_sum_name = scope.get_unique_variable_name('prod_coef0_sum')
+    kernel_result_name = scope.get_unique_variable_name('kernel_result')
+    support_vectors_name = scope.get_unique_variable_name('support_vectors')
+    matmul_result_name = scope.get_unique_variable_name('matmul_result')
+
+    container.add_initializer(
+        support_vectors_name, container.proto_dtype,
+        model.support_vectors_.T.shape, model.support_vectors_.T.ravel())
+    container.add_initializer(
+        gamma_name, container.proto_dtype,
+        [], [model._gamma])
+    container.add_initializer(
+        coef0_name, container.proto_dtype,
+        [], [model.coef0])
+    container.add_initializer(
+        degree_name, container.proto_dtype,
+        [], [model.degree])
+
+    container.add_node(
+        'MatMul', [input_name, support_vectors_name],
+        matmul_result_name, name=scope.get_unique_operator_name('MatMul'))
+    apply_mul(scope, [matmul_result_name, gamma_name],
+              prod_result_name, container, broadcast=1)
+    apply_add(scope, [prod_result_name, coef0_name],
+              prod_coef0_sum_name, container, broadcast=1)
+    if model.kernel == 'poly':
+        apply_pow(scope, [prod_coef0_sum_name, degree_name],
+                  kernel_result_name, container, broadcast=1)
+    else:
+        apply_tanh(scope, prod_coef0_sum_name, kernel_result_name,
+                   container)
+    return kernel_result_name
+
+
+def _kernel_rbf(scope, container, model, input_name):
+    gamma_name = scope.get_unique_variable_name('gamma')
+    support_vectors_name = scope.get_unique_variable_name('support_vectors')
+    sub_result_name = scope.get_unique_variable_name('sub_result')
+    squared_result_name = scope.get_unique_variable_name('squared_result')
+    reshaped_input_name = scope.get_unique_variable_name('reshaped_result')
+    exp_result_name = scope.get_unique_variable_name('exp_result')
+    reduced_square_sum_result_name = scope.get_unique_variable_name(
+        'reduced_square_sum_result')
+    gamma_reduced_sum_result_name = scope.get_unique_variable_name(
+        'gamma_reduced_sum_result')
+
+    container.add_initializer(
+        gamma_name, container.proto_dtype,
+        [], [-model._gamma])
+    container.add_initializer(
+        support_vectors_name, container.proto_dtype,
+        (1, ) + model.support_vectors_.shape,
+        model.support_vectors_.ravel())
+
+    apply_reshape(
+        scope, input_name, reshaped_input_name, container,
+        desired_shape=(-1, 1, model.support_vectors_.shape[1]))
+    apply_sub(scope, [reshaped_input_name, support_vectors_name],
+              sub_result_name, container, broadcast=1)
+    apply_mul(scope, [sub_result_name, sub_result_name],
+              squared_result_name, container, broadcast=1)
+    container.add_node(
+        'ReduceSum', squared_result_name, reduced_square_sum_result_name,
+        axes=[2], name=scope.get_unique_operator_name('ReduceSum'),
+        keepdims=0)
+    apply_mul(scope, [reduced_square_sum_result_name, gamma_name],
+              gamma_reduced_sum_result_name, container, broadcast=1)
+    apply_exp(scope, gamma_reduced_sum_result_name, exp_result_name,
+              container)
+    return exp_result_name
+
+
+def convert_sklearn_svr(scope, operator, container):
+    """
+    Converter for NuSVR and SVR. Here, we call the respective kernel
+    functions whose return value is mutipled to dual_coef, reduced
+    along axis 1 and added to the intercept value.
+    """
+    model = operator.raw_operator
+    dual_coef_name = scope.get_unique_variable_name('dual_coef')
+    intercept_name = scope.get_unique_variable_name('intercept')
+    mul_result_name = scope.get_unique_variable_name('mul_result')
+    reduce_sum_result_name = scope.get_unique_variable_name(
+        'reduce_sum_result')
+    kernel_mapper = {
+        'linear': _kernel_linear,
+        'poly': _kernel_poly_sigmoid,
+        'rbf': _kernel_rbf,
+        'sigmoid': _kernel_poly_sigmoid,
+    }
+    if model.kernel not in kernel_mapper:
+        raise NotImplementedError(
+            "kernel {} not supported yet. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues".format(model.kernel))
+
+    container.add_initializer(
+        dual_coef_name, container.proto_dtype,
+        model.dual_coef_.shape, model.dual_coef_.ravel())
+    container.add_initializer(
+        intercept_name, container.proto_dtype,
+        model.intercept_.shape, model.intercept_)
+
+    input_name = operator.inputs[0].full_name
+    if type(operator.inputs[0].type) in (
+            BooleanTensorType, Int64TensorType):
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, operator.inputs[0].full_name, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
+    kernel_result = kernel_mapper[model.kernel](
+        scope, container, model, input_name)
+    apply_mul(scope, [kernel_result, dual_coef_name],
+              mul_result_name, container, broadcast=1)
+    container.add_node(
+        'ReduceSum', mul_result_name, reduce_sum_result_name,
+        axes=[1], name=scope.get_unique_operator_name('ReduceSum'))
+    apply_add(scope, [reduce_sum_result_name, intercept_name],
+              operator.outputs[0].full_name, container, broadcast=1)
 
 
 def convert_sklearn_svm(scope, operator, container):
@@ -95,24 +245,6 @@ def convert_sklearn_svm(scope, operator, container):
                            [label_name, probability_tensor_name],
                            op_domain='ai.onnx.ml', **svm_attrs)
 
-    elif operator.type in ['SklearnSVR', 'SklearnNuSVR'] or isinstance(
-            op, (SVR, NuSVR)):
-        op_type = 'SVMRegressor'
-        svm_attrs['post_transform'] = 'NONE'
-        svm_attrs['n_supports'] = len(op.support_)
-
-        input_name = operator.input_full_names
-        if type(operator.inputs[0].type) in (
-                BooleanTensorType, Int64TensorType):
-            cast_input_name = scope.get_unique_variable_name('cast_input')
-
-            apply_cast(scope, operator.input_full_names, cast_input_name,
-                       container, to=onnx_proto.TensorProto.FLOAT)
-            input_name = cast_input_name
-
-        container.add_node(op_type, input_name,
-                           operator.output_full_names,
-                           op_domain='ai.onnx.ml', **svm_attrs)
     elif (operator.type in ['SklearnOneClassSVM'] or
           isinstance(op, OneClassSVM)):
         op_type = 'SVMRegressor'
@@ -145,4 +277,4 @@ register_converter('SklearnOneClassSVM', convert_sklearn_svm)
 register_converter('SklearnSVC', convert_sklearn_svm,
                    options={'zipmap': [True, False],
                             'nocl': [True, False]})
-register_converter('SklearnSVR', convert_sklearn_svm)
+register_converter('SklearnSVR', convert_sklearn_svr)

@@ -222,17 +222,6 @@ class TestSklearnSVM(unittest.TestCase):
             model, "SVR", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
-        self._check_attributes(
-            nodes[0],
-            {
-                "coefficients": None,
-                "kernel_params": None,
-                "kernel_type": "LINEAR",
-                "post_transform": None,
-                "rho": None,
-                "support_vectors": None,
-            },
-        )
         dump_data_and_model(X,
                             model,
                             model_onnx,
@@ -413,17 +402,6 @@ class TestSklearnSVM(unittest.TestCase):
             model, "SVR", [("input", FloatTensorType([None, X.shape[1]]))])
         node = model_onnx.graph.node[0]
         self.assertIsNotNone(node)
-        self._check_attributes(
-            node,
-            {
-                "coefficients": None,
-                "kernel_params": None,
-                "kernel_type": "RBF",
-                "post_transform": None,
-                "rho": None,
-                "support_vectors": None,
-            },
-        )
         dump_data_and_model(X, model, model_onnx,
                             basename="SklearnRegNuSVR")
 
