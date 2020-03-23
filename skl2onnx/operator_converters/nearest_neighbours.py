@@ -225,10 +225,25 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     reshaped_cast = OnnxCast(
         reshaped, to=container.proto_dtype, op_version=opv)
     if top_distances is not None:
-        weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
-        res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
-                            keepdims=0)
-        res = OnnxDiv(res, norm, op_version=opv, output_names=out)
+        # Multi-target
+        if (hasattr(operator.raw_operator, '_y') and
+                len(operator.raw_operator._y.shape) > 1 and
+                operator.raw_operator._y.shape[1] > 1):
+            rs = OnnxTranspose(reshaped_cast, perm=[1, 0, 2],
+                               op_version=opv)
+            weighted_rs = OnnxMul(rs, wei, op_version=opv)
+            weighted = OnnxTranspose(weighted_rs, perm=[1, 0, 2],
+                                     op_version=opv)
+            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
+                                keepdims=0)
+            norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),
+                                op_version=opv)
+            res = OnnxDiv(res, norm2, op_version=opv, output_names=out)
+        else:
+            weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
+            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
+                                keepdims=0)
+            res = OnnxDiv(res, norm, op_version=opv, output_names=out)
     else:
         res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
                              keepdims=0, output_names=out)

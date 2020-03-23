@@ -130,12 +130,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    def test_model_knn_regressor_weights_distance(self):
+    def test_model_knn_regressor_weights_distance_11(self):
         model, X = self._fit_model(
             KNeighborsRegressor(
                 weights="distance", algorithm="brute", n_neighbors=1))
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([None, 4]))])
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=11)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:3],
@@ -527,6 +528,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 model_onnx,
                 basename="SklearnKNNImputer",
             )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_iris_regressor(self):
+        iris = datasets.load_iris()
+        X = iris.data.astype(numpy.float32)
+        y = iris.target.astype(numpy.float32)
+        y = numpy.vstack([y, 1 - y, y + 10]).T
+        model = KNeighborsRegressor(
+            algorithm='brute', weights='distance', n_neighbors=7)
+        model.fit(X[:13], y[:13])
+        onx = to_onnx(model, X[:1], target_opset=11,
+                      options={id(model): {'optim': 'cdist'}})
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7],
+            model, onx,
+            basename="SklearnKNeighborsRegressorY3")
 
 
 if __name__ == "__main__":
