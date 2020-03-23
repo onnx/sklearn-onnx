@@ -161,6 +161,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(onnx_opset_version() < TARGET_OPSET,
+                     reason="needs higher target_opset")
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(
             KNeighborsClassifier())
@@ -534,6 +536,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
     def test_model_knn_iris_regressor(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
