@@ -130,6 +130,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
     def test_model_knn_regressor_weights_distance_11(self):
         model, X = self._fit_model(
             KNeighborsRegressor(
