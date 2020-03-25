@@ -540,7 +540,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(onnx_opset_version() < 11,
                      reason="needs higher target_opset")
-    def test_model_knn_iris_regressor(self):
+    def test_model_knn_iris_regressor_multi_reg(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
         y = iris.target.astype(numpy.float32)
@@ -553,7 +553,54 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
             model, onx,
-            basename="SklearnKNeighborsRegressorY3")
+            basename="SklearnKNeighborsRegressorMReg")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
+    def test_model_knn_iris_classifier_multi_reg2_weight(self):
+        iris = datasets.load_iris()
+        X = iris.data.astype(numpy.float32)
+        y = iris.target.astype(numpy.int64)
+        y = numpy.vstack([(y + 1) % 2, y % 2]).T
+        model = KNeighborsClassifier(
+            algorithm='brute', weights='distance', n_neighbors=7)
+        model.fit(X[:13], y[:13])
+        onx = to_onnx(model, X[:1], target_opset=11,
+                      options={id(model): {'optim': 'cdist',
+                                           'zipmap': False}})
+        dump_data_and_model(
+            X.astype(numpy.float32)[:11],
+            model, onx,
+            basename="SklearnKNeighborsClassifierMReg2-Out0")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
+    def test_model_knn_iris_classifier_multi_reg3_weight(self):
+        iris = datasets.load_iris()
+        X = iris.data.astype(numpy.float32)
+        y = iris.target.astype(numpy.int64)
+        y = numpy.vstack([y % 2, y % 2, (y+1) % 2]).T
+        model = KNeighborsClassifier(
+            algorithm='brute', weights='distance',
+            n_neighbors=7)
+        model.fit(X[:13], y[:13])
+        onx = to_onnx(model, X[:1], target_opset=11,
+                      options={id(model): {'optim': 'cdist',
+                                           'zipmap': False}})
+        dump_data_and_model(
+            X.astype(numpy.float32)[:11],
+            model, onx,
+            basename="SklearnKNeighborsClassifierMReg3-Out0")
 
 
 if __name__ == "__main__":

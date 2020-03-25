@@ -25,6 +25,7 @@ from ..algebra.onnx_ops import (
     OnnxReduceSum,
     OnnxReshape,
     OnnxShape,
+    OnnxSqueeze,
     OnnxSub,
     OnnxTopK_1,
     OnnxTranspose,
@@ -251,7 +252,7 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
 
 
 def get_proba_and_label(container, nb_classes, reshaped,
-                        wei, axis, opv):
+                        wei, axis, opv, keep_axis=True):
     """
     This function calculates the label by choosing majority label
     amongst the nearest neighbours.
@@ -264,6 +265,9 @@ def get_proba_and_label(container, nb_classes, reshaped,
             op_version=opv,
             to=container.proto_dtype)
         if wei is not None:
+            if not keep_axis:
+                mat_cast = OnnxSqueeze(mat_cast, axes=[-1],
+                                       op_version=opv)
             mat_cast = OnnxMul(mat_cast, wei, op_version=opv)
         wh = OnnxReduceSum(mat_cast, axes=[1], op_version=opv)
         conc.append(wh)
@@ -312,7 +316,7 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
                 op_version=opv)
             all_together, sum_prob, res = get_proba_and_label(
                 container, len(cur_class), extracted_name,
-                wei, 1, opv)
+                wei, 1, opv, keep_axis=False)
             probas = OnnxDiv(all_together, sum_prob, op_version=opv)
             res_name = OnnxArrayFeatureExtractor(
                 cur_class, res, op_version=opv)
