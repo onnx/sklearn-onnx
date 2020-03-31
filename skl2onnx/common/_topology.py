@@ -29,6 +29,12 @@ from .interface import OperatorBase
 type_fct = type
 
 
+OPSET_TO_IR_VERSION = {
+    1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
+    7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+}
+
+
 class Variable:
     """
     Defines a variable which holds any data defined
@@ -1080,7 +1086,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     _update_domain_version(container, onnx_model)
 
     # Add extra information
-    onnx_model.ir_version = onnx_proto.IR_VERSION
+    opv = _get_main_opset_version(onnx_model) or onnx_target_opset
+    irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+    onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
     onnx_model.producer_version = utils.get_producer_version()
     onnx_model.domain = utils.get_domain()
@@ -1123,3 +1131,13 @@ def _update_domain_version(container, onnx_model):
                 '%d.' % (
                     container.target_opset_any_domain(op_domain),
                     op_version))
+
+
+def _get_main_opset_version(model):
+    """
+    Returns the main opset version.
+    """
+    for op in model.opset_import:
+        if op.domain == '':
+            return op.version
+    return None
