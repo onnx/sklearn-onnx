@@ -86,6 +86,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
             model,
             "scikit-learn simple imputer",
             [("input", FloatTensorType([None, 2]))],
+            target_opset=11
         )
         self.assertTrue(model_onnx.graph.node is not None)
 
