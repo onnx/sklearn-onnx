@@ -6,7 +6,10 @@
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
-from ..common._topology import Variable, Scope, _update_domain_version
+from ..common._topology import (
+    Variable, Scope, _update_domain_version,
+    _get_main_opset_version, OPSET_TO_IR_VERSION
+)
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..proto import get_opset_number_from_onnx, onnx_proto
@@ -547,7 +550,9 @@ class OnnxOperator:
         _update_domain_version(container, onnx_model)
 
         # metadata
-        onnx_model.ir_version = onnx_proto.IR_VERSION
+        opv = _get_main_opset_version(onnx_model) or target_opset
+        irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+        onnx_model.ir_version = irv
         onnx_model.producer_name = utils.get_producer()
         onnx_model.producer_version = utils.get_producer_version()
         onnx_model.domain = utils.get_domain()
