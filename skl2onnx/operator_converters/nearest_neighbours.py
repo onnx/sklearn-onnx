@@ -25,6 +25,7 @@ from ..algebra.onnx_ops import (
     OnnxReduceSum,
     OnnxReshape,
     OnnxShape,
+    OnnxSqueeze,
     OnnxSub,
     OnnxTopK_1,
     OnnxTranspose,
@@ -225,10 +226,25 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     reshaped_cast = OnnxCast(
         reshaped, to=container.proto_dtype, op_version=opv)
     if top_distances is not None:
-        weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
-        res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
-                            keepdims=0)
-        res = OnnxDiv(res, norm, op_version=opv, output_names=out)
+        # Multi-target
+        if (hasattr(operator.raw_operator, '_y') and
+                len(operator.raw_operator._y.shape) > 1 and
+                operator.raw_operator._y.shape[1] > 1):
+            rs = OnnxTranspose(reshaped_cast, perm=[1, 0, 2],
+                               op_version=opv)
+            weighted_rs = OnnxMul(rs, wei, op_version=opv)
+            weighted = OnnxTranspose(weighted_rs, perm=[1, 0, 2],
+                                     op_version=opv)
+            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
+                                keepdims=0)
+            norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),
+                                op_version=opv)
+            res = OnnxDiv(res, norm2, op_version=opv, output_names=out)
+        else:
+            weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
+            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
+                                keepdims=0)
+            res = OnnxDiv(res, norm, op_version=opv, output_names=out)
     else:
         res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
                              keepdims=0, output_names=out)
@@ -236,7 +252,7 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
 
 
 def get_proba_and_label(container, nb_classes, reshaped,
-                        wei, axis, opv):
+                        wei, axis, opv, keep_axis=True):
     """
     This function calculates the label by choosing majority label
     amongst the nearest neighbours.
@@ -249,6 +265,9 @@ def get_proba_and_label(container, nb_classes, reshaped,
             op_version=opv,
             to=container.proto_dtype)
         if wei is not None:
+            if not keep_axis:
+                mat_cast = OnnxSqueeze(mat_cast, axes=[-1],
+                                       op_version=opv)
             mat_cast = OnnxMul(mat_cast, wei, op_version=opv)
         wh = OnnxReduceSum(mat_cast, axes=[1], op_version=opv)
         conc.append(wh)
@@ -297,7 +316,7 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
                 op_version=opv)
             all_together, sum_prob, res = get_proba_and_label(
                 container, len(cur_class), extracted_name,
-                wei, 1, opv)
+                wei, 1, opv, keep_axis=False)
             probas = OnnxDiv(all_together, sum_prob, op_version=opv)
             res_name = OnnxArrayFeatureExtractor(
                 cur_class, res, op_version=opv)
