@@ -12,7 +12,7 @@ from ..common._topology import (
 )
 from ..common._container import ModelComponentContainer
 from ..common import utils
-from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
@@ -164,7 +164,7 @@ class OnnxOperator:
 
         if op_version is None:
             if domain == '':
-                self.op_version = get_opset_number_from_onnx()
+                self.op_version = get_latest_tested_opset_version()
             else:
                 self.op_version = None
         else:
@@ -495,7 +495,7 @@ class OnnxOperator:
                                        name, self.__class__.__name__))
 
         if target_opset is None:
-            target_opset = get_opset_number_from_onnx()
+            target_opset = get_latest_tested_opset_version()
         container = ModelComponentContainer(
             target_opset, dtype=dtype)
 

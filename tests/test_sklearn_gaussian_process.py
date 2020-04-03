@@ -19,7 +19,7 @@ from sklearn.gaussian_process.kernels import (
 )
 from sklearn.model_selection import train_test_split
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
-from skl2onnx import to_onnx
+from skl2onnx import to_onnx, convert_sklearn
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
@@ -494,6 +494,11 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType([None, None]))],
             options=options, dtype=np.float32)
+        model_onnx2 = convert_sklearn(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            options=options, dtype=np.float32)
+        assert "ir_version: 6" in str(model_onnx2)
+        assert "ir_version: 6" in str(model_onnx)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[

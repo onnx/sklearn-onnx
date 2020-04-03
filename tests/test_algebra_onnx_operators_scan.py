@@ -89,6 +89,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = 11
+        model_def.ir_version = 6
 
         # By default, if not specified, the opset version for the
         # main domain which may be higher than the onnx version embedded
