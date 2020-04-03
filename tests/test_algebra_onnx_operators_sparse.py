@@ -20,7 +20,7 @@ except ImportError:
     OnnxConstantOfShape = None
 from onnx import __version__ as onnx__version__
 
-THRESHOLD = "1.0.0"
+THRESHOLD = "1.3.0"
 
 
 class TestOnnxOperatorsSparse(unittest.TestCase):
