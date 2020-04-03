@@ -123,6 +123,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         res = res_out[0]
         assert res.shape[1] == dim
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
     def test_scaler_converted(self):
         st = StandardScaler()
         X = np.array([[0, 1.5], [6.1, 2.3]])
@@ -168,6 +170,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             res = res_out[0]
             assert_almost_equal(exp, res)
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
     def test_model_mlp_regressor_default(self):
         model, X_test = fit_regression_model(
             MLPRegressor(random_state=42))

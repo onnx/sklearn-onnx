@@ -497,8 +497,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         model_onnx2 = convert_sklearn(
             gp, initial_types=[('X', FloatTensorType([None, None]))],
             options=options, dtype=np.float32)
-        assert "ir_version: 6" in str(model_onnx2)
-        assert "ir_version: 6" in str(model_onnx)
+        assert "ir_version: 7" not in str(model_onnx2)
+        assert "ir_version: 7" not in str(model_onnx)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
