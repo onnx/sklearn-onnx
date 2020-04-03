@@ -13,6 +13,14 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
+      Py37-OnnxTest-Rt120-Skl022p:
+        do.bench: '0'
+        python.version: '3.7'
+        numpy.version: '==1.18.1'
+        onnx.version: 'test'
+        onnxrt.version: '==1.2.0'
+        sklearn.version: '==0.22.2.post1'
+        run.example: '1'
       Py37-Onnx160-Rt100-Skl021:
         do.bench: '0'
         python.version: '3.7'
@@ -99,7 +107,13 @@ jobs:
           python setup.py install
           cd ..
         else
-          pip install onnx$(onnx.version)
+          if [ '$(onnx.version)' == 'test' ]
+          then
+            pip install typing-extensions
+            pip install -i https://test.pypi.org/simple/ onnx
+          else
+            pip install onnx$(onnx.version)
+          fi
       fi
     displayName: 'install onnx'
 

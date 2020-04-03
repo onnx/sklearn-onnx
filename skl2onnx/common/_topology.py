@@ -17,7 +17,10 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
 )
-from ..proto import get_opset_number_from_onnx
+from ..proto import (
+    get_opset_number_from_onnx,
+    get_latest_tested_opset_version
+)
 from ..proto.onnx_helper_modified import (
     make_graph, make_model, make_tensor_value_info
 )
@@ -27,6 +30,17 @@ from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
 type_fct = type
+
+
+try:
+    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
+except ImportError:
+    OPSET_TO_IR_VERSION = {
+        1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
+        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+    }
+
+OPSET_ML_TO_OPSET = {1: 11, 2: 11}
 
 
 class Variable:
@@ -854,7 +868,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         raise ValueError("dtype must be specified.")
 
     if target_opset is None:
-        target_opset = get_opset_number_from_onnx()
+        target_opset = get_latest_tested_opset_version()
     elif target_opset > get_opset_number_from_onnx():
         found = get_opset_number_from_onnx()
         raise RuntimeError(
@@ -1035,7 +1049,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                                 '%d.') % (container.target_opset, op_version))
 
     # Add extra information
-    onnx_model.ir_version = onnx_proto.IR_VERSION
+    opv = _get_main_opset_version(onnx_model) or onnx_target_opset
+    irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+    onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
     onnx_model.producer_version = utils.get_producer_version()
     onnx_model.domain = utils.get_domain()
@@ -1043,3 +1059,18 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model.doc_string = doc_string
 
     return onnx_model
+
+
+def _get_main_opset_version(model):
+    """
+    Returns the main opset version.
+    """
+    mld = None
+    for op in model.opset_import:
+        if op.domain == '':
+            return op.version
+        if op.domain == "ai.onnx.ml":
+            mld = op.version
+    if mld is not None:
+        return OPSET_ML_TO_OPSET.get(mld, None)
+    return None
