@@ -157,48 +157,48 @@ jobs:
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
-  - script: |
-      pip install lightgbm xgboost
-      pip install onnxmltools --no-deps
-    displayName: 'install onnxmltools'
-
-  - script: |
-      pytest tests_onnxmltools
-    displayName: 'pytest-onnxmltools'
-    condition: ne(variables['onnxrt.version'], '==0.2.1')
-
-  - script: |
-      pip install matplotlib pydot
-    displayName: 'install modules for examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
-
-  - script: |
-      pytest docs/tests
-    displayName: 'pytest-examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
-
+#   - script: |
+#       pip install lightgbm xgboost
+#       pip install onnxmltools --no-deps
+#     displayName: 'install onnxmltools'
+# 
+#   - script: |
+#       pytest tests_onnxmltools
+#     displayName: 'pytest-onnxmltools'
+#     condition: ne(variables['onnxrt.version'], '==0.2.1')
+# 
+#   - script: |
+#       pip install matplotlib pydot
+#     displayName: 'install modules for examples'
+#     condition: eq(variables['onnxrt.version'], '==0.5.0')
+# 
+#   - script: |
+#       pytest docs/tests
+#     displayName: 'pytest-examples'
+#     condition: eq(variables['onnxrt.version'], '==0.5.0')
+# 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
-      flake8 skl2onnx tests tests_onnxmltools
-    displayName: 'flake8'
-
-  - script: |
-      if [ '$(do.bench)' == '1' ]
-        then
-          pip install onnxmltools openpyxl
-          coverage run --include=skl2onnx/** tests/benchmark.py
-          coverage report -m
-          coverage html
-      fi
-    displayName: 'coverage'
-
-  - script: |
-      if [ '$(do.bench)' == '1' ]
-        then
-          python tests/benchmark.py
-      fi
-    displayName: 'benchmark'
+     flake8 skl2onnx tests tests_onnxmltools
+   displayName: 'flake8'
+# 
+#   - script: |
+#       if [ '$(do.bench)' == '1' ]
+#         then
+#           pip install onnxmltools openpyxl
+#           coverage run --include=skl2onnx/** tests/benchmark.py
+#           coverage report -m
+#           coverage html
+#       fi
+#     displayName: 'coverage'
+# 
+#   - script: |
+#       if [ '$(do.bench)' == '1' ]
+#         then
+#           python tests/benchmark.py
+#       fi
+#     displayName: 'benchmark'
 
   - task: PublishTestResults@2
     inputs:
