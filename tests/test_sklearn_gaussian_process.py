@@ -458,7 +458,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_true(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-5,
+        gp = GaussianProcessRegressor(alpha=1e-7,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
         gp, X = fit_regression_model(gp)
@@ -469,7 +469,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
             dtype=np.float64)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, gp, model_onnx,
-                            verbose=True,
+                            verbose=False,
                             basename="SklearnGaussianProcessRBFT")
 
     @unittest.skipIf(
