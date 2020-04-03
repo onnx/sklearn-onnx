@@ -3,6 +3,7 @@ Tests scikit-learn's binarizer converter.
 """
 
 import unittest
+from onnx.defs import onnx_opset_version
 from sklearn.ensemble import GradientBoostingRegressor
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import (
@@ -24,7 +25,8 @@ class TestSupportedConverters(unittest.TestCase):
         assert len(names) > 35
 
     def test_version(self):
-        assert get_latest_tested_opset_version() == 11
+        assert get_latest_tested_opset_version() == min(
+            11, onnx_opset_version())
 
     def test_ir_version(self):
         model, X = fit_regression_model(

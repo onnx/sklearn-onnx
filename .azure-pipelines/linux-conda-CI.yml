@@ -131,6 +131,7 @@ jobs:
         else
           if [ '$(onnx.version)' == 'test' ]
           then
+            pip install typing-extensions
             pip install -i https://test.pypi.org/simple/ onnx
           else
             pip install onnx$(onnx.version)
