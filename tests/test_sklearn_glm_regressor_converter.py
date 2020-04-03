@@ -462,7 +462,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         )
 
     def test_model_ard_regression(self):
-        model, X = fit_regression_model(linear_model.ARDRegression())
+        model, X = fit_regression_model(
+            linear_model.ARDRegression(), factor=0.001)
         model_onnx = convert_sklearn(
             model, "ard regression",
             [("input", FloatTensorType([None, X.shape[1]]))])
@@ -471,7 +472,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnARDRegression-Dec3",
+            basename="SklearnARDRegression-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",

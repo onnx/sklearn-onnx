@@ -29,10 +29,13 @@ from .interface import OperatorBase
 type_fct = type
 
 
-OPSET_TO_IR_VERSION = {
-    1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
-    7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
-}
+try:
+    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
+except ImportError:
+    OPSET_TO_IR_VERSION = {
+        1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
+        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+    }
 
 
 class Variable:
