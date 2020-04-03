@@ -77,7 +77,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
-        # y_mean = self._y_train_mean + y_mean  # undo normal.
+        # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),
@@ -90,9 +90,16 @@ def convert_gaussian_process_regressor(scope, operator, container):
         mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
-        y_mean = OnnxAdd(y_mean_b, mean_y,
-                         output_names=out[:1],
-                         op_version=opv)
+        if op._y_train_std == 1:
+            y_mean = OnnxAdd(y_mean_b, mean_y, output_names=out[:1],
+                             op_version=opv)
+        else:
+            var_y = op._y_train_std.astype(dtype)
+            if len(var_y.shape) == 1:
+                var_y = mean_y.reshape(var_y.shape + (1,))
+            y_mean = OnnxAdd(
+                OnnxMul(y_mean_b, var_y, op_version=opv),
+                mean_y, output_names=out[:1], op_version=opv)
         y_mean.set_onnx_name_prefix('gpr')
         outputs = [y_mean]
 

@@ -12,7 +12,7 @@ _missing_converter = """
 It usually means the pipeline being converted contains a
 transformer or a predictor with no corresponding converter
 implemented in sklearn-onnx. If the converted is implemented
-in another library (ie: onnxmltools), you need to register
+in another library, you need to register
 the converted so that it can be used by sklearn-onnx (function
 update_registered_converter). If the model is not yet covered
 by sklearn-onnx, you may raise an issue to

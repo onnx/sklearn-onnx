@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from scipy.sparse import coo_matrix
-from onnx import AttributeProto
+# from onnx import AttributeProto
 from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
 
@@ -143,25 +143,25 @@ class GraphState:
         elif isinstance(cst, np.int64):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty = AttributeProto.INT
+            ty = TensorProto.INT64  # AttributeProto.INT
             self.container.add_initializer(name, ty, None, cst)
             return name
         elif isinstance(cst, np.bool):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty = AttributeProto.INT
+            ty = TensorProto.BOOL  # AttributeProto.INT
             self.container.add_initializer(name, ty, None, cst)
             return name
         elif isinstance(cst, np.float64):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty = AttributeProto.DOUBLE
+            ty = TensorProto.DOUBLE  # AttributeProto.DOUBLE
             self.container.add_initializer(name, ty, None, float(cst))
             return name
         elif isinstance(cst, np.float32):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
-            ty = AttributeProto.FLOAT
+            ty = TensorProto.FLOAT  # AttributeProto.FLOAT
             self.container.add_initializer(name, ty, None, float(cst))
             return name
         else:

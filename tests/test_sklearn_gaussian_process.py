@@ -26,7 +26,7 @@ from skl2onnx.operator_converters.gaussian_process import (
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_regression_model
 
 
 Xtrain_ = pd.read_csv(StringIO("""
@@ -456,11 +456,30 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted(self):
+    def test_gpr_rbf_fitted_true(self):
+
+        gp = GaussianProcessRegressor(alpha=1e-9,
+                                      n_restarts_optimizer=0,
+                                      normalize_y=True)
+        gp, X = fit_regression_model(gp)
+
+        # return_cov=False, return_std=False
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X, gp, model_onnx,
+                            verbose=True,
+                            basename="SklearnGaussianProcessRBFT")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_rbf_fitted_false(self):
 
         gp = GaussianProcessRegressor(alpha=1e-7,
                                       n_restarts_optimizer=15,
-                                      normalize_y=True)
+                                      normalize_y=False)
         gp.fit(Xtrain_, Ytrain_)
 
         # return_cov=False, return_std=False
@@ -470,13 +489,12 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
-                            basename="SklearnGaussianProcessRBF")
+                            basename="SklearnGaussianProcessRBF-Dec4")
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted_return_std(self):
-
+    def test_gpr_rbf_fitted_return_std_true(self):
         gp = GaussianProcessRegressor(alpha=1e-7,
                                       n_restarts_optimizer=15,
                                       normalize_y=True)
@@ -510,7 +528,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted_return_std_exp_sine_squared(self):
+    def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
                                       alpha=1e-7,
@@ -528,7 +546,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStd-Out0-Dec3")
+            basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3")
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
@@ -537,7 +555,34 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted_return_std_exp_sine_squared_double(self):
+    def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
+
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
+                                      alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=False)
+        gp.fit(Xtrain_, Ytrain_)
+
+        # return_cov=False, return_std=False
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        gp.predict(Xtrain_, return_std=True)
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            options=options, dtype=np.float64)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            Xtest_.astype(np.float64), gp, model_onnx,
+            verbose=False,
+            basename="SklearnGaussianProcessExpSineSquaredStdF-Out0-Dec3")
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+                           predict_attributes=options[
+                             GaussianProcessRegressor],
+                           decimal=4)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_rbf_fitted_return_std_exp_sine_squared_double_true(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
                                       alpha=1e-7,
@@ -564,7 +609,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted_return_std_dot_product(self):
+    def test_gpr_rbf_fitted_return_std_dot_product_true(self):
 
         gp = GaussianProcessRegressor(kernel=DotProduct(),
                                       alpha=1.,
@@ -590,7 +635,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_gpr_rbf_fitted_return_std_rational_quadratic(self):
+    def test_gpr_rbf_fitted_return_std_rational_quadratic_true(self):
 
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
                                       alpha=1e-7,

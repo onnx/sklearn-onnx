@@ -14,8 +14,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxScaler
-from skl2onnx import to_onnx
-from skl2onnx import convert_sklearn
+from skl2onnx import to_onnx, convert_sklearn
+from skl2onnx.proto import get_latest_tested_opset_version
 from test_utils import fit_regression_model
 
 
@@ -43,6 +43,11 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.array([[93., 93., 93., 93., 93.]]),
                np.array([[100100., 100100., 100100., 100100., 100100.]])]
         for opv in ({'': 10}, None, 9, 10, 11, onnx_opset_version()):
+            if isinstance(opv, dict):
+                if opv[''] > get_latest_tested_opset_version():
+                    continue
+            elif opv is not None and opv > get_latest_tested_opset_version():
+                continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
@@ -94,6 +99,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.zeros((1, 5)),
                np.zeros((1, 5))]
         for opv in (1, 2, 3, None):
+            if opv is not None and opv > get_latest_tested_opset_version():
+                continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
@@ -132,6 +139,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         exp = st.transform(X)
 
         for opv in (1, 2, 10, 11, None, onnx_opset_version()):
+            if opv is not None and opv > get_latest_tested_opset_version():
+                continue
             try:
                 onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
             except RuntimeError as e:
@@ -177,6 +186,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             MLPRegressor(random_state=42))
         exp = model.predict(X_test)
         for opv in (1, 2, 7, 8, 9, 10, 11, None, onnx_opset_version()):
+            if opv is not None and opv > get_latest_tested_opset_version():
+                continue
             try:
                 onx = convert_sklearn(
                     model, "scikit-learn MLPRegressor",

@@ -82,7 +82,7 @@ def register_shape_calculator(operator_name, calculator_function,
     if not overwrite and operator_name in _shape_calculator_pool:
         raise ValueError('We do not overwrite registrated shape calculator '
                          'by default')
-    if len(_shape_calculator_pool) > 0:
+    if calculator_function is not None and len(_shape_calculator_pool) > 0:
         key = next(iter(_shape_calculator_pool))
         check_signature(calculator_function, _shape_calculator_pool[key],
                         skip=('operator', ))

@@ -367,7 +367,7 @@ class ModelComponentContainer(ModelContainer):
             return tensor
         elif sparse_tensor is not None:
             self.add_node('Constant', [], [name], sparse_value=sparse_tensor,
-                          op_version=11, name=name + '_op')
+                          op_version=self.target_opset, name=name + '_op')
             return sparse_tensor
         else:
             raise RuntimeError(
@@ -439,6 +439,10 @@ class ModelComponentContainer(ModelContainer):
             inputs = [inputs]
         if isinstance(outputs, (six.string_types, six.text_type)):
             outputs = [outputs]
+        common = set(inputs) & set(outputs)
+        if common:
+            raise RuntimeError("inputs and outputs cannot have "
+                               "variables in common {}".format(common))
         if not isinstance(inputs, list) or not all(
                 isinstance(s, (six.string_types, six.text_type))
                 for s in inputs):
@@ -463,8 +467,11 @@ class ModelComponentContainer(ModelContainer):
 
         if upd:
             attrs.update(upd)
+        if 'dtype' in attrs:
+            raise RuntimeError("dtype should not be a parameter.")
         try:
-            node = make_node(op_type, inputs, outputs, name=name, **attrs)
+            node = make_node(op_type, inputs, outputs, name=name,
+                             _dtype=self.dtype, **attrs)
         except ValueError as e:
             raise ValueError("Unable to create node '{}' with name='{}'."
                              "".format(op_type, name)) from e

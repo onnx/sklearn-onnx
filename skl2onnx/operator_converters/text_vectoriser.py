@@ -120,7 +120,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     `onnxruntime <https://github.com/Microsoft/onnxruntime>`_ uses
     `re2 <https://github.com/google/re2>`_. You may need to switch
     to a custom tokenizer based on
-    `python wrapper for re2 <https://pypi.org/project/re2/>_`
+    `python wrapper for re2 <https://pypi.org/project/re2/>`_
     or its sources `pyre2 <https://github.com/facebook/pyre2>`_
     (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
     If the regular expression is not specified and if

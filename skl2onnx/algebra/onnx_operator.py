@@ -530,7 +530,8 @@ class OnnxOperator:
                                     "tuple(name, type).")
         else:
             shapes = infer_outputs(container, container.inputs,
-                                   initializer=container.initializers)
+                                   initializer=container.initializers,
+                                   target_opset=target_opset)
 
             if self.output_names:
                 shapes = [shape for shape in shapes
