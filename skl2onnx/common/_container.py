@@ -337,6 +337,9 @@ class ModelComponentContainer(ModelContainer):
             tensor.name = name
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
+        elif shape is None and isinstance(
+                content, (np.float32, np.float64, np.int32, np.int64, float)):
+            tensor = make_tensor(name, onnx_type, [], [content])
         elif (SparseTensorProto is not None and
                 isinstance(content, SparseTensorProto)):
             raise NotImplementedError("Not implemented yet.")
