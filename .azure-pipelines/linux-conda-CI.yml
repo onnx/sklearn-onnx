@@ -182,7 +182,7 @@ jobs:
   - script: |
      flake8 skl2onnx tests tests_onnxmltools
    displayName: 'flake8'
-# 
+
 #   - script: |
 #       if [ '$(do.bench)' == '1' ]
 #         then
