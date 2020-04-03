@@ -458,8 +458,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_true(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-9,
-                                      n_restarts_optimizer=0,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=15,
                                       normalize_y=True)
         gp, X = fit_regression_model(gp)
 
