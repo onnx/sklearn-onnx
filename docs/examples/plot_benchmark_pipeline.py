@@ -97,7 +97,7 @@ print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
 
 
 steps = collect_intermediate_steps(
-    pipe, "pipeline", initial_types, target_opset=11)
+    pipe, "pipeline", initial_types)
 
 assert len(steps) == 2
 
