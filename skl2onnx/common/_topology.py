@@ -1049,7 +1049,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                                 '%d.') % (container.target_opset, op_version))
 
     # Add extra information
-    opv = _get_main_opset_version(onnx_model) or onnx_target_opset
+    opv = _get_main_opset_version(onnx_model) or target_opset
     irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
     onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
