@@ -90,7 +90,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
         mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
-        if op._y_train_std == 1:
+        if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
             y_mean = OnnxAdd(y_mean_b, mean_y, output_names=out[:1],
                              op_version=opv)
         else:
