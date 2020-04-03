@@ -37,6 +37,8 @@ except ImportError:
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
     }
 
+OPSET_ML_TO_OPSET = {1: 11, 2: 11}
+
 
 class Variable:
     """
@@ -1140,7 +1142,12 @@ def _get_main_opset_version(model):
     """
     Returns the main opset version.
     """
+    mld = None
     for op in model.opset_import:
         if op.domain == '':
             return op.version
+        if op.domain == "ai.onnx.ml":
+            mld = op.version
+    if mld is not None:
+        return OPSET_ML_TO_OPSET.get(mld, None)
     return None

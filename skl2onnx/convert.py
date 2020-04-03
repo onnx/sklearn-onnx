@@ -37,7 +37,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         and a type defined in data_types.py
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
+    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
+        if value is not specified, the function will choose the latest tested opset
+        (see :py:func:`skl2onnx.get_latest_tested_opset_version`)
     :param custom_conversion_functions: a dictionary for specifying the user customized conversion function,
         it takes precedence over registered converters
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
@@ -109,6 +111,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     It is used in example :ref:`l-example-tfidfvectorizer`.
+
+    .. versionchanged:: 1.7
+        Parameter `target_opset`, if not specified, is now set to
+        the latest tested opset returned by
+        :py:func:`skl2onnx.get_latest_tested_opset_version` and
+        not the version of the *onnx* package.
     """ # noqa
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
