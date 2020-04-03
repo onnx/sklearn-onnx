@@ -13,6 +13,7 @@ wheel
 sphinx
 sphinx_modern_theme_modified
 sphinxcontrib-blockdiag
+tqdm
 
 # docs/examples
 lightgbm
