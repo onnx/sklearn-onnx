@@ -288,7 +288,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorInt",
+            basename="SklearnAdaBoostRegressorInt-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__) "
             "< StrictVersion('0.5.0') or "
