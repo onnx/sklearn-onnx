@@ -57,7 +57,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
         onx = convert_sklearn(
             tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
-
+        assert "ir_version: 7" not in str(onx)
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
             basename="MixinWay1ConvertSklearn")
