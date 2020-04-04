@@ -172,7 +172,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
         if options is not None:
             raise NotImplementedError(
                 "options not yet implemented for OnnxOperatorMixin.")
-        return model.to_onnx(X=X, name=name, dtype=dtype)
+        return model.to_onnx(X=X, name=name, dtype=dtype,
+                             target_opset=target_opset)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
@@ -184,7 +185,7 @@ def to_onnx(model, X=None, name=None, initial_types=None,
                            name=name, options=options, dtype=dtype)
 
 
-def wrap_as_onnx_mixin(model):
+def wrap_as_onnx_mixin(model, target_opset=None):
     """
     Combines a *scikit-learn* class with :class:`OnnxOperatorMixin`
     which produces a new object which combines *scikit-learn* API
@@ -197,4 +198,5 @@ def wrap_as_onnx_mixin(model):
     state = model.__getstate__()
     obj = object.__new__(cl)
     obj.__setstate__(state)
+    obj.op_version = target_opset
     return obj
