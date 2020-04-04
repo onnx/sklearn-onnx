@@ -146,10 +146,17 @@ class OnnxOperator:
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
 
-        self.op_version = op_version or get_latest_tested_opset_version()
+        if op_version is None:
+            if domain == '':
+                self.op_version = get_latest_tested_opset_version()
+            else:
+                self.op_version = None
+        else:
+            self.op_version = op_version
         self.since_version = self.__class__.since_version
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
             self.expected_inputs = schema.expected_inputs
@@ -161,8 +168,10 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
+            self.op_version = self.since_version
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             raise RuntimeError(
                 "Operator '{}': requested version {} < "
                 "{} schema version.".format(

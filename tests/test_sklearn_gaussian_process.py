@@ -19,14 +19,15 @@ from sklearn.gaussian_process.kernels import (
 )
 from sklearn.model_selection import train_test_split
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
-from skl2onnx import to_onnx
+from skl2onnx import to_onnx, convert_sklearn
+from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, fit_regression_model
 
 
 Xtrain_ = pd.read_csv(StringIO("""
@@ -128,7 +129,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_constant1(self):
         ker = C(5.)
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -143,7 +144,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_rbf1(self):
         ker = RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -158,7 +159,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_rbf10(self):
         ker = RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -173,7 +174,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_rbf2(self):
         ker = RBF(length_scale=1, length_scale_bounds="fixed")
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -189,7 +190,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = (C(1.0, constant_value_bounds="fixed") *
                RBF(1.0, length_scale_bounds="fixed"))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -205,7 +206,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = (C(1.0, (1e-3, 1e3)) *
                RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3)))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -221,7 +222,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = (Sum(C(0.1, (1e-3, 1e3)), C(0.1, (1e-3, 1e3)) *
                RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -241,7 +242,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                                       length_scale_bounds=(1e-3, 1e3))
         )
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -256,7 +257,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_ker2_dotproduct(self):
         ker = DotProduct(sigma_0=2.)
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType())],
             outputs=[('Y', FloatTensorType())],
@@ -280,7 +281,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_ker2_exp_sine_squared(self):
         ker = ExpSineSquared()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -291,7 +292,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
                              x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -307,7 +308,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = ExpSineSquared()
         onx = convert_kernel_diag(
             ker, 'X', output_names=['Y'], dtype=np.float32,
-            op_version=onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -323,7 +324,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = RationalQuadratic()
         onx = convert_kernel_diag(
             ker, 'X', output_names=['Y'], dtype=np.float32,
-            op_version=onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -339,7 +340,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         ker = DotProduct()
         onx = convert_kernel_diag(
             ker, 'X', output_names=['Y'], dtype=np.float32,
-            op_version=onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -354,7 +355,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_dot_product(self):
         ker = DotProduct()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -365,7 +366,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
                              x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -380,7 +381,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def test_kernel_rational_quadratic(self):
         ker = RationalQuadratic()
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -391,7 +392,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
                              x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=onnx_opset_version())
+                             op_version=get_latest_tested_opset_version())
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())

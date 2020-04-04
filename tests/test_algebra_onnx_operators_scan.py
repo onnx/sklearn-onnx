@@ -27,6 +27,7 @@ from onnx import (
 from skl2onnx.algebra.complex_functions import (
     onnx_squareform_pdist, onnx_cdist
 )
+from skl2onnx.proto import get_latest_tested_opset_version
 
 
 THRESHOLD = "0.4.0"
@@ -86,6 +87,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         )
 
         model_def = helper.make_model(graph_def, producer_name='onnx-example')
+        op_set = model_def.opset_import.add()
+        op_set.domain = ''
+        op_set.version = 11
+        model_def.ir_version = 6
+
+        # By default, if not specified, the opset version for the
+        # main domain which may be higher than the onnx version embedded
+        # in onnxruntime.
 
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -106,12 +115,13 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
+        opv = get_latest_tested_opset_version()
         add_node = OnnxAdd(
             'sum_in', 'next', output_names=['sum_out'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         id_node = OnnxIdentity(
             add_node, output_names=['scan_out'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         scan_body = id_node.to_onnx(
             {'sum_in': initial, 'next': initial},
             outputs=[('sum_out', FloatTensorType()),
@@ -119,7 +129,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
         node = OnnxScan('initial', 'x', output_names=['y', 'z'],
                         num_scan_inputs=1, body=scan_body.graph,
-                        op_version=onnx.defs.onnx_opset_version())
+                        op_version=get_latest_tested_opset_version())
         model_def = node.to_onnx(
             {'initial': initial, 'x': x},
             outputs=[('y', FloatTensorType()),
@@ -140,17 +150,18 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
+        opv = get_latest_tested_opset_version()
         diff = OnnxSub('next_in', 'next', output_names=['diff'],
-                       op_version=onnx.defs.onnx_opset_version())
+                       op_version=opv)
         id_next = OnnxIdentity(
             'next_in', output_names=['next_out'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         norm = OnnxReduceSumSquare(
             diff, output_names=['norm'], axes=[1],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         flat = OnnxSqueeze(
             norm, output_names=['scan_out'], axes=[1],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         scan_body = id_next.to_onnx(
             OrderedDict([('next_in', x), ('next', FloatTensorType())]),
             outputs=[('next_out', FloatTensorType([3, 2])),
@@ -166,7 +177,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         node = OnnxScan(
             'x', 'x', output_names=['y', 'z'],
             num_scan_inputs=1, body=scan_body.graph,
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         model_def = node.to_onnx({'x': x},
                                  outputs=[('y', FloatTensorType([3, 2])),
                                           ('z', FloatTensorType([3, 3]))])
@@ -190,15 +201,16 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
+        opv = get_latest_tested_opset_version()
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
             onnx_squareform_pdist(
                 cop, dtype=np.float32,
-                op_version=onnx.defs.onnx_opset_version()),
+                op_version=opv),
             output_names=['pdist'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
@@ -228,9 +240,10 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
+        opv = get_latest_tested_opset_version()
         cop2 = OnnxConstantOfShape(
             OnnxShape('input'), output_names=['mat'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
         sess = InferenceSession(model_def.SerializeToString())
@@ -257,12 +270,13 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
+        opv = get_latest_tested_opset_version()
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
             onnx_cdist(cop, x2, dtype=np.float32,
-                       op_version=onnx.defs.onnx_opset_version()),
-            output_names=['cdist'], op_version=onnx.defs.onnx_opset_version())
+                       op_version=opv),
+            output_names=['cdist'], op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
@@ -303,14 +317,15 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
+        opv = get_latest_tested_opset_version()
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
             onnx_cdist(cop, x2, dtype=np.float32,
                        metric="minkowski", p=2,
-                       op_version=onnx.defs.onnx_opset_version()),
+                       op_version=opv),
             output_names=['cdist'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
@@ -330,12 +345,12 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                       [5.6, 2.9, 3.6, 1.3],
                       [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
             onnx_cdist(cop, x, dtype=np.float32,
-                       op_version=onnx.defs.onnx_opset_version()),
+                       op_version=opv),
             output_names=['cdist'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
@@ -354,12 +369,13 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
+        opv = get_latest_tested_opset_version()
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
-            OnnxCDist(cop, x2, op_version=onnx.defs.onnx_opset_version()),
+            OnnxCDist(cop, x2, op_version=opv),
             output_names=['cdist'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
@@ -383,12 +399,12 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                       [5.6, 2.9, 3.6, 1.3],
                       [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
         cop = OnnxAdd(
-            'input', 'input', op_version=onnx.defs.onnx_opset_version())
+            'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
             OnnxCDist(cop, x,
-                      op_version=onnx.defs.onnx_opset_version()),
+                      op_version=opv),
             output_names=['cdist'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
