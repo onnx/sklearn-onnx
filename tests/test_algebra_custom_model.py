@@ -20,9 +20,11 @@ from test_utils import dump_data_and_model
 class CustomOpTransformer(BaseEstimator, TransformerMixin,
                           OnnxOperatorMixin):
 
-    def __init__(self):
+    def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
+        OnnxOperatorMixin.__init__(self)
+        self.op_version = op_version
 
     def fit(self, X, y=None):
         self.W_ = np.mean(X, axis=0)
@@ -40,8 +42,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         S = self.S_
         # case if there are multiple output nodes
 
-        return OnnxDiv(OnnxSub(i0, W), S,
-                       output_names=outputs)
+        return OnnxDiv(OnnxSub(i0, W, op_version=self.op_version), S,
+                       output_names=outputs, op_version=self.op_version)
 
 
 class CustomOpTransformerShape(CustomOpTransformer):

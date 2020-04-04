@@ -28,7 +28,10 @@ from skl2onnx.algebra.complex_functions import (
     onnx_squareform_pdist, onnx_cdist
 )
 from skl2onnx.proto import get_latest_tested_opset_version
-
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+except ImportError:
+    ortFail = RuntimeError
 
 THRESHOLD = "0.4.0"
 THRESHOLD2 = "0.5.0"
@@ -377,13 +380,16 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             output_names=['cdist'],
             op_version=opv)
 
-        model_def = cop2.to_onnx(
-            inputs=[('input', FloatTensorType([None, None]))],
-            outputs=[('cdist', FloatTensorType())])
+        try:
+            model_def = cop2.to_onnx(
+                inputs=[('input', FloatTensorType([None, None]))],
+                outputs=[('cdist', FloatTensorType())])
+        except OrtFail:
+            return
 
         try:
             sess = InferenceSession(model_def.SerializeToString())
-        except RuntimeError as e:
+        except (RuntimeError, OrtFail) as e:
             if "CDist is not a registered" in str(e):
                 return
         res = sess.run(None, {'input': x})
