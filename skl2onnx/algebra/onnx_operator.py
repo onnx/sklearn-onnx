@@ -5,10 +5,13 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from ..proto import TensorProto
-from ..common._topology import Variable, Scope
+from ..common._topology import (
+    Variable, Scope,
+    _get_main_opset_version, OPSET_TO_IR_VERSION
+)
 from ..common._container import ModelComponentContainer
 from ..common import utils
-from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
@@ -143,10 +146,17 @@ class OnnxOperator:
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
 
-        self.op_version = op_version or get_opset_number_from_onnx()
+        if op_version is None:
+            if domain == '':
+                self.op_version = get_latest_tested_opset_version()
+            else:
+                self.op_version = None
+        else:
+            self.op_version = op_version
         self.since_version = self.__class__.since_version
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
             self.expected_inputs = schema.expected_inputs
@@ -158,8 +168,10 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
+            self.op_version = self.since_version
 
-        if self.op_version < self.since_version:
+        if (self.op_version is not None and
+                self.op_version < self.since_version):
             raise RuntimeError(
                 "Operator '{}': requested version {} < "
                 "{} schema version.".format(
@@ -450,7 +462,7 @@ class OnnxOperator:
                                        name, self.__class__.__name__))
 
         if target_opset is None:
-            target_opset = get_opset_number_from_onnx()
+            target_opset = get_latest_tested_opset_version()
         container = ModelComponentContainer(target_opset, dtype=dtype)
         if container.target_opset < 9 and self.domain in ('', None):
             raise RuntimeError("The operator cannot be converted into ONNX."
@@ -486,7 +498,8 @@ class OnnxOperator:
                                     "tuple(name, type).")
         else:
             shapes = infer_outputs(container, container.inputs,
-                                   initializer=container.initializers)
+                                   initializer=container.initializers,
+                                   target_opset=target_opset)
 
             if self.output_names:
                 shapes = [shape for shape in shapes
@@ -515,14 +528,20 @@ class OnnxOperator:
                 op_set = onnx_model.opset_import.add()
             op_set.domain = k
             op_set.version = domains.get(k, version)
+            if k == 'ai.onnx.ml':
+                op_set.version = min(2, op_set.version)
+            if k == '':
+                op_set.version = min(
+                    get_latest_tested_opset_version(), op_set.version)
 
         # metadata
-        onnx_model.ir_version = onnx_proto.IR_VERSION
+        opv = _get_main_opset_version(onnx_model) or target_opset
+        irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+        onnx_model.ir_version = irv
         onnx_model.producer_name = utils.get_producer()
         onnx_model.producer_version = utils.get_producer_version()
         onnx_model.domain = utils.get_domain()
         onnx_model.model_version = utils.get_model_version()
-
         return onnx_model
 
     def enumerate_nodes(self):

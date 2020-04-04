@@ -1,5 +1,6 @@
 # Visual Studio Code files
 .vscode
+*.bak
 
 # IPython notebook checkpoints
 .ipynb_checkpoints

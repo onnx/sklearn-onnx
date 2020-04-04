@@ -6,6 +6,7 @@ from numpy.testing import assert_almost_equal
 import onnx
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
 from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
+from skl2onnx.proto import get_latest_tested_opset_version
 
 
 class TestAlgebraOnnxDoc(unittest.TestCase):
@@ -30,9 +31,9 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
         node = OnnxTranspose(
             OnnxTranspose(
                 'X', perm=[1, 0, 2],
-                op_version=onnx.defs.onnx_opset_version()),
+                op_version=get_latest_tested_opset_version()),
             perm=[1, 0, 2], output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
         model_def = node.to_onnx({'X': X})

@@ -13,6 +13,13 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
+      Py37-OnnxTest-Rt120:
+        python.version: '3.7'
+        onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '==1.2.0'
+        sklearn.version: '==0.22.1'
       Py37-Onnx160-Rt100-Npy1173:
         do.bench: '1'
         python.version: '3.7'
@@ -75,9 +82,9 @@ jobs:
       pip install flake8
     displayName: 'install flake8'
 
-  - script: |
-      flake8 skl2onnx tests tests_onnxmltools
-    displayName: 'flake8'
+#  - script: |
+#      flake8 skl2onnx tests tests_onnxmltools
+#    displayName: 'flake8'
 
   - script: |
       pip install -r requirements.txt
@@ -100,25 +107,25 @@ jobs:
       pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
-  - script: |
-      pip install lightgbm xgboost
-      pip install onnxmltools --no-deps
-    displayName: 'install onnxmltools'
-
-  - script: |
-      pytest tests_onnxmltools
-    displayName: 'pytest-onnxmltools'
-    condition: ne(variables['onnxrt.version'], '==0.2.1')
-
-  - script: |
-      pip install matplotlib pydot
-    displayName: 'install modules for examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
-
-  - script: |
-      pytest docs/tests
-    displayName: 'pytest-examples'
-    condition: eq(variables['onnxrt.version'], '==0.5.0')
+#  - script: |
+#      pip install lightgbm xgboost
+#      pip install onnxmltools --no-deps
+#    displayName: 'install onnxmltools'
+#
+#  - script: |
+#      pytest tests_onnxmltools
+#    displayName: 'pytest-onnxmltools'
+#    condition: ne(variables['onnxrt.version'], '==0.2.1')
+#
+#  - script: |
+#      pip install matplotlib pydot
+#    displayName: 'install modules for examples'
+#    condition: eq(variables['onnxrt.version'], '==0.5.0')
+#
+#  - script: |
+#      pytest docs/tests
+#    displayName: 'pytest-examples'
+#    condition: eq(variables['onnxrt.version'], '==0.5.0')
 
   - task: PublishTestResults@2
     inputs:

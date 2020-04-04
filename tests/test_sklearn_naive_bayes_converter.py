@@ -102,7 +102,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:5],
             model,
             model_onnx,
             basename="SklearnMclMultinomialNBParams-Dec4",
@@ -419,7 +419,7 @@ class TestNaiveBayesConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:5],
             model,
             model_onnx,
             basename="SklearnMclComplementNBInt-Dec4",

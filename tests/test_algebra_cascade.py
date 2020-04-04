@@ -94,4 +94,5 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestOnnxOperatorsCascade().test_cascade_scaler()
     unittest.main()
