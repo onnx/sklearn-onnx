@@ -65,7 +65,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
                                      inputs)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data[:5],
+            data[:2],
             pipe,
             model_onnx,
             basename="SklearnFunctionTransformer-DF",
