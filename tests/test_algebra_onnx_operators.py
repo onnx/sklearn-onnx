@@ -12,6 +12,7 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_operator import OnnxOperator
+from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv,
     OnnxReduceSumSquare, OnnxGemm,
@@ -50,7 +51,7 @@ class TestOnnxOperators(unittest.TestCase):
             W = operator.raw_operator.W
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=get_latest_tested_opset_version())
             op.add_to(scope, container)
             text = str(container)
             if 'name:"Su_Sub"' not in text:
@@ -108,9 +109,9 @@ class TestOnnxOperators(unittest.TestCase):
             X = operator.inputs[0]
             out = operator.outputs
             op = OnnxDiv(
-                OnnxSub(X, W, op_version=onnx.defs.onnx_opset_version()),
+                OnnxSub(X, W, op_version=get_latest_tested_opset_version()),
                 S, output_names=out,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=get_latest_tested_opset_version())
             op.add_to(scope, container)
 
         def shape(operator):
@@ -139,7 +140,7 @@ class TestOnnxOperators(unittest.TestCase):
 
             rs = OnnxReduceSumSquare(
                 X, axes=[1], keepdims=1,
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=get_latest_tested_opset_version())
 
             N = X.type.shape[0]
             if isinstance(N, int):
@@ -147,21 +148,21 @@ class TestOnnxOperators(unittest.TestCase):
             else:
                 zeros = OnnxMul(
                     rs, np.array([0], dtype=np.float32),
-                    op_version=onnx.defs.onnx_opset_version())
+                    op_version=get_latest_tested_opset_version())
 
             z = OnnxAdd(
                 rs,
                 OnnxGemm(
                     X, C, zeros, alpha=-2., transB=1,
-                    op_version=onnx.defs.onnx_opset_version()),
-                op_version=onnx.defs.onnx_opset_version())
-            y2 = OnnxAdd(C2, z, op_version=onnx.defs.onnx_opset_version())
+                    op_version=get_latest_tested_opset_version()),
+                op_version=get_latest_tested_opset_version())
+            y2 = OnnxAdd(C2, z, op_version=get_latest_tested_opset_version())
             lo = OnnxArgMin(
                 y2, axis=1, keepdims=0, output_names=out[:1],
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=get_latest_tested_opset_version())
             y2s = OnnxSqrt(
                 y2, output_names=out[1:],
-                op_version=onnx.defs.onnx_opset_version())
+                op_version=get_latest_tested_opset_version())
 
             lo.add_to(scope, container)
             y2s.add_to(scope, container)
@@ -196,17 +197,17 @@ class TestOnnxOperators(unittest.TestCase):
         idi2 = np.identity(2) * 2
 
         onx = OnnxAdd(
-            OnnxAdd('X', idi, op_version=onnx.defs.onnx_opset_version()),
+            OnnxAdd('X', idi, op_version=get_latest_tested_opset_version()),
             idi2, output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         self.assertEqual(len(model_def.graph.output), 1)
         onx = OnnxAdd(
             idi2,
             OnnxAdd(
-                'X', idi, op_version=onnx.defs.onnx_opset_version()),
+                'X', idi, op_version=get_latest_tested_opset_version()),
             output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
         self.assertEqual(onx.outputs, ['Y'])
@@ -242,7 +243,7 @@ class TestOnnxOperators(unittest.TestCase):
         onx = OnnxArrayFeatureExtractor(
             'X', np.array([1], dtype=np.int64),
             output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=get_latest_tested_opset_version())
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([2]))])

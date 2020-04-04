@@ -528,6 +528,11 @@ class OnnxOperator:
                 op_set = onnx_model.opset_import.add()
             op_set.domain = k
             op_set.version = domains.get(k, version)
+            if k == 'ai.onnx.ml':
+                op_set.version = min(2, op_set.version)
+            if k == '':
+                op_set.version = min(
+                    get_latest_tested_opset_version(), op_set.version)
 
         # metadata
         opv = _get_main_opset_version(onnx_model) or target_opset
@@ -537,7 +542,6 @@ class OnnxOperator:
         onnx_model.producer_version = utils.get_producer_version()
         onnx_model.domain = utils.get_domain()
         onnx_model.model_version = utils.get_model_version()
-
         return onnx_model
 
     def enumerate_nodes(self):
