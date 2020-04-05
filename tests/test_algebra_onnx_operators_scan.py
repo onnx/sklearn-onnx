@@ -166,7 +166,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             OrderedDict([('next_in', x), ('next', FloatTensorType())]),
             outputs=[('next_out', FloatTensorType([3, 2])),
                      ('scan_out', FloatTensorType([3]))],
-            other_outputs=[flat])
+            other_outputs=[flat],
+            target_opset=opv)
 
         sess = InferenceSession(scan_body.SerializeToString())
         res = sess.run(None, {'next_in': x, 'next': x[:1]})
@@ -295,9 +296,11 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                       [5.4, 3.4, 1.5, 0.4],
                       [5.6, 2.9, 3.6, 1.3],
                       [6.9, 3.1, 5.1, 2.3]], dtype=np.float32)
-        cop = OnnxAdd('input', 'input')
-        cop2 = OnnxIdentity(onnx_cdist(cop, x, dtype=np.float32),
-                            output_names=['cdist'])
+        cop = OnnxAdd('input', 'input', op_version=opv)
+        cop2 = OnnxIdentity(
+            onnx_cdist(cop, x, dtype=np.float32, op_version=opv),
+            output_names=['cdist'],
+            op_version=opv)
 
         model_def = cop2.to_onnx(
             inputs=[('input', FloatTensorType([None, None]))],
