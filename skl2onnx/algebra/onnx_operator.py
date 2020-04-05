@@ -32,6 +32,13 @@ class OnnxOperatorItem:
         self.onx_op = onx_op
         self.index = index
 
+    def get_latest_tested_opset_version(self):
+        """
+        Returns ``get_latest_tested_opset_version()``
+        of the wrapped *OnnxOperator* instance.
+        """
+        return self.onx_op.get_latest_tested_opset_version()
+
     def add_to(self, scope, container, operator=None):
         """
         Adds outputs to the container if not already added,
@@ -495,7 +502,7 @@ class OnnxOperator:
                                        name, self.__class__.__name__))
 
         if target_opset is None:
-            target_opset = get_latest_tested_opset_version()
+            target_opset = self.get_latest_tested_opset_version()
         container = ModelComponentContainer(
             target_opset, dtype=dtype)
 
@@ -600,6 +607,19 @@ class OnnxOperator:
                 name = input.name
                 typ = node.expected_inputs[i]
                 yield (name, typ)
+
+    def get_latest_tested_opset_version(self):
+        """
+        Returns *op_version*, or the max of all results
+        returned by these method applied on every input,
+        or ``get_latest_tested_opset_version()``.
+        """
+        mx = (self.op_version if self.op_version
+              else get_latest_tested_opset_version())
+        for i in self.inputs:
+            if isinstance(i, (OnnxOperator, OnnxOperatorItem)):
+                mx = max(i.get_latest_tested_opset_version(), mx)
+        return mx
 
 
 class OnnxSubEstimator(OnnxOperator):
