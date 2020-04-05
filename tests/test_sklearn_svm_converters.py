@@ -171,7 +171,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMclSVCLinearPF-Dec4",
+            basename="SklearnMclSVCLinearPF-Dec2",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')"
         )
