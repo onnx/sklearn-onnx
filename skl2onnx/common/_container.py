@@ -487,8 +487,8 @@ class ModelComponentContainer(ModelContainer):
                 op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
                 "Opset number {} is higher than targeted opset {} for "
-                "node '{}'.".format(
-                    op_version, self.target_opset, node.op_type))
+                "node '{}' (domain: '{}').".format(
+                    op_version, self.target_opset, node.op_type, op_domain))
 
     def target_opset_any_domain(self, domain):
         if isinstance(self.target_opset, dict):
@@ -554,13 +554,32 @@ class ModelComponentContainer(ModelContainer):
 
     def _get_allowed_options(self, model):
         if self.registered_models is not None:
-            alias = self.registered_models['aliases'][type(model)]
+            if inspect.isfunction(model):
+                try:
+                    alias = self.registered_models['aliases'][model]
+                except KeyError:
+                    raise RuntimeError(
+                        "Unable to find converter for function '{}' "
+                        "in\n{}.".format(
+                            model, '\n'.join(sorted(map(
+                                str, self.registered_models['aliases'])))))
+            else:
+                try:
+                    alias = self.registered_models['aliases'][type(model)]
+                except KeyError:
+                    raise RuntimeError(
+                        "Unable to find converter for model '{}' "
+                        "in\n{}.".format(
+                            model, '\n'.join(sorted(map(
+                                str, self.registered_models['aliases'])))))
             conv = self.registered_models['conv'][alias]
             allowed = conv.get_allowed_options()
             if allowed is None:
+                clname = (str(model) if inspect.isfunction(model)
+                          else model.__class__.__name__)
                 raise AssertionError(
-                    "No option is registered for model '{}'.".format(
-                        model.__class__.__name__))
+                    "No option is registered for model '{}' with alias '{}'."
+                    "".format(clname, alias))
             return allowed
         raise NotImplementedError(
             "No registered models, no known allowed options "

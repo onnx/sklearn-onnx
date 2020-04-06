@@ -469,6 +469,8 @@ class OnnxOperator:
                 "target_opset must be a dictionary {domain: "
                 "target_opset} not %r for operator %r." % (
                     target_opset, self.__class__.__name__))
+        if self.domain in ('', None) and target_opset == 1:
+            raise RuntimeError("target_opset cannot be 1.")
         if (self.op_version is not None and target_opset is not None and
                 self.op_version > target_opset):
             raise RuntimeError(
@@ -500,9 +502,7 @@ class OnnxOperator:
                                    "is unknown. You should specify "
                                    "input types.".format(
                                        name, self.__class__.__name__))
-
-        if target_opset is None:
-            target_opset = self.get_latest_tested_opset_version()
+        target_opset = self.get_latest_tested_opset_version(target_opset)
         container = ModelComponentContainer(
             target_opset, dtype=dtype)
 
@@ -565,7 +565,6 @@ class OnnxOperator:
         onnx_model.producer_version = utils.get_producer_version()
         onnx_model.domain = utils.get_domain()
         onnx_model.model_version = utils.get_model_version()
-
         return onnx_model
 
     def enumerate_nodes(self):
@@ -608,18 +607,15 @@ class OnnxOperator:
                 typ = node.expected_inputs[i]
                 yield (name, typ)
 
-    def get_latest_tested_opset_version(self):
+    def get_latest_tested_opset_version(self, target_opset=None):
         """
         Returns *op_version*, or the max of all results
         returned by these method applied on every input,
         or ``get_latest_tested_opset_version()``.
         """
-        mx = (self.op_version if self.op_version
-              else get_latest_tested_opset_version())
-        for i in self.inputs:
-            if isinstance(i, (OnnxOperator, OnnxOperatorItem)):
-                mx = max(i.get_latest_tested_opset_version(), mx)
-        return mx
+        if target_opset is not None:
+            return target_opset
+        return get_latest_tested_opset_version()
 
 
 class OnnxSubEstimator(OnnxOperator):
