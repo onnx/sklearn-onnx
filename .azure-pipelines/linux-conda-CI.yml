@@ -16,27 +16,27 @@ jobs:
       Py37-OnnxTest-Rt120-Skl022p:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.18.1'
+        numpy.version: '==1.18.2'
         onnx.version: 'test'
         onnxrt.version: '==1.2.0'
         sklearn.version: '==0.22.2.post1'
         run.example: '1'
-      Py37-Onnx160-Rt120-Skl022p:
+      Py37-Onnx160-Rt120-Skl0222:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '==1.2.0'
-        sklearn.version: '==0.22.2.post1'
+        sklearn.version: '==0.22.2'
         run.example: '1'
-      Py37-Onnx160-Rt111-Skl022:
+      Py37-Onnx160-Rt111-Skl0221:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '==1.1.1'
         sklearn.version: '==0.22.1'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx160-Rt100-Skl021:
         do.bench: '0'
         python.version: '3.7'
@@ -216,6 +216,11 @@ jobs:
           python tests/benchmark.py
       fi
     displayName: 'benchmark'
+
+  - script: |
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+    displayName: 'run documentation examples'
+    condition: eq(variables['run.example'], '1')
 
   - task: PublishTestResults@2
     inputs:
