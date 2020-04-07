@@ -13,13 +13,13 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-OnnxTest-Rt120-Skl022p:
+      Py37-OnnxTest-Rt120-Skl022:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.18.1'
+        numpy.version: '>=1.18.1'
         onnx.version: 'test'
         onnxrt.version: '==1.2.0'
-        sklearn.version: '==0.22.2.post1'
+        sklearn.version: '>=0.22.1'
         run.example: '1'
       Py37-Onnx160-Rt100-Skl021:
         do.bench: '0'
