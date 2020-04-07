@@ -350,7 +350,7 @@ class TestSklearnSVM(unittest.TestCase):
 
     @unittest.skipIf(
         StrictVersion(
-            '.'.join(sk__version__.split('.'))
+            '.'.join(sk__version__.split('.')[:2]))
                 < StrictVersion("0.22.0"),
         reason="break_ties introduced after 0.22.0")
     def test_convert_svc_multi_pfalse_4_break_ties(self):
