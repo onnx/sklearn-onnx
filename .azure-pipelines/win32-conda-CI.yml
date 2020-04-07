@@ -16,10 +16,10 @@ jobs:
       Py37-OnnxTest-Rt120-0222:
         python.version: '3.7'
         onnx.version: '-i https://test.pypi.org/simple/ onnx'
-        numpy.version: 'numpy>=1.18.2'
+        numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.2.0'
-        sklearn.version: '==0.22.2'
+        sklearn.version: '>=0.22.1'
       Py37-Onnx160-Rt120-0221:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
