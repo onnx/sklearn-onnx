@@ -59,6 +59,8 @@ def _get_operation_list():
                     # implementation of apply_squeeze, apply_unsqueeze
                     # does not follow the same schema
                     continue
+                if k in {'apply_less_or_equal', 'apply_greater_or_equal'}:
+                    continue
                 warnings.warn("Unable to find an ONNX name in function "
                               "'{0}', source=\n{1}".format(k, source))
             res[found] = v
@@ -78,11 +80,11 @@ def _build_options(model, defined_options, default_values, allowed_options):
                         k, list(sorted(allowed_options)),
                         model.__class__.__name__))
             allowed = allowed_options[k]
-            if allowed is not None and v not in allowed:
+            if allowed is not None and v not in allowed and v is not None:
                 raise ValueError(
-                    "Unexpected value for option '{}' (it must be in {}) for "
-                    "model '{}'.".format(
-                        k, allowed, model.__class__.__name__))
+                    "Unexpected value [{}] for option '{}'"
+                    " (it must be in {}) for model '{}'.".format(
+                        v, k, allowed, model.__class__.__name__))
     elif len(opts) != 0 and allowed_options != 'passthrough':
         raise RuntimeError(
             "Options {} are not registerd for model '{}'.".format(

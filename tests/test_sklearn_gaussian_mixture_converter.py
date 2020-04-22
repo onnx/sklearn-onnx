@@ -2,7 +2,9 @@ import unittest
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
-from skl2onnx import convert_sklearn
+from onnxruntime import InferenceSession
+from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, TARGET_OPSET
@@ -24,6 +26,21 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X.astype(np.float32)
 
+    def _test_score(self, model, X, tg):
+        X = X.astype(np.float32)
+        exp = model.score_samples(X)
+        onx = to_onnx(
+            model, X[:1], target_opset=tg,
+            options={id(model): {'score_samples': True}})
+        try:
+            sess = InferenceSession(onx.SerializeToString())
+        except OrtFail as e:
+            raise RuntimeError('Issue {}\n{}'.format(e, str(onx)))
+        got = sess.run(None, {'X': X})
+        self.assertEqual(len(got), 3)
+        np.testing.assert_almost_equal(
+            exp.ravel(), got[2].ravel(), decimal=5)
+
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_gaussian_mixture_binary_classification(self):
@@ -44,6 +61,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+        self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -65,6 +83,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+        # self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -86,6 +105,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+        self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -108,6 +128,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+        self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -130,6 +151,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+        self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -152,6 +174,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+        self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -174,6 +197,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+        # self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -196,6 +220,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+        # self._test_score(model, X, TARGET_OPSET)
 
 
 if __name__ == "__main__":
