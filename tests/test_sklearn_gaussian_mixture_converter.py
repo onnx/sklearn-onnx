@@ -223,8 +223,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             intermediate_steps=True,
             # Operator gemm is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+                          " < StrictVersion('1.2')")
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
 
