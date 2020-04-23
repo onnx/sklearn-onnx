@@ -82,7 +82,7 @@ def _build_options(model, defined_options, default_values, allowed_options):
             allowed = allowed_options[k]
             if allowed is not None and v not in allowed and v is not None:
                 raise ValueError(
-                    "Unexpected value [{}] for option '{}'"
+                    "Unexpected value [{!r}] for option '{}'"
                     " (it must be in {}) for model '{}'.".format(
                         v, k, allowed, model.__class__.__name__))
     elif len(opts) != 0 and allowed_options != 'passthrough':
