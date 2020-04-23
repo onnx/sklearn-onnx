@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from sklearn.mixture import BayesianGaussianMixture
 try:
     from sklearn.mixture._gaussian_mixture import _compute_log_det_cholesky
 except ImportError:
@@ -35,6 +36,9 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     add_score = options.get('score_samples', False)
     if add_score and len(out) != 3:
         raise RuntimeError("3 outputs are expected.")
+    if isinstance(op, BayesianGaussianMixture):
+        raise NotImplementedError(
+            "Converter for BayesianGaussianMixture is not implemented.")
 
     # All comments come from scikit-learn code and tells
     # which functions is being onnxified.
@@ -135,7 +139,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
                            op_version=opv)
     else:
         raise RuntimeError("Unknown op.covariance_type='{}'. Upgrade "
-                           "to a mroe recent version of skearn-onnx "
+                           "to a more recent version of skearn-onnx "
                            "or raise an issue.".format(op.covariance_type))
 
     # -.5 * (cst + log_prob) + log_det
