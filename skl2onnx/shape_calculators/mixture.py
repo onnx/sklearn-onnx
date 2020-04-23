@@ -29,7 +29,7 @@ def calculate_gaussian_mixture_output_shapes(operator):
     operator.outputs[0].type = Int64TensorType([N, 1])
     operator.outputs[1].type.shape = [N, op.n_components]
     if len(operator.outputs) > 2:
-        operator.outputs[2].type.shape = [N, op.n_components]
+        operator.outputs[2].type.shape = [N, 1]
 
 
 register_shape_calculator('SklearnGaussianMixture',
