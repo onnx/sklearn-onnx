@@ -594,7 +594,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
                 options=options)
             raise AssertionError("Expecting an error.")
         except ValueError as e:
-            assert "Unexpected value for option 'zipmap'" in str(e)
+            assert "Unexpected value ['True'] for option 'zipmap'" in str(e)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
