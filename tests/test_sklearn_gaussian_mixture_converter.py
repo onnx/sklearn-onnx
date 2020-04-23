@@ -3,7 +3,10 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from onnxruntime import InferenceSession
-from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+except ImportError:
+    OrtFail = RuntimeError
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
