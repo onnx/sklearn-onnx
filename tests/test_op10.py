@@ -55,16 +55,6 @@ class TestOp10(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
-    def test_bayesian_gaussian_mixture(self):
-        model, X = fit_classification_model(BayesianGaussianMixture(), 3)
-        target_opset = 10
-        model_onnx = convert_sklearn(model, "op10",
-                                     [("input", FloatTensorType([None, 3]))],
-                                     target_opset=target_opset)
-        self.check_domain(model_onnx, target_opset=target_opset)
-
-    @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
-    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_process_regressor(self):
         model, X = fit_classification_model(GaussianProcessRegressor(), 3)
         target_opset = 10
