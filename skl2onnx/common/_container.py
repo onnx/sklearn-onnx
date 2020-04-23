@@ -550,9 +550,7 @@ class ModelComponentContainer(ModelContainer):
             conv = self.registered_models['conv'][alias]
             allowed = conv.get_allowed_options()
             if allowed is None:
-                raise AssertionError(
-                    "No option is registered for model '{}'.".format(
-                        model.__class__.__name__))
+                return {}
             return allowed
         raise NotImplementedError(
             "No registered models, no known allowed options "
