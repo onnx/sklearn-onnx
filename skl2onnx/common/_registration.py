@@ -24,7 +24,8 @@ class RegisteredConverter:
                 hasattr(args[2], '_get_allowed_options') and
                 hasattr(args[1], 'raw_operator')):
             # Checks that the user did not specify a wrong option.
-            args[2]._get_allowed_options(args[1].raw_operator)
+            if args[1].raw_operator is not None:
+                args[2]._get_allowed_options(args[1].raw_operator)
         return self._fct(*args)
 
     def get_allowed_options(self):

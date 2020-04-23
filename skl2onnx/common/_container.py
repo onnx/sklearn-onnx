@@ -545,7 +545,8 @@ class ModelComponentContainer(ModelContainer):
             self._op_versions[k] = list(sorted(v))
 
     def _get_allowed_options(self, model):
-        if self.registered_models is not None:
+        if (model is not None and self.registered_models is not None and
+                'aliases' in self.registered_models):
             alias = self.registered_models['aliases'][type(model)]
             conv = self.registered_models['conv'][alias]
             allowed = conv.get_allowed_options()
