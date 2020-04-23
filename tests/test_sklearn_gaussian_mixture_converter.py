@@ -211,9 +211,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         X = data.data
         model = GaussianMixture(n_components=2, covariance_type='spherical')
         model.fit(X)
-        model_onnx = convert_sklearn(model, "GM",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
