@@ -217,8 +217,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
-            model,
-            model_onnx,
+            model, model_onnx,
             basename="GaussianMixtureC2Spherical",
             intermediate_steps=True,
             # Operator gemm is not implemented in onnxruntime
