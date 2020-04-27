@@ -323,7 +323,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMclNuSVCPF-Dec2",
+            basename="SklearnMclNuSVCPF-Dec1",  # max relative error is 1e-5
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')"
         )
