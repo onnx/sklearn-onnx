@@ -47,12 +47,13 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
-        sess = InferenceSession(model_onnx.SerializeToString())
-        out = sess.get_outputs()
-        lb = out[0].type
-        sh = out[0].shape
-        self.assertEqual(str(lb), "tensor(int64)")
-        self.assertEqual(sh, [None])
+        if StrictVersion(onnxruntime.__version__) >= StrictVersion("1.0.0"):
+            sess = InferenceSession(model_onnx.SerializeToString())
+            out = sess.get_outputs()
+            lb = out[0].type
+            sh = out[0].shape
+            self.assertEqual(str(lb), "tensor(int64)")
+            self.assertEqual(sh, [None])
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -75,12 +76,13 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
-        sess = InferenceSession(model_onnx.SerializeToString())
-        out = sess.get_outputs()
-        lb = out[0].type
-        sh = out[0].shape
-        self.assertEqual(str(lb), "tensor(string)")
-        self.assertEqual(sh, [None])
+        if StrictVersion(onnxruntime.__version__) >= StrictVersion("1.0.0"):
+            sess = InferenceSession(model_onnx.SerializeToString())
+            out = sess.get_outputs()
+            lb = out[0].type
+            sh = out[0].shape
+            self.assertEqual(str(lb), "tensor(string)")
+            self.assertEqual(sh, [None])
 
     def test_model_logistic_regression_int(self):
         model, X = fit_classification_model(
