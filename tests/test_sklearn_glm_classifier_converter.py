@@ -5,7 +5,7 @@ import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -47,7 +47,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
-        if StrictVersion(onnxruntime.__version__) >= StrictVersion("1.0.0"):
+        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -76,7 +76,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
-        if StrictVersion(onnxruntime.__version__) >= StrictVersion("1.0.0"):
+        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
