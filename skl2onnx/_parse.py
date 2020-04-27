@@ -41,7 +41,7 @@ from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology
 from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
-from .common.data_types import Int64Type, StringType, TensorType
+from .common.data_types import StringTensorType, TensorType
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
@@ -334,7 +334,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         return probability_tensor
     this_operator = scope.declare_local_operator('SklearnZipMap')
     this_operator.inputs = probability_tensor
-    label_type = Int64Type()
+    label_type = Int64TensorType([None])
     classes = get_label_classes(scope, model)
 
     if (isinstance(model.classes_, list) and
@@ -354,7 +354,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
         this_operator.classlabels_strings = classes
-        label_type = StringType()
+        label_type = StringTensorType([None])
 
     output_label = scope.declare_local_variable('output_label', label_type)
     output_probability = scope.declare_local_variable(

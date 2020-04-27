@@ -220,21 +220,18 @@ class Operator(OperatorBase):
     def tensor_type(self):
         if self.dtype == np.float32:
             return FloatTensorType
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return FloatTensorType
-        else:
-            raise NotImplementedError(
-                "Unable to guess the tensor type from {}.".format(self.dtype))
+        raise NotImplementedError(
+            "Unable to guess the tensor type from [{}].".format(self.dtype))
 
     @property
     def proto_type(self):
         if self.dtype == np.float32:
             return onnx_proto.TensorProto.FLOAT
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return onnx_proto.TensorProto.DOUBLE
-        else:
-            raise ValueError("dtype should be either np.float32 or "
-                             "np.float64.")
+        raise ValueError("dtype should be either np.float32 or np.float64.")
 
 
 class Scope:
