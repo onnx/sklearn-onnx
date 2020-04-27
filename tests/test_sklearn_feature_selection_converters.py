@@ -396,6 +396,20 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
                           " <= StrictVersion('0.2.1')",
         )
 
+    def test_select_from_model_float_nomodel(self):
+        model = SelectFromModel(
+            estimator=SVR(kernel="linear"), threshold=1e5)
+        X = np.array(
+            [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]],
+            dtype=np.float32,
+        )
+        y = np.array([0, 1, 0, 1])
+        model.fit(X, y)
+        with self.assertRaises(RuntimeError):
+            convert_sklearn(
+                model, "select from model",
+                [("input", FloatTensorType([None, X.shape[1]]))])
+
     def test_select_fwe_float(self):
         model = SelectFwe()
         X, y = load_breast_cancer(return_X_y=True)
