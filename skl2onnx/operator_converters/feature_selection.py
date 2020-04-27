@@ -14,6 +14,11 @@ def convert_sklearn_feature_selection(scope, operator, container):
     op = operator.raw_operator
     # Get indices of the features selected
     index = op.get_support(indices=True)
+    if len(index) == 0:
+        raise RuntimeError(
+            "Model '{}' did not select any feature. "
+            "This model cannot be converted into ONNX."
+            "".format(op.__class__.__name__))
     needs_cast = not isinstance(operator.inputs[0].type,
                                 (FloatTensorType, FloatType))
     if needs_cast:
