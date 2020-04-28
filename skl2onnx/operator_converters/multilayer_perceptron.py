@@ -110,9 +110,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
 
-    container.add_initializer(classes_name, class_type,
-                              classes.shape, classes)
-
     if len(classes) == 2:
         unity_name = scope.get_unique_variable_name('unity')
         negative_class_proba_name = scope.get_unique_variable_name(
@@ -138,6 +135,9 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
             scope, binariser_output_name, operator.outputs[0].full_name,
             container, to=onnx_proto.TensorProto.INT64)
     else:
+        container.add_initializer(classes_name, class_type,
+                                  classes.shape, classes)
+
         container.add_node('ArgMax', operator.outputs[1].full_name,
                            argmax_output_name, axis=1,
                            name=scope.get_unique_operator_name('ArgMax'))
