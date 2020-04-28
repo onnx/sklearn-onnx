@@ -14,7 +14,7 @@ except ImportError:
     try:
         from sklearn.utils.testing import ignore_warnings
     except ImportError:
-        def ignore_warnings(x):
+        def ignore_warnings(x, category=None):
             return x
 
 from sklearn.exceptions import ConvergenceWarning
