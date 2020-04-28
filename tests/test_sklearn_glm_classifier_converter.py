@@ -5,6 +5,7 @@ import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -46,6 +47,42 @@ class TestGLMClassifierConverter(unittest.TestCase):
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
+        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+            sess = InferenceSession(model_onnx.SerializeToString())
+            out = sess.get_outputs()
+            lb = out[0].type
+            sh = out[0].shape
+            self.assertEqual(str(lb), "tensor(int64)")
+            self.assertEqual(sh, [None])
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_binary_class_string(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(max_iter=100), 2,
+            label_string=True)
+        model_onnx = convert_sklearn(
+            model, "logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLogitisticRegressionBinary",
+            # Operator cast-1 is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+        )
+        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+            sess = InferenceSession(model_onnx.SerializeToString())
+            out = sess.get_outputs()
+            lb = out[0].type
+            sh = out[0].shape
+            self.assertEqual(str(lb), "tensor(string)")
+            self.assertEqual(sh, [None])
 
     def test_model_logistic_regression_int(self):
         model, X = fit_classification_model(
