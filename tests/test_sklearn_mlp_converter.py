@@ -3,6 +3,7 @@ Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
 
 import unittest
+from functools import wraps
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -14,8 +15,24 @@ except ImportError:
     try:
         from sklearn.utils.testing import ignore_warnings
     except ImportError:
-        def ignore_warnings(x, category=None):
-            return x
+        class _IgnoreWarnings:
+            def __init__(self):
+                pass
+
+            def __call__(self, fn):
+                @wraps(fn)
+                def wrapper(*args, **kwargs):
+                    return fn(*args, **kwargs)
+                return wrapper
+
+            def __enter__(self):
+                pass
+
+            def __exit__(self):
+                pass
+
+        def ignore_warnings(obj=None, category=Warning):
+            return _IgnoreWarnings()(obj)
 
 from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import InferenceSession
