@@ -65,6 +65,7 @@ def calculate_sklearn_concat(operator):
         elif seen != final_type:
             if more_generic(final_type, seen):
                 final_type = seen
+
     if final_type is None:
         raise NotImplementedError(
             "Columns must be tensors."
