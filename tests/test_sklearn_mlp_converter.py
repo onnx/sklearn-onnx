@@ -11,7 +11,12 @@ from sklearn.datasets import make_multilabel_classification
 try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
-    from sklearn.utils.testing import ignore_warnings
+    try:
+        from sklearn.utils.testing import ignore_warnings
+    except ImportError:
+        def ignore_warnings(x):
+            return x
+
 from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
