@@ -1,6 +1,7 @@
+from distutils.version import StrictVersion
 import unittest
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.ensemble import (
     GradientBoostingClassifier,
     GradientBoostingRegressor,
@@ -129,6 +130,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'],
         )
+        if StrictVersion(ort_version) < StrictVersion("1.0.0"):
+            return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
         model_onnx = convert_sklearn(
             model, "ovr classification",
