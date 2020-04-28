@@ -1,4 +1,6 @@
 import unittest
+from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 from sklearn.ensemble import (
     GradientBoostingClassifier,
     GradientBoostingRegressor,
@@ -127,6 +129,16 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'],
         )
+        options = {id(model): {'raw_scores': True, 'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options, target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X})[1]
+        dec = model.decision_function(X)
+        assert_almost_equal(got[:, 1], dec, decimal=4)
+        assert_almost_equal(-got[:, 0], dec, decimal=4)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
