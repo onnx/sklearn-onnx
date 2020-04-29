@@ -14,11 +14,21 @@ def convert_sklearn_label_binariser(scope, operator, container):
     """Converts Scikit Label Binariser model to onnx format."""
     binariser_op = operator.raw_operator
     classes = binariser_op.classes_
+    if (hasattr(binariser_op, 'sparse_input_') and
+            binariser_op.sparse_input_):
+        raise RuntimeError("sparse is not supported for LabelBinarizer.")
     if (hasattr(binariser_op, 'y_type_') and
             binariser_op.y_type_ == "multilabel-indicator"):
-        raise NotImplementedError("multilabel-indicator not implemented yet.")
+        if binariser_op.pos_label != 1:
+            raise RuntimeError("pos_label != 1 is not supported "
+                               "for LabelBinarizer.")
+        if list(classes) != list(range(len(classes))):
+            raise RuntimeError("classes != [0, 1, ..., n_classes] is not "
+                               "supported for LabelBinarizer.")
+        container.add_node('Identity', operator.inputs[0].full_name,
+                           operator.output_full_names,
+                           name=scope.get_unique_operator_name('identity'))
     else:
-        print(classes)
         zeros_tensor = np.full((1, len(classes)),
                                binariser_op.neg_label, dtype=np.float)
         unit_tensor = np.full((1, len(classes)),

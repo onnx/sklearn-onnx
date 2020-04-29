@@ -115,6 +115,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model, 'lb',
             [('float_input', Int64TensorType([None, X1.shape[1]]))])
         sess = InferenceSession(onnx_fs.SerializeToString())
+
         res = sess.run(None, input_feed={'float_input': X1})
         exp = model.transform(X1)
         got = res[0]
@@ -122,5 +123,4 @@ class TestSklearnLabelBinariser(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnLabelBinariser().test_model_label_binariser_2d()
     unittest.main()
