@@ -106,6 +106,17 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function'],
         )
+        if StrictVersion(ort_version) < StrictVersion("1.0.0"):
+            return
+        options = {id(model): {'raw_scores': True, 'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options=options, target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X})[1]
+        dec = model.decision_function(X)
+        assert_almost_equal(got, dec, decimal=4)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
