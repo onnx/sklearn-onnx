@@ -180,12 +180,13 @@ class TestSklearnSVM(unittest.TestCase):
         model, X = self._fit_multi_classification(
             SVC(kernel="linear", probability=False,
                 decision_function_shape='ovr'))
-        try:
-            convert_sklearn(
+        model_onnx = convert_sklearn(
                 model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
-            raise AssertionError('not implemented')
-        except RuntimeError:
-            pass
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnMclSVCOVR-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " < StrictVersion('0.5.0')")
 
     def test_convert_svc_multi_linear_ptrue(self):
         model, X = self._fit_multi_classification(
@@ -521,5 +522,5 @@ class TestSklearnSVM(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnSVM().test_convert_svc_multi_linear_pfalse_ovr()
+    # TestSklearnSVM().test_convert_svc_multi_linear_pfalse_ovr()
     unittest.main()
