@@ -118,6 +118,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                     'probabilities', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+
     elif type(model) in cluster_list or isinstance(model, ClusterMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores of all classes. Notice that their
@@ -129,6 +130,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) in outlier_list or isinstance(model, OutlierMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores.
@@ -138,6 +140,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) == NearestNeighbors:
         # For Nearest Neighbours, we have two outputs, one for nearest
         # neighbours' indices and the other one for distances
@@ -147,6 +150,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+
     elif type(model) in {GaussianMixture, BayesianGaussianMixture}:
         label_variable = scope.declare_local_variable('label',
                                                       Int64TensorType())
