@@ -102,8 +102,10 @@ In many cases, the training datasets is a numerical matrix
 ``initial_type=[('X', FloatTensorType([None, X_train.shape[1]]))]``.
 *X* is the name of this unique input, the second term indicates the
 type and shape. The shape is ``[None, X_train.shape[1]]``,
-the first dimension is the number of rows, undefined, and the 
-number of features, fixed.
+the first dimension is the number of rows followed by the 
+number of features. The number of rows is undefined as the
+the number of requested predictions is unknown at the time
+the model is converted. The number of features is usually known.
 Let's assume now the input is a string column followed by
 a matrix, then initial types would be:
 
@@ -115,7 +117,7 @@ a matrix, then initial types would be:
     ]
 
 Function :func:`to_onnx <skl2onnx.to_onnx>` was implemented
-after discussions with the core developpers of *scikit-learn*.
+after discussions with the core developers of *scikit-learn*.
 It also contains a mechanism to infer the proper type based on
 one row of the training datasets. Then, the following code 
 ``convert_sklearn(clr, initial_types=[('X', FloatTensorType([None, 4]))])``
