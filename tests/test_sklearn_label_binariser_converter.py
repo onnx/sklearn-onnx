@@ -4,7 +4,9 @@ Tests scikit-learn's Label Binariser converter.
 
 import unittest
 import numpy as np
+from numpy.testing import assert_almost_equal
 from sklearn.preprocessing import LabelBinarizer
+from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import Int64TensorType
 from test_utils import dump_data_and_model
@@ -105,6 +107,19 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+
+    def test_model_label_binariser_2d(self):
+        X1 = np.array([[0, 1, 1], [1, 0, 0]], dtype=np.int64)
+        model = LabelBinarizer().fit(X1)
+        onnx_fs = convert_sklearn(
+            model, 'lb',
+            [('float_input', Int64TensorType([None, X1.shape[1]]))])
+        sess = InferenceSession(onnx_fs.SerializeToString())
+
+        res = sess.run(None, input_feed={'float_input': X1})
+        exp = model.transform(X1)
+        got = res[0]
+        assert_almost_equal(exp, got)
 
 
 if __name__ == "__main__":
