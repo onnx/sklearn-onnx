@@ -320,13 +320,10 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnMclNuSVCPF-Dec2",
+            X, model, model_onnx,
+            basename="SklearnMclNuSVCPF-Dec1",  # max relative error is 1e-5
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+                          " < StrictVersion('0.5.0')")
 
     def test_convert_svc_multi_pfalse_4(self):
         model, X = self._fit_multi_classification(
