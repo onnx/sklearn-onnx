@@ -21,7 +21,11 @@ def _column_tranformer_fitted_from_df(data):
         if column.dtype in ['bool']:
             return 'passthrough'
         if column.dtype in ['O']:
-            return OneHotEncoder(drop='first')
+            try:
+                return OneHotEncoder(drop='first')
+            except TypeError:
+                # older version of scikit-learn
+                return OneHotEncoder()
         raise ValueError(
             'Unexpected column dtype for {column.name}:{column.dtype}'.format(
                 column=column))
