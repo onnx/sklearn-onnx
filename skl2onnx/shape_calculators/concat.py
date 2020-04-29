@@ -55,7 +55,7 @@ def calculate_sklearn_concat(operator):
         raise NotImplementedError(
                 "Columns must be tensors."
                 "Inputs:\n{}\nOutputs:\n{}".format(
-                    t1, t2, operator.inputs, operator.outputs))
+                    operator.inputs, operator.outputs))
 
     # Let's determine the resulting type
     final_type = None

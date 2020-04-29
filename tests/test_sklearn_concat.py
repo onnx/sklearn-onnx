@@ -5,7 +5,10 @@ import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    ColumnTransformer = None
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from skl2onnx import convert_sklearn
@@ -75,6 +78,7 @@ def _predict(session: rt.InferenceSession, data: pd.DataFrame) -> pd.Series:
 
 class TestSklearnPipeline(unittest.TestCase):
 
+    @unittest.skipIf(ColumnTransformer is None, reason="too old scikit-learn")
     def test_concat(self):
         data = os.path.join(os.path.dirname(__file__), "small_titanic.csv")
         data = pd.read_csv(data)
