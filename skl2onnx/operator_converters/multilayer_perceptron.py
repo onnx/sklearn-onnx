@@ -95,7 +95,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     classes = mlp_op.classes_
     class_type = onnx_proto.TensorProto.STRING
 
-    classes_name = scope.get_unique_variable_name('classes')
     argmax_output_name = scope.get_unique_variable_name('argmax_output')
     array_feature_extractor_result_name = scope.get_unique_variable_name(
         'array_feature_extractor_result')
@@ -135,6 +134,7 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
             scope, binariser_output_name, operator.outputs[0].full_name,
             container, to=onnx_proto.TensorProto.INT64)
     else:
+        classes_name = scope.get_unique_variable_name('classes')
         container.add_initializer(classes_name, class_type,
                                   classes.shape, classes)
 

@@ -1,7 +1,7 @@
 """
 Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
-
+from distutils.version import StrictVersion
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -18,7 +18,7 @@ except ImportError:
             return lambda x: x
 
 from sklearn.exceptions import ConvergenceWarning
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -329,6 +329,9 @@ class TestSklearnMLPConverters(unittest.TestCase):
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion('1.0.0'),
+        reason="onnxruntime %s" % '1.0.0')
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_nozipmap(self):
         X, y = make_multilabel_classification(n_labels=5, n_classes=10)
