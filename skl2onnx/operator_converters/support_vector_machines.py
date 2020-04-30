@@ -10,7 +10,7 @@ import six
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
 from ..common._apply_operation import (
     apply_cast, apply_concat, apply_abs,
-    apply_add, apply_mul, apply_div)
+    apply_add, apply_mul, apply_div, apply_less)
 from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
@@ -154,20 +154,25 @@ def convert_sklearn_svm(scope, operator, container):
         # See https://github.com/scikit-learn/scikit-learn/blob/
         # master/sklearn/utils/multiclass.py#L407:
         # ::
-        #   n_samples = predictions.shape[0]
-        #   votes = np.zeros((n_samples, n_classes))
-        #   sum_of_confidences = np.zeros((n_samples, n_classes))
-        #   k = 0
-        #   for i in range(n_classes):
-        #       for j in range(i + 1, n_classes):
-        #           sum_of_confidences[:, i] -= confidences[:, k]
-        #           sum_of_confidences[:, j] += confidences[:, k]
-        #           votes[predictions[:, k] == 0, i] += 1
-        #           votes[predictions[:, k] == 1, j] += 1
-        #           k += 1
-        #   transformed_confidences = (sum_of_confidences /
-        #                              (3 * (np.abs(sum_of_confidences) + 1)))
-        #   return votes + transformed_confidences
+        #     _ovr_decision_function(dec < 0, -dec, len(self.classes_))
+        #
+        #     ...
+        #     def _ovr_decision_function(predictions, confidences, n_classes):
+        #
+        #     n_samples = predictions.shape[0]
+        #     votes = np.zeros((n_samples, n_classes))
+        #     sum_of_confidences = np.zeros((n_samples, n_classes))
+        #     k = 0
+        #     for i in range(n_classes):
+        #         for j in range(i + 1, n_classes):
+        #             sum_of_confidences[:, i] -= confidences[:, k]
+        #             sum_of_confidences[:, j] += confidences[:, k]
+        #             votes[predictions[:, k] == 0, i] += 1
+        #             votes[predictions[:, k] == 1, j] += 1
+        #             k += 1
+        #     transformed_confidences = (
+        #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
+        #     return votes + transformed_confidences
         if list(op.classes_) != list(range(len(op.classes_))):
             raise RuntimeError(
                 "Classes different from first n integers are not supported "
@@ -177,6 +182,14 @@ def convert_sklearn_svm(scope, operator, container):
         container.add_initializer(cst3, container.proto_dtype, [], [3])
         cst1 = scope.get_unique_variable_name('cst1')
         container.add_initializer(cst1, container.proto_dtype, [], [1])
+        cst0 = scope.get_unique_variable_name('cst0')
+        container.add_initializer(cst0, container.proto_dtype, [], [0])
+
+        prediction = scope.get_unique_variable_name('prediction')
+        apply_less(scope, [output_name, cst0], prediction, container)
+        iprediction = scope.get_unique_variable_name('iprediction')
+        apply_cast(scope, prediction, iprediction, container,
+                   to=container.proto_dtype)
 
         n_classes = len(op.classes_)
         sumc_name = [scope.get_unique_variable_name('svcsumc_%d' % i)
@@ -190,41 +203,41 @@ def convert_sklearn_svm(scope, operator, container):
             for j in range(i + 1, n_classes):
                 name = scope.get_unique_operator_name(
                     'ArrayFeatureExtractor')
-                ext = scope.get_unique_variable_name('svc_%d' % k)
-                ind = scope.get_unique_variable_name('ind_%d' % k)
+                ext = scope.get_unique_variable_name('Csvc_%d' % k)
+                ind = scope.get_unique_variable_name('Cind_%d' % k)
                 container.add_initializer(
                     ind, onnx_proto.TensorProto.INT64, [], [k])
                 container.add_node(
                     'ArrayFeatureExtractor', [output_name, ind],
                     ext, op_domain='ai.onnx.ml', name=name)
-                sumc_add[sumc_name[j]].append(ext)
+                sumc_add[sumc_name[i]].append(ext)
 
-                neg = scope.get_unique_variable_name('neg_%d' % k)
+                neg = scope.get_unique_variable_name('Cneg_%d' % k)
                 name = scope.get_unique_operator_name('Neg')
                 container.add_node(
                     'Neg', ext, neg, op_domain='', name=name,
                     op_version=6)
-                sumc_add[sumc_name[i]].append(neg)
+                sumc_add[sumc_name[j]].append(neg)
 
                 # votes
                 name = scope.get_unique_operator_name(
                     'ArrayFeatureExtractor')
-                exti = scope.get_unique_variable_name('svcv_%d' % k)
+                ext = scope.get_unique_variable_name('Vsvcv_%d' % k)
                 container.add_node(
-                    'ArrayFeatureExtractor', [label_name, ind],
-                    exti, op_domain='ai.onnx.ml', name=name)
-                ext = scope.get_unique_variable_name('svcvf_%d' % k)
-                apply_cast(
-                    scope, exti, ext, container, to=container.proto_dtype)
+                    'ArrayFeatureExtractor', [iprediction, ind],
+                    ext, op_domain='ai.onnx.ml', name=name)
                 vote_add[vote_name[j]].append(ext)
-                neg = scope.get_unique_variable_name('negv_%d' % k)
+                neg = scope.get_unique_variable_name('Vnegv_%d' % k)
                 name = scope.get_unique_operator_name('Neg')
                 container.add_node(
                     'Neg', ext, neg, op_domain='', name=name,
                     op_version=6)
-                neg1 = scope.get_unique_variable_name('negv1_%d' % k)
+                neg1 = scope.get_unique_variable_name('Vnegv1_%d' % k)
                 apply_add(scope, [neg, cst1], neg1, container, broadcast=1)
                 vote_add[vote_name[i]].append(neg1)
+
+                # next
+                k += 1
 
         for k, v in sumc_add.items():
             name = scope.get_unique_operator_name('Sum')
@@ -235,20 +248,20 @@ def convert_sklearn_svm(scope, operator, container):
             container.add_node(
                 'Sum', v, k, op_domain='', name=name, op_version=8)
 
-        conc = scope.get_unique_variable_name('svcconc')
+        conc = scope.get_unique_variable_name('Csvcconc')
         apply_concat(scope, sumc_name, conc, container, axis=1)
-        conc_vote = scope.get_unique_variable_name('svcconcv')
+        conc_vote = scope.get_unique_variable_name('Vsvcconcv')
         apply_concat(scope, vote_name, conc_vote, container, axis=1)
 
-        conc_abs = scope.get_unique_variable_name('abs')
+        conc_abs = scope.get_unique_variable_name('Cabs')
         apply_abs(scope, conc, conc_abs, container)
 
-        conc_abs1 = scope.get_unique_variable_name('conc_abs1')
+        conc_abs1 = scope.get_unique_variable_name('Cconc_abs1')
         apply_add(scope, [conc_abs, cst1], conc_abs1, container, broadcast=1)
-        conc_abs3 = scope.get_unique_variable_name('conc_abs1')
+        conc_abs3 = scope.get_unique_variable_name('Cconc_abs3')
         apply_mul(scope, [conc_abs1, cst3], conc_abs3, container, broadcast=1)
 
-        final = scope.get_unique_variable_name('svcfinal')
+        final = scope.get_unique_variable_name('Csvcfinal')
         apply_div(
             scope, [conc, conc_abs3], final, container, broadcast=0)
 

@@ -41,7 +41,8 @@ class TestSklearnSVM(unittest.TestCase):
         if nbclass == 4:
             y[-10:] = 3
         model.fit(X, y)
-        return model, X[:5].astype(numpy.float32)
+        X = numpy.vstack([X[:2], X[-3:]])
+        return model, X.astype(numpy.float32)
 
     def _fit_multi_regression(self, model):
         iris = load_iris()
@@ -149,32 +150,25 @@ class TestSklearnSVM(unittest.TestCase):
     def test_convert_svc_multi_linear_pfalse(self):
         model, X = self._fit_multi_classification(
             SVC(kernel="linear", probability=False,
-                decision_function_shape='ovo'))
+                decision_function_shape="ovo"))
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
+
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
         self._check_attributes(
-            svc_node,
-            {
-                "coefficients": None,
-                "kernel_params": None,
-                "kernel_type": "LINEAR",
-                "post_transform": None,
-                "rho": None,
-                "support_vectors": None,
-                "vectors_per_class": None,
-            },
-        )
+            svc_node, {
+                "coefficients": None, "kernel_params": None,
+                "kernel_type": "LINEAR", "post_transform": None,
+                "rho": None, "support_vectors": None,
+                "vectors_per_class": None})
+
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnMclSVCLinearPF-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+                          " < StrictVersion('0.5.0')")
 
     def test_convert_svc_multi_linear_pfalse_ovr(self):
         model, X = self._fit_multi_classification(
@@ -212,7 +206,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMclSVCLinearPT-Dec4",
+            basename="SklearnMclSVCLinearPT-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')"
         )
@@ -400,7 +394,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMclNuSVCPT",
+            basename="SklearnMclNuSVCPT-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')"
         )
@@ -517,10 +511,8 @@ class TestSklearnSVM(unittest.TestCase):
             model_onnx,
             basename="SklearnBinOneClassSVM",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+                          " < StrictVersion('0.5.0')")
 
 
 if __name__ == "__main__":
-    # TestSklearnSVM().test_convert_svc_multi_linear_pfalse_ovr()
     unittest.main()
