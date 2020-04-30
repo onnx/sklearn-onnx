@@ -490,13 +490,13 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
               negated_labels_name, container, broadcast=1)
     try:
         apply_topk(scope, negated_labels_name,
-                [sorted_values_name, sorted_indices_name],
-                container, k=len(op.estimators_))
+                   [sorted_values_name, sorted_indices_name],
+                   container, k=len(op.estimators_))
     except TypeError:
         # onnxconverter-common < 1.7.0
         apply_topk(scope, [negated_labels_name],
-                [sorted_values_name, sorted_indices_name],
-                container, k=len(op.estimators_))
+                   [sorted_values_name, sorted_indices_name],
+                   container, k=len(op.estimators_))
     container.add_node(
         'ArrayFeatureExtractor',
         [estimators_weights_name, sorted_indices_name],
