@@ -15,8 +15,9 @@ from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
     OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
-    OnnxReduceSum, OnnxLog
+    OnnxReduceSum, OnnxLog, OnnxReduceMax, OnnxEqual, OnnxCast
 )
+from ..proto import onnx_proto
 
 
 def convert_sklearn_gaussian_mixture(scope, operator, container):
@@ -163,8 +164,22 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
                                 log_weights, op_version=opv)
 
     # labels
-    labels = OnnxArgMax(weighted_log_prob, axis=1,
-                        output_names=out[:1], op_version=opv)
+    if container.is_allowed('ArgMax'):
+        labels = OnnxArgMax(weighted_log_prob, axis=1,
+                            output_names=out[:1], op_version=opv)
+    else:
+        mxlabels = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        zeros = OnnxEqual(
+            OnnxSub(weighted_log_prob, mxlabels, op_version=opv),
+            np.array([0], dtype=container.dtype),
+            op_version=opv)
+        toint = OnnxCast(zeros, to=onnx_proto.TensorProto.INT64,
+                         op_version=opv)
+        mulind = OnnxMul(toint,
+                         np.arange(n_components).astype(np.int64),
+                         op_version=opv)
+        labels = OnnxReduceMax(mulind, axes=[1], output_names=out[:1],
+                               op_version=opv)
 
     # def _estimate_log_prob_resp():
     # np.exp(log_resp)
