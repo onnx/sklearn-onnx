@@ -44,7 +44,7 @@ meta = sess.get_modelmeta()
 
 print("custom_metadata_map={}".format(meta.custom_metadata_map))
 print("description={}".format(meta.description))
-print("domain={}".format(meta.domain, meta.domain))
+print("domain={}".format(meta.domain))
 print("graph_name={}".format(meta.graph_name))
 print("producer_name={}".format(meta.producer_name))
 print("version={}".format(meta.version))
