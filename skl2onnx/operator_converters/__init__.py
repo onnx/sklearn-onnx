@@ -41,6 +41,7 @@ from . import ordinal_encoder
 from . import polynomial_features
 from . import power_transformer
 from . import random_forest
+from . import random_projection
 from . import ransac_regressor
 from . import scaler_op
 from . import sgd_classifier
@@ -89,6 +90,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     random_forest,
+    random_projection,
     ransac_regressor,
     scaler_op,
     sgd_classifier,
