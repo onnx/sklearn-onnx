@@ -138,7 +138,11 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
         zeros = np.zeros((n_components, ))
         precisions = op.precisions_cholesky_ ** 2
-        normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
+        if combined_reducesum:
+            normX = OnnxReduceSum(OnnxMul(X, X, op_version=opv),
+                                  axes=[1], op_version=opv)
+        else:
+            normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
         outer = OnnxGemm(
             normX, precisions[np.newaxis, :].astype(container.dtype),
             zeros.astype(container.dtype), alpha=1., beta=1., op_version=opv)
