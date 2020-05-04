@@ -256,6 +256,8 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="OnnxEqual does not support float")
     def test_gaussian_mixture_full_black_op_noargmax(self):
         data = load_iris()
         X = data.data
