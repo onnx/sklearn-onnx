@@ -9,11 +9,12 @@ import numpy as np
 from sklearn.random_projection import GaussianRandomProjection
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnRandomProjection(unittest.TestCase):
 
+    @unittest.skipIf(TARGET_OPSET < 9, reason="MatMul not available")
     def test_gaussian_random_projection_float32(self):
         rng = np.random.RandomState(42)
         pt = GaussianRandomProjection(n_components=4)
@@ -27,6 +28,7 @@ class TestSklearnRandomProjection(unittest.TestCase):
         dump_data_and_model(X.astype(np.float32), model,
                             model_onnx, basename="GaussianRandomProjection")
 
+    @unittest.skipIf(TARGET_OPSET < 9, reason="MatMul not available")
     def test_gaussian_random_projection_float64(self):
         rng = np.random.RandomState(42)
         pt = GaussianRandomProjection(n_components=4)
