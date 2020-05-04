@@ -427,7 +427,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
                         custom_parsers=None, dtype=np.float32,
-                        options=None):
+                        options=None, white_op=None,
+                        black_op=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -451,9 +452,14 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         float computation (float32 or float64)
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline, if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed
+        while converting a pipeline, if empty, none are blacklisted
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainerNode(model, dtype)
+    raw_model_container = SklearnModelContainerNode(
+        model, dtype, white_op=white_op, black_op=black_op)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.

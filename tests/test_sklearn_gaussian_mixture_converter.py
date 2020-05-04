@@ -191,6 +191,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, "GM",
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=TARGET_OPSET)
+        self.assertIn('ReduceLogSumExp', str(model_onnx))
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -225,6 +226,35 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                           " < StrictVersion('1.2')")
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_full_black_op(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='full')
+        model.fit(X)
+        with self.assertRaises(RuntimeError):
+            convert_sklearn(
+                model, "GM", [("input", FloatTensorType([None, 4]))],
+                target_opset=TARGET_OPSET, black_op={'Add'})
+        model_onnx = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET, black_op={'ReduceLogSumExp'})
+        self.assertIsNotNone(model_onnx)
+        self.assertNotIn('ReduceLogSumExp', str(model_onnx))
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2Full",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+        self._test_score(model, X, TARGET_OPSET)
+
 
 if __name__ == "__main__":
+    TestGaussianMixtureConverter().test_gaussian_mixture_full_black_op()
     unittest.main()
