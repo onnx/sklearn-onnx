@@ -284,6 +284,49 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         )
         self._test_score(model, X, TARGET_OPSET)
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="OnnxEqual does not support float")
+    def test_gaussian_mixture_full_black_op_noargmax_inf(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=10, covariance_type='full')
+        model.fit(X)    
+        model_onnx1 = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'score_samples': True}})
+        model_onnx2 = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'score_samples': True}},
+            black_op={'ReduceLogSumExp', 'ArgMax'})
+        self.assertNotIn('ArgMax', str(model_onnx2))
+
+        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        a1, b1, c1 = res1
+        print(b1.min(), b1.max(), c1.min(), c1.max())
+
+        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        res2 = sess2.run(None, {'input': (X * 1e2).astype(np.float32)})
+        a2, b2, c2 = res2
+        print("*", b2.min(), b2.max(), c2.min(), c2.max())
+        
+        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        a2, b2, c2 = res2
+        print(b2.min(), b2.max(), c2.min(), c2.max())
+        
+        from mlprodict.onnxrt import OnnxInference
+        oinf = OnnxInference(model_onnx2)
+        oinf.run({'input': (X[:5] * 1e2).astype(np.float32)}, verbose=15, fLOG=print)
+
+        oinf = OnnxInference(model_onnx1)
+        oinf.run({'input': (X[:3] * 1e2).astype(np.float32)}, verbose=15, fLOG=print)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    TestGaussianMixtureConverter().test_gaussian_mixture_full_black_op_noargmax_inf()
+    #unittest.main()
