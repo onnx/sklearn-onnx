@@ -29,13 +29,14 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X.astype(np.float32)
 
-    def _test_score(self, model, X, tg, decimal=5):
+    def _test_score(self, model, X, tg, decimal=5, black_op=None):
         X = X.astype(np.float32)
         exp = model.score_samples(X)
         expp = model.predict_proba(X)
         onx = to_onnx(
             model, X[:1], target_opset=tg,
-            options={id(model): {'score_samples': True}})
+            options={id(model): {'score_samples': True}},
+            black_op=black_op)
         try:
             sess = InferenceSession(onx.SerializeToString())
         except OrtFail as e:
@@ -292,7 +293,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         data = load_iris()
         X = data.data
         model = GaussianMixture(n_components=10, covariance_type='full')
-        model.fit(X)    
+        model.fit(X)
         model_onnx1 = convert_sklearn(
             model, "GM", [("input", FloatTensorType([None, 4]))],
             target_opset=TARGET_OPSET,
@@ -307,26 +308,20 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         sess1 = InferenceSession(model_onnx1.SerializeToString())
         res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a1, b1, c1 = res1
-        print(b1.min(), b1.max(), c1.min(), c1.max())
 
-        sess2 = InferenceSession(model_onnx2.SerializeToString())
-        res2 = sess2.run(None, {'input': (X * 1e2).astype(np.float32)})
-        a2, b2, c2 = res2
-        print("*", b2.min(), b2.max(), c2.min(), c2.max())
-        
         sess2 = InferenceSession(model_onnx2.SerializeToString())
         res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a2, b2, c2 = res2
-        print(b2.min(), b2.max(), c2.min(), c2.max())
-        
-        from mlprodict.onnxrt import OnnxInference
-        oinf = OnnxInference(model_onnx2)
-        oinf.run({'input': (X[:5] * 1e2).astype(np.float32)}, verbose=15, fLOG=print)
 
-        oinf = OnnxInference(model_onnx1)
-        oinf.run({'input': (X[:3] * 1e2).astype(np.float32)}, verbose=15, fLOG=print)
+        self.assertEqual(b1.max(), b2.max())
+        self.assertEqual(b1.min(), b2.min())
+        self.assertEqual(c1.max(), c2.max())
+        self.assertEqual(c1.min(), c2.min())
+
+        self._test_score(
+            model, X, TARGET_OPSET, black_op={'ReduceLogSumExp', 'ArgMax'},
+            decimal=4)
 
 
 if __name__ == "__main__":
-    TestGaussianMixtureConverter().test_gaussian_mixture_full_black_op_noargmax_inf()
-    #unittest.main()
+    unittest.main()
