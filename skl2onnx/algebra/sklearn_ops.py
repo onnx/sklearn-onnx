@@ -73,8 +73,9 @@ def find_class(skl_cl):
     this = sys.modules[__name__]
     if not hasattr(this, full_name):
         available = sorted(filter(lambda n: prefix in n, sys.modules))
-        raise RuntimeError("Unable to find a class for '{}' in\n{}".format(
-            skl_cl.__name__, "\n".join(available)))
+        raise RuntimeError(
+            "Unable to find a class for '{}' in\n{}".format(
+                skl_cl.__name__, "\n".join(available)))
     cl = getattr(this, full_name)
     if "automation" in str(cl):
         raise RuntimeError("Dynamic operation issue with class "
