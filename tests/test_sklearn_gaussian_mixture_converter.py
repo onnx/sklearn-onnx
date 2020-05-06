@@ -315,8 +315,8 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
         self.assertEqual(b1.max(), b2.max())
         self.assertEqual(b1.min(), b2.min())
-        self.assertEqual(c1.max(), c2.max())
-        self.assertEqual(c1.min(), c2.min())
+        self.assertLess(abs(c1.max() - c2.max()) / c2.max(), 1e-5)
+        self.assertLess(abs(c1.min() - c2.min()) / c2.min(), 1e-5)
 
         self._test_score(
             model, X, TARGET_OPSET, black_op={'ReduceLogSumExp', 'ArgMax'},
