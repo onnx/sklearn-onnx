@@ -112,12 +112,25 @@ def _transform_isotonic(scope, container, model, T, k):
         'nearest_x_index')
     nearest_y_name = scope.get_unique_variable_name('nearest_y')
 
+    if hasattr(model.calibrators_[k], '_X_'):
+        atX, atY = '_X_', '_y_'
+    elif hasattr(model.calibrators_[k], '_necessary_X_'):
+        atX, atY = '_necessary_X_', '_necessary_y_'
+    else:
+        raise AttributeError(
+            "Unable to find attribute '_X_' or '_necessary_X_' "
+            "for type {}\n{}."
+            "".format(type(model.calibrators_[k]),
+                      dir(model.calibrators_[k])))
+
     container.add_initializer(
         calibrator_x_name, onnx_proto.TensorProto.FLOAT,
-        [len(model.calibrators_[k]._X_)], model.calibrators_[k]._X_)
+        [len(getattr(model.calibrators_[k], atX))],
+        getattr(model.calibrators_[k], atX))
     container.add_initializer(
         calibrator_y_name, onnx_proto.TensorProto.FLOAT,
-        [len(model.calibrators_[k]._y_)], model.calibrators_[k]._y_)
+        [len(getattr(model.calibrators_[k], atY))],
+        getattr(model.calibrators_[k], atY))
 
     apply_reshape(scope, T, reshaped_df_name, container,
                   desired_shape=(-1, 1))
