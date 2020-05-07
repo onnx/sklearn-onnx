@@ -191,25 +191,16 @@ class TestSklearnSVM(unittest.TestCase):
         self.assertIsNotNone(nodes)
         svc_node = nodes[0]
         self._check_attributes(
-            svc_node,
-            {
-                "coefficients": None,
-                "kernel_params": None,
-                "kernel_type": "LINEAR",
-                "post_transform": None,
-                "rho": None,
-                "support_vectors": None,
-                "vectors_per_class": None,
-            },
-        )
+            svc_node, {
+                "coefficients": None, "kernel_params": None,
+                "kernel_type": "LINEAR", "post_transform": None,
+                "rho": None, "support_vectors": None,
+                "vectors_per_class": None})
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnMclSVCLinearPT-Dec3",
+            X, model, model_onnx, verbose=True,
+            basename="SklearnMclSVCLinearPT-Dec2",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')"
-        )
+                          " <= StrictVersion('0.4.0')")
 
     def test_convert_svr_linear(self):
         model, X = self._fit_binary_classification(SVR(kernel="linear"))
