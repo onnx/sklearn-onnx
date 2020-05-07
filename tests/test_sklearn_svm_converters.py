@@ -197,7 +197,7 @@ class TestSklearnSVM(unittest.TestCase):
                 "rho": None, "support_vectors": None,
                 "vectors_per_class": None})
         dump_data_and_model(
-            X, model, model_onnx, verbose=True,
+            X, model, model_onnx,
             basename="SklearnMclSVCLinearPT-Dec2",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')")
