@@ -157,7 +157,6 @@ try:
 except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
-    pass
 from sklearn.preprocessing import (
     LabelBinarizer, LabelEncoder,
     Normalizer, OneHotEncoder
