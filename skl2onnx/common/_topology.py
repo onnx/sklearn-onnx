@@ -942,7 +942,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     container = ModelComponentContainer(
         target_opset, options=options, dtype=dtype,
-        registered_models=topology.registered_models)
+        registered_models=topology.registered_models,
+        white_op=topology.raw_model._white_op,
+        black_op=topology.raw_model._black_op)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.

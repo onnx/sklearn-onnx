@@ -29,13 +29,14 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model.fit(X, y)
         return model, X.astype(np.float32)
 
-    def _test_score(self, model, X, tg, decimal=5):
+    def _test_score(self, model, X, tg, decimal=5, black_op=None):
         X = X.astype(np.float32)
         exp = model.score_samples(X)
         expp = model.predict_proba(X)
         onx = to_onnx(
             model, X[:1], target_opset=tg,
-            options={id(model): {'score_samples': True}})
+            options={id(model): {'score_samples': True}},
+            black_op=black_op)
         try:
             sess = InferenceSession(onx.SerializeToString())
         except OrtFail as e:
@@ -191,6 +192,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         model_onnx = convert_sklearn(model, "GM",
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=TARGET_OPSET)
+        self.assertIn('ReduceLogSumExp', str(model_onnx))
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[40:60],
@@ -224,6 +226,101 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')")
         self._test_score(model, X, TARGET_OPSET, decimal=4)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_gaussian_mixture_full_black_op(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='full')
+        model.fit(X)
+        with self.assertRaises(RuntimeError):
+            convert_sklearn(
+                model, "GM", [("input", FloatTensorType([None, 4]))],
+                target_opset=TARGET_OPSET, black_op={'Add'})
+        model_onnx = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET, black_op={'ReduceLogSumExp'})
+        self.assertIsNotNone(model_onnx)
+        self.assertNotIn('ReduceLogSumExp', str(model_onnx))
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model,
+            model_onnx,
+            basename="GaussianMixtureC2FullBL",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+        self._test_score(model, X, TARGET_OPSET)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="OnnxEqual does not support float")
+    def test_gaussian_mixture_full_black_op_noargmax(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=2, covariance_type='full')
+        model.fit(X)
+        with self.assertRaises(RuntimeError):
+            convert_sklearn(
+                model, "GM", [("input", FloatTensorType([None, 4]))],
+                target_opset=TARGET_OPSET, black_op={'Add'})
+        model_onnx = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            black_op={'ReduceLogSumExp', 'ArgMax'})
+        self.assertIsNotNone(model_onnx)
+        self.assertNotIn('ArgMax', str(model_onnx))
+        dump_data_and_model(
+            X.astype(np.float32)[40:60],
+            model, model_onnx,
+            basename="GaussianMixtureC2FullBLNM",
+            intermediate_steps=True,
+            # Operator gemm is not implemented in onnxruntime
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')",
+        )
+        self._test_score(model, X, TARGET_OPSET)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="OnnxEqual does not support float")
+    def test_gaussian_mixture_full_black_op_noargmax_inf(self):
+        data = load_iris()
+        X = data.data
+        model = GaussianMixture(n_components=10, covariance_type='full')
+        model.fit(X)
+        model_onnx1 = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'score_samples': True}})
+        model_onnx2 = convert_sklearn(
+            model, "GM", [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'score_samples': True}},
+            black_op={'ReduceLogSumExp', 'ArgMax'})
+        self.assertNotIn('ArgMax', str(model_onnx2))
+
+        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        a1, b1, c1 = res1
+
+        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        a2, b2, c2 = res2
+
+        self.assertEqual(b1.max(), b2.max())
+        self.assertEqual(b1.min(), b2.min())
+        self.assertLess(abs(c1.max() - c2.max()) / c2.max(), 1e-5)
+        self.assertLess(abs(c1.min() - c2.min()) / c2.min(), 1e-5)
+
+        self._test_score(
+            model, X, TARGET_OPSET, black_op={'ReduceLogSumExp', 'ArgMax'},
+            decimal=4)
 
 
 if __name__ == "__main__":
