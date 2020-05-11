@@ -80,7 +80,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(ColumnTransformer is None, reason="too old scikit-learn")
     def test_concat(self):
-        data = os.path.join(os.path.dirname(__file__), "small_titanic.csv")
+        data = os.path.join(os.path.dirname(__file__),
+                            "datasets", "small_titanic.csv")
         data = pd.read_csv(data)
         data['female'] = data['sex'] == 'female'
         data = data[['age', 'fare', 'female', 'embarked',
