@@ -225,21 +225,18 @@ class Operator(OperatorBase):
     def tensor_type(self):
         if self.dtype == np.float32:
             return FloatTensorType
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return FloatTensorType
-        else:
-            raise NotImplementedError(
-                "Unable to guess the tensor type from {}.".format(self.dtype))
+        raise NotImplementedError(
+            "Unable to guess the tensor type from [{}].".format(self.dtype))
 
     @property
     def proto_type(self):
         if self.dtype == np.float32:
             return onnx_proto.TensorProto.FLOAT
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return onnx_proto.TensorProto.DOUBLE
-        else:
-            raise ValueError("dtype should be either np.float32 or "
-                             "np.float64.")
+        raise ValueError("dtype should be either np.float32 or np.float64.")
 
 
 class Scope:
@@ -958,7 +955,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     container = ModelComponentContainer(
         target_opset, options=options, dtype=dtype,
-        registered_models=topology.registered_models)
+        registered_models=topology.registered_models,
+        white_op=topology.raw_model._white_op,
+        black_op=topology.raw_model._black_op)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.

@@ -19,7 +19,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    dtype=np.float32, intermediate=False):
+                    dtype=np.float32, intermediate=False,
+                    white_op=None, black_op=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -52,6 +53,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         `np.float32` or `np.float64`
     :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
         it returns the converted model otherwise
+    :param white_op: white list of ONNX nodes allowed while converting a pipeline,
+        if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed while converting a pipeline,
+        if empty, none are blacklisted
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -136,7 +141,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                    custom_conversion_functions,
                                    custom_shape_calculators,
                                    custom_parsers, options=options,
-                                   dtype=dtype)
+                                   dtype=dtype, white_op=white_op,
+                                   black_op=black_op)
 
     # Infer variable shapes
     topology.compile()
@@ -149,7 +155,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
 
 def to_onnx(model, X=None, name=None, initial_types=None,
-            target_opset=None, options=None, dtype=np.float32):
+            target_opset=None, options=None, dtype=np.float32,
+            white_op=None, black_op=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -164,6 +171,10 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param name: name of the model
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline, if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed
+        while converting a pipeline, if empty, none are blacklisted
     :return: converted model
 
     This function checks if the model inherits from class
@@ -187,7 +198,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
             "dtype should be real not {}".format(dtype))
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
-                           name=name, options=options, dtype=dtype)
+                           name=name, options=options, dtype=dtype,
+                           white_op=white_op, black_op=black_op)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):

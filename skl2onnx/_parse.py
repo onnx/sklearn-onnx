@@ -41,7 +41,7 @@ from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology
 from .common.data_types import DictionaryType
 from .common.data_types import Int64TensorType, SequenceType
-from .common.data_types import Int64Type, StringType, TensorType
+from .common.data_types import StringTensorType, TensorType
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
@@ -118,6 +118,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                     'probabilities', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+
     elif type(model) in cluster_list or isinstance(model, ClusterMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores of all classes. Notice that their
@@ -129,6 +130,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) in outlier_list or isinstance(model, OutlierMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores.
@@ -138,6 +140,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) == NearestNeighbors:
         # For Nearest Neighbours, we have two outputs, one for nearest
         # neighbours' indices and the other one for distances
@@ -147,6 +150,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+
     elif type(model) in {GaussianMixture, BayesianGaussianMixture}:
         label_variable = scope.declare_local_variable('label',
                                                       Int64TensorType())
@@ -154,6 +158,11 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                      scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(prob_variable)
+        options = scope.get_options(model, dict(score_samples=False))
+        if options['score_samples']:
+            scores_var = scope.declare_local_variable(
+                'score_samples', scope.tensor_type())
+            this_operator.outputs.append(scores_var)
     else:
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable(
@@ -329,7 +338,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         return probability_tensor
     this_operator = scope.declare_local_operator('SklearnZipMap')
     this_operator.inputs = probability_tensor
-    label_type = Int64Type()
+    label_type = Int64TensorType([None])
     classes = get_label_classes(scope, model)
 
     if (isinstance(model.classes_, list) and
@@ -349,7 +358,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
         this_operator.classlabels_strings = classes
-        label_type = StringType()
+        label_type = StringTensorType([None])
 
     output_label = scope.declare_local_variable('output_label', label_type)
     output_probability = scope.declare_local_variable(
@@ -418,7 +427,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
                         custom_parsers=None, dtype=np.float32,
-                        options=None):
+                        options=None, white_op=None,
+                        black_op=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -442,9 +452,14 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         float computation (float32 or float64)
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline, if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed
+        while converting a pipeline, if empty, none are blacklisted
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainerNode(model, dtype)
+    raw_model_container = SklearnModelContainerNode(
+        model, dtype, white_op=white_op, black_op=black_op)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.

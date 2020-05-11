@@ -414,7 +414,7 @@ class OnnxOperator:
                 inputs, self.output_names_, self.operator_name,
                 scope, container, None, op_version=self.op_version,
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property
@@ -656,7 +656,7 @@ class OnnxSubEstimator(OnnxOperator):
                 kwargs = self.kwargs
 
             if hasattr(self, 'output_names_'):
-                outputs = self.output_names_
+                pass
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
@@ -669,7 +669,6 @@ class OnnxSubEstimator(OnnxOperator):
                     outputs.append(name)
                 self.output_names_ = outputs
             else:
-                outputs = None
                 self.output_names_ = None
 
             inputs = []

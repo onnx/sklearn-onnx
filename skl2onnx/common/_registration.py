@@ -20,6 +20,12 @@ class RegisteredConverter:
         self._options = options
 
     def __call__(self, *args):
+        if (len(args) == 3 and
+                hasattr(args[2], '_get_allowed_options') and
+                hasattr(args[1], 'raw_operator')):
+            # Checks that the user did not specify a wrong option.
+            if args[1].raw_operator is not None:
+                args[2]._get_allowed_options(args[1].raw_operator)
         return self._fct(*args)
 
     def get_allowed_options(self):

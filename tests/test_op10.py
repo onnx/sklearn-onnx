@@ -4,7 +4,7 @@ from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
+from sklearn.mixture import GaussianMixture
 from onnx.defs import onnx_opset_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
@@ -47,16 +47,6 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_gaussian_mixture(self):
         model, X = fit_classification_model(GaussianMixture(), 3)
-        target_opset = 10
-        model_onnx = convert_sklearn(model, "op10",
-                                     [("input", FloatTensorType([None, 3]))],
-                                     target_opset=target_opset)
-        self.check_domain(model_onnx, target_opset=target_opset)
-
-    @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
-    @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
-    def test_bayesian_gaussian_mixture(self):
-        model, X = fit_classification_model(BayesianGaussianMixture(), 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",
                                      [("input", FloatTensorType([None, 3]))],

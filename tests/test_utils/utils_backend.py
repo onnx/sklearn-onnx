@@ -197,7 +197,7 @@ def extract_options(name):
         res = {}
         for opt in opts[1:]:
             if opt in ("SkipDim1", "OneOff", "NoProb", "NoProbOpp",
-                       "Dec4", "Dec3", "Dec2", 'Svm',
+                       "Dec4", "Dec3", "Dec2", "Dec1", 'Svm',
                        'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray',
                        'Out1'):
                 res[opt] = True
@@ -217,6 +217,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
     Dec4 = kwargs.pop("Dec4", False)
     Dec3 = kwargs.pop("Dec3", False)
     Dec2 = kwargs.pop("Dec2", False)
+    Dec1 = kwargs.pop("Dec1", False)
     Disc = kwargs.pop("Disc", False)
     Mism = kwargs.pop("Mism", False)
 
@@ -226,6 +227,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 3)
     if Dec2:
         kwargs["decimal"] = min(kwargs["decimal"], 2)
+    if Dec1:
+        kwargs["decimal"] = min(kwargs["decimal"], 1)
     if isinstance(expected, numpy.ndarray) and isinstance(
             output, numpy.ndarray):
         if SkipDim1:

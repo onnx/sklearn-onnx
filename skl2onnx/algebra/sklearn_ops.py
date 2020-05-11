@@ -73,8 +73,9 @@ def find_class(skl_cl):
     this = sys.modules[__name__]
     if not hasattr(this, full_name):
         available = sorted(filter(lambda n: prefix in n, sys.modules))
-        raise RuntimeError("Unable to find a class for '{}' in\n".format(
-            skl_cl.__name__, "\n".join(available)))
+        raise RuntimeError(
+            "Unable to find a class for '{}' in\n{}".format(
+                skl_cl.__name__, "\n".join(available)))
     cl = getattr(this, full_name)
     if "automation" in str(cl):
         raise RuntimeError("Dynamic operation issue with class "
@@ -89,8 +90,8 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.Pipeline.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
-    def __init__(self, op_version=None):
-        Pipeline.__init__(self)
+    def __init__(self, steps, memory=None, verbose=False, op_version=None):
+        Pipeline.__init__(self, steps=steps, memory=memory, verbose=verbose)
         OnnxSubGraphOperatorMixin.__init__(self)
         self.op_version = op_version
 
