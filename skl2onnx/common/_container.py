@@ -614,9 +614,11 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             if allowed is None:
                 return {}
             return allowed
+        clname = (str(model) if inspect.isfunction(model)
+                  else model.__class__.__name__)
         raise NotImplementedError(
             "No registered models, no known allowed options "
-            "for model '{}'.".format(model.__class__.__name__))
+            "for model '{}'.".format(clname))
 
     def get_options(self, model, default_values=None):
         """

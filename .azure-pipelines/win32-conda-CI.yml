@@ -13,9 +13,10 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-OnnxTest-Rt120-0222:
+      Py37-Onnx170-Rt120-0221:
         python.version: '3.7'
-        onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.7.o'
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.2.0'
