@@ -20,6 +20,7 @@ jobs:
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.2.0'
+        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
         sklearn.version: '>=0.22.1'
       Py37-Onnx160-Rt120-0221:
         python.version: '3.7'
@@ -27,6 +28,7 @@ jobs:
         numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.2.0'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.22.1'
       Py37-Onnx160-Rt110-0220:
         python.version: '3.7'
@@ -34,6 +36,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==1.1.0'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.22.0'
       Py37-Onnx160-Rt100-0213:
         python.version: '3.7'
@@ -41,6 +44,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==1.0.0'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.21.3'
       Py37-Onnx150-Rt050:
         python.version: '3.7'
@@ -48,6 +52,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.5.0'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.21.3'
       Py36-Onnx141-Rt040:
         python.version: '3.6'
@@ -55,6 +60,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.4.0'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.21.3'
       Py36-Onnx130-Rt021:
         python.version: '3.6'
@@ -62,6 +68,7 @@ jobs:
         numpy.version: 'numpy>=1.16.0'
         scipy.version: 'scipy'
         onnxrt.version: '==0.2.1'
+        onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.20.3'        
     maxParallel: 3
 
@@ -116,16 +123,13 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      git clone https://github.com/microsoft/onnxconverter-common
-      cd onnxconverter-common
-      pip install -e .
-      cd ..
-    displayName: 'install onnxconverter-common'
+      pip install -r requirements.txt
+    displayName: 'install requirements'
 
   - script: |
       call activate skl2onnxEnvironment
-      pip install -r requirements.txt
-    displayName: 'install requirements'
+      pip install $(onnxcc.version)
+    displayName: 'install onnxconverter-common'
 
   - script: |
       call activate skl2onnxEnvironment

@@ -55,7 +55,7 @@ class TestSahpes(unittest.TestCase):
         shape1 = sess.get_inputs()[0].shape
         shape2 = sess.get_outputs()[0].shape
         assert shape1 == [None, 4]
-        assert shape2 in ([None, 1], [1])
+        assert shape2 in ([None, 1], [1], [None])
         if len(pred_onx[0].shape) > 1:
             assert pred_onx[0].shape[1] == shape2[1]
 
