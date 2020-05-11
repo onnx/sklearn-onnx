@@ -118,6 +118,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                     'probabilities', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
+
     elif type(model) in cluster_list or isinstance(model, ClusterMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores of all classes. Notice that their
@@ -129,6 +130,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) in outlier_list or isinstance(model, OutlierMixin):
         # For clustering, we may have two outputs, one for label and
         # the other one for scores.
@@ -138,6 +140,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'scores', scope.tensor_type())
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
+
     elif type(model) == NearestNeighbors:
         # For Nearest Neighbours, we have two outputs, one for nearest
         # neighbours' indices and the other one for distances
@@ -147,6 +150,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                                                          scope.tensor_type())
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
+
     elif type(model) in {GaussianMixture, BayesianGaussianMixture}:
         label_variable = scope.declare_local_variable('label',
                                                       Int64TensorType())
@@ -423,7 +427,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
                         custom_parsers=None, dtype=np.float32,
-                        options=None):
+                        options=None, white_op=None,
+                        black_op=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -447,9 +452,14 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         float computation (float32 or float64)
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline, if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed
+        while converting a pipeline, if empty, none are blacklisted
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
-    raw_model_container = SklearnModelContainerNode(model, dtype)
+    raw_model_container = SklearnModelContainerNode(
+        model, dtype, white_op=white_op, black_op=black_op)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.
