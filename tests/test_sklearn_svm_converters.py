@@ -339,12 +339,10 @@ class TestSklearnSVM(unittest.TestCase):
         self.assertIsNotNone(nodes)
         dump_data_and_model(
             X.astype(numpy.float32),
-            model,
-            model_onnx,
-            basename="SklearnMcSVCPFBTF",
+            model, model_onnx,
+            basename="SklearnMcSVCPFBTF-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+                          " < StrictVersion('0.5.0')")
 
     def test_convert_svc_multi_ptrue_4(self):
         model, X = self._fit_multi_classification(SVC(probability=True), 4)
