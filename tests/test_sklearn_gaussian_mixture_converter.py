@@ -320,7 +320,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
         self._test_score(
             model, X, TARGET_OPSET, black_op={'ReduceLogSumExp', 'ArgMax'},
-            decimal=4)
+            decimal=2)
 
 
 if __name__ == "__main__":
