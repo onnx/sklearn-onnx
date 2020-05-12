@@ -16,7 +16,7 @@ jobs:
       Py37-Onnx170-Rt120-0221:
         python.version: '3.7'
         # onnx.version: '-i https://test.pypi.org/simple/ onnx'
-        onnx.version: 'onnx==1.7.o'
+        onnx.version: 'onnx==1.7.0'
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '==1.2.0'
