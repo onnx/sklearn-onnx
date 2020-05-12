@@ -10,7 +10,12 @@ import six
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
 from ..common._apply_operation import (
     apply_cast, apply_concat, apply_abs,
-    apply_add, apply_mul, apply_div, apply_less)
+    apply_add, apply_mul, apply_div)
+try:
+    from ..common._apply_operation import apply_less
+except ImportError:
+    # onnxconverter-common is too old
+    apply_less = None
 from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
@@ -186,6 +191,10 @@ def convert_sklearn_svm(scope, operator, container):
         container.add_initializer(cst0, container.proto_dtype, [], [0])
 
         prediction = scope.get_unique_variable_name('prediction')
+        if apply_less is None:
+            raise RuntimeError(
+                "Function apply_less is missing. "
+                "onnxconverter-common is too old.")
         apply_less(scope, [output_name, cst0], prediction, container)
         iprediction = scope.get_unique_variable_name('iprediction')
         apply_cast(scope, prediction, iprediction, container,

@@ -165,18 +165,17 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
-      pip install -r requirements.txt
       if [ '$(onnxcc.version)' == 'git' ]
       then
-        git clone https://github.com/microsoft/onnxconverter-common
+        pip install git+https://github.com/microsoft/onnxconverter-common
       else
         pip install onnxconverter-common$(onnxcc.version)
       fi
-      cd onnxconverter-common
-      pip install -e .
-      cd ..
+    displayName: 'install onnxconverter-common'
+
+  - script: |
+      pip install -r requirements.txt
       pip install -r requirements-dev.txt
-      pip install pytest
     displayName: 'install requirements'
 
   - script: |
