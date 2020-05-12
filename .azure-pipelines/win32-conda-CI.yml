@@ -124,6 +124,7 @@ jobs:
   - script: |
       call activate skl2onnxEnvironment
       pip install -r requirements.txt
+      pip install -r requirements-dev.txt
     displayName: 'install requirements'
 
   - script: |

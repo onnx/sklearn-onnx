@@ -187,6 +187,8 @@ jobs:
       echo "---------------"
       pip show numpy
       echo "---------------"
+      pip show pandas
+      echo "---------------"
       pip show onnx
       echo "---------------"
       pip show onnxruntime

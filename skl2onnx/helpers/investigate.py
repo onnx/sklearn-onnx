@@ -278,7 +278,7 @@ def compare_objects(o1, o2):
                 else:
                     o = o[0]
         # Following line avoid importing pandas and taking
-        # dependency on pandas.        
+        # dependency on pandas.
         if o.__class__.__name__ == "Series":
             c = list(o)
         elif isinstance(o, numpy.ndarray):
