@@ -13,9 +13,14 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 import onnxruntime
+try:
+    from skl2onnx.common._apply_operation import apply_less
+except ImportError:
+    # onnxconverter-common is too old
+    apply_less = None
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from skl2onnx.common.data_types import onnx_built_with_ml
+from skl2onnx.common.data_types import (
+    FloatTensorType, Int64TensorType, onnx_built_with_ml)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -193,6 +198,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     def test_model_calibrated_classifier_cv_svc(self):
         data = load_iris()
         X, y = data.data, data.target
