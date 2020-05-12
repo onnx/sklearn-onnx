@@ -105,6 +105,9 @@ class TestSklearnPipeline(unittest.TestCase):
             basename="SklearnPipelineScaler11",
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime too old")
     def test_combine_inputs_union_in_pipeline(self):
         from sklearn.preprocessing import StandardScaler
         from sklearn.pipeline import Pipeline

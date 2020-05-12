@@ -5,18 +5,23 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from sklearn.datasets import load_digits, load_iris
 from sklearn.decomposition import PCA, TruncatedSVD
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import FeatureUnion
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime too old")
     def test_feature_union_default(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -34,6 +39,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                             model_onnx,
                             basename="SklearnFeatureUnionDefault")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime too old")
     def test_feature_union_transformer_weights_0(self):
         data = load_iris()
         X, y = data.data, data.target
