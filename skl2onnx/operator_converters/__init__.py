@@ -11,6 +11,7 @@ from . import array_feature_extractor
 from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
+from . import cast_op
 from . import concat_op
 from . import cross_decomposition
 from . import decision_tree
@@ -23,6 +24,7 @@ from . import gaussian_process
 from . import gaussian_mixture
 from . import gradient_boosting
 from . import grid_search_cv
+from . import id_op
 from . import imputer_op
 from . import k_bins_discretiser
 from . import k_means
@@ -59,6 +61,7 @@ __all__ = [
     bagging,
     binariser,
     calibrated_classifier_cv,
+    cast_op,
     concat_op,
     cross_decomposition,
     decision_tree,
@@ -71,6 +74,7 @@ __all__ = [
     gaussian_mixture,
     gradient_boosting,
     grid_search_cv,
+    id_op,
     imputer_op,
     k_bins_discretiser,
     k_means,

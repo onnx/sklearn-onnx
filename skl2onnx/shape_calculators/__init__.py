@@ -7,6 +7,7 @@
 # To register shape calculators for scikit-learn operators,
 # import associated modules here.
 from . import array_feature_extractor
+from . import cast
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
@@ -14,6 +15,7 @@ from . import flatten
 from . import function_transformer
 from . import gaussian_process
 from . import grid_search_cv
+from . import identity
 from . import imputer
 from . import k_bins_discretiser
 from . import k_means
@@ -39,6 +41,7 @@ from . import zip_map
 
 __all__ = [
     array_feature_extractor,
+    cast,
     concat,
     cross_decomposition,
     dict_vectorizer,
@@ -46,6 +49,7 @@ __all__ = [
     function_transformer,
     gaussian_process,
     grid_search_cv,
+    identity,
     imputer,
     k_bins_discretiser,
     k_means,
