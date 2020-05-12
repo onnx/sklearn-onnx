@@ -20,7 +20,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
                     dtype=np.float32, intermediate=False,
-                    white_op=None, black_op=None):
+                    white_op=None, black_op=None, final_types=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -35,7 +35,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     :param model: A scikit-learn model
     :param initial_types: a python list. Each element is a tuple of a variable name
-        and a type defined in data_types.py
+        and a type defined in `data_types.py`
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
     :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
@@ -55,6 +55,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed while converting a pipeline,
         if empty, none are blacklisted
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -129,12 +132,11 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     if target_opset else get_opset_number_from_onnx())
     # Parse scikit-learn model as our internal data structure
     # (i.e., Topology)
-    topology = parse_sklearn_model(model, initial_types, target_opset,
-                                   custom_conversion_functions,
-                                   custom_shape_calculators,
-                                   custom_parsers, options=options,
-                                   dtype=dtype, white_op=white_op,
-                                   black_op=black_op)
+    topology = parse_sklearn_model(
+        model, initial_types, target_opset, custom_conversion_functions,
+        custom_shape_calculators, custom_parsers, options=options,
+        dtype=dtype, white_op=white_op, black_op=black_op,
+        final_types=final_types)
 
     # Infer variable shapes
     topology.compile()
@@ -148,7 +150,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
 def to_onnx(model, X=None, name=None, initial_types=None,
             target_opset=None, options=None, dtype=np.float32,
-            white_op=None, black_op=None):
+            white_op=None, black_op=None, final_types=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -167,6 +169,9 @@ def to_onnx(model, X=None, name=None, initial_types=None,
         while converting a pipeline, if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed
         while converting a pipeline, if empty, none are blacklisted
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: converted model
 
     This function checks if the model inherits from class
@@ -193,7 +198,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
                            name=name, options=options, dtype=dtype,
-                           white_op=white_op, black_op=black_op)
+                           white_op=white_op, black_op=black_op,
+                           final_types=final_types)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):

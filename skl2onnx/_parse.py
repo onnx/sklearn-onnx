@@ -391,7 +391,7 @@ def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
-def parse_sklearn(scope, model, inputs, custom_parsers=None):
+def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
     """
     This is a delegate function. It does nothing but invokes the
     correct parsing function according to the input model's type.
@@ -405,8 +405,37 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None):
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
         model, inputs, custom_parsers=None) }``
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: The output variables produced by the input model
     """
+    if final_types is not None:
+        outputs = []
+        for name, ty in final_types:
+            var = scope.declare_local_variable(name, ty)
+            if var.onnx_name != name:
+                raise RuntimeError(
+                    "Unable to add duplicated output '{}', '{}'.".format(
+                        var.onnx_name, name))
+            outputs.append(var)
+        hidden_outputs = parse_sklearn(
+            scope, model, inputs, custom_parsers=custom_parsers)
+        if len(hidden_outputs) != len(outputs):
+            raise RuntimeError(
+                "Number of declared outputs is unexpected, declared '{}' "
+                "found '{}'.".format(
+                    ", ".join(_.onnx_name for _ in outputs),
+                    ", ".join(_.onnx_name for _ in hidden_outputs)))
+        for h, o in zip(hidden_outputs, outputs):
+            if o.type is None:
+                iop = scope.declare_local_operator('SklearnIdentity')
+            else:
+                iop = scope.declare_local_operator('SklearnCast')
+            iop.inputs = [h]
+            iop.outputs = [o]
+        return outputs
+
     tmodel = type(model)
     if custom_parsers is not None and tmodel in custom_parsers:
         outputs = custom_parsers[tmodel](scope, model, inputs,
@@ -428,7 +457,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_shape_calculators=None,
                         custom_parsers=None, dtype=np.float32,
                         options=None, white_op=None,
-                        black_op=None):
+                        black_op=None, final_types=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -455,7 +484,10 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     :param white_op: white list of ONNX nodes allowed
         while converting a pipeline, if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed
-        while converting a pipeline, if empty, none are blacklisted
+        while converting a pipeline, if empty, none are blacklisted*
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
     raw_model_container = SklearnModelContainerNode(
@@ -491,7 +523,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
 
     # Parse the input scikit-learn model as a Topology object.
     outputs = parse_sklearn(scope, model, inputs,
-                            custom_parsers=custom_parsers)
+                            custom_parsers=custom_parsers,
+                            final_types=final_types)
 
     # The object raw_model_container is a part of the topology we're
     # going to return. We use it to store the outputs of the
