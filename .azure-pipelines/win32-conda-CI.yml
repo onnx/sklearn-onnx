@@ -13,6 +13,13 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
+      Py37-Onnx160-Rt120-Skl023:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.6.0'
+        numpy.version: 'numpy>=1.17.0'
+        scipy.version: 'scipy'
+        onnxrt.version: '==1.1.0'
+        sklearn.version: '==0.23.0'
       Py37-Onnx160-Rt110:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
@@ -80,7 +87,8 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      conda install scikit-learn$(sklearn.version)
+      # latest version of scikit-learn are not available on conda
+      pip install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |
