@@ -87,7 +87,8 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      conda install scikit-learn$(sklearn.version)
+      # latest version of scikit-learn are not available on conda
+      pip install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |
