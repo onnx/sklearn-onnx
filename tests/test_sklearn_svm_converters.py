@@ -341,7 +341,7 @@ class TestSklearnSVM(unittest.TestCase):
             X.astype(numpy.float32),
             model,
             model_onnx,
-            basename="SklearnMcSVCPFBTF",
+            basename="SklearnMcSVCPFBTF-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')"
         )
