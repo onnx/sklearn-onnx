@@ -197,12 +197,16 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         outnames = None
 
     if combined_reducesum:
-        log_prob_norm = OnnxLog(
+        max_weight = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        log_prob_norm_demax = OnnxLog(
             OnnxReduceSum(
-                OnnxExp(weighted_log_prob, op_version=opv),
+                OnnxExp(
+                    OnnxSub(weighted_log_prob, max_weight, op_version=opv),
+                    op_version=opv),
                 axes=[1], op_version=opv),
-            op_version=opv,
-            output_names=out[2:3])
+            op_version=opv)
+        log_prob_norm = OnnxAdd(log_prob_norm_demax, max_weight,
+                                op_version=opv, output_names=out[2:3])
     else:
         log_prob_norm = OnnxReduceLogSumExp(
             weighted_log_prob, axes=[1], op_version=opv,

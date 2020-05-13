@@ -199,14 +199,10 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = CalibratedClassifierCV(
             base_estimator=SVC(),
             method='sigmoid').fit(X, y)
-        try:
-            convert_sklearn(
+        model_onnx = convert_sklearn(
                 model, "unused",
                 [("input", FloatTensorType([None, X.shape[1]]))])
-            raise AssertionError(
-                "SVC has no decision_function for ovr")
-        except RuntimeError as e:
-            assert "'ovr' is not supported" in str(e)
+        assert model_onnx is not None
 
 
 if __name__ == "__main__":

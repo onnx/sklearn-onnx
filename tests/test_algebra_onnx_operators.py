@@ -55,7 +55,7 @@ class TestOnnxOperators(unittest.TestCase):
             text = str(container)
             if 'name:"Su_Sub"' not in text:
                 raise AssertionError(
-                    "Unnamed operator: '{}'\n".format(text))
+                    "Unnamed operator: '{}'".format(text))
             nin = list(op.enumerate_initial_types())
             nno = list(op.enumerate_nodes())
             nva = list(op.enumerate_variables())
