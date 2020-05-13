@@ -497,7 +497,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
-                             GaussianProcessRegressor])
+                             GaussianProcessRegressor],
+                           decimal=4)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
                             basename="SklearnGaussianProcessRBFStd-Out0")
