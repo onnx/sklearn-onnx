@@ -484,7 +484,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     :param white_op: white list of ONNX nodes allowed
         while converting a pipeline, if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed
-        while converting a pipeline, if empty, none are blacklisted*
+        while converting a pipeline, if empty, none are blacklisted
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.

@@ -30,6 +30,7 @@ from . import ordinal_encoder
 from . import one_vs_rest_classifier
 from . import polynomial_features
 from . import power_transformer
+from . import random_projection
 from . import scaler
 from . import svd
 from . import support_vector_machines
@@ -64,6 +65,7 @@ __all__ = [
     one_vs_rest_classifier,
     polynomial_features,
     power_transformer,
+    random_projection,
     scaler,
     svd,
     support_vector_machines,
