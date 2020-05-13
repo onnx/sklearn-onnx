@@ -269,8 +269,19 @@ def dump_data_and_model(
                     lambda: model.decision_function(dataone))  # noqa
             elif _has_transform_model(model):
                 # clustering
-                prediction = [model.predict(data), model.transform(data)]
-                lambda_original = lambda: model.transform(dataone)  # noqa
+                try:
+                    prediction = [model.predict(data), model.transform(data)]
+                    lambda_original = lambda: model.transform(dataone)  # noqa
+                except ValueError as e:
+                    if "Buffer dtype mismatch" in str(e):
+                        # scikit-learn does not cast anymore
+                        data64 = data.astype(numpy.float64)
+                        prediction = [model.predict(data64),
+                                      model.transform(data64)]
+                        dataone64 = dataone.astype(numpy.float64)
+                        lambda_original = lambda: model.transform(dataone64)  # noqa
+                    else:
+                        raise e
             else:
                 # Regressor or VotingClassifier
                 prediction = [model.predict(data)]
