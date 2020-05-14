@@ -62,7 +62,7 @@ class TestSklearnDocumentation(unittest.TestCase):
     def test_pipeline_tfidf(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         train = fetch_20newsgroups(random_state=1,
-                                   subset="train",
+                                   subset="test",
                                    categories=categories)
         train_data = SubjectBodyExtractor().fit_transform(train.data)
         tfi = TfidfVectorizer(min_df=30)
