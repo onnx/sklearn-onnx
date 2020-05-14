@@ -13,7 +13,20 @@ from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
 from sklearn.utils.testing import all_estimators
 from sklearn.model_selection import train_test_split
 from onnxruntime import InferenceSession
-import onnxruntime.capi.onnxruntime_pybind11_state as OrtErr
+
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import (
+        Fail as OrtErr_Fail,
+        InvalidArgument as OrtErr_InvalidArgument,
+        InvalidGraph as OrtErr_InvalidGraph,
+        NotImplemented as OrtErr_NotImplemented,
+    )
+except ImportError:
+    OrtErr_Fail = RuntimeError
+    OrtErr_InvalidArgument = RuntimeError
+    OrtErr_InvalidGraph = RuntimeError
+    OrtErr_NotImplemented = RuntimeError
+
 from . import __version__ as ort_version
 from .convert import to_onnx
 from ._validate_problems import _problems, find_suitable_problem
@@ -322,8 +335,8 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
         sess, t6 = _measure_time(
             lambda: InferenceSession(ser))
         obs_op['tostring_time'] = t6
-    except (RuntimeError, ValueError, OrtErr.NotImplemented,
-            OrtErr.Fail, OrtErr.InvalidGraph) as e:
+    except (RuntimeError, ValueError, OrtErr_NotImplemented,
+            OrtErr_Fail, OrtErr_InvalidGraph, OrtErr_InvalidArgument) as e:
         if debug:
             raise
         obs_op['_5ort_load_exc'] = e
