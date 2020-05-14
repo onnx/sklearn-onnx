@@ -29,7 +29,7 @@ def has_pydot():
 def one_hot_encoder_supports_string():
     # StrictVersion does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.20.0")
+    return StrictVersion(vers) >= StrictVersion("0.20")
 
 
 class TestOnnxHelper(unittest.TestCase):
@@ -92,6 +92,9 @@ class TestOnnxHelper(unittest.TestCase):
         assert X2.shape == (4, 2)
 
     @unittest.skipIf(not has_pydot(), reason="dot is missing")
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20")
     def test_onnx_to_dot(self):
         model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
                               StandardScaler())
