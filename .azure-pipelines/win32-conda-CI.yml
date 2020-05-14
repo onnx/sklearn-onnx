@@ -171,6 +171,9 @@ jobs:
 
   - script: |
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
+      cd tests
+      python -c "import test_utils;print(test_utils.TARGET_OPSET, test_utils.TARGET_IR)"
+      cd ..
     displayName: 'target_opset'
 
   - script: |
