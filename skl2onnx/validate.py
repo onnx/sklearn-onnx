@@ -10,46 +10,14 @@ import numpy
 import pandas
 import onnx
 from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
-from sklearn.decomposition import SparseCoder
-from sklearn.ensemble import (
-    VotingClassifier, AdaBoostRegressor,
-)
-try:
-    from sklearn.ensemble import VotingRegressor
-except ImportError:
-    # Available only in 0.21
-    VotingRegressor = 'VotingRegressor'
-from sklearn.feature_selection import SelectFromModel, RFE, RFECV
-from sklearn.linear_model import (
-    LogisticRegression, SGDClassifier, LinearRegression
-)
-from sklearn.model_selection import (
-    train_test_split, GridSearchCV,
-    RandomizedSearchCV
-)
-from sklearn.multiclass import (
-    OneVsRestClassifier, OneVsOneClassifier,
-    OutputCodeClassifier
-)
-from sklearn.multioutput import (
-    MultiOutputRegressor, MultiOutputClassifier,
-)
-try:
-    from sklearn.multioutput import (
-        ClassifierChain, RegressorChain
-    )
-except ImportError:
-    # Available only in 0.21
-    ClassifierChain = 'ClassifierChain'
-    RegressorChain = 'RegressorChain'
-from sklearn.neighbors import LocalOutlierFactor
-from sklearn.svm import SVC, NuSVC
-from sklearn.tree import DecisionTreeRegressor
 from sklearn.utils.testing import all_estimators
+from sklearn.model_selection import train_test_split
 from onnxruntime import InferenceSession
+import onnxruntime.capi.onnxruntime_pybind11_state as OrtErr
 from . import __version__ as ort_version
 from .convert import to_onnx
-from .validate_problems import _problems, find_suitable_problem
+from ._validate_problems import _problems, find_suitable_problem
+from ._validate_scenarios import _extra_parameters
 from .helpers.onnx_helper import to_dot
 
 
@@ -93,145 +61,6 @@ def sklearn_operators(subfolder=None):
     if subfolder is None:
         found.sort(key=lambda t: (t['subfolder'], t['name']))
     return found
-
-
-def build_custom_scenarios():
-    """
-    Defines parameters values for some operators.
-    """
-    return {
-        # skips
-        SparseCoder: None,
-        # scenarios
-        AdaBoostRegressor: [
-            ('default', {
-                'n_estimators': 5,
-            }),
-        ],
-        ClassifierChain: [
-            ('logreg', {
-                'base_estimator': LogisticRegression(solver='liblinear'),
-            })
-        ],
-        GridSearchCV: [
-            ('cl', {
-                'estimator': LogisticRegression(solver='liblinear'),
-                'param_grid': {'fit_intercept': [False, True]},
-            }),
-            ('reg', {
-                'estimator': LinearRegression(),
-                'param_grid': {'fit_intercept': [False, True]},
-            }),
-        ],
-        LocalOutlierFactor: [
-            ('novelty', {
-                'novelty': True,
-            }),
-        ],
-        LogisticRegression: [
-            ('liblinear', {
-                'solver': 'liblinear',
-            }),
-        ],
-        MultiOutputClassifier: [
-            ('logreg', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            })
-        ],
-        MultiOutputRegressor: [
-            ('linreg', {
-                'estimator': LinearRegression(),
-            })
-        ],
-        NuSVC: [
-            ('prob', {
-                'probability': True,
-            }),
-        ],
-        OneVsOneClassifier: [
-            ('logreg', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            })
-        ],
-        OneVsRestClassifier: [
-            ('logreg', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            })
-        ],
-        OutputCodeClassifier: [
-            ('logreg', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            })
-        ],
-        RandomizedSearchCV: [
-            ('cl', {
-                'estimator': LogisticRegression(solver='liblinear'),
-                'param_distributions': {'fit_intercept': [False, True]},
-            }),
-            ('reg', {
-                'estimator': LinearRegression(),
-                'param_distributions': {'fit_intercept': [False, True]},
-            }),
-        ],
-        RegressorChain: [
-            ('linreg', {
-                'base_estimator': LinearRegression(),
-            })
-        ],
-        RFE: [
-            ('cl', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            }),
-            ('reg', {
-                'estimator': LinearRegression(),
-            })
-        ],
-        RFECV: [
-            ('cl', {
-                'estimator': LogisticRegression(solver='liblinear'),
-            }),
-            ('reg', {
-                'estimator': LinearRegression(),
-            })
-        ],
-        SelectFromModel: [
-            ('rf', {
-                'estimator': DecisionTreeRegressor(),
-            }),
-        ],
-        SGDClassifier: [
-            ('log', {
-                'loss': 'log',
-            }),
-        ],
-        SVC: [
-            ('prob', {
-                'probability': True,
-            }),
-        ],
-        VotingClassifier: [
-            ('logreg-noflatten', {
-                'voting': 'soft',
-                'flatten_transform': False,
-                'estimators': [
-                    ('lr1', LogisticRegression(solver='liblinear')),
-                    ('lr2', LogisticRegression(
-                        solver='liblinear', fit_intercept=False)),
-                ],
-            })
-        ],
-        VotingRegressor: [
-            ('linreg', {
-                'estimators': [
-                    ('lr1', LinearRegression()),
-                    ('lr2', LinearRegression(fit_intercept=False)),
-                ],
-            })
-        ],
-    }
-
-
-_extra_parameters = build_custom_scenarios()
 
 
 def _measure_time(fct):
@@ -493,7 +322,8 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
         sess, t6 = _measure_time(
             lambda: InferenceSession(ser))
         obs_op['tostring_time'] = t6
-    except (RuntimeError, ValueError) as e:
+    except (RuntimeError, ValueError, OrtErr.NotImplemented,
+            OrtErr.Fail, OrtErr.InvalidGraph) as e:
         if debug:
             raise
         obs_op['_5ort_load_exc'] = e
@@ -546,56 +376,6 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
                 obs_op['max_abs_diff_batch'] = max_abs_diff
                 if dump_folder and max_abs_diff > 1e-5:
                     dump_into_folder(dump_folder, kind='batch', obs_op=obs_op,
-                                     X_=X_, y_=y_, init_types=init_types,
-                                     method=init_types,
-                                     output_index=output_index,
-                                     Xort_=Xort_)
-
-    # compute single
-    def fct_single(se=sess, xo=Xort_test, it=init_types):  # noqa
-        return [se.run(None, {it[0][0]: Xort_row})
-                for Xort_row in xo]
-    try:
-        opred, t7 = _measure_time(fct_single)
-        obs_op['ort_run_time_single'] = t7
-    except (RuntimeError, TypeError, ValueError, KeyError) as e:
-        if debug:
-            raise
-        obs_op['_9ort_run_single_exc'] = e
-
-    # difference
-    if '_9ort_run_single_exc' not in obs_op:
-        if isinstance(opred[0], dict):
-            ch = [[(k, v) for k, v in sorted(o.items())]
-                  for o in opred]
-            # names = [[_[0] for _ in row] for row in ch]
-            opred = [[_[1] for _ in row] for row in ch]
-
-        try:
-            opred = [o[output_index] for o in opred]
-        except IndexError:
-            if debug:
-                raise
-            obs_op['_Amax_abs_diff_single_exc'] = (
-                "Unable to fetch output {}/{} for model '{}'"
-                "".format(output_index, len(opred),
-                          model.__name__))
-            opred = None
-        if opred is not None:
-            max_abs_diff = _measure_absolute_difference(
-                ypred, opred)
-            if numpy.isnan(max_abs_diff):
-                obs_op['_Amax_abs_diff_single_exc'] = (
-                    "Unable to compute differences between"
-                    "\n{}\n--------\n{}".format(
-                        ypred, opred))
-                if debug:
-                    debug_exc.append(RuntimeError(
-                        obs_op['_Amax_abs_diff_single_exc']))
-            else:
-                obs_op['max_abs_diff_single'] = max_abs_diff
-                if dump_folder and max_abs_diff > 1e-5:
-                    dump_into_folder(dump_folder, kind='single', obs_op=obs_op,
                                      X_=X_, y_=y_, init_types=init_types,
                                      method=init_types,
                                      output_index=output_index,
