@@ -30,6 +30,8 @@ from skl2onnx.algebra.complex_functions import (
 from skl2onnx.proto import get_latest_tested_opset_version
 from test_utils import TARGET_OPSET, TARGET_IR
 
+_TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
+
 
 THRESHOLD = "0.4.0"
 THRESHOLD2 = "0.5.0"
@@ -116,7 +118,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         add_node = OnnxAdd(
             'sum_in', 'next', output_names=['sum_out'],
             op_version=opv)
@@ -151,7 +153,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         diff = OnnxSub('next_in', 'next', output_names=['diff'],
                        op_version=opv)
         id_next = OnnxIdentity(
@@ -203,7 +205,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     def test_onnx_example_pdist_in(self):
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         cop = OnnxAdd(
             'input', 'input', op_version=opv)
@@ -242,7 +244,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         cop2 = OnnxConstantOfShape(
             OnnxShape('input'), output_names=['mat'],
             op_version=opv)
@@ -272,7 +274,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         cop = OnnxAdd(
             'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
@@ -321,7 +323,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         cop = OnnxAdd(
             'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(
@@ -373,7 +375,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
             np.float32).reshape((4, 2))
-        opv = get_latest_tested_opset_version()
+        opv = _TARGET_OPSET_
         cop = OnnxAdd(
             'input', 'input', op_version=opv)
         cop2 = OnnxIdentity(

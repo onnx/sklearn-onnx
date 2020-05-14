@@ -23,6 +23,7 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -342,7 +343,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                 return
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

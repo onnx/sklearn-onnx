@@ -15,6 +15,7 @@ from skl2onnx.common.data_types import (
     FloatTensorType, DoubleTensorType)
 from skl2onnx import convert_sklearn
 from onnxruntime import InferenceSession
+from test_utils import TARGET_OPSET
 
 
 class TestParsingOptions(unittest.TestCase):
@@ -76,10 +77,12 @@ class TestParsingOptions(unittest.TestCase):
                             final_types=[('output4', None)])
         with self.assertRaises(RuntimeError):
             convert_sklearn(model, initial_types=initial_types,
-                            final_types=[('dup1', None), ('dup1', None)])
+                            final_types=[('dup1', None), ('dup1', None)],
+                            target_opset=TARGET_OPSET)
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output4', None), ('output5', None)])
+            final_types=[('output4', None), ('output5', None)],
+            target_opset=TARGET_OPSET)
         assert model_onnx is not None
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output4'

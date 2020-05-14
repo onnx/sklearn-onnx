@@ -509,13 +509,15 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         try:
             to_onnx(
                 gp, initial_types=[('X', FloatTensorType([None, None]))],
-                options=options, dtype=np.float32)
+                options=options, dtype=np.float32,
+                target_opset=TARGET_OPSET)
         except RuntimeError as e:
             assert "The method *predict* must be called" in str(e)
         gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType([None, None]))],
-            options=options, dtype=np.float32)
+            options=options, dtype=np.float32,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
@@ -541,7 +543,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            options=options, dtype=np.float64)
+            options=options, dtype=np.float64,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
@@ -568,7 +571,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            options=options, dtype=np.float64)
+            options=options, dtype=np.float64,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
@@ -595,7 +599,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            options=options, dtype=np.float64)
+            options=options, dtype=np.float64,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
@@ -622,7 +627,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            options=options, dtype=np.float64)
+            options=options, dtype=np.float64,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
@@ -648,7 +654,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         options = {GaussianProcessRegressor: {"return_std": True}}
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            options=options, dtype=np.float64)
+            options=options, dtype=np.float64,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
@@ -669,7 +676,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         gp.fit(X_train, y_train)
 
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType([None, None]))])
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {}, skip_if_float32=True)
 
