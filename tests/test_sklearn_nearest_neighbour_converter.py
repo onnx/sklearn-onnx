@@ -137,8 +137,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             KNeighborsRegressor(
                 weights="distance", algorithm="brute", n_neighbors=1))
         model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=11)
+                                     [("input", FloatTensorType([None, 4]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:3],
@@ -548,7 +547,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model = KNeighborsRegressor(
             algorithm='brute', weights='distance', n_neighbors=7)
         model.fit(X[:13], y[:13])
-        onx = to_onnx(model, X[:1], target_opset=11,
+        onx = to_onnx(model, X[:1],
                       options={id(model): {'optim': 'cdist'}})
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
@@ -570,7 +569,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model = KNeighborsClassifier(
             algorithm='brute', weights='distance', n_neighbors=7)
         model.fit(X[:13], y[:13])
-        onx = to_onnx(model, X[:1], target_opset=11,
+        onx = to_onnx(model, X[:1],
                       options={id(model): {'optim': 'cdist',
                                            'zipmap': False}})
         dump_data_and_model(
@@ -594,7 +593,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             algorithm='brute', weights='distance',
             n_neighbors=7)
         model.fit(X[:13], y[:13])
-        onx = to_onnx(model, X[:1], target_opset=11,
+        onx = to_onnx(model, X[:1],
                       options={id(model): {'optim': 'cdist',
                                            'zipmap': False}})
         dump_data_and_model(

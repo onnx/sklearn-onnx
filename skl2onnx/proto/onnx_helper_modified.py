@@ -34,6 +34,7 @@ def make_node(
         name=None,  # type: Optional[Text]
         doc_string=None,  # type: Optional[Text]
         domain=None,  # type: Optional[Text]
+        _dtype=None,  # type: [np.float32, np.float64]
         **kwargs  # type: Any
         ):  # type: (...) -> NodeProto
     """Construct a NodeProto.
@@ -44,13 +45,15 @@ def make_node(
         outputs (list of string): list of output names
         name (string, default None): optional unique identifier for NodeProto
         doc_string (string, default None): optional documentation
-        string for NodeProto
+            string for NodeProto
+        dtype: dtype for double used to infer
         domain (string, default None): optional domain for NodeProto.
             If it's None, we will just use default domain (which is empty)
         **kwargs (dict): the attributes of the node.  The acceptable values
             are documented in :func:`make_attribute`.
     """
-
+    if _dtype is None:
+        raise ValueError("dtype cannot be None")
     node = NodeProto()
     node.op_type = op_type
     node.input.extend(inputs)
@@ -63,7 +66,7 @@ def make_node(
         node.domain = domain
     if kwargs:
         node.attribute.extend(
-            make_attribute(key, value)
+            make_attribute(key, value, dtype=_dtype, domain=domain)
             for key, value in sorted(kwargs.items()))
     return node
 
@@ -100,7 +103,7 @@ def make_attribute(
             attr.type = AttributeProto.TENSOR
             attr.t.CopyFrom(
                 make_tensor(
-                    key, TensorProto.DOUBLE, (len(value), ), [value]))
+                    key, TensorProto.DOUBLE, (1, ), [value]))
         else:
             attr.f = value
             attr.type = AttributeProto.FLOAT
@@ -140,16 +143,23 @@ def make_attribute(
             #         key, TensorProto.FLOAT,
             #         getshape(value), value))
         elif all(isinstance(v, np.float64) for v in value):
-            attr.floats.extend(value)
-            attr.type = AttributeProto.FLOATS
-            # return make_attribute(
-            #    key, doc_string=doc_string,
-            #     value=make_tensor(
-            #         key, TensorProto.DOUBLE,
-            #         getshape(value), value))
+            if use_float64:
+                attr.type = AttributeProto.TENSOR
+                attr.t.CopyFrom(
+                    make_tensor(
+                        key, TensorProto.DOUBLE, (len(value), ), value))
+            else:
+                attr.floats.extend(value)
+                attr.type = AttributeProto.FLOATS
         elif all(isinstance(v, float) for v in value):
-            attr.floats.extend(value)
-            attr.type = AttributeProto.FLOATS
+            if use_float64:
+                attr.type = AttributeProto.TENSOR
+                attr.t.CopyFrom(
+                    make_tensor(
+                        key, TensorProto.DOUBLE, (len(value), ), value))
+            else:
+                attr.floats.extend(value)
+                attr.type = AttributeProto.FLOATS
         elif all(isinstance(v, np.int32) for v in value):
             attr.ints.extend(int(v) for v in value)
             attr.type = AttributeProto.INTS

@@ -383,6 +383,9 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             tensor.name = name
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
+        elif shape is None and isinstance(
+                content, (np.float32, np.float64, np.int32, np.int64, float)):
+            tensor = make_tensor(name, onnx_type, [], [content])
         elif (SparseTensorProto is not None and
                 isinstance(content, SparseTensorProto)):
             raise NotImplementedError("Not implemented yet.")
@@ -413,7 +416,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             return tensor
         elif sparse_tensor is not None:
             self.add_node('Constant', [], [name], sparse_value=sparse_tensor,
-                          op_version=11, name=name + '_op')
+                          op_version=self.target_opset, name=name + '_op')
             return sparse_tensor
         else:
             raise RuntimeError(
@@ -486,6 +489,10 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             inputs = [inputs]
         if isinstance(outputs, (six.string_types, six.text_type)):
             outputs = [outputs]
+        common = set(inputs) & set(outputs)
+        if common:
+            raise RuntimeError("inputs and outputs cannot have "
+                               "variables in common {}".format(common))
         if not isinstance(inputs, list) or not all(
                 isinstance(s, (six.string_types, six.text_type))
                 for s in inputs):
@@ -510,8 +517,11 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
 
         if upd:
             attrs.update(upd)
+        if 'dtype' in attrs:
+            raise RuntimeError("dtype should not be a parameter.")
         try:
-            node = make_node(op_type, inputs, outputs, name=name, **attrs)
+            node = make_node(op_type, inputs, outputs, name=name,
+                             _dtype=self.dtype, **attrs)
         except ValueError as e:
             raise ValueError("Unable to create node '{}' with name='{}'."
                              "".format(op_type, name)) from e
@@ -524,8 +534,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                 op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
                 "Opset number {} is higher than targeted opset {} for "
-                "node '{}'.".format(
-                    op_version, self.target_opset, node.op_type))
+                "node '{}' (domain: '{}').".format(
+                    op_version, self.target_opset, node.op_type, op_domain))
 
     def target_opset_any_domain(self, domain):
         if isinstance(self.target_opset, dict):
@@ -590,19 +600,25 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             self._op_versions[k] = list(sorted(v))
 
     def _get_allowed_options(self, model):
-        if (model is not None and self.registered_models is not None and
-                'aliases' in self.registered_models):
-            if type(model) not in self.registered_models['aliases']:
-                return {}
-            alias = self.registered_models['aliases'][type(model)]
+        if self.registered_models is not None:
+            if inspect.isfunction(model):
+                if model not in self.registered_models['aliases']:
+                    return None
+                alias = self.registered_models['aliases'][model]
+            else:
+                if type(model) not in self.registered_models['aliases']:
+                    return {}
+                alias = self.registered_models['aliases'][type(model)]
             conv = self.registered_models['conv'][alias]
             allowed = conv.get_allowed_options()
             if allowed is None:
                 return {}
             return allowed
+        clname = (str(model) if inspect.isfunction(model)
+                  else model.__class__.__name__)
         raise NotImplementedError(
             "No registered models, no known allowed options "
-            "for model '{}'.".format(model.__class__.__name__))
+            "for model '{}'.".format(clname))
 
     def get_options(self, model, default_values=None):
         """

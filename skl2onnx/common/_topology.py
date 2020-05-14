@@ -17,7 +17,10 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
 )
-from ..proto import get_opset_number_from_onnx
+from ..proto import (
+    get_opset_number_from_onnx,
+    get_latest_tested_opset_version
+)
 from ..proto.onnx_helper_modified import (
     make_graph, make_model, make_tensor_value_info
 )
@@ -36,6 +39,8 @@ except ImportError:
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
     }
+
+OPSET_ML_TO_OPSET = {1: 11, 2: 11}
 
 
 class Variable:
@@ -924,19 +929,27 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         raise ValueError("dtype must be specified.")
 
     if target_opset is None:
-        target_opset = get_opset_number_from_onnx()
+        target_opset = get_latest_tested_opset_version()
     if isinstance(target_opset, dict):
-        onnx_target_opset = target_opset.get('', get_opset_number_from_onnx())
+        onnx_target_opset = target_opset.get(
+            '', get_latest_tested_opset_version())
     else:
         onnx_target_opset = target_opset
     if onnx_target_opset > get_opset_number_from_onnx():
         found = get_opset_number_from_onnx()
         raise RuntimeError(
             "Parameter target_opset {} > {} is higher than the "
-            "number of the installed onnx package. See "
+            "version of the installed onnx package. See "
             "https://github.com/onnx/onnx/blob/master/docs/"
             "Versioning.md#released-versions"
             ".".format(onnx_target_opset, found))
+    if onnx_target_opset > get_latest_tested_opset_version():
+        warnings.warn(
+            "Parameter target_opset {} > {} is higher than the "
+            "the latest tested version"
+            ".".format(
+                onnx_target_opset,
+                get_latest_tested_opset_version()))
 
     topology._initialize_graph_status_for_traversing()
 
@@ -1139,7 +1152,12 @@ def _get_main_opset_version(model):
     """
     Returns the main opset version.
     """
+    mld = None
     for op in model.opset_import:
         if op.domain == '':
             return op.version
+        if op.domain == "ai.onnx.ml":
+            mld = op.version
+    if mld is not None:
+        return OPSET_ML_TO_OPSET.get(mld, None)
     return None

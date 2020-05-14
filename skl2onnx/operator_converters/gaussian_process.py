@@ -77,7 +77,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
-        # y_mean = self._y_train_mean + y_mean  # undo normal.
+        # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),

@@ -6,6 +6,11 @@ from distutils.version import StrictVersion
 import numpy
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
+try:
+    from skl2onnx.common._apply_operation import apply_less
+except ImportError:
+    # onnxconverter-common is too old
+    apply_less = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -170,6 +175,7 @@ class TestSklearnSVM(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')")
 
+    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     def test_convert_svc_multi_linear_pfalse_ovr(self):
         model, X = self._fit_multi_classification(
             SVC(kernel="linear", probability=False,
@@ -339,12 +345,10 @@ class TestSklearnSVM(unittest.TestCase):
         self.assertIsNotNone(nodes)
         dump_data_and_model(
             X.astype(numpy.float32),
-            model,
-            model_onnx,
+            model, model_onnx,
             basename="SklearnMcSVCPFBTF-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+                          " < StrictVersion('0.5.0')")
 
     def test_convert_svc_multi_ptrue_4(self):
         model, X = self._fit_multi_classification(SVC(probability=True), 4)
@@ -356,7 +360,7 @@ class TestSklearnSVM(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMcSVCPF4",
+            basename="SklearnMcSVCPF4-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')"
         )

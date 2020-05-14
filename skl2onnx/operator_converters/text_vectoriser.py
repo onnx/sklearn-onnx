@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import warnings
+import numpy as np
 from ..common._apply_operation import apply_cast, apply_reshape
 from ..common._registration import register_converter
 from ..proto import onnx_proto
@@ -120,7 +121,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     `onnxruntime <https://github.com/Microsoft/onnxruntime>`_ uses
     `re2 <https://github.com/google/re2>`_. You may need to switch
     to a custom tokenizer based on
-    `python wrapper for re2 <https://pypi.org/project/re2/>_`
+    `python wrapper for re2 <https://pypi.org/project/re2/>`_
     or its sources `pyre2 <https://github.com/facebook/pyre2>`_
     (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
     If the regular expression is not specified and if
@@ -319,7 +320,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         'pool_strings': words,
         'ngram_indexes': key_indices,
         'ngram_counts': ngcounts,
-        'weights': weights,
+        'weights': list(map(np.float32, weights)),
     })
     output = (scope.get_unique_variable_name('output')
               if op.binary else operator.output_full_names)
