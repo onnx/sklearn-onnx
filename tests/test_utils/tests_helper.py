@@ -50,8 +50,9 @@ def _has_transform_model(model):
 
 def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
-                             random_state=42, is_bool=False):
-    X, y = make_classification(n_classes=n_classes, n_features=20,
+                             random_state=42, is_bool=False,
+                             n_features=20):
+    X, y = make_classification(n_classes=n_classes, n_features=n_features,
                                n_samples=500,
                                random_state=random_state,
                                n_informative=7)
