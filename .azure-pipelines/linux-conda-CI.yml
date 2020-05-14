@@ -221,7 +221,7 @@ jobs:
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
-        export TEST_TARGET_OPSET=$(onnx.target_opset)
+        export TEST_TARGET_OPSET='$(onnx.target_opset)'
       fi
       cd tests
       python -c "import test_utils;print(test_utils.TARGET_OPSET, test_utils.TARGET_IR)"

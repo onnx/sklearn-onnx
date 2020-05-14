@@ -59,7 +59,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
             target_opset=TARGET_OPSET)
         if (TARGET_OPSET == 11 or
-                os.environ.get('TEST_TARGET_OPSET', '') == '11'):
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
             sonx = str(onx)
             if "version: 11" not in sonx or "ir_version: 6" not in sonx:
                 raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
@@ -76,6 +76,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
         onx = to_onnx(tr, X.astype(np.float32),
                       target_opset=TARGET_OPSET)
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -115,6 +121,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = tr.to_onnx(X.astype(np.float32))
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -130,7 +142,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
             target_opset=TARGET_OPSET)
         if (TARGET_OPSET == 11 or
-                os.environ.get('TEST_TARGET_OPSET', '') == '11'):
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
             sonx = str(onx)
             if "version: 11" not in sonx or "ir_version: 6" not in sonx:
                 raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
@@ -146,6 +158,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = to_onnx(tr, X.astype(np.float32), target_opset=TARGET_OPSET)
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -168,6 +186,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         except RuntimeError as e:
             assert "Method enumerate_initial_types" in str(e)
         onx = tr_mixin.to_onnx(X.astype(np.float32))
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
@@ -187,6 +211,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         tr.fit(X)
 
         onx = tr.to_onnx(X.astype(np.float32))
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') != ''):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
 
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
