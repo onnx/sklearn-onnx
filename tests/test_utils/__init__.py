@@ -41,6 +41,8 @@ def _get_ir_version(opv):
         return 5
     if opv >= 9:
         return 4
+    if opv >= 8:
+        return 4
     return 3
 
 

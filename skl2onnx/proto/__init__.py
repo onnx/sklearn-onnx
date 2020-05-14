@@ -76,4 +76,4 @@ def get_latest_tested_opset_version():
     version specified by *onnx* package if this one is lower
     (return by `onnx.defs.onnx_opset_version()`).
     """
-    return min(11, get_opset_number_from_onnx())
+    return min(12, get_opset_number_from_onnx())
