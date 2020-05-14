@@ -52,7 +52,7 @@ def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
                              random_state=42, is_bool=False):
     X, y = make_classification(n_classes=n_classes, n_features=20,
-                               n_samples=400,
+                               n_samples=500,
                                random_state=random_state,
                                n_informative=7)
     if label_string:
