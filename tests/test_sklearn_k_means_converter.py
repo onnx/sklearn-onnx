@@ -82,7 +82,6 @@ class TestSklearnKMeansModel(unittest.TestCase):
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=11)
         self.assertIsNotNone(model_onnx)
-        print(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
             model,

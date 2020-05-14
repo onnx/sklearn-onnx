@@ -1,3 +1,4 @@
+import os
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -57,7 +58,12 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         onx = convert_sklearn(
             tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
             target_opset=TARGET_OPSET)
-
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') == '11'):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
             basename="MixinWay1ConvertSklearn")
@@ -123,9 +129,14 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         onx = convert_sklearn(
             tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
             target_opset=TARGET_OPSET)
-
+        if (TARGET_OPSET == 11 or
+                os.environ.get('TEST_TARGET_OPSET', '') == '11'):
+            sonx = str(onx)
+            if "version: 11" not in sonx or "ir_version: 6" not in sonx:
+                raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
+                    TARGET_OPSET, sonx))
         dump_data_and_model(
-            X.astype(np.float32), tr, onx, verbose=True,
+            X.astype(np.float32), tr, onx,
             basename="MixinPipeWay1ConvertSklearn")
 
     def test_pipe_way2_to_onnx(self):
