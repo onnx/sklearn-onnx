@@ -12,7 +12,7 @@ from ..common._topology import (
 )
 from ..common._container import ModelComponentContainer
 from ..common import utils
-from ..proto import get_opset_number_from_onnx, onnx_proto
+from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState
@@ -31,6 +31,13 @@ class OnnxOperatorItem:
             raise TypeError("index must be an integer.")
         self.onx_op = onx_op
         self.index = index
+
+    def get_latest_tested_opset_version(self):
+        """
+        Returns ``get_latest_tested_opset_version()``
+        of the wrapped *OnnxOperator* instance.
+        """
+        return self.onx_op.get_latest_tested_opset_version()
 
     def add_to(self, scope, container, operator=None):
         """
@@ -164,7 +171,7 @@ class OnnxOperator:
 
         if op_version is None:
             if domain == '':
-                self.op_version = get_opset_number_from_onnx()
+                self.op_version = get_latest_tested_opset_version()
             else:
                 self.op_version = None
         else:
@@ -453,7 +460,7 @@ class OnnxOperator:
         if isinstance(target_opset, dict):
             target_opset = target_opset.get(self.domain, None)
         elif isinstance(target_opset, int):
-            if self.domain != '':
+            if self.domain not in ('', None):
                 # The target_opset is for the domain ''
                 # We ignore it.
                 target_opset = None
@@ -462,6 +469,8 @@ class OnnxOperator:
                 "target_opset must be a dictionary {domain: "
                 "target_opset} not %r for operator %r." % (
                     target_opset, self.__class__.__name__))
+        if self.domain in ('', None) and target_opset == 1:
+            raise RuntimeError("target_opset cannot be 1.")
         if (self.op_version is not None and target_opset is not None and
                 self.op_version > target_opset):
             raise RuntimeError(
@@ -493,9 +502,7 @@ class OnnxOperator:
                                    "is unknown. You should specify "
                                    "input types.".format(
                                        name, self.__class__.__name__))
-
-        if target_opset is None:
-            target_opset = get_opset_number_from_onnx()
+        target_opset = self.get_latest_tested_opset_version(target_opset)
         container = ModelComponentContainer(
             target_opset, dtype=dtype)
 
@@ -530,7 +537,8 @@ class OnnxOperator:
                                     "tuple(name, type).")
         else:
             shapes = infer_outputs(container, container.inputs,
-                                   initializer=container.initializers)
+                                   initializer=container.initializers,
+                                   target_opset=target_opset)
 
             if self.output_names:
                 shapes = [shape for shape in shapes
@@ -557,7 +565,6 @@ class OnnxOperator:
         onnx_model.producer_version = utils.get_producer_version()
         onnx_model.domain = utils.get_domain()
         onnx_model.model_version = utils.get_model_version()
-
         return onnx_model
 
     def enumerate_nodes(self):
@@ -599,6 +606,16 @@ class OnnxOperator:
                 name = input.name
                 typ = node.expected_inputs[i]
                 yield (name, typ)
+
+    def get_latest_tested_opset_version(self, target_opset=None):
+        """
+        Returns *op_version*, or the max of all results
+        returned by these method applied on every input,
+        or ``get_latest_tested_opset_version()``.
+        """
+        if target_opset is not None:
+            return target_opset
+        return get_latest_tested_opset_version()
 
 
 class OnnxSubEstimator(OnnxOperator):

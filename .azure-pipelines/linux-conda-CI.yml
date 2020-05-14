@@ -13,6 +13,24 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
+      Py37-Onnx170-Rt120-Skl0230:
+        do.bench: '0'
+        python.version: '3.7'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.7.0'
+        onnxrt.version: '==1.2.0'
+        sklearn.version: '==0.23.0'
+        onnxcc.version: 'git'
+        run.example: '1'
+      Py37-Onnx170-Rt120-COM:
+        do.bench: '0'
+        python.version: '3.7'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.7.0'
+        onnxrt.version: '==1.2.0'
+        onnxcc.version: '==1.6.1'
+        sklearn.version: '==0.22.2'
+        run.example: '0'
       Py37-Onnx160-Rt111-Skl0230:
         do.bench: '0'
         python.version: '3.7'
@@ -20,20 +38,31 @@ jobs:
         onnx.version: '==1.6.0'
         onnxrt.version: '==1.2.0'
         sklearn.version: '==0.23.0'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx160-Rt111-Skl022:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
+        onnxrt.version: '==1.2.0'
+        onnxcc.version: '==1.6.1'
+        sklearn.version: '==0.22.2'
+        run.example: '0'
+      Py37-Onnx160-Rt111-Skl0222:
+        do.bench: '0'
+        python.version: '3.7'
+        numpy.version: '==1.18.1'
+        onnx.version: '==1.6.0'
+        onnxcc.version: '==1.6.1'
         onnxrt.version: '==1.1.1'
-        sklearn.version: '==0.22.1'
-        run.example: '1'
+        sklearn.version: '==0.22.2'
+        run.example: '0'
       Py37-Onnx160-Rt100-Skl021:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
+        onnxcc.version: '==1.6.1'
         onnxrt.version: '==1.0.0'
         sklearn.version: '==0.21.3'
         run.example: '0'
@@ -42,6 +71,7 @@ jobs:
         python.version: '3.7'
         numpy.version: '==1.17.4'
         onnx.version: '==1.5.0'
+        onnxcc.version: '==1.6.1'
         onnxrt.version: '==0.5.0'
         sklearn.version: '==0.21.3'
         run.example: '0'
@@ -51,6 +81,7 @@ jobs:
         numpy.version: '==1.17.4'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.4.0'
+        onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
       Py36-Onnx141-Rt030-Skl020:
@@ -67,6 +98,7 @@ jobs:
         numpy.version: '==1.16.5'
         onnx.version: '==1.3.0'
         onnxrt.version: '==0.2.1'
+        onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
       Py35-Onnx150-Rt021-Skl019:
@@ -75,6 +107,7 @@ jobs:
         numpy.version: '<=1.16.5'
         onnx.version: '==1.5.0'
         onnxrt.version: '==0.2.1'
+        onnxcc.version: '==1.6.1'
         sklearn.version: '==0.19.2'
         run.example: '0'
     maxParallel: 3
@@ -121,7 +154,13 @@ jobs:
           python setup.py install
           cd ..
         else
-          pip install onnx$(onnx.version)
+          if [ '$(onnx.version)' == 'test' ]
+          then
+            pip install typing-extensions
+            pip install -i https://test.pypi.org/simple/ onnx
+          else
+            pip install onnx$(onnx.version)
+          fi
       fi
     displayName: 'install onnx'
 
@@ -134,13 +173,17 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
+      if [ '$(onnxcc.version)' == 'git' ]
+      then
+        pip install git+https://github.com/microsoft/onnxconverter-common
+      else
+        pip install onnxconverter-common$(onnxcc.version)
+      fi
+    displayName: 'install onnxconverter-common'
+
+  - script: |
       pip install -r requirements.txt
-      git clone https://github.com/microsoft/onnxconverter-common
-      cd onnxconverter-common
-      pip install -e .
-      cd ..
       pip install -r requirements-dev.txt
-      pip install pytest
     displayName: 'install requirements'
 
   - script: |
@@ -150,6 +193,8 @@ jobs:
   - script: |
       echo "---------------"
       pip show numpy
+      echo "---------------"
+      pip show pandas
       echo "---------------"
       pip show onnx
       echo "---------------"
@@ -202,6 +247,11 @@ jobs:
           python tests/benchmark.py
       fi
     displayName: 'benchmark'
+
+  - script: |
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+    displayName: 'run documentation examples'
+    condition: eq(variables['run.example'], '1')
 
   - task: PublishTestResults@2
     inputs:

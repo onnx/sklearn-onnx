@@ -11,6 +11,7 @@ from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,
     make_model, ValueInfoProto
 )
+from ..proto import get_latest_tested_opset_version
 from onnx import onnx_pb as onnx_proto
 from ..common._topology import Variable
 
@@ -171,7 +172,8 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     return onnx_model
 
 
-def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
+def infer_outputs(op_type, inputs, outputs=None, initializer=None,
+                  target_opset=None, **atts):
     """
     Infers outputs type and shapes given an ONNX operator.
     """
@@ -236,7 +238,14 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None, **atts):
         else:
             op_set = original_model.opset_import.add()
         op_set.domain = k
-        op_set.version = 10
+        if target_opset:
+            if isinstance(target_opset, dict):
+                op_set.version = target_opset.get(
+                    k, get_latest_tested_opset_version())
+            else:
+                op_set.version = target_opset
+        else:
+            op_set.version = get_latest_tested_opset_version()
 
     inferred_model = shape_inference.infer_shapes(original_model)
     shapes = Variable.from_pb(inferred_model.graph.value_info)

@@ -11,7 +11,7 @@ from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_mul, apply_reshape, apply_sub, apply_topk, apply_transpose
 )
-from ..common.data_types import FloatTensorType
+from ..common.data_types import FloatTensorType, DoubleTensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 from .._supported_operators import sklearn_operator_name_map
@@ -335,6 +335,8 @@ def _get_estimators_label(scope, operator, container, model):
     This function computes labels for each estimator and returns
     a tensor produced by concatenating the labels.
     """
+    var_type = (FloatTensorType if container.proto_dtype == np.float32
+                else DoubleTensorType)
     concatenated_labels_name = scope.get_unique_variable_name(
         'concatenated_labels')
 
@@ -342,7 +344,7 @@ def _get_estimators_label(scope, operator, container, model):
     estimators_results_list = []
     for i, estimator in enumerate(model.estimators_):
         estimator_label_name = scope.declare_local_variable(
-            'est_label_%d' % i, FloatTensorType([None, 1]))
+            'est_label_%d' % i, var_type([None, 1]))
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
@@ -531,7 +533,7 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     _apply_gather_elements(
         scope, container, [concatenated_labels, median_estimators_name],
         output_name, axis=1, dim=len(op.estimators_),
-        zero_type=onnx_proto.TensorProto.FLOAT, suffix="B")
+        zero_type=container.proto_dtype, suffix="B")
 
 
 register_converter('SklearnAdaBoostClassifier',

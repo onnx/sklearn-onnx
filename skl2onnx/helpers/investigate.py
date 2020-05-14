@@ -6,7 +6,6 @@
 import textwrap
 import warnings
 from types import MethodType
-import pandas
 import numpy
 from numpy.testing import assert_almost_equal
 from scipy.sparse.csr import csr_matrix
@@ -278,12 +277,18 @@ def compare_objects(o1, o2):
                     o = list(o[0])
                 else:
                     o = o[0]
-        if isinstance(o, (list, pandas.Series)):
+        # Following line avoid importing pandas and taking
+        # dependency on pandas.
+        if o.__class__.__name__ == "Series":
             c = list(o)
         elif isinstance(o, numpy.ndarray):
             c = o
         elif isinstance(o, csr_matrix):
             c = o.todense()
+        elif isinstance(o, list):
+            c = o.copy()
+        elif isinstance(o, tuple):
+            c = list(o)
         else:
             raise TypeError("Unexpected type {}.".format(type(o)))
         return c

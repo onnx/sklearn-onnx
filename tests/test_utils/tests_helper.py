@@ -273,10 +273,11 @@ def dump_data_and_model(
                     prediction = [model.predict(data), model.transform(data)]
                     lambda_original = lambda: model.transform(dataone)  # noqa
                 except ValueError as e:
-                    if 'Buffer dtype mismatch' in str(e):
-                        d64 = data.astype(numpy.float64)
-                        prediction = [model.predict(d64),
-                                      model.transform(d64)]
+                    if "Buffer dtype mismatch" in str(e):
+                        # scikit-learn does not cast anymore
+                        data64 = data.astype(numpy.float64)
+                        prediction = [model.predict(data64),
+                                      model.transform(data64)]
                         dataone64 = dataone.astype(numpy.float64)
                         lambda_original = lambda: model.transform(dataone64)  # noqa
                     else:

@@ -55,8 +55,9 @@ class TestSahpes(unittest.TestCase):
         shape1 = sess.get_inputs()[0].shape
         shape2 = sess.get_outputs()[0].shape
         assert shape1 == [None, 4]
-        assert shape2 == [None, 1]
-        assert pred_onx[0].shape[1] == shape2[1]
+        assert shape2 in ([None, 1], [1], [None])
+        if len(pred_onx[0].shape) > 1:
+            assert pred_onx[0].shape[1] == shape2[1]
 
         try:
             ishape = onnx.shape_inference.infer_shapes(onx)

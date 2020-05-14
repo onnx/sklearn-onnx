@@ -61,4 +61,19 @@ def make_tensor_fixed(name, data_type, dims, vals, raw=False):
 
 
 def get_opset_number_from_onnx():
+    """
+    Returns the latest opset version supported
+    by the *onnx* package.
+    """
     return onnx.defs.onnx_opset_version()
+
+
+def get_latest_tested_opset_version():
+    """
+    This module relies on *onnxruntime* to test every
+    converter. The function returns the most recent
+    target opset tested with *onnxruntime* or the opset
+    version specified by *onnx* package if this one is lower
+    (return by `onnx.defs.onnx_opset_version()`).
+    """
+    return min(11, get_opset_number_from_onnx())

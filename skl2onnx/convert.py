@@ -6,7 +6,7 @@
 
 from uuid import uuid4
 import numpy as np
-from .proto import get_opset_number_from_onnx
+from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
 
@@ -38,7 +38,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         and a type defined in `data_types.py`
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
+    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
+        if value is not specified, the function will choose the latest tested opset
+        (see :py:func:`skl2onnx.get_latest_tested_opset_version`)
     :param custom_conversion_functions: a dictionary for specifying the user customized conversion function,
         it takes precedence over registered converters
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
@@ -117,6 +119,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     It is used in example :ref:`l-example-tfidfvectorizer`.
+
+    .. versionchanged:: 1.7
+        Parameter `target_opset`, if not specified, is now set to
+        the latest tested opset returned by
+        :py:func:`skl2onnx.get_latest_tested_opset_version` and
+        not the version of the *onnx* package.
     """ # noqa
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
@@ -129,7 +137,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         name = str(uuid4().hex)
 
     target_opset = (target_opset
-                    if target_opset else get_opset_number_from_onnx())
+                    if target_opset else get_latest_tested_opset_version())
     # Parse scikit-learn model as our internal data structure
     # (i.e., Topology)
     topology = parse_sklearn_model(
@@ -182,13 +190,11 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     from .algebra.type_helper import guess_initial_types
 
     if isinstance(model, OnnxOperatorMixin):
-        if target_opset is not None:
-            raise NotImplementedError(
-                "target opset not yet implemented for OnnxOperatorMixin.")
         if options is not None:
             raise NotImplementedError(
                 "options not yet implemented for OnnxOperatorMixin.")
-        return model.to_onnx(X=X, name=name, dtype=dtype)
+        return model.to_onnx(X=X, name=name, dtype=dtype,
+                             target_opset=target_opset)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
