@@ -784,7 +784,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            dtype=np.float64)
+            dtype=np.float64, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
@@ -826,7 +826,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
-            dtype=np.float64)
+            dtype=np.float64, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
