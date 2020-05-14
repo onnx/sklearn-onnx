@@ -348,7 +348,9 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
     try:
         opred, t7 = _measure_time(fct_batch)
         obs_op['ort_run_time_batch'] = t7
-    except (RuntimeError, TypeError, ValueError, KeyError) as e:
+    except (RuntimeError, TypeError, ValueError, KeyError,
+            OrtErr_NotImplemented, OrtErr_Fail, OrtErr_InvalidGraph,
+            OrtErr_InvalidArgument) as e:
         if debug:
             raise
         obs_op['_6ort_run_batch_exc'] = e
