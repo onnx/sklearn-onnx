@@ -395,6 +395,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.2.0"),
+                     reason="fails to load the model")
     def test_ovr_raw_scores(self):
         X, y = make_classification(
             n_classes=2, n_samples=100, random_state=42,
