@@ -170,6 +170,7 @@ jobs:
     displayName: 'check numpy'
 
   - script: |
+      call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       cd tests
       python -c "import test_utils;print(test_utils.TARGET_OPSET, test_utils.TARGET_IR)"
@@ -178,11 +179,13 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
       call activate skl2onnxEnvironment
+      if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       pip install lightgbm xgboost
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'

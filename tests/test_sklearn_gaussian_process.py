@@ -760,14 +760,16 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         try:
             to_onnx(
                 gp, initial_types=[('X', FloatTensorType([None, None]))],
-                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}},
+                target_opset=TARGET_OPSET)
             raise AssertionError("CDIST is not implemented")
         except ValueError:
             pass
 
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType([None, None]))],
-            options={GaussianProcessRegressor: {'optim': 'cdist'}})
+            options={GaussianProcessRegressor: {'optim': 'cdist'}},
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         name_save = inspect.currentframe().f_code.co_name + '.onnx'
         with open(name_save, 'wb') as f:
@@ -800,14 +802,16 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         try:
             to_onnx(
                 gp, initial_types=[('X', FloatTensorType([None, None]))],
-                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}},
+                target_opset=TARGET_OPSET)
             raise AssertionError("CDIST is not implemented")
         except ValueError:
             pass
 
         model_onnx = to_onnx(
             gp, initial_types=[('X', FloatTensorType([None, None]))],
-            options={GaussianProcessRegressor: {'optim': 'cdist'}})
+            options={GaussianProcessRegressor: {'optim': 'cdist'}},
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         name_save = inspect.currentframe().f_code.co_name + '.onnx'
         with open(name_save, 'wb') as f:
