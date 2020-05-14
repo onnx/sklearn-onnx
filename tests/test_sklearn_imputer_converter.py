@@ -13,10 +13,10 @@ try:
 except ImportError:
     # changed in 0.20
     SimpleImputer = None
-from onnx.defs import onnx_opset_version
+
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnImputerConverter(unittest.TestCase):
@@ -87,8 +87,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
             model,
             "scikit-learn simple imputer",
             [("input", FloatTensorType([None, 2]))],
-            target_opset=min(11, onnx_opset_version())
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx.graph.node is not None)
 
         # should contain only node
@@ -97,14 +96,12 @@ class TestSklearnImputerConverter(unittest.TestCase):
         # last node should contain the Imputer
         outputs = model_onnx.graph.output
         self.assertEqual(len(outputs), 1)
-        self.assertEqual(outputs[0].type.tensor_type.shape.dim[-1].dim_value,
-                         2)
+        self.assertEqual(
+            outputs[0].type.tensor_type.shape.dim[-1].dim_value, 2)
         dump_data_and_model(
             np.array(data, dtype=np.float32),
-            model,
-            model_onnx,
-            basename="SklearnSimpleImputerMeanFloat32",
-        )
+            model, model_onnx,
+            basename="SklearnSimpleImputerMeanFloat32")
 
 
 if __name__ == "__main__":

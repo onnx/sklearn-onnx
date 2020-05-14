@@ -28,6 +28,7 @@ from skl2onnx.algebra.complex_functions import (
     onnx_squareform_pdist, onnx_cdist
 )
 from skl2onnx.proto import get_latest_tested_opset_version
+from test_utils import TARGET_OPSET, TARGET_IR
 
 
 THRESHOLD = "0.4.0"
@@ -89,8 +90,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         model_def = helper.make_model(graph_def, producer_name='onnx-example')
         op_set = model_def.opset_import.add()
         op_set.domain = ''
-        op_set.version = 11
-        model_def.ir_version = 6
+        op_set.version = TARGET_OPSET
+        model_def.ir_version = TARGET_IR
 
         # By default, if not specified, the opset version for the
         # main domain which may be higher than the onnx version embedded

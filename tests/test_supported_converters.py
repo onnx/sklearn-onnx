@@ -3,14 +3,13 @@ Tests scikit-learn's binarizer converter.
 """
 
 import unittest
-from onnx.defs import onnx_opset_version
 from sklearn.ensemble import GradientBoostingRegressor
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import (
     supported_converters, get_latest_tested_opset_version,
     convert_sklearn
 )
-from test_utils import fit_regression_model
+from test_utils import fit_regression_model, TARGET_IR, TARGET_OPSET
 
 
 class TestSupportedConverters(unittest.TestCase):
@@ -25,8 +24,7 @@ class TestSupportedConverters(unittest.TestCase):
         assert len(names) > 35
 
     def test_version(self):
-        assert get_latest_tested_opset_version() == min(
-            11, onnx_opset_version())
+        assert get_latest_tested_opset_version() == TARGET_OPSET
 
     def test_ir_version(self):
         model, X = fit_regression_model(
@@ -35,8 +33,9 @@ class TestSupportedConverters(unittest.TestCase):
             model,
             "gradient boosting regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
-        assert "ir_version: 6" in str(model_onnx)
+        assert ("ir_version: %d" % TARGET_IR) in str(model_onnx)
 
 
 if __name__ == "__main__":
