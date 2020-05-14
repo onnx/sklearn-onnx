@@ -98,7 +98,7 @@ jobs:
         numpy.version: '==1.16.5'
         onnx.version: '==1.4.1'
         onnx.target_opset: ''
-        onnxrt.version: '==0.3.0'
+        onnxrt.version: 'onnxruntime==0.3.0'
         sklearn.version: '==0.20.3'
         run.example: '0'
       Py36-Onnx130-Rt021-Skl020:

@@ -48,7 +48,7 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
 
 class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
-    def test_way1_convert_sklean(self):
+    def test_way1_convert_sklearn(self):
 
         X = np.arange(20).reshape(10, 2)
         tr = KMeans(n_clusters=2)
@@ -114,7 +114,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             X.astype(np.float32), tr, onx,
             basename="MixinWay4OnnxMixin2")
 
-    def test_pipe_way1_convert_sklean(self):
+    def test_pipe_way1_convert_sklearn(self):
 
         X = np.arange(20).reshape(10, 2)
         tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
@@ -125,7 +125,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             target_opset=TARGET_OPSET)
 
         dump_data_and_model(
-            X.astype(np.float32), tr, onx,
+            X.astype(np.float32), tr, onx, verbose=True,
             basename="MixinPipeWay1ConvertSklearn")
 
     def test_pipe_way2_to_onnx(self):
