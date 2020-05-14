@@ -64,6 +64,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             if "version: 11" not in sonx or "ir_version: 6" not in sonx:
                 raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
                     TARGET_OPSET, sonx))
+        raise AssertionError("..........#####\n{}".format(str(onx)))
         dump_data_and_model(
             X.astype(np.float32), tr, onx,
             basename="MixinWay1ConvertSklearn")
