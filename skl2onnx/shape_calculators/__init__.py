@@ -7,12 +7,15 @@
 # To register shape calculators for scikit-learn operators,
 # import associated modules here.
 from . import array_feature_extractor
+from . import cast
 from . import concat
+from . import cross_decomposition
 from . import dict_vectorizer
 from . import flatten
 from . import function_transformer
 from . import gaussian_process
 from . import grid_search_cv
+from . import identity
 from . import imputer
 from . import k_bins_discretiser
 from . import k_means
@@ -26,9 +29,11 @@ from . import one_hot_encoder
 from . import ordinal_encoder
 from . import one_vs_rest_classifier
 from . import polynomial_features
+from . import power_transformer
+from . import random_projection
 from . import scaler
 from . import svd
-from . import svm
+from . import support_vector_machines
 from . import text_vectorizer
 from . import tfidf_transformer
 from . import voting_classifier
@@ -37,12 +42,15 @@ from . import zip_map
 
 __all__ = [
     array_feature_extractor,
+    cast,
     concat,
+    cross_decomposition,
     dict_vectorizer,
     flatten,
     function_transformer,
     gaussian_process,
     grid_search_cv,
+    identity,
     imputer,
     k_bins_discretiser,
     k_means,
@@ -56,9 +64,11 @@ __all__ = [
     ordinal_encoder,
     one_vs_rest_classifier,
     polynomial_features,
+    power_transformer,
+    random_projection,
     scaler,
     svd,
-    svm,
+    support_vector_machines,
     text_vectorizer,
     tfidf_transformer,
     voting_classifier,

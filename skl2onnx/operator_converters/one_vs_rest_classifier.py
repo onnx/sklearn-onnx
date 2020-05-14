@@ -5,7 +5,11 @@
 # --------------------------------------------------------------------------
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_concat
+from ..common._apply_operation import (
+    apply_concat,
+    apply_identity,
+    apply_mul,
+)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
@@ -18,7 +22,13 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     """
     Converts a *OneVsRestClassifier* into *ONNX* format.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
     probs_names = []
     for i, estimator in enumerate(op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
@@ -32,11 +42,13 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                                                       FloatTensorType())
             this_operator.outputs.append(score_name)
 
-            if len(estimator.coef_.shape) == 2:
+            if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
                 raise RuntimeError("OneVsRestClassifier accepts "
                                    "regressor with only one target.")
             p1 = score_name.raw_name
         else:
+            container.add_options(
+                id(estimator), {'raw_scores': use_raw_scores})
             label_name = scope.declare_local_variable('label_%d' % i)
             prob_name = scope.declare_local_variable('proba_%d' % i,
                                                      FloatTensorType())
@@ -80,10 +92,35 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         # concatenates outputs
         conc_name = scope.get_unique_variable_name('concatenated')
         apply_concat(scope, probs_names, conc_name, container, axis=1)
+        if len(op.estimators_) == 1:
+            zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
+            merged_prob_name = scope.get_unique_variable_name('merged_prob')
+            unit_float_tensor_name = scope.get_unique_variable_name(
+                'unit_float_tensor')
+            if use_raw_scores:
+                container.add_initializer(
+                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
+                    [], [-1.0])
+                apply_mul(scope, [unit_float_tensor_name, conc_name],
+                          zeroth_col_name, container, broadcast=1)
+            else:
+                container.add_initializer(
+                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
+                    [], [1.0])
+                apply_sub(scope, [unit_float_tensor_name, conc_name],
+                          zeroth_col_name, container, broadcast=1)
+            apply_concat(scope, [zeroth_col_name, conc_name],
+                         merged_prob_name, container, axis=1)
+            conc_name = merged_prob_name
 
-        # normalizes the outputs
-        apply_normalization(scope, conc_name, operator.outputs[1].full_name,
-                            container, axis=1, p=1)
+        if use_raw_scores:
+            apply_identity(scope, conc_name,
+                           operator.outputs[1].full_name, container)
+        else:
+            # normalizes the outputs
+            apply_normalization(
+                scope, conc_name, operator.outputs[1].full_name,
+                container, axis=1, p=1)
 
         # extracts the labels
         label_name = scope.get_unique_variable_name('label_name')
@@ -97,4 +134,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
 
 
 register_converter('SklearnOneVsRestClassifier',
-                   convert_one_vs_rest_classifier)
+                   convert_one_vs_rest_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})

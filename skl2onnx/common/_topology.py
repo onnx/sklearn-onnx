@@ -17,7 +17,10 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
 )
-from ..proto import get_opset_number_from_onnx
+from ..proto import (
+    get_opset_number_from_onnx,
+    get_latest_tested_opset_version
+)
 from ..proto.onnx_helper_modified import (
     make_graph, make_model, make_tensor_value_info
 )
@@ -27,6 +30,17 @@ from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
 type_fct = type
+
+
+try:
+    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
+except ImportError:
+    OPSET_TO_IR_VERSION = {
+        1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
+        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+    }
+
+OPSET_ML_TO_OPSET = {1: 11, 2: 11}
 
 
 class Variable:
@@ -133,7 +147,7 @@ class Operator(OperatorBase):
     """
 
     def __init__(self, onnx_name, scope, type, raw_operator,
-                 target_opset, dtype):
+                 target_opset, dtype, scope_inst):
         """
         :param onnx_name: A unique ID, which is a string
         :param scope: The name of the scope where this operator is
@@ -147,6 +161,7 @@ class Operator(OperatorBase):
                              a CoreML Normalizer.
         :param dtype: preferred output type
         :param target_opset: The target opset number for the converted model.
+        :param scope_inst: :class:`Scope` instance the operator belongs to
         """
         if isinstance(raw_operator, str):
             raise RuntimeError("Parameter raw_operator must be an object not "
@@ -162,6 +177,7 @@ class Operator(OperatorBase):
         self.is_abandoned = False
         self.target_opset = target_opset
         self.dtype = dtype
+        self.scope_inst = scope_inst
 
     @property
     def full_name(self):
@@ -209,21 +225,18 @@ class Operator(OperatorBase):
     def tensor_type(self):
         if self.dtype == np.float32:
             return FloatTensorType
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return FloatTensorType
-        else:
-            raise NotImplementedError(
-                "Unable to guess the tensor type from {}.".format(self.dtype))
+        raise NotImplementedError(
+            "Unable to guess the tensor type from [{}].".format(self.dtype))
 
     @property
     def proto_type(self):
         if self.dtype == np.float32:
             return onnx_proto.TensorProto.FLOAT
-        elif self.dtype == np.float64:
+        if self.dtype == np.float64:
             return onnx_proto.TensorProto.DOUBLE
-        else:
-            raise ValueError("dtype should be either np.float32 or "
-                             "np.float64.")
+        raise ValueError("dtype should be either np.float32 or np.float64.")
 
 
 class Scope:
@@ -236,7 +249,7 @@ class Scope:
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 dtype=np.float32):
+                 dtype=np.float32, registered_models=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -256,6 +269,7 @@ class Scope:
         :param dtype: select the computation for real type,
             by default it is float but double is sometime needed
         :param options: see :ref:`l-conv-options`
+        :param registered_models: registered models
         """
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
@@ -294,6 +308,9 @@ class Scope:
 
         # Additional options given to converters.
         self.options = options
+
+        # Registered models
+        self.registered_models = registered_models
 
     def get_shape_calculator(self, model_type):
         """
@@ -349,7 +366,8 @@ class Scope:
         """
         onnx_name = self.get_unique_operator_name(str(type))
         operator = Operator(onnx_name, self.name, type, raw_model,
-                            self.target_opset, self.dtype)
+                            self.target_opset, self.dtype,
+                            scope_inst=self)
         self.operators[onnx_name] = operator
         return operator
 
@@ -375,6 +393,16 @@ class Scope:
         self.variable_name_mapping[raw_name].remove(onnx_name)
         del self.variables[onnx_name]
 
+    def _get_allowed_options(self, model):
+        if self.registered_models is not None:
+            alias = self.registered_models['aliases'][type(model)]
+            conv = self.registered_models['conv'][alias]
+            allowed = conv.get_allowed_options()
+            return allowed
+        raise NotImplementedError(
+            "No registered models, no known allowed options "
+            "for model '{}'.".format(model.__class__.__name__))
+
     def get_options(self, model, default_values=None):
         """
         Returns additional options for a model.
@@ -384,7 +412,9 @@ class Scope:
                                the function)
         :return: dictionary
         """
-        return _build_options(model, self.options, default_values)
+        return _build_options(
+            model, self.options, default_values,
+            self._get_allowed_options(model))
 
 
 class Topology:
@@ -400,7 +430,7 @@ class Topology:
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None,
                  target_opset=None, custom_conversion_functions=None,
-                 custom_shape_calculators=None, metadata_props=None):
+                 custom_shape_calculators=None, registered_models=None):
         """
         Initializes a *Topology* object, which is an intermediate
         representation of a computational graph.
@@ -424,6 +454,7 @@ class Topology:
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying the
                                         user customized shape calculator
+        :param registered_models: registered models
         """
         self.scopes = []
         self.raw_model = model
@@ -435,7 +466,6 @@ class Topology:
                     reserved_operator_names
                     if reserved_operator_names is not None else set())
         self.initial_types = initial_types if initial_types else list()
-        self.metadata_props = metadata_props if metadata_props else dict()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
         self.custom_conversion_functions = (
@@ -469,6 +499,11 @@ class Topology:
         for mtype in all_model_types:
             alias = "{}_{}".format(mtype.__name__, id(self))
             self.model_aliases[mtype] = alias
+
+        # Registered models
+        if registered_models is None:
+            raise AssertionError()
+        self.registered_models = registered_models
 
     @staticmethod
     def _generate_unique_name(seed, existing_names):
@@ -515,7 +550,8 @@ class Topology:
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options, dtype=dtype)
+            options=options, dtype=dtype,
+            registered_models=self.registered_models)
         self.scopes.append(scope)
         return scope
 
@@ -557,15 +593,52 @@ class Topology:
                         # an output somewhere
                         if variable.is_fed:
                             raise RuntimeError(
-                                'One variable can only be '
-                                'assigned once: {}.'.format(variable))
+                                "A variable is already assigned ({}) "
+                                "for operator '{}' (name='{}'). This "
+                                "may still happen if a converter is a "
+                                "combination of sub-operators and one of "
+                                "of them is producing this output. "
+                                "In that case, an identity node must be "
+                                "added.".format(
+                                    variable, operator.type,
+                                    operator.onnx_name))
                         # Mark this variable as filled
                         variable.is_fed = True
                     # Make this operator as handled
                     operator.is_evaluated = True
                     is_evaluation_happened = True
+
                     # Send out an operator
                     yield operator
+
+                    # This step may create new nodes if the
+                    # the converter is called while looping on
+                    # the nodes. The outputs of an operator
+                    # are not necessary the inputs of the next
+                    # one and but can processed by other ONNX nodes
+                    # inserted in the container. As a result, some
+                    # variables never have is_fed set to True which
+                    # is updated now unless they are an operator
+                    # output.
+                    known_outputs = {}
+                    for op in self.unordered_operator_iterator():
+                        for out in op.outputs:
+                            if hasattr(out, 'onnx_name'):
+                                known_outputs[out.onnx_name] = out
+                            else:
+                                known_outputs[out] = out
+                    for variable in self.unordered_variable_iterator():
+                        if variable.is_fed:
+                            continue
+                        if variable.onnx_name in known_outputs:
+                            continue
+                        update = (False if self.root_names and
+                                  variable.onnx_name not in self.root_names
+                                  else True)
+                        if update:
+                            variable.is_fed = True
+                            is_evaluation_happened = True
+
             # After scanning through the whole computational graph, at
             # least one operator should be evaluated. If not, we need
             # to terminate this procedure to avoid dead lock.
@@ -842,8 +915,10 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                        returned model. The string "model_name" would be
                        assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for
-                         ONNX 1.3.
+    :param target_opset: number or dictionary,
+        for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
+        a dictionary is used to indicate different opset for
+        different domains
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
     :param options: see :ref:`l-conv-options`
@@ -854,19 +929,35 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         raise ValueError("dtype must be specified.")
 
     if target_opset is None:
-        target_opset = get_opset_number_from_onnx()
-    elif target_opset > get_opset_number_from_onnx():
+        target_opset = get_latest_tested_opset_version()
+    if isinstance(target_opset, dict):
+        onnx_target_opset = target_opset.get(
+            '', get_latest_tested_opset_version())
+    else:
+        onnx_target_opset = target_opset
+    if onnx_target_opset > get_opset_number_from_onnx():
         found = get_opset_number_from_onnx()
         raise RuntimeError(
             "Parameter target_opset {} > {} is higher than the "
-            "number of the installed onnx package. See "
-            "https://github.com/onnx/onnx/blob/master/docs/Versioning.md#released-versions" # noqa
-            ".".format(target_opset, found))
+            "version of the installed onnx package. See "
+            "https://github.com/onnx/onnx/blob/master/docs/"
+            "Versioning.md#released-versions"
+            ".".format(onnx_target_opset, found))
+    if onnx_target_opset > get_latest_tested_opset_version():
+        warnings.warn(
+            "Parameter target_opset {} > {} is higher than the "
+            "the latest tested version"
+            ".".format(
+                onnx_target_opset,
+                get_latest_tested_opset_version()))
 
     topology._initialize_graph_status_for_traversing()
 
     container = ModelComponentContainer(
-        target_opset, options=options, dtype=dtype)
+        target_opset, options=options, dtype=dtype,
+        registered_models=topology.registered_models,
+        white_op=topology.raw_model._white_op,
+        black_op=topology.raw_model._black_op)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.
@@ -963,7 +1054,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         conv(scope, operator, container)
 
     # Create a graph from its main components
-    if container.target_opset < 9:
+    if container.target_opset_onnx < 9:
         # When calling ModelComponentContainer's add_initializer(...),
         # nothing is added into the input list. However, for ONNX target
         # opset < 9, initializers should also be a part of model's
@@ -1006,6 +1097,23 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Create model
     onnx_model = make_model(graph)
 
+    # Update domain version
+    _update_domain_version(container, onnx_model)
+
+    # Add extra information
+    opv = _get_main_opset_version(onnx_model) or onnx_target_opset
+    irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+    onnx_model.ir_version = irv
+    onnx_model.producer_name = utils.get_producer()
+    onnx_model.producer_version = utils.get_producer_version()
+    onnx_model.domain = utils.get_domain()
+    onnx_model.model_version = utils.get_model_version()
+    onnx_model.doc_string = doc_string
+
+    return onnx_model
+
+
+def _update_domain_version(container, onnx_model):
     # Merge operator sets for the same domain, the largest version
     # number would be kept
     purified_operator_set = dict()
@@ -1019,6 +1127,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # Fill operator sets
     i = 0
     for op_domain, op_version in purified_operator_set.items():
+        if op_version is None:
+            continue
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
             # make_model(...)
@@ -1029,17 +1139,25 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         op_set.domain = op_domain
         op_set.version = op_version
         i += 1
-        if container.target_opset < op_version:
-            raise RuntimeError(('The specified opset %d is too low to convert '
-                                'this model, which requires at least opset '
-                                '%d.') % (container.target_opset, op_version))
+        if container.target_opset_any_domain(op_domain) < op_version:
+            raise RuntimeError(
+                'The specified opset %d is too low to convert '
+                'this model, which requires at least opset '
+                '%d.' % (
+                    container.target_opset_any_domain(op_domain),
+                    op_version))
 
-    # Add extra information
-    onnx_model.ir_version = onnx_proto.IR_VERSION
-    onnx_model.producer_name = utils.get_producer()
-    onnx_model.producer_version = utils.get_producer_version()
-    onnx_model.domain = utils.get_domain()
-    onnx_model.model_version = utils.get_model_version()
-    onnx_model.doc_string = doc_string
 
-    return onnx_model
+def _get_main_opset_version(model):
+    """
+    Returns the main opset version.
+    """
+    mld = None
+    for op in model.opset_import:
+        if op.domain == '':
+            return op.version
+        if op.domain == "ai.onnx.ml":
+            mld = op.version
+    if mld is not None:
+        return OPSET_ML_TO_OPSET.get(mld, None)
+    return None

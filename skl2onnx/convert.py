@@ -6,7 +6,7 @@
 
 from uuid import uuid4
 import numpy as np
-from .proto import get_opset_number_from_onnx
+from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
 
@@ -19,7 +19,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    dtype=np.float32, intermediate=False):
+                    dtype=np.float32, intermediate=False,
+                    white_op=None, black_op=None, final_types=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -34,10 +35,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     :param model: A scikit-learn model
     :param initial_types: a python list. Each element is a tuple of a variable name
-        and a type defined in data_types.py
+        and a type defined in `data_types.py`
     :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3.
+    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
+        if value is not specified, the function will choose the latest tested opset
+        (see :py:func:`skl2onnx.get_latest_tested_opset_version`)
     :param custom_conversion_functions: a dictionary for specifying the user customized conversion function,
         it takes precedence over registered converters
     :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
@@ -50,6 +53,13 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         `np.float32` or `np.float64`
     :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
         it returns the converted model otherwise
+    :param white_op: white list of ONNX nodes allowed while converting a pipeline,
+        if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed while converting a pipeline,
+        if empty, none are blacklisted
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -109,6 +119,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                                      options=extra)
 
     It is used in example :ref:`l-example-tfidfvectorizer`.
+
+    .. versionchanged:: 1.7
+        Parameter `target_opset`, if not specified, is now set to
+        the latest tested opset returned by
+        :py:func:`skl2onnx.get_latest_tested_opset_version` and
+        not the version of the *onnx* package.
     """ # noqa
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
@@ -121,14 +137,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         name = str(uuid4().hex)
 
     target_opset = (target_opset
-                    if target_opset else get_opset_number_from_onnx())
+                    if target_opset else get_latest_tested_opset_version())
     # Parse scikit-learn model as our internal data structure
     # (i.e., Topology)
-    topology = parse_sklearn_model(model, initial_types, target_opset,
-                                   custom_conversion_functions,
-                                   custom_shape_calculators,
-                                   custom_parsers, options=options,
-                                   dtype=dtype)
+    topology = parse_sklearn_model(
+        model, initial_types, target_opset, custom_conversion_functions,
+        custom_shape_calculators, custom_parsers, options=options,
+        dtype=dtype, white_op=white_op, black_op=black_op,
+        final_types=final_types)
 
     # Infer variable shapes
     topology.compile()
@@ -141,7 +157,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
 
 def to_onnx(model, X=None, name=None, initial_types=None,
-            target_opset=None, options=None, dtype=np.float32):
+            target_opset=None, options=None, dtype=np.float32,
+            white_op=None, black_op=None, final_types=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -158,6 +175,13 @@ def to_onnx(model, X=None, name=None, initial_types=None,
         and 8 for ONNX 1.3.
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline, if empty, all are allowed
+    :param black_op: black list of ONNX nodes allowed
+        while converting a pipeline, if empty, none are blacklisted
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
     :return: converted model
 
     This function checks if the model inherits from class
@@ -168,13 +192,11 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     from .algebra.type_helper import guess_initial_types
 
     if isinstance(model, OnnxOperatorMixin):
-        if target_opset is not None:
-            raise NotImplementedError(
-                "target opset not yet implemented for OnnxOperatorMixin.")
         if options is not None:
             raise NotImplementedError(
                 "options not yet implemented for OnnxOperatorMixin.")
-        return model.to_onnx(X=X, name=name, dtype=dtype)
+        return model.to_onnx(X=X, name=name, dtype=dtype,
+                             target_opset=target_opset)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
@@ -183,10 +205,12 @@ def to_onnx(model, X=None, name=None, initial_types=None,
             "dtype should be real not {}".format(dtype))
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
-                           name=name, options=options, dtype=dtype)
+                           name=name, options=options, dtype=dtype,
+                           white_op=white_op, black_op=black_op,
+                           final_types=final_types)
 
 
-def wrap_as_onnx_mixin(model):
+def wrap_as_onnx_mixin(model, target_opset=None):
     """
     Combines a *scikit-learn* class with :class:`OnnxOperatorMixin`
     which produces a new object which combines *scikit-learn* API
@@ -199,4 +223,5 @@ def wrap_as_onnx_mixin(model):
     state = model.__getstate__()
     obj = object.__new__(cl)
     obj.__setstate__(state)
+    obj.op_version = target_opset
     return obj

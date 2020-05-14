@@ -15,6 +15,11 @@ from onnx import onnx_pb as onnx_proto # noqa
 # (string tensor get assigned twice)
 from onnx import mapping
 from onnx.onnx_pb import TensorProto, ValueInfoProto # noqa
+try:
+    from onnx.onnx_pb import SparseTensorProto # noqa
+except ImportError:
+    # onnx is too old.
+    pass
 from onnx.helper import split_complex_to_pairs
 
 
@@ -56,4 +61,19 @@ def make_tensor_fixed(name, data_type, dims, vals, raw=False):
 
 
 def get_opset_number_from_onnx():
+    """
+    Returns the latest opset version supported
+    by the *onnx* package.
+    """
     return onnx.defs.onnx_opset_version()
+
+
+def get_latest_tested_opset_version():
+    """
+    This module relies on *onnxruntime* to test every
+    converter. The function returns the most recent
+    target opset tested with *onnxruntime* or the opset
+    version specified by *onnx* package if this one is lower
+    (return by `onnx.defs.onnx_opset_version()`).
+    """
+    return min(11, get_opset_number_from_onnx())

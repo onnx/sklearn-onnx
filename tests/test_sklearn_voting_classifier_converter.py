@@ -15,6 +15,7 @@ from test_utils import (
     dump_multiple_classification,
     dump_binary_classification,
     dump_data_and_model,
+    TARGET_OPSET
 )
 
 
@@ -93,6 +94,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -116,6 +118,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -135,6 +138,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             comparable_outputs=[0, 1],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -154,6 +158,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="WeightedSoft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -176,6 +181,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -199,6 +205,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             comparable_outputs=[0],
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.5.0')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -217,6 +224,26 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_voting_soft_multi_string(self):
+        model = VotingClassifier(
+            voting="soft",
+            flatten_transform=False,
+            estimators=[
+                ("lr", LogisticRegression()),
+                ("lr2", LogisticRegression()),
+            ],
+        )
+        dump_multiple_classification(
+            model, label_string=True,
+            suffix="Soft",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -236,6 +263,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="WeightedSoft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -257,6 +285,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="Weighted4Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -278,6 +307,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             suffix="Weighted42Soft",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
+            target_opset=TARGET_OPSET
         )
 
 

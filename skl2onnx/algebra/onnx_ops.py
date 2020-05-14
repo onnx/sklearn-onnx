@@ -16,6 +16,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
     def __init__(self, *args, **kwargs):
 
         op_version = kwargs.pop('op_version', None)
+        if isinstance(op_version, dict):
+            op_version = op_version.get(domain, None)
 
         if op_version is None:
             if len(args) == 0 and input_range[0] == input_range[1]:
@@ -29,9 +31,25 @@ def ClassFactory(class_name, op_name, inputs, outputs,
         attr_names = self.attr_names
         if '_' in self.__class__.__name__:
             op_version_class = int(self.__class__.__name__.split('_')[-1])
-            op_version = min(op_version, op_version_class)
+            if op_version is None:
+                op_version = op_version_class
+            try:
+                op_version = min(op_version, op_version_class)
+            except TypeError:
+                raise TypeError(
+                    "Could not compare versions {} ? {} for "
+                    "class '{}' since_version {}. Parameter 'op_version' "
+                    "is probably missing when the class "
+                    "is instantiated.".format(
+                        op_version, op_version_class, class_name,
+                        since_version))
         else:
             op_version_class = None
+
+        # By default, the op_version is None.
+        # None means the latest available.
+        if op_version is None:
+            op_version = since_version
 
         found = None
         if op_version is not None:
@@ -49,7 +67,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                 "op_version={} does not refer to the same opset as the class "
                 "name ('{}').".format(op_version, self.__class__.__name__))
         for key in kwargs:
-            if key in {'output_names', 'op_version', 'domain'}:
+            if key in {'output_names', 'op_version', 'domain', 'ir_version'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s'"

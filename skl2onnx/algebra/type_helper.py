@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
+from scipy.sparse import coo_matrix
 from ..proto import TensorProto, ValueInfoProto
 from ..common._topology import Variable
 from ..common.data_types import (
@@ -23,39 +24,46 @@ def _guess_type(given_type):
     """
     Returns the proper type of an input.
     """
-    if isinstance(given_type, np.ndarray):
+    def _guess_dim(value):
+        if value == 0:
+            return None
+        return value
+
+    if isinstance(given_type, (np.ndarray, coo_matrix)):
         shape = list(given_type.shape)
         shape[0] = None
         return _guess_numpy_type(given_type.dtype, shape)
-    elif isinstance(given_type, (FloatTensorType, Int64TensorType,
-                                 Int32TensorType, StringTensorType,
-                                 BooleanTensorType, DoubleTensorType)):
+    if isinstance(given_type, (FloatTensorType, Int64TensorType,
+                               Int32TensorType, StringTensorType,
+                               BooleanTensorType, DoubleTensorType)):
         return given_type
-    elif isinstance(given_type, Variable):
+    if isinstance(given_type, Variable):
         return given_type.type
-    elif isinstance(given_type, DataType):
+    if isinstance(given_type, DataType):
         return given_type
-    elif isinstance(given_type, TensorProto):
+    if isinstance(given_type, TensorProto):
         return _guess_type_proto(given_type.data_type,
                                  given_type.dims)
-    elif isinstance(given_type, ValueInfoProto):
+    if isinstance(given_type, ValueInfoProto):
         ttype = given_type.type.tensor_type
-        dims = [ttype.shape.dim[i].dim_value
+        dims = [_guess_dim(ttype.shape.dim[i].dim_value)
                 for i in range(len(ttype.shape.dim))]
         return _guess_type_proto(ttype.elem_type, dims)
-    elif isinstance(given_type, np.int64):
+    if isinstance(given_type, np.int64):
         return Int64Type()
-    else:
-        raise NotImplementedError(
-            "Unsupported type '{}'. You may raise an issue "
-            "at https://github.com/onnx/sklearn-onnx/issues."
-            "".format(type(given_type)))
+    if given_type.__class__.__name__.endswith("Categorical"):
+        # pandas Categorical without important pandas
+        return Int64TensorType()
+    raise NotImplementedError(
+        "Unsupported type '{}'. You may raise an issue "
+        "at https://github.com/onnx/sklearn-onnx/issues."
+        "".format(type(given_type)))
 
 
 def guess_initial_types(X, initial_types):
     if X is None and initial_types is None:
         raise NotImplementedError("Initial types must be specified.")
-    elif initial_types is None:
+    if initial_types is None:
         if isinstance(X, np.ndarray):
             X = X[:1]
         gt = _guess_type(X)

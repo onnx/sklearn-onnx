@@ -5,12 +5,19 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
+from sklearn.mixture import BayesianGaussianMixture
+try:
+    from sklearn.mixture._gaussian_mixture import _compute_log_det_cholesky
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
-    OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat
+    OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
+    OnnxReduceSum, OnnxLog, OnnxReduceMax, OnnxEqual, OnnxCast
 )
+from ..proto import onnx_proto
 
 
 def convert_sklearn_gaussian_mixture(scope, operator, container):
@@ -27,6 +34,15 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     n_features = X.type.shape[1]
     n_components = op.means_.shape[0]
     opv = container.target_opset
+    options = container.get_options(op, dict(score_samples=None))
+    add_score = options.get('score_samples', False)
+    combined_reducesum = not container.is_allowed(
+        {'ReduceLogSumExp', 'ReduceSumSquare'})
+    if add_score and len(out) != 3:
+        raise RuntimeError("3 outputs are expected.")
+    if isinstance(op, BayesianGaussianMixture):
+        raise NotImplementedError(
+            "Converter for BayesianGaussianMixture is not implemented.")
 
     # All comments come from scikit-learn code and tells
     # which functions is being onnxified.
@@ -52,8 +68,14 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         for c in range(n_components):
             prec_chol = op.precisions_cholesky_[c, :, :]
             cst = - np.dot(op.means_[c, :], prec_chol)
-            y = OnnxGemm(X, prec_chol, cst, alpha=1., beta=1., op_version=opv)
-            y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
+            y = OnnxGemm(X, prec_chol.astype(container.dtype),
+                         cst.astype(container.dtype), alpha=1.,
+                         beta=1., op_version=opv)
+            if combined_reducesum:
+                y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
+                                    axes=[1], op_version=opv)
+            else:
+                y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
         log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
@@ -71,9 +93,14 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         ys = []
         for f in range(n_components):
             cst = - np.dot(op.means_[f, :], precisions_chol)
-            y = OnnxGemm(X, precisions_chol, cst,
+            y = OnnxGemm(X, precisions_chol.astype(container.dtype),
+                         cst.astype(container.dtype),
                          alpha=1., beta=1., op_version=opv)
-            y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
+            if combined_reducesum:
+                y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
+                                    axes=[1], op_version=opv)
+            else:
+                y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
         log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
@@ -90,8 +117,10 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         precisions = op.precisions_cholesky_ ** 2
         mp = np.sum((op.means_ ** 2 * precisions), 1)
         zeros = np.zeros((n_components, ))
-        xmp = OnnxGemm(X, (op.means_ * precisions).T, zeros,
-                       alpha=-2., beta=0., op_version=opv)
+        xmp = OnnxGemm(
+            X, (op.means_ * precisions).T.astype(container.dtype),
+            zeros.astype(container.dtype),
+            alpha=-2., beta=0., op_version=opv)
         term = OnnxGemm(OnnxMul(X, X, op_version=opv),
                         precisions.T, zeros, alpha=1., beta=0.,
                         op_version=opv)
@@ -109,17 +138,24 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
         zeros = np.zeros((n_components, ))
         precisions = op.precisions_cholesky_ ** 2
-        normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
-        outer = OnnxGemm(normX, precisions[np.newaxis, :], zeros,
-                         alpha=1., beta=1., op_version=opv)
-        xmp = OnnxGemm(X, (op.means_.T * precisions), zeros,
-                       alpha=-2., beta=0., op_version=opv)
+        if combined_reducesum:
+            normX = OnnxReduceSum(OnnxMul(X, X, op_version=opv),
+                                  axes=[1], op_version=opv)
+        else:
+            normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
+        outer = OnnxGemm(
+            normX, precisions[np.newaxis, :].astype(container.dtype),
+            zeros.astype(container.dtype), alpha=1., beta=1., op_version=opv)
+        xmp = OnnxGemm(
+            X, (op.means_.T * precisions).astype(container.dtype),
+            zeros.astype(container.dtype), alpha=-2.,
+            beta=0., op_version=opv)
         mp = np.sum(op.means_ ** 2, 1) * precisions
         log_prob = OnnxAdd(mp, OnnxAdd(xmp, outer, op_version=opv),
                            op_version=opv)
     else:
         raise RuntimeError("Unknown op.covariance_type='{}'. Upgrade "
-                           "to a mroe recent version of skearn-onnx "
+                           "to a more recent version of skearn-onnx "
                            "or raise an issue.".format(op.covariance_type))
 
     # -.5 * (cst + log_prob) + log_det
@@ -132,8 +168,22 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
                                 log_weights, op_version=opv)
 
     # labels
-    labels = OnnxArgMax(weighted_log_prob, axis=1,
-                        output_names=out[:1], op_version=opv)
+    if container.is_allowed('ArgMax'):
+        labels = OnnxArgMax(weighted_log_prob, axis=1,
+                            output_names=out[:1], op_version=opv)
+    else:
+        mxlabels = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        zeros = OnnxEqual(
+            OnnxSub(weighted_log_prob, mxlabels, op_version=opv),
+            np.array([0], dtype=container.dtype),
+            op_version=opv)
+        toint = OnnxCast(zeros, to=onnx_proto.TensorProto.INT64,
+                         op_version=opv)
+        mulind = OnnxMul(toint,
+                         np.arange(n_components).astype(np.int64),
+                         op_version=opv)
+        labels = OnnxReduceMax(mulind, axes=[1], output_names=out[:1],
+                               op_version=opv)
 
     # def _estimate_log_prob_resp():
     # np.exp(log_resp)
@@ -141,19 +191,40 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     # log_prob_norm = logsumexp(weighted_log_prob, axis=1)
     # with np.errstate(under='ignore'):
     #    log_resp = weighted_log_prob - log_prob_norm[:, np.newaxis]
+    if add_score:
+        outnames = out[2:3]
+    else:
+        outnames = None
 
-    log_prob_norm = OnnxReduceLogSumExp(
-        weighted_log_prob, axes=[1], op_version=opv)
+    if combined_reducesum:
+        max_weight = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        log_prob_norm_demax = OnnxLog(
+            OnnxReduceSum(
+                OnnxExp(
+                    OnnxSub(weighted_log_prob, max_weight, op_version=opv),
+                    op_version=opv),
+                axes=[1], op_version=opv),
+            op_version=opv)
+        log_prob_norm = OnnxAdd(log_prob_norm_demax, max_weight,
+                                op_version=opv, output_names=out[2:3])
+    else:
+        log_prob_norm = OnnxReduceLogSumExp(
+            weighted_log_prob, axes=[1], op_version=opv,
+            output_names=outnames)
     log_resp = OnnxSub(weighted_log_prob, log_prob_norm, op_version=opv)
 
     # probabilities
-    probs = OnnxExp(log_resp, output_names=out[1:], op_version=opv)
+    probs = OnnxExp(log_resp, output_names=out[1:2], op_version=opv)
 
     # final
     labels.add_to(scope, container)
     probs.add_to(scope, container)
+    if add_score:
+        log_prob_norm.add_to(scope, container)
 
 
-register_converter('SklearnGaussianMixture', convert_sklearn_gaussian_mixture)
+register_converter('SklearnGaussianMixture', convert_sklearn_gaussian_mixture,
+                   options={'score_samples': [True, False]})
 register_converter('SklearnBayesianGaussianMixture',
-                   convert_sklearn_gaussian_mixture)
+                   convert_sklearn_gaussian_mixture,
+                   options={'score_samples': [True, False]})

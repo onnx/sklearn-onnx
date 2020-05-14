@@ -26,6 +26,10 @@ def convert_voting_classifier(scope, operator, container):
     distinction and always creates two outputs, labels
     and probabilities.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
     n_classes = len(op.classes_)
 
@@ -122,4 +126,7 @@ def convert_voting_classifier(scope, operator, container):
                                 op.classes_)
 
 
-register_converter('SklearnVotingClassifier', convert_voting_classifier)
+register_converter('SklearnVotingClassifier',
+                   convert_voting_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})

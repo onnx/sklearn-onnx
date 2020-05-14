@@ -4,6 +4,7 @@ Tests on functions in *onnx_helper*.
 import unittest
 from distutils.version import StrictVersion
 import numpy
+import onnx
 from sklearn import __version__ as sklearn_version
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
@@ -68,8 +69,10 @@ class TestOnnxHelper(unittest.TestCase):
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
     def test_onnx_helper_load_save_init(self):
-        model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
-                              StandardScaler())
+        model = make_pipeline(
+            Binarizer(),
+            OneHotEncoder(sparse=False, handle_unknown='ignore'),
+            StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
@@ -89,21 +92,33 @@ class TestOnnxHelper(unittest.TestCase):
         assert X2.shape == (4, 2)
 
     @unittest.skipIf(not has_pydot(), reason="dot is missing")
-    @unittest.skipIf(
-        not one_hot_encoder_supports_string(),
-        reason="OneHotEncoder did not have categories_ before 0.20",
-    )
     def test_onnx_to_dot(self):
         model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
                               StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([1, 2]))])
+                                     [("input", FloatTensorType([None, 2]))])
         dot = to_dot(model_onnx)
         assert "filled" in dot
         assert "digraph" in dot
         assert "Scaler/Scaler" in dot
+
+    @unittest.skipIf(
+        not one_hot_encoder_supports_string(),
+        reason="OneHotEncoder did not have categories_ before 0.20")
+    def test_onnx_helper_load_save_init_meta(self):
+        model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
+                              StandardScaler())
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", FloatTensorType([None, 2]))])
+        meta = {'pA': 'one', 'pB': 'two'}
+        onnx.helper.set_model_props(model_onnx, meta)
+        new_model = select_model_inputs_outputs(model_onnx, "variable")
+        vals = {p.key: p.value for p in new_model.metadata_props}
+        assert vals == meta
 
 
 if __name__ == "__main__":

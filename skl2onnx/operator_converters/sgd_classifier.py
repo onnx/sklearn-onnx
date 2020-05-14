@@ -8,8 +8,9 @@ import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
+from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
@@ -30,7 +31,7 @@ def _decision_function(scope, operator, container, model):
                               model.intercept_.shape, model.intercept_)
 
     input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
@@ -166,7 +167,7 @@ def _predict_proba_modified_huber(scope, operator, container,
 def convert_sklearn_sgd_classifier(scope, operator, container):
     """Converter for SGDClassifier."""
     sgd_op = operator.raw_operator
-    classes = sgd_op.classes_
+    classes = get_label_classes(scope, sgd_op)
     class_type = onnx_proto.TensorProto.STRING
 
     if np.issubdtype(classes.dtype, np.floating):
@@ -186,10 +187,12 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
                               classes.shape, classes)
 
     scores = _decision_function(scope, operator, container, sgd_op)
-    if sgd_op.loss == 'log':
+    options = container.get_options(sgd_op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+    if sgd_op.loss == 'log' and not use_raw_scores:
         proba = _predict_proba_log(scope, operator, container, scores,
                                    len(classes))
-    elif sgd_op.loss == 'modified_huber':
+    elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
         proba = _predict_proba_modified_huber(
             scope, operator, container, scores, len(classes))
     else:
@@ -233,4 +236,7 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
 
 
 register_converter('SklearnSGDClassifier',
-                   convert_sklearn_sgd_classifier)
+                   convert_sklearn_sgd_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})

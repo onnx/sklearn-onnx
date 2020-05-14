@@ -5,7 +5,8 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from ..common._apply_operation import apply_cast
+import numpy as np
+from ..common._apply_operation import apply_cast, apply_reshape
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -120,7 +121,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     `onnxruntime <https://github.com/Microsoft/onnxruntime>`_ uses
     `re2 <https://github.com/google/re2>`_. You may need to switch
     to a custom tokenizer based on
-    `python wrapper for re2 <https://pypi.org/project/re2/>_`
+    `python wrapper for re2 <https://pypi.org/project/re2/>`_
     or its sources `pyre2 <https://github.com/facebook/pyre2>`_
     (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
     If the regular expression is not specified and if
@@ -168,7 +169,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             warnings.warn("Converter for TfidfVectorizer will use "
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
-                          DeprecationWarning)
+                          UserWarning)
             default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:
@@ -209,6 +210,15 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "https://github.com/onnx/sklearn-onnx/issues.")
 
     if op.lowercase or op.stop_words_:
+
+        if len(operator.input_full_names) != 1:
+            raise RuntimeError("Only one input is allowed, found {}.".format(
+                operator.input_full_names))
+        flatten = scope.get_unique_variable_name('flattened')
+        apply_reshape(scope, operator.input_full_names[0],
+                      flatten, container,
+                      desired_shape=(-1, ))
+
         # StringNormalizer
         op_type = 'StringNormalizer'
         attrs = {'name': scope.get_unique_operator_name(op_type)}
@@ -230,7 +240,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
         if op.stop_words_:
             attrs['stopwords'] = list(sorted(op.stop_words_))
-        container.add_node(op_type, operator.input_full_names,
+        container.add_node(op_type, flatten,
                            normalized, op_version=op_version,
                            op_domain=domain, **attrs)
     else:
@@ -310,19 +320,29 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         'pool_strings': words,
         'ngram_indexes': key_indices,
         'ngram_counts': ngcounts,
-        'weights': weights,
+        'weights': list(map(np.float32, weights)),
     })
     output = (scope.get_unique_variable_name('output')
               if op.binary else operator.output_full_names)
 
+    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+        output_tf = scope.get_unique_variable_name('cast_result')
+    else:
+        output_tf = output
+
     if container.target_opset < 9:
         op_type = 'Ngram'
-        container.add_node(op_type, tokenized, output,
+        container.add_node(op_type, tokenized, output_tf,
                            op_domain='com.microsoft', **attrs)
     else:
         op_type = 'TfIdfVectorizer'
-        container.add_node(op_type, tokenized, output, op_domain='',
+        container.add_node(op_type, tokenized, output_tf, op_domain='',
                            op_version=9, **attrs)
+
+    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+        apply_cast(scope, output_tf, output,
+                   container, to=container.proto_dtype)
+
     if op.binary:
         cast_result_name = scope.get_unique_variable_name('cast_result')
 
@@ -332,4 +352,5 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                    container, to=onnx_proto.TensorProto.FLOAT)
 
 
-register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer)
+register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
+                   options={'tokenexp': None, 'separators': None})

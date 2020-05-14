@@ -24,7 +24,6 @@ does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import numpy
@@ -97,8 +96,8 @@ print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
 # an smaller ONNX graph for every operator.
 
 
-steps = collect_intermediate_steps(pipe, "pipeline",
-                                   initial_types)
+steps = collect_intermediate_steps(
+    pipe, "pipeline", initial_types)
 
 assert len(steps) == 2
 
@@ -131,5 +130,5 @@ for i, step in enumerate(steps):
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

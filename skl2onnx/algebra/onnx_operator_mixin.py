@@ -39,7 +39,13 @@ class OnnxOperatorMixin:
             initial_types = self.infer_initial_types()
         else:
             initial_types = guess_initial_types(X, None)
-        return convert_sklearn(self, initial_types=initial_types, dtype=dtype)
+        if not hasattr(self, 'op_version'):
+            raise AttributeError(
+                "Attribute 'op_version' is missing for '{}'.".format(
+                    self.__class__.__name__))
+        return convert_sklearn(
+            self, initial_types=initial_types, dtype=dtype,
+            target_opset=self.op_version)
 
     def infer_initial_types(self):
         """
@@ -132,7 +138,8 @@ class OnnxOperatorMixin:
             return get_shape_calculator(name)
 
         def shape_calculator(operator):
-            onx = op.to_onnx(operator.inputs, operator.outputs)
+            onx = op.to_onnx(operator.inputs, operator.outputs,
+                             target_opset=self.op_version)
             inferred_model = shape_inference.infer_shapes(onx)
             shapes = Variable.from_pb(inferred_model.graph.value_info)
             shapes = {shape.onnx_name: shape for shape in shapes}

@@ -95,7 +95,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     classes = mlp_op.classes_
     class_type = onnx_proto.TensorProto.STRING
 
-    classes_name = scope.get_unique_variable_name('classes')
     argmax_output_name = scope.get_unique_variable_name('argmax_output')
     array_feature_extractor_result_name = scope.get_unique_variable_name(
         'array_feature_extractor_result')
@@ -109,14 +108,6 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
         class_type = onnx_proto.TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
-
-    container.add_initializer(classes_name, class_type,
-                              classes.shape, classes)
-
-    container.add_node(
-        'ArrayFeatureExtractor', [classes_name, argmax_output_name],
-        array_feature_extractor_result_name, op_domain='ai.onnx.ml',
-        name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
     if len(classes) == 2:
         unity_name = scope.get_unique_variable_name('unity')
@@ -133,23 +124,42 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
         apply_identity(scope, y_pred,
                        operator.outputs[1].full_name, container)
 
-    container.add_node('ArgMax', operator.outputs[1].full_name,
-                       argmax_output_name, axis=1,
-                       name=scope.get_unique_operator_name('ArgMax'))
+    if mlp_op._label_binarizer.y_type_ == 'multilabel-indicator':
+        binariser_output_name = scope.get_unique_variable_name(
+            'binariser_output')
 
-    if class_type == onnx_proto.TensorProto.INT32:
-        reshaped_result_name = scope.get_unique_variable_name(
-            'reshaped_result')
-
-        apply_reshape(scope, array_feature_extractor_result_name,
-                      reshaped_result_name, container,
-                      desired_shape=(-1,))
-        apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name,
-                   container, to=onnx_proto.TensorProto.INT64)
+        container.add_node('Binarizer', y_pred, binariser_output_name,
+                           threshold=0.5, op_domain='ai.onnx.ml')
+        apply_cast(
+            scope, binariser_output_name, operator.outputs[0].full_name,
+            container, to=onnx_proto.TensorProto.INT64)
     else:
-        apply_reshape(scope, array_feature_extractor_result_name,
-                      operator.outputs[0].full_name, container,
-                      desired_shape=(-1,))
+        classes_name = scope.get_unique_variable_name('classes')
+        container.add_initializer(classes_name, class_type,
+                                  classes.shape, classes)
+
+        container.add_node('ArgMax', operator.outputs[1].full_name,
+                           argmax_output_name, axis=1,
+                           name=scope.get_unique_operator_name('ArgMax'))
+        container.add_node(
+            'ArrayFeatureExtractor', [classes_name, argmax_output_name],
+            array_feature_extractor_result_name, op_domain='ai.onnx.ml',
+            name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+
+        if class_type == onnx_proto.TensorProto.INT32:
+            reshaped_result_name = scope.get_unique_variable_name(
+                'reshaped_result')
+
+            apply_reshape(scope, array_feature_extractor_result_name,
+                          reshaped_result_name, container,
+                          desired_shape=(-1,))
+            apply_cast(
+                scope, reshaped_result_name, operator.outputs[0].full_name,
+                container, to=onnx_proto.TensorProto.INT64)
+        else:
+            apply_reshape(scope, array_feature_extractor_result_name,
+                          operator.outputs[0].full_name, container,
+                          desired_shape=(-1,))
 
 
 def convert_sklearn_mlp_regressor(scope, operator, container):
@@ -165,6 +175,8 @@ def convert_sklearn_mlp_regressor(scope, operator, container):
 
 
 register_converter('SklearnMLPClassifier',
-                   convert_sklearn_mlp_classifier)
+                   convert_sklearn_mlp_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnMLPRegressor',
                    convert_sklearn_mlp_regressor)

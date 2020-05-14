@@ -8,7 +8,7 @@
 import os
 import sys
 import skl2onnx
-import sphinx_modern_theme_modified
+import sphinx_readable_theme
 import tabulate
 
 sys.path.append(os.path.abspath('exts'))
@@ -50,8 +50,8 @@ pygments_style = 'default'
 
 html_theme = "sphinx_mo"
 html_static_path = ['_static']
-html_theme = "sphinx_modern_theme_modified"
-html_theme_path = [sphinx_modern_theme_modified.get_html_theme_path()]
+html_theme = "readable"
+html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
 html_logo = "logo_main.png"
 
 # -- Options for graphviz ----------------------------------------------------

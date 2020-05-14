@@ -27,7 +27,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_float(self):
-        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
@@ -52,7 +52,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_grid_search_multiclass_float(self):
-        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             SVC(random_state=42, probability=True, gamma='auto'),
             tuned_parameters, cv=5, iid=False)
@@ -76,7 +76,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_int(self):
-        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
@@ -101,7 +101,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_grid_search_multiclass_int(self):
-        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='multinomial'),
@@ -124,7 +124,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         )
 
     def test_grid_search_regression_int(self):
-        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(Lasso(max_iter=100),
                            tuned_parameters, cv=5, iid=False)
         model, X = fit_regression_model(clf, is_int=True)
@@ -145,7 +145,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         )
 
     def test_grid_search_regressor_float(self):
-        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(LassoLars(max_iter=100),
                            tuned_parameters, cv=5, iid=False)
         model, X = fit_regression_model(clf)
@@ -169,7 +169,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_float(self):
-        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
                            tuned_parameters, cv=5, iid=False)
         model, X = fit_regression_model(clf)
@@ -194,7 +194,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_double(self):
-        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 30)}]
+        tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
                            tuned_parameters, cv=3, iid=False)
         model, X = fit_regression_model(clf)
@@ -214,6 +214,35 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             "<= StrictVersion('0.4.0') or "
             "StrictVersion(onnx.__version__) "
             "== StrictVersion('1.4.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_grid_search_binary_float_nozipmap(self):
+        tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
+        clf = GridSearchCV(
+            LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
+                               multi_class='ovr'),
+            tuned_parameters, cv=5, iid=False)
+        model, X = fit_classification_model(clf, n_classes=2)
+        model_onnx = convert_sklearn(
+            model,
+            "GridSearchCV",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(clf): {'zipmap': False, 'raw_scores': True}}
+        )
+        self.assertIsNotNone(model_onnx)
+        assert "zipmap" not in str(model_onnx).lower()
+        assert '"LOGISTIC"' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGridSearchBinaryFloat-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            methods=['predict', 'decision_function']
         )
 
 

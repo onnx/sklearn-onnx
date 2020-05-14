@@ -14,7 +14,7 @@ from test_utils import dump_data_and_model
 class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_short_word(self):
         corpus = numpy.array([
@@ -25,7 +25,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='word', token_pattern=".{1,2}")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))])
+                                     [('input', StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -36,7 +36,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             verbose=False)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer22_short_word(self):
         corpus = numpy.array([
@@ -48,13 +48,13 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         vect.fit(corpus.ravel())
         try:
             convert_sklearn(vect, 'TfidfVectorizer',
-                            [('input', StringTensorType([1, 1]))])
+                            [('input', StringTensorType([1]))])
         except RuntimeError as e:
             assert ("Unable to split n-grams ' seco nd do' "
                     "into tokens") in str(e)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_char(self):
         corpus = numpy.array([
@@ -65,7 +65,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))])
+                                     [('input', StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -76,7 +76,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             verbose=False)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_char(self):
         corpus = numpy.array([
@@ -87,7 +87,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))])
+                                     [('input', StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(
@@ -98,7 +98,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             verbose=False)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_normL1_char(self):
         corpus = numpy.array([
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm='l1', analyzer='char')
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))])
+                                     [('input', StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
@@ -119,7 +119,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                           "StrictVersion('0.3.0')")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_short_word_spaces(self):
         corpus = numpy.array([
@@ -139,7 +139,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                 raise e
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_short_word_spaces(self):
         corpus = numpy.array([
@@ -150,7 +150,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                                analyzer='word', token_pattern=".{1,3}")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1, 1]))])
+                                     [('input', StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
 
         dump_data_and_model(

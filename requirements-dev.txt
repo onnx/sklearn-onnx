@@ -17,8 +17,8 @@ sphinx
 sphinx_modern_theme_modified
 sphinxcontrib-blockdiag
 openpyxl
+tqdm
 
 # docs/examples
 lightgbm
 matplotlib
-onnxruntime

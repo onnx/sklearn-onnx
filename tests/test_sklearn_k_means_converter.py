@@ -7,12 +7,12 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy
+import onnx
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.datasets import load_digits, load_iris
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model
-import onnx
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnKMeansModel(unittest.TestCase):
@@ -22,7 +22,8 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model = KMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([None, 4]))])
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
@@ -40,7 +41,8 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model = MiniBatchKMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([None, 4]))])
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
@@ -59,7 +61,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model = MiniBatchKMeans(n_clusters=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([1, 4]))],
+                                     [("input", FloatTensorType([None, 4]))],
                                      target_opset=9)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -78,7 +80,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model.fit(X)
         try:
             convert_sklearn(model, "kmeans",
-                            [("input", FloatTensorType([1, 4]))],
+                            [("input", FloatTensorType([None, 4]))],
                             target_opset=1)
         except RuntimeError as e:
             assert "Node 'OnnxAdd' has been changed since version" in str(e)
@@ -90,7 +92,8 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", Int64TensorType([None,
-                                      X.shape[1]]))])
+                                      X.shape[1]]))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.int64)[40:60],
@@ -111,7 +114,8 @@ class TestSklearnKMeansModel(unittest.TestCase):
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", Int64TensorType([None,
-                                      X.shape[1]]))])
+                                      X.shape[1]]))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.int64)[40:60],

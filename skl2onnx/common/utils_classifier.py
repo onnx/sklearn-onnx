@@ -9,6 +9,23 @@ from ._apply_operation import apply_cast, apply_reshape
 from ..proto import onnx_proto
 
 
+def get_label_classes(scope, op):
+    """
+    Extracts the model classes,
+    handles option ``nocl``.
+    """
+    options = scope.get_options(op, dict(nocl=False))
+    if options['nocl']:
+        if len(op.classes_.shape) > 1 and op.classes_.shape[1] > 1:
+            raise RuntimeError(
+                "Options 'nocl=True' is not implemented for multi-label "
+                "classification (class: {}).".format(op.__class__.__name__))
+        classes = np.arange(0, len(op.classes_))
+    else:
+        classes = op.classes_
+    return classes
+
+
 def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
                                 container, classes):
     """

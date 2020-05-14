@@ -77,7 +77,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
-        # y_mean = self._y_train_mean + y_mean  # undo normal.
+        # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
         k_trans = convert_kernel(kernel, X,
                                  x_train=op.X_train_.astype(dtype),
@@ -90,9 +90,22 @@ def convert_gaussian_process_regressor(scope, operator, container):
         mean_y = op._y_train_mean.astype(dtype)
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
-        y_mean = OnnxAdd(y_mean_b, mean_y,
-                         output_names=out[:1],
-                         op_version=opv)
+
+        if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
+            y_mean = OnnxAdd(y_mean_b, mean_y, output_names=out[:1],
+                             op_version=opv)
+        else:
+            # A bug was fixed in 0.23 and it changed
+            # the predictions when return_std is True.
+            # See https://github.com/scikit-learn/scikit-learn/pull/15782.
+            # y_mean = self._y_train_std * y_mean + self._y_train_mean
+            var_y = op._y_train_std.astype(dtype)
+            if len(var_y.shape) == 1:
+                var_y = var_y.reshape(var_y.shape + (1,))
+            y_mean = OnnxAdd(
+                OnnxMul(y_mean_b, var_y, op_version=opv),
+                mean_y, output_names=out[:1], op_version=opv)
+
         y_mean.set_onnx_name_prefix('gpr')
         outputs = [y_mean]
 
@@ -128,6 +141,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             ys0_var = OnnxMax(ys_var, np.array([0], dtype=dtype),
                               op_version=opv)
 
+            if hasattr(op, '_y_train_std') and op._y_train_std != 1:
+                # y_var = y_var * self._y_train_std**2
+                ys0_var = OnnxMul(ys0_var, var_y ** 2, op_version=opv)
+
             # var = np.sqrt(ys0_var)
             var = OnnxSqrt(ys0_var, output_names=out[1:], op_version=opv)
             var.set_onnx_name_prefix('gprv')
@@ -139,4 +156,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
 if OnnxConstantOfShape is not None:
     register_converter('SklearnGaussianProcessRegressor',
-                       convert_gaussian_process_regressor)
+                       convert_gaussian_process_regressor,
+                       options={'return_cov': [False, True],
+                                'return_std': [False, True],
+                                'optim': [None, 'cdist']})

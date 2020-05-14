@@ -71,7 +71,8 @@ def compare_backend(backend,
                     verbose=False,
                     context=None,
                     comparable_outputs=None,
-                    intermediate_steps=False):
+                    intermediate_steps=False,
+                    classes=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -91,6 +92,7 @@ def compare_backend(backend,
         more information on the standard output
     :param intermediate_steps: displays intermediate steps
         in case of an error
+    :param classes: classes names (if option 'nocl' is used)
 
     The function does not return anything but raises an error
     if the comparison failed.
@@ -106,7 +108,8 @@ def compare_backend(backend,
                                options=options,
                                verbose=verbose,
                                comparable_outputs=comparable_outputs,
-                               intermediate_steps=intermediate_steps)
+                               intermediate_steps=intermediate_steps,
+                               classes=classes)
     else:
         raise ValueError("Does not support backend '{0}'.".format(backend))
 
@@ -194,8 +197,9 @@ def extract_options(name):
         res = {}
         for opt in opts[1:]:
             if opt in ("SkipDim1", "OneOff", "NoProb", "NoProbOpp",
-                       "Dec4", "Dec3", "Dec2", 'Svm',
-                       'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray'):
+                       "Dec4", "Dec3", "Dec2", "Dec1", 'Svm',
+                       'Out0', 'Reshape', 'SklCol', 'DF', 'OneOffArray',
+                       'Out1'):
                 res[opt] = True
             else:
                 raise NameError("Unable to parse option '{}'".format(opts[1:]))
@@ -213,6 +217,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
     Dec4 = kwargs.pop("Dec4", False)
     Dec3 = kwargs.pop("Dec3", False)
     Dec2 = kwargs.pop("Dec2", False)
+    Dec1 = kwargs.pop("Dec1", False)
     Disc = kwargs.pop("Disc", False)
     Mism = kwargs.pop("Mism", False)
 
@@ -222,6 +227,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 3)
     if Dec2:
         kwargs["decimal"] = min(kwargs["decimal"], 2)
+    if Dec1:
+        kwargs["decimal"] = min(kwargs["decimal"], 1)
     if isinstance(expected, numpy.ndarray) and isinstance(
             output, numpy.ndarray):
         if SkipDim1:
@@ -257,7 +264,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         if len(output.shape) == 3 and output.shape[0] == 1 and len(
                 expected.shape) == 2:
             output = output.reshape(output.shape[1:])
-        if expected.dtype in (numpy.str, numpy.dtype("<U1")):
+        if expected.dtype in (numpy.str, numpy.dtype("<U1"),
+                              numpy.dtype("<U3")):
             try:
                 assert_array_equal(expected, output, verbose=verbose)
             except Exception as e:

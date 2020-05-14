@@ -29,16 +29,14 @@ Train a LightGBM classifier
 import lightgbm
 import onnxmltools
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import convert_sklearn
-from skl2onnx import update_registered_converter
-from onnxmltools.convert.lightgbm.shape_calculators.Classifier import calculate_linear_classifier_output_shapes  # noqa
+from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
 import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
@@ -79,9 +77,10 @@ pipe.fit(X, y)
 
 ###########################
 # Let's register the new converter.
-update_registered_converter(LGBMClassifier, 'LightGbmLGBMClassifier',
-                            calculate_linear_classifier_output_shapes,
-                            convert_lightgbm)
+update_registered_converter(
+    LGBMClassifier, 'LightGbmLGBMClassifier',
+    calculate_linear_classifier_output_shapes, convert_lightgbm,
+    options={'nocl': [True, False], 'zipmap': [True, False]})
 
 ##################################
 # Convert again
@@ -135,7 +134,7 @@ ax.axis('off')
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
 print("onnxmltools: ", onnxmltools.__version__)
 print("lightgbm: ", lightgbm.__version__)

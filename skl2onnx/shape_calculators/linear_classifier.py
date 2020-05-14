@@ -28,6 +28,8 @@ register_shape_calculator('SklearnGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnBernoulliNB',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnCategoricalNB',
+                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnComplementNB',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnGaussianNB',
@@ -41,4 +43,8 @@ register_shape_calculator('SklearnCalibratedClassifierCV',
 register_shape_calculator('SklearnMLPClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnSGDClassifier',
+                          calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnHistGradientBoostingClassifier',
+                          calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnStackingClassifier',
                           calculate_linear_classifier_output_shapes)

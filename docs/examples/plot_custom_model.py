@@ -46,15 +46,13 @@ And to predict on a test set:
 """
 
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import convert_sklearn
-from skl2onnx._parse import _get_sklearn_operator_name
+from skl2onnx import convert_sklearn, get_model_alias
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx.common.data_types import FloatTensorType
 from matplotlib import offsetbox
@@ -80,7 +78,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
             the output of the *t-SNE* and applies that same
             normalization to he prediction of the estimator
         :param keep_tsne_output: if True, keep raw outputs of
-            :epkg:`TSNE` is stored in member *tsne_outputs_*
+            *TSNE* is stored in member *tsne_outputs_*
         :param kwargs: sent to :meth:`set_params <mlinsights.mlmodel.
             tsne_transformer.PredictableTSNE.set_params>`, see its
             documentation to understand how to specify parameters
@@ -130,7 +128,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         mean_: average of the *t-SNE* output on each dimension
         inv_std_: inverse of the standard deviation of the *t-SNE*
             output on each dimension
-        loss_: loss (:epkg:`sklearn:metrics:mean_squared_error`)
+        loss_: loss (*mean_squared_error*)
         between the predictions and the outputs of t-SNE
         """
         params = dict(y=y, sample_weight=sample_weight)
@@ -329,9 +327,9 @@ def predictable_tsne_converter(scope, operator, container):
 
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
-    # operator
+    # operator.
     model = op.estimator_
-    alias = _get_sklearn_operator_name(type(model))
+    alias = get_model_alias(type(model))
     knn_op = scope.declare_local_operator(alias, model)
     knn_op.inputs = operator.inputs
 
@@ -425,5 +423,5 @@ ax.axis('off')
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

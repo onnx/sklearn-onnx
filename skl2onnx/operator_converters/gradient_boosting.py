@@ -8,7 +8,7 @@ import numbers
 import numpy as np
 import six
 from ..common._apply_operation import apply_cast
-from ..common.data_types import Int64TensorType
+from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common._registration import register_converter
 from ..common.tree_ensemble import add_tree_to_attribute_pairs
 from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
@@ -47,7 +47,9 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
             'issue at https://github.com/onnx/sklearn-onnx/issues.')
 
     attrs['base_values'] = [float(v) for v in base_values]
-    attrs['post_transform'] = transform
+    options = container.get_options(op, dict(raw_scores=False))
+    if not options['raw_scores']:
+        attrs['post_transform'] = transform
 
     classes = op.classes_
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
@@ -78,8 +80,15 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
                                             tree_weight, c, False, True,
                                             dtype=container.dtype)
 
+    input_name = operator.input_full_names
+    if type(operator.inputs[0].type) == BooleanTensorType:
+        cast_input_name = scope.get_unique_variable_name('cast_input')
+
+        apply_cast(scope, input_name, cast_input_name,
+                   container, to=onnx_proto.TensorProto.FLOAT)
+        input_name = cast_input_name
     container.add_node(
-            op_type, operator.input_full_names,
+            op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain='ai.onnx.ml', **attrs)
 
@@ -118,7 +127,7 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
                                     0, False, True, dtype=container.dtype)
 
     input_name = operator.input_full_names
-    if type(operator.inputs[0].type) == Int64TensorType:
+    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
@@ -131,6 +140,9 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
 
 
 register_converter('SklearnGradientBoostingClassifier',
-                   convert_sklearn_gradient_boosting_classifier)
+                   convert_sklearn_gradient_boosting_classifier,
+                   options={'zipmap': [True, False],
+                            'raw_scores': [True, False],
+                            'nocl': [True, False]})
 register_converter('SklearnGradientBoostingRegressor',
                    convert_sklearn_gradient_boosting_regressor)

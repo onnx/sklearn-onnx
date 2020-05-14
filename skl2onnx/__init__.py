@@ -7,7 +7,7 @@
 """
 Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
-__version__ = "1.5.2"
+__version__ = "1.6.5"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
@@ -16,8 +16,11 @@ __model_version__ = 0
 
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin # noqa
-from ._supported_operators import update_registered_converter # noqa
+from ._supported_operators import ( # noqa
+    update_registered_converter, get_model_alias
+)
 from ._parse import update_registered_parser # noqa
+from .proto import get_latest_tested_opset_version # noqa
 
 
 def supported_converters(from_sklearn=False):
@@ -42,5 +45,4 @@ def supported_converters(from_sklearn=False):
     names = sorted(_converter_pool.keys())
     if from_sklearn:
         return [_[7:] for _ in names if _.startswith('Sklearn')]
-    else:
-        return list(names)
+    return list(names)

@@ -14,7 +14,7 @@ from test_utils import dump_data_and_model
 class TestSklearnCountVectorizer(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer11(self):
         corpus = numpy.array([
@@ -26,7 +26,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 1))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -38,7 +38,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer22(self):
         corpus = numpy.array([
@@ -50,7 +50,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(2, 2))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -62,7 +62,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer12(self):
         corpus = numpy.array([
@@ -74,7 +74,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 2))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -86,7 +86,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer13(self):
         corpus = numpy.array([
@@ -98,7 +98,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(ngram_range=(1, 3))
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -110,7 +110,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     def test_model_count_vectorizer_binary(self):
         corpus = numpy.array([
@@ -122,7 +122,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         vect = CountVectorizer(binary=True)
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "CountVectorizer",
-                                     [("input", StringTensorType([1, 1]))])
+                                     [("input", StringTensorType([1]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,

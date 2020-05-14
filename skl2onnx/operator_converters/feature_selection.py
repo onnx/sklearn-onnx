@@ -5,22 +5,19 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
-from ..common.data_types import FloatTensorType, FloatType
 
 
 def convert_sklearn_feature_selection(scope, operator, container):
     op = operator.raw_operator
     # Get indices of the features selected
     index = op.get_support(indices=True)
-    needs_cast = not isinstance(operator.inputs[0].type,
-                                (FloatTensorType, FloatType))
-    if needs_cast:
-        output_name = scope.get_unique_variable_name('output')
-    else:
-        output_name = operator.outputs[0].full_name
-
+    if len(index) == 0:
+        raise RuntimeError(
+            "Model '{}' did not select any feature. "
+            "This model cannot be converted into ONNX."
+            "".format(op.__class__.__name__))
+    output_name = operator.outputs[0].full_name
     if index.any():
         column_indices_name = scope.get_unique_variable_name('column_indices')
 
@@ -36,9 +33,6 @@ def convert_sklearn_feature_selection(scope, operator, container):
     else:
         container.add_node('ConstantOfShape', operator.inputs[0].full_name,
                            output_name, op_version=9)
-    if needs_cast:
-        apply_cast(scope, output_name, operator.outputs[0].full_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
 
 
 register_converter('SklearnGenericUnivariateSelect',

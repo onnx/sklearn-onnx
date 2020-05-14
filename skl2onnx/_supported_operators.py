@@ -5,15 +5,18 @@
 # --------------------------------------------------------------------------
 
 import warnings
-from .common._registration import register_converter, register_shape_calculator
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.linear_model import Perceptron, SGDClassifier
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import (
+    LogisticRegression, LogisticRegressionCV,
+    PassiveAggressiveClassifier,
+    Perceptron, SGDClassifier,
+    RidgeClassifier, RidgeClassifierCV,
+)
+from sklearn.svm import LinearSVC, OneClassSVM
 
 # Linear regressors
 from sklearn.linear_model import (
@@ -26,7 +29,11 @@ from sklearn.linear_model import (
     LassoLars, LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
+    MultiTaskElasticNet, MultiTaskElasticNetCV,
     MultiTaskLasso, MultiTaskLassoCV,
+    OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
+    PassiveAggressiveRegressor,
+    RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor,
@@ -56,6 +63,12 @@ try:
 except ImportError:
     # New in 0.21
     VotingRegressor = None
+try:
+    from sklearn.ensemble import StackingClassifier, StackingRegressor
+except ImportError:
+    # New in 0.22
+    StackingClassifier = None
+    StackingRegressor = None
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
     ExtraTreeClassifier, ExtraTreeRegressor
@@ -71,9 +84,20 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import (
+    KNeighborsClassifier,
+    KNeighborsRegressor,
+    NearestNeighbors,
+)
+try:
+    from sklearn.neighbors import (
+        KNeighborsTransformer,
+        NeighborhoodComponentsAnalysis,
+    )
+except ImportError:
+    # New in 0.22
+    KNeighborsTransformer = None
+    NeighborhoodComponentsAnalysis = None
 
 # Naive Bayes
 from sklearn.naive_bayes import (
@@ -82,8 +106,11 @@ from sklearn.naive_bayes import (
     MultinomialNB,
 )
 try:
+    from sklearn.naive_bayes import CategoricalNB
     from sklearn.naive_bayes import ComplementNB
 except ImportError:
+    # scikit-learn versions <= 0.21
+    CategoricalNB = None
     # scikit-learn versions <= 0.19
     ComplementNB = None
 
@@ -94,16 +121,20 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.cluster import KMeans, MiniBatchKMeans
 
 # Operators for preprocessing and feature engineering
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import (
-    PCA, IncrementalPCA, TruncatedSVD
+    PCA, IncrementalPCA, TruncatedSVD,
 )
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import GenericUnivariateSelect, RFE, RFECV
-from sklearn.feature_selection import SelectFdr, SelectFpr, SelectFromModel
-from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile
-from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_extraction.text import (
+    CountVectorizer, TfidfTransformer, TfidfVectorizer
+)
+from sklearn.feature_selection import (
+    GenericUnivariateSelect, RFE, RFECV,
+    SelectFdr, SelectFpr, SelectFromModel,
+    SelectFwe, SelectKBest, SelectPercentile,
+    VarianceThreshold
+)
 try:
     # 0.20
     from sklearn.impute import SimpleImputer
@@ -117,26 +148,57 @@ except ImportError:
     # removed in 0.21
     Imputer = None
 try:
+    from sklearn.impute import KNNImputer
+except ImportError:
+    # New in 0.22
+    KNNImputer = None
+try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
-    pass
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import (
+    LabelBinarizer, LabelEncoder,
+    Normalizer, OneHotEncoder
+)
 try:
     from sklearn.preprocessing import OrdinalEncoder
 except ImportError:
     # Not available in scikit-learn < 0.20.0
     OrdinalEncoder = None
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.preprocessing import RobustScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import (
+    MinMaxScaler, MaxAbsScaler,
+    FunctionTransformer,
+    PolynomialFeatures, RobustScaler,
+    StandardScaler,
+)
+
+try:
+    from sklearn.preprocessing import PowerTransformer
+except ImportError:
+    # Not available in scikit-learn < 0.20.0
+    PowerTransformer = None
+
+try:
+    from sklearn.ensemble import (
+        HistGradientBoostingClassifier,
+        HistGradientBoostingRegressor
+    )
+except ImportError:
+    # Second verification as these models still require
+    # manual activation.
+    try:
+        from sklearn.ensemble._hist_gradient_boosting.gradient_boosting import (  # noqa
+            HistGradientBoostingClassifier,
+            HistGradientBoostingRegressor
+        )
+    except ImportError:
+        HistGradientBoostingRegressor = None
+        HistGradientBoostingClassifier = None
+
+from sklearn.random_projection import GaussianRandomProjection
+
+from .common._registration import register_converter, register_shape_calculator
 
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
@@ -145,26 +207,44 @@ from sklearn.preprocessing import FunctionTransformer
 # classifiers. In the parsing stage, we produce two outputs for objects
 # included in the following list and one output for everything not in
 # the list.
-sklearn_classifier_list = [
-    LogisticRegression, LogisticRegressionCV, Perceptron, SGDClassifier,
-    LinearSVC, SVC, NuSVC,
-    GradientBoostingClassifier, RandomForestClassifier,
-    DecisionTreeClassifier, ExtraTreeClassifier, ExtraTreesClassifier,
+sklearn_classifier_list = list(filter(lambda m: m is not None, [
+    AdaBoostClassifier,
     BaggingClassifier,
-    BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
+    BernoulliNB,
+    CategoricalNB,
+    CalibratedClassifierCV,
+    ComplementNB,
+    DecisionTreeClassifier,
+    ExtraTreeClassifier,
+    ExtraTreesClassifier,
+    GaussianNB,
+    GradientBoostingClassifier,
+    HistGradientBoostingClassifier,
     KNeighborsClassifier,
-    CalibratedClassifierCV, OneVsRestClassifier, VotingClassifier,
-    AdaBoostClassifier, MLPClassifier, LinearDiscriminantAnalysis
-]
+    LinearDiscriminantAnalysis,
+    LinearSVC,
+    LogisticRegression,
+    LogisticRegressionCV,
+    MLPClassifier,
+    MultinomialNB,
+    NuSVC,
+    OneVsRestClassifier,
+    PassiveAggressiveClassifier,
+    Perceptron,
+    RandomForestClassifier,
+    SGDClassifier,
+    StackingClassifier,
+    SVC,
+    VotingClassifier,
+]))
 
 # Clustering algorithms: produces two outputs, label and score for
 # each cluster in most cases.
 cluster_list = [KMeans, MiniBatchKMeans]
 
-# Classifiers with converters supporting decision_function().
-decision_function_classifiers = (
-    SGDClassifier,
-)
+# Outlier detection algorithms:
+# produces two outputs, label and scores
+outlier_list = [OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -172,33 +252,88 @@ decision_function_classifiers = (
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
-                AdaBoostClassifier, AdaBoostRegressor,
-                BaggingClassifier, BaggingRegressor,
-                BernoulliNB, ComplementNB, GaussianNB, MultinomialNB,
-                CalibratedClassifierCV,
-                DecisionTreeClassifier, DecisionTreeRegressor,
-                ExtraTreeClassifier, ExtraTreeRegressor,
-                ExtraTreesClassifier, ExtraTreesRegressor,
-                GradientBoostingClassifier, GradientBoostingRegressor,
-                KNeighborsClassifier, KNeighborsRegressor, NearestNeighbors,
-                LinearSVC, LinearSVR, SVC, SVR,
-                LinearRegression,
-                MLPClassifier, MLPRegressor,
-                OneVsRestClassifier,
-                RandomForestClassifier, RandomForestRegressor,
-                SGDClassifier,
-                VotingClassifier, VotingRegressor,
-                KMeans, MiniBatchKMeans,
-                PCA, TruncatedSVD, IncrementalPCA,
-                Binarizer, MinMaxScaler, MaxAbsScaler, Normalizer,
-                CountVectorizer, TfidfVectorizer, TfidfTransformer,
-                FunctionTransformer, KBinsDiscretizer, PolynomialFeatures,
-                Imputer, SimpleImputer, LabelBinarizer, LabelEncoder,
-                RobustScaler, OneHotEncoder, DictVectorizer, OrdinalEncoder,
-                GenericUnivariateSelect, RFE, RFECV, SelectFdr, SelectFpr,
-                SelectFromModel, SelectFwe, SelectKBest, SelectPercentile,
-                VarianceThreshold, GaussianMixture, GaussianProcessRegressor,
+                AdaBoostClassifier,
+                AdaBoostRegressor,
+                BaggingClassifier,
+                BaggingRegressor,
                 BayesianGaussianMixture,
+                BernoulliNB,
+                Binarizer,
+                CalibratedClassifierCV,
+                CategoricalNB,
+                ComplementNB,
+                CountVectorizer,
+                DictVectorizer,
+                GaussianNB,
+                DecisionTreeClassifier,
+                DecisionTreeRegressor,
+                ExtraTreeClassifier,
+                ExtraTreeRegressor,
+                ExtraTreesClassifier,
+                ExtraTreesRegressor,
+                FunctionTransformer,
+                GaussianMixture,
+                GaussianProcessRegressor,
+                GaussianRandomProjection,
+                GenericUnivariateSelect,
+                GradientBoostingClassifier,
+                GradientBoostingRegressor,
+                HistGradientBoostingClassifier,
+                HistGradientBoostingRegressor,
+                Imputer,
+                IncrementalPCA,
+                KMeans,
+                LabelBinarizer,
+                LabelEncoder,
+                LinearRegression,
+                LinearSVC,
+                LinearSVR,
+                MaxAbsScaler,
+                MiniBatchKMeans,
+                MinMaxScaler,
+                MLPClassifier,
+                MLPRegressor,
+                MultinomialNB,
+                KBinsDiscretizer,
+                KNeighborsClassifier,
+                KNeighborsRegressor,
+                KNeighborsTransformer,
+                KNNImputer,
+                NearestNeighbors,
+                NeighborhoodComponentsAnalysis,
+                Normalizer,
+                OneClassSVM,
+                OneHotEncoder,
+                OneVsRestClassifier,
+                OrdinalEncoder,
+                PCA,
+                PLSRegression,
+                PolynomialFeatures,
+                PowerTransformer,
+                RandomForestClassifier,
+                RandomForestRegressor,
+                RANSACRegressor,
+                RFE,
+                RFECV,
+                RobustScaler,
+                SelectFdr,
+                SelectFpr,
+                SelectFromModel,
+                SelectFwe,
+                SelectKBest,
+                SelectPercentile,
+                SGDClassifier,
+                SimpleImputer,
+                StackingClassifier,
+                StackingRegressor,
+                SVC,
+                SVR,
+                TfidfVectorizer,
+                TfidfTransformer,
+                TruncatedSVD,
+                VarianceThreshold,
+                VotingClassifier,
+                VotingRegressor,
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
@@ -218,13 +353,21 @@ def build_sklearn_operator_name_map():
         LinearDiscriminantAnalysis: 'SklearnLinearClassifier',
         LogisticRegression: 'SklearnLinearClassifier',
         LogisticRegressionCV: 'SklearnLinearClassifier',
+        MultiTaskElasticNet: 'SklearnLinearRegressor',
+        MultiTaskElasticNetCV: 'SklearnLinearRegressor',
         MultiTaskLasso: 'SklearnLinearRegressor',
         MultiTaskLassoCV: 'SklearnLinearRegressor',
         NuSVC: 'SklearnSVC',
         NuSVR: 'SklearnSVR',
+        OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
+        OrthogonalMatchingPursuitCV: 'SklearnLinearRegressor',
+        PassiveAggressiveClassifier: 'SklearnSGDClassifier',
+        PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
+        RidgeClassifier: 'SklearnLinearClassifier',
+        RidgeClassifierCV: 'SklearnLinearClassifier',
         SGDRegressor: 'SklearnLinearRegressor',
         StandardScaler: 'SklearnScaler',
         TheilSenRegressor: 'SklearnLinearRegressor',
@@ -233,7 +376,7 @@ def build_sklearn_operator_name_map():
 
 
 def update_registered_converter(model, alias, shape_fct, convert_fct,
-                                overwrite=True, parser=None):
+                                overwrite=True, parser=None, options=None):
     """
     Registers or updates a converter for a new model so that
     it can be converted when inserted in a *scikit-learn* pipeline.
@@ -248,25 +391,29 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     :param overwrite: False to raise exception if a converter
         already exists
     :param parser: overwrites the parser as well if not empty
+    :param options: registered options for this converter
 
     The alias is usually the library name followed by the model name.
     Example:
 
     ::
 
-        from onnxmltools.convert.common.shape_calculator import calculate_linear_classifier_output_shapes
+        from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
         from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
         from skl2onnx import update_registered_converter
         update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                     calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier)
+                                    convert_sklearn_random_forest_classifier,
+                                    options={'zipmap': [True, False],
+                                             'raw_scores': [True, False]})
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
             and alias != sklearn_operator_name_map[model]):
         warnings.warn("Model '{0}' was already registered under alias "
                       "'{1}'.".format(model, sklearn_operator_name_map[model]))
     sklearn_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite)
+    register_converter(alias, convert_fct, overwrite=overwrite,
+                       options=options)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
     if parser is not None:
         from ._parse import update_registered_parser
@@ -286,6 +433,23 @@ def _get_sklearn_operator_name(model_type):
         # "No proper operator name found, it means a local operator.
         return None
     return sklearn_operator_name_map[model_type]
+
+
+def get_model_alias(model_type):
+    """
+    Get alias model. Raise an exception if not found.
+
+    :param model_type:  A scikit-learn object (e.g., SGDClassifier
+                        and Binarizer)
+    :return: A string which stands for the type of the input model in
+             our conversion framework
+    """
+    res = _get_sklearn_operator_name(model_type)
+    if res is None:
+        raise RuntimeError("Unable to find alias for model '{}'. "
+                           "The converter is likely missing."
+                           "".format(type(model_type)))
+    return res
 
 
 # registered converters

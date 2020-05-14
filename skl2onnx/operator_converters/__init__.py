@@ -11,7 +11,9 @@ from . import array_feature_extractor
 from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
+from . import cast_op
 from . import concat_op
+from . import cross_decomposition
 from . import decision_tree
 from . import decomposition
 from . import dict_vectoriser
@@ -22,6 +24,7 @@ from . import gaussian_process
 from . import gaussian_mixture
 from . import gradient_boosting
 from . import grid_search_cv
+from . import id_op
 from . import imputer_op
 from . import k_bins_discretiser
 from . import k_means
@@ -38,9 +41,13 @@ from . import one_hot_encoder
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import polynomial_features
+from . import power_transformer
 from . import random_forest
+from . import random_projection
+from . import ransac_regressor
 from . import scaler_op
 from . import sgd_classifier
+from . import stacking
 from . import support_vector_machines
 from . import text_vectoriser
 from . import tfidf_transformer
@@ -55,7 +62,9 @@ __all__ = [
     bagging,
     binariser,
     calibrated_classifier_cv,
+    cast_op,
     concat_op,
+    cross_decomposition,
     decision_tree,
     decomposition,
     dict_vectoriser,
@@ -66,6 +75,7 @@ __all__ = [
     gaussian_mixture,
     gradient_boosting,
     grid_search_cv,
+    id_op,
     imputer_op,
     k_bins_discretiser,
     k_means,
@@ -82,9 +92,13 @@ __all__ = [
     one_vs_rest_classifier,
     ordinal_encoder,
     polynomial_features,
+    power_transformer,
     random_forest,
+    random_projection,
+    ransac_regressor,
     scaler_op,
     sgd_classifier,
+    stacking,
     support_vector_machines,
     text_vectoriser,
     tfidf_transformer,

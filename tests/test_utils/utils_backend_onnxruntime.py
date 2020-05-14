@@ -56,7 +56,8 @@ def compare_runtime(test,
                     verbose=False,
                     context=None,
                     comparable_outputs=None,
-                    intermediate_steps=False):
+                    intermediate_steps=False,
+                    classes=None):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -74,6 +75,7 @@ def compare_runtime(test,
     :param comparable_outputs: compare only these outputs
     :param intermediate_steps: displays intermediate steps
         in case of an error
+    :param classes: classes names (if option 'nocl' is used)
     :return: tuple (outut, lambda function to run the predictions)
 
     The function does not return anything but raises an error
@@ -355,6 +357,7 @@ def compare_runtime(test,
                           onx,
                           decimal=decimal,
                           verbose=verbose,
+                          classes=classes,
                           **options)
     except ExpectedAssertionError as expe:
         raise expe
@@ -439,6 +442,7 @@ def _compare_expected(expected,
                       onnx,
                       decimal=5,
                       verbose=False,
+                      classes=None,
                       **kwargs):
     """
     Compares the expected output against the runtime outputs.
@@ -452,6 +456,14 @@ def _compare_expected(expected,
                 expected = expected[:1]
                 output = output[:1]
                 del kwargs['Out0']
+            elif 'Out1' in kwargs:
+                print('----------')
+                print(expected)
+                print(output)
+                print('----------')
+                expected = expected[1:2]
+                output = output[1:2]
+                del kwargs['Out1']
             if 'Reshape' in kwargs:
                 del kwargs['Reshape']
                 output = numpy.hstack(output).ravel()
@@ -468,6 +480,7 @@ def _compare_expected(expected,
                                   onnx,
                                   decimal=5,
                                   verbose=verbose,
+                                  classes=classes,
                                   **kwargs)
                 tested += 1
         else:
@@ -513,6 +526,13 @@ def _compare_expected(expected,
             raise OnnxRuntimeAssertionError(
                 "output must be an array for onnx '{0}' not {1}".format(
                     onnx, type(output)))
+        if (classes is not None and (
+                expected.dtype == numpy.str or expected.dtype.char == 'U')):
+            try:
+                output = numpy.array([classes[cl] for cl in output])
+            except IndexError as e:
+                raise RuntimeError('Unable to handle\n{}\n{}\n{}'.format(
+                    expected, output, classes)) from e
         msg = compare_outputs(expected,
                               output,
                               decimal=decimal,

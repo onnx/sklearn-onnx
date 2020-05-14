@@ -8,11 +8,10 @@ import numpy as np
 
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_abs, apply_add, apply_cast, apply_concat, apply_div, apply_exp,
-    apply_mul, apply_reshape, apply_sub)
+    apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
+    apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
-from .._supported_operators import decision_function_classifiers
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -97,11 +96,10 @@ def _transform_isotonic(scope, container, model, T, k):
     if model.calibrators_[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
 
-        container.add_node(
-            'Clip', T, clipped_df_name,
-            name=scope.get_unique_operator_name('Clip'),
-            min=model.calibrators_[k].X_min_,
-            max=model.calibrators_[k].X_max_)
+        apply_clip(scope, T, clipped_df_name, container,
+                   operator_name=scope.get_unique_operator_name('Clip'),
+                   max=model.calibrators_[k].X_max_,
+                   min=model.calibrators_[k].X_min_)
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
@@ -114,12 +112,25 @@ def _transform_isotonic(scope, container, model, T, k):
         'nearest_x_index')
     nearest_y_name = scope.get_unique_variable_name('nearest_y')
 
+    if hasattr(model.calibrators_[k], '_X_'):
+        atX, atY = '_X_', '_y_'
+    elif hasattr(model.calibrators_[k], '_necessary_X_'):
+        atX, atY = '_necessary_X_', '_necessary_y_'
+    else:
+        raise AttributeError(
+            "Unable to find attribute '_X_' or '_necessary_X_' "
+            "for type {}\n{}."
+            "".format(type(model.calibrators_[k]),
+                      dir(model.calibrators_[k])))
+
     container.add_initializer(
         calibrator_x_name, onnx_proto.TensorProto.FLOAT,
-        [len(model.calibrators_[k]._X_)], model.calibrators_[k]._X_)
+        [len(getattr(model.calibrators_[k], atX))],
+        getattr(model.calibrators_[k], atX))
     container.add_initializer(
         calibrator_y_name, onnx_proto.TensorProto.FLOAT,
-        [len(model.calibrators_[k]._y_)], model.calibrators_[k]._y_)
+        [len(getattr(model.calibrators_[k], atY))],
+        getattr(model.calibrators_[k], atY))
 
     apply_reshape(scope, T, reshaped_df_name, container,
                   desired_shape=(-1, 1))
@@ -134,7 +145,13 @@ def _transform_isotonic(scope, container, model, T, k):
         [calibrator_y_name, nearest_x_index_name],
         nearest_y_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
-    return nearest_y_name
+
+    nearest_y_name_reshaped = scope.get_unique_variable_name(
+        'nearest_y_name_reshaped')
+    apply_reshape(scope, nearest_y_name,
+                  nearest_y_name_reshaped, container,
+                  desired_shape=(-1, 1))
+    return nearest_y_name_reshaped
 
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container,
@@ -226,6 +243,10 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     #                           |                        |
     #                           V                        |
     #                        class_prob_tensor [M, C] <--'
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
@@ -234,6 +255,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = base_model
+    container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
     df_name = scope.declare_local_variable('probability_tensor',
@@ -386,14 +408,6 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
                               [], [clf_length])
 
     for clf in op.calibrated_classifiers_:
-        if (hasattr(clf.base_estimator, 'decision_function') and
-                not isinstance(clf.base_estimator,
-                               decision_function_classifiers)):
-            raise NotImplementedError(
-                "'{0}' is not supported with CalibratedClassifierCV yet. "
-                "You may raise an issue at "
-                "https://github.com/onnx/sklearn-onnx/issues"
-                "".format(type(clf.base_estimator)))
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
             scope, operator, container, clf))
 
@@ -424,4 +438,6 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
 
 register_converter('SklearnCalibratedClassifierCV',
-                   convert_sklearn_calibrated_classifier_cv)
+                   convert_sklearn_calibrated_classifier_cv,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False]})

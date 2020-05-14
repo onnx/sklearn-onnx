@@ -22,12 +22,17 @@ def _calculate_proba(scope, operator, container, model):
     """
     final_proba_name = operator.outputs[1].full_name
     proba_list = []
-    has_proba = hasattr(model.estimators_[0], 'predict_proba')
+    options = container.get_options(model, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+    has_proba = (hasattr(model.estimators_[0], 'predict_proba')
+                 or (use_raw_scores and hasattr(
+                     model.estimators_[0], 'decision_function')))
     for index, estimator in enumerate(model.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
         this_operator = scope.declare_local_operator(op_type)
         this_operator.raw_operator = estimator
+        container.add_options(id(estimator), {'raw_scores': use_raw_scores})
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % index)
@@ -83,6 +88,11 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
     """
     Converter for BaggingClassifier.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
+
     bagging_op = operator.raw_operator
     if (not (isinstance(bagging_op.max_features, float) and
              bagging_op.max_features == 1.0)):
@@ -179,6 +189,9 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
 
 
 register_converter('SklearnBaggingClassifier',
-                   convert_sklearn_bagging_classifier)
+                   convert_sklearn_bagging_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
 register_converter('SklearnBaggingRegressor',
                    convert_sklearn_bagging_regressor)

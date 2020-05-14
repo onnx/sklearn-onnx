@@ -3,10 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+from onnx import onnx_pb as onnx_proto
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from ..common._apply_operation import apply_identity
-from ..common.data_types import FloatTensorType
+from ..common.data_types import FloatTensorType, DoubleTensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -23,7 +23,15 @@ def convert_sklearn_tfidf_vectoriser(scope, operator, container):
     cv_operator.inputs = operator.inputs
     cv_output_name = scope.declare_local_variable('count_vec_output')
     columns = max(operator.raw_operator.vocabulary_.values()) + 1
-    cv_output_name.type = FloatTensorType([None, columns])
+    if container.proto_dtype == onnx_proto.TensorProto.FLOAT:
+        clr = FloatTensorType
+    elif container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+        clr = DoubleTensorType
+    else:
+        raise RuntimeError(
+            "Unexpected dtype '{}'. Float or double expected.".format(
+                container.proto_dtype))
+    cv_output_name.type = clr([None, columns])
     cv_operator.outputs.append(cv_output_name)
 
     op_type = sklearn_operator_name_map[TfidfTransformer]
@@ -37,4 +45,5 @@ def convert_sklearn_tfidf_vectoriser(scope, operator, container):
                    operator.outputs[0].full_name, container)
 
 
-register_converter('SklearnTfidfVectorizer', convert_sklearn_tfidf_vectoriser)
+register_converter('SklearnTfidfVectorizer', convert_sklearn_tfidf_vectoriser,
+                   options={'tokenexp': None, 'separators': None})

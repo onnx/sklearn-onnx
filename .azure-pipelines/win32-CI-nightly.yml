@@ -13,10 +13,31 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx150-nightlyRT-Npy1163:
+      Py37-Onnx170-nightlyRT-Npy1180-Sk0230:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.7.0'
+        numpy.version: 'numpy==1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.23.0'
+      Py37-Onnx160-nightlyRT-Npy1180-Sk0230:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.6.0'
+        numpy.version: 'numpy==1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.23.0'
+      Py37-Onnx160-nightlyRT-Npy1180-Sk0221:
+        python.version: '3.7'
+        onnx.version: 'onnx==1.6.0'
+        numpy.version: 'numpy==1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.22.1'
+      Py37-Onnx150-nightlyRT-Npy1180-Sk0213:
         python.version: '3.7'
         onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.16.3'
+        numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.21.3'
@@ -38,8 +59,9 @@ jobs:
       call activate py$(python.version)
       python -m pip install --upgrade pip
       pip install $(numpy.version)
-      pip install $(scipy.version)
+      conda install $(scipy.version)
       pip install $(onnx.version)
+      pip install openpyxl
     displayName: 'Install numpy, scipy, onnx'
 
   - script: |
@@ -79,19 +101,12 @@ jobs:
 
   - script: |
       call activate py$(python.version)
-      pytest tests --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
       call activate py$(python.version)
-      pip install onnxmltools openpyxl
-      coverage run --include=skl2onnx/** tests/benchmark.py
-      coverage report -m
-      coverage html
-    displayName: 'coverage'
-
-  - script: |
-      call activate py$(python.version)
+      python -m pip install openpyxl
       python tests/benchmark.py
     displayName: 'benchmark'
 

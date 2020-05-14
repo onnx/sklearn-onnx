@@ -14,16 +14,25 @@ from sklearn.tree import (
 )
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import onnx_built_with_ml
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from skl2onnx import convert_sklearn
+from onnxruntime import InferenceSession, __version__
 from test_utils import (
     dump_one_class_classification,
     dump_binary_classification,
+    dump_data_and_model,
     dump_multiple_classification,
+    dump_multiple_regression,
+    dump_single_regression,
+    fit_classification_model,
+    fit_multilabel_classification_model,
+    fit_regression_model,
+    TARGET_OPSET
 )
-from test_utils import dump_data_and_model, fit_regression_model
-from test_utils import dump_multiple_regression, dump_single_regression
-from onnxruntime import InferenceSession, __version__
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
@@ -156,8 +165,112 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model_onnx,
             basename="SklearnDecisionTreeRegressionInt",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multi_class_nocl(self):
+        model, X = fit_classification_model(
+            DecisionTreeClassifier(),
+            4, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class nocl",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        dump_data_and_model(
+            X, model, model_onnx, classes=model.classes_,
+            basename="SklearnDTMultiNoCl",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_decision_tree_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            DecisionTreeClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn DecisionTreeClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+            target_opset=TARGET_OPSET
         )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_extra_tree_classifier_multilabel(self):
+        model, X_test = fit_multilabel_classification_model(
+            ExtraTreeClassifier(random_state=42))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ExtraTreeClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            options=options,
+            target_opset=TARGET_OPSET
+        )
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreeClassifierMultiLabel-Out0",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
+        )
+
+    def test_decision_tree_regressor_bool(self):
+        model, X = fit_regression_model(
+            DecisionTreeRegressor(random_state=42), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "decision tree regressor",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeRegressionBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+
+    def test_extra_tree_regressor_bool(self):
+        model, X = fit_regression_model(
+            ExtraTreeRegressor(random_state=42), is_bool=True)
+        model_onnx = convert_sklearn(
+            model,
+            "extra tree regressor",
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreeRegressionBool-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

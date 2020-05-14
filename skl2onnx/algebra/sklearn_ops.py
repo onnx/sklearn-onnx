@@ -21,7 +21,8 @@ def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc):
                      '_fct_converter': conv,
                      '_fct_shape_calc': shape_calc,
                      'input_range': [1, 1e9],
-                     'output_range': [1, 1e9]})
+                     'output_range': [1, 1e9],
+                     'op_version': None})
     return newclass
 
 
@@ -72,8 +73,9 @@ def find_class(skl_cl):
     this = sys.modules[__name__]
     if not hasattr(this, full_name):
         available = sorted(filter(lambda n: prefix in n, sys.modules))
-        raise RuntimeError("Unable to find a class for '{}' in\n".format(
-            skl_cl.__name__, "\n".join(available)))
+        raise RuntimeError(
+            "Unable to find a class for '{}' in\n{}".format(
+                skl_cl.__name__, "\n".join(available)))
     cl = getattr(this, full_name)
     if "automation" in str(cl):
         raise RuntimeError("Dynamic operation issue with class "
@@ -88,7 +90,10 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.Pipeline.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
-    pass
+    def __init__(self, steps, memory=None, verbose=False, op_version=None):
+        Pipeline.__init__(self, steps=steps, memory=memory, verbose=verbose)
+        OnnxSubGraphOperatorMixin.__init__(self)
+        self.op_version = op_version
 
 
 if ColumnTransformer is not None:
@@ -101,7 +106,9 @@ if ColumnTransformer is not None:
         sklearn.compose.ColumnTransformer.html>`_ and
         :class:`OnnxSubGraphOperatorMixin`.
         """
-        pass
+
+        def __init__(self, op_version=None):
+            self.op_version = op_version
 
 
 class OnnxSklearnFeatureUnion(FeatureUnion, OnnxSubGraphOperatorMixin):
@@ -111,7 +118,9 @@ class OnnxSklearnFeatureUnion(FeatureUnion, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.FeatureUnion.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
-    pass
+
+    def __init__(self, op_version=None):
+        self.op_version = op_version
 
 
 _update_module()

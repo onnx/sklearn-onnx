@@ -3,16 +3,55 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+from distutils.version import StrictVersion
 import numpy as np
 from onnx.helper import make_tensor
+from sklearn import __version__
 from ..common._apply_operation import (
-    apply_add, apply_cast, apply_concat, apply_div, apply_exp, apply_mul,
-    apply_reshape, apply_sub, apply_topk, apply_transpose)
-from ..common.data_types import FloatTensorType
+    apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
+    apply_mul, apply_reshape, apply_sub, apply_topk, apply_transpose
+)
+from ..common.data_types import FloatTensorType, DoubleTensorType
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 from .._supported_operators import sklearn_operator_name_map
+
+
+def _scikit_learn_before_022():
+    if '.dev' in __version__:
+        return StrictVersion(
+            __version__.split(".dev")[0]) < StrictVersion("0.22")
+    if '.post' in __version__:
+        return StrictVersion(
+            __version__.split(".post")[0]) < StrictVersion("0.22")
+    return StrictVersion(__version__) < StrictVersion("0.22")
+
+
+def _samme_proba(scope, container, proba_name, weight,
+                 zero_name, classes_ind_name, one_name):
+    weight_name = scope.get_unique_variable_name('weight')
+    container.add_initializer(
+        weight_name, onnx_proto.TensorProto.FLOAT, [], [weight])
+
+    argmax_output_name = scope.get_unique_variable_name('argmax_output')
+    container.add_node('ArgMax', proba_name,
+                       argmax_output_name,
+                       name=scope.get_unique_operator_name('ArgMax'),
+                       axis=1)
+    equal_name = scope.get_unique_variable_name('equal')
+    container.add_node('Equal', [argmax_output_name, classes_ind_name],
+                       equal_name,
+                       name=scope.get_unique_operator_name('Equal'))
+
+    max_proba_name = scope.get_unique_variable_name('probsmax')
+    container.add_node('Where', [equal_name, one_name, zero_name],
+                       max_proba_name,
+                       name=scope.get_unique_operator_name('Where'))
+
+    samme_proba_name = scope.get_unique_variable_name('samme_proba')
+    apply_mul(scope, [max_proba_name, weight_name],
+              samme_proba_name, container, broadcast=1)
+    return samme_proba_name
 
 
 def _samme_r_proba(scope, container, proba_name, n_classes):
@@ -29,15 +68,15 @@ def _samme_r_proba(scope, container, proba_name, n_classes):
     samme_proba_name = scope.get_unique_variable_name('samme_proba')
 
     container.add_initializer(
-        inverted_n_classes_name, onnx_proto.TensorProto.FLOAT,
+        inverted_n_classes_name, container.proto_dtype,
         [], [1. / n_classes])
     container.add_initializer(
-        n_classes_minus_one_name, onnx_proto.TensorProto.FLOAT,
+        n_classes_minus_one_name, container.proto_dtype,
         [], [n_classes - 1])
 
-    container.add_node(
-        'Clip', proba_name, clipped_proba_name,
-        name=scope.get_unique_operator_name('Clip'),
+    apply_clip(
+        scope, proba_name, clipped_proba_name, container,
+        operator_name=scope.get_unique_operator_name('Clip'),
         min=np.finfo(float).eps)
     container.add_node(
         'Log', clipped_proba_name, log_proba_name,
@@ -77,10 +116,10 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     cast_normaliser_name = scope.get_unique_variable_name('cast_normaliser')
 
     container.add_initializer(
-        est_weights_sum_name, onnx_proto.TensorProto.FLOAT,
+        est_weights_sum_name, container.proto_dtype,
         [], [model.estimator_weights_.sum()])
     container.add_initializer(
-        mul_operand_name, onnx_proto.TensorProto.FLOAT,
+        mul_operand_name, container.proto_dtype,
         [], [1. / (model.n_classes_ - 1)])
     container.add_initializer(zero_scalar_name,
                               onnx_proto.TensorProto.INT32, [], [0])
@@ -105,7 +144,7 @@ def _normalise_probability(scope, container, operator, proba_names_list,
                        comparison_result_name,
                        name=scope.get_unique_operator_name('Equal'))
     apply_cast(scope, comparison_result_name, cast_output_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+               container, to=container.proto_dtype)
     apply_add(scope, [normaliser_name, cast_output_name],
               zero_filtered_normaliser_name,
               container, broadcast=0)
@@ -114,32 +153,49 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     return operator.outputs[1].full_name
 
 
-def _samme_proba(scope, container, proba_name, n_classes, weight,
-                 zero_name, classes_ind_name, one_name):
-    weight_name = scope.get_unique_variable_name('weight')
+def _generate_raw_scores(scope, container, operator, proba_names_list, model):
+    summation_prob_name = scope.get_unique_variable_name('summation_proba')
+    est_weights_sum_name = scope.get_unique_variable_name('est_weights')
+
     container.add_initializer(
-        weight_name, onnx_proto.TensorProto.FLOAT, [], [weight])
+        est_weights_sum_name, container.proto_dtype,
+        [], [model.estimator_weights_.sum()])
 
-    argmax_output_name = scope.get_unique_variable_name('argmax_output')
-    container.add_node('ArgMax', proba_name,
-                       argmax_output_name,
-                       name=scope.get_unique_operator_name('ArgMax'),
-                       axis=1)
+    container.add_node(
+        'Sum', proba_names_list, summation_prob_name,
+        name=scope.get_unique_operator_name('Sum'))
+    if len(model.classes_) == 2:
+        div_res_name = scope.get_unique_variable_name('div_res')
+        operand_name = scope.get_unique_variable_name('operand')
+        neg_name = scope.get_unique_variable_name('neg')
+        mul_res_name = scope.get_unique_variable_name('mul_res')
+        pos_class_scores_name = scope.get_unique_variable_name(
+            'pos_class_scores')
+        neg_class_scores_name = scope.get_unique_variable_name(
+            'neg_class_scores')
+        container.add_initializer(
+            operand_name, container.proto_dtype,
+            [2], [-1, 1])
+        container.add_initializer(
+            neg_name, container.proto_dtype,
+            [], [-1])
 
-    equal_name = scope.get_unique_variable_name('equal')
-    container.add_node('Equal', [argmax_output_name, classes_ind_name],
-                       equal_name,
-                       name=scope.get_unique_operator_name('Equal'))
-
-    max_proba_name = scope.get_unique_variable_name('probsmax')
-    container.add_node('Where', [equal_name, one_name, zero_name],
-                       max_proba_name,
-                       name=scope.get_unique_operator_name('Where'))
-
-    samme_proba_name = scope.get_unique_variable_name('samme_proba')
-    apply_mul(scope, [max_proba_name, weight_name],
-              samme_proba_name, container, broadcast=1)
-    return samme_proba_name
+        apply_div(scope, [summation_prob_name, est_weights_sum_name],
+                  div_res_name, container, broadcast=1)
+        apply_mul(scope, [div_res_name, operand_name],
+                  mul_res_name, container, broadcast=1)
+        container.add_node(
+            'ReduceSum', mul_res_name, pos_class_scores_name, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+        apply_mul(scope, [pos_class_scores_name, neg_name],
+                  neg_class_scores_name, container, broadcast=1)
+        apply_concat(
+            scope, [neg_class_scores_name, pos_class_scores_name],
+            operator.outputs[1].full_name, container, axis=1)
+    else:
+        apply_div(scope, [summation_prob_name, est_weights_sum_name],
+                  operator.outputs[1].full_name, container, broadcast=1)
+    return operator.outputs[1].full_name
 
 
 def convert_sklearn_ada_boost_classifier(scope, operator, container):
@@ -153,8 +209,14 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     the probability score for the final result. Label is
     calculated by simply doing an argmax of the probability scores.
     """
+    if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
+        raise RuntimeError(
+            "Option 'nocl' is not implemented for operator '{}'.".format(
+                operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
     op_type = 'TreeEnsembleClassifier'
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
     classes = op.classes_
     class_type = onnx_proto.TensorProto.STRING
     if np.issubdtype(classes.dtype, np.floating):
@@ -173,7 +235,9 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     proba_names_list = []
+    classes_ind_name = None
     zero_name = None
+    one_name = None
     classes_ind_name = None
 
     for i_est, estimator in enumerate(op.estimators_):
@@ -189,45 +253,60 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
 
         if op.algorithm == 'SAMME.R':
             cur_proba_name = _samme_r_proba(
-                scope, container, proba_name.onnx_name, op.n_classes_)
-        else:  # SAMME
-
-            if classes_ind_name is None:
-                classes_ind_name = scope.get_unique_variable_name(
-                    'classes_ind3')
+                scope, container, proba_name.onnx_name, len(classes))
+        else:
+            # SAMME
+            if _scikit_learn_before_022() and not use_raw_scores:
+                weight_name = scope.get_unique_variable_name('weight')
+                samme_proba_name = scope.get_unique_variable_name(
+                    'samme_proba')
                 container.add_initializer(
-                    classes_ind_name, onnx_proto.TensorProto.INT64,
-                    (1, len(classes)), list(range(len(classes))))
+                    weight_name, onnx_proto.TensorProto.FLOAT,
+                    [], [op.estimator_weights_[i_est]])
+                apply_mul(scope, [proba_name.onnx_name, weight_name],
+                          samme_proba_name, container, broadcast=1)
+                cur_proba_name = samme_proba_name
+            else:
+                if classes_ind_name is None:
+                    classes_ind_name = scope.get_unique_variable_name(
+                        'classes_ind3')
+                    container.add_initializer(
+                        classes_ind_name, onnx_proto.TensorProto.INT64,
+                        (1, len(classes)), list(range(len(classes))))
 
-            if zero_name is None:
-                shape_name = scope.get_unique_variable_name('shape')
-                container.add_node(
-                    'Shape', proba_name.onnx_name, shape_name,
-                    name=scope.get_unique_operator_name('Shape'))
+                if zero_name is None:
+                    shape_name = scope.get_unique_variable_name('shape')
+                    container.add_node(
+                        'Shape', proba_name.onnx_name, shape_name,
+                        name=scope.get_unique_operator_name('Shape'))
 
-                zero_name = scope.get_unique_variable_name('zero')
-                container.add_node(
-                    'ConstantOfShape', shape_name, zero_name,
-                    name=scope.get_unique_operator_name('CoSA'),
-                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
-                                      (1, ), [0]))
+                    zero_name = scope.get_unique_variable_name('zero')
+                    container.add_node(
+                        'ConstantOfShape', shape_name, zero_name,
+                        name=scope.get_unique_operator_name('CoSA'),
+                        value=make_tensor(
+                            "value", onnx_proto.TensorProto.FLOAT,
+                            (1, ), [0]))
 
-                one_name = scope.get_unique_variable_name('one')
-                container.add_node(
-                    'ConstantOfShape', shape_name, one_name,
-                    name=scope.get_unique_operator_name('CoSB'),
-                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
-                                      (1, ), [1.]))
+                    one_name = scope.get_unique_variable_name('one')
+                    container.add_node(
+                        'ConstantOfShape', shape_name, one_name,
+                        name=scope.get_unique_operator_name('CoSB'),
+                        value=make_tensor(
+                            "value", onnx_proto.TensorProto.FLOAT,
+                            (1, ), [1.]))
 
-            cur_proba_name = _samme_proba(
-                scope, container, proba_name.onnx_name, op.n_classes_,
-                op.estimator_weights_[i_est], zero_name, classes_ind_name,
-                one_name)
+                cur_proba_name = _samme_proba(
+                    scope, container, proba_name.onnx_name,
+                    op.estimator_weights_[i_est], zero_name,
+                    classes_ind_name, one_name)
 
         proba_names_list.append(cur_proba_name)
 
-    class_prob_name = _normalise_probability(scope, container, operator,
-                                             proba_names_list, op)
+    function = (_generate_raw_scores if use_raw_scores
+                else _normalise_probability)
+    class_prob_name = function(scope, container, operator,
+                               proba_names_list, op)
     container.add_node('ArgMax', class_prob_name,
                        argmax_output_name,
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
@@ -256,7 +335,8 @@ def _get_estimators_label(scope, operator, container, model):
     This function computes labels for each estimator and returns
     a tensor produced by concatenating the labels.
     """
-    op_type = 'TreeEnsembleRegressor'
+    var_type = (FloatTensorType if container.proto_dtype == np.float32
+                else DoubleTensorType)
     concatenated_labels_name = scope.get_unique_variable_name(
         'concatenated_labels')
 
@@ -264,7 +344,7 @@ def _get_estimators_label(scope, operator, container, model):
     estimators_results_list = []
     for i, estimator in enumerate(model.estimators_):
         estimator_label_name = scope.declare_local_variable(
-            'est_label_%d' % i, FloatTensorType([None, 1]))
+            'est_label_%d' % i, var_type([None, 1]))
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
@@ -282,6 +362,7 @@ def _get_estimators_label(scope, operator, container, model):
 
 def cum_sum(scope, container, rnn_input_name, sequence_length):
     opv = container.target_opset
+    weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
     if opv < 11:
         transposed_input_name = scope.get_unique_variable_name(
             'transposed_input')
@@ -291,12 +372,11 @@ def cum_sum(scope, container, rnn_input_name, sequence_length):
         rec_weights_name = scope.get_unique_variable_name('rec_weights')
         rnn_output_name = scope.get_unique_variable_name('rnn_output')
         permuted_rnn_y_name = scope.get_unique_variable_name('permuted_rnn_y')
-        weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
 
         container.add_initializer(weights_name,
-                                  onnx_proto.TensorProto.FLOAT, [1, 1, 1], [1])
+                                  container.proto_dtype, [1, 1, 1], [1])
         container.add_initializer(rec_weights_name,
-                                  onnx_proto.TensorProto.FLOAT, [1, 1, 1], [1])
+                                  container.proto_dtype, [1, 1, 1], [1])
 
         apply_transpose(scope, rnn_input_name, transposed_input_name,
                         container, perm=(1, 0))
@@ -313,17 +393,15 @@ def cum_sum(scope, container, rnn_input_name, sequence_length):
         apply_reshape(
             scope, permuted_rnn_y_name, weights_cdf_name, container,
             desired_shape=(-1, sequence_length))
-        return weights_cdf_name
     else:
         axis_name = scope.get_unique_variable_name('axis_name')
         container.add_initializer(axis_name, onnx_proto.TensorProto.INT32,
                                   [], [1])
-        weights_cdf_name = scope.get_unique_variable_name('weights_cdf')
         container.add_node(
             'CumSum', [rnn_input_name, axis_name], [weights_cdf_name],
             name=scope.get_unique_operator_name('CumSum'),
             op_version=11)
-        return weights_cdf_name
+    return weights_cdf_name
 
 
 def _apply_gather_elements(scope, container, inputs, output, axis,
@@ -361,7 +439,7 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
                            selected,
                            name=scope.get_unique_operator_name('Where'))
         container.add_node('ReduceSum', selected, output, axes=[1],
-                           name=scope.get_unique_operator_name('Where'))
+                           name=scope.get_unique_operator_name('ReduceSum'))
 
 
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
@@ -397,13 +475,13 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     median_estimators_name = scope.get_unique_variable_name(
         'median_estimators')
 
-    container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(negate_name, container.proto_dtype,
                               [], [-1])
     container.add_initializer(estimators_weights_name,
-                              onnx_proto.TensorProto.FLOAT,
+                              container.proto_dtype,
                               [len(op.estimator_weights_)],
                               op.estimator_weights_)
-    container.add_initializer(half_scalar_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(half_scalar_name, container.proto_dtype,
                               [], [0.5])
     container.add_initializer(last_index_name, onnx_proto.TensorProto.INT64,
                               [], [len(op.estimators_) - 1])
@@ -412,9 +490,15 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
                                                 container, op)
     apply_mul(scope, [concatenated_labels, negate_name],
               negated_labels_name, container, broadcast=1)
-    apply_topk(scope, negated_labels_name,
-               [sorted_values_name, sorted_indices_name],
-               container, k=len(op.estimators_))
+    try:
+        apply_topk(scope, negated_labels_name,
+                   [sorted_values_name, sorted_indices_name],
+                   container, k=len(op.estimators_))
+    except TypeError:
+        # onnxconverter-common < 1.7.0
+        apply_topk(scope, [negated_labels_name],
+                   [sorted_values_name, sorted_indices_name],
+                   container, k=len(op.estimators_))
     container.add_node(
         'ArrayFeatureExtractor',
         [estimators_weights_name, sorted_indices_name],
@@ -437,7 +521,7 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
         median_or_above_name,
         name=scope.get_unique_operator_name('Less'))
     apply_cast(scope, median_or_above_name, cast_result_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+               container, to=container.proto_dtype)
     container.add_node('ArgMin', cast_result_name,
                        median_idx_name,
                        name=scope.get_unique_operator_name('ArgMin'), axis=1)
@@ -449,10 +533,13 @@ def convert_sklearn_ada_boost_regressor(scope, operator, container):
     _apply_gather_elements(
         scope, container, [concatenated_labels, median_estimators_name],
         output_name, axis=1, dim=len(op.estimators_),
-        zero_type=onnx_proto.TensorProto.FLOAT, suffix="B")
+        zero_type=container.proto_dtype, suffix="B")
 
 
 register_converter('SklearnAdaBoostClassifier',
-                   convert_sklearn_ada_boost_classifier)
+                   convert_sklearn_ada_boost_classifier,
+                   options={'zipmap': [True, False],
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
 register_converter('SklearnAdaBoostRegressor',
                    convert_sklearn_ada_boost_regressor)
