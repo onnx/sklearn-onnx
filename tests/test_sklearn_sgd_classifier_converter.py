@@ -1,8 +1,10 @@
 """Tests scikit-learn's SGDClassifier converter."""
 
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from sklearn.linear_model import SGDClassifier
+from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -213,6 +215,8 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("1.0.0"),
+                     reason="discrepencies")
     def test_model_sgd_multi_class_log_l1_no_intercept(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
