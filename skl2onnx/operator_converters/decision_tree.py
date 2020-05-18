@@ -76,7 +76,8 @@ def populate_tree_attributes(model, name):
     return attrs
 
 
-def predict(model, scope, operator, container, op_type, is_ensemble=False):
+def predict(model, scope, operator, container,
+            op_type, op_domain, op_version, is_ensemble=False):
     """Predict target and calculate probability scores."""
     indices_name = scope.get_unique_variable_name('indices')
     dummy_proba_name = scope.get_unique_variable_name('dummy_proba')
@@ -105,7 +106,7 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
         container.add_node(
             op_type, input_name,
             [indices_name, dummy_proba_name],
-            op_domain='ai.onnx.ml', **attrs)
+            op_domain=op_domain, op_version=op_version, **attrs)
     else:
         zero_name = scope.get_unique_variable_name('zero')
         zero_matrix_name = scope.get_unique_variable_name('zero_matrix')
@@ -145,9 +146,10 @@ def predict(model, scope, operator, container, op_type, is_ensemble=False):
     return transposed_result_name
 
 
-def convert_sklearn_decision_tree_classifier(scope, operator, container):
+def convert_sklearn_decision_tree_classifier(
+        scope, operator, container, op_type='TreeEnsembleClassifier',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleClassifier'
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -177,10 +179,10 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
         container.add_node(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
-            op_domain='ai.onnx.ml', **attrs)
+            op_domain=op_domain, op_version=op_version, **attrs)
     else:
         transposed_result_name = predict(
-            op, scope, operator, container, op_type)
+            op, scope, operator, container, op_type, op_version)
         predictions = []
         for k in range(op.n_outputs_):
             preds_name = scope.get_unique_variable_name('preds')
@@ -221,9 +223,10 @@ def convert_sklearn_decision_tree_classifier(scope, operator, container):
                      container, axis=1)
 
 
-def convert_sklearn_decision_tree_regressor(scope, operator, container):
+def convert_sklearn_decision_tree_regressor(
+        scope, operator, container, op_type='TreeEnsembleClassifier',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleRegressor'
 
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -239,9 +242,9 @@ def convert_sklearn_decision_tree_regressor(scope, operator, container):
                    container, to=onnx_proto.TensorProto.FLOAT)
         input_name = [cast_input_name]
 
-    container.add_node(op_type, input_name,
-                       operator.output_full_names, op_domain='ai.onnx.ml',
-                       **attrs)
+    container.add_node(
+        op_type, input_name, operator.output_full_names,
+        op_domain=op_domain, op_version=op_version, **attrs)
 
 
 register_converter('SklearnDecisionTreeClassifier',
