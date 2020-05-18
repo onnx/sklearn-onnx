@@ -205,8 +205,8 @@ def convert_sklearn_random_forest_classifier(
             reshaped_est_proba_name = scope.get_unique_variable_name(
                 'reshaped_est_proba')
             est_proba = predict(
-                est, scope, operator, container, op_type, op_version,
-                is_ensemble=True)
+                est, scope, operator, container, op_type, op_domain,
+                op_version, is_ensemble=True)
             apply_reshape(
                 scope, est_proba, reshaped_est_proba_name, container,
                 desired_shape=(
