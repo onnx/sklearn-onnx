@@ -182,7 +182,7 @@ def convert_sklearn_decision_tree_classifier(
             op_domain=op_domain, op_version=op_version, **attrs)
     else:
         transposed_result_name = predict(
-            op, scope, operator, container, op_type, op_version)
+            op, scope, operator, container, op_type, op_domain, op_version)
         predictions = []
         for k in range(op.n_outputs_):
             preds_name = scope.get_unique_variable_name('preds')
@@ -224,7 +224,7 @@ def convert_sklearn_decision_tree_classifier(
 
 
 def convert_sklearn_decision_tree_regressor(
-        scope, operator, container, op_type='TreeEnsembleClassifier',
+        scope, operator, container, op_type='TreeEnsembleRegressor',
         op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
 
