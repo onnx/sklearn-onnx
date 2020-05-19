@@ -402,7 +402,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             n_classes=2, n_samples=100, random_state=42,
             n_features=100, n_informative=7)
 
-        X_train, X_test, y_train, y_test = train_test_split(
+        X_train, X_test, y_train, _ = train_test_split(
             X, y, test_size=0.5, random_state=42)
         model = OneVsRestClassifier(
             estimator=GradientBoostingClassifier(random_state=42))
