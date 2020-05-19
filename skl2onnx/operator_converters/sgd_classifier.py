@@ -155,7 +155,9 @@ def _predict_proba_modified_huber(scope, operator, container,
     container.add_initializer(constant_name, onnx_proto.TensorProto.FLOAT,
                               [], [2])
 
-    apply_clip(scope, scores, clipped_scores_name, container, max=1, min=-1)
+    apply_clip(scope, scores, clipped_scores_name, container,
+               max=np.array(1, dtype=container.dtype),
+               min=np.array(-1, dtype=container.dtype))
     apply_add(scope, [clipped_scores_name, unity_name],
               add_result_name, container, broadcast=1)
     apply_div(scope, [add_result_name, constant_name],
