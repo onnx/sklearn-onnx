@@ -412,7 +412,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         onnx_model = convert_sklearn(
             model, 'lr',
             [('input', FloatTensorType([None, X_test.shape[1]]))],
-            options=options)
+            options=options, target_opset=TARGET_OPSET)
         sess = InferenceSession(onnx_model.SerializeToString())
         res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
         exp = model.predict(X_test)
