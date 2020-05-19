@@ -385,7 +385,7 @@ class TestSklearnPipeline(unittest.TestCase):
             ColumnTransformer(
                 [('pca', PCA(n_components=5), slice(0, 10)),
                  ('svd', TruncatedSVD(n_components=5), slice(10, 100))],
-                transformer_weights={'pca': 2, 'svd': 3}), 3)
+                transformer_weights={'pca': 2, 'svd': 3}), 3, n_features=100)
         model_onnx = convert_sklearn(
             model,
             "column transformer weights",
@@ -413,7 +413,7 @@ class TestSklearnPipeline(unittest.TestCase):
             ColumnTransformer(
                 [('pca', PCA(n_components=5), slice(0, 10)),
                  ('svd', TruncatedSVD(n_components=5), slice(80, 100))],
-                remainder='drop'), 3)
+                remainder='drop'), 3, n_features=100)
         model_onnx = convert_sklearn(
             model,
             "column transformer drop",
@@ -442,7 +442,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 [('pca', PCA(n_components=5), slice(0, 10)),
                  ('svd', TruncatedSVD(n_components=5), slice(80, 100))],
                 transformer_weights={'pca': 2, 'svd': 3},
-                remainder='passthrough'), 3)
+                remainder='passthrough'), 3, n_features=100)
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
@@ -470,7 +470,7 @@ class TestSklearnPipeline(unittest.TestCase):
             ColumnTransformer(
                 [('pca', PCA(n_components=5), slice(0, 10)),
                  ('svd', TruncatedSVD(n_components=5), slice(70, 80))],
-                remainder='passthrough'), 3)
+                remainder='passthrough'), 3, n_features=100)
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
