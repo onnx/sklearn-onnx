@@ -27,13 +27,11 @@ class TestSklearnKMeansModel(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
-            model,
-            model_onnx,
+            model, model_onnx,
             basename="SklearnKMeans-Dec4",
             # Operator gemm is not implemented in onnxruntime
             allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+                          " < StrictVersion('1.2')")
 
     def test_batchkmeans_clustering(self):
         data = load_iris()
@@ -72,6 +70,25 @@ class TestSklearnKMeansModel(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2')",
         )
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
+                     reason="OnnxOperator not working")
+    def test_batchkmeans_clustering_opset11(self):
+        data = load_iris()
+        X = data.data
+        model = MiniBatchKMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "kmeans",
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=11)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[40:60],
+            model,
+            model_onnx,
+            basename="SklearnKMeansOp9-Dec4",
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.2')")
 
     def test_batchkmeans_clustering_opset1(self):
         data = load_iris()

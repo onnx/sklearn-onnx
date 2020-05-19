@@ -180,26 +180,20 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         model, X = fit_classification_model(
             BaggingClassifier(GradientBoostingClassifier(
                                   random_state=42, n_estimators=10),
-                              random_state=42), 4)
+                              random_state=42), 4, n_features=40)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
-            model,
-            "bagging classifier",
+            model, "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            dtype=np.float32, options=options,
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:5],
-            model,
-            model_onnx,
+            X[:15], model, model_onnx,
             basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function'],
-        )
+            methods=['predict', 'decision_function'])
 
     def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
