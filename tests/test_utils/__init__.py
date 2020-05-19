@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import os
 import numpy as np
 import onnx
 from .tests_helper import dump_data_and_model  # noqa
@@ -31,4 +32,21 @@ def create_tensor(N, C, H=None, W=None):
         raise ValueError('This function only produce 2-D or 4-D tensor.')
 
 
-TARGET_OPSET = min(11, onnx.defs.onnx_opset_version())
+def _get_ir_version(opv):
+    if opv >= 12:
+        return 7
+    if opv >= 11:
+        return 6
+    if opv >= 10:
+        return 5
+    if opv >= 9:
+        return 4
+    if opv >= 8:
+        return 4
+    return 3
+
+
+TARGET_OPSET = int(os.environ.get('TEST_TARGET_OPSET',
+                                  onnx.defs.onnx_opset_version()))
+TARGET_IR = int(os.environ.get('TEST_TARGET_IR',
+                               _get_ir_version(TARGET_OPSET)))

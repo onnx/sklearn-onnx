@@ -50,9 +50,10 @@ def _has_transform_model(model):
 
 def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
-                             random_state=42, is_bool=False):
-    X, y = make_classification(n_classes=n_classes, n_features=100,
-                               n_samples=1000,
+                             random_state=42, is_bool=False,
+                             n_features=20):
+    X, y = make_classification(n_classes=n_classes, n_features=n_features,
+                               n_samples=500,
                                random_state=random_state,
                                n_informative=7)
     if label_string:
@@ -69,7 +70,7 @@ def fit_classification_model(model, n_classes, is_int=False,
 
 
 def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
-                                        n_samples=1000, n_features=100,
+                                        n_samples=400, n_features=20,
                                         is_int=False):
     X, y = make_multilabel_classification(
         n_classes=n_classes, n_labels=n_labels, n_features=n_features,
@@ -83,7 +84,7 @@ def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
 
 def fit_regression_model(model, is_int=False, n_targets=1, is_bool=False,
                          factor=1.):
-    X, y = make_regression(n_features=10, n_samples=1000,
+    X, y = make_regression(n_features=10, n_samples=500,
                            n_targets=n_targets, random_state=42)
     y *= factor
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)

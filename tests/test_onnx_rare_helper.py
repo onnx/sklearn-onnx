@@ -9,6 +9,7 @@ from onnx.defs import onnx_opset_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.helpers.onnx_rare_helper import upgrade_opset_number
+from test_utils import TARGET_OPSET
 
 
 class TestOnnxRareHelper(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestOnnxRareHelper(unittest.TestCase):
         model8 = upgrade_opset_number(model_onnx, 8)
         assert "version: 8" in str(model8)
 
-    @unittest.skipIf(onnx_opset_version() <= 11,
+    @unittest.skipIf(onnx_opset_version() < 11,
                      reason="Needs opset >= 11")
     def test_knn_upgrade(self):
         iris = load_iris()
@@ -42,7 +43,7 @@ class TestOnnxRareHelper(unittest.TestCase):
         except RuntimeError:
             pass
         try:
-            upgrade_opset_number(model_onnx, 11)
+            upgrade_opset_number(model_onnx, TARGET_OPSET)
         except RuntimeError as e:
             assert "was updated" in str(e)
 
