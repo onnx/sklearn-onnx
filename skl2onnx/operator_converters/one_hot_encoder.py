@@ -90,9 +90,28 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
 
         if isinstance(inp_type, (Int64TensorType, Int32TensorType)):
             attrs['cats_int64s'] = categories.astype(np.int64)
-        else:
+        elif isinstance(inp_type, StringTensorType):
             attrs['cats_strings'] = np.array(
                 [str(s).encode('utf-8') for s in categories])
+        elif isinstance(inp_type, (FloatTensorType, DoubleTensorType)):
+            # The converter checks that categories can be casted into
+            # integers. String is not allowed here.
+            # Input type is casted into int64.
+            for c in categories:
+                try:
+                    ci = int(c)
+                except TypeError:
+                    raise RuntimeError(
+                        "Category '{}' cannot be casted into int.".format(c))
+                if ci != c:
+                    raise RuntimeError(
+                        "Category '{}' is not an int64.".format(c))
+            attrs['cats_int64s'] = categories.astype(np.int64)
+        else:
+            raise RuntimeError(
+                "Input type {} is not supported for OneHotEncoder. "
+                "Ideally, it should either integer or strings.".format(
+                    inp_type))
 
         ohe_output = scope.get_unique_variable_name(name + 'out')
 
