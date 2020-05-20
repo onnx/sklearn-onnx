@@ -11,7 +11,11 @@ import numpy as np
 from onnxruntime import __version__ as ort_version
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    # old version of scikit-learn
+    ColumnTransformer = None
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from sklearn.pipeline import Pipeline
@@ -24,10 +28,10 @@ from test_utils import (
 class TestSklearnArrayFeatureExtractor(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        ColumnTransformer is None or
+            StrictVersion(ort_version) <= StrictVersion("0.4.0"),
         reason="onnxruntime too old")
     def test_array_feature_extractor(self):
-        # dataset would be much larger in reality
         data_to_cluster = pd.DataFrame(
             [[1, 2, 3.5, 4.5], [1, 2, 1.7, 4.0],
              [2, 4, 2.4, 4.3], [2, 4, 2.5, 4.0]],
