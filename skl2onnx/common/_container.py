@@ -641,3 +641,13 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         return _build_options(
             model, self.options, default_values,
             self._get_allowed_options(model))
+
+    def has_options(self, model, option_name):
+        """
+        Tells if a model allows one specific options.
+
+        :param model: model being converted
+        :return: boolean
+        """
+        opts = self._get_allowed_options(model)
+        return option_name in opts

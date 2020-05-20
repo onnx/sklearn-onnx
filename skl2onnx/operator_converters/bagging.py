@@ -32,7 +32,9 @@ def _calculate_proba(scope, operator, container, model):
 
         this_operator = scope.declare_local_operator(op_type)
         this_operator.raw_operator = estimator
-        container.add_options(id(estimator), {'raw_scores': use_raw_scores})
+        if container.has_options(estimator, 'raw_scores'):
+            container.add_options(
+                id(estimator), {'raw_scores': use_raw_scores})
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % index)
@@ -107,6 +109,7 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
             "not supported with BaggingClassifier yet. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues")
+
     classes = bagging_op.classes_
     output_shape = (-1,)
     classes_name = scope.get_unique_variable_name('classes')
@@ -114,6 +117,7 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
     array_feature_extractor_result_name = scope.get_unique_variable_name(
         'array_feature_extractor_result')
     class_type = onnx_proto.TensorProto.STRING
+
     if np.issubdtype(bagging_op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
@@ -125,13 +129,14 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     proba_name = _calculate_proba(scope, operator, container, bagging_op)
-    container.add_node('ArgMax', proba_name,
-                       argmax_output_name,
-                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
+    container.add_node(
+        'ArgMax', proba_name, argmax_output_name,
+        name=scope.get_unique_operator_name('ArgMax'), axis=1)
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, argmax_output_name],
         array_feature_extractor_result_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+
     if class_type == onnx_proto.TensorProto.INT32:
         cast_result_name = scope.get_unique_variable_name('cast_result')
         reshaped_result_name = scope.get_unique_variable_name(
