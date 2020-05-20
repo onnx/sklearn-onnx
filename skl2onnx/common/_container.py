@@ -620,6 +620,15 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             "No registered models, no known allowed options "
             "for model '{}'.".format(clname))
 
+    def validate_options(self, operator):
+        """
+        Validates every operator allows the options
+        given by the user at converter time
+        for an operator.
+        """
+        skl_op = operator.raw_operator
+        self.get_options(skl_op)
+
     def get_options(self, model, default_values=None):
         """
         Returns additional options for a model.
