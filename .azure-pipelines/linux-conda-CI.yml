@@ -271,19 +271,19 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation examples'
-    condition: eq(variables['run.example'], '1')
+      python -m pip install git+https://github.com/xadupre/onnxmltools.git@i396xgb
+      pytest tests_onnxmltools --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results-onnxmltools.xml
+    displayName: 'run onnxmltools tests'
+    condition: eq(variables['run.onnxmltools'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      python -m pip install git+https://github.com/xadupre/onnxmltools.git@i396xgb
-      pytest tests_onnxmltools --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results-onnxmltools.xml
-    displayName: 'run onnxmltools tests'
-    condition: eq(variables['run.onnxmltools'], '1')
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+    displayName: 'run documentation examples'
+    condition: eq(variables['run.example'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]

@@ -181,7 +181,7 @@ jobs:
   - script: |
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
-      pip install lightgbm xgboost
+      pip install lightgbm xgboost pydot
       pip install onnxmltools --no-deps
     displayName: 'install onnxmltools'
 
