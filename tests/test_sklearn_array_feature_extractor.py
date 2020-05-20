@@ -29,7 +29,7 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None or
-            StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
         reason="onnxruntime too old")
     def test_array_feature_extractor(self):
         data_to_cluster = pd.DataFrame(
