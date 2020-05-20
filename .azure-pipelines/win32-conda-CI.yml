@@ -188,6 +188,7 @@ jobs:
   - script: |
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
+      python -m pip install git+https://github.com/onnx/onnxmltools.git@i396xgb
       python -m pytest tests_onnxmltools --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results-onnxmltools.xml
     displayName: 'run onnxmltools tests'
     condition: eq(variables['run.onnxmltools'], '1')
