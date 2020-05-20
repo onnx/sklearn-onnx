@@ -30,6 +30,11 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import onnxruntime
 from onnxruntime import InferenceSession
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import (
+        NotImplemented as OrtImpl)
+except ImportError:
+    OrtImpl = RuntimeError
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     DoubleTensorType,
@@ -85,6 +90,31 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model, model_onnx,
             basename="SklearnKNeighborsRegressor")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_regressor_double(self):
+        model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
+        model_onnx = convert_sklearn(
+            model, "KNN regressor",
+            [("input", DoubleTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'optim': 'cdist'}},
+            dtype=numpy.float64)
+        self.assertIsNotNone(model_onnx)
+        try:
+            InferenceSession(model_onnx.SerializeToString())
+        except OrtImpl as e:
+            if ("Could not find an implementation for the node "
+                    "To_TopK:TopK(11)") in str(e):
+                # onnxruntime does not declare TopK(11) for double
+                return
+            raise e
+        dump_data_and_model(
+            X.astype(numpy.float64)[:7],
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressor64")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -613,4 +643,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestNearestNeighbourConverter().test_model_knn_regressor_double()
     unittest.main()
