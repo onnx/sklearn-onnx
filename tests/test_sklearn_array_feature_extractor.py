@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
+from distutils.version import StrictVersion
 import pandas as pd
 import numpy as np
+from onnxruntime import __version__ as ort_version
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -20,6 +22,10 @@ from test_utils import (
 
 
 class TestSklearnArrayFeatureExtractor(unittest.TestCase):
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="onnxruntime too old")
     def test_array_feature_extractor(self):
         # dataset would be much larger in reality
         data_to_cluster = pd.DataFrame(
