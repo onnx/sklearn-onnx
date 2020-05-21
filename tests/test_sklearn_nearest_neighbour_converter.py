@@ -525,6 +525,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             dtype=numpy.float32)
         model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
         for opset in [9, 10, 11, 12]:
+            if opset > TARGET_OPSET:
+                continue
             model_onnx = convert_sklearn(
                 model, "KNN imputer",
                 [("input", FloatTensorType((None, x_test.shape[1])))],
@@ -556,6 +558,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 options={id(model): {'optim2': 'cdist'}})
 
         for opset in [12, 11, 10, 9]:
+            if opset > TARGET_OPSET:
+                continue
             model_onnx = convert_sklearn(
                 model, "KNN imputer",
                 [("input", FloatTensorType((None, x_test.shape[1])))],
