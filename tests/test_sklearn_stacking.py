@@ -77,6 +77,25 @@ class TestStackingConverter(unittest.TestCase):
             comparable_outputs=[0]
         )
 
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    def test_model_stacking_classifier_nozipmap(self):
+        model, X = fit_classification_model(
+            model_to_test_cl(), n_classes=2)
+        model_onnx = convert_sklearn(
+            model, "stacking classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'zipmap': False}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingClassifierNoZipMap",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+            comparable_outputs=[0])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -201,6 +201,23 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_ovr_classification_float_binary_nozipmap(self):
+        model, X = fit_classification_model(
+            OneVsRestClassifier(LogisticRegression()), 2)
+        model_onnx = convert_sklearn(
+            model, "ovr classification",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'zipmap': False}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnOVRClassificationFloatBinNoZipMap",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_ovr_classification_int_binary(self):
         model, X = fit_classification_model(
             OneVsRestClassifier(LogisticRegression()), 2, is_int=True)
