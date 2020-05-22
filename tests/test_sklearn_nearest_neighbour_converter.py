@@ -16,7 +16,7 @@ from sklearn.neighbors import (
     NearestNeighbors,
 )
 try:
-    from sklearn.imputer import KNNImputer
+    from sklearn.impute import KNNImputer
     from sklearn.neighbors import (
         KNeighborsTransformer,
         NeighborhoodComponentsAnalysis,
@@ -557,20 +557,53 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             [[1.3, 2.4, numpy.nan, 1], [-1.3, numpy.nan, 3.1, numpy.nan]],
             dtype=numpy.float32)
         model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
-        for opset in [9, 10, 11]:
+        for opset in [9, 10, 11, 12]:
+            if opset > TARGET_OPSET:
+                continue
             model_onnx = convert_sklearn(
-                model,
-                "KNN imputer",
+                model, "KNN imputer",
                 [("input", FloatTensorType((None, x_test.shape[1])))],
-                target_opset=opset,
-            )
+                target_opset=opset)
             self.assertIsNotNone(model_onnx)
             dump_data_and_model(
-                x_test,
-                model,
-                model_onnx,
-                basename="SklearnKNNImputer",
-            )
+                x_test, model, model_onnx,
+                basename="SklearnKNNImputer%d" % opset)
+
+    @unittest.skipIf(KNNImputer is None,
+                     reason="new in 0.22")
+    @unittest.skipIf((StrictVersion(onnx.__version__) <
+                      StrictVersion("1.4.1")),
+                     reason="ConstantOfShape op not available")
+    def test_sklearn_knn_imputer_cdist(self):
+        x_train = numpy.array(
+            [[1, 2, numpy.nan, 12], [3, numpy.nan, 3, 13],
+             [1, 4, numpy.nan, 1], [numpy.nan, 4, 3, 12]], dtype=numpy.float32)
+        x_test = numpy.array(
+            [[1.3, 2.4, numpy.nan, 1], [-1.3, numpy.nan, 3.1, numpy.nan]],
+            dtype=numpy.float32)
+        model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
+
+        with self.assertRaises(NameError):
+            convert_sklearn(
+                model, "KNN imputer",
+                [("input", FloatTensorType((None, x_test.shape[1])))],
+                target_opset=TARGET_OPSET,
+                options={id(model): {'optim2': 'cdist'}})
+
+        for opset in [12, 11, 10, 9]:
+            if opset > TARGET_OPSET:
+                continue
+            model_onnx = convert_sklearn(
+                model, "KNN imputer",
+                [("input", FloatTensorType((None, x_test.shape[1])))],
+                target_opset=opset,
+                options={id(model): {'optim': 'cdist'}})
+            self.assertIsNotNone(model_onnx)
+            self.assertIn('op_type: "cdist"', str(model_onnx).lower())
+            self.assertNotIn('scan', str(model_onnx).lower())
+            dump_data_and_model(
+                x_test, model, model_onnx,
+                basename="SklearnKNNImputer%dcdist" % opset)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
