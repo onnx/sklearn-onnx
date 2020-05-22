@@ -47,8 +47,9 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                                    "regressor with only one target.")
             p1 = score_name.raw_name
         else:
-            container.add_options(
-                id(estimator), {'raw_scores': use_raw_scores})
+            if container.has_options(estimator, 'raw_scores'):
+                container.add_options(
+                    id(estimator), {'raw_scores': use_raw_scores})
             label_name = scope.declare_local_variable('label_%d' % i)
             prob_name = scope.declare_local_variable('proba_%d' % i,
                                                      FloatTensorType())

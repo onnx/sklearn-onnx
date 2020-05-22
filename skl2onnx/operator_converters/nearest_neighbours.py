@@ -405,7 +405,7 @@ def convert_k_neighbours_transformer(scope, operator, container):
     res.add_to(scope, container)
 
 
-def _nan_euclidean_distance(container, model, input_name, op_version):
+def _nan_euclidean_distance(container, model, input_name, op_version, optim):
     training_data = model._fit_X.astype(container.dtype)
     shape = OnnxShape(input_name, op_version=op_version)
     zero = OnnxConstantOfShape(
@@ -419,9 +419,18 @@ def _nan_euclidean_distance(container, model, input_name, op_version):
     training_data[missing_y] = 0
     d_in = training_data.shape[1] if hasattr(training_data, 'shape') else None
     d_out = training_data.shape[0] if hasattr(training_data, 'shape') else None
-    dist = _onnx_cdist_sqeuclidean(
-        masked_input_name, training_data, dtype=container.dtype,
-        op_version=container.target_opset, dim_in=d_in, dim_out=d_out)
+
+    if optim is None:
+        dist = _onnx_cdist_sqeuclidean(
+            masked_input_name, training_data, dtype=container.dtype,
+            op_version=container.target_opset, dim_in=d_in, dim_out=d_out)
+    elif optim == 'cdist':
+        from skl2onnx.algebra.custom_ops import OnnxCDist
+        dist = OnnxCDist(
+            masked_input_name, training_data, metric='sqeuclidean',
+            op_version=container.target_opset)
+    else:
+        raise RuntimeError("Unexpected optimization '{}'.".format(optim))
     dist1 = OnnxMatMul(
         OnnxMul(masked_input_name, masked_input_name, op_version=op_version),
         missing_y.T.astype(container.dtype), op_version=op_version)
@@ -446,9 +455,9 @@ def _nan_euclidean_distance(container, model, input_name, op_version):
 
 
 def _nearest_neighbours(container, model, input_name,
-                        op_version, **kwargs):
+                        op_version, optim, **kwargs):
     dist, missing_input_name = _nan_euclidean_distance(
-        container, model, input_name, op_version)
+        container, model, input_name, op_version, optim)
     dtype = container.dtype
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array(
@@ -484,13 +493,14 @@ def convert_knn_imputer(scope, operator, container):
             'KNNImputer with distance as metric is not supported, '
             'you may raise an issue at '
             'https://github.com/onnx/sklearn-onnx/issues.')
+    options = container.get_options(knn_op, dict(optim=None))
     op_version = container.target_opset
     input_name = operator.inputs[0]
     training_data = knn_op._fit_X.astype(container.dtype)
     training_data[np.isnan(training_data)] = 0
     out = operator.outputs
     top_indices, missing_input_name = _nearest_neighbours(
-        container, knn_op, input_name, op_version)
+        container, knn_op, input_name, op_version, options['optim'])
     flattened = OnnxFlatten(top_indices, op_version=op_version)
     extracted = OnnxArrayFeatureExtractor(
         training_data.T, flattened, op_version=op_version)
@@ -558,6 +568,7 @@ register_converter(
     'SklearnNearestNeighbors', convert_nearest_neighbors_transform,
     options={'optim': [None, 'cdist']})
 register_converter(
-    'SklearnKNNImputer', convert_knn_imputer)
+    'SklearnKNNImputer', convert_knn_imputer,
+    options={'optim': [None, 'cdist']})
 register_converter(
     'SklearnNeighborhoodComponentsAnalysis', convert_nca)
