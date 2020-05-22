@@ -1051,6 +1051,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                     "https://github.com/onnx/sklearn-onnx/issues."
                     "".format(operator.type,
                               type(getattr(operator, 'raw_model', None))))
+        container.validate_options(operator)
         conv(scope, operator, container)
 
     # Create a graph from its main components

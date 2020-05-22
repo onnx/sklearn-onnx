@@ -50,6 +50,25 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_calibrated_classifier_cv_float_nozipmap(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        clf = MultinomialNB().fit(X, y)
+        model = CalibratedClassifierCV(clf, cv=2, method="sigmoid").fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "scikit-learn CalibratedClassifierCVMNB",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'zipmap': False}})
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnCalibratedClassifierCVFloatNoZipMap",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_calibrated_classifier_cv_int(self):
         data = load_digits()
         X, y = data.data, data.target
