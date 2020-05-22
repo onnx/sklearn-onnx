@@ -2,7 +2,9 @@
 Tests scikit-learn's tfidf converter using downloaded data.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
+import onnx
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
@@ -13,6 +15,9 @@ from test_utils import dump_data_and_model
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_tfidf_20newsgroups(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
