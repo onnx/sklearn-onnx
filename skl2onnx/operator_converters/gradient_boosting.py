@@ -16,9 +16,10 @@ from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
 from ..proto import onnx_proto
 
 
-def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
+def convert_sklearn_gradient_boosting_classifier(
+        scope, operator, container, op_type='TreeEnsembleClassifier',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleClassifier'
     if op.loss != 'deviance':
         raise NotImplementedError(
             "Loss '{0}' is not supported yet. You "
@@ -90,12 +91,13 @@ def convert_sklearn_gradient_boosting_classifier(scope, operator, container):
     container.add_node(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
-            op_domain='ai.onnx.ml', **attrs)
+            op_domain=op_domain, op_version=op_version, **attrs)
 
 
-def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
+def convert_sklearn_gradient_boosting_regressor(
+        scope, operator, container, op_type='TreeEnsembleRegressor',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = 1
@@ -134,9 +136,9 @@ def convert_sklearn_gradient_boosting_regressor(scope, operator, container):
                    container, to=onnx_proto.TensorProto.FLOAT)
         input_name = cast_input_name
 
-    container.add_node(op_type, input_name,
-                       operator.output_full_names, op_domain='ai.onnx.ml',
-                       **attrs)
+    container.add_node(
+        op_type, input_name, operator.output_full_names,
+        op_domain=op_domain, op_version=op_version, **attrs)
 
 
 register_converter('SklearnGradientBoostingClassifier',

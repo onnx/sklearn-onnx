@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
-
 from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
@@ -95,11 +94,12 @@ def _transform_isotonic(scope, container, model, T, k):
     """
     if model.calibrators_[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
-
         apply_clip(scope, T, clipped_df_name, container,
                    operator_name=scope.get_unique_operator_name('Clip'),
-                   max=model.calibrators_[k].X_max_,
-                   min=model.calibrators_[k].X_min_)
+                   max=np.array(model.calibrators_[k].X_max_,
+                                dtype=container.dtype),
+                   min=np.array(model.calibrators_[k].X_min_,
+                                dtype=container.dtype))
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
@@ -255,7 +255,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = base_model
-    container.add_options(id(base_model), {'raw_scores': True})
+    if container.has_options(base_model, 'raw_scores'):
+        container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
     df_name = scope.declare_local_variable('probability_tensor',

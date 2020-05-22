@@ -87,9 +87,10 @@ def _calculate_labels(scope, container, model, proba):
     return predictions
 
 
-def convert_sklearn_random_forest_classifier(scope, operator, container):
+def convert_sklearn_random_forest_classifier(
+        scope, operator, container, op_type='TreeEnsembleClassifier',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleClassifier'
 
     if hasattr(op, 'n_outputs_'):
         n_outputs = int(op.n_outputs_)
@@ -190,9 +191,8 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
             input_name = cast_input_name
         container.add_node(
             op_type, input_name,
-            [operator.outputs[0].full_name,
-             operator.outputs[1].full_name],
-            op_domain='ai.onnx.ml', **attr_pairs)
+            [operator.outputs[0].full_name, operator.outputs[1].full_name],
+            op_domain=op_domain, op_version=op_version, **attr_pairs)
     else:
         if use_raw_scores:
             raise RuntimeError(
@@ -205,7 +205,8 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
             reshaped_est_proba_name = scope.get_unique_variable_name(
                 'reshaped_est_proba')
             est_proba = predict(
-                est, scope, operator, container, op_type, is_ensemble=True)
+                est, scope, operator, container, op_type, op_domain,
+                op_version, is_ensemble=True)
             apply_reshape(
                 scope, est_proba, reshaped_est_proba_name, container,
                 desired_shape=(
@@ -223,10 +224,10 @@ def convert_sklearn_random_forest_classifier(scope, operator, container):
                      container, axis=1)
 
 
-def convert_sklearn_random_forest_regressor_converter(scope,
-                                                      operator, container):
+def convert_sklearn_random_forest_regressor_converter(
+        scope, operator, container, op_type='TreeEnsembleRegressor',
+        op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
-    op_type = 'TreeEnsembleRegressor'
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
 
@@ -286,7 +287,8 @@ def convert_sklearn_random_forest_regressor_converter(scope,
 
     container.add_node(
         op_type, input_name,
-        operator.output_full_names, op_domain='ai.onnx.ml', **attrs)
+        operator.output_full_names, op_domain=op_domain,
+        op_version=op_version, **attrs)
 
 
 register_converter('SklearnRandomForestClassifier',
