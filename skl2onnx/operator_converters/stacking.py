@@ -22,7 +22,8 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
     op_type = sklearn_operator_name_map[type(model)]
     this_operator = scope.declare_local_operator(op_type)
     this_operator.raw_operator = model
-    container.add_options(id(model), {'raw_scores': raw_scores})
+    if container.has_options(model, 'raw_scores'):
+        container.add_options(id(model), {'raw_scores': raw_scores})
     this_operator.inputs.append(inputs)
     label_name = scope.declare_local_variable('label')
     this_operator.outputs.append(label_name)
