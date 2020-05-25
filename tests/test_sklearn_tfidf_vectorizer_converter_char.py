@@ -78,6 +78,29 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(True, reason="expected failure")
+    def test_model_tfidf_vectorizer11_char_doublespace(self):
+        corpus = numpy.array([
+                'This is the first  document.',
+                'This document is the second document.',
+                ]).reshape((2, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None,
+                               analyzer='char')
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1]))])
+        self.assertTrue(model_onnx is not None)
+
+        dump_data_and_model(
+            corpus, vect, model_onnx,
+            basename="SklearnTfidfVectorizer11CharSpace-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__) <= "
+                          "StrictVersion('0.3.0')",
+            verbose=False)
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_model_tfidf_vectorizer12_char(self):
         corpus = numpy.array([
                 'This is the first document.',
