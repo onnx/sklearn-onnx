@@ -110,7 +110,7 @@ def convert_sklearn_one_hot_encoder(scope, operator, container):
         else:
             raise RuntimeError(
                 "Input type {} is not supported for OneHotEncoder. "
-                "Ideally, it should be either integer or strings.".format(
+                "Ideally, it should either be integer or strings.".format(
                     inp_type))
 
         ohe_output = scope.get_unique_variable_name(name + 'out')
