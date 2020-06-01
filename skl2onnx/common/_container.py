@@ -59,7 +59,8 @@ def _get_operation_list():
                     # implementation of apply_squeeze, apply_unsqueeze
                     # does not follow the same schema
                     continue
-                if k in {'apply_less_or_equal', 'apply_greater_or_equal'}:
+                if k in {'apply_less_or_equal', 'apply_greater_or_equal',
+                         'apply_relu6'}:
                     continue
                 warnings.warn("Unable to find an ONNX name in function "
                               "'{0}', source=\n{1}".format(k, source))
