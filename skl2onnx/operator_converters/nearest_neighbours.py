@@ -170,21 +170,19 @@ def _convert_nearest_neighbors(operator, container, k=None):
         raise RuntimeError(
             "Unable to convert KNeighborsRegressor when weights is callable.")
 
-    shape = OnnxShape(top_indices, op_version=opv)
-    flattened = OnnxFlatten(top_indices, op_version=opv)
     if training_labels is not None:
         if ndim > 1:
-            # shape = (ntargets, ) + shape
             training_labels = training_labels.T
-            shape = OnnxConcat(np.array([ndim], dtype=np.int64),
-                               shape, op_version=opv, axis=0)
+            shape = np.array([ndim, -1, k], dtype=np.int64)
             axis = 2
         else:
             training_labels = training_labels.ravel()
+            shape = np.array([-1, k], dtype=np.int64)
             axis = 1
 
         if training_labels.dtype == np.int32:
             training_labels = training_labels.astype(np.int64)
+        flattened = OnnxFlatten(top_indices, op_version=opv)
         extracted = OnnxArrayFeatureExtractor(
             training_labels, flattened, op_version=opv)
         reshaped = OnnxReshape(extracted, shape, op_version=opv)
@@ -244,6 +242,8 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
             res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
                                 keepdims=0)
+            shape = OnnxShape(res, op_version=opv)
+            norm = OnnxReshape(norm, shape, op_version=opv)
             res = OnnxDiv(res, norm, op_version=opv, output_names=out)
     else:
         res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
