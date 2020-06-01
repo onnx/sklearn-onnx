@@ -171,6 +171,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param name: name of the model
+    :param target_opset: number, for example, 7 for ONNX 1.2,
+        and 8 for ONNX 1.3.
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
     :param white_op: white list of ONNX nodes allowed

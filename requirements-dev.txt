@@ -1,9 +1,12 @@
+cython
 numpy
 protobuf
 codecov
+nose
 pandas
 py-cpuinfo
 pybind11
+pydot
 pytest
 pytest-cov
 scipy
@@ -13,6 +16,7 @@ wheel
 sphinx
 sphinx_modern_theme_modified
 sphinxcontrib-blockdiag
+openpyxl
 tqdm
 
 # docs/examples

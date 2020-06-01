@@ -47,6 +47,11 @@ benchmarks/*.csv
 benchmarks/*.png
 tests/Operators*.md
 docs/examples/*.pkl
+tests/sklearn_opsets_report.*
+tests/~$*
+docs/supported_covered.rst
+tests/sklearn_opsets*.xlsx
+docs/graphs/*
 tests/debug_gp.onnx
 tests/test*.onnx
 tests_onnxmltools/*.pkl
