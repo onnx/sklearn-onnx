@@ -1,5 +1,6 @@
 from distutils.version import StrictVersion
 import unittest
+import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.ensemble import (
@@ -9,6 +10,8 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -405,8 +408,34 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRRegressionIntEnsemble-Out0",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.2.0"),
+                     reason="fails to load the model")
+    def test_ovr_raw_scores(self):
+        X, y = make_classification(
+            n_classes=2, n_samples=100, random_state=42,
+            n_features=100, n_informative=7)
+
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, test_size=0.5, random_state=42)
+        model = OneVsRestClassifier(
+            estimator=GradientBoostingClassifier(random_state=42))
+        model.fit(X_train, y_train)
+
+        options = {id(model): {'raw_scores': True, 'zipmap': False}}
+        onnx_model = convert_sklearn(
+            model, 'lr',
+            [('input', FloatTensorType([None, X_test.shape[1]]))],
+            options=options, target_opset=TARGET_OPSET)
+        sess = InferenceSession(onnx_model.SerializeToString())
+        res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
+        exp = model.predict(X_test)
+        assert_almost_equal(exp, res[0])
+        exp = model.decision_function(X_test)
+        assert_almost_equal(exp, res[1][:, 1], decimal=5)
 
 
 if __name__ == "__main__":
