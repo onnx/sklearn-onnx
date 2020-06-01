@@ -146,9 +146,16 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only tokenizer='word' is supported. "
+            "only tokenizer='word' is fully supported. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
+    if op.analyzer == "char":
+        warnings.warn(
+            "The conversion of CountVectorizer may not work. "
+            "only tokenizer='word' is fully supported. "
+            "You may raise an issue at "
+            "https://github.com/onnx/sklearn-onnx/issues.",
+            UserWarning)
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
