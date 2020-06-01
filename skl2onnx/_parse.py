@@ -312,12 +312,10 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 
         # Declare output name of scikit-learn ColumnTransformer
         transformed_column_name = scope.declare_local_variable(
-                                            'transformed_column', ty)
+            'transformed_column', ty)
         concat_operator.outputs.append(transformed_column_name)
-
         return concat_operator.outputs
-    else:
-        return transformed_result_names
+    return transformed_result_names
 
 
 def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
