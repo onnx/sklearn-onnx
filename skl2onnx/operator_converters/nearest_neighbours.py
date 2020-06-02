@@ -447,7 +447,8 @@ def _nan_euclidean_distance(container, model, input_name, op_version, optim):
         OnnxCast(missing_input_name, to=container.proto_dtype,
                  op_version=op_version),
         (training_data * training_data).T, op_version=op_version)
-    distances = OnnxSub(dist, OnnxAdd(dist1, dist2), op_version=op_version)
+    distances = OnnxSub(dist, OnnxAdd(dist1, dist2, op_version=op_version),
+                        op_version=op_version)
     present_x = OnnxSub(
         np.array([1], dtype=container.dtype),
         OnnxCast(missing_input_name, to=container.proto_dtype,
