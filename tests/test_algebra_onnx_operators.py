@@ -49,7 +49,7 @@ class TestOnnxOperators(unittest.TestCase):
             W = operator.raw_operator.W
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
-                op_version=None)
+                op_version=TARGET_OPSET)
             op.add_to(scope, container)
             text = str(container)
             if 'name:"Su_Sub"' not in text:
