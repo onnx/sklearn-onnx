@@ -3,7 +3,6 @@ from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
-import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
@@ -202,17 +201,17 @@ class TestOnnxOperators(unittest.TestCase):
         idi2 = np.identity(2) * 2
 
         onx = OnnxAdd(
-            OnnxAdd('X', idi, op_version=onnx.defs.onnx_opset_version()),
+            OnnxAdd('X', idi, op_version=TARGET_OPSET),
             idi2, output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         self.assertEqual(len(model_def.graph.output), 1)
         onx = OnnxAdd(
             idi2,
             OnnxAdd(
-                'X', idi, op_version=onnx.defs.onnx_opset_version()),
+                'X', idi, op_version=TARGET_OPSET),
             output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
         self.assertEqual(onx.outputs, ['Y'])
