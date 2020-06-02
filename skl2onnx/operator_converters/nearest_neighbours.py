@@ -255,8 +255,15 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
                 norm = OnnxReshape(norm, shape, op_version=opv)
             res = OnnxDiv(res, norm, op_version=opv, output_names=out)
     else:
+        if (hasattr(operator.raw_operator, '_y') and
+                len(np.squeeze(operator.raw_operator._y).shape) == 1):
+            keepdims = 1
+        elif operator.raw_operator.n_neighbors == 1:
+            keepdims = 0
+        else:
+            keepdims = 0
         res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
-                             keepdims=0, output_names=out)
+                             keepdims=keepdims, output_names=out)
     res.add_to(scope, container)
 
 
