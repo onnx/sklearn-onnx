@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import copy
+import numpy as np
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
@@ -43,6 +44,22 @@ def calculate_sklearn_nearest_neighbours(operator):
     operator.outputs[1].type.shape = [N, neighbours]
 
 
+def calculate_sklearn_nearest_neighbours_regressor(operator):
+    check_input_and_output_numbers(operator, input_count_range=1,
+                                   output_count_range=[1, 2])
+    check_input_and_output_types(
+        operator, good_input_types=[
+            FloatTensorType, Int64TensorType, DoubleTensorType])
+
+    N = operator.inputs[0].type.shape[0]
+    if (hasattr(operator.raw_operator, '_y') and
+            len(np.squeeze(operator.raw_operator._y).shape) == 1):
+        C = 1
+    else:
+        C = operator.raw_operator._y.shape[-1]
+    operator.outputs[0].type.shape = [N, C]
+
+
 def calculate_sklearn_nca(operator):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
@@ -70,6 +87,8 @@ def calculate_sklearn_knn_imputer(operator):
     operator.outputs[0].type.shape = operator.inputs[0].type.shape
 
 
+register_shape_calculator('SklearnKNeighborsRegressor',
+                          calculate_sklearn_nearest_neighbours_regressor)
 register_shape_calculator('SklearnKNNImputer',
                           calculate_sklearn_knn_imputer)
 register_shape_calculator('SklearnKNeighborsTransformer',

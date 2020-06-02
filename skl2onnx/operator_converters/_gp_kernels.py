@@ -28,6 +28,8 @@ except ImportError:
 
 def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                         optim=None, op_version=None):
+    if op_version is None:
+        raise RuntimeError("op_version must not be None.")
     if isinstance(kernel, Sum):
         return OnnxAdd(
             convert_kernel_diag(
@@ -298,6 +300,8 @@ def convert_kernel(kernel, X, output_names=None,
 
 def _zero_vector_of_size(X, output_names=None, axis=0,
                          keepdims=None, dtype=None, op_version=None):
+    if op_version is None:
+        raise RuntimeError("op_version must not be None.")
     if keepdims is None:
         raise ValueError("Default for keepdims is not allowed.")
     if dtype == np.float32:

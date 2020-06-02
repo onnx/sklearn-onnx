@@ -145,7 +145,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                      target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32)[:2],
+            X.astype(numpy.float32)[:3],
             model, model_onnx,
             basename="SklearnKNeighborsRegressor2")
 
@@ -349,7 +349,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         exp = model.predict(X_test)
 
         sess = InferenceSession(model_onnx.SerializeToString())
-        res = sess.run(None, {'input': numpy.array(X_test)})[0]
+        res = sess.run(None, {'input': numpy.array(X_test)})[0].ravel()
 
         # The conversion has discrepencies when
         # neighbours are at the exact same distance.
