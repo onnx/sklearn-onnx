@@ -34,7 +34,8 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                 kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
             convert_kernel_diag(
                 kernel.k2, X, dtype=dtype, optim=optim, op_version=op_version),
-            output_names=output_names)
+            output_names=output_names,
+            op_version=op_version)
 
     if isinstance(kernel, Product):
         return OnnxMul(
