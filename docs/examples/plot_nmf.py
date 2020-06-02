@@ -98,8 +98,9 @@ def nmf_to_onnx(W, H):
     """
     col = OnnxArrayFeatureExtractor(H, 'col')
     row = OnnxArrayFeatureExtractor(W.T, 'row')
-    dot = OnnxMul(col, row)
-    res = OnnxReduceSum(dot, output_names="rec")
+    dot = OnnxMul(col, row, op_version=12)
+    res = OnnxReduceSum(dot, output_names="rec",
+                        op_version=12)
     indices_type = np.array([0], dtype=np.int64)
     onx = res.to_onnx(inputs={'col': indices_type,
                               'row': indices_type},
