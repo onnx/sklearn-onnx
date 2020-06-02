@@ -108,7 +108,7 @@ def convert_powertransformer(scope, operator, container):
                               op_version=opv)
 
         # positive input, lambda == 0
-        y_gr0_l_eq0 = OnnxLog(op_in)
+        y_gr0_l_eq0 = OnnxLog(op_in, op_version=opv)
         y_gr0_l_eq0 = OnnxImputer(y_gr0_l_eq0,
                                   imputed_value_floats=[0.0],
                                   replaced_value_float=numpy.NAN,
