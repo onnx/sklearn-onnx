@@ -138,7 +138,9 @@ onnx.checker.check_model(original_model)
 
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
-node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
+node = OnnxTranspose(
+    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
+    perm=[1, 0, 2], op_version=12)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape
