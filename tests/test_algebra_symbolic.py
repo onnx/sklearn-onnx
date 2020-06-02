@@ -18,6 +18,7 @@ except ImportError:
     warnings.warn(
         'Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.')
     OnnxAbs = None
+from test_utils import TARGET_OPSET
 
 
 class TestAlgebraSymbolic(unittest.TestCase):
@@ -28,7 +29,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_abs(self):
 
-        op = OnnxAbs('I0')
+        op = OnnxAbs('I0', op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
 
@@ -93,7 +94,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_argmin(self):
 
-        op = OnnxArgMin('I0', op_version=1)
+        op = OnnxArgMin('I0', op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -114,7 +115,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
         op = OnnxArgMin(
             OnnxNormalizer('I0', norm='L1', output_names=['Y']),
-            op_version=onnx.defs.onnx_opset_version() - 1)
+            op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -136,7 +137,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         op = OnnxArgMin(
             OnnxNormalizer(
                 'I0', norm='L1'),
-            op_version=onnx.defs.onnx_opset_version() - 1)
+            op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.ones((1, 2), dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
@@ -155,7 +156,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
 
-        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'])
+        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'],
+                       op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.arange(6, dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)

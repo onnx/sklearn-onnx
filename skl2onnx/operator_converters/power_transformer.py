@@ -86,7 +86,7 @@ def convert_powertransformer(scope, operator, container):
         y_le0_l_eq2 = OnnxMul(y_le0_l_eq2, lambda_two_mask)
 
         # negative input, an arbitrary lambda
-        y_le0 = OnnxAdd(y_le0_l_ne2, y_le0_l_eq2)
+        y_le0 = OnnxAdd(y_le0_l_ne2, y_le0_l_eq2, op_version=opv)
         y_le0 = OnnxImputer(y_le0, imputed_value_floats=[0.0],
                             replaced_value_float=numpy.NAN,
                             op_version=opv)
