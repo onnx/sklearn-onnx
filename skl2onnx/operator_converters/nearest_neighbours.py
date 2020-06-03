@@ -177,16 +177,19 @@ def _convert_nearest_neighbors(operator, container, k=None):
         else:
             training_labels = training_labels.ravel()
             axis = 1
-        if opv >= 12:
+        if opv >= 9:
             if ndim > 1:
                 shape = np.array([ndim, -1, k], dtype=np.int64)
             else:
                 shape = np.array([-1, k], dtype=np.int64)
         else:
-            shape = OnnxShape(top_indices, op_version=opv)
-            if ndim > 1:
-                shape = OnnxConcat(np.array([ndim], dtype=np.int64),
-                                   shape, op_version=opv, axis=0)
+            raise RuntimeError(
+                "Conversion of a KNeighborsRegressor for multi regression "
+                "requires opset >= 9.")
+            # shape = OnnxShape(top_indices, op_version=opv)
+            # if ndim > 1:
+            #     shape = OnnxConcat(np.array([ndim], dtype=np.int64),
+            #                       shape, op_version=opv, axis=0)
 
         if training_labels.dtype == np.int32:
             training_labels = training_labels.astype(np.int64)
