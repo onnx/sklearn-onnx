@@ -152,6 +152,27 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+        reason="not available")
+    def test_model_knn_regressor2_1_opset(self):
+        model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
+                                   n_targets=2)
+        for op in [12, 11, 10, 9]:
+            with self.subTest(opset=op):
+                model_onnx = convert_sklearn(
+                    model, "KNN regressor",
+                    [("input", FloatTensorType([None, 4]))],
+                    target_opset=op)
+                self.assertIsNotNone(model_onnx)
+                dump_data_and_model(
+                    X.astype(numpy.float32)[:3],
+                    model, model_onnx,
+                    basename="SklearnKNeighborsRegressor2")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2),
                                    n_targets=2)
