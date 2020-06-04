@@ -19,7 +19,7 @@ jobs:
         numpy.version: '>=1.18.1'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: 'onnxruntime==1.3.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.0'
         onnxcc.version: 'git'
         run.example: '1'
@@ -228,7 +228,7 @@ jobs:
 
   - script: |
       conda install -c conda-forge lightgbm xgboost --no-deps
-      pip install onnxmltools --no-deps
+      pip install git+https://github.com/onnx/onnxmltools.git --no-deps
     displayName: 'install onnxmltools'
 
   - script: |

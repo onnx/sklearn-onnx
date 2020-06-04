@@ -20,7 +20,7 @@ jobs:
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: 'onnxruntime==1.3.0'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
         sklearn.version: '==0.23.0'
       Py37-Onnx160-Rt120-Skl0221:
@@ -168,7 +168,7 @@ jobs:
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       pip install lightgbm xgboost
-      pip install onnxmltools --no-deps
+      pip install git+https://github.com/onnx/onnxmltools.git --no-deps
     displayName: 'install onnxmltools'
 
   - task: PublishTestResults@2
