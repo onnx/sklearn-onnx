@@ -190,18 +190,32 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(TARGET_OPSET < 11,
+    @unittest.skipIf(TARGET_OPSET < 9,
                      reason="needs higher target_opset")
     def test_model_knn_regressor_weights_distance_11(self):
         model, X = self._fit_model(
             KNeighborsRegressor(
                 weights="distance", algorithm="brute", n_neighbors=1))
         for op in sorted(set([9, 10, 11, 12, TARGET_OPSET])):
+            if op > TARGET_OPSET:
+                continue
             with self.subTest(opset=op):
                 model_onnx = convert_sklearn(
                     model, "KNN regressor",
                     [("input", FloatTensorType([None, 4]))],
                     target_opset=op)
+                if op < 12 and model_onnx.ir_version > 6:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 6.".format(
+                            model_onnx.ir_version, op))
+                if op < 11 and model_onnx.ir_version > 5:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 5.".format(
+                            model_onnx.ir_version, op))
+                if op < 10 and model_onnx.ir_version > 4:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 4.".format(
+                            model_onnx.ir_version, op))
                 self.assertIsNotNone(model_onnx)
                 dump_data_and_model(
                     X.astype(numpy.float32)[:3],

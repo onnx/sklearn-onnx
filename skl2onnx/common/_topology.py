@@ -40,7 +40,7 @@ except ImportError:
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
     }
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 11}
+OPSET_ML_TO_OPSET = {1: 11, 2: 12}
 
 
 class Variable:
