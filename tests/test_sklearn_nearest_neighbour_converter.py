@@ -196,14 +196,17 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model(
             KNeighborsRegressor(
                 weights="distance", algorithm="brute", n_neighbors=1))
-        model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(numpy.float32)[:3],
-            model, model_onnx,
-            basename="SklearnKNeighborsRegressorWeightsDistance-Dec3")
+        for op in sorted(set([9, 10, 11, 12, TARGET_OPSET])):
+            with self.subTest(opset=op):
+                model_onnx = convert_sklearn(
+                    model, "KNN regressor",
+                    [("input", FloatTensorType([None, 4]))],
+                    target_opset=op)
+                self.assertIsNotNone(model_onnx)
+                dump_data_and_model(
+                    X.astype(numpy.float32)[:3],
+                    model, model_onnx,
+                    basename="SklearnKNeighborsRegressorWDist%d-Dec3" % op)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
