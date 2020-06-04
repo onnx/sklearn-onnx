@@ -180,7 +180,7 @@ update_registered_converter(ValidatorClassifier, 'CustomValidatorClassifier',
 
 try:
     to_onnx(model, X_test[:1].astype(np.float32),
-    target_opset=12)
+            target_opset=12)
 except RuntimeError as e:
     print(e)
 
