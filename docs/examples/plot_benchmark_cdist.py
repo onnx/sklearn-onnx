@@ -42,7 +42,7 @@ print(cdist(X, Y, metric='euclidean'))
 ####################################
 # ONNX
 
-op = OnnxCDist('X', 'Y', op_version=11, output_names=['Z'],
+op = OnnxCDist('X', 'Y', op_version=12, output_names=['Z'],
                metric='euclidean')
 onx = op.to_onnx({'X': X, 'Y': Y},
                  outputs=[('Z', FloatTensorType())])

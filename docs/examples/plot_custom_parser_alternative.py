@@ -105,7 +105,8 @@ print(model.validate(X_test))
 # to this new model.
 
 try:
-    to_onnx(model, X_train[:1].astype(np.float32))
+    to_onnx(model, X_train[:1].astype(np.float32),
+            target_opset=12)
 except RuntimeError as e:
     print(e)
 
@@ -178,7 +179,8 @@ update_registered_converter(ValidatorClassifier, 'CustomValidatorClassifier',
 # And conversion...
 
 try:
-    to_onnx(model, X_test[:1].astype(np.float32))
+    to_onnx(model, X_test[:1].astype(np.float32),
+    target_opset=12)
 except RuntimeError as e:
     print(e)
 
@@ -222,7 +224,8 @@ update_registered_converter(ValidatorClassifier, 'CustomValidatorClassifier',
 #############################
 # And conversion again.
 
-model_onnx = to_onnx(model, X_test[:1].astype(np.float32))
+model_onnx = to_onnx(model, X_test[:1].astype(np.float32),
+                     target_opset=12)
 
 #######################################
 # Final test

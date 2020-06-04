@@ -153,10 +153,10 @@ seps = {
         ]
     }
 }
-model_onnx = convert_sklearn(pipeline, "tfidf",
-                             initial_types=[
-                                 ("input", StringTensorType([None, 2]))],
-                             options=seps)
+model_onnx = convert_sklearn(
+    pipeline, "tfidf",
+    initial_types=[("input", StringTensorType([None, 2]))],
+    options=seps, target_opset=12)
 
 #################################
 # And save.

@@ -48,7 +48,8 @@ tr = KMeans(n_clusters=2)
 tr.fit(X)
 
 onx = convert_sklearn(
-    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
+    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
+    target_opset=12)
 print(predict_with_onnxruntime(onx, X))
 
 #################################
@@ -59,7 +60,7 @@ X = np.arange(20).reshape(10, 2)
 tr = KMeans(n_clusters=2)
 tr.fit(X)
 
-onx = to_onnx(tr, X.astype(np.float32))
+onx = to_onnx(tr, X.astype(np.float32), target_opset=12)
 print(predict_with_onnxruntime(onx, X))
 
 
@@ -122,8 +123,9 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         i0 = self.get_inputs(inputs, 0)
         W = self.W_
         S = self.S_
-        return OnnxDiv(OnnxSub(i0, W), S,
-                       output_names=outputs)
+        return OnnxDiv(OnnxSub(i0, W, op_version=12), S,
+                       output_names=outputs,
+                       op_version=12)
 
 #############################
 # Way 1
@@ -134,7 +136,8 @@ tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
 onx = convert_sklearn(
-    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))])
+    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
+    target_opset=12)
 print(predict_with_onnxruntime(onx, X))
 
 #############################
@@ -144,7 +147,7 @@ X = np.arange(20).reshape(10, 2)
 tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
-onx = to_onnx(tr, X.astype(np.float32))
+onx = to_onnx(tr, X.astype(np.float32), target_opset=12)
 print(predict_with_onnxruntime(onx, X))
 
 #############################
@@ -163,8 +166,9 @@ print(predict_with_onnxruntime(onx, X))
 # Way 4
 
 X = np.arange(20).reshape(10, 2)
-tr = wrap_as_onnx_mixin(make_pipeline(CustomOpTransformer(),
-                                      KMeans(n_clusters=2)))
+tr = wrap_as_onnx_mixin(
+    make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)),
+    target_opset=12)
 
 tr.fit(X)
 

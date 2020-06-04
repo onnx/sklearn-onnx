@@ -86,8 +86,10 @@ update_registered_converter(
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(pipe, 'pipeline_lightgbm',
-                             [('input', FloatTensorType([None, 2]))])
+model_onnx = convert_sklearn(
+    pipe, 'pipeline_lightgbm',
+    [('input', FloatTensorType([None, 2]))],
+    target_opset=12)
 
 # And save.
 with open("pipeline_lightgbm.onnx", "wb") as f:
