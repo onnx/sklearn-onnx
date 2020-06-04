@@ -9,7 +9,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnLabelEncoderConverter(unittest.TestCase):
@@ -21,6 +21,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn label encoder",
             [("input", StringTensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
@@ -42,6 +43,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn label encoder",
             [("input", FloatTensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
@@ -63,6 +65,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn label encoder",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
