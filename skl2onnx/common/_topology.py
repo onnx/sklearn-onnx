@@ -927,7 +927,6 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     """
     if dtype is None:
         raise ValueError("dtype must be specified.")
-
     if target_opset is None:
         target_opset = get_latest_tested_opset_version()
     if isinstance(target_opset, dict):
@@ -1102,7 +1101,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     _update_domain_version(container, onnx_model)
 
     # Add extra information
-    opv = _get_main_opset_version(onnx_model) or onnx_target_opset
+    opv = min(onnx_target_opset,
+              _get_main_opset_version(onnx_model) or onnx_target_opset)
     irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
     onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
