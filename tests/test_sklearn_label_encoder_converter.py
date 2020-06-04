@@ -25,6 +25,8 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
+        if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+            raise AssertionError("Incompatbilities")
         dump_data_and_model(
             np.array(data),
             model,
@@ -47,6 +49,8 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
+        if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+            raise AssertionError("Incompatbilities")
         dump_data_and_model(
             data,
             model,
@@ -69,6 +73,8 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
+        if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+            raise AssertionError("Incompatbilities")
         dump_data_and_model(
             data,
             model,
