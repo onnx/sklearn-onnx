@@ -56,7 +56,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
     if not hasattr(op, "X_train_") or op.X_train_ is None:
         out0 = _zero_vector_of_size(X, keepdims=1, output_names=out[:1],
-                                    dtype=dtype)
+                                    dtype=dtype, op_version=opv)
 
         outputs = [out0]
         if options['return_cov']:

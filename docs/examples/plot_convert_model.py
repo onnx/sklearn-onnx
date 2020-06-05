@@ -47,7 +47,8 @@ print(clr)
 # +++++++++++++++++++++++++
 
 initial_type = [('float_input', FloatTensorType([None, 4]))]
-onx = convert_sklearn(clr, initial_types=initial_type)
+onx = convert_sklearn(clr, initial_types=initial_type,
+                      target_opset=12)
 
 with open("rf_iris.onnx", "wb") as f:
     f.write(onx.SerializeToString())
@@ -68,7 +69,8 @@ print(pred_onx)
 clr = LogisticRegression()
 clr.fit(X_train, y_train)
 initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
-onx = convert_sklearn(clr, initial_types=initial_type)
+onx = convert_sklearn(clr, initial_types=initial_type,
+                      target_opset=12)
 with open("logreg_iris.onnx", "wb") as f:
     f.write(onx.SerializeToString())
 

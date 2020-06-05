@@ -100,4 +100,9 @@ def calculate_linear_regressor_output_shapes(operator):
         FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type.shape = [N, 1]
+    if (hasattr(operator.raw_operator, 'coef_') and
+            len(operator.raw_operator.coef_.shape) > 1):
+        operator.outputs[0].type.shape = [
+            N, operator.raw_operator.coef_.shape[1]]
+    else:
+        operator.outputs[0].type.shape = [N, 1]
