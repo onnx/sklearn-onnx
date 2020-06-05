@@ -88,7 +88,7 @@ print(got)
 # *predict* implemented above.
 
 
-def nmf_to_onnx(W, H):
+def nmf_to_onnx(W, H, op_version=12):
     """
     The function converts a NMF described by matrices
     *W*, *H* (*WH* approximate training data *M*).
@@ -98,13 +98,13 @@ def nmf_to_onnx(W, H):
     """
     col = OnnxArrayFeatureExtractor(H, 'col')
     row = OnnxArrayFeatureExtractor(W.T, 'row')
-    dot = OnnxMul(col, row, op_version=12)
-    res = OnnxReduceSum(dot, output_names="rec",
-                        op_version=12)
+    dot = OnnxMul(col, row, op_version=op_version)
+    res = OnnxReduceSum(dot, output_names="rec", op_version=op_version)
     indices_type = np.array([0], dtype=np.int64)
     onx = res.to_onnx(inputs={'col': indices_type,
                               'row': indices_type},
-                      outputs=[('rec', FloatTensorType((None, 1)))])
+                      outputs=[('rec', FloatTensorType((None, 1)))],
+                      target_opset=op_version)
     return onx
 
 
