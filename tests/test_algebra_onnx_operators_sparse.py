@@ -4,7 +4,6 @@ import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
 from scipy.sparse import coo_matrix
-import onnx
 from onnxruntime import InferenceSession, __version__ as ort_version
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -20,6 +19,7 @@ except ImportError:
     # onnx is too old.
     OnnxConstantOfShape = None
 from onnx import __version__ as onnx__version__
+from test_utils import TARGET_OPSET
 
 THRESHOLD = "1.3.0"
 
@@ -33,7 +33,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
     def test_onnx_init_dense(self):
         X = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
-        node = OnnxAdd('X', X, output_names=['Y'])
+        node = OnnxAdd('X', X, output_names=['Y'], op_version=TARGET_OPSET)
 
         model_def = node.to_onnx({'X': X},
                                  outputs=[('Y', FloatTensorType())])
@@ -55,7 +55,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
 
         node = OnnxAdd(
             'X', X, output_names=['Y'],
-            op_version=onnx.defs.onnx_opset_version())
+            op_version=TARGET_OPSET)
 
         model_def = node.to_onnx({'X': X},
                                  outputs=[('Y', FloatTensorType())])

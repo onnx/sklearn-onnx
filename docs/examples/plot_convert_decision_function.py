@@ -41,7 +41,8 @@ clr.fit(X_train, y_train)
 print(clr)
 
 initial_type = [('float_input', FloatTensorType([None, 4]))]
-onx = convert_sklearn(clr, initial_types=initial_type)
+onx = convert_sklearn(clr, initial_types=initial_type,
+                      target_opset=12)
 
 ############################
 # Output type
@@ -62,7 +63,8 @@ print("onnx", res[1][:2])
 
 initial_type = [('float_input', FloatTensorType([None, 4]))]
 options = {id(clr): {'raw_scores': True}}
-onx2 = convert_sklearn(clr, initial_types=initial_type, options=options)
+onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
+                       target_opset=12)
 
 sess2 = rt.InferenceSession(onx2.SerializeToString())
 res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})

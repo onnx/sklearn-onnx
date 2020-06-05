@@ -419,7 +419,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
         # return_cov=False, return_std=False
         model_onnx = to_onnx(
-            gp, initial_types=[('X', FloatTensorType([]))], dtype=np.float32)
+            gp, initial_types=[('X', FloatTensorType([]))], dtype=np.float32,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
@@ -429,7 +430,8 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         options = {GaussianProcessRegressor: {"return_std": True,
                                               "return_cov": True}}
         try:
-            to_onnx(gp, Xtrain_.astype(np.float32), options=options)
+            to_onnx(gp, Xtrain_.astype(np.float32), options=options,
+                    target_opset=TARGET_OPSET)
         except RuntimeError as e:
             assert "Not returning standard deviation" in str(e)
 
@@ -438,7 +440,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         model_onnx = to_onnx(
             gp, options=options,
             initial_types=[('X', FloatTensorType([None, None]))],
-            dtype=np.float32)
+            dtype=np.float32, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
@@ -450,7 +452,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         model_onnx = to_onnx(
             gp, options=options,
             initial_types=[('X', FloatTensorType([None, None]))],
-            dtype=np.float32)
+            dtype=np.float32, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[

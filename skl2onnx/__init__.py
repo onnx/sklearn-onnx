@@ -7,7 +7,7 @@
 """
 Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
-__version__ = "1.6.9"
+__version__ = "1.7.0"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
