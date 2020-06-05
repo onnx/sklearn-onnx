@@ -57,7 +57,8 @@ pipe.fit(X_digits, y_digits)
 
 
 initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
-model_onnx = convert_sklearn(pipe, initial_types=initial_types)
+model_onnx = convert_sklearn(pipe, initial_types=initial_types,
+                             target_opset=12)
 
 sess = rt.InferenceSession(model_onnx.SerializeToString())
 print("skl predict_proba")

@@ -177,16 +177,19 @@ def _convert_nearest_neighbors(operator, container, k=None):
         else:
             training_labels = training_labels.ravel()
             axis = 1
-        if opv >= 12:
+        if opv >= 9:
             if ndim > 1:
                 shape = np.array([ndim, -1, k], dtype=np.int64)
             else:
                 shape = np.array([-1, k], dtype=np.int64)
         else:
-            shape = OnnxShape(top_indices, op_version=opv)
-            if ndim > 1:
-                shape = OnnxConcat(np.array([ndim], dtype=np.int64),
-                                   shape, op_version=opv, axis=0)
+            raise RuntimeError(
+                "Conversion of a KNeighborsRegressor for multi regression "
+                "requires opset >= 9.")
+            # shape = OnnxShape(top_indices, op_version=opv)
+            # if ndim > 1:
+            #     shape = OnnxConcat(np.array([ndim], dtype=np.int64),
+            #                       shape, op_version=opv, axis=0)
 
         if training_labels.dtype == np.int32:
             training_labels = training_labels.astype(np.int64)
@@ -253,10 +256,22 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             if opv >= 12:
                 shape = OnnxShape(res, op_version=opv)
                 norm = OnnxReshape(norm, shape, op_version=opv)
-            res = OnnxDiv(res, norm, op_version=opv, output_names=out)
+            if opv >= 12:
+                res = OnnxDiv(res, norm, op_version=opv, output_names=out)
+            else:
+                res = OnnxDiv(res, norm, op_version=opv)
+                res = OnnxReshape(res, np.array([-1, 1], dtype=np.int64),
+                                  output_names=out, op_version=opv)
     else:
+        if (hasattr(operator.raw_operator, '_y') and
+                len(np.squeeze(operator.raw_operator._y).shape) == 1):
+            keepdims = 1
+        elif operator.raw_operator.n_neighbors == 1:
+            keepdims = 0
+        else:
+            keepdims = 0
         res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
-                             keepdims=0, output_names=out)
+                             keepdims=keepdims, output_names=out)
     res.add_to(scope, container)
 
 
@@ -447,7 +462,8 @@ def _nan_euclidean_distance(container, model, input_name, op_version, optim):
         OnnxCast(missing_input_name, to=container.proto_dtype,
                  op_version=op_version),
         (training_data * training_data).T, op_version=op_version)
-    distances = OnnxSub(dist, OnnxAdd(dist1, dist2), op_version=op_version)
+    distances = OnnxSub(dist, OnnxAdd(dist1, dist2, op_version=op_version),
+                        op_version=op_version)
     present_x = OnnxSub(
         np.array([1], dtype=container.dtype),
         OnnxCast(missing_input_name, to=container.proto_dtype,

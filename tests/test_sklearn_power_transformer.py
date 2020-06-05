@@ -28,7 +28,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
                                        FloatTensorType([None, None]))],
                                      target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(data, model, model_onnx, verbose=True,
+        dump_data_and_model(data, model, model_onnx,
                             basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")

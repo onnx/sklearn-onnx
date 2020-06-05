@@ -88,7 +88,9 @@ class TestCustomModelAlgebra(unittest.TestCase):
             basename="CustomTransformerAlgebra")
 
     def test_custom_scaler_pipeline_right(self):
-        pipe = make_pipeline(StandardScaler(), CustomOpTransformerShape())
+        pipe = make_pipeline(
+            StandardScaler(),
+            CustomOpTransformerShape(op_version=TARGET_OPSET))
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         pipe.fit(mat)
         z = pipe.transform(mat)
@@ -109,7 +111,9 @@ class TestCustomModelAlgebra(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.3.0"),
                      reason="not available")
     def test_custom_scaler_pipeline_left(self):
-        pipe = make_pipeline(CustomOpTransformer(), StandardScaler())
+        pipe = make_pipeline(
+            CustomOpTransformer(op_version=TARGET_OPSET),
+            StandardScaler())
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         pipe.fit(mat)
         z = pipe.transform(mat)
@@ -121,7 +125,9 @@ class TestCustomModelAlgebra(unittest.TestCase):
         except RuntimeError as e:
             assert "cannot be infered" in str(e)
 
-        pipe = make_pipeline(CustomOpTransformerShape(), StandardScaler())
+        pipe = make_pipeline(
+            CustomOpTransformerShape(op_version=TARGET_OPSET),
+            StandardScaler())
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         pipe.fit(mat)
         z = pipe.transform(mat)

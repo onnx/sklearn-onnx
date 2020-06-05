@@ -131,7 +131,8 @@ pprint.pprint(inputs)
 # ++++++++++++++++++++++++++++++
 
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                                 target_opset=12)
 except Exception as e:
     print(e)
 
@@ -146,7 +147,8 @@ white_list = numeric_features + categorical_features
 to_drop = [c for c in X_train.columns if c not in white_list]
 inputs = convert_dataframe_schema(X_train, to_drop)
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                             target_opset=12)
 
 
 # And save.
