@@ -13,6 +13,7 @@ try:
 except (ImportError, KeyError):
     warnings.warn('Unable to test OnnxSklearnScaler.')
     OnnxSklearnStandardScaler = None
+from test_utils import TARGET_OPSET
 
 
 class TestAlgebraConverters(unittest.TestCase):
@@ -68,14 +69,16 @@ class TestAlgebraConverters(unittest.TestCase):
         X = numpy.random.randn(5, 4)
         beta = numpy.array([1, 2, 3, 4]) / 10
         beta32 = beta.astype(numpy.float32)
-        onnxExpM = OnnxExp(OnnxMatMul('X', beta32))
+        onnxExpM = OnnxExp(
+            OnnxMatMul('X', beta32, op_version=TARGET_OPSET),
+            op_version=TARGET_OPSET)
         cst = numpy.ones((1, 3), dtype=numpy.float32)
-        onnxExpM1 = OnnxAdd(onnxExpM, cst)
-        onnxPred = OnnxDiv(onnxExpM, onnxExpM1)
+        onnxExpM1 = OnnxAdd(onnxExpM, cst, op_version=TARGET_OPSET)
+        onnxPred = OnnxDiv(onnxExpM, onnxExpM1, op_version=TARGET_OPSET)
         inputs = {'X': X[:1].astype(numpy.float32)}
-        model_onnx = onnxPred.to_onnx(inputs)
+        model_onnx = onnxPred.to_onnx(inputs, target_opset=TARGET_OPSET)
         s1 = str(model_onnx)
-        model_onnx = onnxPred.to_onnx(inputs)
+        model_onnx = onnxPred.to_onnx(inputs, target_opset=TARGET_OPSET)
         s2 = str(model_onnx)
         assert s1 == s2
         nin = list(onnxExpM1.enumerate_initial_types())
@@ -85,9 +88,9 @@ class TestAlgebraConverters(unittest.TestCase):
         self.assertEqual(len(nno), 3)
         self.assertEqual(len(nva), 0)
 
-    def test_add(self):
+    def test_add_12(self):
         idi = numpy.identity(2)
-        onx = OnnxAdd('X', idi, output_names=['Y'])
+        onx = OnnxAdd('X', idi, output_names=['Y'], op_version=12)
         model_def = onx.to_onnx({'X': idi.astype(numpy.float32)},
                                 target_opset=12)
         X = numpy.array([[1, 2], [3, 4]], dtype=numpy.float32)

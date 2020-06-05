@@ -42,7 +42,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.array([[42., 42., 42., 42., 42.]]),
                np.array([[93., 93., 93., 93., 93.]]),
                np.array([[100100., 100100., 100100., 100100., 100100.]])]
-        for opv in ({'': 10}, None, 9, 10, 11, onnx_opset_version()):
+        for opv in ({'': 10}, 9, 10, 11, 12, onnx_opset_version()):
             if isinstance(opv, dict):
                 if opv[''] > get_latest_tested_opset_version():
                     continue
@@ -98,8 +98,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                np.zeros((1, 5)),
                np.zeros((1, 5)),
                np.zeros((1, 5))]
-        for opv in (1, 2, 3, None):
-            if opv is not None and opv > get_latest_tested_opset_version():
+        for opv in (1, 2, 3):
+            if opv > get_latest_tested_opset_version():
                 continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
@@ -138,8 +138,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         st.fit(X)
         exp = st.transform(X)
 
-        for opv in (1, 2, 10, 11, None, onnx_opset_version()):
-            if opv is not None and opv > get_latest_tested_opset_version():
+        for opv in (1, 2, 10, 11, 12, onnx_opset_version()):
+            if opv > get_latest_tested_opset_version():
                 continue
             try:
                 onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
@@ -162,7 +162,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             res = res_out[0]
             assert_almost_equal(exp, res)
 
-        for opv in (1, 2, 10, 11, None, onnx_opset_version()):
+        for opv in (1, 2, 10, 11, 12, onnx_opset_version()):
             onx = to_onnx(st, X.astype(np.float32),
                           target_opset={'ai.onnx.ml': opv})
             as_string = onx.SerializeToString()
@@ -185,7 +185,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         model, X_test = fit_regression_model(
             MLPRegressor(random_state=42))
         exp = model.predict(X_test)
-        for opv in (1, 2, 7, 8, 9, 10, 11, None, onnx_opset_version()):
+        for opv in (1, 2, 7, 8, 9, 10, 11, 12, onnx_opset_version()):
             if opv is not None and opv > get_latest_tested_opset_version():
                 continue
             try:
