@@ -9,6 +9,7 @@ from sklearn import datasets
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
+from test_utils import TARGET_OPSET
 
 
 class IdentityTransformer(BaseEstimator, TransformerMixin):
@@ -38,8 +39,9 @@ def dummy_converter(scope, operator, container):
     X = operator.inputs[0]
     out = operator.outputs
 
-    id1 = OnnxIdentity(X)
-    id2 = OnnxIdentity(id1, output_names=out[1:])
+    id1 = OnnxIdentity(X, op_version=TARGET_OPSET)
+    id2 = OnnxIdentity(id1, output_names=out[1:],
+                       op_version=TARGET_OPSET)
     id2.add_to(scope, container)
 
 
@@ -64,7 +66,7 @@ class TestTopologyPrune(unittest.TestCase):
             idtr,
             "idtr",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
 
         idnode = [node for node in model_onnx.graph.node
                   if node.op_type == "Identity"]

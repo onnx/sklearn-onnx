@@ -558,7 +558,8 @@ class OnnxOperator:
         _update_domain_version(container, onnx_model)
 
         # metadata
-        opv = _get_main_opset_version(onnx_model) or target_opset
+        opv = min(target_opset,
+                  _get_main_opset_version(onnx_model) or target_opset)
         irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
         onnx_model.ir_version = irv
         onnx_model.producer_name = utils.get_producer()

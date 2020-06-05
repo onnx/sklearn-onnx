@@ -63,7 +63,8 @@ pipe.fit(X, y)
 
 try:
     convert_sklearn(pipe, 'pipeline_xgboost',
-                    [('input', FloatTensorType([None, 2]))])
+                    [('input', FloatTensorType([None, 2]))],
+                    target_opset=12)
 except Exception as e:
     print(e)
 
@@ -102,8 +103,10 @@ update_registered_converter(
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(pipe, 'pipeline_xgboost',
-                             [('input', FloatTensorType([None, 2]))])
+model_onnx = convert_sklearn(
+    pipe, 'pipeline_xgboost',
+    [('input', FloatTensorType([None, 2]))],
+    target_opset=12)
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:

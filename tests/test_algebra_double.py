@@ -6,6 +6,7 @@ from numpy.testing import assert_almost_equal
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxSub
 import onnxruntime
 from onnxruntime import InferenceSession
+from test_utils import TARGET_OPSET
 
 
 class TestAlgebraDouble(unittest.TestCase):
@@ -21,10 +22,13 @@ class TestAlgebraDouble(unittest.TestCase):
         intercept = 1
         X_test = numpy.array([[1, -2], [3, -4]], dtype=numpy.float64)
 
-        onnx_fct = OnnxSub(OnnxMatMul('X', coef),
-                           numpy.array([intercept], dtype=numpy.float64),
-                           output_names=['Y'])
-        onnx_model = onnx_fct.to_onnx({'X': X_test}, dtype=numpy.float64)
+        onnx_fct = OnnxSub(
+            OnnxMatMul('X', coef, op_version=TARGET_OPSET),
+            numpy.array([intercept], dtype=numpy.float64),
+            output_names=['Y'],
+            op_version=TARGET_OPSET)
+        onnx_model = onnx_fct.to_onnx(
+            {'X': X_test}, dtype=numpy.float64, target_opset=TARGET_OPSET)
 
         sess = InferenceSession(onnx_model.SerializeToString())
         ort_pred = sess.run(None, {'X': X_test})[0]
