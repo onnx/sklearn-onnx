@@ -35,6 +35,7 @@ import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
+from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
@@ -86,8 +87,10 @@ update_registered_converter(
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(pipe, 'pipeline_lightgbm',
-                             [('input', FloatTensorType([None, 2]))])
+model_onnx = convert_sklearn(
+    pipe, 'pipeline_lightgbm',
+    [('input', FloatTensorType([None, 2]))],
+    target_opset=12)
 
 # And save.
 with open("pipeline_lightgbm.onnx", "wb") as f:
@@ -105,10 +108,17 @@ print("predict_proba", pipe.predict_proba(X[:1]))
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("pipeline_lightgbm.onnx")
-pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
-print("predict", pred_onx[0])
-print("predict_proba", pred_onx[1][:1])
+try:
+    sess = rt.InferenceSession("pipeline_lightgbm.onnx")
+except OrtFail as e:
+    print(e)
+    print("The converter requires onnxmltools>=1.7.0")
+    sess = None
+
+if sess is not None:
+    pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
+    print("predict", pred_onx[0])
+    print("predict_proba", pred_onx[1][:1])
 
 ##################################
 # Display the ONNX graph

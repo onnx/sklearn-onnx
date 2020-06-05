@@ -9,7 +9,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnLabelEncoderConverter(unittest.TestCase):
@@ -21,9 +21,12 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn label encoder",
             [("input", StringTensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
+        if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+            raise AssertionError("Incompatbilities")
         dump_data_and_model(
             np.array(data),
             model,
@@ -42,9 +45,12 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn label encoder",
             [("input", FloatTensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         self.assertTrue(model_onnx.graph.node is not None)
+        if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+            raise AssertionError("Incompatbilities")
         dump_data_and_model(
             data,
             model,
@@ -59,22 +65,28 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         model = LabelEncoder()
         data = np.array([10, 3, 5, -34, 0], dtype=np.int64)
         model.fit(data)
-        model_onnx = convert_sklearn(
-            model,
-            "scikit-learn label encoder",
-            [("input", Int64TensorType([None]))],
-        )
-        self.assertTrue(model_onnx is not None)
-        self.assertTrue(model_onnx.graph.node is not None)
-        dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            basename="SklearnLabelEncoderInt",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+        for op in sorted(set([9, 10, 11, 12, TARGET_OPSET])):
+            if op > TARGET_OPSET:
+                continue
+            with self.subTest(opset=op):
+                model_onnx = convert_sklearn(
+                    model,
+                    "scikit-learn label encoder",
+                    [("input", Int64TensorType([None]))],
+                    target_opset=op)
+                self.assertTrue(model_onnx is not None)
+                self.assertTrue(model_onnx.graph.node is not None)
+                if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
+                    raise AssertionError("Incompatbilities")
+                dump_data_and_model(
+                    data,
+                    model,
+                    model_onnx,
+                    basename="SklearnLabelEncoderInt",
+                    allow_failure="StrictVersion("
+                    "onnxruntime.__version__)"
+                    "<= StrictVersion('0.5.0')",
+                )
 
 
 if __name__ == "__main__":

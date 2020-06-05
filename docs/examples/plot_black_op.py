@@ -44,7 +44,8 @@ model.fit(X_train)
 
 model_onnx = to_onnx(
     model, X_train[:1].astype(np.float32),
-    options={id(model): {'score_samples': True}})
+    options={id(model): {'score_samples': True}},
+    target_opset=12)
 sess = InferenceSession(model_onnx.SerializeToString())
 
 xt = X_test[:5].astype(np.float32)
@@ -80,7 +81,8 @@ ax.axis('off')
 model_onnx2 = to_onnx(
     model, X_train[:1].astype(np.float32),
     options={id(model): {'score_samples': True}},
-    black_op={'ReduceLogSumExp'})
+    black_op={'ReduceLogSumExp'},
+    target_opset=12)
 sess2 = InferenceSession(model_onnx2.SerializeToString())
 
 xt = X_test[:5].astype(np.float32)
@@ -130,7 +132,8 @@ try:
     to_onnx(
         model, X_train[:1].astype(np.float32),
         options={id(model): {'score_samples': True}},
-        black_op={'ReduceLogSumExp', 'Add'})
+        black_op={'ReduceLogSumExp', 'Add'},
+        target_opset=12)
 except RuntimeError as e:
     print('Error:', e)
 

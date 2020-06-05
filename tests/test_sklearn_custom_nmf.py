@@ -13,6 +13,7 @@ from skl2onnx.common.data_types import FloatTensorType, onnx_built_with_ml
 from skl2onnx.algebra.onnx_ops import (
     OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
 from onnxruntime import InferenceSession
+from test_utils import TARGET_OPSET
 
 
 class TestSklearnCustomNMF(unittest.TestCase):
@@ -55,8 +56,9 @@ class TestSklearnCustomNMF(unittest.TestCase):
             """
             col = OnnxArrayFeatureExtractor(H, 'col')
             row = OnnxArrayFeatureExtractor(W.T, 'row')
-            dot = OnnxMul(col, row)
-            res = OnnxReduceSum(dot, output_names="rec")
+            dot = OnnxMul(col, row, op_version=TARGET_OPSET)
+            res = OnnxReduceSum(dot, output_names="rec",
+                                op_version=TARGET_OPSET)
             indices_type = np.array([0], dtype=np.int64)
             onx = res.to_onnx(inputs={'col': indices_type,
                                       'row': indices_type},

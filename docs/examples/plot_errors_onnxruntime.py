@@ -33,8 +33,10 @@ except ImportError:
 data = load_iris()
 clr = LogisticRegression().fit(data.data[:, :2], data.target)
 with open("logreg_iris.onnx", "wb") as f:
-    f.write(skl2onnx.to_onnx(
-        clr, data.data[:, :2].astype(np.float32)).SerializeToString())
+    f.write(
+        skl2onnx.to_onnx(
+            clr, data.data[:, :2].astype(np.float32),
+            target_opset=12).SerializeToString())
 
 example2 = "logreg_iris.onnx"
 sess = rt.InferenceSession(example2)

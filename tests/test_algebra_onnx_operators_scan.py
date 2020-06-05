@@ -246,8 +246,8 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
         opv = _TARGET_OPSET_
         cop2 = OnnxConstantOfShape(
-            OnnxShape('input'), output_names=['mat'],
-            op_version=opv)
+            OnnxShape('input', op_version=opv),
+            output_names=['mat'], op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
         sess = InferenceSession(model_def.SerializeToString())
@@ -257,8 +257,10 @@ class TestOnnxOperatorsScan(unittest.TestCase):
 
         tensor_value = onnx.helper.make_tensor("value", onnx.TensorProto.FLOAT,
                                                (1,), [-5])
-        cop2 = OnnxConstantOfShape(OnnxShape('input'), value=tensor_value,
-                                   output_names=['mat'])
+        cop2 = OnnxConstantOfShape(
+            OnnxShape('input', op_version=opv),
+            value=tensor_value, output_names=['mat'],
+            op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
         sess = InferenceSession(model_def.SerializeToString())
