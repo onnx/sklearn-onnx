@@ -192,11 +192,14 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     from .algebra.type_helper import guess_initial_types
 
     if isinstance(model, OnnxOperatorMixin):
-        if options is not None:
-            raise NotImplementedError(
-                "options not yet implemented for OnnxOperatorMixin.")
+        if not hasattr(model, 'op_version'):
+            raise RuntimeError(
+                "Missing attribute 'op_version' for type '{}'.".format(
+                    type(model)))
         return model.to_onnx(X=X, name=name, dtype=dtype,
-                             target_opset=target_opset)
+                             target_opset=target_opset,
+                             options=options, black_op=black_op,
+                             white_op=white_op, final_types=final_types)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)

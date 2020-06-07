@@ -95,3 +95,44 @@ by using option:
     options={type(model): {'raw_scores': True}}
 
 It is implemented by PR `308 <https://github.com/onnx/sklearn-onnx/pull/308>`_.
+
+Pickability and Pipeline
+========================
+
+The proposed way to specify options is not always pickable.
+Function ``id(model)`` depends on the execution and map an option
+to one class may be not enough to customize the conversion.
+However, it is possible to specify an option the same way
+parameters are referenced in a *scikit-learn* pipeline
+with method `get_params <https://scikit-learn.org/stable/modules/generated/
+sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.get_params>`_.
+Following syntax are supported:
+
+::
+
+    pipe = Pipeline([('pca', PCA()), ('classifier', LogisticRegression())])
+
+    options = {'classifier': {'zipmap': False}}
+
+Or
+
+::
+
+    options = {'classifier__zipmap': False}
+
+Options applied to one model, not a pipeline as the converter
+replaces the pipeline structure by a single onnx graph.
+Following that rule, option *zipmap* would not have any impact
+if applied to a pipeline and to the last step of the pipeline.
+However, because there is no ambiguity about what the conversion
+should be, for options *zipmap* and *nocl*, the following
+options would have the same effect:
+
+::
+
+    pipe = Pipeline([('pca', PCA()), ('classifier', LogisticRegression())])
+
+    options = {id(pipe.steps[-1][1]): {'zipmap': False}}
+    options = {id(pipe): {'zipmap': False}}
+    options = {'classifier': {'zipmap': False}}
+    options = {'classifier__zipmap': False}
