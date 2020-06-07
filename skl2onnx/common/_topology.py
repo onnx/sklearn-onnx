@@ -312,16 +312,20 @@ class Scope:
         # Registered models
         self.registered_models = registered_models
 
+        # Reserved variables.
+        self.reserved = {}
+
     def temp(self):
         """
         Creates a new Scope with the same options but no names.
         """
-        return Scope(
+        scope = Scope(
             'temp', parent_scopes=self.parent_scopes,
             target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
             options=self.options, dtype=self.dtype,
             registered_models=self.registered_models)
+        return scope
 
     def get_shape_calculator(self, model_type):
         """
@@ -370,6 +374,26 @@ class Scope:
         else:
             self.variable_name_mapping[raw_name] = [onnx_name]
         return variable
+
+    def reserve_name(self, raw_name):
+        """
+        Keeps this name to be used by other converters.
+        """
+        if raw_name in self.reserved:
+            raise RuntimeError(
+                "Name '{}' already reserved.".format(raw_name))
+        self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
+        return self.reserved[raw_name]
+
+    def unreserve_name(self, name):
+        """
+        Deletes a name from the reserved list.
+        """
+        if name not in self.reserved:
+            raise RuntimeError(
+                "Name '{}' not reserved.".format(name))
+        self.onnx_variable_names.discard(name)
+        del self.reserved[name]
 
     def declare_local_operator(self, type, raw_model=None):
         """
@@ -986,9 +1010,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             if variable.is_leaf:
                 if isinstance(variable.type, (TensorType, Int64Type,
                                               FloatType, StringType)):
-                    tensor_outputs[variable.raw_name] = variable
+                    tensor_outputs[variable.onnx_name] = variable
                 else:
-                    other_outputs[variable.raw_name] = variable
+                    other_outputs[variable.onnx_name] = variable
 
     # Add roots the graph according to their order in the original model
     invalid_name = []
