@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 from collections import OrderedDict
 from sklearn.base import BaseEstimator
+from sklearn.pipeline import Pipeline
 
 
 def enumerate_model_names(model, prefix="", short=True):
@@ -63,3 +64,11 @@ def enumerate_model_names(model, prefix="", short=True):
                                   else "{}__{}".format(prefix, key))
                     for t in enumerate_model_names(obj, prefix, short=short):
                         yield t
+
+
+def has_pipeline(model):
+    """
+    Tells if a model contains a pipeline.
+    """
+    return any(map(lambda x: isinstance(x[1], Pipeline),
+                   enumerate_model_names(model)))

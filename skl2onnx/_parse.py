@@ -45,7 +45,7 @@ from .common.data_types import StringTensorType, TensorType
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
-from .common.utils_sklearn import enumerate_model_names
+from .common.utils_sklearn import enumerate_model_names, has_pipeline
 
 
 do_not_merge_columns = tuple(
@@ -471,7 +471,7 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
         (if type is not None) and the name of every output.
     :return: The output variables produced by the input model
     """
-    if final_types is None:
+    if final_types is None and has_pipeline(model):
         try:
             outputs = _parse_sklearn(
                 scope.temp(), model, inputs, custom_parsers=custom_parsers)
@@ -482,12 +482,14 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
         reserved = []
         for o in outputs:
             reserved.append(scope.reserve_name(o.raw_name))
+    else:
+        reserved = None
 
     res = _parse_sklearn(
         scope, model, inputs, custom_parsers=custom_parsers,
         final_types=final_types)
 
-    if final_types is None:
+    if final_types is None and reserved is not None:
         for r in reserved:
             scope.unreserve_name(r)
 
