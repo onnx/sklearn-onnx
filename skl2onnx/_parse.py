@@ -472,10 +472,12 @@ def _process_options(model, options):
         try:
             ri = k.rindex('__')
             m2, k2 = k[:ri], k[ri+2:]
-        except IndexError:
-            raise RuntimeError(
-                "Unable to find model name '{}' in \n{}".format(
-                    k, list(sorted(names))))
+        except ValueError:
+            key = id(model)
+            if key not in new_options:
+                new_options[key] = {}
+            new_options[key][k] = v
+            continue
         if m2 in names:
             key = id(names[m2])
             if key not in new_options:

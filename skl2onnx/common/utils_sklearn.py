@@ -36,7 +36,8 @@ def enumerate_model_names(model, prefix="", short=True):
     else:
         yield (prefix, model)
         reserved_atts = {'transformers', 'steps', 'transformer_list',
-                         'named_estimators_', 'named_transformers_'}
+                         'named_estimators_', 'named_transformers_',
+                         'transformer_', 'estimator_'}
         for key in dir(model):
             if (key in ('estimators_', 'estimator') and
                     hasattr(model, 'named_estimators_')):
