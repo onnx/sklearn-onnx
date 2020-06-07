@@ -2,8 +2,10 @@
 Tests on functions in *onnx_helper*.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy
 import pandas
+from onnxruntime import __version__ as ort_version
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.datasets import load_iris
@@ -79,6 +81,9 @@ class TestUtilsSklearn(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        reason="onnxruntime too old")
     def test_pipeline_column_transformer(self):
 
         iris = load_iris()
