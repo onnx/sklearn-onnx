@@ -448,7 +448,7 @@ def get_model_alias(model_type):
     if res is None:
         raise RuntimeError("Unable to find alias for model '{}'. "
                            "The converter is likely missing."
-                           "".format(type(model_type)))
+                           "".format(model_type))
     return res
 
 

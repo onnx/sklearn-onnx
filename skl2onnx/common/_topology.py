@@ -312,6 +312,17 @@ class Scope:
         # Registered models
         self.registered_models = registered_models
 
+    def temp(self):
+        """
+        Creates a new Scope with the same options but no names.
+        """
+        return Scope(
+            'temp', parent_scopes=self.parent_scopes,
+            target_opset=self.target_opset,
+            custom_shape_calculators=self.custom_shape_calculators,
+            options=self.options, dtype=self.dtype,
+            registered_models=self.registered_models)
+
     def get_shape_calculator(self, model_type):
         """
         Returns the shape calculator for the given model type.

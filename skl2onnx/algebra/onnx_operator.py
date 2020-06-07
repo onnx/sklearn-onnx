@@ -400,11 +400,11 @@ class OnnxOperator:
                             operator))
                     # The inputs must be looked into the graph.
                     for i in operator.inputs:
-                        if i.raw_name == input.name:
+                        if i.onnx_name == input.name:
                             inputs.append(i)
                             break
                     else:
-                        vars = ', '.join(map(lambda o: "'%s'" % o.raw_name,
+                        vars = ', '.join(map(lambda o: "'%s'" % o.onnx_name,
                                              operator.inputs))
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
@@ -683,11 +683,11 @@ class OnnxSubEstimator(OnnxOperator):
                             operator))
                     # The inputs must be looked into the graph.
                     for i in operator.inputs:
-                        if i.raw_name == input.name:
+                        if i.onnx_name == input.name:
                             inputs.append(i)
                             break
                     else:
-                        vars = ', '.join(map(lambda o: "'%s'" % o.raw_name,
+                        vars = ', '.join(map(lambda o: "'%s'" % o.onnx_name,
                                              operator.inputs))
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
