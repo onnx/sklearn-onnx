@@ -17,7 +17,6 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
 )
-from onnxconverter_common import optimize_onnx_model
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
@@ -30,6 +29,7 @@ from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
+from .onnx_optimisation_identity import onnx_remove_node_identity
 type_fct = type
 
 
@@ -1153,8 +1153,12 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model.model_version = utils.get_model_version()
     onnx_model.doc_string = doc_string
 
-    # optimize
-    onnx_model = optimize_onnx_model(onnx_model)
+    # Removes many identity nodes,
+    # the converter may introduct identity nodes
+    # after a zipmap operator and onnx <= 1.7 does not
+    # support that. It does not use onnxconverter-common
+    # as the optimizer only support opset >= 9.
+    onnx_model = onnx_remove_node_identity(onnx_model)
 
     return onnx_model
 
