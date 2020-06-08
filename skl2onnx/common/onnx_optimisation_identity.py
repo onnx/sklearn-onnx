@@ -44,10 +44,10 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
         for i, (node, exnode) in enumerate(zip(graph.node, existing_nodes)):
             if exnode is None:
                 continue
-            if node.op_type == 'Identity':
-                input = node.input[0]
-                output = node.output[0]
-                idnodes.append((i, node, input, output))
+            if exnode.op_type == 'Identity':
+                input = exnode.input[0]
+                output = exnode.output[0]
+                idnodes.append((i, exnode, input, output))
         return idnodes
 
     nodes = list(graph.node)
@@ -73,7 +73,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                     if out in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], out, inp)
                         rem += 1
-                        if nodes[j] == 'Identity':
+                        if nodes[j].op_type == 'Identity':
                             restart = True
                 nodes[i] = None
                 rem += 1
@@ -86,12 +86,12 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
                         rem += 1
-                        if nodes[j] == 'Identity':
+                        if nodes[j].op_type == 'Identity':
                             restart = True
                     if inp in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], inp, out)
                         rem += 1
-                        if nodes[j] == 'Identity':
+                        if nodes[j].op_type == 'Identity':
                             restart = True
                 nodes[i] = None
                 rem += 1
