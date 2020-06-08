@@ -1,6 +1,6 @@
 """
 Optimization of :epkg:`ONNX` graphs.
-Function in *onnxconverter-common* do not support
+Functions in *onnxconverter-common* do not support
 opset < 9.
 """
 from onnx.helper import make_graph
@@ -78,13 +78,18 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 nodes[i] = None
                 rem += 1
                 continue
-            if not restart and inp not in inputs:
-                # We cannot change an input name.
+            if not restart and inp not in inputs and inp not in outputs:
+                # We cannot change an input name or an output name.
                 for j in range(len(nodes)):
                     if nodes[j] is None:
                         continue
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
+                        rem += 1
+                        if nodes[j] == 'Identity':
+                            restart = True
+                    if inp in nodes[j].input:
+                        nodes[j] = _rename_node_input(nodes[j], inp, out)
                         rem += 1
                         if nodes[j] == 'Identity':
                             restart = True
