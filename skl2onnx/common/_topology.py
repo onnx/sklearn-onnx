@@ -327,6 +327,12 @@ class Scope:
             registered_models=self.registered_models)
         return scope
 
+    def has_variable_name(self, name):
+        """
+        Tells if a variable is already registered.
+        """
+        return name in self.onnx_variable_names
+
     def get_shape_calculator(self, model_type):
         """
         Returns the shape calculator for the given model type.

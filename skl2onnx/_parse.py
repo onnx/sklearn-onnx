@@ -97,7 +97,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     this_operator.inputs = inputs
 
     if hasattr(model, 'onnx_parser'):
-        parser_names = model.onnx_parser(inputs=inputs)
+        parser_names = model.onnx_parser(scope=scope, inputs=inputs)
         if parser_names is not None:
             names = parser_names()
             for name in names:
