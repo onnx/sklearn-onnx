@@ -41,7 +41,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
 
     def retrieve_idnodes(graph, existing_nodes):
         idnodes = []
-        for i, (node, exnode) in enumerate(zip(graph.node, existing_nodes)):
+        for i, exnode in enumerate(existing_nodes):
             if exnode is None:
                 continue
             if exnode.op_type == 'Identity':
