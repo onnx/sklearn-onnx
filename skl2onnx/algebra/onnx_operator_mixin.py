@@ -93,7 +93,7 @@ class OnnxOperatorMixin:
         """
         raise NotImplementedError()
 
-    def onnx_parser(self, inputs=None):
+    def onnx_parser(self, scope=None, inputs=None):
         """
         Returns a parser for this model.
         If not overloaded, it fetches the parser
