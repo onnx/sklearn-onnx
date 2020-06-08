@@ -17,6 +17,7 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
 )
+from onnxconverter_common import optimize_onnx_model
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
@@ -1151,6 +1152,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model.domain = utils.get_domain()
     onnx_model.model_version = utils.get_model_version()
     onnx_model.doc_string = doc_string
+
+    # optimize
+    onnx_model = optimize_onnx_model(onnx_model)
 
     return onnx_model
 
