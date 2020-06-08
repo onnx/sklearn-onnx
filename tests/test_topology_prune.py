@@ -63,14 +63,13 @@ class TestTopologyPrune(unittest.TestCase):
                                     dummy_shape_calculator, dummy_converter)
 
         model_onnx = convert_sklearn(
-            idtr,
-            "idtr",
+            idtr, "idtr",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
             target_opset=TARGET_OPSET)
 
         idnode = [node for node in model_onnx.graph.node
                   if node.op_type == "Identity"]
-        assert len(idnode) == 2
+        assert len(idnode) == 0
 
 
 if __name__ == "__main__":

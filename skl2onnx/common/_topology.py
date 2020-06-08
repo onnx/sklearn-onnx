@@ -948,7 +948,7 @@ class Topology:
 
 def convert_topology(topology, model_name, doc_string, target_opset,
                      channel_first_inputs=None, dtype=None,
-                     options=None):
+                     options=None, remove_identity=True):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
@@ -964,6 +964,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     :param dtype: float type to use everywhere in the graph,
         `np.float32` or `np.float64`
     :param options: see :ref:`l-conv-options`
+    :param remove_identity: removes identity nodes
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     """
@@ -1158,7 +1159,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     # after a zipmap operator and onnx <= 1.7 does not
     # support that. It does not use onnxconverter-common
     # as the optimizer only support opset >= 9.
-    onnx_model = onnx_remove_node_identity(onnx_model)
+    if remove_identity:
+        onnx_model = onnx_remove_node_identity(onnx_model)
 
     return onnx_model
 
