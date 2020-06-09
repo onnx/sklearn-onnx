@@ -38,8 +38,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         i0 = self.get_inputs(inputs, 0)
-        W = self.W_
-        S = self.S_
+        W = self.W_.astype(np.float32)
+        S = self.S_.astype(np.float32)
         # case if there are multiple output nodes
         return OnnxDiv(OnnxSub(i0, W, op_version=self.op_version), S,
                        output_names=outputs, op_version=self.op_version)
