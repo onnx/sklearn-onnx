@@ -12,7 +12,7 @@ except ImportError:
 from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin
 
 
-def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc):
+def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc, alias):
     from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin
 
     newclass = type(class_name, (OnnxSubGraphOperatorMixin, skl_obj),
@@ -22,7 +22,8 @@ def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc):
                      '_fct_shape_calc': shape_calc,
                      'input_range': [1, 1e9],
                      'output_range': [1, 1e9],
-                     'op_version': None})
+                     'op_version': None,
+                     'alias': alias})
     return newclass
 
 
@@ -46,7 +47,8 @@ def dynamic_class_creation_sklearn():
         prefix = "Sklearn" if "sklearn" in str(skl_obj) else ""
         class_name = "Onnx" + prefix + skl_name
         cl = ClassFactorySklearn(skl_obj, class_name,
-                                 doc, conv, shape_calc)
+                                 doc, conv, shape_calc,
+                                 name)
         cls[class_name] = cl
     return cls
 

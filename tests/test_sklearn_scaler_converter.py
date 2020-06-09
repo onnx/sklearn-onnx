@@ -54,12 +54,30 @@ class TestSklearnScalerConverter(unittest.TestCase):
         model.fit(data)
         model_onnx = convert_sklearn(
             model, "scaler", [("input", FloatTensorType([None, 3]))],
-            options={id(model): {'div': True}})
+            options={id(model): {'div': 'div'}})
         assert 'op_type: "Div"' in str(model_onnx)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model, basename="SklearnStandardScalerFloat32")
+            model, basename="SklearnStandardScalerFloat32Div")
+
+    def test_standard_scaler_floats_div_cast(self):
+        model = StandardScaler()
+        data = [
+            [0.0, 0.0, 3.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 2.0, 1.0],
+            [1.0, 0.0, 2.0],
+        ]
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model, "scaler", [("input", FloatTensorType([None, 3]))],
+            options={id(model): {'div': 'div_cast'}})
+        assert 'op_type: "Div"' in str(model_onnx)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            numpy.array(data, dtype=numpy.float32),
+            model, basename="SklearnStandardScalerFloat32DivCast")
 
     def test_standard_scaler_floats_no_std(self):
         model = StandardScaler(with_std=False)

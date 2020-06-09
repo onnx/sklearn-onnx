@@ -7,8 +7,9 @@
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
-from ..algebra.onnx_ops import OnnxSub, OnnxDiv
+from ..algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxCast
 from ..common._registration import register_converter
+from ..proto import onnx_proto
 from .common import concatenate_variables
 
 
@@ -61,14 +62,25 @@ def convert_sklearn_scaler(scope, operator, container):
             attrs[k] = v.astype(np.float64)
 
     if inv_scale is not None:
-        options = container.get_options(op, dict(div=False))
+        options = container.get_options(op, dict(div='std'))
         div = options['div']
-        if div:
+        if div == 'div':
             opv = container.target_opset
             sub = OnnxSub(feature_name, attrs['offset'], op_version=opv)
             div = OnnxDiv(sub, inv_scale, op_version=opv,
                           output_names=[operator.outputs[0].full_name])
             div.add_to(scope, container)
+            return
+        if div == 'div_cast':
+            opv = container.target_opset
+            cast = OnnxCast(feature_name, to=onnx_proto.TensorProto.DOUBLE,
+                            op_version=opv)
+            sub = OnnxSub(cast, attrs['offset'].astype(np.float64),
+                          op_version=opv)
+            div = OnnxDiv(sub, inv_scale.astype(np.float64), op_version=opv)
+            cast = OnnxCast(div, to=container.proto_dtype, op_version=opv,
+                            output_names=[operator.outputs[0].full_name])
+            cast.add_to(scope, container)
             return
 
     container.add_node(
@@ -77,9 +89,9 @@ def convert_sklearn_scaler(scope, operator, container):
 
 
 register_converter('SklearnRobustScaler', convert_sklearn_scaler,
-                   options={'div': [False, True]})
+                   options={'div': ['std', 'div', 'div_cast']})
 register_converter('SklearnScaler', convert_sklearn_scaler,
-                   options={'div': [False, True]})
+                   options={'div': ['std', 'div', 'div_cast']})
 register_converter('SklearnMinMaxScaler', convert_sklearn_scaler)
 register_converter('SklearnMaxAbsScaler', convert_sklearn_scaler,
-                   options={'div': [False, True]})
+                   options={'div': ['std', 'div', 'div_cast']})
