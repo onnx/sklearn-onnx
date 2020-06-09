@@ -75,14 +75,16 @@ def convert_sklearn_kmeans(scope, operator, container):
         x_cast = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT, op_version=opv)
         input_name = x_cast
 
-    C2 = row_norms(C, squared=True)
+    C2 = row_norms(C, squared=True).astype(container.dtype)
+    C = C.astype(container.dtype)
     rs = OnnxReduceSumSquare(input_name, axes=[1], keepdims=1, op_version=opv)
 
     N = X.type.shape[0]
     if isinstance(N, int):
-        zeros = np.zeros((N, ))
+        zeros = np.zeros((N, ), dtype=container.dtype)
     else:
-        zeros = OnnxMul(rs, np.array([0], dtype=np.float32), op_version=opv)
+        zeros = OnnxMul(rs, np.array([0], dtype=container.dtype),
+                        op_version=opv)
 
     z = OnnxAdd(rs, OnnxGemm(input_name, C, zeros, alpha=-2.,
                              transB=1, op_version=opv),
