@@ -66,8 +66,11 @@ def convert_sklearn_scaler(scope, operator, container):
         div = options['div']
         if div == 'div':
             opv = container.target_opset
-            sub = OnnxSub(feature_name, attrs['offset'], op_version=opv)
-            div = OnnxDiv(sub, inv_scale, op_version=opv,
+            sub = OnnxSub(
+                feature_name, attrs['offset'].astype(container.dtype),
+                op_version=opv)
+            div = OnnxDiv(sub, inv_scale.astype(container.dtype),
+                          op_version=opv,
                           output_names=[operator.outputs[0].full_name])
             div.add_to(scope, container)
             return
