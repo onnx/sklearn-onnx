@@ -108,7 +108,8 @@ def nmf_to_onnx(W, H, op_version=12):
     return onx
 
 
-model_onnx = nmf_to_onnx(W, H)
+model_onnx = nmf_to_onnx(W.astype(np.float32),
+                         H.astype(np.float32))
 print(model_onnx)
 
 ########################################
