@@ -71,9 +71,11 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(
-            model, "scaler", [("input", FloatTensorType([None, 3]))],
+            model, "cast", [("input", FloatTensorType([None, 3]))],
             options={id(model): {'div': 'div_cast'}})
         assert 'op_type: "Div"' in str(model_onnx)
+        assert 'caler"' not in str(model_onnx)
+        assert "double_data:" in str(model_onnx)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
