@@ -8,6 +8,8 @@ import numpy as np
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
 from ..common._registration import register_converter
+from ..common._apply_operation import apply_cast
+from ..proto import onnx_proto
 from .common import concatenate_variables
 
 
@@ -51,11 +53,35 @@ def convert_sklearn_scaler(scope, operator, container):
         if isinstance(v, np.ndarray) and v.dtype == np.float32:
             attrs[k] = v.astype(np.float64)
 
-    container.add_node(op_type, feature_name, operator.outputs[0].full_name,
-                       op_domain='ai.onnx.ml', **attrs)
+    options = container.get_options(op, dict(double=False))
+    cast = options['double'] and container.dtype != np.float64
+    if cast:
+        feature_name_double = scope.get_unique_variable_name(
+            'scaler_double')
+        apply_cast(scope, feature_name, feature_name_double,
+                   container, to=onnx_proto.TensorProto.DOUBLE)
+        feature_name = feature_name_double
+
+        scaled_feature_name_double = scope.get_unique_variable_name(
+            'scaled_double')
+        container.add_node(
+            op_type, feature_name, scaled_feature_name_double,
+            op_domain='ai.onnx.ml', **attrs)
+
+        apply_cast(scope, scaled_feature_name_double,
+                   operator.outputs[0].full_name,
+                   container, to=container.proto_dtype)
+    else:
+        container.add_node(
+            op_type, feature_name, operator.outputs[0].full_name,
+            op_domain='ai.onnx.ml', **attrs)
 
 
-register_converter('SklearnRobustScaler', convert_sklearn_scaler)
-register_converter('SklearnScaler', convert_sklearn_scaler)
-register_converter('SklearnMinMaxScaler', convert_sklearn_scaler)
-register_converter('SklearnMaxAbsScaler', convert_sklearn_scaler)
+register_converter('SklearnRobustScaler', convert_sklearn_scaler,
+                   options={'double': [False, True]})
+register_converter('SklearnScaler', convert_sklearn_scaler,
+                   options={'double': [False, True]})
+register_converter('SklearnMinMaxScaler', convert_sklearn_scaler,
+                   options={'double': [False, True]})
+register_converter('SklearnMaxAbsScaler', convert_sklearn_scaler,
+                   options={'double': [False, True]})
