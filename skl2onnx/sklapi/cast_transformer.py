@@ -5,7 +5,10 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
-from sklearn.utils.validation import _deprecate_positional_args
+try:
+    from sklearn.utils.validation import _deprecate_positional_args
+except ImportError:
+    _deprecate_positional_args = lambda x: x  # noqa
 
 
 class CastTransformer(TransformerMixin, BaseEstimator):
