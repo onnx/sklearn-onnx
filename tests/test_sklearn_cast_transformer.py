@@ -3,8 +3,9 @@ Tests scikit-learn's cast transformer converter.
 """
 import unittest
 import math
+from distutils.version import StrictVersion
 import numpy
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -51,6 +52,8 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             numpy.int64, Int64TensorType)
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+                     reason="runtime too old")
     def test_pipeline(self):
 
         def maxdiff(a1, a2):
