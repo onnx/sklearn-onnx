@@ -23,4 +23,6 @@ def calculate_sklearn_cast_transformer(operator):
 
 
 register_shape_calculator(
+    'SklearnCast', calculate_sklearn_cast)
+register_shape_calculator(
     'SklearnCastTransformer', calculate_sklearn_cast_transformer)
