@@ -353,6 +353,8 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         this_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
         this_operator.classlabels_int64s = classes
+    elif np.issubdtype(classes.dtype, np.unsignedinteger):
+        this_operator.classlabels_int64s = classes
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
         this_operator.classlabels_strings = classes
