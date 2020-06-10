@@ -17,4 +17,5 @@ def convert_sklearn_cast(scope, operator, container):
                container, to=et)
 
 
+register_converter('SklearnCastTransformer', convert_sklearn_cast)
 register_converter('SklearnCast', convert_sklearn_cast)

@@ -138,6 +138,11 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
+        if not hasattr(self, 'op_version'):
+            raise AttributeError(
+                "Class '{}' should have an attribute 'op_version'.".format(
+                    self.__class__.__name__))
+
         inputs = getattr(self, "parsed_inputs_", None)
         try:
             if inputs:
