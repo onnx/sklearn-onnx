@@ -39,14 +39,20 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             basename="SklearnCastTransformer{}".format(
                 input_type.__class__.__name__))
 
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+                     reason="runtime too old")
     def test_cast_transformer_float(self):
         self.common_test_cast_transformer(
             numpy.float32, FloatTensorType)
 
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+                     reason="runtime too old")
     def test_cast_transformer_float64(self):
         self.common_test_cast_transformer(
             numpy.float64, DoubleTensorType)
 
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+                     reason="runtime too old")
     def test_cast_transformer_int64(self):
         self.common_test_cast_transformer(
             numpy.int64, Int64TensorType)
