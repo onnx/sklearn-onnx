@@ -122,8 +122,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
             raise RuntimeError("Parameter inputs should contain at least "
                                "one name.")
         i0 = self.get_inputs(inputs, 0)
-        W = self.W_
-        S = self.S_
+        W = self.W_.astype(np.float32)
+        S = self.S_.astype(np.float32)
         return OnnxDiv(OnnxSub(i0, W, op_version=12), S,
                        output_names=outputs,
                        op_version=12)
