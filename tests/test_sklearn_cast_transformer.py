@@ -14,7 +14,7 @@ from skl2onnx.sklapi import CastTransformer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType)
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnCastTransformerConverter(unittest.TestCase):
@@ -30,7 +30,8 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         pred = model.steps[0][1].transform(data)
         assert pred.dtype == dtype
         model_onnx = convert_sklearn(
-            model, "cast", [("input", FloatTensorType([None, 3]))])
+            model, "cast", [("input", FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data, model, model_onnx,
@@ -49,6 +50,7 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         self.common_test_cast_transformer(
             numpy.int64, Int64TensorType)
 
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
     def test_pipeline(self):
 
         def maxdiff(a1, a2):
@@ -75,7 +77,8 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         ])
         model1.fit(Xi_train, yi_train)
         exp1 = model1.predict(Xi_test)
-        onx1 = to_onnx(model1, X_train[:1].astype(numpy.float32))
+        onx1 = to_onnx(model1, X_train[:1].astype(numpy.float32),
+                       target_opset=TARGET_OPSET)
         sess1 = InferenceSession(onx1.SerializeToString())
         got1 = sess1.run(None, {'X': Xi_test})[0]
         md1 = maxdiff(exp1, got1)
@@ -90,7 +93,8 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         model2.fit(Xi_train, yi_train)
         exp2 = model2.predict(Xi_test)
         onx = to_onnx(model2, X_train[:1].astype(numpy.float32),
-                      options={StandardScaler: {'div': 'div_cast'}})
+                      options={StandardScaler: {'div': 'div_cast'}},
+                      target_opset=TARGET_OPSET)
         sess2 = InferenceSession(onx.SerializeToString())
         got2 = sess2.run(None, {'X': Xi_test})[0]
         md2 = maxdiff(exp2, got2)
