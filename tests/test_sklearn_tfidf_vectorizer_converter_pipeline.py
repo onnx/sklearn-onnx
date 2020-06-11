@@ -92,16 +92,19 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
             assert_almost_equal(a, b)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
+        reason="Requires opset 10.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.0.0"),
+        reason="Too old")
     def test_model_tfidf_vectorizer_pipeline(self):
         for kind in [None, 'cls', 'reg']:
             with self.subTest(kind=kind):
                 self.common_test_model_tfidf_vectorizer_pipeline_cls(kind)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
+        reason="Requires opset 10.")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="Wrong handling of stopwods and n-grams")
