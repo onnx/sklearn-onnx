@@ -94,8 +94,21 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+                          " <= StrictVersion('0.2.1')")
+        dump_multiple_classification(
+            model,
+            label_uint8=True,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
+        dump_multiple_classification(
+            model,
+            label_string=True,
+            allow_failure="StrictVersion(onnx.__version__)"
+                          " < StrictVersion('1.3') or "
+                          "StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.2.1')")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
