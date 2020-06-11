@@ -13,8 +13,9 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import (
     LogisticRegression, LogisticRegressionCV,
     PassiveAggressiveClassifier,
-    Perceptron, SGDClassifier,
+    Perceptron,
     RidgeClassifier, RidgeClassifierCV,
+    SGDClassifier,
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -75,7 +76,9 @@ from sklearn.tree import (
 )
 
 # Gaussian processes
-from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process import (
+    GaussianProcessClassifier, GaussianProcessRegressor
+)
 
 # GridSearchCV
 from sklearn.model_selection import GridSearchCV
@@ -218,6 +221,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     ExtraTreeClassifier,
     ExtraTreesClassifier,
     GaussianNB,
+    GaussianProcessClassifier,
     GradientBoostingClassifier,
     HistGradientBoostingClassifier,
     KNeighborsClassifier,
@@ -273,6 +277,7 @@ def build_sklearn_operator_name_map():
                 ExtraTreesRegressor,
                 FunctionTransformer,
                 GaussianMixture,
+                GaussianProcessClassifier,
                 GaussianProcessRegressor,
                 GaussianRandomProjection,
                 GenericUnivariateSelect,
