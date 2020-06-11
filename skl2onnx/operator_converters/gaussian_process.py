@@ -8,7 +8,8 @@ from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
-    OnnxMul, OnnxMax
+    OnnxMul, OnnxMax, OnnxArgMax, OnnxReshape,
+    OnnxArrayFeatureExtractor,
 )
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
@@ -154,7 +155,87 @@ def convert_gaussian_process_regressor(scope, operator, container):
         o.add_to(scope, container)
 
 
+def convert_gaussian_process_classifier(scope, operator, container):
+    """
+    The method *predict* from class *GaussianProcessClassifier*
+    may cache some results if it is called with parameter
+    ``return_std=True`` or ``return_cov=True``. This converter
+    needs to be called with theses options to enable
+    the second results.
+    See example :ref:`l-gpr-example` to see how to
+    use this converter which does not behave exactly
+    as the others.
+    """
+    dtype = container.dtype
+    if dtype is None:
+        raise RuntimeError("dtype cannot be None")
+    X = operator.inputs[0]
+    out = operator.outputs
+    op = operator.raw_operator
+    op_est = operator.raw_operator.base_estimator_
+    opv = container.target_opset
+    if opv is None:
+        raise RuntimeError("container.target_opset must not be None")
+    outputs = []
+
+    options = container.get_options(op, dict(optim=None))
+    if hasattr(op, 'kernel_') and op.kernel_ is not None:
+        kernel = op.kernel_
+    elif op.kernel is None:
+        kernel = (C(1.0, constant_value_bounds="fixed") *
+                  RBF(1.0, length_scale_bounds="fixed"))
+    else:
+        kernel = op.kernel
+
+    K_star = convert_kernel(
+        kernel, X, x_train=op_est.X_train_.astype(dtype), dtype=dtype,
+        optim=options.get('optim', None), op_version=opv)
+    K_star.set_onnx_name_prefix('kgpd')
+
+    # common
+    # f_star = K_star.T.dot(self.y_train_ - self.pi_)
+    f_star_right = (op_est.y_train_ - op_est.pi_).astype(dtype)
+    f_star = OnnxMatMul(K_star, f_star_right, op_version=opv)
+    best = OnnxArgMax(f_star, axis=1, op_version=opv)
+    classes = OnnxArrayFeatureExtractor(op.classes_, best)
+    labels = OnnxReshape(classes, np.array([-1], dtype=np.int64),
+                         op_version=opv, output_names=out[:1])
+    outputs.append(labels)
+    
+    # predict_proba
+    if False:
+        v = solve(self.L_, self.W_sr_[:, np.newaxis] * K_star)  # Line 5
+        # Line 6 (compute np.diag(v.T.dot(v)) via einsum)
+        var_f_star = self.kernel_.diag(X) - np.einsum("ij,ij->j", v, v)
+
+        # Line 7:
+        # Approximate \int log(z) * N(z | f_star, var_f_star)
+        # Approximation is due to Williams & Barber, "Bayesian Classification
+        # with Gaussian Processes", Appendix A: Approximate the logistic
+        # sigmoid by a linear combination of 5 error functions.
+        # For information on how this integral can be computed see
+        # blitiri.blogspot.de/2012/11/gaussian-integral-of-error-function.html
+        alpha = 1 / (2 * var_f_star)
+        gamma = LAMBDAS * f_star
+        integrals = np.sqrt(np.pi / alpha) \
+            * erf(gamma * np.sqrt(alpha / (alpha + LAMBDAS**2))) \
+            / (2 * np.sqrt(var_f_star * 2 * np.pi))
+        pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
+
+        return np.vstack((1 - pi_star, pi_star)).T
+    
+
+    for o in outputs:
+        o.add_to(scope, container)
+
+
+
 if OnnxConstantOfShape is not None:
+    register_converter('SklearnGaussianProcessClassifier',
+                       convert_gaussian_process_classifier,
+                       options={'optim': [None, 'cdist'],
+                                'nocl': [False, True],
+                                'zipmap': [False, True]})
     register_converter('SklearnGaussianProcessRegressor',
                        convert_gaussian_process_regressor,
                        options={'return_cov': [False, True],
