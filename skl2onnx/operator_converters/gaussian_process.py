@@ -5,7 +5,10 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
-from sklearn.gaussian_process._gpc import LAMBDAS, COEFS
+try:
+    from sklearn.gaussian_process._gpc import LAMBDAS, COEFS
+except ImportError:
+    LAMBDAS, COEFS = None, None
 from ..proto import onnx_proto
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
@@ -184,6 +187,8 @@ def convert_gaussian_process_classifier(scope, operator, container):
     if OnnxEinsum is None:
         raise RuntimeError(
             "target opset must be >= 12 for operator 'einsum'.")
+    if LAMBDAS is None:
+        raise RuntimeError("Only scikit-learn>=0.22 is supported.")
     outputs = []
 
     options = container.get_options(op, dict(optim=None))
