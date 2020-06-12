@@ -11,7 +11,7 @@ from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
     OnnxMul, OnnxMax, OnnxReshape, OnnxDiv, OnnxNot,
-    OnnxErf, OnnxEinsum, OnnxReciprocal, OnnxCast, OnnxLess,
+    OnnxErf, OnnxReciprocal, OnnxCast, OnnxLess,
     OnnxPow, OnnxNeg, OnnxConcat, OnnxArrayFeatureExtractor,
     OnnxTranspose,
 )
@@ -20,7 +20,10 @@ try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
     OnnxConstantOfShape = None
-
+try:
+    from ..algebra.onnx_ops import OnnxEinsum
+except ImportError:
+    OnnxEinsum = None
 from ._gp_kernels import (
     convert_kernel_diag,
     convert_kernel,
@@ -178,6 +181,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
     opv = container.target_opset
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
+    if OnnxEinsum is None:
+        raise RuntimeError(
+            "target opset must be >= 12 for operator 'einsum'.")
     outputs = []
 
     options = container.get_options(op, dict(optim=None))
