@@ -556,6 +556,8 @@ class OnnxOperator:
 
         # infer shapes
         if outputs:
+            if isinstance(outputs, dict):
+                outputs = [(k, v) for k, v in outputs.items()]
             shapes = []
             for o in outputs:
                 if isinstance(o, Variable):
