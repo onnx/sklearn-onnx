@@ -54,7 +54,8 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
             rst = get_rst_doc_sklearn()
             assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
         except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(e)
+            assert ("SklearnGaussianProcessRegressor" in str(e) or
+                "SklearnGaussianProcessClassifier" in str(e))
 
 
 if __name__ == "__main__":

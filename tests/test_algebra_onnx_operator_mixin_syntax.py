@@ -93,7 +93,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         try:
             tr_mixin = wrap_as_onnx_mixin(tr, target_opset=TARGET_OPSET)
         except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(e)
+            assert ("SklearnGaussianProcessRegressor" in str(e) or
+                "SklearnGaussianProcessClassifier" in str(e))
             return
 
         try:
@@ -113,7 +114,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
             tr = wrap_as_onnx_mixin(KMeans(n_clusters=2),
                                     target_opset=TARGET_OPSET)
         except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(e)
+            assert ("SklearnGaussianProcessRegressor" in str(e) or
+                "SklearnGaussianProcessClassifier" in str(e))
             return
         tr.fit(X)
 
@@ -178,7 +180,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         try:
             tr_mixin = wrap_as_onnx_mixin(tr, target_opset=TARGET_OPSET)
         except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(e)
+            assert ("SklearnGaussianProcessRegressor" in str(e) or
+                "SklearnGaussianProcessClassifier" in str(e))
             return
 
         try:
@@ -204,7 +207,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
                 make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)),
                 target_opset=TARGET_OPSET)
         except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(e)
+            assert ("SklearnGaussianProcessRegressor" in str(e) or
+                "SklearnGaussianProcessClassifier" in str(e))
             return
 
         tr.fit(X)
