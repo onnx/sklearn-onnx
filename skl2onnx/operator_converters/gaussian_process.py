@@ -324,13 +324,15 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
 
 if OnnxConstantOfShape is not None:
-    register_converter('SklearnGaussianProcessClassifier',
-                       convert_gaussian_process_classifier,
-                       options={'optim': [None, 'cdist'],
-                                'nocl': [False, True],
-                                'zipmap': [False, True]})
     register_converter('SklearnGaussianProcessRegressor',
                        convert_gaussian_process_regressor,
                        options={'return_cov': [False, True],
                                 'return_std': [False, True],
                                 'optim': [None, 'cdist']})
+
+if OnnxEinsum is not None and OnnxErf is not None:
+    register_converter('SklearnGaussianProcessClassifier',
+                       convert_gaussian_process_classifier,
+                       options={'optim': [None, 'cdist'],
+                                'nocl': [False, True],
+                                'zipmap': [False, True]})
