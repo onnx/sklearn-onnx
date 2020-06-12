@@ -9,7 +9,10 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.gaussian_process import GaussianProcessClassifier
+try:
+    from sklearn.gaussian_process import GaussianProcessClassifier
+except ImportError:
+    GaussianProcessClassifier = None
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
@@ -66,10 +69,14 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
             "<= StrictVersion('1.5.0')")
 
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum")
+    @unittest.skipIf(GaussianProcessClassifier is None,
+                     reason="scikit-learn is too old")
     def test_gpc_float_bin(self):
         self.common_test_gpc(dtype=np.float32)
 
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum")
+    @unittest.skipIf(GaussianProcessClassifier is None,
+                     reason="scikit-learn is too old")
     def test_gpc_double_bin(self):
         self.common_test_gpc(dtype=np.float64)
 
