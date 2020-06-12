@@ -14,7 +14,7 @@ from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
     OnnxMul, OnnxMax, OnnxReshape, OnnxDiv, OnnxNot,
-    OnnxErf, OnnxReciprocal, OnnxCast, OnnxLess,
+    OnnxReciprocal, OnnxCast, OnnxLess,
     OnnxPow, OnnxNeg, OnnxConcat, OnnxArrayFeatureExtractor,
     OnnxTranspose,
 )
@@ -23,6 +23,10 @@ try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
     OnnxConstantOfShape = None
+try:
+    from ..algebra.onnx_ops import OnnxErf
+except ImportError:
+    OnnxErf = None
 try:
     from ..algebra.onnx_ops import OnnxEinsum
 except ImportError:
@@ -184,9 +188,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
     opv = container.target_opset
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
-    if OnnxEinsum is None:
+    if OnnxEinsum is None or OnnxErf is None:
         raise RuntimeError(
-            "target opset must be >= 12 for operator 'einsum'.")
+            "target opset must be >= 12 for operator 'einsum' and 'erf'.")
     if LAMBDAS is None:
         raise RuntimeError("Only scikit-learn>=0.22 is supported.")
     outputs = []
