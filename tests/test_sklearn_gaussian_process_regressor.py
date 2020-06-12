@@ -89,7 +89,7 @@ THRESHOLD = "0.4.0"
 THRESHOLD2 = "0.5.0"
 
 
-class TestSklearnGaussianProcess(unittest.TestCase):
+class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
     def remove_dim1(self, arr):
         new_shape = tuple(v for v in arr.shape if v != 1)
