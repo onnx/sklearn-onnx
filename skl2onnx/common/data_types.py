@@ -66,7 +66,7 @@ def _guess_numpy_type(data_type, dims):
     if data_type == np.float64:
         return DoubleTensorType(dims)
     if data_type in (np.str, str, object) or str(
-        data_type) in ('<U1', ): # noqa
+        data_type) in ('<U1', ) or data_type.type is np.str_: # noqa
         return StringTensorType(dims)
     if data_type in (np.int64, np.uint64) or str(data_type) == '<U6':
         return Int64TensorType(dims)
@@ -76,9 +76,9 @@ def _guess_numpy_type(data_type, dims):
     if data_type == np.bool:
         return BooleanTensorType(dims)
     raise NotImplementedError(
-        "Unsupported data_type '{}'. You may raise an issue "
+        "Unsupported data_type '{}' (type: {}). You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
+        "".format(data_type, data_type.type))
 
 
 def guess_data_type(type_, shape=None):
