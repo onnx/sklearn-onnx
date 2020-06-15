@@ -250,12 +250,16 @@ def convert_sklearn_decision_tree_regressor(
 register_converter('SklearnDecisionTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'decision_path': [True, Flase]})
 register_converter('SklearnDecisionTreeRegressor',
-                   convert_sklearn_decision_tree_regressor)
+                   convert_sklearn_decision_tree_regressor,
+                   options={'decision_path': [True, Flase]})
 register_converter('SklearnExtraTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False]},
+                            'decision_path': [True, Flase]})
 register_converter('SklearnExtraTreeRegressor',
-                   convert_sklearn_decision_tree_regressor)
+                   convert_sklearn_decision_tree_regressor,
+                   options={'decision_path': [True, Flase]})
