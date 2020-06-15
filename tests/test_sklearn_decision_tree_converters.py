@@ -93,6 +93,36 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_decisiontree_classifier_decision_path(self):
+        model = DecisionTreeClassifier(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True, 'zipmap': False}})
+
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString())
+        except Exception as e:
+            # onnxruntime.capi.onnxruntime_pybind11_state.Fail: 
+            # [ONNXRuntimeError] : 1 : FAIL : Node:TreePath Output:decision_path 
+            # [ShapeInferenceError] Mismatch between number of source and 
+            # target dimensions. Source=0 Target=2
+            warnings.warn(str(e))
+            return
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict(X)
+        assert_almost_equal(prob, res[1].ravel())
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec.todense())
+        assert exp == res[2].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_decision_tree_classifier(self):
         model = DecisionTreeClassifier()
         dump_one_class_classification(

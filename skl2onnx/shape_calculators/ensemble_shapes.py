@@ -7,8 +7,10 @@
 from ..common._registration import register_shape_calculator
 from ..common.utils import (
     check_input_and_output_numbers, check_input_and_output_types)
-from ..common.shape_calculator import calculate_linear_regressor_output_shapes
-from ..common.shape_calculator import calculate_linear_classifier_output_shapes
+from ..common.shape_calculator import (
+    calculate_linear_regressor_output_shapes,
+    calculate_linear_classifier_output_shapes,
+    _calculate_linear_classifier_output_shapes)
 from ..common.data_types import (
     BooleanTensorType,
     DoubleTensorType,
@@ -17,7 +19,7 @@ from ..common.data_types import (
 )
 
 
-def calculate_tree_output_shapes(operator):
+def calculate_tree_regressor_output_shapes(operator):
     """
     Allowed input/output patterns are
         1. [N, C] ---> [N, 1]
@@ -43,12 +45,19 @@ def calculate_tree_output_shapes(operator):
         operator.outputs[0].type.shape = [N, 1]
 
 
+def calculate_tree_classifier_output_shapes(operator):
+    _calculate_linear_classifier_output_shapes(operator, True)
+    if len(operator.outputs) == 3:
+        N = operator.inputs[0].type.shape[0]
+        operator.outputs[2].type.shape = [N, 1]
+
+
 register_shape_calculator('SklearnDecisionTreeRegressor',
-                          calculate_tree_output_shapes)
+                          calculate_tree_regressor_output_shapes)
 register_shape_calculator('SklearnRandomForestRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnExtraTreeRegressor',
-                          calculate_linear_regressor_output_shapes)
+                          calculate_tree_regressor_output_shapes)
 register_shape_calculator('SklearnExtraTreesRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnGradientBoostingRegressor',
@@ -57,11 +66,11 @@ register_shape_calculator('SklearnHistGradientBoostingRegressor',
                           calculate_linear_regressor_output_shapes)
 
 register_shape_calculator('SklearnDecisionTreeClassifier',
-                          calculate_linear_classifier_output_shapes)
+                          calculate_tree_classifier_output_shapes)
 register_shape_calculator('SklearnRandomForestClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnExtraTreeClassifier',
-                          calculate_linear_classifier_output_shapes)
+                          calculate_tree_classifier_output_shapes)
 register_shape_calculator('SklearnExtraTreesClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnGradientBoostingClassifier',

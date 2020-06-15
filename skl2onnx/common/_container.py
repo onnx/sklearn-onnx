@@ -60,14 +60,15 @@ def _get_operation_list():
     return res
 
 
-def _build_options(model, defined_options, default_values, allowed_options):
+def _build_options(model, defined_options, default_values,
+                   allowed_options, fail):
     opts = {} if default_values is None else default_values
     if defined_options is not None:
         opts.update(defined_options.get(type(model), {}))
         opts.update(defined_options.get(id(model), {}))
     if allowed_options not in (None, 'passthrough'):
         for k, v in opts.items():
-            if k not in allowed_options:
+            if fail and k not in allowed_options:
                 raise NameError(
                     "Option '{}' not in {} for class '{}'.".format(
                         k, list(sorted(allowed_options)),
@@ -78,7 +79,7 @@ def _build_options(model, defined_options, default_values, allowed_options):
                     "Unexpected value [{!r}] for option '{}'"
                     " (it must be in {}) for model '{}'.".format(
                         v, k, allowed, model.__class__.__name__))
-    elif len(opts) != 0 and allowed_options != 'passthrough':
+    elif fail and len(opts) != 0 and allowed_options != 'passthrough':
         raise RuntimeError(
             "Options {} are not registerd for model '{}'.".format(
                 list(sorted(opts)), model.__class__.__name__))
@@ -622,18 +623,19 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         skl_op = operator.raw_operator
         self.get_options(skl_op)
 
-    def get_options(self, model, default_values=None):
+    def get_options(self, model, default_values=None, fail=True):
         """
         Returns additional options for a model.
         It first looks by class then by id (``id(model)``).
         :param model: model being converted
         :param default_values: default options (it is modified by
                                the function)
+        :param fail: fails if options not found
         :return: dictionary
         """
         return _build_options(
             model, self.options, default_values,
-            self._get_allowed_options(model))
+            self._get_allowed_options(model), fail=fail)
 
     def has_options(self, model, option_name):
         """

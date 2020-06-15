@@ -403,18 +403,20 @@ class Scope:
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__))
 
-    def get_options(self, model, default_values=None):
+    def get_options(self, model, default_values=None, fail=True):
         """
         Returns additional options for a model.
         It first looks by class then by id (``id(model)``).
         :param model: model being converted
         :param default_values: default options (it is modified by
                                the function)
+        :param fail: fails if option it not found
         :return: dictionary
         """
         return _build_options(
             model, self.options, default_values,
-            self._get_allowed_options(model))
+            self._get_allowed_options(model),
+            fail=fail)
 
 
 class Topology:

@@ -150,6 +150,7 @@ def convert_sklearn_decision_tree_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
     op = operator.raw_operator
+    options = scope.get_options(op, dict(decision_path=False))
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -180,6 +181,36 @@ def convert_sklearn_decision_tree_classifier(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain=op_domain, op_version=op_version, **attrs)
+
+        if not options['decision_path']:
+            return
+
+        # decision_path
+        attrs = attrs.copy()
+        attrs['name'] = scope.get_unique_operator_name(op_type)
+        attrs['n_targets'] = 1
+        attrs['post_transform'] = 'NONE'
+        attrs['target_ids'] = [0 for _ in attrs['class_ids']]
+        attrs['target_weights'] = [float(_) for _ in attrs['class_nodeids']]
+        attrs['target_nodeids'] = attrs['class_nodeids']
+        attrs['target_treeids'] = attrs['class_treeids']
+        rem = [k for k in attrs if k.startswith('class')]
+        for k in rem:
+            del attrs[k]
+        dpath = scope.get_unique_variable_name("dpath")
+        container.add_node(
+            op_type.replace("Classifier", "Regressor"), input_name, dpath,
+            op_domain=op_domain, op_version=op_version, **attrs)
+
+        labels = _build_labels(op.tree_)
+        ordered = list(sorted(labels.items()))
+        keys = [float(_[0]) for _ in ordered]
+        values = [_[1] for _ in ordered]
+        container.add_node(
+            'LabelEncoder', dpath, operator.outputs[2].full_name,
+            op_domain=op_domain, op_version=2,
+            default_string='0', keys_floats=keys, values_strings=values,
+            name=scope.get_unique_operator_name('TreePath'))        
     else:
         transposed_result_name = predict(
             op, scope, operator, container, op_type, op_domain, op_version)
@@ -221,6 +252,10 @@ def convert_sklearn_decision_tree_classifier(
             predictions.append(reshaped_preds_name)
         apply_concat(scope, predictions, operator.outputs[0].full_name,
                      container, axis=1)
+
+        if options['decision_path']:
+            raise RuntimeError(
+                "Decision output for multi-outputs is not implemented yet.")
 
 
 def convert_sklearn_decision_tree_regressor(
