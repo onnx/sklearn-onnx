@@ -210,7 +210,7 @@ def convert_sklearn_decision_tree_classifier(
             'LabelEncoder', dpath, operator.outputs[2].full_name,
             op_domain=op_domain, op_version=2,
             default_string='0', keys_floats=keys, values_strings=values,
-            name=scope.get_unique_operator_name('TreePath'))        
+            name=scope.get_unique_operator_name('TreePath'))
     else:
         transposed_result_name = predict(
             op, scope, operator, container, op_type, op_domain, op_version)

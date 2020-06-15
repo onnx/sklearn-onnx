@@ -68,11 +68,13 @@ def _build_options(model, defined_options, default_values,
         opts.update(defined_options.get(id(model), {}))
     if allowed_options not in (None, 'passthrough'):
         for k, v in opts.items():
-            if fail and k not in allowed_options:
-                raise NameError(
-                    "Option '{}' not in {} for class '{}'.".format(
-                        k, list(sorted(allowed_options)),
-                        model.__class__.__name__))
+            if k not in allowed_options:
+                if fail:
+                    raise NameError(
+                        "Option '{}' not in {} for class '{}'.".format(
+                            k, list(sorted(allowed_options)),
+                            model.__class__.__name__))
+                return None
             allowed = allowed_options[k]
             if allowed is not None and v not in allowed and v is not None:
                 raise ValueError(

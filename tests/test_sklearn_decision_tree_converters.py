@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import warnings
 from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -106,9 +107,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
         except Exception as e:
-            # onnxruntime.capi.onnxruntime_pybind11_state.Fail: 
-            # [ONNXRuntimeError] : 1 : FAIL : Node:TreePath Output:decision_path 
-            # [ShapeInferenceError] Mismatch between number of source and 
+            # onnxruntime.capi.onnxruntime_pybind11_state.Fail:
+            # [ONNXRuntimeError] FAIL : Node:TreePath Output:decision_path
+            # [ShapeInferenceError] Mismatch between number of source and
             # target dimensions. Source=0 Target=2
             warnings.warn(str(e))
             return
