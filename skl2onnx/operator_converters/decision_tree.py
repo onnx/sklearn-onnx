@@ -243,23 +243,75 @@ def convert_sklearn_decision_tree_regressor(
         input_name = [cast_input_name]
 
     container.add_node(
-        op_type, input_name, operator.output_full_names,
+        op_type, input_name, operator.outputs[0].full_name,
         op_domain=op_domain, op_version=op_version, **attrs)
+
+    options = scope.get_options(op, dict(decision_path=False))
+    if not options['decision_path']:
+        return
+
+    # decision_path
+    attrs = attrs.copy()
+    attrs['name'] = scope.get_unique_operator_name(op_type)
+    attrs['n_targets'] = 1
+    attrs['post_transform'] = 'NONE'
+    attrs['target_ids'] = [0 for _ in attrs['target_ids']]
+    attrs['target_weights'] = [float(_) for _ in attrs['target_nodeids']]
+    dpath = scope.get_unique_variable_name("dpath")
+    container.add_node(
+        op_type, input_name, dpath,
+        op_domain=op_domain, op_version=op_version, **attrs)
+
+    labels = _build_labels(op.tree_)
+    ordered = list(sorted(labels.items()))
+    keys = [float(_[0]) for _ in ordered]
+    values = [_[1] for _ in ordered]
+    container.add_node(
+        'LabelEncoder', dpath, operator.outputs[1].full_name,
+        op_domain=op_domain, op_version=2,
+        default_string='0', keys_floats=keys, values_strings=values,
+        name=scope.get_unique_operator_name('TreePath'))
+
+
+def _build_labels(tree):
+    def _recursive_build_labels(index, current):
+        current[index] = True
+        if tree.children_left[index] == -1:
+            yield (index, current.copy())
+        else:
+            for it in _recursive_build_labels(
+                    tree.children_left[index], current):
+                yield it
+            for it in _recursive_build_labels(
+                    tree.children_right[index], current):
+                yield it
+        current[index] = False
+
+    paths = {}
+    current = {}
+
+    for leave_index, path in _recursive_build_labels(0, current):
+        spath = ["0" for _ in range(tree.node_count)]
+        for nodeid, b in path.items():
+            if b:
+                spath[nodeid] = "1"
+        paths[leave_index] = ''.join(spath)
+    return paths
 
 
 register_converter('SklearnDecisionTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False],
                             'nocl': [True, False],
-                            'decision_path': [True, Flase]})
+                            'decision_path': [True, False]})
 register_converter('SklearnDecisionTreeRegressor',
                    convert_sklearn_decision_tree_regressor,
-                   options={'decision_path': [True, Flase]})
+                   options={'decision_path': [True, False]})
 register_converter('SklearnExtraTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False],
-                            'nocl': [True, False]},
-                            'decision_path': [True, Flase]})
+                            'nocl': [True, False],
+                            'decision_path': [True, False]})
 register_converter('SklearnExtraTreeRegressor',
                    convert_sklearn_decision_tree_regressor,
-                   options={'decision_path': [True, Flase]})
+                   options={'decision_path': [True, False]})

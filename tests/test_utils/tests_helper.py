@@ -966,3 +966,12 @@ def make_report_backend(folder, as_df=False):
             row["onnx-version"] = onnx.__version__
             row["onnxruntime-version"] = onnxruntime.__version__
         return aslist
+
+
+def binary_array_to_string(mat):
+    if not isinstance(mat, numpy.ndarray):
+        raise NotImplementedError()
+    if len(mat.shape) != 2:
+        raise NotImplementedError()
+    res = [[str(i) for i in row] for row in mat.tolist()]
+    return [''.join(row) for row in res]
