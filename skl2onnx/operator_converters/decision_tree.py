@@ -206,11 +206,16 @@ def convert_sklearn_decision_tree_classifier(
         ordered = list(sorted(labels.items()))
         keys = [float(_[0]) for _ in ordered]
         values = [_[1] for _ in ordered]
+        name = scope.get_unique_variable_name("spath")
         container.add_node(
-            'LabelEncoder', dpath, operator.outputs[2].full_name,
+            'LabelEncoder', dpath, name,
             op_domain=op_domain, op_version=2,
             default_string='0', keys_floats=keys, values_strings=values,
             name=scope.get_unique_operator_name('TreePath'))
+        apply_reshape(
+            scope, name, operator.outputs[1].full_name,
+            container, desired_shape=(-1, 1),
+            operator_name=scope.get_unique_operator_name('TreePathShape'))
     else:
         transposed_result_name = predict(
             op, scope, operator, container, op_type, op_domain, op_version)
@@ -301,11 +306,16 @@ def convert_sklearn_decision_tree_regressor(
     ordered = list(sorted(labels.items()))
     keys = [float(_[0]) for _ in ordered]
     values = [_[1] for _ in ordered]
+    name = scope.get_unique_variable_name("spath")
     container.add_node(
-        'LabelEncoder', dpath, operator.outputs[1].full_name,
+        'LabelEncoder', dpath, name,
         op_domain=op_domain, op_version=2,
         default_string='0', keys_floats=keys, values_strings=values,
         name=scope.get_unique_operator_name('TreePath'))
+    apply_reshape(
+        scope, name, operator.outputs[1].full_name,
+        container, desired_shape=(-1, 1),
+        operator_name=scope.get_unique_operator_name('TreePathShape'))
 
 
 def _build_labels(tree):
