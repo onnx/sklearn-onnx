@@ -76,7 +76,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
-    def test_decisiontree_regressor0_decision_path(self):
+    def test_decisiontree_regressor_decision_path(self):
         model = DecisionTreeRegressor(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
