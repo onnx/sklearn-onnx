@@ -213,7 +213,7 @@ def convert_sklearn_decision_tree_classifier(
             default_string='0', keys_floats=keys, values_strings=values,
             name=scope.get_unique_operator_name('TreePath'))
         apply_reshape(
-            scope, name, operator.outputs[1].full_name,
+            scope, name, operator.outputs[2].full_name,
             container, desired_shape=(-1, 1),
             operator_name=scope.get_unique_operator_name('TreePathShape'))
     else:
