@@ -35,14 +35,13 @@ def calculate_tree_regressor_output_shapes(operator):
         FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].type.shape[0]
-    if (hasattr(operator.raw_operator, 'coef_') and
-            len(operator.raw_operator.coef_.shape) > 1):
-        operator.outputs[0].type.shape = [
-            N, operator.raw_operator.coef_.shape[1]]
-    else:
-        operator.outputs[0].type.shape = [N, 1]
+    operator.outputs[0].type.shape = [N, 1]
     if len(operator.outputs) == 2:
-        operator.outputs[0].type.shape = [N, 1]
+        if hasattr(operator.raw_operator, 'estimators_'):
+            operator.outputs[1].type.shape = [
+                N, len(operator.raw_operator.estimators_)]
+        else:
+            operator.outputs[1].type.shape = [N, 1]
 
 
 def calculate_tree_classifier_output_shapes(operator):
@@ -54,26 +53,26 @@ def calculate_tree_classifier_output_shapes(operator):
 
 register_shape_calculator('SklearnDecisionTreeRegressor',
                           calculate_tree_regressor_output_shapes)
-register_shape_calculator('SklearnRandomForestRegressor',
-                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnExtraTreeRegressor',
                           calculate_tree_regressor_output_shapes)
 register_shape_calculator('SklearnExtraTreesRegressor',
-                          calculate_linear_regressor_output_shapes)
+                          calculate_tree_regressor_output_shapes)
 register_shape_calculator('SklearnGradientBoostingRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnHistGradientBoostingRegressor',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnRandomForestRegressor',
+                          calculate_tree_regressor_output_shapes)
 
 register_shape_calculator('SklearnDecisionTreeClassifier',
                           calculate_tree_classifier_output_shapes)
-register_shape_calculator('SklearnRandomForestClassifier',
-                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnExtraTreeClassifier',
                           calculate_tree_classifier_output_shapes)
 register_shape_calculator('SklearnExtraTreesClassifier',
-                          calculate_linear_classifier_output_shapes)
+                          calculate_tree_classifier_output_shapes)
 register_shape_calculator('SklearnGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnHistGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnRandomForestClassifier',
+                          calculate_tree_classifier_output_shapes)

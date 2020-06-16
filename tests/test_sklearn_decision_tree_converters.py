@@ -24,6 +24,7 @@ from skl2onnx.common.data_types import (
 from skl2onnx import convert_sklearn
 from onnxruntime import InferenceSession, __version__
 from test_utils import (
+    binary_array_to_string,
     dump_one_class_classification,
     dump_binary_classification,
     dump_data_and_model,
@@ -34,7 +35,6 @@ from test_utils import (
     fit_multilabel_classification_model,
     fit_regression_model,
     TARGET_OPSET,
-    binary_array_to_string
 )
 
 
