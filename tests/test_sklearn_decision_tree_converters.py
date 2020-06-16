@@ -118,7 +118,7 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
-        prob = model.predict(X)
+        prob = model.predict_proba(X)
         assert_almost_equal(prob, res[1].ravel())
         dec = model.decision_path(X)
         exp = binary_array_to_string(dec.todense())
