@@ -435,8 +435,14 @@ class Scope:
         self.variable_name_mapping[raw_name].remove(onnx_name)
         del self.variables[onnx_name]
 
-    def _get_allowed_options(self, model):
+    def _get_allowed_options(self, model, fail=True):
         if self.registered_models is not None:
+            if type(model) not in self.registered_models['aliases']:
+                if fail:
+                    raise NotImplementedError(
+                        "No registered models, no known allowed options "
+                        "for model '{}'.".format(model.__class__.__name__))
+                return {}
             alias = self.registered_models['aliases'][type(model)]
             conv = self.registered_models['conv'][alias]
             allowed = conv.get_allowed_options()
@@ -445,18 +451,20 @@ class Scope:
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__))
 
-    def get_options(self, model, default_values=None):
+    def get_options(self, model, default_values=None, fail=True):
         """
         Returns additional options for a model.
         It first looks by class then by id (``id(model)``).
         :param model: model being converted
         :param default_values: default options (it is modified by
                                the function)
+        :param fail: fails if option it not found
         :return: dictionary
         """
         return _build_options(
             model, self.options, default_values,
-            self._get_allowed_options(model))
+            self._get_allowed_options(model, fail=fail),
+            fail=fail)
 
 
 class Topology:

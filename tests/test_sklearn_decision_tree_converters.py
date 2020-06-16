@@ -5,8 +5,10 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import warnings
 from distutils.version import StrictVersion
 import numpy as np
+from numpy.testing import assert_almost_equal
 from pandas import DataFrame
 from sklearn.tree import (
     DecisionTreeClassifier, DecisionTreeRegressor,
@@ -22,6 +24,7 @@ from skl2onnx.common.data_types import (
 from skl2onnx import convert_sklearn
 from onnxruntime import InferenceSession, __version__
 from test_utils import (
+    binary_array_to_string,
     dump_one_class_classification,
     dump_binary_classification,
     dump_data_and_model,
@@ -31,7 +34,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
-    TARGET_OPSET
+    TARGET_OPSET,
 )
 
 
@@ -69,6 +72,57 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         pred = model.predict(X)
         if res[0][0, 0] != pred[0]:
             raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_regressor0_decision_path(self):
+        model = DecisionTreeRegressor(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec.todense())
+        assert exp == res[1].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_classifier_decision_path(self):
+        model = DecisionTreeClassifier(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True, 'zipmap': False}})
+
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString())
+        except Exception as e:
+            # onnxruntime.capi.onnxruntime_pybind11_state.Fail:
+            # [ONNXRuntimeError] FAIL : Node:TreePath Output:decision_path
+            # [ShapeInferenceError] Mismatch between number of source and
+            # target dimensions. Source=0 Target=2
+            warnings.warn(str(e))
+            return
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict(X)
+        assert_almost_equal(prob, res[1].ravel())
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec.todense())
+        assert exp == res[2].ravel().tolist()
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
