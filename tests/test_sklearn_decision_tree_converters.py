@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 import unittest
-import warnings
 from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -105,21 +104,12 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True, 'zipmap': False}})
-
-        try:
-            sess = InferenceSession(model_onnx.SerializeToString())
-        except Exception as e:
-            # onnxruntime.capi.onnxruntime_pybind11_state.Fail:
-            # [ONNXRuntimeError] FAIL : Node:TreePath Output:decision_path
-            # [ShapeInferenceError] Mismatch between number of source and
-            # target dimensions. Source=0 Target=2
-            warnings.warn(str(e))
-            return
+        sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         prob = model.predict_proba(X)
-        assert_almost_equal(prob, res[1].ravel())
+        assert_almost_equal(prob, res[1])
         dec = model.decision_path(X)
         exp = binary_array_to_string(dec.todense())
         assert exp == res[2].ravel().tolist()
