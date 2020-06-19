@@ -3,7 +3,9 @@ Test scikit-learn's IsolationForest.
 """
 import warnings
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
+from sklearn import __version__ as sklv
 try:
     from sklearn.ensemble import IsolationForest
 except ImportError:
@@ -19,9 +21,14 @@ except ImportError:
     NotImplemented = RuntimeError
 
 
+sklv2 = '.'.join(sklv.split('.')[:2])
+
+
 class TestSklearnIsolationForest(unittest.TestCase):
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
+    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+                     reason="tree structure is different.")
     def test_isolation_forest(self):
         isol = IsolationForest(n_estimators=3, random_state=0)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
@@ -39,6 +46,8 @@ class TestSklearnIsolationForest(unittest.TestCase):
             return
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
+    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+                     reason="tree structure is different.")
     def test_isolation_forest_rnd(self):
         isol = IsolationForest(n_estimators=2, random_state=0)
         rs = np.random.RandomState(0)
