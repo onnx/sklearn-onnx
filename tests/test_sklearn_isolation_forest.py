@@ -4,7 +4,10 @@ Test scikit-learn's IsolationForest.
 import warnings
 import unittest
 import numpy as np
-from sklearn.ensemble import IsolationForest
+try:
+    from sklearn.ensemble import IsolationForest
+except ImportError:
+    IsolationForest = None
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 from test_utils.utils_backend import (
@@ -17,6 +20,7 @@ except ImportError:
 
 class TestSklearnIsolationForest(unittest.TestCase):
 
+    @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     def test_isolation_forest(self):
         isol = IsolationForest(n_estimators=3, random_state=0)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
@@ -32,6 +36,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
             warnings.warn(str(e))
             return
 
+    @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     def test_isolation_forest_rnd(self):
         isol = IsolationForest(n_estimators=5, random_state=0)
         data = np.random.rand(100, 4).astype(np.float32)
