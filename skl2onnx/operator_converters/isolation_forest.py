@@ -4,7 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from sklearn.ensemble._iforest import _average_path_length
+try:
+    from sklearn.ensemble._iforest import _average_path_length
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.ensemble.iforest import _average_path_length
 from ..common._registration import register_converter
 from ..common.data_types import BooleanTensorType, Int64TensorType
 from ..common.tree_ensemble import (
