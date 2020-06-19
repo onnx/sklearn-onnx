@@ -32,7 +32,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForest")
         except (OnnxRuntimeMissingNewOnnxOperatorException,
-                NotImplemented) as e:
+                NotImplemented, RuntimeError) as e:
             warnings.warn(str(e))
             return
 
@@ -50,7 +50,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForestRnd")
         except (OnnxRuntimeMissingNewOnnxOperatorException,
-                NotImplemented) as e:
+                NotImplemented, RuntimeError) as e:
             warnings.warn(str(e))
             return
 
