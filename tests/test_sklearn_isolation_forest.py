@@ -1,11 +1,14 @@
 """
 Test scikit-learn's IsolationForest.
 """
+import warnings
 import unittest
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils.utils_backend import (
+    OnnxRuntimeMissingNewOnnxOperatorException)
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import NotImplemented
 except ImportError:
@@ -24,7 +27,8 @@ class TestSklearnIsolationForest(unittest.TestCase):
         try:
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForest")
-        except NotImplemented as e:
+        except (OnnxRuntimeMissingNewOnnxOperatorException,
+                NotImplemented) as e:
             warnings.warn(str(e))
             return
 
@@ -39,7 +43,8 @@ class TestSklearnIsolationForest(unittest.TestCase):
         try:
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForestRnd")
-        except NotImplemented as e:
+        except (OnnxRuntimeMissingNewOnnxOperatorException,
+                NotImplemented) as e:
             warnings.warn(str(e))
             return
 
