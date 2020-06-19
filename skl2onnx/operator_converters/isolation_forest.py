@@ -91,7 +91,6 @@ def convert_sklearn_isolation_forest(
         eq2.set_onnx_name_prefix('eq2_%d' % i)
 
         # 2.0 * (np.log(n_samples_leaf[not_mask] - 1.0) + np.euler_gamma)
-        # - 2.0 * (n_samples_leaf[not_mask] - 1.0) / n_samples_leaf[not_mask]
 
         eqp2p = OnnxCast(
                     OnnxGreater(
@@ -119,12 +118,19 @@ def convert_sklearn_isolation_forest(
                     op_version=opv)
         eqp_log.set_onnx_name_prefix('eqp_log%d' % i)
 
+        # - 2.0 * (n_samples_leaf[not_mask] - 1.0) / n_samples_leaf[not_mask]
+
         eqp2p_m0 = OnnxMax(eqp2ps_1, np.array([0], dtype=container.dtype),
                            op_version=opv)
         eqp2p_m0.set_onnx_name_prefix('eqp2p_m1_%d' % i)
 
-        eqp_ns = OnnxMul(OnnxDiv(eqp2p_m0, eqp2p_m1, op_version=opv),
-                         np.array([2], dtype=container.dtype), op_version=opv)
+        eqp_ns = OnnxMul(
+                    OnnxDiv(
+                        eqp2p_m0,
+                        OnnxMax(eqp2ps, np.array([1], dtype=container.dtype),
+                                op_version=opv),
+                        op_version=opv),
+                    np.array([-2], dtype=container.dtype), op_version=opv)
         eqp_ns.set_onnx_name_prefix('eqp_ns%d' % i)
 
         # np.ravel(node_indicator.sum(axis=1))

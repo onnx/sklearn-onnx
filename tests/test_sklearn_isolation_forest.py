@@ -38,8 +38,9 @@ class TestSklearnIsolationForest(unittest.TestCase):
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     def test_isolation_forest_rnd(self):
-        isol = IsolationForest(n_estimators=5, random_state=0)
-        data = np.random.rand(100, 4).astype(np.float32)
+        isol = IsolationForest(n_estimators=2, random_state=0)
+        rs = np.random.RandomState(0)
+        data = rs.randn(100, 4).astype(np.float32)
         data[-1, 2:] = 99.
         data[-2, :2] = -99.
         model = isol.fit(data)
