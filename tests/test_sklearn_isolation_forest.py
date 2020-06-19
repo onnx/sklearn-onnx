@@ -11,7 +11,8 @@ except ImportError:
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 from test_utils.utils_backend import (
-    OnnxRuntimeMissingNewOnnxOperatorException)
+    OnnxRuntimeMissingNewOnnxOperatorException,
+    OnnxRuntimeAssertionError)
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import NotImplemented
 except ImportError:
@@ -32,7 +33,8 @@ class TestSklearnIsolationForest(unittest.TestCase):
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForest")
         except (OnnxRuntimeMissingNewOnnxOperatorException,
-                NotImplemented, RuntimeError) as e:
+                NotImplemented, RuntimeError,
+                OnnxRuntimeAssertionError) as e:
             warnings.warn(str(e))
             return
 
@@ -50,7 +52,8 @@ class TestSklearnIsolationForest(unittest.TestCase):
             dump_data_and_model(data, model, model_onnx,
                                 basename="IsolationForestRnd")
         except (OnnxRuntimeMissingNewOnnxOperatorException,
-                NotImplemented, RuntimeError) as e:
+                NotImplemented, RuntimeError,
+                OnnxRuntimeAssertionError) as e:
             warnings.warn(str(e))
             return
 
