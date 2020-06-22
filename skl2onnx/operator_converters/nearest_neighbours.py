@@ -12,13 +12,16 @@ from ..algebra.onnx_ops import (
     OnnxArrayFeatureExtractor,
     OnnxCast,
     OnnxConcat,
+    OnnxCumSum,
     OnnxDiv,
     OnnxEqual,
     OnnxFlatten,
     OnnxIdentity,
+    OnnxLess,
     OnnxMatMul,
     OnnxMax,
     OnnxMul,
+    OnnxNeg,
     OnnxNot,
     OnnxReciprocal,
     OnnxReduceMean,
@@ -53,11 +56,12 @@ from ..common._registration import register_converter
 from ..common.data_types import DoubleTensorType, Int64TensorType
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
+from ._gp_kernels import py_make_float_array
 
 
-def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
-                                   op_version=None, keep_distances=False,
-                                   optim=None, **kwargs):
+def onnx_nearest_neighbors_indices_k(X, Y, k, metric='euclidean', dtype=None,
+                                     op_version=None, keep_distances=False,
+                                     optim=None, **kwargs):
     """
     Retrieves the nearest neigbours *ONNX*.
     :param X: features or *OnnxOperatorMixin*
@@ -70,7 +74,7 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
     :param optim: implements specific optimisations,
         ``'cdist'`` replaces *Scan* operator by operator *CDist*
     :param kwargs: additional parameters for function @see fn onnx_cdist
-    :return: top indices
+    :return: top indices, top distances
     """
     if optim == 'cdist':
         from skl2onnx.algebra.custom_ops import OnnxCDist
@@ -86,12 +90,12 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
     if op_version < 10:
-        neg_dist = OnnxMul(dist, np.array(
-            [-1], dtype=dtype), op_version=op_version)
+        neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
+                           op_version=op_version)
         node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs)
     elif op_version < 11:
-        neg_dist = OnnxMul(dist, np.array(
-            [-1], dtype=dtype), op_version=op_version)
+        neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
+                           op_version=op_version)
         node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
                            op_version=10, **kwargs)
     else:
@@ -99,14 +103,75 @@ def onnx_nearest_neighbors_indices(X, Y, k, metric='euclidean', dtype=None,
                            largest=0, sorted=1,
                            op_version=11, **kwargs)
         if keep_distances:
-            return (node[1], OnnxMul(node[0], np.array(
-                [-1], dtype=dtype), op_version=op_version))
+            return (node[1], OnnxMul(
+                node[0], np.array([-1], dtype=dtype), op_version=op_version))
     if keep_distances:
         return (node[1], node[0])
     return node[1]
 
 
-def _convert_nearest_neighbors(operator, container, k=None):
+def onnx_nearest_neighbors_indices_radius(
+        X, Y, radius, metric='euclidean', dtype=None, op_version=None,
+        keep_distances=False, optim=None, proto_dtype=None, **kwargs):
+    """
+    Retrieves the nearest neigbours *ONNX*.
+    :param X: features or *OnnxOperatorMixin*
+    :param Y: neighbours or *OnnxOperatorMixin*
+    :param radius: radius
+    :param metric: requires metric
+    :param dtype: numerical type
+    :param op_version: opset version
+    :param keep_distance: returns the distances as well (second position)
+    :param optim: implements specific optimisations,
+        ``'cdist'`` replaces *Scan* operator by operator *CDist*
+    :param kwargs: additional parameters for function @see fn onnx_cdist
+    :return: 3 squares matrices, indices or -1, distance or 0,
+        based on the fact that the distance is below the radius,
+        binary weights
+    """
+    opv = op_version
+    if optim == 'cdist':
+        from skl2onnx.algebra.custom_ops import OnnxCDist
+        dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
+                         **kwargs)
+    elif optim is None:
+        dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
+        dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
+        dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
+                          op_version=op_version,
+                          dim_in=dim_in, dim_out=dim_out,
+                          **kwargs)
+    else:
+        raise ValueError("Unknown optimisation '{}'.".format(optim))
+
+    less = OnnxLess(dist, np.array([radius], dtype=dtype), op_version=opv)
+    less.set_onnx_name_prefix('cond')
+    shape = OnnxShape(dist, op_version=opv)
+    zero = OnnxCast(
+        OnnxConstantOfShape(shape, op_version=opv),
+        op_version=opv, to=proto_dtype)
+    tensor_value = py_make_float_array(-1, dtype=np.float32, as_tensor=True)
+    minus = OnnxCast(
+        OnnxConstantOfShape(
+            shape, op_version=opv, value=tensor_value),
+        op_version=opv, to=onnx_proto.TensorProto.INT64)
+    minus_range = OnnxAdd(
+        OnnxNeg(
+            OnnxCumSum(minus, np.array([1], dtype=np.int64), op_version=opv),
+            op_version=opv),
+        minus, op_version=opv)
+    minus_range.set_onnx_name_prefix('arange')
+
+    dist_only = OnnxWhere(less, dist, zero, op_version=opv)
+    dist_only.set_onnx_name_prefix('nndist')
+    indices = OnnxWhere(less, minus_range, minus, op_version=opv)
+    indices.set_onnx_name_prefix('nnind')
+    binary = OnnxCast(less, to=proto_dtype, op_version=opv)
+    binary.set_onnx_name_prefix('nnbin')
+    return indices, dist_only, binary
+
+
+def _convert_nearest_neighbors(operator, container, k=None, radius=None):
     """
     Common parts to regressor and classifier. Let's denote
     *N* as the number of observations, *k*
@@ -122,7 +187,7 @@ def _convert_nearest_neighbors(operator, container, k=None):
         associated to every top index
     weights: [N, k] (dtype), if top_distances is not None,
         returns weights
-    norm: [N, k] (dtype), if top_distances is not None,
+    norm: [N] (dtype), if top_distances is not None,
         returns normalized weights
     axis: 1 if there is one dimension only, 2 if
         this is a multi-regression or a multi classification
@@ -144,7 +209,25 @@ def _convert_nearest_neighbors(operator, container, k=None):
     metric = (op.effective_metric_ if hasattr(op, 'effective_metric_') else
               op.metric)
     neighb = op._fit_X.astype(container.dtype)
-    k = op.n_neighbors if k is None else k
+
+    if (hasattr(op, 'n_neighbors') and op.n_neighbors is not None and
+            hasattr(op, 'radius') and op.radius is not None):
+        raise RuntimeError(
+            "The model defines radius and n_neighbors at the "
+            "same time ({} and {}). "
+            "This case is not supported.".format(
+                op.radius, op.n_neighbors))
+
+    if hasattr(op, 'n_neighbors') and op.n_neighbors is not None:
+        k = op.n_neighbors if k is None else k
+        radius = None
+    elif hasattr(op, 'radius') and op.radius is not None:
+        k = None
+        radius = op.radius if radius is None else radius
+    else:
+        raise RuntimeError(
+            "Cannot convert class '{}'.".format(op.__class__.__name__))
+
     training_labels = op._y if hasattr(op, '_y') else None
     distance_kwargs = {}
     if metric == 'minkowski':
@@ -154,14 +237,23 @@ def _convert_nearest_neighbors(operator, container, k=None):
             metric = "euclidean"
 
     weights = op.weights if hasattr(op, 'weights') else 'distance'
-    if weights == 'uniform':
-        top_indices = onnx_nearest_neighbors_indices(
+    binary = None
+    if weights == 'uniform' and radius is None:
+        top_indices = onnx_nearest_neighbors_indices_k(
             X, neighb, k, metric=metric, dtype=dtype,
             op_version=opv, optim=options.get('optim', None),
             **distance_kwargs)
         top_distances = None
+    elif radius is not None:
+        three = onnx_nearest_neighbors_indices_radius(
+            X, neighb, radius, metric=metric, dtype=dtype,
+            op_version=opv, keep_distances=True,
+            proto_dtype=container.proto_dtype,
+            optim=options.get('optim', None),
+            **distance_kwargs)
+        top_indices, top_distances, binary = three
     elif weights == 'distance':
-        top_indices, top_distances = onnx_nearest_neighbors_indices(
+        top_indices, top_distances = onnx_nearest_neighbors_indices_k(
             X, neighb, k, metric=metric, dtype=dtype,
             op_version=opv, keep_distances=True,
             optim=options.get('optim', None),
@@ -178,18 +270,15 @@ def _convert_nearest_neighbors(operator, container, k=None):
             training_labels = training_labels.ravel()
             axis = 1
         if opv >= 9:
+            kor = k if k is not None else training_labels.shape[-1]
             if ndim > 1:
-                shape = np.array([ndim, -1, k], dtype=np.int64)
+                shape = np.array([ndim, -1, kor], dtype=np.int64)
             else:
-                shape = np.array([-1, k], dtype=np.int64)
+                shape = np.array([-1, kor], dtype=np.int64)
         else:
             raise RuntimeError(
                 "Conversion of a KNeighborsRegressor for multi regression "
                 "requires opset >= 9.")
-            # shape = OnnxShape(top_indices, op_version=opv)
-            # if ndim > 1:
-            #     shape = OnnxConcat(np.array([ndim], dtype=np.int64),
-            #                       shape, op_version=opv, axis=0)
 
         if training_labels.dtype == np.int32:
             training_labels = training_labels.astype(np.int64)
@@ -200,11 +289,22 @@ def _convert_nearest_neighbors(operator, container, k=None):
 
         if ndim > 1:
             reshaped = OnnxTranspose(reshaped, op_version=opv, perm=[1, 0, 2])
+        reshaped.set_onnx_name_prefix('knny')
+
     else:
         reshaped = None
         axis = 1
 
-    if top_distances is not None:
+    if binary is not None:
+        if op.weights == 'uniform':
+            wei = binary
+        else:
+            modified = OnnxMax(top_distances, np.array([1e-6], dtype=dtype),
+                               op_version=opv)
+            wei = OnnxMul(binary, OnnxReciprocal(modified, op_version=opv),
+                          op_version=opv)
+        norm = OnnxReduceSum(wei, op_version=opv, axes=[1], keepdims=0)
+    elif top_distances is not None:
         modified = OnnxMax(top_distances, np.array([1e-6], dtype=dtype),
                            op_version=opv)
         wei = OnnxReciprocal(modified, op_version=opv)
@@ -213,6 +313,10 @@ def _convert_nearest_neighbors(operator, container, k=None):
         norm = None
         wei = None
 
+    if wei is not None:
+        wei.set_onnx_name_prefix('wei')
+    if norm is not None:
+        norm.set_onnx_name_prefix('norm')
     return top_indices, top_distances, reshaped, wei, norm, axis
 
 
@@ -253,9 +357,11 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
             res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
                                 keepdims=0)
+            res.set_onnx_name_prefix('final')
             if opv >= 12:
                 shape = OnnxShape(res, op_version=opv)
                 norm = OnnxReshape(norm, shape, op_version=opv)
+                norm.set_onnx_name_prefix('normr')
             if opv >= 12:
                 res = OnnxDiv(res, norm, op_version=opv, output_names=out)
             else:
@@ -585,6 +691,9 @@ register_converter(
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,
+    options={'optim': [None, 'cdist']})
+register_converter(
+    'SklearnRadiusNeighborsRegressor', convert_nearest_neighbors_regressor,
     options={'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsTransformer', convert_k_neighbours_transformer,

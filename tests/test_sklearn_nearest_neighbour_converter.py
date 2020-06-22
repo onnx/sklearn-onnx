@@ -11,7 +11,7 @@ from onnx.defs import onnx_opset_version
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
-    KNeighborsRegressor,
+    KNeighborsRegressor, RadiusNeighborsRegressor,
     KNeighborsClassifier,
     NearestNeighbors,
 )
@@ -94,6 +94,21 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    def test_model_knn_regressor_radius(self):
+        model, X = self._fit_model(RadiusNeighborsRegressor())
+        model_onnx = convert_sklearn(model, "KNN regressor",
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=TARGET_OPSET,
+                                     options={id(model): {'optim': 'cdist'}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressor")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
         reason="not available")
@@ -122,6 +137,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
+        reason="not available")
+    def test_model_knn_regressor_double_radius(self):
+        model, X = self._fit_model(RadiusNeighborsRegressor())
+        model_onnx = convert_sklearn(
+            model, "KNN regressor",
+            [("input", DoubleTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'optim': 'cdist'}},
+            dtype=numpy.float64)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float64)[:7],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressor64")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor_yint(self):
         model, X = self._fit_model(
             KNeighborsRegressor(n_neighbors=2), label_int=True)
@@ -137,6 +172,21 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    def test_model_knn_regressor_yint_radius(self):
+        model, X = self._fit_model(
+            RadiusNeighborsRegressor(), label_int=True)
+        model_onnx = convert_sklearn(model, "KNN regressor",
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressorYInt")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
     def test_model_knn_regressor2_1(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
@@ -148,6 +198,21 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:3],
             model, model_onnx,
             basename="SklearnKNeighborsRegressor2")
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    def test_model_knn_regressor2_1_radius(self):
+        model, X = self._fit_model(RadiusNeighborsRegressor(),
+                                   n_targets=2)
+        model_onnx = convert_sklearn(model, "KNN regressor",
+                                     [("input", FloatTensorType([None, 4]))],
+                                     target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:3],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressor2")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -221,6 +286,41 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     X.astype(numpy.float32)[:3],
                     model, model_onnx,
                     basename="SklearnKNeighborsRegressorWDist%d-Dec3" % op)
+
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="needs higher target_opset")
+    def test_model_knn_regressor_weights_distance_11_radius(self):
+        model, X = self._fit_model(
+            RadiusNeighborsRegressor(
+                weights="distance", algorithm="brute"))
+        for op in sorted(set([11, 12, TARGET_OPSET])):
+            if op > TARGET_OPSET:
+                continue
+            with self.subTest(opset=op):
+                model_onnx = convert_sklearn(
+                    model, "KNN regressor",
+                    [("input", FloatTensorType([None, 4]))],
+                    target_opset=op)
+                if op < 12 and model_onnx.ir_version > 6:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 6.".format(
+                            model_onnx.ir_version, op))
+                if op < 11 and model_onnx.ir_version > 5:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 5.".format(
+                            model_onnx.ir_version, op))
+                if op < 10 and model_onnx.ir_version > 4:
+                    raise AssertionError(
+                        "ir_version ({}, op={}) must be <= 4.".format(
+                            model_onnx.ir_version, op))
+                self.assertIsNotNone(model_onnx)
+                dump_data_and_model(
+                    X.astype(numpy.float32)[:3],
+                    model, model_onnx,
+                    basename="SklearnRadiusNeighborsRegressorWD%d-Dec3" % op)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -453,7 +553,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         X, _ = iris.data, iris.target
 
         X_train, X_test = train_test_split(X, random_state=11)
-        clr = NearestNeighbors(n_neighbors=3)
+        clr = NearestNeighbors(n_neighbors=3, radius=None)
         clr.fit(X_train)
 
         for to in (9, 10, 11):
@@ -667,6 +767,29 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model, onx,
             basename="SklearnKNeighborsRegressorMReg")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
+    def test_model_knn_iris_regressor_multi_reg_radius(self):
+        iris = datasets.load_iris()
+        X = iris.data.astype(numpy.float32)
+        y = iris.target.astype(numpy.float32)
+        y = numpy.vstack([y, 1 - y, y + 10]).T
+        model = KNeighborsRegressor(
+            algorithm='brute', weights='distance')
+        model.fit(X[:13], y[:13])
+        onx = to_onnx(model, X[:1],
+                      options={id(model): {'optim': 'cdist'}},
+                      target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:7],
+            model, onx,
+            basename="SklearnRadiusNeighborsRegressorMReg")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
