@@ -92,7 +92,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     def test_model_knn_regressor_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
@@ -135,7 +135,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor64")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
@@ -170,7 +170,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressorYInt")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     def test_model_knn_regressor_yint_radius(self):
         model, X = self._fit_model(
@@ -200,7 +200,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor2")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     def test_model_knn_regressor2_1_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor(),
@@ -288,7 +288,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     basename="SklearnKNeighborsRegressorWDist%d-Dec3" % op)
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
@@ -771,7 +771,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     @unittest.skipIf(onnx_opset_version() < 11,
                      reason="needs higher target_opset")
