@@ -34,7 +34,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
 
     # self._estimate_log_prob(X)
     log_det = _compute_log_det_cholesky(
-        op.precisions_cholesky_, op.covariance_type, n_features).astype(
+        precisions_chol, covariance_type, n_features).astype(
             dtype)
 
     if covariance_type == 'full':
