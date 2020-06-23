@@ -103,10 +103,10 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
             X, (means * precisions).T.astype(dtype),
             zeros, alpha=-2., beta=0., op_version=opv)
         term = OnnxGemm(OnnxMul(X, X, op_version=opv),
-                        precisions.T.astype(container.dtype),
+                        precisions.T.astype(dtype),
                         zeros, alpha=1., beta=0., op_version=opv)
         log_prob = OnnxAdd(
-            OnnxAdd(mp.astype(container.dtype), xmp, op_version=opv),
+            OnnxAdd(mp.astype(dtype), xmp, op_version=opv),
             term, op_version=opv)
 
     elif covariance_type == 'spherical':
@@ -194,7 +194,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         cst_log_lambda = .5 * (log_lambda - n_features / op.mean_precision_)
         cst = cst_log_lambda - .5 * n_features * np.log(op.degrees_of_freedom_)
         if isinstance(cst, np.ndarray):
-            cst_array = cst
+            cst_array = cst.astype(container.dtype)
         else:
             cst_array = np.array([cst], dtype=container.dtype)
         log_gauss = OnnxAdd(log_gauss, cst_array, op_version=opv)
