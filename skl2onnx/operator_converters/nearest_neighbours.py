@@ -590,9 +590,7 @@ def _nan_euclidean_distance(container, model, input_name, op_version, optim):
                  op_version=op_version),
         op_version=op_version)
     present_y = (1. - missing_y).astype(container.dtype)
-    present_count = OnnxMatMul(
-        present_x, present_y.T.astype(container.dtype),
-        op_version=op_version)
+    present_count = OnnxMatMul(present_x, present_y.T, op_version=op_version)
     present_count = OnnxMax(np.array([1], dtype=container.dtype),
                             present_count, op_version=op_version)
     dist = OnnxDiv(distances, present_count, op_version=op_version)
@@ -685,7 +683,7 @@ def convert_nca(scope, operator, container):
     nca_op = operator.raw_operator
     op_version = container.target_opset
     out = operator.outputs
-    components = nca_op.components_.T.astype(container.dtype)
+    components = nca_op.components_.T
 
     if isinstance(X.type, Int64TensorType):
         X = OnnxCast(X, to=container.proto_dtype, op_version=op_version)
