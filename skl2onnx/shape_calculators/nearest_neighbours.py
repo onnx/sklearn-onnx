@@ -7,6 +7,7 @@
 import copy
 import numpy as np
 from ..common._registration import register_shape_calculator
+from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 from ..common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
 )
@@ -89,6 +90,12 @@ def calculate_sklearn_knn_imputer(operator):
 
 register_shape_calculator('SklearnKNeighborsRegressor',
                           calculate_sklearn_nearest_neighbours_regressor)
+register_shape_calculator('SklearnRadiusNeighborsRegressor',
+                          calculate_sklearn_nearest_neighbours_regressor)
+register_shape_calculator('SklearnKNeighborsClassifier',
+                          calculate_linear_classifier_output_shapes)
+register_shape_calculator('SklearnRadiusNeighborsClassifier',
+                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnKNNImputer',
                           calculate_sklearn_knn_imputer)
 register_shape_calculator('SklearnKNeighborsTransformer',
