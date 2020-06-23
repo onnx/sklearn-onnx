@@ -12,7 +12,7 @@ from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
     KNeighborsRegressor, RadiusNeighborsRegressor,
-    KNeighborsClassifier,
+    KNeighborsClassifier, RadiusNeighborsClassifier,
     NearestNeighbors,
 )
 try:
@@ -90,6 +90,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model, model_onnx,
             basename="SklearnKNeighborsRegressor")
+        dump_data_and_model(
+            (X + 0.1).astype(numpy.float32)[:7],
+            model, model_onnx,
+            basename="SklearnKNeighborsRegressor")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
@@ -103,6 +107,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressor")
+        dump_data_and_model(
+            (X + 0.1).astype(numpy.float32)[:7],
             model, model_onnx,
             basename="SklearnRadiusNeighborsRegressor")
 
@@ -151,6 +159,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float64)[:7],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsRegressor64")
+        dump_data_and_model(
+            (X + 0.1).astype(numpy.float64)[:7],
             model, model_onnx,
             basename="SklearnRadiusNeighborsRegressor64")
 
@@ -361,6 +373,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
+        reason="not available")
+    @unittest.skipIf(onnx_opset_version() < TARGET_OPSET,
+                     reason="needs higher target_opset")
+    def test_model_knn_classifier_binary_class_radius(self):
+        model, X = self._fit_model_binary_classification(
+            RadiusNeighborsClassifier())
+        model_onnx = convert_sklearn(
+            model, "KNN classifier binary",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsClassifierBinary")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
     def test_model_knn_classifier_multi_class(self):
@@ -377,6 +409,25 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32),
             model, model_onnx,
             basename="SklearnKNeighborsClassifierMulti")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
+        reason="not available")
+    def test_model_knn_classifier_multi_class_radius(self):
+        model, X = self._fit_model_multiclass_classification(
+            RadiusNeighborsClassifier())
+        model_onnx = convert_sklearn(
+            model, "KNN classifier multi-class",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'optim': 'cdist'}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:5],
+            model, model_onnx,
+            basename="SklearnRadiusNeighborsClassifierMulti")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -790,6 +841,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:7],
             model, onx,
             basename="SklearnRadiusNeighborsRegressorMReg")
+        dump_data_and_model(
+            (X + 0.1).astype(numpy.float32)[:7],
+            model, onx,
+            basename="SklearnRadiusNeighborsRegressorMReg")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -814,6 +869,30 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             X.astype(numpy.float32)[:11],
             model, onx,
             basename="SklearnKNeighborsClassifierMReg2-Out0")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
+        reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 11,
+                     reason="needs higher target_opset")
+    def test_model_knn_iris_classifier_multi_reg2_weight_radius(self):
+        iris = datasets.load_iris()
+        X = iris.data.astype(numpy.float32)
+        y = iris.target.astype(numpy.int64)
+        y = numpy.vstack([(y + 1) % 2, y % 2]).T
+        model = RadiusNeighborsClassifier(
+            algorithm='brute', weights='distance')
+        model.fit(X[:13], y[:13])
+        onx = to_onnx(model, X[:1],
+                      options={id(model): {'optim': 'cdist',
+                                           'zipmap': False}},
+                      target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(numpy.float32)[:11],
+            model, onx,
+            basename="SklearnRadiusNeighborsClassifierMReg2-Out0")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")

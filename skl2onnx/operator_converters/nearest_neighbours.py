@@ -12,7 +12,6 @@ from ..algebra.onnx_ops import (
     OnnxArrayFeatureExtractor,
     OnnxCast,
     OnnxConcat,
-    OnnxCumSum,
     OnnxDiv,
     OnnxEqual,
     OnnxFlatten,
@@ -36,11 +35,13 @@ from ..algebra.onnx_ops import (
 try:
     from ..algebra.onnx_ops import (
         OnnxConstantOfShape,
+        OnnxCumSum,
         OnnxIsNaN,
         OnnxWhere,
     )
 except ImportError:
     OnnxConstantOfShape = None
+    OnnxCumSum = None
     OnnxIsNaN = None
     OnnxWhere = None
 try:
@@ -434,6 +435,11 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     classes = get_label_classes(scope, op)
     if hasattr(classes, 'dtype') and np.issubdtype(classes.dtype, np.floating):
         classes = classes.astype(np.int32)
+        is_integer = True
+    elif isinstance(classes[0], (int, np.int32, np.int64)):
+        is_integer = True
+    else:
+        is_integer = False
     if (isinstance(op.classes_, list)
             and isinstance(op.classes_[0], np.ndarray)):
         # Multi-label
@@ -444,12 +450,14 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
             extracted_name = OnnxArrayFeatureExtractor(
                 transpose_result, np.array([index], dtype=np.int64),
                 op_version=opv)
+            extracted_name.set_onnx_name_prefix('tr%d' % index)
             all_together, sum_prob, res = get_proba_and_label(
                 container, len(cur_class), extracted_name,
                 wei, 1, opv, keep_axis=False)
             probas = OnnxDiv(all_together, sum_prob, op_version=opv)
             res_name = OnnxArrayFeatureExtractor(
                 cur_class, res, op_version=opv)
+            res_name.set_onnx_name_prefix('div%d' % index)
             reshaped_labels = OnnxReshape(
                 res_name, np.array([-1, 1], dtype=np.int64), op_version=opv)
             reshaped_probas = OnnxReshape(
@@ -471,9 +479,14 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
             container, nb_classes, reshaped, wei, axis, opv)
         probas = OnnxDiv(all_together, sum_prob, op_version=opv,
                          output_names=out[1:])
+        probas.set_onnx_name_prefix('bprob')
         res_name = OnnxArrayFeatureExtractor(classes, res, op_version=opv)
+        if is_integer:
+            res_name = OnnxCast(
+                res_name, to=onnx_proto.TensorProto.INT64, op_version=opv)
         out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
                                  output_names=out[:1], op_version=opv)
+        out_labels.set_onnx_name_prefix('blab')
         out_labels.add_to(scope, container)
         probas.add_to(scope, container)
 
