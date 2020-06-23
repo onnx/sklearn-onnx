@@ -691,6 +691,8 @@ def convert_nca(scope, operator, container):
         components = OnnxCast(
             components, to=onnx_proto.TensorProto.DOUBLE,
             op_version=op_version)
+    else:
+        components = components.astype(container.dtype)
     res = OnnxMatMul(
         X, components,
         output_names=out[:1], op_version=op_version)
