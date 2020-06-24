@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 import textwrap
 import onnx
-import onnx.defs
+import onnx.defs  # noqa
 from onnx.defs import OpSchema
 
 
