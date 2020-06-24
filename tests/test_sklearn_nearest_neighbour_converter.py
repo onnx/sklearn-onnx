@@ -88,7 +88,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     def _fit_model_simple(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 3, n_targets, 2)
+        X, y = self._get_reg_data(20, 3, n_targets, 3)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
