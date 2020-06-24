@@ -74,10 +74,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     @functools.lru_cache(maxsize=20)
-    def _get_reg_data(self, n, n_features, n_targets):
+    def _get_reg_data(self, n, n_features, n_targets, n_informative=10):
         X, y = datasets.make_regression(
             n, n_features=n_features, random_state=0,
-            n_targets=n_targets)
+            n_targets=n_targets, n_informative=n_informative)
         return X, y
 
     def _fit_model(self, model, n_targets=1, label_int=False):
@@ -88,7 +88,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     def _fit_model_simple(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 2, n_targets)
+        X, y = self._get_reg_data(20, 3, n_targets, 2)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
