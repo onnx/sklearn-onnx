@@ -21,7 +21,7 @@ def convert_powertransformer(scope, operator, container):
     op_out = operator.outputs[0].full_name
     op = operator.raw_operator
     opv = container.target_opset
-    lambdas = op.lambdas_
+    lambdas = op.lambdas_.astype(container.dtype)
 
     # tensors of units and zeros
     ones_ = OnnxDiv(op_in, op_in, op_version=opv)
@@ -52,10 +52,9 @@ def convert_powertransformer(scope, operator, container):
         y_gr0_l_ne0 = OnnxPow(y0, lambdas, op_version=opv)
         y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_, op_version=opv)
         y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas, op_version=opv)
-        y_gr0_l_ne0 = OnnxImputer(y_gr0_l_ne0,
-                                  imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.inf,
-                                  op_version=opv)
+        y_gr0_l_ne0 = OnnxImputer(
+            y_gr0_l_ne0, imputed_value_floats=[0.0],
+            replaced_value_float=numpy.inf, op_version=opv)
         y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask,
                               op_version=opv)
 
@@ -74,11 +73,11 @@ def convert_powertransformer(scope, operator, container):
         # negative input, lambda != 2
         y_le0_l_ne2 = OnnxPow(y1, 2-lambdas, op_version=opv)
         y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2, op_version=opv)
-        y_le0_l_ne2 = OnnxDiv(y_le0_l_ne2, 2-lambdas, op_version=opv)
-        y_le0_l_ne2 = OnnxImputer(y_le0_l_ne2,
-                                  imputed_value_floats=[0.0],
-                                  replaced_value_float=numpy.inf,
-                                  op_version=opv)
+        y_le0_l_ne2 = OnnxDiv(
+            y_le0_l_ne2, (2-lambdas).astype(container.dtype), op_version=opv)
+        y_le0_l_ne2 = OnnxImputer(
+            y_le0_l_ne2, imputed_value_floats=[0.0],
+            replaced_value_float=numpy.inf, op_version=opv)
         y_le0_l_ne2 = OnnxMul(y_le0_l_ne2, lambda_nontwo_mask, op_version=opv)
 
         # negative input, lambda == 2

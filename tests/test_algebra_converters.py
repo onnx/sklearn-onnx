@@ -89,7 +89,7 @@ class TestAlgebraConverters(unittest.TestCase):
         self.assertEqual(len(nva), 0)
 
     def test_add_12(self):
-        idi = numpy.identity(2)
+        idi = numpy.identity(2, dtype=numpy.float32)
         onx = OnnxAdd('X', idi, output_names=['Y'], op_version=12)
         model_def = onx.to_onnx({'X': idi.astype(numpy.float32)},
                                 target_opset=12)

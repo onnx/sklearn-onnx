@@ -97,6 +97,7 @@ def register_shape_calculator(operator_name, calculator_function,
 
 def get_shape_calculator(operator_name):
     if operator_name not in _shape_calculator_pool:
-        msg = 'Unsupported shape calculator for operator %s' % operator_name
+        msg = ("Unsupported shape calculator for operator "
+               "'%s'." % operator_name)
         raise ValueError(msg)
     return _shape_calculator_pool[operator_name]
