@@ -2,6 +2,7 @@
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
 import unittest
+import functools
 from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
@@ -51,27 +52,43 @@ from test_utils import (
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
-    def _fit_model_binary_classification(self, model):
+
+    @functools.lru_cache(maxsize=1)
+    def _get_iris(self):
         iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
+        X = iris.data[::2, :3]
+        y = iris.target[::2]
+        return X, y
+
+    def _fit_model_binary_classification(self, model):
+        X, y = self._get_iris()
         y[y == 2] = 1
         model.fit(X, y)
         return model, X
 
     def _fit_model_multiclass_classification(self, model, use_string=False):
-        iris = datasets.load_iris()
-        X = iris.data[:, :3]
-        y = iris.target
+        X, y = self._get_iris()
         if use_string:
             y = numpy.array(["cl%d" % _ for _ in y])
         model.fit(X, y)
         return model, X
 
+    @functools.lru_cache(maxsize=20)
+    def _get_reg_data(self, n, n_features, n_targets):
+        X, y = datasets.make_regression(
+            n, n_features=n_features, random_state=0,
+            n_targets=n_targets)
+        return X, y
+
     def _fit_model(self, model, n_targets=1, label_int=False):
-        X, y = datasets.make_regression(n_features=4,
-                                        random_state=0,
-                                        n_targets=n_targets)
+        X, y = self._get_reg_data(20, 4, n_targets)
+        if label_int:
+            y = y.astype(numpy.int64)
+        model.fit(X, y)
+        return model, X
+
+    def _fit_model_simple(self, model, n_targets=1, label_int=False):
+        X, y = self._get_reg_data(20, 2, n_targets)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
@@ -89,11 +106,11 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
             model, model_onnx,
-            basename="SklearnKNeighborsRegressor")
+            basename="SklearnKNeighborsRegressor-Dec4")
         dump_data_and_model(
             (X + 0.1).astype(numpy.float32)[:7],
             model, model_onnx,
-            basename="SklearnKNeighborsRegressor")
+            basename="SklearnKNeighborsRegressor-Dec4")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
@@ -215,14 +232,15 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
     def test_model_knn_regressor2_1_radius(self):
-        model, X = self._fit_model(RadiusNeighborsRegressor(),
-                                   n_targets=2)
-        model_onnx = convert_sklearn(model, "KNN regressor",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=TARGET_OPSET)
+        model, X = self._fit_model_simple(
+            RadiusNeighborsRegressor(), n_targets=2)
+        model_onnx = convert_sklearn(
+            model, "KNN regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(numpy.float32)[:3],
+            X.astype(numpy.float32),
             model, model_onnx,
             basename="SklearnRadiusNeighborsRegressor2")
 
@@ -305,16 +323,16 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
     def test_model_knn_regressor_weights_distance_11_radius(self):
-        model, X = self._fit_model(
+        model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(
-                weights="distance", algorithm="brute", radius=0.5))
+                weights="distance", algorithm="brute", radius=100))
         for op in sorted(set([TARGET_OPSET, 12])):
             if op > TARGET_OPSET:
                 continue
             with self.subTest(opset=op):
                 model_onnx = convert_sklearn(
                     model, "KNN regressor",
-                    [("input", FloatTensorType([None, 4]))],
+                    [("input", FloatTensorType([None, X.shape[1]]))],
                     target_opset=op)
                 self.assertIsNotNone(model_onnx)
                 dump_data_and_model(
