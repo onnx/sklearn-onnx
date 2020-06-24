@@ -141,8 +141,9 @@ def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None,
     ``cdist(X, metric='sqeuclidean')``.
     """
     diff, id_next = _onnx_cdist_begin(op_version)
-    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[
-                               1], keepdims=0, op_version=op_version)
+    norm = OnnxReduceSumSquare(
+        diff, output_names=['norm'], axes=[1],
+        keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)
@@ -157,8 +158,9 @@ def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2,
     diff, id_next = _onnx_cdist_begin(op_version)
     diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
                        np.array([p], dtype=dtype), op_version=op_version)
-    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
-                         'norm'], keepdims=0, op_version=op_version)
+    norm = OnnxReduceSum(
+        diff_pow, axes=[1], output_names=['norm'],
+        keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)
