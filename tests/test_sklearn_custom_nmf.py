@@ -65,7 +65,8 @@ class TestSklearnCustomNMF(unittest.TestCase):
                               outputs=[('rec', FloatTensorType((None, 1)))])
             return onx
 
-        model_onnx = nmf_to_onnx(W, H)
+        model_onnx = nmf_to_onnx(W.astype(np.float32),
+                                 H.astype(np.float32))
         sess = InferenceSession(model_onnx.SerializeToString())
 
         def predict_onnx(sess, row_indices, col_indices):

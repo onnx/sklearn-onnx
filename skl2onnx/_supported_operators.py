@@ -198,6 +198,9 @@ except ImportError:
 
 from sklearn.random_projection import GaussianRandomProjection
 
+# Custom extension
+from .sklapi import CastTransformer
+
 from .common._registration import register_converter, register_shape_calculator
 
 # In most cases, scikit-learn operator produces only one output.
@@ -261,6 +264,7 @@ def build_sklearn_operator_name_map():
                 Binarizer,
                 CalibratedClassifierCV,
                 CategoricalNB,
+                CastTransformer,
                 ComplementNB,
                 CountVectorizer,
                 DictVectorizer,
