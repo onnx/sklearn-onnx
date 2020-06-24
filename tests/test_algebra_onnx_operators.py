@@ -46,7 +46,7 @@ class TestOnnxOperators(unittest.TestCase):
         z = tr.transform(mat)
 
         def conv(scope, operator, container):
-            W = operator.raw_operator.W
+            W = operator.raw_operator.W.astype(container.dtype)
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
                 op_version=TARGET_OPSET)
@@ -102,8 +102,8 @@ class TestOnnxOperators(unittest.TestCase):
         z = tr.transform(mat)
 
         def conv(scope, operator, container):
-            W = operator.raw_operator.W
-            S = operator.raw_operator.S
+            W = operator.raw_operator.W.astype(np.float32)
+            S = operator.raw_operator.S.astype(np.float32)
             X = operator.inputs[0]
             out = operator.outputs
             op = OnnxDiv(
@@ -139,7 +139,8 @@ class TestOnnxOperators(unittest.TestCase):
             op = operator.raw_operator
 
             C = op.cluster_centers_
-            C2 = row_norms(C, squared=True)
+            C2 = row_norms(C, squared=True).astype(container.dtype)
+            C = C.astype(container.dtype)
 
             rs = OnnxReduceSumSquare(
                 X, axes=[1], keepdims=1,
