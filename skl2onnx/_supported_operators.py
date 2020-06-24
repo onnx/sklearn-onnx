@@ -88,8 +88,8 @@ from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
 from sklearn.neighbors import (
-    KNeighborsClassifier,
-    KNeighborsRegressor,
+    KNeighborsClassifier, RadiusNeighborsClassifier,
+    KNeighborsRegressor, RadiusNeighborsRegressor,
     NearestNeighbors,
 )
 try:
@@ -319,6 +319,8 @@ def build_sklearn_operator_name_map():
                 PLSRegression,
                 PolynomialFeatures,
                 PowerTransformer,
+                RadiusNeighborsClassifier,
+                RadiusNeighborsRegressor,
                 RandomForestClassifier,
                 RandomForestRegressor,
                 RANSACRegressor,
