@@ -733,7 +733,7 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property

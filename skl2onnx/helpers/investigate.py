@@ -307,7 +307,6 @@ def compare_objects(o1, o2):
     if isinstance(c1, list) and isinstance(c2, list):
         try:
             res = c1 == c2
-            res = True
         except ValueError:
             res = False
             reason = 'list'
