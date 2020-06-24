@@ -307,8 +307,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor_weights_distance_11_radius(self):
         model, X = self._fit_model(
             RadiusNeighborsRegressor(
-                weights="distance", algorithm="brute"))
-        for op in sorted(set([11, 12, TARGET_OPSET])):
+                weights="distance", algorithm="brute", radius=0.5))
+        for op in sorted(set([TARGET_OPSET, 12])):
             if op > TARGET_OPSET:
                 continue
             with self.subTest(opset=op):
@@ -316,21 +316,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     model, "KNN regressor",
                     [("input", FloatTensorType([None, 4]))],
                     target_opset=op)
-                if op < 12 and model_onnx.ir_version > 6:
-                    raise AssertionError(
-                        "ir_version ({}, op={}) must be <= 6.".format(
-                            model_onnx.ir_version, op))
-                if op < 11 and model_onnx.ir_version > 5:
-                    raise AssertionError(
-                        "ir_version ({}, op={}) must be <= 5.".format(
-                            model_onnx.ir_version, op))
-                if op < 10 and model_onnx.ir_version > 4:
-                    raise AssertionError(
-                        "ir_version ({}, op={}) must be <= 4.".format(
-                            model_onnx.ir_version, op))
                 self.assertIsNotNone(model_onnx)
                 dump_data_and_model(
-                    X.astype(numpy.float32)[:3],
+                    X.astype(numpy.float32),
                     model, model_onnx,
                     basename="SklearnRadiusNeighborsRegressorWD%d-Dec3" % op)
 
