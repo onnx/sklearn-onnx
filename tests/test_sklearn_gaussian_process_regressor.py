@@ -293,8 +293,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
-                             x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=_TARGET_OPSET_)
+                             x_train=(Xtest_ * 2).astype(np.float32),
+                             dtype=np.float32, op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -367,8 +367,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
-                             x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=_TARGET_OPSET_)
+                             x_train=(Xtest_ * 2).astype(np.float32),
+                             dtype=np.float32, op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -393,8 +393,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
         onx = convert_kernel(ker, 'X', output_names=['Z'],
-                             x_train=Xtest_ * 2, dtype=np.float32,
-                             op_version=_TARGET_OPSET_)
+                             x_train=(Xtest_ * 2).astype(np.float32),
+                             dtype=np.float32, op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))], dtype=np.float32)
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -834,4 +834,5 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestSklearnGaussianProcess().test_kernel_rational_quadratic()
     unittest.main()
