@@ -125,6 +125,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=TARGET_OPSET,
                                      options={id(model): {'optim': 'cdist'}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+        exp = model.predict(X.astype(numpy.float32))
+        if any(numpy.isnan(got.ravel())):
+            # The model is unexpectedly producing nan values
+            # not on all platforms.
+            rows = ['--EXP--', str(exp), '--GOT--', str(got),
+                    '--EVERY-OUTPUT--']
+            for out in enumerate_model_node_outputs(
+                    model_onnx, add_node=False):
+                onx = select_model_inputs_outputs(model_onnx, out)
+                sess = InferenceSession(onx.SerializeToString())
+                res = sess.run(
+                    None, {'input': X.astype(numpy.float32)})
+                rows.append('--{}--'.format(out))
+                rows.append(str(res))
+            if (StrictVersion(onnxruntime.__version__) <
+                    StrictVersion("1.4.0")):
+                return
+            raise AssertionError('\n'.join(rows))
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
