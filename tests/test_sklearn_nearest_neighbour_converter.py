@@ -80,15 +80,17 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             n_targets=n_targets, n_informative=n_informative)
         return X, y
 
-    def _fit_model(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 4, n_targets)
+    def _fit_model(self, model, n_targets=1, label_int=False,
+                   n_informative=10):
+        X, y = self._get_reg_data(20, 4, n_targets, n_informative)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
         return model, X
 
-    def _fit_model_simple(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 3, n_targets, 3)
+    def _fit_model_simple(self, model, n_targets=1, label_int=False,
+                          n_informative=3):
+        X, y = self._get_reg_data(20, 2, n_targets, n_informative)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
@@ -233,16 +235,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     def test_model_knn_regressor2_1_radius(self):
         model, X = self._fit_model_simple(
-            RadiusNeighborsRegressor(), n_targets=2)
+            RadiusNeighborsRegressor(algorithm="brute"),
+            n_targets=2)
         model_onnx = convert_sklearn(
             model, "KNN regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(numpy.float32),
-            model, model_onnx,
-            basename="SklearnRadiusNeighborsRegressor2")
+
+        try:
+            dump_data_and_model(
+                X.astype(numpy.float32),
+                model, model_onnx,
+                basename="SklearnRadiusNeighborsRegressor2")
+        except AssertionError:
+            from onnxruntime import InferenceSession
+            sess = InferenceSession(model_onnx.SerializeToString())
+            got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+            exp = model.predict(X.astype(numpy.float32))
+            raise AssertionError(
+                "Issue\n--EXP--\n{}\n--GOT--\n{}".format(exp, got))
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
