@@ -31,7 +31,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
             model,
@@ -55,7 +55,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             SVC(random_state=42, probability=True, gamma='auto'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=5)
         model_onnx = convert_sklearn(
             model,
@@ -80,7 +80,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2, is_int=True)
         model_onnx = convert_sklearn(
             model,
@@ -105,7 +105,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='multinomial'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=4, is_int=True)
         model_onnx = convert_sklearn(
             model,
@@ -126,7 +126,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_regression_int(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(Lasso(max_iter=100),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf, is_int=True)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
@@ -147,7 +147,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(LassoLars(max_iter=100),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
@@ -171,7 +171,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
@@ -196,7 +196,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_gaussian_regressor_double(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
-                           tuned_parameters, cv=3, iid=False)
+                           tuned_parameters, cv=3)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
@@ -223,7 +223,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
             model,

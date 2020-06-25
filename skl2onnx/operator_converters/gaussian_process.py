@@ -85,9 +85,6 @@ def convert_gaussian_process_regressor(scope, operator, container):
                         kernel, X, dtype=dtype, op_version=opv),
                     output_names=out[1:], op_version=opv))
     else:
-        out0 = _zero_vector_of_size(
-            X, keepdims=1, dtype=dtype, op_version=opv)
-
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)

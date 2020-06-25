@@ -7,6 +7,8 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
+import onnxruntime
+from onnxruntime import InferenceSession
 from pandas import DataFrame
 from onnx.defs import onnx_opset_version
 from sklearn import datasets
@@ -29,8 +31,6 @@ except ImportError:
     NeighborhoodComponentsAnalysis = None
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-import onnxruntime
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
         NotImplemented as OrtImpl)
@@ -43,12 +43,13 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
+from skl2onnx.helpers.onnx_helper import (
+    enumerate_model_node_outputs, select_model_inputs_outputs)
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET
-)
+    TARGET_OPSET)
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
@@ -74,21 +75,24 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     @functools.lru_cache(maxsize=20)
-    def _get_reg_data(self, n, n_features, n_targets):
+    def _get_reg_data(self, n, n_features, n_targets, n_informative=10):
         X, y = datasets.make_regression(
             n, n_features=n_features, random_state=0,
-            n_targets=n_targets)
+            n_targets=n_targets, n_informative=n_informative)
         return X, y
 
-    def _fit_model(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 4, n_targets)
+    def _fit_model(self, model, n_targets=1, label_int=False,
+                   n_informative=10):
+        X, y = self._get_reg_data(20, 4, n_targets, n_informative)
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
         return model, X
 
-    def _fit_model_simple(self, model, n_targets=1, label_int=False):
-        X, y = self._get_reg_data(20, 2, n_targets)
+    def _fit_model_simple(self, model, n_targets=1, label_int=False,
+                          n_informative=3):
+        X, y = self._get_reg_data(20, 2, n_targets, n_informative)
+        y /= 100
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
@@ -121,6 +125,26 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=TARGET_OPSET,
                                      options={id(model): {'optim': 'cdist'}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+        exp = model.predict(X.astype(numpy.float32))
+        if any(numpy.isnan(got.ravel())):
+            # The model is unexpectedly producing nan values
+            # not on all platforms.
+            rows = ['--EXP--', str(exp), '--GOT--', str(got),
+                    '--EVERY-OUTPUT--']
+            for out in enumerate_model_node_outputs(
+                    model_onnx, add_node=False):
+                onx = select_model_inputs_outputs(model_onnx, out)
+                sess = InferenceSession(onx.SerializeToString())
+                res = sess.run(
+                    None, {'input': X.astype(numpy.float32)})
+                rows.append('--{}--'.format(out))
+                rows.append(str(res))
+            if (StrictVersion(onnxruntime.__version__) <
+                    StrictVersion("1.4.0")):
+                return
+            raise AssertionError('\n'.join(rows))
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32)[:7],
@@ -233,16 +257,39 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     def test_model_knn_regressor2_1_radius(self):
         model, X = self._fit_model_simple(
-            RadiusNeighborsRegressor(), n_targets=2)
+            RadiusNeighborsRegressor(algorithm="brute"),
+            n_targets=2)
         model_onnx = convert_sklearn(
             model, "KNN regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(numpy.float32),
-            model, model_onnx,
-            basename="SklearnRadiusNeighborsRegressor2")
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+        exp = model.predict(X.astype(numpy.float32))
+        if any(numpy.isnan(got.ravel())):
+            # The model is unexpectedly producing nan values
+            # not on all platforms.
+            # It happens when two matrices are multiplied,
+            # one is (2, 20, 20), second is (20, 20)
+            # and contains only 0 or 1 values.
+            # The output contains nan values on the first row
+            # but not on the second one.
+            rows = ['--EXP--', str(exp), '--GOT--', str(got),
+                    '--EVERY-OUTPUT--']
+            for out in enumerate_model_node_outputs(
+                    model_onnx, add_node=False):
+                onx = select_model_inputs_outputs(model_onnx, out)
+                sess = InferenceSession(onx.SerializeToString())
+                res = sess.run(
+                    None, {'input': X.astype(numpy.float32)})
+                rows.append('--{}--'.format(out))
+                rows.append(str(res))
+            if (StrictVersion(onnxruntime.__version__) <
+                    StrictVersion("1.4.0")):
+                return
+            raise AssertionError('\n'.join(rows))
+        assert_almost_equal(exp, got, decimal=5)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -326,7 +373,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(
                 weights="distance", algorithm="brute", radius=100))
-        for op in sorted(set([TARGET_OPSET, 12])):
+        for op in sorted(set([TARGET_OPSET, 12, 11])):
             if op > TARGET_OPSET:
                 continue
             with self.subTest(opset=op):
@@ -335,10 +382,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     [("input", FloatTensorType([None, X.shape[1]]))],
                     target_opset=op)
                 self.assertIsNotNone(model_onnx)
-                dump_data_and_model(
-                    X.astype(numpy.float32),
-                    model, model_onnx,
-                    basename="SklearnRadiusNeighborsRegressorWD%d-Dec3" % op)
+                sess = InferenceSession(model_onnx.SerializeToString())
+                got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+                exp = model.predict(X.astype(numpy.float32))
+                assert_almost_equal(exp, got.ravel(), decimal=3)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
