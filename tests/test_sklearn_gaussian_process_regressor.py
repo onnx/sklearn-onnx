@@ -834,5 +834,4 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnGaussianProcess().test_kernel_rational_quadratic()
     unittest.main()

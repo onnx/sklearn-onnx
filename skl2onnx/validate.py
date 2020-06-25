@@ -12,7 +12,7 @@ import onnx
 from sklearn import __all__ as sklearn__all__, __version__ as sklearn_version
 try:
     from sklearn.utils import all_estimators
-except ImportError as e:
+except ImportError:
     # scikit-learn < 0.24
     from sklearn.utils.testing import all_estimators
 from sklearn.model_selection import train_test_split
