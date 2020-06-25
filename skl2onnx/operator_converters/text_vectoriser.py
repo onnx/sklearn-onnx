@@ -177,7 +177,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
                           UserWarning)
-            default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'

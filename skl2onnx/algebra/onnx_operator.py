@@ -366,6 +366,12 @@ class OnnxOperator:
 
             if hasattr(self, 'output_names_'):
                 outputs = self.output_names_
+                if outputs is None or len(outputs) == 0:
+                    raise RuntimeError(
+                        "Empty cached outputs. The conversion was "
+                        "maybe triggered on some part "
+                        "of the graph before being applied "
+                        "on the whole graph.")
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
@@ -698,7 +704,7 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property
