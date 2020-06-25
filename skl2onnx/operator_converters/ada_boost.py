@@ -214,7 +214,6 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
     op = operator.raw_operator
-    op_type = 'TreeEnsembleClassifier'
     options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
     classes = op.classes_
