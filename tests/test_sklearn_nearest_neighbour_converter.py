@@ -7,6 +7,8 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
+import onnxruntime
+from onnxruntime import InferenceSession
 from pandas import DataFrame
 from onnx.defs import onnx_opset_version
 from sklearn import datasets
@@ -29,8 +31,6 @@ except ImportError:
     NeighborhoodComponentsAnalysis = None
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-import onnxruntime
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
         NotImplemented as OrtImpl)
@@ -91,6 +91,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def _fit_model_simple(self, model, n_targets=1, label_int=False,
                           n_informative=3):
         X, y = self._get_reg_data(20, 2, n_targets, n_informative)
+        y /= 100
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
@@ -242,19 +243,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-
-        try:
-            dump_data_and_model(
-                X.astype(numpy.float32),
-                model, model_onnx,
-                basename="SklearnRadiusNeighborsRegressor2")
-        except AssertionError:
-            from onnxruntime import InferenceSession
-            sess = InferenceSession(model_onnx.SerializeToString())
-            got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
-            exp = model.predict(X.astype(numpy.float32))
-            raise AssertionError(
-                "Issue\n--EXP--\n{}\n--GOT--\n{}".format(exp, got))
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+        exp = model.predict(X.astype(numpy.float32))
+        assert_almost_equal(exp, got, decimal=5)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -338,7 +330,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(
                 weights="distance", algorithm="brute", radius=100))
-        for op in sorted(set([TARGET_OPSET, 12])):
+        for op in sorted(set([TARGET_OPSET, 12, 11])):
             if op > TARGET_OPSET:
                 continue
             with self.subTest(opset=op):
@@ -347,10 +339,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     [("input", FloatTensorType([None, X.shape[1]]))],
                     target_opset=op)
                 self.assertIsNotNone(model_onnx)
-                dump_data_and_model(
-                    X.astype(numpy.float32),
-                    model, model_onnx,
-                    basename="SklearnRadiusNeighborsRegressorWD%d-Dec3" % op)
+                sess = InferenceSession(model_onnx.SerializeToString())
+                got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+                exp = model.predict(X.astype(numpy.float32))
+                assert_almost_equal(exp, got.ravel(), decimal=3)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
