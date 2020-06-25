@@ -258,7 +258,7 @@ def collect_intermediate_steps(model, *args, **kwargs):
     return steps
 
 
-def compare_objects(o1, o2):
+def compare_objects(o1, o2, decimal=4):
     """
     Compares two objects assuming they are vectors or matrices.
     *o1* and *o2* can be a numpy array, a sparse matrix,
@@ -268,6 +268,7 @@ def compare_objects(o1, o2):
 
     :param o1: a dataframe, a series, an array a sparse matrix
     :param o2: a dataframe, a series, an array a sparse matrix
+    :param decimal: parameter decimal for assert_almost_equal
     """
 
     def convert(o):
@@ -302,25 +303,31 @@ def compare_objects(o1, o2):
     c1 = convert(o1)
     c2 = convert(o2)
     reason = None
+    if isinstance(c2, list) and isinstance(c2[0], dict):
+        res = numpy.zeros((len(c2), max(len(c) for c in c2)))
+        for i, row in enumerate(c2):
+            for k, v in row.items():
+                res[i, k] = v
+        c2 = res
     if isinstance(c1, numpy.ndarray) and isinstance(c2, list):
         c1 = list(c1.ravel())
     if isinstance(c1, list) and isinstance(c2, list):
         try:
             res = c1 == c2
-            res = True
+            reason = 'list-equal'
         except ValueError:
             res = False
             reason = 'list'
     elif isinstance(c1, numpy.ndarray) and isinstance(c2, numpy.ndarray):
         try:
-            assert_almost_equal(c1, c2, decimal=4)
+            assert_almost_equal(c1, c2, decimal=decimal)
             res = True
         except (AssertionError, TypeError):
             reason = 'array'
             cc1 = c1.ravel()
             cc2 = c2.ravel()
             try:
-                assert_almost_equal(cc1, cc2)
+                assert_almost_equal(cc1, cc2, decimal=decimal)
                 res = True
             except (AssertionError, TypeError) as e:
                 res = False
