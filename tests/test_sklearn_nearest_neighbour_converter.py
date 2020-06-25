@@ -43,12 +43,13 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
+from skl2onnx.helpers.onnx_helper import (
+    enumerate_model_node_outputs, select_model_inputs_outputs)
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET
-)
+    TARGET_OPSET)
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
@@ -246,6 +247,20 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
+        if any(numpy.isnan(got.ravel())):
+            # The model is unexpectedly producing nan values
+            # not on all platforms.
+            rows = ['--EXP--', str(exp), '--GOT--', str(got),
+                    '--EVERY-OUTPUT--']
+            for out in enumerate_model_node_outputs(
+                    model_onnx, add_node=False):
+                onx = select_model_inputs_outputs(model_onnx, out)
+                sess = InferenceSession(onx.SerializeToString())
+                res = sess.run(
+                    None, {'input': X.astype(numpy.float32)})
+                rows.append('--{}--'.format(out))
+                rows.append(str(res))
+            raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp, got, decimal=5)
 
     @unittest.skipIf(
