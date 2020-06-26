@@ -74,10 +74,16 @@ def _samme_r_proba(scope, container, proba_name, n_classes):
         n_classes_minus_one_name, container.proto_dtype,
         [], [n_classes - 1])
 
+    try:
+        cst_min = np.finfo(np.float64).eps.astype(container.dtype)
+    except TypeError:
+        raise TypeError("Unable to convert {} (type {}) into {}.".format(
+            np.finfo(float).eps, type(np.finfo(float).eps),
+            container.dtype))
     apply_clip(
         scope, proba_name, clipped_proba_name, container,
         operator_name=scope.get_unique_operator_name('Clip'),
-        min=container.dtype(np.finfo(float).eps))
+        min=cst_min)
     container.add_node(
         'Log', clipped_proba_name, log_proba_name,
         name=scope.get_unique_operator_name('Log'))
