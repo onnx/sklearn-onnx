@@ -75,7 +75,8 @@ class TestOnnxOperators(unittest.TestCase):
         model_onnx = convert_sklearn(
             tr, 'a-sub', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
-            custom_conversion_functions={CustomOpTransformer: conv})
+            custom_conversion_functions={CustomOpTransformer: conv},
+            target_opset=TARGET_OPSET)
 
         sess = InferenceSession(model_onnx.SerializeToString())
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
@@ -121,7 +122,7 @@ class TestOnnxOperators(unittest.TestCase):
             tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv},
-            target_opset=None)
+            target_opset=TARGET_OPSET)
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
@@ -250,7 +251,8 @@ class TestOnnxOperators(unittest.TestCase):
             output_names=['Y'], op_version=1)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
-                                outputs=[('Y', FloatTensorType([2]))])
+                                outputs=[('Y', FloatTensorType([2]))],
+                                target_opset=TARGET_OPSET)
         sess = InferenceSession(model_def.SerializeToString())
         got = sess.run(None, {'X': X})[0]
         self.assertEqual(got.shape, (2, 1))
@@ -261,12 +263,13 @@ class TestOnnxOperators(unittest.TestCase):
     def test_container_init(self):
         onx = OnnxReshape(
                 OnnxReshape('X', np.array([1, -1], dtype=np.int64),
-                            op_version=12),
+                            op_version=TARGET_OPSET),
                 np.array([1, -1], dtype=np.int64),
-                output_names=['Y'], op_version=12)
+                output_names=['Y'], op_version=TARGET_OPSET)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
-                                outputs=[('Y', FloatTensorType([None, 2]))])
+                                outputs=[('Y', FloatTensorType([None, 2]))],
+                                target_opset=TARGET_OPSET)
         sess = InferenceSession(model_def.SerializeToString())
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(X.reshape((1, -1)), got)
