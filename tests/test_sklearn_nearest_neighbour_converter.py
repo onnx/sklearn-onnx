@@ -145,7 +145,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     StrictVersion("1.4.0")):
                 return
             raise AssertionError('\n'.join(rows))
-        assert_almost_equal(got, exp, decimal=5)
+        assert_almost_equal(got, exp, decimal=3)
         # Bug in onnxuntime.
         # self.assertIsNotNone(model_onnx)
         # dump_data_and_model(
