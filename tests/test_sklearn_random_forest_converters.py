@@ -607,5 +607,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnTreeEnsembleModels().test_model_hgb_classifier_nonan_multi()
     unittest.main()
