@@ -698,5 +698,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnTreeEnsembleModels().test_randomforestclassifier_decision_path()
     unittest.main()
