@@ -6,9 +6,11 @@ import onnx
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
 try:
-    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph, Fail
+    from onnxruntime.capi.onnxruntime_pybind11_state import (
+        InvalidGraph, Fail, InvalidArgument)
 except ImportError:
     InvalidGraph = RuntimeError
+    InvalidArgument = RuntimeError
     Fail = RuntimeError
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
@@ -53,8 +55,12 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 as_string = onx.SerializeToString()
                 try:
                     ort = InferenceSession(as_string)
-                except InvalidGraph as e:
-                    if opv >= onnx_opset_version():
+                except (InvalidGraph, InvalidArgument) as e:
+                    if (isinstance(opv, dict) and
+                            opv[''] >= onnx_opset_version()):
+                        continue
+                    if (isinstance(opv, int) and
+                            int >= onnx_opset_version()):
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
