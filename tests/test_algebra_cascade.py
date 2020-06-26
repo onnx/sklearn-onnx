@@ -52,6 +52,18 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
+                if opv == {'': 10}:
+                    for im in onx.opset_import:
+                        if im.version > 10:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
+                else:
+                    for im in onx.opset_import:
+                        if im.version > opv:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
                 as_string = onx.SerializeToString()
                 try:
                     ort = InferenceSession(as_string)
@@ -60,7 +72,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                             opv[''] >= onnx_opset_version()):
                         continue
                     if (isinstance(opv, int) and
-                            int >= onnx_opset_version()):
+                            opv >= onnx_opset_version()):
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
