@@ -371,6 +371,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         sparse_tensor = None
         tensor = None
 
+        cached_value = None
         if isinstance(content, TensorProto):
             tensor = TensorProto()
             tensor.data_type = content.data_type
@@ -400,43 +401,53 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             dense_shape = list(content.shape)
             sparse_tensor = make_sparse_tensor(
                 values_tensor, indices_tensor, dense_shape)
+
+            # cached value: same without names
+            values_tensor = make_tensor(
+                "_v", data_type=onnx_type,
+                dims=(len(content.data), ), vals=content.data)
+            indices_tensor = make_tensor(
+                name="_i", data_type=TensorProto.INT64,
+                dims=(len(indices), ), vals=indices)
+            cached_value = make_sparse_tensor(
+                values_tensor, indices_tensor, dense_shape)
+
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None.')
             tensor = make_tensor(name, onnx_type, shape, content)
 
         if tensor is not None:
-
-            name = tensor.name
-            tensor.name = "tensor"
-            content = tensor.SerializeToString()
-            cached = self.initializers_strings.get(content, None)
-            if cached is None:
-                self.initializers_strings[content] = name
+            if cached_value is None:
+                name = tensor.name
+                tensor.name = "tensor"
+                content = tensor.SerializeToString()
                 tensor.name = name
+            else:
+                content = cached_value.SerializeToString()
+            cached_name = self.initializers_strings.get(content, None)
+            if cached_name is None:
+                self.initializers_strings[content] = name
                 self.initializers.append(tensor)
                 return tensor
 
             self.add_node(
-                'Identity', cached, name, op_version=self.target_opset,
+                'Identity', cached_name, name, op_version=self.target_opset,
                 name=name + '_op')
             return name
 
         if sparse_tensor is not None:
-            name = tensor.name
-            sparse_tensor.name = "sparse_tensor"
-            content = sparse_tensor.SerializeToString()
-            cached = self.initializers_strings.get(content, None)
-            if cached is None:
+            content = cached_value.SerializeToString()
+            cached_name = self.initializers_strings.get(content, None)
+            if cached_name is None:
                 self.initializers_strings[content] = name
-                sparse_tensor.name = name
                 self.add_node(
                     'Constant', [], [name], sparse_value=sparse_tensor,
                     op_version=self.target_opset, name=name + '_op')
                 return sparse_tensor
 
             self.add_node(
-                'Identity', cached, name, op_version=self.target_opset,
+                'Identity', cached_name, name, op_version=self.target_opset,
                 name=name + '_op')
             return name
 
