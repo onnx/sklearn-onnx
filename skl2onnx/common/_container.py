@@ -240,6 +240,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         # ONNX tensors (type: TensorProto). They are initializers of
         # ONNX GraphProto.
         self.initializers = []
+        self.initializers_strings = {}
         # Intermediate variables in ONNX computational graph. They are
         # ValueInfoProto in ONNX.
         self.value_info = []
@@ -405,15 +406,42 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             tensor = make_tensor(name, onnx_type, shape, content)
 
         if tensor is not None:
-            self.initializers.append(tensor)
-            return tensor
-        elif sparse_tensor is not None:
-            self.add_node('Constant', [], [name], sparse_value=sparse_tensor,
-                          op_version=self.target_opset, name=name + '_op')
-            return sparse_tensor
-        else:
-            raise RuntimeError(
-                "Either tensor or sparse_tensor should be defined.")
+
+            name = tensor.name
+            tensor.name = "tensor"
+            content = tensor.SerializeToString()
+            cached = self.initializers_strings.get(content, None)
+            if cached is None:
+                self.initializers_strings[content] = name
+                tensor.name = name
+                self.initializers.append(tensor)
+                return tensor
+
+            self.add_node(
+                'Identity', cached, name, op_version=self.target_opset,
+                name=name + '_op')
+            return name
+
+        if sparse_tensor is not None:
+            name = tensor.name
+            sparse_tensor.name = "sparse_tensor"
+            content = sparse_tensor.SerializeToString()
+            cached = self.initializers_strings.get(content, None)
+            if cached is None:
+                self.initializers_strings[content] = name
+                sparse_tensor.name = name
+                self.add_node(
+                    'Constant', [], [name], sparse_value=sparse_tensor,
+                    op_version=self.target_opset, name=name + '_op')
+                return sparse_tensor
+
+            self.add_node(
+                'Identity', cached, name, op_version=self.target_opset,
+                name=name + '_op')
+            return name
+
+        raise RuntimeError(
+            "Either tensor or sparse_tensor should be defined.")
 
     def add_value_info(self, variable):
         self.value_info.append(self._make_value_info(variable))

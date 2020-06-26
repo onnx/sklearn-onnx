@@ -12,7 +12,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
-    OnnxSub, OnnxDiv,
+    OnnxSub, OnnxDiv, OnnxReshape,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul
@@ -255,6 +255,24 @@ class TestOnnxOperators(unittest.TestCase):
         got = sess.run(None, {'X': X})[0]
         self.assertEqual(got.shape, (2, 1))
         assert_almost_equal(X[:, 1:2], got)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_container_init(self):
+        onx = OnnxReshape(
+                OnnxReshape('X', np.array([1, -1], dtype=np.int64),
+                            op_version=12),
+                np.array([1, -1], dtype=np.int64),
+                output_names=['Y'], op_version=12)
+        X = np.array([[1, 2], [3, 4]], dtype=np.float32)
+        model_def = onx.to_onnx({'X': X},
+                                outputs=[('Y', FloatTensorType([None, 2]))])
+        sess = InferenceSession(model_def.SerializeToString())
+        got = sess.run(None, {'X': X})[0]
+        assert_almost_equal(X.reshape((1, -1)), got)
+        inits = [row for row in str(model_def).split('\n')
+                 if row.startswith("  initializer {")]
+        self.assertEqual(len(inits), 1)
 
 
 if __name__ == "__main__":
