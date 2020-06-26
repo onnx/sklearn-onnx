@@ -48,7 +48,11 @@ def calculate_tree_classifier_output_shapes(operator):
     _calculate_linear_classifier_output_shapes(operator, True)
     if len(operator.outputs) == 3:
         N = operator.inputs[0].type.shape[0]
-        operator.outputs[2].type.shape = [N, 1]
+        if hasattr(operator.raw_operator, 'estimators_'):
+            operator.outputs[2].type.shape = [
+                N, len(operator.raw_operator.estimators_)]
+        else:
+            operator.outputs[2].type.shape = [N, 1]
 
 
 register_shape_calculator('SklearnDecisionTreeRegressor',
