@@ -145,7 +145,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     StrictVersion("1.4.0")):
                 return
             raise AssertionError('\n'.join(rows))
-        assert_almost_equal(exp, got, decimal=3)
+        assert_almost_equal(exp.ravel(), got.ravel(), decimal=3)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
