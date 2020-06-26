@@ -56,7 +56,11 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 try:
                     ort = InferenceSession(as_string)
                 except (InvalidGraph, InvalidArgument) as e:
-                    if opv >= onnx_opset_version():
+                    if (isinstance(opv, dict) and
+                            opv[''] >= onnx_opset_version()):
+                        continue
+                    if (isinstance(opv, int) and
+                            int >= onnx_opset_version()):
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
