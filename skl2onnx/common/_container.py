@@ -601,6 +601,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                 if model not in self.registered_models['aliases']:
                     return None
                 alias = self.registered_models['aliases'][model]
+            elif hasattr(model, 'alias'):
+                alias = model.alias
             else:
                 if type(model) not in self.registered_models['aliases']:
                     return {}
