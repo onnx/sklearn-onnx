@@ -56,7 +56,6 @@ from sklearn.ensemble import (
     BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
-    IsolationForest,
     RandomForestClassifier, RandomForestRegressor,
     VotingClassifier
 )
@@ -252,7 +251,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM, IsolationForest]
+outlier_list = [OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -292,7 +291,6 @@ def build_sklearn_operator_name_map():
                 HistGradientBoostingRegressor,
                 Imputer,
                 IncrementalPCA,
-                IsolationForest,
                 KMeans,
                 LabelBinarizer,
                 LabelEncoder,

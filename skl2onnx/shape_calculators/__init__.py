@@ -18,7 +18,6 @@ from . import gaussian_process
 from . import grid_search_cv
 from . import identity
 from . import imputer
-from . import isolation_forest
 from . import k_bins_discretiser
 from . import k_means
 from . import label_binariser
@@ -55,7 +54,6 @@ __all__ = [
     grid_search_cv,
     identity,
     imputer,
-    isolation_forest,
     k_bins_discretiser,
     k_means,
     label_binariser,
