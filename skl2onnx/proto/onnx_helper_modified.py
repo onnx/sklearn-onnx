@@ -79,12 +79,6 @@ def make_attribute(
         doc_string=None  # type: Optional[Text]
         ):  # type: (...) -> AttributeProto
     """Makes an AttributeProto based on the value type."""
-    def getshape(obj):
-        if hasattr(obj, 'shape'):
-            return obj.shape
-        else:
-            return (len(obj), )
-
     attr = AttributeProto()
     attr.name = key
     if doc_string:
@@ -137,11 +131,6 @@ def make_attribute(
         if all(isinstance(v, np.float32) for v in value):
             attr.floats.extend(value)
             attr.type = AttributeProto.FLOATS
-            # return make_attribute(
-            #     key, doc_string=doc_string,
-            #     value=make_tensor(
-            #         key, TensorProto.FLOAT,
-            #         getshape(value), value))
         elif all(isinstance(v, np.float64) for v in value):
             if use_float64:
                 attr.type = AttributeProto.TENSOR
@@ -163,19 +152,9 @@ def make_attribute(
         elif all(isinstance(v, np.int32) for v in value):
             attr.ints.extend(int(v) for v in value)
             attr.type = AttributeProto.INTS
-            # return make_attribute(
-            #     key, doc_string=doc_string,
-            #     value=make_tensor(
-            #         key, TensorProto.INT32,
-            #         getshape(value), value))
         elif all(isinstance(v, np.int64) for v in value):
             attr.ints.extend(int(v) for v in value)
             attr.type = AttributeProto.INTS
-            # return make_attribute(
-            #     key, doc_string=doc_string,
-            #     value=make_tensor(
-            #         key, TensorProto.INT64,
-            #         getshape(value), value))
         elif all(isinstance(v, numbers.Integral) for v in value):
             # Turn np.int32/64 into Python built-in int.
             attr.ints.extend(int(v) for v in value)

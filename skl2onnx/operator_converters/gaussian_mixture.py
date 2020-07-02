@@ -52,7 +52,8 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
     # self._estimate_log_prob(X)
     log_det = _compute_log_det_cholesky(
-        op.precisions_cholesky_, op.covariance_type, n_features)
+        op.precisions_cholesky_, op.covariance_type, n_features).astype(
+            container.dtype)
 
     if op.covariance_type == 'full':
         # shape(op.means_) = (n_components, n_features)
@@ -116,16 +117,16 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
         precisions = op.precisions_cholesky_ ** 2
         mp = np.sum((op.means_ ** 2 * precisions), 1)
-        zeros = np.zeros((n_components, ))
+        zeros = np.zeros((n_components, ), dtype=container.dtype)
         xmp = OnnxGemm(
             X, (op.means_ * precisions).T.astype(container.dtype),
-            zeros.astype(container.dtype),
-            alpha=-2., beta=0., op_version=opv)
+            zeros, alpha=-2., beta=0., op_version=opv)
         term = OnnxGemm(OnnxMul(X, X, op_version=opv),
-                        precisions.T, zeros, alpha=1., beta=0.,
-                        op_version=opv)
-        log_prob = OnnxAdd(OnnxAdd(mp, xmp, op_version=opv),
-                           term, op_version=opv)
+                        precisions.T.astype(container.dtype),
+                        zeros, alpha=1., beta=0., op_version=opv)
+        log_prob = OnnxAdd(
+            OnnxAdd(mp.astype(container.dtype), xmp, op_version=opv),
+            term, op_version=opv)
 
     elif op.covariance_type == 'spherical':
         # shape(op.means_) = (n_components, n_features)
@@ -151,8 +152,10 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
             zeros.astype(container.dtype), alpha=-2.,
             beta=0., op_version=opv)
         mp = np.sum(op.means_ ** 2, 1) * precisions
-        log_prob = OnnxAdd(mp, OnnxAdd(xmp, outer, op_version=opv),
-                           op_version=opv)
+        log_prob = OnnxAdd(
+            mp.astype(container.dtype),
+            OnnxAdd(xmp, outer, op_version=opv),
+            op_version=opv)
     else:
         raise RuntimeError("Unknown op.covariance_type='{}'. Upgrade "
                            "to a more recent version of skearn-onnx "
@@ -160,12 +163,14 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
     # -.5 * (cst + log_prob) + log_det
     cst = np.array([n_features * np.log(2 * np.pi)])
-    add = OnnxAdd(cst, log_prob, op_version=opv)
-    mul = OnnxMul(add, np.array([-0.5]), op_version=opv)
+    add = OnnxAdd(cst.astype(container.dtype), log_prob, op_version=opv)
+    mul = OnnxMul(add, np.array([-0.5], dtype=container.dtype),
+                  op_version=opv)
     if isinstance(log_det, float):
-        log_det = np.array([log_det])
-    weighted_log_prob = OnnxAdd(OnnxAdd(mul, log_det, op_version=opv),
-                                log_weights, op_version=opv)
+        log_det = np.array([log_det], dtype=container.dtype)
+    weighted_log_prob = OnnxAdd(
+        OnnxAdd(mul, log_det, op_version=opv),
+        log_weights.astype(container.dtype), op_version=opv)
 
     # labels
     if container.is_allowed('ArgMax'):

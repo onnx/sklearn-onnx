@@ -8,8 +8,8 @@
 # we import ONNX protobuf definition here so that we can conduct quick
 # fixes by overwriting ONNX functions without changing any lines
 # elsewhere.
-import onnx
 from onnx import onnx_pb as onnx_proto # noqa
+from onnx import defs # noqa
 
 # Overwrite the make_tensor defined in onnx.helper because of a bug
 # (string tensor get assigned twice)
@@ -65,7 +65,7 @@ def get_opset_number_from_onnx():
     Returns the latest opset version supported
     by the *onnx* package.
     """
-    return onnx.defs.onnx_opset_version()
+    return defs.onnx_opset_version()
 
 
 def get_latest_tested_opset_version():

@@ -10,7 +10,7 @@ import onnxruntime as rt
 import numpy
 
 
-class TestSahpes(unittest.TestCase):
+class TestShapes(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
                      reason="not available")

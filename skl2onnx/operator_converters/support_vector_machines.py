@@ -7,6 +7,7 @@
 import numbers
 import numpy as np
 import six
+from scipy.sparse import isspmatrix
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
 from ..common._apply_operation import (
     apply_cast, apply_concat, apply_abs,
@@ -56,8 +57,14 @@ def convert_sklearn_svm_regressor(
     svm_attrs['kernel_type'] = op.kernel.upper()
     svm_attrs['kernel_params'] = [float(_) for _ in
                                   [op._gamma, op.coef0, op.degree]]
-    svm_attrs['support_vectors'] = support_vectors
-    svm_attrs['coefficients'] = coef
+    if isspmatrix(support_vectors):
+        svm_attrs['support_vectors'] = support_vectors.toarray().ravel()
+    else:
+        svm_attrs['support_vectors'] = support_vectors
+    if isspmatrix(coef):
+        svm_attrs['coefficients'] = coef.toarray().ravel()
+    else:
+        svm_attrs['coefficients'] = coef
     svm_attrs['rho'] = intercept
 
     if operator.type in ['SklearnSVR', 'SklearnNuSVR'] or isinstance(
@@ -123,7 +130,7 @@ def convert_sklearn_svm_classifier(
     sklearn/utils/multiclass.py#L402>`_. *onnxruntime* returns
     the raw score from *svm* algorithm as a *matrix[N, (C(C-1)/2]*.
     """
-    svm_attrs = {'name': scope.get_unique_operator_name('SVM')}
+    svm_attrs = {'name': scope.get_unique_operator_name('SVMc')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
         coef = op.dual_coef_.ravel().tolist()
@@ -132,6 +139,8 @@ def convert_sklearn_svm_classifier(
     intercept = op.intercept_
     if isinstance(op.support_vectors_, np.ndarray):
         support_vectors = op.support_vectors_.ravel().tolist()
+    elif isspmatrix(op.support_vectors_):
+        support_vectors = op.support_vectors_.toarray().ravel().tolist()
     else:
         support_vectors = op.support_vectors_
 
@@ -142,10 +151,17 @@ def convert_sklearn_svm_classifier(
 
     if (operator.type in ['SklearnSVC', 'SklearnNuSVC'] or isinstance(
             op, (SVC, NuSVC))) and len(op.classes_) == 2:
-        svm_attrs['coefficients'] = [-v for v in coef]
+        if isspmatrix(coef):
+            coef_dense = coef.toarray().ravel()
+            svm_attrs['coefficients'] = [-v for v in coef_dense]
+        else:
+            svm_attrs['coefficients'] = [-v for v in coef]
         svm_attrs['rho'] = [-v for v in intercept]
     else:
-        svm_attrs['coefficients'] = coef
+        if isspmatrix(coef):
+            svm_attrs['coefficients'] = coef.todense()
+        else:
+            svm_attrs['coefficients'] = coef
         svm_attrs['rho'] = intercept
 
     handles_ovr = False

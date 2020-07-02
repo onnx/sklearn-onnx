@@ -224,7 +224,7 @@ class OnnxOperator:
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
                         OnnxOperator.ConstantVariable(
-                            inp, implicit_cast=True))
+                            inp, implicit_cast=False))
                 elif isinstance(inp, TensorProto):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
@@ -730,7 +730,7 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property
