@@ -8,6 +8,7 @@ from uuid import uuid4
 import numpy as np
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
+from .common.utils_sklearn import _process_options
 from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
@@ -150,6 +151,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology.compile()
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
+    options = _process_options(model, options)
     onnx_model = convert_topology(
         topology, name, doc_string, target_opset, dtype=dtype,
         options=options, remove_identity=not intermediate)

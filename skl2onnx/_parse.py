@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import copy
 import numpy as np
 
 from sklearn import pipeline
@@ -45,7 +44,7 @@ from .common.data_types import StringTensorType, TensorType
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
-from .common.utils_sklearn import enumerate_model_names, has_pipeline
+from .common.utils_sklearn import has_pipeline, _process_options
 
 
 do_not_merge_columns = tuple(
@@ -508,71 +507,6 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
         return outputs
 
     return res
-
-
-def _process_options(model, options):
-    """
-    Converts options defined as string into options
-    ``id(model): options``. The second format is not
-    pickable.
-    """
-    if options is None:
-        return None
-    if all(map(lambda x: not isinstance(x, str), options)):
-        # No need to transform.
-        return _process_pipeline_options(model, options)
-
-    new_options = copy.deepcopy(options)
-    names = dict(enumerate_model_names(model))
-    for k, v in options.items():
-        if k in names:
-            new_options[id(names[k])] = v
-            continue
-        try:
-            ri = k.rindex('__')
-            m2, k2 = k[:ri], k[ri+2:]
-        except ValueError:
-            key = id(model)
-            if key not in new_options:
-                new_options[key] = {}
-            new_options[key][k] = v
-            continue
-        if m2 in names:
-            key = id(names[m2])
-            if key not in new_options:
-                new_options[key] = {}
-            new_options[key][k2] = v
-            continue
-        raise RuntimeError(
-            "Unable to find model name '{}' or '{}' in \n{}".format(
-                k, m2, list(sorted(names))))
-
-    return _process_pipeline_options(model, new_options)
-
-
-def _process_pipeline_options(model, options):
-    """
-    Tells the final classifier of a pipeline that
-    options 'zipmap' or 'nocl' were attached to
-    the pipeline.
-    """
-    new_options = None
-    names = dict(enumerate_model_names(model))
-    for k, v in names.items():
-        if id(v) in options and isinstance(v, Pipeline):
-            opts = options[id(v)]
-            last = v.steps[-1][1]
-            key = id(last)
-            for opt, val in opts.items():
-                if opt not in {'zipmap', 'nocl'}:
-                    continue
-                if new_options is None:
-                    new_options = copy.deepcopy(options)
-                if key not in new_options:
-                    new_options[key] = {}
-                if opt not in new_options[key]:
-                    new_options[key][opt] = val
-    return new_options or options
 
 
 def parse_sklearn_model(model, initial_types=None, target_opset=None,

@@ -29,10 +29,11 @@ try:
 except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
 from skl2onnx.common.utils_sklearn import enumerate_model_names
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     FloatTensorType, StringTensorType)
-from skl2onnx._parse import _process_options, _process_pipeline_options
+from skl2onnx.common.utils_sklearn import (
+    _process_options, _process_pipeline_options)
 from test_utils import dump_data_and_model, fit_regression_model
 
 
@@ -77,6 +78,30 @@ class TestUtilsSklearn(unittest.TestCase):
         names = list(enumerate_model_names(model))
         assert [_[0] for _ in names] == ['', 'scaler1', 'union',
                                          'union__scaler2', 'union__scaler3']
+
+    def test_pipeline_lr(self):
+        data = numpy.array(
+            [[0.0, 0.0], [0.0, 0.0], [1.0, 1.0], [1.0, 1.0]],
+            dtype=numpy.float32)
+        yd = numpy.array([0, 1, 0, 2], dtype=numpy.float32)
+        pipe = Pipeline([
+            ('norm', MinMaxScaler()),
+            ('clr', LogisticRegression())
+        ])
+        pipe.fit(data, yd)
+
+        options = {'clr__raw_scores': True, 'clr__zipmap': False}
+        new_options = _process_options(pipe, options)
+        exp = {'raw_scores': True, 'zipmap': False}
+        op = pipe.steps[1][1]
+        self.assertIn(id(op), new_options)
+        self.assertEqual(new_options[id(op)], exp)
+
+        model_def = to_onnx(
+            pipe, data,
+            options={'clr__raw_scores': True, 'clr__zipmap': False})
+        sonx = str(model_def)
+        assert "SOFTMAX" not in sonx
 
     @unittest.skipIf(
         ColumnTransformer is None,
