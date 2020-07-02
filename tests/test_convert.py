@@ -33,7 +33,8 @@ class TestConvert(unittest.TestCase):
             model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
                                  target_opset=i)
             dom = get_domain_opset(model_onnx)
-            self.assertEqual(dom, {'': i})
+            self.assertEqual(len(dom), 1)
+            assert dom[''] <= i
 
     def test_target_opset_dict(self):
         data = load_iris()
@@ -46,7 +47,8 @@ class TestConvert(unittest.TestCase):
                 model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
                                      target_opset=tops)
                 dom = get_domain_opset(model_onnx)
-                self.assertEqual(dom, {'': i})
+                self.assertEqual(len(dom), 1)
+                assert dom[''] <= i
 
     def test_target_opset_dict_kbins(self):
         data = load_iris()
