@@ -4,9 +4,74 @@ Functions in *onnxconverter-common* do not support
 opset < 9.
 """
 from onnx.helper import make_graph
+from onnxconverter_common.optimizer import (
+    RedundantOptimizer, _apply_optimization,
+    LinkedNode, reserve_node_for_embedded_graph)
 from ._onnx_optimisation_common import (
     _rename_node_input, _rename_node_output,
     _apply_optimisation_on_graph, _apply_remove_node_fct_node)
+
+
+def _process_optimization(node_list):
+    optimizers = [RedundantOptimizer]
+
+    need_optimize = True
+    while need_optimize:
+        solution_find = 0
+        for optm in optimizers:
+            blockout = set()
+            cur_optm_process = True
+            while cur_optm_process:
+                success = False
+                temp_list = []
+                for node_ in node_list:
+                    if node_ in blockout:
+                        continue
+                    solution = optm.find(node_)
+                    if solution is not None:
+                        temp_list, success = _apply_optimization(
+                            solution, node_list)
+                        if success:
+                            break
+                        else:
+                            blockout.add(node_)
+
+                if success:
+                    solution_find += 1
+                    node_list = temp_list
+                else:
+                    cur_optm_process = False
+
+        if solution_find == 0:
+            need_optimize = False
+    return node_list
+
+
+def onnx_remove_node_identity_common(
+        onnx_model, recursive=True, debug_info=None):
+    """
+    Removes as many *Identity* nodes as possible.
+
+    :param onnx_model: onnx model
+    :param recursive: unused
+    :param debug_info: unused
+    :return: new onnx model
+    """
+    graph = onnx_model.graph
+    onnx_nodes = list(graph.node)
+
+    onnx_nodelist, LinkedNode.reserved_names_in_graph = (
+        reserve_node_for_embedded_graph(onnx_nodes))
+    node_list = LinkedNode.build_from_onnx(onnx_nodelist, [], [], [])
+
+    new_list = _process_optimization(node_list)
+    graph = _build_onnx_model(node_list)
+    assert graph is not None
+    # graph = make_graph(new_list, onnx_model.name,
+    #                   onnx_model.input, onnx_model.output,
+    #                   onnx_model.initializer)
+    # graph.value_info.extend(onnx_model.value_info)
+    # return graph
 
 
 def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
@@ -21,7 +86,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
     :param onnx_model: onnx model
     :param recursive: looks into subgraphs
     :param debug_info: debug information (private)
-    :return: new onnx _model
+    :return: new onnx model
     """
     if debug_info is None:
         debug_info = [str(type(onnx_model)).split('.')[-1].strip("'>")]
