@@ -6,8 +6,7 @@
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
-    FloatTensorType, Int64TensorType, DoubleTensorType
-)
+    FloatTensorType, Int64TensorType, DoubleTensorType)
 from ..common.utils import check_input_and_output_numbers
 from ..common.utils import check_input_and_output_types
 
@@ -30,6 +29,8 @@ def calculate_sklearn_truncated_svd_output_shapes(operator):
         raise RuntimeError('Only 2-D tensor(s) can be input(s).')
 
     cls_type = operator.inputs[0].type.__class__
+    if cls_type != DoubleTensorType:
+        cls_type = FloatTensorType
     N = operator.inputs[0].type.shape[0]
     K = (operator.raw_operator.n_components
          if operator.type == 'SklearnTruncatedSVD'

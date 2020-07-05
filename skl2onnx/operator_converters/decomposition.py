@@ -5,17 +5,21 @@
 # --------------------------------------------------------------------------
 
 from ..proto import onnx_proto
-from ..common._apply_operation import apply_cast, apply_div
-from ..common._apply_operation import apply_sqrt, apply_sub
+from ..common._apply_operation import (
+    apply_cast, apply_div, apply_sqrt, apply_sub)
 from ..common._registration import register_converter
-from ..common.data_types import Int64TensorType, guess_proto_type
+from ..common.data_types import (
+    Int64TensorType, DoubleTensorType, FloatTensorType, guess_proto_type)
 
 
 def convert_truncated_svd(scope, operator, container):
     # Create alias for the scikit-learn truncated SVD model we
     # are going to convert
     svd = operator.raw_operator
-    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if isinstance(operator.inputs[0].type, DoubleTensorType):
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
+    else:
+        proto_dtype = guess_proto_type(FloatTensorType())
     # Transpose [K, C] matrix to [C, K], where C/K is the
     # input/transformed feature dimension
     transform_matrix = svd.components_.transpose()
