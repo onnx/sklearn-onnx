@@ -6,12 +6,10 @@
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
-    FloatTensorType, Int64TensorType, DoubleTensorType
-)
+    FloatTensorType, Int64TensorType, DoubleTensorType)
 from ..common.utils import (
     check_input_and_output_numbers,
-    check_input_and_output_types
-)
+    check_input_and_output_types)
 
 
 def calculate_pls_regression_output_shapes(operator):
@@ -24,8 +22,9 @@ def calculate_pls_regression_output_shapes(operator):
         raise RuntimeError('Input must be a [N, C]-tensor')
 
     op = operator.raw_operator
+    cls_type = operator.inputs[0].type.__class__
     N = operator.inputs[0].type.shape[0]
-    operator.outputs[0].type.shape = [N, op.coef_.shape[1]]
+    operator.outputs[0].type = cls_type([N, op.coef_.shape[1]])
 
 
 register_shape_calculator('SklearnPLSRegression',

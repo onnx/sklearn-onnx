@@ -103,3 +103,43 @@ def guess_data_type(type_, shape=None):
                     "DataType. You may raise an issue at "
                     "https://github.com/onnx/sklearn-onnx/issues."
                     "".format(type(type_)))
+
+
+def guess_numpy_type(data_type):
+    """
+    Guess the corresponding numpy type based on data_type.
+    """
+    if isinstance(data_type, FloatTensorType):
+        return np.float32
+    if isinstance(data_type, DoubleTensorType):
+        return np.float64
+    if isinstance(data_type, Int32TensorType):
+        return np.int32
+    if isinstance(data_type, Int64TensorType):
+        return np.int64
+    if isinstance(data_type, StringTensorType):
+        return np.str
+    if isinstance(data_type, BooleanTensorType):
+        return np.bool
+    raise NotImplementedError(
+        "Unsupported data_type '{}'.".format(data_type))
+
+
+def guess_proto_type(data_type):
+    """
+    Guess the corresponding proto type based on data_type.
+    """
+    if isinstance(data_type, FloatTensorType):
+        return onnx_proto.TensorProto.FLOAT
+    if isinstance(data_type, DoubleTensorType):
+        return onnx_proto.TensorProto.DOUBLE
+    if isinstance(data_type, Int32TensorType):
+        return onnx_proto.TensorProto.INT32
+    if isinstance(data_type, Int64TensorType):
+        return onnx_proto.TensorProto.INT64
+    if isinstance(data_type, StringTensorType):
+        return onnx_proto.TensorProto.STRING
+    if isinstance(data_type, BooleanTensorType):
+        return onnx_proto.TensorProto.BOOL
+    raise NotImplementedError(
+        "Unsupported data_type '{}'.".format(data_type))
