@@ -8,21 +8,23 @@ from ..proto import onnx_proto
 from ..common._apply_operation import apply_cast, apply_div
 from ..common._apply_operation import apply_sqrt, apply_sub
 from ..common._registration import register_converter
-from ..common.data_types import Int64TensorType
+from ..common.data_types import Int64TensorType, guess_proto_type
 
 
 def convert_truncated_svd(scope, operator, container):
     # Create alias for the scikit-learn truncated SVD model we
     # are going to convert
     svd = operator.raw_operator
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
     # Transpose [K, C] matrix to [C, K], where C/K is the
     # input/transformed feature dimension
     transform_matrix = svd.components_.transpose()
     transform_matrix_name = scope.get_unique_variable_name('transform_matrix')
     # Put the transformation into an ONNX tensor
     container.add_initializer(
-        transform_matrix_name, onnx_proto.TensorProto.FLOAT,
-        transform_matrix.shape, transform_matrix.flatten())
+        transform_matrix_name, proto_dtype,
+        transform_matrix.shape, transform_matrix.flatten(),
+        can_cast=False)
 
     input_name = operator.inputs[0].full_name
     if isinstance(operator.inputs[0].type, Int64TensorType):
@@ -42,8 +44,9 @@ def convert_truncated_svd(scope, operator, container):
             mean_name = scope.get_unique_variable_name('mean')
             sub_result_name = scope.get_unique_variable_name('sub_result')
 
-            container.add_initializer(mean_name, onnx_proto.TensorProto.FLOAT,
-                                      svd.mean_.shape, svd.mean_)
+            container.add_initializer(mean_name, proto_dtype,
+                                      svd.mean_.shape, svd.mean_,
+                                      can_cast=False)
 
             # Subtract mean from input tensor
             apply_sub(scope, [input_name, mean_name],
@@ -59,7 +62,7 @@ def convert_truncated_svd(scope, operator, container):
                 'matmul_result')
 
             container.add_initializer(
-                explained_variance_name, onnx_proto.TensorProto.FLOAT,
+                explained_variance_name, proto_dtype,
                 svd.explained_variance_.shape, svd.explained_variance_)
 
             container.add_node(

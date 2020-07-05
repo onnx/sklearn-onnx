@@ -29,12 +29,13 @@ def calculate_sklearn_truncated_svd_output_shapes(operator):
     if len(operator.inputs[0].type.shape) != 2:
         raise RuntimeError('Only 2-D tensor(s) can be input(s).')
 
+    cls_type = operator.inputs[0].type.__class__
     N = operator.inputs[0].type.shape[0]
     K = (operator.raw_operator.n_components
          if operator.type == 'SklearnTruncatedSVD'
          else operator.raw_operator.n_components_)
 
-    operator.outputs[0].type.shape = [N, K]
+    operator.outputs[0].type = cls_type([N, K])
 
 
 register_shape_calculator('SklearnIncrementalPCA',

@@ -584,6 +584,10 @@ class Topology:
             for operator in sorted(self.unordered_operator_iterator(),
                                    key=lambda op: priorities[op.type]
                                    if op.type in priorities else 0):
+                if not isinstance(operator.inputs, list):
+                    raise TypeError(
+                        "operator.inputs must be a list not {}".format(
+                            type(operator.inputs)))
                 if (all(variable.is_fed for variable in operator.inputs)
                         and not operator.is_evaluated):
                     # Check if over-writing problem occurs (i.e., multiple
