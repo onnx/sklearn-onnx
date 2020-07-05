@@ -8,11 +8,12 @@ import numbers
 import numpy as np
 import six
 from ..common._apply_operation import apply_cast
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_numpy_type)
 from ..common._registration import register_converter
-from ..common.tree_ensemble import add_tree_to_attribute_pairs
-from ..common.tree_ensemble import get_default_tree_classifier_attribute_pairs
-from ..common.tree_ensemble import get_default_tree_regressor_attribute_pairs
+from ..common.tree_ensemble import (
+    add_tree_to_attribute_pairs, get_default_tree_classifier_attribute_pairs,
+    get_default_tree_regressor_attribute_pairs)
 from ..proto import onnx_proto
 
 
@@ -122,11 +123,12 @@ def convert_sklearn_gradient_boosting_regressor(
     tree_weight = op.learning_rate
     n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
              op.n_estimators)
+    dtype = guess_numpy_type(operator.inputs[0].type)
     for i in range(n_est):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
-                                    0, False, True, dtype=container.dtype)
+                                    0, False, True, dtype=dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):

@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from ..common.data_types import guess_proto_type
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_identity,
     apply_reshape, apply_sub)
@@ -12,7 +13,7 @@ from ..common._registration import register_converter
 from ..proto import onnx_proto
 
 
-def _forward_pass(scope, container, model, activations):
+def _forward_pass(scope, container, model, activations, proto_type):
     """
     Perform a forward pass on the network by computing the values of
     the neurons in the hidden layers and the output layer.
@@ -33,10 +34,10 @@ def _forward_pass(scope, container, model, activations):
         add_result_name = scope.get_unique_variable_name('add_result')
 
         container.add_initializer(
-            coefficient_name, container.proto_dtype,
+            coefficient_name, proto_type,
             model.coefs_[i].shape, model.coefs_[i].ravel())
         container.add_initializer(
-            intercepts_name, container.proto_dtype,
+            intercepts_name, proto_type,
             [1, len(model.intercepts_[i])], model.intercepts_[i])
 
         container.add_node(
@@ -67,7 +68,7 @@ def _forward_pass(scope, container, model, activations):
     return activations
 
 
-def _predict(scope, input_name, container, model):
+def _predict(scope, input_name, container, model, proto_type):
     """
     This function initialises the input layer, calls _forward_pass()
     and returns the final layer.
@@ -75,10 +76,11 @@ def _predict(scope, input_name, container, model):
     cast_input_name = scope.get_unique_variable_name('cast_input')
 
     apply_cast(scope, input_name, cast_input_name,
-               container, to=container.proto_dtype)
+               container, to=proto_type)
 
     # forward propagate
-    activations = _forward_pass(scope, container, model, [cast_input_name])
+    activations = _forward_pass(scope, container, model, [cast_input_name],
+                                proto_type)
     return activations[-1]
 
 
@@ -109,13 +111,13 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
 
+    proto_type = guess_proto_type(operator.inputs[0].type)
+
     if len(classes) == 2:
         unity_name = scope.get_unique_variable_name('unity')
         negative_class_proba_name = scope.get_unique_variable_name(
             'negative_class_proba')
-        container.add_initializer(unity_name, container.proto_dtype,
-                                  [], [1])
-
+        container.add_initializer(unity_name, proto_type, [], [1])
         apply_sub(scope, [unity_name, y_pred],
                   negative_class_proba_name, container, broadcast=1)
         apply_concat(scope, [negative_class_proba_name, y_pred],
@@ -169,7 +171,8 @@ def convert_sklearn_mlp_regressor(scope, operator, container):
     """
     mlp_op = operator.raw_operator
 
-    y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op)
+    y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op,
+                      proto_type=guess_proto_type(operator.inputs[0].type))
     apply_reshape(scope, y_pred, operator.output_full_names,
                   container, desired_shape=(-1, 1))
 

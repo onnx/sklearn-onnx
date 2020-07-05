@@ -166,7 +166,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     else:
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable(
-            'variable', scope.tensor_type())
+            'variable', inputs[0].type.__class__())
         this_operator.outputs.append(variable)
 
     return this_operator.outputs
@@ -455,7 +455,7 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
 def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_conversion_functions=None,
                         custom_shape_calculators=None,
-                        custom_parsers=None, dtype=np.float32,
+                        custom_parsers=None,
                         options=None, white_op=None,
                         black_op=None, final_types=None):
     """
@@ -477,8 +477,6 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary
         ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
-    :param dtype: parameter which defines the type for
-        float computation (float32 or float64)
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param white_op: white list of ONNX nodes allowed
@@ -491,7 +489,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
     raw_model_container = SklearnModelContainerNode(
-        model, dtype, white_op=white_op, black_op=black_op)
+        model, white_op=white_op, black_op=black_op)
 
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.
@@ -507,7 +505,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # Declare an object to provide variables' and operators' naming mechanism.
     # In contrast to CoreML, one global scope
     # is enough for parsing scikit-learn models.
-    scope = topology.declare_scope('__root__', options=options, dtype=dtype)
+    scope = topology.declare_scope('__root__', options=options)
 
     # Declare input variables. They should be the inputs of the scikit-learn
     # model you want to convert into ONNX.
