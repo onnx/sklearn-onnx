@@ -27,13 +27,13 @@ def convert_pls_regression(scope, operator, container):
         X = OnnxCast(X, to=proto_dtype, op_version=opv)
 
     norm_x = OnnxDiv(
-                OnnxSub(X, op.x_mean_.astype(container),
+                OnnxSub(X, op.x_mean_.astype(dtype),
                         op_version=opv),
-                op.x_std_.astype(container),
+                op.x_std_.astype(dtype),
                 op_version=opv)
-    dot = OnnxMatMul(norm_x, op.coef_.astype(container),
+    dot = OnnxMatMul(norm_x, op.coef_.astype(dtype),
                      op_version=opv)
-    pred = OnnxAdd(dot, op.y_mean_.astype(container),
+    pred = OnnxAdd(dot, op.y_mean_.astype(dtype),
                    op_version=opv, output_names=operator.outputs)
     pred.add_to(scope, container)
 

@@ -474,8 +474,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType())],
-                                     options=self.get_options(),
-                                     dtype=numpy.float64)
+                                     options=self.get_options())
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,

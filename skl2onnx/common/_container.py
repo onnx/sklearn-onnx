@@ -480,9 +480,11 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             dtype = None
         elif len(dtypes) == 1:
             dtype = list(dtypes)[0]
-        else:
+        elif (np.float32 in dtypes and np.float64 in dtypes):
             raise RuntimeError(
                 "Unable to select a dtype among {}.".format(dtypes))
+        else:
+            dtype = None
         try:
             node = make_node(op_type, inputs, outputs, name=name,
                              _dtype=dtype, **attrs)
