@@ -12,6 +12,7 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
+from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
     OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
@@ -29,6 +30,9 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     * *covariance_type*
     """
     X = operator.inputs[0]
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
     out = operator.outputs
     op = operator.raw_operator
     n_features = X.type.shape[1]
@@ -52,8 +56,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
     # self._estimate_log_prob(X)
     log_det = _compute_log_det_cholesky(
-        op.precisions_cholesky_, op.covariance_type, n_features).astype(
-            container.dtype)
+        op.precisions_cholesky_, op.covariance_type, n_features).astype(dtype)
 
     if op.covariance_type == 'full':
         # shape(op.means_) = (n_components, n_features)
@@ -69,8 +72,8 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         for c in range(n_components):
             prec_chol = op.precisions_cholesky_[c, :, :]
             cst = - np.dot(op.means_[c, :], prec_chol)
-            y = OnnxGemm(X, prec_chol.astype(container.dtype),
-                         cst.astype(container.dtype), alpha=1.,
+            y = OnnxGemm(X, prec_chol.astype(dtype),
+                         cst.astype(dtype), alpha=1.,
                          beta=1., op_version=opv)
             if combined_reducesum:
                 y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
@@ -94,8 +97,8 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         ys = []
         for f in range(n_components):
             cst = - np.dot(op.means_[f, :], precisions_chol)
-            y = OnnxGemm(X, precisions_chol.astype(container.dtype),
-                         cst.astype(container.dtype),
+            y = OnnxGemm(X, precisions_chol.astype(dtype),
+                         cst.astype(dtype),
                          alpha=1., beta=1., op_version=opv)
             if combined_reducesum:
                 y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
@@ -117,15 +120,15 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
         precisions = op.precisions_cholesky_ ** 2
         mp = np.sum((op.means_ ** 2 * precisions), 1)
-        zeros = np.zeros((n_components, ), dtype=container.dtype)
+        zeros = np.zeros((n_components, ), dtype=dtype)
         xmp = OnnxGemm(
-            X, (op.means_ * precisions).T.astype(container.dtype),
+            X, (op.means_ * precisions).T.astype(dtype),
             zeros, alpha=-2., beta=0., op_version=opv)
         term = OnnxGemm(OnnxMul(X, X, op_version=opv),
-                        precisions.T.astype(container.dtype),
+                        precisions.T.astype(dtype),
                         zeros, alpha=1., beta=0., op_version=opv)
         log_prob = OnnxAdd(
-            OnnxAdd(mp.astype(container.dtype), xmp, op_version=opv),
+            OnnxAdd(mp.astype(dtype), xmp, op_version=opv),
             term, op_version=opv)
 
     elif op.covariance_type == 'spherical':
@@ -145,15 +148,15 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         else:
             normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
         outer = OnnxGemm(
-            normX, precisions[np.newaxis, :].astype(container.dtype),
-            zeros.astype(container.dtype), alpha=1., beta=1., op_version=opv)
+            normX, precisions[np.newaxis, :].astype(dtype),
+            zeros.astype(dtype), alpha=1., beta=1., op_version=opv)
         xmp = OnnxGemm(
-            X, (op.means_.T * precisions).astype(container.dtype),
-            zeros.astype(container.dtype), alpha=-2.,
+            X, (op.means_.T * precisions).astype(dtype),
+            zeros.astype(dtype), alpha=-2.,
             beta=0., op_version=opv)
         mp = np.sum(op.means_ ** 2, 1) * precisions
         log_prob = OnnxAdd(
-            mp.astype(container.dtype),
+            mp.astype(dtype),
             OnnxAdd(xmp, outer, op_version=opv),
             op_version=opv)
     else:
@@ -163,14 +166,14 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
 
     # -.5 * (cst + log_prob) + log_det
     cst = np.array([n_features * np.log(2 * np.pi)])
-    add = OnnxAdd(cst.astype(container.dtype), log_prob, op_version=opv)
-    mul = OnnxMul(add, np.array([-0.5], dtype=container.dtype),
+    add = OnnxAdd(cst.astype(dtype), log_prob, op_version=opv)
+    mul = OnnxMul(add, np.array([-0.5], dtype=dtype),
                   op_version=opv)
     if isinstance(log_det, float):
-        log_det = np.array([log_det], dtype=container.dtype)
+        log_det = np.array([log_det], dtype=dtype)
     weighted_log_prob = OnnxAdd(
         OnnxAdd(mul, log_det, op_version=opv),
-        log_weights.astype(container.dtype), op_version=opv)
+        log_weights.astype(dtype), op_version=opv)
 
     # labels
     if container.is_allowed('ArgMax'):
@@ -180,7 +183,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         mxlabels = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
         zeros = OnnxEqual(
             OnnxSub(weighted_log_prob, mxlabels, op_version=opv),
-            np.array([0], dtype=container.dtype),
+            np.array([0], dtype=dtype),
             op_version=opv)
         toint = OnnxCast(zeros, to=onnx_proto.TensorProto.INT64,
                          op_version=opv)

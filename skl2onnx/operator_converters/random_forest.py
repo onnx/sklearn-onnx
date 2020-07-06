@@ -13,7 +13,8 @@ from ..common._apply_operation import (
     apply_reshape,
     apply_transpose,
 )
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_numpy_type)
 from ..common._registration import register_converter
 from ..common.tree_ensemble import (
     add_tree_to_attribute_pairs,
@@ -90,6 +91,9 @@ def _calculate_labels(scope, container, model, proba):
 def convert_sklearn_random_forest_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     op = operator.raw_operator
 
     if hasattr(op, 'n_outputs_'):
@@ -144,20 +148,20 @@ def convert_sklearn_random_forest_classifier(
                 add_tree_to_attribute_pairs(
                     attr_pairs, True, tree, tree_id,
                     tree_weight, 0, True, True,
-                    dtype=container.dtype)
+                    dtype=dtype)
             else:
                 # HistGradientBoostClassifier
                 if len(op._predictors[tree_id]) == 1:
                     tree = op._predictors[tree_id][0]
                     add_tree_to_attribute_pairs_hist_gradient_boosting(
                         attr_pairs, True, tree, tree_id, tree_weight, 0,
-                        False, False, dtype=container.dtype)
+                        False, False, dtype=dtype)
                 else:
                     for cl, tree in enumerate(op._predictors[tree_id]):
                         add_tree_to_attribute_pairs_hist_gradient_boosting(
                             attr_pairs, True, tree, tree_id * n_outputs + cl,
                             tree_weight, cl, False, False,
-                            dtype=container.dtype)
+                            dtype=dtype)
 
         if hasattr(op, '_baseline_prediction'):
             if isinstance(op._baseline_prediction, np.ndarray):
@@ -227,6 +231,9 @@ def convert_sklearn_random_forest_classifier(
 def convert_sklearn_random_forest_regressor_converter(
         scope, operator, container, op_type='TreeEnsembleRegressor',
         op_domain='ai.onnx.ml', op_version=1):
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     op = operator.raw_operator
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -259,7 +266,7 @@ def convert_sklearn_random_forest_regressor_converter(
             tree = op.estimators_[tree_id].tree_
             add_tree_to_attribute_pairs(attrs, False, tree, tree_id,
                                         tree_weight, 0, False, True,
-                                        dtype=container.dtype)
+                                        dtype=dtype)
         else:
             # HistGradientBoostingRegressor
             if len(op._predictors[tree_id]) != 1:
@@ -269,7 +276,7 @@ def convert_sklearn_random_forest_regressor_converter(
             tree = op._predictors[tree_id][0]
             add_tree_to_attribute_pairs_hist_gradient_boosting(
                 attrs, False, tree, tree_id, tree_weight, 0, False,
-                False, dtype=container.dtype)
+                False, dtype=dtype)
 
     if hasattr(op, '_baseline_prediction'):
         if isinstance(op._baseline_prediction, np.ndarray):

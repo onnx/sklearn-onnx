@@ -20,6 +20,9 @@ from ..proto import onnx_proto
 def convert_sklearn_gradient_boosting_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     op = operator.raw_operator
     if op.loss != 'deviance':
         raise NotImplementedError(
@@ -72,7 +75,7 @@ def convert_sklearn_gradient_boosting_classifier(
             tree = op.estimators_[tree_id][0].tree_
             add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
                                         tree_weight, 0, False, True,
-                                        dtype=container.dtype)
+                                        dtype=dtype)
     else:
         for i in range(n_est):
             for c in range(op.n_classes_):
@@ -80,7 +83,7 @@ def convert_sklearn_gradient_boosting_classifier(
                 tree = op.estimators_[i][c].tree_
                 add_tree_to_attribute_pairs(attrs, True, tree, tree_id,
                                             tree_weight, c, False, True,
-                                            dtype=container.dtype)
+                                            dtype=dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == BooleanTensorType:

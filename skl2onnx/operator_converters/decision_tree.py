@@ -15,7 +15,9 @@ from ..common._apply_operation import (
     apply_transpose,
 )
 from ..common._registration import register_converter
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_numpy_type,
+    guess_proto_type)
 from ..common.tree_ensemble import (
     add_tree_to_attribute_pairs,
     get_default_tree_classifier_attribute_pairs,
@@ -93,6 +95,10 @@ def predict(model, scope, operator, container,
         values_name, onnx_proto.TensorProto.FLOAT,
         value.shape, value.ravel())
 
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == BooleanTensorType:
         cast_input_name = scope.get_unique_variable_name('cast_input')
@@ -114,7 +120,7 @@ def predict(model, scope, operator, container,
             'reduced_zero_matrix')
 
         container.add_initializer(
-            zero_name, container.proto_dtype, [], [0])
+            zero_name, proto_dtype, [], [0])
         apply_mul(scope, [input_name[0], zero_name],
                   zero_matrix_name, container, broadcast=1)
         container.add_node(
@@ -149,6 +155,9 @@ def predict(model, scope, operator, container,
 def convert_sklearn_decision_tree_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     op = operator.raw_operator
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
@@ -168,7 +177,7 @@ def convert_sklearn_decision_tree_classifier(
             raise ValueError('Labels must be all integers or all strings.')
 
         add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True,
-                                    True, dtype=container.dtype)
+                                    True, dtype=dtype)
         input_name = operator.input_full_names
         if type(operator.inputs[0].type) == BooleanTensorType:
             cast_input_name = scope.get_unique_variable_name('cast_input')
@@ -226,13 +235,16 @@ def convert_sklearn_decision_tree_classifier(
 def convert_sklearn_decision_tree_regressor(
         scope, operator, container, op_type='TreeEnsembleRegressor',
         op_domain='ai.onnx.ml', op_version=1):
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     op = operator.raw_operator
 
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs['name'] = scope.get_unique_operator_name(op_type)
     attrs['n_targets'] = int(op.n_outputs_)
     add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False,
-                                True, dtype=container.dtype)
+                                True, dtype=dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):

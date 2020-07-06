@@ -143,3 +143,12 @@ def guess_proto_type(data_type):
         return onnx_proto.TensorProto.BOOL
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
+
+
+def guess_tensor_type(data_type):
+    """
+    Guess the corresponding variable type based on input type.
+    """
+    if isinstance(data_type, DoubleTensorType):
+        return DoubleTensorType()
+    return FloatTensorType()

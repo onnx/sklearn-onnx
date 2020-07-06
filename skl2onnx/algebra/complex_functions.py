@@ -125,7 +125,7 @@ def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
         outputs=[('next_out', tensor_type()),
                  ('scan_out', tensor_type())],
         other_outputs=[flat],
-        dtype=dtype, target_opset=op_version)
+        target_opset=op_version)
 
     node = OnnxScan(XA, XB, output_names=['u(scan0)', 'u(scan1)'],
                     num_scan_inputs=1, body=scan_body.graph,
