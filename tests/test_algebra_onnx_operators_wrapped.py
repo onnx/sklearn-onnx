@@ -1,4 +1,5 @@
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -9,6 +10,7 @@ from skl2onnx import to_onnx
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubOperator
 from skl2onnx import update_registered_converter
+from onnxruntime import __version__ as ortv
 from test_utils import TARGET_OPSET
 
 
@@ -74,6 +76,8 @@ def decorrelate_transformer_convertor2(scope, operator, container):
 
 class TestOnnxOperatorsWrapped(unittest.TestCase):
 
+    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+                     reason="onnxruntime too old")
     def test_sub(self):
 
         data = load_iris()
@@ -94,6 +98,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
+    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+                     reason="onnxruntime too old")
     def test_sub_double(self):
 
         data = load_iris()
@@ -114,6 +120,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
+    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+                     reason="onnxruntime too old")
     def test_sub_output(self):
 
         data = load_iris()
@@ -134,6 +142,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
+    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+                     reason="onnxruntime too old")
     def test_sub_output_double(self):
 
         data = load_iris()
@@ -156,5 +166,4 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOnnxOperatorsWrapped().test_sub_output_double()
     unittest.main()
