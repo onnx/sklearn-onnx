@@ -105,7 +105,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
         # use assert_consistent_outputs
         # calls dump_data_and_model
         dump_data_and_model(
-            mat.astype(np.float32), pipe, model_onnx, verbose=True,
+            mat.astype(np.float32), pipe, model_onnx, verbose=False,
             basename="CustomTransformerPipelineRightAlgebra")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.3.0"),

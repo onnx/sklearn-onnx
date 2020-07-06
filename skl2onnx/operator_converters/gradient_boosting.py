@@ -127,6 +127,8 @@ def convert_sklearn_gradient_boosting_regressor(
     n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
              op.n_estimators)
     dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float32:
+        dtype = np.float32
     for i in range(n_est):
         tree = op.estimators_[i][0].tree_
         tree_id = i

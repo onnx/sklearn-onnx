@@ -53,7 +53,7 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
         outputs=[('next_out', tensor_type()),
                  ('scan_out', tensor_type())],
         other_outputs=[flat],
-        dtype=dtype, target_opset=op_version)
+        target_opset=op_version)
 
     node = OnnxScan(X, X, output_names=['u(scan0)', 'u(scan1)'],
                     num_scan_inputs=1, body=scan_body.graph,

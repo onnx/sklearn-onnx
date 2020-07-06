@@ -99,7 +99,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             names = parser_names()
             for name in names:
                 var = scope.declare_local_variable(
-                    name, guess_tensor_type(inputs))
+                    name, guess_tensor_type(inputs[0].type))
                 this_operator.outputs.append(var)
             return this_operator.outputs
 
@@ -114,7 +114,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
         probability_tensor_variable = scope.declare_local_variable(
-            'probabilities', guess_tensor_type(inputs))
+            'probabilities', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
 
@@ -126,7 +126,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
         score_tensor_variable = scope.declare_local_variable(
-            'scores', guess_tensor_type(inputs))
+            'scores', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
@@ -136,7 +136,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
         score_tensor_variable = scope.declare_local_variable(
-            'scores', guess_tensor_type(inputs))
+            'scores', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
@@ -146,7 +146,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         index_variable = scope.declare_local_variable(
             'index', Int64TensorType())
         distance_variable = scope.declare_local_variable(
-            'distance', guess_tensor_type(inputs))
+            'distance', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(index_variable)
         this_operator.outputs.append(distance_variable)
 
@@ -154,13 +154,13 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
         prob_variable = scope.declare_local_variable(
-            'probabilities', guess_tensor_type(inputs))
+            'probabilities', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(prob_variable)
         options = scope.get_options(model, dict(score_samples=False))
         if options['score_samples']:
             scores_var = scope.declare_local_variable(
-                'score_samples', guess_tensor_type(inputs))
+                'score_samples', guess_tensor_type(inputs[0].type))
             this_operator.outputs.append(scores_var)
     else:
         # We assume that all scikit-learn operator produce a single output.
@@ -213,7 +213,7 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
             multiply_operator.inputs = transform_result
             multiply_operator.operand = model.transformer_weights[name]
             multiply_output = scope.declare_local_variable(
-                'multiply_output', guess_tensor_type(inputs))
+                'multiply_output', guess_tensor_type(inputs[0].type))
             multiply_operator.outputs.append(multiply_output)
             transformed_result_names.append(multiply_operator.outputs[0])
 
@@ -223,7 +223,7 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
 
     # Declare output name of scikit-learn FeatureUnion
     union_name = scope.declare_local_variable(
-        'union', guess_tensor_type(inputs))
+        'union', guess_tensor_type(inputs[0].type))
     concat_operator.outputs.append(union_name)
 
     return concat_operator.outputs
@@ -299,7 +299,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
                 multiply_operator.inputs.append(var_out)
                 multiply_operator.operand = model.transformer_weights[name]
                 var_out = scope.declare_local_variable(
-                    'multiply_output', guess_tensor_type(inputs))
+                    'multiply_output', guess_tensor_type(inputs[0].type))
                 multiply_operator.outputs.append(var_out)
         if var_out:
             transformed_result_names.append(var_out)
@@ -363,7 +363,9 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     output_label = scope.declare_local_variable('output_label', label_type)
     output_probability = scope.declare_local_variable(
         'output_probability',
-        SequenceType(DictionaryType(label_type, guess_tensor_type(inputs))))
+        SequenceType(
+            DictionaryType(
+                label_type, guess_tensor_type(inputs[0].type))))
     this_operator.outputs.append(output_label)
     this_operator.outputs.append(output_probability)
     return this_operator.outputs
@@ -380,14 +382,14 @@ def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     mean_tensor = scope.declare_local_variable(
-        "GPmean", guess_tensor_type(inputs))
+        "GPmean", guess_tensor_type(inputs[0].type))
     this_operator.inputs = inputs
     this_operator.outputs.append(mean_tensor)
 
     if options['return_std'] or options['return_cov']:
         # covariance or standard deviation
-        covstd_tensor = scope.declare_local_variable('GPcovstd',
-                                                     guess_tensor_type(inputs))
+        covstd_tensor = scope.declare_local_variable(
+            'GPcovstd', guess_tensor_type(inputs[0].type))
         this_operator.outputs.append(covstd_tensor)
     return this_operator.outputs
 

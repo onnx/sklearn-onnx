@@ -151,4 +151,10 @@ def guess_tensor_type(data_type):
     """
     if isinstance(data_type, DoubleTensorType):
         return DoubleTensorType()
+    if not isinstance(data_type, (
+            Int64TensorType, Int32TensorType, BooleanTensorType,
+            FloatTensorType, StringTensorType, DoubleTensorType)):
+        raise TypeError(
+            "data_type is not a tensor type but '{}'.".format(
+                type(data_type)))
     return FloatTensorType()

@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import numpy as np
 from sklearn.base import BaseEstimator
 from onnx import shape_inference
 from ..common._registration import get_converter, get_shape_calculator
@@ -19,7 +18,7 @@ class OnnxOperatorMixin:
     sharing an API to convert object to *ONNX*.
     """
 
-    def to_onnx(self, X=None, name=None, dtype=np.float32):
+    def to_onnx(self, X=None, name=None):
         """
         Converts the model in *ONNX* format.
         It calls method *_to_onnx* which must be
@@ -29,8 +28,6 @@ class OnnxOperatorMixin:
             it is used to guess the type of the input data.
         :param name: name of the model, if None,
             it is replaced by the the class name.
-        :param dtype: defines the type of floats to use
-            during the conversion
         """
         from .. import convert_sklearn
         if X is None:
@@ -45,8 +42,7 @@ class OnnxOperatorMixin:
                 "(model: '{}').".format(
                     self.__class__.__name__, name))
         return convert_sklearn(
-            self, initial_types=initial_types, dtype=dtype,
-            target_opset=self.op_version)
+            self, initial_types=initial_types, target_opset=self.op_version)
 
     def infer_initial_types(self):
         """
