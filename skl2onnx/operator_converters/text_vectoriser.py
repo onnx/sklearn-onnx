@@ -140,8 +140,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     ````
     
     """ # noqa
-
     op = operator.raw_operator
+
+    if (container.target_opset is not None and
+            container.target_opset < 9):
+        raise RuntimeError(
+            "Converter for '{}' only works for opset >= 9."
+            "".format(op.__class__.__name__))
 
     if op.analyzer == "char_wb":
         raise NotImplementedError(
