@@ -151,6 +151,8 @@ def guess_tensor_type(data_type):
     """
     if isinstance(data_type, DoubleTensorType):
         return DoubleTensorType()
+    if isinstance(data_type, DictionaryType):
+        return guess_tensor_type(data_type.value_type)
     if not isinstance(data_type, (
             Int64TensorType, Int32TensorType, BooleanTensorType,
             FloatTensorType, StringTensorType, DoubleTensorType)):

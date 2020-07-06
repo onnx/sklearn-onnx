@@ -61,6 +61,8 @@ def convert_sklearn_scaler(scope, operator, container):
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
     dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     for k in attrs:
         v = attrs[k]
         if isinstance(v, np.ndarray) and v.dtype != dtype:

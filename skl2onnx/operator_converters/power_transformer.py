@@ -137,8 +137,8 @@ def convert_powertransformer(scope, operator, container):
     if op.standardize:
         name = scope.get_unique_operator_name('Scaler')
         attrs = dict(name=name,
-                     offset=op._scaler.mean_,
-                     scale=1.0 / op._scaler.scale_)
+                     offset=op._scaler.mean_.astype(np.float32),
+                     scale=(1.0 / op._scaler.scale_).astype(np.float32))
         container.add_node('Scaler', 'tmp', op_out,
                            op_domain='ai.onnx.ml', **attrs)
     else:

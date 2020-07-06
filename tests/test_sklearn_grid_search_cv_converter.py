@@ -200,8 +200,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", DoubleTensorType([None, X.shape[1]]))],
-            dtype=np.float64)
+            [("input", DoubleTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float64),

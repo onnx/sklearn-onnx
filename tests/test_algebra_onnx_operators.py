@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, guess_numpy_type
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv,
@@ -46,7 +46,8 @@ class TestOnnxOperators(unittest.TestCase):
         z = tr.transform(mat)
 
         def conv(scope, operator, container):
-            W = operator.raw_operator.W.astype(container.dtype)
+            dtype = guess_numpy_type(operator.inputs[0].type)
+            W = operator.raw_operator.W.astype(dtype)
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
                 op_version=TARGET_OPSET)
@@ -137,10 +138,11 @@ class TestOnnxOperators(unittest.TestCase):
             X = operator.inputs[0]
             out = operator.outputs
             op = operator.raw_operator
+            dtype = guess_numpy_type(X.type)
 
             C = op.cluster_centers_
-            C2 = row_norms(C, squared=True).astype(container.dtype)
-            C = C.astype(container.dtype)
+            C2 = row_norms(C, squared=True).astype(dtype)
+            C = C.astype(dtype)
 
             rs = OnnxReduceSumSquare(
                 X, axes=[1], keepdims=1,
