@@ -47,7 +47,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             'This document is the second document.',
             'And this is the third one.',
             'Is this the first document?',
-        ]).reshape((4, 1))        
+        ]).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         for opset in range(8, TARGET_OPSET + 1):
