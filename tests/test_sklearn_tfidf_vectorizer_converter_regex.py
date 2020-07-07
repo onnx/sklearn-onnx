@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 import onnx
+import onnxruntime
 from test_utils import dump_data_and_model
 
 
@@ -19,6 +20,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -41,6 +45,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11_word4(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -64,6 +71,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11_empty_string(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -87,6 +97,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -115,6 +128,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -137,6 +153,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
             'AA AA',
@@ -157,6 +176,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer122(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -179,6 +201,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -200,6 +225,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -222,6 +250,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -244,6 +275,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -274,6 +308,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
         reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Not implemented in onnxruntime.")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
             'This is the first document.',

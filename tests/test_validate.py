@@ -76,8 +76,8 @@ class TestValidate(unittest.TestCase):
         sdf.to_excel("sklearn_opsets_summary_LR.xlsx", index=False)
         assert sdf.loc[0, 'Opset'] == "1+"
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="OnnxOperator not working")
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.5.0"),
+                     reason="OnnxConstantOfShape missing")
     @unittest.skipIf(("dev" not in sklearn.__version__ and
                       StrictVersion(sklearn.__version__) <
                       StrictVersion("0.21")),
