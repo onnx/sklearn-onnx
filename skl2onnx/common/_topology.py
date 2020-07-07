@@ -291,7 +291,7 @@ class Scope:
             'temp', parent_scopes=self.parent_scopes,
             target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=self.options, dtype=self.dtype,
+            options=self.options,
             registered_models=self.registered_models)
         return scope
 
