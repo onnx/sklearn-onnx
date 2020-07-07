@@ -379,14 +379,17 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
 
         debug_exc = []
         if opred is not None:
-            max_abs_diff = _measure_absolute_difference(
-                ypred, opred)
+            try:
+                max_abs_diff = _measure_absolute_difference(
+                    ypred, opred)
+            except RuntimeError:
+                max_abs_diff = numpy.nan
             if numpy.isnan(max_abs_diff):
                 obs_op['_8max_abs_diff_batch_exc'] = (
                     "Unable to compute differences between"
                     " {}-{}\n{}\n--------\n{}".format(
-                        _shape_exc(
-                            ypred), _shape_exc(opred),
+                        _shape_exc(ypred),
+                        _shape_exc(opred),
                         ypred, opred))
                 if debug:
                     debug_exc.append(RuntimeError(
