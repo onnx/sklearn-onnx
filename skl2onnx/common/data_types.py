@@ -143,3 +143,20 @@ def guess_proto_type(data_type):
         return onnx_proto.TensorProto.BOOL
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
+
+
+def guess_tensor_type(data_type):
+    """
+    Guess the corresponding variable type based on input type.
+    """
+    if isinstance(data_type, DoubleTensorType):
+        return DoubleTensorType()
+    if isinstance(data_type, DictionaryType):
+        return guess_tensor_type(data_type.value_type)
+    if not isinstance(data_type, (
+            Int64TensorType, Int32TensorType, BooleanTensorType,
+            FloatTensorType, StringTensorType, DoubleTensorType)):
+        raise TypeError(
+            "data_type is not a tensor type but '{}'.".format(
+                type(data_type)))
+    return FloatTensorType()

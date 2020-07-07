@@ -169,8 +169,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, "KNN regressor",
             [("input", DoubleTensorType([None, 4]))],
             target_opset=TARGET_OPSET,
-            options={id(model): {'optim': 'cdist'}},
-            dtype=numpy.float64)
+            options={id(model): {'optim': 'cdist'}})
         self.assertIsNotNone(model_onnx)
         try:
             InferenceSession(model_onnx.SerializeToString())
@@ -197,8 +196,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, "KNN regressor",
             [("input", DoubleTensorType([None, 4]))],
             target_opset=TARGET_OPSET,
-            options={id(model): {'optim': 'cdist'}},
-            dtype=numpy.float64)
+            options={id(model): {'optim': 'cdist'}})
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float64)[:7],
@@ -976,4 +974,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestNearestNeighbourConverter().test_model_knn_regressor_double()
     unittest.main()

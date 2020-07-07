@@ -60,9 +60,9 @@ class GraphState:
         if isinstance(var, (np.ndarray, np.bool, np.int64,
                             np.float32, np.float64, np.bool)):
             return self._add_constant(var)
-        if hasattr(var, 'ConstantValue'):
-            return self._add_constant(var.ConstantValue, var.ImplicitCast)
-        if hasattr(var, 'add_to'):
+        elif hasattr(var, 'ConstantValue'):
+            return self._add_constant(var.ConstantValue)
+        elif hasattr(var, 'add_to'):
             var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
             if isinstance(outputs, list):
@@ -80,7 +80,7 @@ class GraphState:
         raise RuntimeError("Unexpected type for parameter 'var': {0}."
                            "".format(type(var)))
 
-    def _add_constant(self, cst, can_cast=True):
+    def _add_constant(self, cst):
 
         def _ty_astype(cst):
             dtype = cst.dtype
@@ -121,8 +121,7 @@ class GraphState:
             if astype is not None:
                 cst = cst.astype(astype)
             self.container.add_initializer(
-                name, ty, shape, cst.flatten(),
-                can_cast=can_cast)
+                name, ty, shape, cst.flatten())
             return name
         if isinstance(cst, coo_matrix):
             shape = cst.shape
@@ -130,8 +129,7 @@ class GraphState:
                 self.onnx_prefix + 'cst')
             cst, ty, astype = _ty_astype(cst)
             self.container.add_initializer(
-                name, ty, shape, cst.astype(astype),
-                can_cast=can_cast)
+                name, ty, shape, cst.astype(astype))
             return name
         if isinstance(cst, TensorProto):
             name = self.scope.get_unique_variable_name(

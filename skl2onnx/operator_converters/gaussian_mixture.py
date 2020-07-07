@@ -13,6 +13,7 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
+from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
     OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
@@ -214,7 +215,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         mxlabels = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
         zeros = OnnxEqual(
             OnnxSub(weighted_log_prob, mxlabels, op_version=opv),
-            np.array([0], dtype=container.dtype),
+            np.array([0], dtype=dtype),
             op_version=opv)
         toint = OnnxCast(zeros, to=onnx_proto.TensorProto.INT64,
                          op_version=opv)

@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from uuid import uuid4
-import numpy as np
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from .common.utils_sklearn import _process_options
@@ -20,7 +19,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    dtype=np.float32, intermediate=False,
+                    intermediate=False,
                     white_op=None, black_op=None, final_types=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
@@ -50,8 +49,6 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :param options: specific options given to converters (see :ref:`l-conv-options`)
-    :param dtype: float type to use everywhere in the graph,
-        `np.float32` or `np.float64`
     :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
         it returns the converted model otherwise
     :param white_op: white list of ONNX nodes allowed while converting a pipeline,
@@ -144,7 +141,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology = parse_sklearn_model(
         model, initial_types, target_opset, custom_conversion_functions,
         custom_shape_calculators, custom_parsers, options=options,
-        dtype=dtype, white_op=white_op, black_op=black_op,
+        white_op=white_op, black_op=black_op,
         final_types=final_types)
 
     # Infer variable shapes
@@ -153,14 +150,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
     onnx_model = convert_topology(
-        topology, name, doc_string, target_opset, dtype=dtype,
+        topology, name, doc_string, target_opset,
         options=options, remove_identity=not intermediate)
 
     return (onnx_model, topology) if intermediate else onnx_model
 
 
 def to_onnx(model, X=None, name=None, initial_types=None,
-            target_opset=None, options=None, dtype=np.float32,
+            target_opset=None, options=None,
             white_op=None, black_op=None, final_types=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
@@ -176,8 +173,6 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param name: name of the model
     :param target_opset: number, for example, 7 for ONNX 1.2,
         and 8 for ONNX 1.3.
-    :param dtype: float type to use everywhere in the graph,
-        `np.float32` or `np.float64`
     :param white_op: white list of ONNX nodes allowed
         while converting a pipeline, if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed
@@ -199,19 +194,16 @@ def to_onnx(model, X=None, name=None, initial_types=None,
             raise RuntimeError(
                 "Missing attribute 'op_version' for type '{}'.".format(
                     type(model)))
-        return model.to_onnx(X=X, name=name, dtype=dtype,
+        return model.to_onnx(X=X, name=name,
                              target_opset=target_opset,
                              options=options, black_op=black_op,
                              white_op=white_op, final_types=final_types)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
-    if dtype not in (np.float32, np.float64):
-        raise NotImplementedError(
-            "dtype should be real not {}".format(dtype))
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
-                           name=name, options=options, dtype=dtype,
+                           name=name, options=options,
                            white_op=white_op, black_op=black_op,
                            final_types=final_types)
 

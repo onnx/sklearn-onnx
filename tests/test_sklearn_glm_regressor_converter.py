@@ -2,7 +2,6 @@
 
 import unittest
 from distutils.version import StrictVersion
-import numpy
 from sklearn import linear_model
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
@@ -41,8 +40,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_linear_regression64(self):
         model, X = fit_regression_model(linear_model.LinearRegression())
         model_onnx = convert_sklearn(model, "linear regression",
-                                     [("input", DoubleTensorType(X.shape))],
-                                     dtype=numpy.float64)
+                                     [("input", DoubleTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         self.assertIn("elem_type: 11", str(model_onnx))
 

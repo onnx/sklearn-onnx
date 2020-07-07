@@ -128,8 +128,8 @@ def predictable_tsne_converter(scope, operator, container):
     name = scope.get_unique_operator_name("Scaler")
     attrs = dict(
         name=name,
-        scale=op.inv_std_.ravel().astype(float),
-        offset=op.mean_.ravel().astype(float),
+        scale=op.inv_std_.ravel().astype(numpy.float32),
+        offset=op.mean_.ravel().astype(numpy.float32),
     )
 
     container.add_node("Scaler", [knn_output.onnx_name], [output.full_name],

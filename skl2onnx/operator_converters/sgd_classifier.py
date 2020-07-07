@@ -8,7 +8,8 @@ import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_numpy_type)
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
@@ -144,6 +145,9 @@ def _predict_proba_modified_huber(scope, operator, container,
     Binary probability estimates are given by
     (clip(scores, -1, 1) + 1) / 2.
     """
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     unity_name = scope.get_unique_variable_name('unity')
     constant_name = scope.get_unique_variable_name('constant')
     add_result_name = scope.get_unique_variable_name('add_result')
@@ -156,8 +160,8 @@ def _predict_proba_modified_huber(scope, operator, container,
                               [], [2])
 
     apply_clip(scope, scores, clipped_scores_name, container,
-               max=np.array(1, dtype=container.dtype),
-               min=np.array(-1, dtype=container.dtype))
+               max=np.array(1, dtype=dtype),
+               min=np.array(-1, dtype=dtype))
     apply_add(scope, [clipped_scores_name, unity_name],
               add_result_name, container, broadcast=1)
     apply_div(scope, [add_result_name, constant_name],

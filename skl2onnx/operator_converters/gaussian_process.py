@@ -10,6 +10,7 @@ try:
 except ImportError:
     LAMBDAS, COEFS = None, None
 from ..proto import onnx_proto
+from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
@@ -49,15 +50,15 @@ def convert_gaussian_process_regressor(scope, operator, container):
     use this converter which does not behave exactly
     as the others.
     """
-    dtype = container.dtype
-    if dtype is None:
-        raise RuntimeError("dtype cannot be None")
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
     opv = container.target_opset
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
 
     options = container.get_options(
         op, dict(return_cov=False, return_std=False, optim=None))
