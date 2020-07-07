@@ -176,9 +176,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
     use this converter which does not behave exactly
     as the others.
     """
-    dtype = container.dtype
-    if dtype is None:
-        raise RuntimeError("dtype cannot be None")
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator

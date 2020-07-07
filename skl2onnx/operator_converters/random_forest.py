@@ -220,7 +220,7 @@ def convert_sklearn_random_forest_classifier(
             attrs['n_targets'] = int(op.n_outputs_)
             add_tree_to_attribute_pairs(
                 attrs, True, tree.tree_, 0, 1., 0, False,
-                True, dtype=container.dtype)
+                True, dtype=dtype)
 
             attrs['n_targets'] = 1
             attrs['post_transform'] = 'NONE'
@@ -379,7 +379,7 @@ def convert_sklearn_random_forest_regressor_converter(
         attrs['name'] = scope.get_unique_operator_name("%s_%d" % (op_type, i))
         attrs['n_targets'] = int(op.n_outputs_)
         add_tree_to_attribute_pairs(attrs, False, tree.tree_, 0, 1., 0, False,
-                                    True, dtype=container.dtype)
+                                    True, dtype=dtype)
 
         attrs['n_targets'] = 1
         attrs['post_transform'] = 'NONE'

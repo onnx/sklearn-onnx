@@ -44,7 +44,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
             cls = DoubleTensorType
         model_onnx = to_onnx(
             gp, initial_types=[('X', cls([None, None]))],
-            target_opset=TARGET_OPSET, dtype=dtype,
+            target_opset=TARGET_OPSET,
             options={GaussianProcessClassifier: {
                 'zipmap': False, 'optim': 'cdist'}})
         self.assertTrue(model_onnx is not None)
