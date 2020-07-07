@@ -202,6 +202,14 @@ def convert_sklearn_random_forest_classifier(
             apply_cast(scope, input_name, cast_input_name,
                        container, to=onnx_proto.TensorProto.FLOAT)
             input_name = cast_input_name
+
+        if dtype is not None:
+            for k in attr_pairs:
+                if k in ('nodes_values', 'class_weights',
+                         'target_weights', 'nodes_hitrates',
+                         'base_values'):
+                    attr_pairs[k] = np.array(attr_pairs[k], dtype=dtype)
+
         container.add_node(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
@@ -232,6 +240,13 @@ def convert_sklearn_random_forest_classifier(
             rem = [k for k in attrs if k.startswith('class')]
             for k in rem:
                 del attrs[k]
+
+            if dtype is not None:
+                for k in attrs:
+                    if k in ('nodes_values', 'class_weights',
+                             'target_weights', 'nodes_hitrates',
+                             'base_values'):
+                        attrs[k] = np.array(attrs[k], dtype=dtype)
 
             dpath = scope.get_unique_variable_name("dpath%d" % i)
             container.add_node(
@@ -359,6 +374,13 @@ def convert_sklearn_random_forest_regressor_converter(
                    container, to=onnx_proto.TensorProto.FLOAT)
         input_name = cast_input_name
 
+    if dtype is not None:
+        for k in attrs:
+            if k in ('nodes_values', 'class_weights',
+                     'target_weights', 'nodes_hitrates',
+                     'base_values'):
+                attrs[k] = np.array(attrs[k], dtype=dtype)
+
     container.add_node(
         op_type, input_name,
         operator.outputs[0].full_name, op_domain=op_domain,
@@ -385,6 +407,14 @@ def convert_sklearn_random_forest_regressor_converter(
         attrs['post_transform'] = 'NONE'
         attrs['target_ids'] = [0 for _ in attrs['target_ids']]
         attrs['target_weights'] = [float(_) for _ in attrs['target_nodeids']]
+
+        if dtype is not None:
+            for k in attrs:
+                if k in ('nodes_values', 'class_weights',
+                         'target_weights', 'nodes_hitrates',
+                         'base_values'):
+                    attrs[k] = np.array(attrs[k], dtype=dtype)
+
         dpath = scope.get_unique_variable_name("dpath%d" % i)
         container.add_node(
             op_type, input_name, dpath,

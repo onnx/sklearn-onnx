@@ -198,7 +198,8 @@ def convert_sklearn_decision_tree_classifier(
         if dtype is not None:
             for k in attrs:
                 if k in ('nodes_values', 'class_weights',
-                         'target_weights', 'nodes_hitrates'):
+                         'target_weights', 'nodes_hitrates',
+                         'base_values'):
                     attrs[k] = np.array(attrs[k], dtype=dtype)
 
         container.add_node(
@@ -304,7 +305,8 @@ def convert_sklearn_decision_tree_regressor(
     if dtype is not None:
         for k in attrs:
             if k in ('nodes_values', 'class_weights',
-                     'target_weights', 'nodes_hitrates'):
+                     'target_weights', 'nodes_hitrates',
+                     'base_values'):
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
     input_name = operator.input_full_names
