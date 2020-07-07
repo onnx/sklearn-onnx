@@ -121,6 +121,8 @@ def guess_numpy_type(data_type):
         return np.str
     if isinstance(data_type, BooleanTensorType):
         return np.bool
+    if isinstance(data_type, DictionaryType):
+        return guess_numpy_type(data_type.value_type)
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
 

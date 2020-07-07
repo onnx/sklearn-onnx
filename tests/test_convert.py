@@ -8,7 +8,10 @@ import unittest
 import numpy
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import KBinsDiscretizer
+try:
+    from sklearn.preprocessing import KBinsDiscretizer
+except ImportError:
+    KBinsDiscretizer = None
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.datasets import load_iris
 from skl2onnx import to_onnx
@@ -50,6 +53,8 @@ class TestConvert(unittest.TestCase):
                 self.assertEqual(len(dom), 1)
                 assert dom[''] <= i
 
+    @unittest.skipIf(KBinsDiscretizer is None,
+                     reason="scikit-learn too old")
     def test_target_opset_dict_kbins(self):
         data = load_iris()
         X = data.data
