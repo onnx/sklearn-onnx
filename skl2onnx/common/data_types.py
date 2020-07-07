@@ -109,6 +109,8 @@ def guess_numpy_type(data_type):
     """
     Guess the corresponding numpy type based on data_type.
     """
+    if data_type in (np.float64, np.float32):
+        return data_type
     if isinstance(data_type, FloatTensorType):
         return np.float32
     if isinstance(data_type, DoubleTensorType):
