@@ -10,7 +10,9 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.ensemble.iforest import _average_path_length
 from ..common._registration import register_converter
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType,
+    guess_numpy_type, guess_proto_type)
 from ..common.tree_ensemble import (
     add_tree_to_attribute_pairs,
     get_default_tree_regressor_attribute_pairs)
@@ -29,9 +31,16 @@ def convert_sklearn_isolation_forest(
     outputs = operator.outputs
     opv = container.target_opset
 
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+
     input_name = operator.inputs[0]
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
-        input_name = OnnxCast(input_name, to=container.proto_dtype,
+        input_name = OnnxCast(input_name, to=proto_dtype,
                               op_version=opv)
 
     if op._max_features != operator.inputs[0].type.shape[1]:
@@ -52,7 +61,7 @@ def convert_sklearn_isolation_forest(
         attrs = get_default_tree_regressor_attribute_pairs()
         attrs['n_targets'] = 1
         add_tree_to_attribute_pairs(attrs, False, tree.tree_, 0, 1., 0, False,
-                                    True, dtype=container.dtype)
+                                    True, dtype=dtype)
 
         # tree leave
         attrs['n_targets'] = 1
@@ -91,7 +100,7 @@ def convert_sklearn_isolation_forest(
         eq2 = OnnxCast(
                 OnnxEqual(node_sample, np.array([2], dtype=np.float32),
                           op_version=opv),
-                to=container.proto_dtype, op_version=opv)
+                to=proto_dtype, op_version=opv)
         eq2.set_onnx_name_prefix('eq2_%d' % i)
 
         # 2.0 * (np.log(n_samples_leaf[not_mask] - 1.0) + np.euler_gamma)
@@ -100,41 +109,41 @@ def convert_sklearn_isolation_forest(
                     OnnxGreater(
                         node_sample, np.array([2], dtype=np.float32),
                         op_version=opv),
-                    to=container.proto_dtype, op_version=opv)
+                    to=proto_dtype, op_version=opv)
         eqp2p.set_onnx_name_prefix('plus2_%d' % i)
 
         eqp2ps = OnnxMul(eqp2p, node_sample, op_version=opv)
         eqp2ps.set_onnx_name_prefix('eqp2ps%d' % i)
 
-        eqp2ps_1 = OnnxAdd(eqp2ps, np.array([-1], dtype=container.dtype),
+        eqp2ps_1 = OnnxAdd(eqp2ps, np.array([-1], dtype=dtype),
                            op_version=opv)
 
-        eqp2p_m1 = OnnxMax(eqp2ps_1, np.array([1], dtype=container.dtype),
+        eqp2p_m1 = OnnxMax(eqp2ps_1, np.array([1], dtype=dtype),
                            op_version=opv)
         eqp2p_m1.set_onnx_name_prefix('eqp2p_m1_%d' % i)
 
         eqp_log = OnnxMul(
                     OnnxAdd(OnnxLog(eqp2p_m1, op_version=opv),
                             np.array([np.euler_gamma],
-                                     dtype=container.dtype),
+                                     dtype=dtype),
                             op_version=opv),
-                    np.array([2], dtype=container.dtype),
+                    np.array([2], dtype=dtype),
                     op_version=opv)
         eqp_log.set_onnx_name_prefix('eqp_log%d' % i)
 
         # - 2.0 * (n_samples_leaf[not_mask] - 1.0) / n_samples_leaf[not_mask]
 
-        eqp2p_m0 = OnnxMax(eqp2ps_1, np.array([0], dtype=container.dtype),
+        eqp2p_m0 = OnnxMax(eqp2ps_1, np.array([0], dtype=dtype),
                            op_version=opv)
         eqp2p_m0.set_onnx_name_prefix('eqp2p_m1_%d' % i)
 
         eqp_ns = OnnxMul(
                     OnnxDiv(
                         eqp2p_m0,
-                        OnnxMax(eqp2ps, np.array([1], dtype=container.dtype),
+                        OnnxMax(eqp2ps, np.array([1], dtype=dtype),
                                 op_version=opv),
                         op_version=opv),
-                    np.array([-2], dtype=container.dtype), op_version=opv)
+                    np.array([-2], dtype=dtype), op_version=opv)
         eqp_ns.set_onnx_name_prefix('eqp_ns%d' % i)
 
         # np.ravel(node_indicator.sum(axis=1))
@@ -149,28 +158,28 @@ def convert_sklearn_isolation_forest(
 
         depth = OnnxAdd(
                     OnnxAdd(path_length, av_path_length, op_version=opv),
-                    np.array([-1], dtype=container.dtype),
+                    np.array([-1], dtype=dtype),
                     op_version=opv)
         depth.set_onnx_name_prefix('depth%d' % i)
         scores.append(depth)
 
     cst = len(op.estimators_) * _average_path_length([op.max_samples_])
     depths = OnnxDiv(OnnxSum(*scores, op_version=opv),
-                     np.array([cst], dtype=container.dtype),
+                     np.array([cst], dtype=dtype),
                      op_version=opv)
 
     # decision_function
     decision = OnnxAdd(
                 OnnxNeg(
-                    OnnxPow(np.array([2], dtype=container.dtype),
+                    OnnxPow(np.array([2], dtype=dtype),
                             OnnxNeg(depths, op_version=opv),
                             op_version=opv),
                     op_version=opv),
-                np.array([-op.offset_], dtype=container.dtype),
+                np.array([-op.offset_], dtype=dtype),
                 op_version=opv, output_names=outputs[1].full_name)
     decision.set_onnx_name_prefix('dec')
 
-    less = OnnxLess(decision, np.array([0], dtype=container.dtype),
+    less = OnnxLess(decision, np.array([0], dtype=dtype),
                     op_version=opv)
     predict = OnnxAdd(
                     OnnxMul(

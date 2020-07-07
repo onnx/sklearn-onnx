@@ -156,6 +156,9 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     *BayesianGaussianMixture*.
     """
     X = operator.inputs[0]
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
     out = operator.outputs
     op = operator.raw_operator
     n_components = op.means_.shape[0]
@@ -178,11 +181,11 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     # All comments come from scikit-learn code and tells
     # which functions is being onnxified.
     # def _estimate_weighted_log_prob(self, X):
-    log_weights = op._estimate_log_weights().astype(container.dtype)
+    log_weights = op._estimate_log_weights().astype(dtype)
 
     log_gauss = _estimate_log_gaussian_prob(
         X, op.means_, op.precisions_cholesky_, op.covariance_type,
-        container.dtype, opv, combined_reducesum)
+        dtype, opv, combined_reducesum)
 
     if isinstance(op, BayesianGaussianMixture):
         # log_gauss = (_estimate_log_gaussian_prob(
@@ -195,9 +198,9 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
         cst_log_lambda = .5 * (log_lambda - n_features / op.mean_precision_)
         cst = cst_log_lambda - .5 * n_features * np.log(op.degrees_of_freedom_)
         if isinstance(cst, np.ndarray):
-            cst_array = cst.astype(container.dtype)
+            cst_array = cst.astype(dtype)
         else:
-            cst_array = np.array([cst], dtype=container.dtype)
+            cst_array = np.array([cst], dtype=dtype)
         log_gauss = OnnxAdd(log_gauss, cst_array, op_version=opv)
     elif not isinstance(op, GaussianMixture):
         raise RuntimeError(
