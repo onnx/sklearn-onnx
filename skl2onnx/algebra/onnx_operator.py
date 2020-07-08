@@ -33,6 +33,12 @@ class OnnxOperatorItem:
         self.onx_op = onx_op
         self.index = index
 
+    def __str__(self):
+        """
+        usual
+        """
+        return "%s[%d]" % (str(self.onx_op), self.index)
+
     def get_latest_tested_opset_version(self):
         """
         Returns ``get_latest_tested_opset_version()``
@@ -186,6 +192,12 @@ class OnnxOperator:
         def ConstantValue(self):
             return self.value
 
+        def __str__(self):
+            """
+            usual
+            """
+            return "Cst({})".format(self.value)
+
     def find_schema(self, op_version):
         """
         Checks if there is an existing schema for a
@@ -327,6 +339,16 @@ class OnnxOperator:
                                         i, type(name)))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
+
+    def __str__(self):
+        """
+        usual
+        """
+        return "{}({} in) -> {}".format(
+            self.__class__.__name__,
+            len(self.inputs) if self.inputs is not None else 0,
+            [str(o) for o in self.output_names]
+            if self.output_names is not None else "?")
 
     def set_onnx_name_prefix(self, onnx_prefix_name):
         """
@@ -501,6 +523,16 @@ class OnnxOperator:
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 **kwargs)
             self.state.run(operator=operator)
+        self._verify_add_to_()
+
+    def _verify_add_to_(self):
+        if self.state is None:
+            raise RuntimeError(
+                "Graph was not produced for operator '{}': {}."
+                "".format(self.__class__.__name__, self))
+        for i in self.inputs:
+            if hasattr(i, '_verify_add_to_'):
+                i._verify_add_to_()
 
     @property
     def outputs(self):
