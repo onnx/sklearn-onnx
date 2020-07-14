@@ -5,12 +5,17 @@ import unittest
 import math
 from distutils.version import StrictVersion
 import numpy
+from pandas import DataFrame
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeRegressor
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    ColumnTransformer = None
 from skl2onnx.sklapi import CastTransformer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
@@ -25,7 +30,8 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             ('cast', CastTransformer(dtype=dtype)),
             ('invcast', CastTransformer(dtype=numpy.float32)),
         ])
-        data = numpy.array([[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]],
+        data = numpy.array([[0.1, 0.2, 3.1], [1, 1, 0],
+                            [0, 2, 1], [1, 0, 2]],
                            dtype=numpy.float32)
         model.fit(data)
         pred = model.steps[0][1].transform(data)
@@ -109,6 +115,29 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         md2 = maxdiff(exp2, got2)
         assert md2 <= md1
         assert md2 <= 0.01
+
+    @unittest.skipIf(ColumnTransformer is None,
+                     reason="scikit-learn too old")
+    def test_cast_transformer_dataframe(self):
+        model = Pipeline([
+            ('prep', ColumnTransformer([
+                ('prep1', CastTransformer(), [0, 1]),
+                ('prep2', CastTransformer(), [2]),
+            ])),
+            ('invcast', CastTransformer(dtype=numpy.float32)),
+        ])
+        data = numpy.array([[0.1, 0.2, 3.4], [1, 1, 0],
+                            [0, 2, 1], [1, 0, 2]],
+                           dtype=numpy.float32)
+        data = DataFrame(data)
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model, "cast", [("input", FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            data.values, model, model_onnx,
+            basename="SklearnCastTransformerCT")
 
 
 if __name__ == "__main__":
