@@ -106,8 +106,8 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
         StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
         reason="Requires opset 10.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
-        reason="Wrong handling of stopwods and n-grams")
+        StrictVersion(ort_version) < StrictVersion("1.5.0"),
+        reason="Wrong handling of stopwords and n-grams")
     def test_model_tfidf_vectorizer_pipeline_stop_words(self):
         for kind in ['stop']:
             with self.subTest(kind=kind):
