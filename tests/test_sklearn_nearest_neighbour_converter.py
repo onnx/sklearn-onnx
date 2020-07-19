@@ -268,6 +268,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
         if any(numpy.isnan(got.ravel())):
+            # probably a bug in the runtime
+            got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
+        if any(numpy.isnan(got.ravel())):
             # The model is unexpectedly producing nan values
             # not on all platforms.
             # It happens when two matrices are multiplied,
