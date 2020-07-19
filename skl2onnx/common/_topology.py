@@ -16,6 +16,7 @@ from onnxconverter_common.data_types import (  # noqa
     StringTensorType, DoubleTensorType,
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
+    Int8TensorType, UInt8TensorType,
 )
 from ..proto import (
     get_opset_number_from_onnx,
@@ -128,6 +129,10 @@ class Variable:
                 ty = StringTensorType(shape)
             elif elem == onnx_proto.TensorProto.INT64:
                 ty = Int64TensorType(shape)
+            elif elem == onnx_proto.TensorProto.UINT8:
+                ty = UInt8TensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT8:
+                ty = Int8TensorType(shape)
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
             else:
