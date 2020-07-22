@@ -107,7 +107,7 @@ def convert_sklearn_random_forest_classifier(
 
     use_raw_scores = options['raw_scores']
 
-    if n_outputs == 1 or hasattr(op, 'loss_'):
+    if n_outputs == 1 or hasattr(op, 'loss_') or hasattr(op, '_loss'):
         classes = get_label_classes(scope, op)
 
         if all(isinstance(i, np.ndarray) for i in classes):
@@ -169,16 +169,23 @@ def convert_sklearn_random_forest_classifier(
                 attr_pairs['base_values'] = [op._baseline_prediction]
 
         if hasattr(op, 'loss_'):
+            loss = op.loss_
+        elif hasattr(op, '_loss'):
+            # scikit-learn >= 0.24
+            loss = op._loss
+        else:
+            loss = None
+        if loss is not None:
             if use_raw_scores:
                 attr_pairs['post_transform'] = "NONE"
-            elif op.loss_.__class__.__name__ == "BinaryCrossEntropy":
+            elif loss.__class__.__name__ == "BinaryCrossEntropy":
                 attr_pairs['post_transform'] = "LOGISTIC"
-            elif op.loss_.__class__.__name__ == "CategoricalCrossEntropy":
+            elif loss.__class__.__name__ == "CategoricalCrossEntropy":
                 attr_pairs['post_transform'] = "SOFTMAX"
             else:
                 raise NotImplementedError(
                     "There is no corresponding post_transform for "
-                    "'{}'.".format(op.loss_.__class__.__name__))
+                    "'{}'.".format(loss.__class__.__name__))
         elif use_raw_scores:
             raise RuntimeError(
                 "The converter cannot implement decision_function for "
