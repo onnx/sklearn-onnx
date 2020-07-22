@@ -145,15 +145,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     StrictVersion("1.4.0")):
                 return
             raise AssertionError('\n'.join(rows))
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(numpy.float32)[:7],
-            model, model_onnx,
-            basename="SklearnRadiusNeighborsRegressor")
-        dump_data_and_model(
-            (X + 0.1).astype(numpy.float32)[:7],
-            model, model_onnx,
-            basename="SklearnRadiusNeighborsRegressor")
+        assert_almost_equal(exp.ravel(), got.ravel(), decimal=3)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
