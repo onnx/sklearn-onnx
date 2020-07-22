@@ -7,6 +7,8 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy
+from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 import sklearn
 from sklearn.datasets import (
     load_iris, make_regression, make_classification,
@@ -27,6 +29,7 @@ from skl2onnx.common.data_types import (
 )
 from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
+    binary_array_to_string,
     convert_model,
     dump_one_class_classification,
     dump_binary_classification,
@@ -37,7 +40,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
-    TARGET_OPSET
+    TARGET_OPSET,
 )
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
@@ -605,6 +608,95 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             "onnxruntime.__version__) <= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_randomforestregressor_decision_path(self):
+        model = RandomForestRegressor(max_depth=2, n_estimators=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec[0].todense())
+        got = numpy.array([''.join(row) for row in res[1]])
+        assert exp == got.ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_extratreesregressor_decision_path(self):
+        model = ExtraTreesRegressor(max_depth=2, n_estimators=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec[0].todense())
+        got = numpy.array([''.join(row) for row in res[1]])
+        assert exp == got.ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_randomforestclassifier_decision_path(self):
+        model = RandomForestClassifier(max_depth=2, n_estimators=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True, 'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict_proba(X)
+        assert_almost_equal(prob, res[1])
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec[0].todense())
+        got = numpy.array([''.join(row) for row in res[2]])
+        assert exp == got.ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_extratreesclassifier_decision_path(self):
+        model = ExtraTreesClassifier(max_depth=2, n_estimators=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_path': True, 'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict_proba(X)
+        assert_almost_equal(prob, res[1])
+        dec = model.decision_path(X)
+        exp = binary_array_to_string(dec[0].todense())
+        got = numpy.array([''.join(row) for row in res[2]])
+        assert exp == got.ravel().tolist()
+
 
 if __name__ == "__main__":
+    # TestSklearnTreeEnsembleModels().test_randomforestclassifier_decision_path()
     unittest.main()
