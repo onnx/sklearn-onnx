@@ -276,11 +276,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         model, X = fit_regression_model(
             BaggingRegressor(SGDRegressor()))
         model_onnx = convert_sklearn(
-            model,
-            "bagging regressor",
+            model, "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            dtype=np.float32, target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -296,20 +294,15 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             BaggingRegressor(
                 GradientBoostingRegressor(n_estimators=10)))
         model_onnx = convert_sklearn(
-            model,
-            "bagging regressor",
+            model, "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            dtype=np.float32, target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnBaggingRegressorGradientBoosting-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     def test_bagging_regressor_bool(self):
         model, X = fit_regression_model(
