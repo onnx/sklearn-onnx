@@ -184,6 +184,7 @@ jobs:
     displayName: 'install onnxconverter-common'
 
   - script: |
+      pip install git+https://github.com/xadupre/onnxconverter-common.git@jenkins
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
     displayName: 'install requirements'

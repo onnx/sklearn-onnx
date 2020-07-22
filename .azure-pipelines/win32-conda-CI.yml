@@ -136,6 +136,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      pip install git+https://github.com/xadupre/onnxconverter-common.git@jenkins
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
     displayName: 'install requirements'
