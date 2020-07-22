@@ -752,7 +752,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "KNN transformer",
             [("input", FloatTensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X_test,
@@ -771,7 +771,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "KNN transformer",
             [("input", FloatTensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X_test,
