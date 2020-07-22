@@ -169,6 +169,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'variable', scope.tensor_type())
         this_operator.outputs.append(variable)
 
+    options = scope.get_options(model, dict(decision_path=False), fail=False)
+    if options is not None and options['decision_path']:
+        dec_path = scope.declare_local_variable(
+            'decision_path', StringTensorType())
+        this_operator.outputs.append(dec_path)
+
     return this_operator.outputs
 
 
