@@ -491,7 +491,8 @@ class OnnxOperator:
         :param domain: domain of the operator
         """
         if isinstance(target_opset, dict):
-            target_opset = target_opset.get(self.domain, None)
+            dom = self.domain or ''
+            target_opset = target_opset.get(dom, None)
         elif isinstance(target_opset, int):
             if self.domain not in ('', None):
                 # The target_opset is for the domain ''

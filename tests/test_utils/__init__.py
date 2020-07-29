@@ -20,6 +20,7 @@ from .tests_helper import (  # noqa
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    binary_array_to_string
 )
 
 

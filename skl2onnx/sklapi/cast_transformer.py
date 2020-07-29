@@ -43,7 +43,13 @@ class CastTransformer(TransformerMixin, BaseEstimator):
 
     def _cast(self, a, name):
         if not isinstance(a, np.ndarray):
-            raise TypeError("{} must be a numpy array.".format(name))
+            if hasattr(a, 'values') and hasattr(a, 'iloc'):
+                # dataframe
+                a = a.values
+            else:
+                raise TypeError(
+                    "{} must be a numpy array or a dataframe.".format(
+                        name))
         try:
             a2 = a.astype(self.dtype)
         except ValueError:
