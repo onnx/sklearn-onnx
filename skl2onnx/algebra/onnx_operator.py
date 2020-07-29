@@ -224,7 +224,7 @@ class OnnxOperator:
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
                         OnnxOperator.ConstantVariable(
-                            inp, implicit_cast=True))
+                            inp, implicit_cast=False))
                 elif isinstance(inp, TensorProto):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
@@ -366,6 +366,12 @@ class OnnxOperator:
 
             if hasattr(self, 'output_names_'):
                 outputs = self.output_names_
+                if outputs is None or len(outputs) == 0:
+                    raise RuntimeError(
+                        "Empty cached outputs. The conversion was "
+                        "maybe triggered on some part "
+                        "of the graph before being applied "
+                        "on the whole graph.")
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
@@ -459,7 +465,8 @@ class OnnxOperator:
         :param domain: domain of the operator
         """
         if isinstance(target_opset, dict):
-            target_opset = target_opset.get(self.domain, None)
+            dom = self.domain or ''
+            target_opset = target_opset.get(dom, None)
         elif isinstance(target_opset, int):
             if self.domain not in ('', None):
                 # The target_opset is for the domain ''
@@ -698,7 +705,7 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property

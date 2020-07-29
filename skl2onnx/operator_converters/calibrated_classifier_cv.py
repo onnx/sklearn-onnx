@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import pprint
 import numpy as np
 from ..proto import onnx_proto
 from ..common._apply_operation import (
@@ -116,12 +116,14 @@ def _transform_isotonic(scope, container, model, T, k):
         atX, atY = '_X_', '_y_'
     elif hasattr(model.calibrators_[k], '_necessary_X_'):
         atX, atY = '_necessary_X_', '_necessary_y_'
+    elif hasattr(model.calibrators_[k], 'X_thresholds_'):
+        atX, atY = 'X_thresholds_', 'y_thresholds_'
     else:
         raise AttributeError(
             "Unable to find attribute '_X_' or '_necessary_X_' "
             "for type {}\n{}."
             "".format(type(model.calibrators_[k]),
-                      dir(model.calibrators_[k])))
+                      pprint.pformat(dir(model.calibrators_[k]))))
 
     container.add_initializer(
         calibrator_x_name, onnx_proto.TensorProto.FLOAT,

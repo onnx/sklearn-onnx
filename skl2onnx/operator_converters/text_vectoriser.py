@@ -177,7 +177,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
                           UserWarning)
-            default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'
@@ -216,8 +215,10 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
-    if op.lowercase or op.stop_words_:
+    stop_words = op.stop_words_ | (
+        set(op.stop_words) if op.stop_words else set())
 
+    if op.lowercase or stop_words:
         if len(operator.input_full_names) != 1:
             raise RuntimeError("Only one input is allowed, found {}.".format(
                 operator.input_full_names))
@@ -245,8 +246,8 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             op_version = 9
             domain = 'com.microsoft'
 
-        if op.stop_words_:
-            attrs['stopwords'] = list(sorted(op.stop_words_))
+        if stop_words:
+            attrs['stopwords'] = list(sorted(stop_words))
         container.add_node(op_type, flatten,
                            normalized, op_version=op_version,
                            op_domain=domain, **attrs)
