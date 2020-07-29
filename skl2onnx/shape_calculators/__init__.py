@@ -11,6 +11,7 @@ from . import cast_op
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
+from . import ensemble_shapes
 from . import flatten
 from . import function_transformer
 from . import gaussian_process
@@ -46,6 +47,7 @@ __all__ = [
     concat,
     cross_decomposition,
     dict_vectorizer,
+    ensemble_shapes,
     flatten,
     function_transformer,
     gaussian_process,

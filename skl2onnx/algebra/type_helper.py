@@ -31,6 +31,9 @@ def _guess_type(given_type):
 
     if isinstance(given_type, (np.ndarray, coo_matrix)):
         shape = list(given_type.shape)
+        if len(shape) == 0:
+            # a number
+            return _guess_numpy_type(given_type.dtype, tuple())
         shape[0] = None
         return _guess_numpy_type(given_type.dtype, shape)
     if isinstance(given_type, (FloatTensorType, Int64TensorType,
