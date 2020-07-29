@@ -23,7 +23,7 @@ from ..common.tree_ensemble import (
 )
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
-from .decision_tree import predict
+from .decision_tree import predict, _build_labels
 
 
 def _num_estimators(op):
@@ -94,18 +94,20 @@ def convert_sklearn_random_forest_classifier(
 
     if hasattr(op, 'n_outputs_'):
         n_outputs = int(op.n_outputs_)
+        options = container.get_options(
+            op, dict(raw_scores=False, decision_path=False))
     elif hasattr(op, 'n_trees_per_iteration_'):
         # HistGradientBoostingClassifier
         n_outputs = op.n_trees_per_iteration_
+        options = container.get_options(op, dict(raw_scores=False))
     else:
         raise NotImplementedError(
             "Model should have attribute 'n_outputs_' or "
             "'n_trees_per_iteration_'.")
 
-    options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
 
-    if n_outputs == 1 or hasattr(op, 'loss_'):
+    if n_outputs == 1 or hasattr(op, 'loss_') or hasattr(op, '_loss'):
         classes = get_label_classes(scope, op)
 
         if all(isinstance(i, np.ndarray) for i in classes):
@@ -167,16 +169,23 @@ def convert_sklearn_random_forest_classifier(
                 attr_pairs['base_values'] = [op._baseline_prediction]
 
         if hasattr(op, 'loss_'):
+            loss = op.loss_
+        elif hasattr(op, '_loss'):
+            # scikit-learn >= 0.24
+            loss = op._loss
+        else:
+            loss = None
+        if loss is not None:
             if use_raw_scores:
                 attr_pairs['post_transform'] = "NONE"
-            elif op.loss_.__class__.__name__ == "BinaryCrossEntropy":
+            elif loss.__class__.__name__ == "BinaryCrossEntropy":
                 attr_pairs['post_transform'] = "LOGISTIC"
-            elif op.loss_.__class__.__name__ == "CategoricalCrossEntropy":
+            elif loss.__class__.__name__ == "CategoricalCrossEntropy":
                 attr_pairs['post_transform'] = "SOFTMAX"
             else:
                 raise NotImplementedError(
                     "There is no corresponding post_transform for "
-                    "'{}'.".format(op.loss_.__class__.__name__))
+                    "'{}'.".format(loss.__class__.__name__))
         elif use_raw_scores:
             raise RuntimeError(
                 "The converter cannot implement decision_function for "
@@ -193,6 +202,60 @@ def convert_sklearn_random_forest_classifier(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain=op_domain, op_version=op_version, **attr_pairs)
+
+        if not options.get('decision_path', False):
+            return
+
+        # decision_path
+        tree_paths = []
+        for i, tree in enumerate(op.estimators_):
+
+            attrs = get_default_tree_classifier_attribute_pairs()
+            attrs['name'] = scope.get_unique_operator_name(
+                "%s_%d" % (op_type, i))
+            attrs['n_targets'] = int(op.n_outputs_)
+            add_tree_to_attribute_pairs(
+                attrs, True, tree.tree_, 0, 1., 0, False,
+                True, dtype=container.dtype)
+
+            attrs['n_targets'] = 1
+            attrs['post_transform'] = 'NONE'
+            attrs['target_ids'] = [0 for _ in attrs['class_ids']]
+            attrs['target_weights'] = [
+                float(_) for _ in attrs['class_nodeids']]
+            attrs['target_nodeids'] = attrs['class_nodeids']
+            attrs['target_treeids'] = attrs['class_treeids']
+            rem = [k for k in attrs if k.startswith('class')]
+            for k in rem:
+                del attrs[k]
+
+            dpath = scope.get_unique_variable_name("dpath%d" % i)
+            container.add_node(
+                op_type.replace("Classifier", "Regressor"), input_name, dpath,
+                op_domain=op_domain, op_version=op_version, **attrs)
+
+            labels = _build_labels(tree.tree_)
+            ordered = list(sorted(labels.items()))
+            keys = [float(_[0]) for _ in ordered]
+            values = [_[1] for _ in ordered]
+            name = scope.get_unique_variable_name('spath%d' % i)
+            container.add_node(
+                'LabelEncoder', dpath, name,
+                op_domain=op_domain, op_version=2,
+                default_string='0', keys_floats=keys, values_strings=values,
+                name=scope.get_unique_operator_name('TreePath'))
+            name_shape = scope.get_unique_variable_name('spath%d' % i)
+            apply_reshape(
+                scope, name, name_shape,
+                container, desired_shape=(-1, 1),
+                operator_name=scope.get_unique_operator_name('sdpath2d%d' % i))
+            tree_paths.append(name_shape)
+
+        # merges everything
+        apply_concat(
+            scope, tree_paths, operator.outputs[2].full_name, container,
+            axis=1, operator_name=scope.get_unique_operator_name('concat'))
+
     else:
         if use_raw_scores:
             raise RuntimeError(
@@ -222,6 +285,10 @@ def convert_sklearn_random_forest_classifier(
             scope, container, op, operator.outputs[1].full_name)
         apply_concat(scope, predictions, operator.outputs[0].full_name,
                      container, axis=1)
+
+        if options.get('decision_path', False):
+            raise RuntimeError(
+                "Decision output for multi-outputs is not implemented yet.")
 
 
 def convert_sklearn_random_forest_regressor_converter(
@@ -287,24 +354,76 @@ def convert_sklearn_random_forest_regressor_converter(
 
     container.add_node(
         op_type, input_name,
-        operator.output_full_names, op_domain=op_domain,
+        operator.outputs[0].full_name, op_domain=op_domain,
         op_version=op_version, **attrs)
+
+    if hasattr(op, 'n_trees_per_iteration_'):
+        # HistGradientBoostingRegressor does not implement decision_path.
+        return
+    options = scope.get_options(op, dict(decision_path=False))
+    if not options['decision_path']:
+        return
+
+    # decision_path
+    tree_paths = []
+    for i, tree in enumerate(op.estimators_):
+
+        attrs = get_default_tree_regressor_attribute_pairs()
+        attrs['name'] = scope.get_unique_operator_name("%s_%d" % (op_type, i))
+        attrs['n_targets'] = int(op.n_outputs_)
+        add_tree_to_attribute_pairs(attrs, False, tree.tree_, 0, 1., 0, False,
+                                    True, dtype=container.dtype)
+
+        attrs['n_targets'] = 1
+        attrs['post_transform'] = 'NONE'
+        attrs['target_ids'] = [0 for _ in attrs['target_ids']]
+        attrs['target_weights'] = [float(_) for _ in attrs['target_nodeids']]
+        dpath = scope.get_unique_variable_name("dpath%d" % i)
+        container.add_node(
+            op_type, input_name, dpath,
+            op_domain=op_domain, op_version=op_version, **attrs)
+
+        labels = _build_labels(tree.tree_)
+        ordered = list(sorted(labels.items()))
+        keys = [float(_[0]) for _ in ordered]
+        values = [_[1] for _ in ordered]
+        name = scope.get_unique_variable_name('spath%d' % i)
+        container.add_node(
+            'LabelEncoder', dpath, name,
+            op_domain=op_domain, op_version=2,
+            default_string='0', keys_floats=keys, values_strings=values,
+            name=scope.get_unique_operator_name('TreePath'))
+        name_shape = scope.get_unique_variable_name('spath%d' % i)
+        apply_reshape(
+            scope, name, name_shape,
+            container, desired_shape=(-1, 1),
+            operator_name=scope.get_unique_operator_name('sdpath2d%d' % i))
+        tree_paths.append(name_shape)
+
+    # merges everything
+    apply_concat(
+        scope, tree_paths, operator.outputs[1].full_name, container, axis=1,
+        operator_name=scope.get_unique_operator_name('concat'))
 
 
 register_converter('SklearnRandomForestClassifier',
                    convert_sklearn_random_forest_classifier,
                    options={'zipmap': [True, False],
                             'raw_scores': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'decision_path': [True, False]})
 register_converter('SklearnRandomForestRegressor',
-                   convert_sklearn_random_forest_regressor_converter)
+                   convert_sklearn_random_forest_regressor_converter,
+                   options={'decision_path': [True, False]})
 register_converter('SklearnExtraTreesClassifier',
                    convert_sklearn_random_forest_classifier,
                    options={'zipmap': [True, False],
                             'raw_scores': [True, False],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'decision_path': [True, False]})
 register_converter('SklearnExtraTreesRegressor',
-                   convert_sklearn_random_forest_regressor_converter)
+                   convert_sklearn_random_forest_regressor_converter,
+                   options={'decision_path': [True, False]})
 register_converter('SklearnHistGradientBoostingClassifier',
                    convert_sklearn_random_forest_classifier,
                    options={'zipmap': [True, False],

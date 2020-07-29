@@ -16,16 +16,6 @@ register_shape_calculator('SklearnAdaBoostClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnBaggingClassifier',
                           calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnDecisionTreeClassifier',
-                          calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnRandomForestClassifier',
-                          calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnExtraTreeClassifier',
-                          calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnExtraTreesClassifier',
-                          calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnGradientBoostingClassifier',
-                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnBernoulliNB',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnCategoricalNB',
@@ -36,15 +26,11 @@ register_shape_calculator('SklearnGaussianNB',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnMultinomialNB',
                           calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnKNeighborsClassifier',
-                          calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnCalibratedClassifierCV',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnMLPClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnSGDClassifier',
-                          calculate_linear_classifier_output_shapes)
-register_shape_calculator('SklearnHistGradientBoostingClassifier',
                           calculate_linear_classifier_output_shapes)
 register_shape_calculator('SklearnStackingClassifier',
                           calculate_linear_classifier_output_shapes)

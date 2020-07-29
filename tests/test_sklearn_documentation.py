@@ -8,8 +8,13 @@ import onnx
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
-from sklearn.datasets.twenty_newsgroups import strip_newsgroup_footer
-from sklearn.datasets.twenty_newsgroups import strip_newsgroup_quoting
+try:
+    from sklearn.datasets._twenty_newsgroups import (
+        strip_newsgroup_footer, strip_newsgroup_quoting)
+except ImportError:
+    # scikit-learn < 0.24
+    from sklearn.datasets.twenty_newsgroups import (
+        strip_newsgroup_footer, strip_newsgroup_quoting)
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 
@@ -20,7 +25,7 @@ except ImportError:
 
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
@@ -76,10 +81,9 @@ class TestSklearnDocumentation(unittest.TestCase):
             }
         }
         model_onnx = convert_sklearn(
-            tfi,
-            "tfidf",
+            tfi, "tfidf",
             initial_types=[("input", StringTensorType([1]))],
-            options=extra,
+            options=extra, target_opset=TARGET_OPSET
         )
         dump_data_and_model(
             tdata[:5],
@@ -137,10 +141,9 @@ class TestSklearnDocumentation(unittest.TestCase):
             }
         }
         model_onnx = convert_sklearn(
-            pipeline,
-            "tfidf",
+            pipeline, "tfidf",
             initial_types=[("input", StringTensorType([None, 2]))],
-            options=extra,
+            options=extra, target_opset=TARGET_OPSET
         )
         test_data = np.array([
             ["Albert Einstein", "Not relatively."],

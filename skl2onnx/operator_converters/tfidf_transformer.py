@@ -6,7 +6,6 @@
 
 import numpy as np
 from ..common._registration import register_converter
-from ..common._apply_operation import apply_log, apply_add
 from ..common._apply_operation import apply_mul, apply_identity
 
 
@@ -18,7 +17,6 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
     op = operator.raw_operator
     data = operator.input_full_names
     final = operator.output_full_names
-    C = operator.inputs[0].type.shape[1]
 
     if op.sublinear_tf:
         # code scikit-learn
@@ -28,19 +26,19 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
             "ONNX does not support sparse tensors before opset < 11, "
             "sublinear_tf must be False.")
 
-        logged = scope.get_unique_variable_name('logged')
-        apply_log(scope, data, logged, container)
-
-        if not op.use_idf and op.norm is None:
-            loggedplus1 = final
-        else:
-            loggedplus1 = scope.get_unique_variable_name('loggedplus1')
-        ones = scope.get_unique_variable_name('ones')
-        cst = np.ones((C,), dtype=float_type)
-        container.add_initializer(ones, proto_type, [C], cst.flatten())
-        apply_add(scope, [logged, ones], loggedplus1, container, broadcast=1)
-
-        data = [loggedplus1]
+        # In case sparse is enabled.
+        # C = operator.inputs[0].type.shape[1]
+        # logged = scope.get_unique_variable_name('logged')
+        # apply_log(scope, data, logged, container)
+        # if not op.use_idf and op.norm is None:
+        #     loggedplus1 = final
+        # else:
+        #     loggedplus1 = scope.get_unique_variable_name('loggedplus1')
+        # ones = scope.get_unique_variable_name('ones')
+        # cst = np.ones((C,), dtype=float_type)
+        # container.add_initializer(ones, proto_type, [C], cst.flatten())
+        # apply_add(scope, [logged, ones], loggedplus1, container, broadcast=1)
+        # data = [loggedplus1]
 
     if op.use_idf:
         cst = op.idf_.astype(float_type)

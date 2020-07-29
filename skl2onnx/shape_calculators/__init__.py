@@ -7,10 +7,11 @@
 # To register shape calculators for scikit-learn operators,
 # import associated modules here.
 from . import array_feature_extractor
-from . import cast
+from . import cast_op
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
+from . import ensemble_shapes
 from . import flatten
 from . import function_transformer
 from . import gaussian_process
@@ -43,10 +44,11 @@ from . import zip_map
 
 __all__ = [
     array_feature_extractor,
-    cast,
+    cast_op,
     concat,
     cross_decomposition,
     dict_vectorizer,
+    ensemble_shapes,
     flatten,
     function_transformer,
     gaussian_process,

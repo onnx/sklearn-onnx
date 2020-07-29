@@ -43,9 +43,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
 
-    options = container.get_options(op, dict(return_cov=False,
-                                             return_std=False,
-                                             optim=None))
+    options = container.get_options(
+        op, dict(return_cov=False, return_std=False, optim=None))
     if hasattr(op, 'kernel_') and op.kernel_ is not None:
         kernel = op.kernel_
     elif op.kernel is None:
@@ -60,10 +59,9 @@ def convert_gaussian_process_regressor(scope, operator, container):
 
         outputs = [out0]
         if options['return_cov']:
-            outputs.append(convert_kernel(kernel, X,
-                                          output_names=out[1:],
-                                          dtype=dtype,
-                                          op_version=opv))
+            outputs.append(convert_kernel(
+                kernel, X, output_names=out[1:],
+                dtype=dtype, op_version=opv))
         if options['return_std']:
             outputs.append(
                 OnnxSqrt(
@@ -71,19 +69,15 @@ def convert_gaussian_process_regressor(scope, operator, container):
                         kernel, X, dtype=dtype, op_version=opv),
                     output_names=out[1:], op_version=opv))
     else:
-        out0 = _zero_vector_of_size(
-            X, keepdims=1, dtype=dtype, op_version=opv)
-
         # Code scikit-learn
         # K_trans = self.kernel_(X, self.X_train_)
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
         # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
-        k_trans = convert_kernel(kernel, X,
-                                 x_train=op.X_train_.astype(dtype),
-                                 dtype=dtype,
-                                 optim=options.get('optim', None),
-                                 op_version=opv)
+        k_trans = convert_kernel(
+            kernel, X, x_train=op.X_train_.astype(dtype),
+            dtype=dtype, optim=options.get('optim', None),
+            op_version=opv)
         k_trans.set_onnx_name_prefix('kgpd')
         y_mean_b = OnnxMatMul(k_trans, op.alpha_.astype(dtype), op_version=opv)
 
