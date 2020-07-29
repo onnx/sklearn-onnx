@@ -60,7 +60,8 @@ def _get_operation_list():
     return res
 
 
-def _build_options(model, defined_options, default_values, allowed_options):
+def _build_options(model, defined_options, default_values,
+                   allowed_options, fail):
     opts = {} if default_values is None else default_values
     if defined_options is not None:
         opts.update(defined_options.get(type(model), {}))
@@ -68,17 +69,19 @@ def _build_options(model, defined_options, default_values, allowed_options):
     if allowed_options not in (None, 'passthrough'):
         for k, v in opts.items():
             if k not in allowed_options:
-                raise NameError(
-                    "Option '{}' not in {} for class '{}'.".format(
-                        k, list(sorted(allowed_options)),
-                        model.__class__.__name__))
+                if fail:
+                    raise NameError(
+                        "Option '{}' not in {} for class '{}'.".format(
+                            k, list(sorted(allowed_options)),
+                            model.__class__.__name__))
+                return None
             allowed = allowed_options[k]
             if allowed is not None and v not in allowed and v is not None:
                 raise ValueError(
                     "Unexpected value [{!r}] for option '{}'"
                     " (it must be in {}) for model '{}'.".format(
                         v, k, allowed, model.__class__.__name__))
-    elif len(opts) != 0 and allowed_options != 'passthrough':
+    elif fail and len(opts) != 0 and allowed_options != 'passthrough':
         raise RuntimeError(
             "Options {} are not registerd for model '{}'.".format(
                 list(sorted(opts)), model.__class__.__name__))
@@ -240,6 +243,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         # ONNX tensors (type: TensorProto). They are initializers of
         # ONNX GraphProto.
         self.initializers = []
+        self.initializers_strings = {}
         # Intermediate variables in ONNX computational graph. They are
         # ValueInfoProto in ONNX.
         self.value_info = []
@@ -370,6 +374,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         sparse_tensor = None
         tensor = None
 
+        cached_value = None
         if isinstance(content, TensorProto):
             tensor = TensorProto()
             tensor.data_type = content.data_type
@@ -399,21 +404,58 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             dense_shape = list(content.shape)
             sparse_tensor = make_sparse_tensor(
                 values_tensor, indices_tensor, dense_shape)
+
+            # cached value: same without names
+            values_tensor = make_tensor(
+                "_v", data_type=onnx_type,
+                dims=(len(content.data), ), vals=content.data)
+            indices_tensor = make_tensor(
+                name="_i", data_type=TensorProto.INT64,
+                dims=(len(indices), ), vals=indices)
+            cached_value = make_sparse_tensor(
+                values_tensor, indices_tensor, dense_shape)
+
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None.')
             tensor = make_tensor(name, onnx_type, shape, content)
 
         if tensor is not None:
-            self.initializers.append(tensor)
-            return tensor
-        elif sparse_tensor is not None:
-            self.add_node('Constant', [], [name], sparse_value=sparse_tensor,
-                          op_version=self.target_opset, name=name + '_op')
-            return sparse_tensor
-        else:
-            raise RuntimeError(
-                "Either tensor or sparse_tensor should be defined.")
+            if cached_value is None:
+                name = tensor.name
+                tensor.name = "tensor"
+                content = tensor.SerializeToString()
+                tensor.name = name
+            else:
+                content = cached_value.SerializeToString()
+            cached_name = self.initializers_strings.get(content, None)
+            if cached_name is None:
+                self.initializers_strings[content] = name
+                self.initializers.append(tensor)
+                return tensor
+
+            self.add_node(
+                'Identity', cached_name, name, op_version=self.target_opset,
+                name=name + '_op')
+            return name
+
+        if sparse_tensor is not None:
+            content = cached_value.SerializeToString()
+            cached_name = self.initializers_strings.get(content, None)
+            if cached_name is None:
+                self.initializers_strings[content] = name
+                self.add_node(
+                    'Constant', [], [name], sparse_value=sparse_tensor,
+                    op_version=self.target_opset, name=name + '_op')
+                return sparse_tensor
+
+            self.add_node(
+                'Identity', cached_name, name, op_version=self.target_opset,
+                name=name + '_op')
+            return name
+
+        raise RuntimeError(
+            "Either tensor or sparse_tensor should be defined.")
 
     def add_value_info(self, variable):
         self.value_info.append(self._make_value_info(variable))
@@ -624,18 +666,19 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         skl_op = operator.raw_operator
         self.get_options(skl_op)
 
-    def get_options(self, model, default_values=None):
+    def get_options(self, model, default_values=None, fail=True):
         """
         Returns additional options for a model.
         It first looks by class then by id (``id(model)``).
         :param model: model being converted
         :param default_values: default options (it is modified by
                                the function)
+        :param fail: fails if options not found
         :return: dictionary
         """
         return _build_options(
             model, self.options, default_values,
-            self._get_allowed_options(model))
+            self._get_allowed_options(model), fail=fail)
 
     def has_options(self, model, option_name):
         """

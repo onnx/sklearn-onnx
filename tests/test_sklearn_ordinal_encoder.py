@@ -13,7 +13,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def ordinal_encoder_support():
@@ -33,9 +33,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
                         dtype=np.int64)
         model.fit(data)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn ordinal encoder",
+            model, "scikit-learn ordinal encoder",
             [("input", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -72,7 +72,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             ("input2", Int64TensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(
-            model, "ordinal encoder", inputs)
+            model, "ordinal encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test,
@@ -94,7 +94,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         model.fit(data)
         inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(model, "ordinal encoder one string cat",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data,
@@ -116,7 +116,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         model.fit(data)
         inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(model, "ordinal encoder two string cats",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data,
@@ -140,9 +140,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
                         dtype=np.int64)
         model.fit(data)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn ordinal encoder",
+            model, "scikit-learn ordinal encoder",
             [("input", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
