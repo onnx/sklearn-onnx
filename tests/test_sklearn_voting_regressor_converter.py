@@ -15,7 +15,8 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from test_utils import dump_data_and_model, fit_regression_model
+from test_utils import (
+    dump_data_and_model, fit_regression_model, TARGET_OPSET)
 
 
 def model_to_test():
@@ -33,7 +34,8 @@ class TestVotingRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(model_to_test())
         model_onnx = convert_sklearn(
             model, "voting regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
@@ -52,7 +54,8 @@ class TestVotingRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(model_to_test(), is_int=True)
         model_onnx = convert_sklearn(
             model, "voting regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -71,7 +74,8 @@ class TestVotingRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(model_to_test(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "voting regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

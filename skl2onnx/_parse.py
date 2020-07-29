@@ -169,6 +169,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             'variable', scope.tensor_type())
         this_operator.outputs.append(variable)
 
+    options = scope.get_options(model, dict(decision_path=False), fail=False)
+    if options is not None and options['decision_path']:
+        dec_path = scope.declare_local_variable(
+            'decision_path', StringTensorType())
+        this_operator.outputs.append(dec_path)
+
     return this_operator.outputs
 
 
@@ -352,6 +358,8 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
                                "be integers or strings.")
         this_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
+        this_operator.classlabels_int64s = classes
+    elif np.issubdtype(classes.dtype, np.unsignedinteger):
         this_operator.classlabels_int64s = classes
     else:
         classes = np.array([s.encode('utf-8') for s in classes])

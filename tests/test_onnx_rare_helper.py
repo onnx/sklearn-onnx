@@ -31,7 +31,7 @@ class TestOnnxRareHelper(unittest.TestCase):
         iris = load_iris()
         X, _ = iris.data, iris.target
 
-        clr = NearestNeighbors(n_neighbors=3)
+        clr = NearestNeighbors(n_neighbors=3, radius=None)
         clr.fit(X)
 
         model_onnx = convert_sklearn(clr, "up",
