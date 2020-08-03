@@ -163,7 +163,11 @@ def predict(model, scope, operator, container,
 def convert_sklearn_decision_tree_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
-    dtype = guess_numpy_type(operator.inputs[0].type)
+    try:
+        dtype = guess_numpy_type(operator.inputs[0].type)
+    except NotImplementedError as e:
+        raise RuntimeError(
+            "Unknown variable {}.".format(operator.inputs[0])) from e
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
