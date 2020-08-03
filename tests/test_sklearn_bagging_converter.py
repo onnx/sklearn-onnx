@@ -88,6 +88,34 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_bagging_classifier_max_features(self):
+        model, X = fit_classification_model(
+            BaggingClassifier(max_features=0.5), 2)
+        model_onnx = convert_sklearn(
+            model, "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32, target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, verbose=False,
+            basename="SklearnBaggingClassifierMaxFeatures",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
+    def test_bagging_classifier_bootstrap_features(self):
+        model, X = fit_classification_model(
+            BaggingClassifier(bootstrap_features=True), 2)
+        model_onnx = convert_sklearn(
+            model, "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32, target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[:5], model, model_onnx, verbose=False,
+            basename="SklearnBaggingClassifierBootstrapFeatures",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
     def test_bagging_classifier_default_binary_nozipmap(self):
         model, X = fit_classification_model(
             BaggingClassifier(), 2)
@@ -160,14 +188,11 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:5],
-            model,
-            model_onnx,
+            X[:5], model, model_onnx,
             basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function_binary'],
-        )
+            methods=['predict', 'decision_function_binary'])
 
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
@@ -183,13 +208,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:5],
-            model,
-            model_onnx,
+            X[:5], model, model_onnx,
             basename="SklearnBaggingClassifierSGDMulticlass-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     def test_bagging_classifier_sgd_multiclass_decision_function(self):
         model, X = fit_classification_model(
@@ -272,6 +294,34 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_bagging_regressor_max_features(self):
+        model, X = fit_regression_model(
+            BaggingRegressor(max_features=0.5))
+        model_onnx = convert_sklearn(
+            model, "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32, target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, verbose=False,
+            basename="SklearnBaggingRegressorMaxFeatures-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
+    def test_bagging_regressor_bootstrap_features(self):
+        model, X = fit_regression_model(
+            BaggingRegressor(bootstrap_features=False))
+        model_onnx = convert_sklearn(
+            model, "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            dtype=np.float32, target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, verbose=False,
+            basename="SklearnBaggingRegressorBootstrapFeatures-Dec4",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')")
+
     def test_bagging_regressor_sgd(self):
         model, X = fit_regression_model(
             BaggingRegressor(SGDRegressor()))
@@ -325,4 +375,5 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestSklearnBaggingConverter().test_bagging_classifier_bootstrap_features()
     unittest.main()
