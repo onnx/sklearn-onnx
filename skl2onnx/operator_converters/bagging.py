@@ -45,8 +45,7 @@ def _calculate_proba(scope, operator, container, model):
         else:
             # subset of features
             feat_name = scope.declare_local_variable(
-                'fsel_%d' % index,
-                operator.inputs[0].type.__class__())
+                'fsel_%d' % index, operator.inputs[0].type.__class__())
             index_name = scope.get_unique_variable_name('index_name')
             container.add_initializer(
                 index_name, onnx_proto.TensorProto.INT64,
@@ -176,8 +175,7 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
         else:
             # subset of features
             feat_name = scope.declare_local_variable(
-                'fsel_%d' % index,
-                operator.inputs[0].type.__class__())
+                'fsel_%d' % index, operator.inputs[0].type.__class__())
             index_name = scope.get_unique_variable_name('index_name')
             container.add_initializer(
                 index_name, onnx_proto.TensorProto.INT64,

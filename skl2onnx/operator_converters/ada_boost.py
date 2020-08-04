@@ -262,7 +262,8 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
 
     for i_est, estimator in enumerate(op.estimators_):
         label_name = scope.declare_local_variable('elab_name_%d' % i_est)
-        proba_name = scope.declare_local_variable('eprob_name_%d' % i_est)
+        proba_name = scope.declare_local_variable(
+            'eprob_name_%d' % i_est, operator.inputs[0].type.__class__())
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
