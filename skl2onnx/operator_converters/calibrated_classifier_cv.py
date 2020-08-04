@@ -10,7 +10,6 @@ from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common.data_types import guess_numpy_type
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
