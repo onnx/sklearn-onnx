@@ -4,7 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
 from .._supported_operators import sklearn_operator_name_map
@@ -29,7 +28,7 @@ def convert_voting_regressor(scope, operator, container):
         this_operator.inputs = operator.inputs
 
         var_name = scope.declare_local_variable(
-            'var_%d' % i, FloatTensorType())
+            'var_%d' % i, operator.inputs[0].type.__class__())
         this_operator.outputs.append(var_name)
         var_name = var_name.onnx_name
 
