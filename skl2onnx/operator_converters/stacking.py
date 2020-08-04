@@ -27,7 +27,7 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
         output_proba = label_name
     else:
         output_proba = scope.declare_local_variable(
-            'probability_tensor', inputs[0].type.__class__())
+            'probability_tensor', inputs.type.__class__())
         this_operator.outputs.append(output_proba)
     return output_proba.full_name
 
