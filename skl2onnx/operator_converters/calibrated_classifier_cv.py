@@ -9,7 +9,6 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -261,8 +260,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
-    df_name = scope.declare_local_variable('probability_tensor',
-                                           FloatTensorType())
+    df_name = scope.declare_local_variable(
+        'probability_tensor', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name
