@@ -23,9 +23,9 @@ def import_source(module_file_path, module_name):
     return module_spec.loader.exec_module(module)
 
 
-class TestDocumentationExample(unittest.TestCase):
+class TestDocumentationTutorial(unittest.TestCase):
 
-    def test_documentation_examples(self):
+    def test_documentation_tutorial(self):
 
         this = os.path.abspath(os.path.dirname(__file__))
         fold = os.path.normpath(os.path.join(this, '..', 'tutorial'))
