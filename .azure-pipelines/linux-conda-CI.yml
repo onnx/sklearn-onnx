@@ -261,18 +261,9 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation examples'
-    condition: eq(variables['run.example'], '1')
-
-  - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
       pip install -r docs/requirements.txt
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation tutorial'
+    displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 
   - script: |
