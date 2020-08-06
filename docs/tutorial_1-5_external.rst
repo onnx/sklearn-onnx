@@ -1,0 +1,15 @@
+Using converter from other libraries
+====================================
+
+Before starting writing our own converter,
+we can use some available in other libraries
+than :epkg:`sklearn-onnx`. :epkg:`onnxmltools` implements
+converters for :epkg:`xgboost` and :epkg:`LightGBM`.
+Following examples show how to use the conveter when the
+model are part of a pipeline.
+
+.. toctree::
+    :maxdepth: 1
+
+    auto_examples/plot_gexternal_lightgbm
+    auto_examples/plot_gexternal_xgboost
