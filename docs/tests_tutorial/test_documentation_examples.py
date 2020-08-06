@@ -17,9 +17,8 @@ def import_source(module_file_path, module_name):
         module_name, module_file_path)
     if module_spec is None:
         raise FileNotFoundError(
-            "Unable to find '{}' in '{}', cwd='{}'.".format(
-                module_name, module_file_path,
-                os.path.abspath(__file__)))
+            "Unable to find '{}' in '{}'.".format(
+                module_name, module_file_path))
     module = importlib.util.module_from_spec(module_spec)
     return module_spec.loader.exec_module(module)
 
@@ -29,24 +28,12 @@ class TestDocumentationExample(unittest.TestCase):
     def test_documentation_examples(self):
 
         this = os.path.abspath(os.path.dirname(__file__))
-        onxc = os.path.normpath(os.path.join(this, '..'))
-        pypath = os.environ.get('PYTHONPATH', None)
-        sep = ";" if sys.platform == 'win32' else ':'
-        pypath = "" if pypath in (None, "") else (pypath + sep)
-        pypath += onxc
-        os.environ['PYTHONPATH'] = pypath
-        fold = os.path.normpath(os.path.join(this, '..', 'examples'))
+        fold = os.path.normpath(os.path.join(this, '..', 'tutorial'))
         found = os.listdir(fold)
         tested = 0
         for name in found:
             if name.startswith("plot_") and name.endswith(".py"):
-                if (name == "plot_pipeline_lightgbm.py" and
-                        StrictVersion(onnxruntime.__version__) <
-                            StrictVersion('1.0.0')):
-                    continue
-                if __name__ == "__main__":
-                    print("run %r" % name)
-                sys.path.insert(0, fold)
+                print("run %r" % name)
                 try:
                     mod = import_source(fold, os.path.splitext(name)[0])
                     assert mod is not None
@@ -86,9 +73,6 @@ class TestDocumentationExample(unittest.TestCase):
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
                                 "failed due to\n{}"
                                 "".format(name, cmds, sys.exec_prefix, st))
-                finally:
-                    if sys.path[0] == fold:
-                        del sys.path[0]
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")
