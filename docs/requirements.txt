@@ -22,7 +22,9 @@ skl2onnx
 sphinx
 sphinx_readable_theme
 sphinxcontrib-blockdiag
+sphinxcontrib.imagesvg
 sphinx-gallery
+tabulate
 tqdm
 wheel
 xgboost
