@@ -19,5 +19,5 @@ That's the difficult part.
 .. toctree::
     :maxdepth: 1
 
-    auto_examples/plot_pextend_python_runtime
-    auto_examples/plot_qextend_onnxruntime
+    auto_tutorial/plot_pextend_python_runtime
+    auto_tutorial/plot_qextend_onnxruntime

@@ -11,5 +11,5 @@ model are part of a pipeline.
 .. toctree::
     :maxdepth: 1
 
-    auto_examples/plot_gexternal_lightgbm
-    auto_examples/plot_gexternal_xgboost
+    auto_tutorial/plot_gexternal_lightgbm
+    auto_tutorial/plot_gexternal_xgboost
