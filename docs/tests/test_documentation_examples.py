@@ -66,12 +66,10 @@ class TestDocumentationExample(unittest.TestCase):
                             # still the same in released version on pypi
                             pass
                         else:
-                            installed = os.listdir(os.path.dirname(numpy.__file__))
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
-                                "failed due to\n{}\n----\n"
-                                "".format(name, cmds, sys.exec_prefix, st,
-                                          "\n".join(installed)))
+                                "failed due to\n{}"
+                                "".format(name, cmds, sys.exec_prefix, st))
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")
