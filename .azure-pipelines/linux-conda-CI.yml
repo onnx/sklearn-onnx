@@ -262,6 +262,7 @@ jobs:
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
       pip install -r docs/requirements.txt
+      pip uninstall -y skl2onnx
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
