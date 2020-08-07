@@ -263,6 +263,7 @@ jobs:
       fi
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
+      python setup.py install
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
