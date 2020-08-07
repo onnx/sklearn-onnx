@@ -2,6 +2,7 @@ codecov
 coverage
 flake8
 joblib
+lightgbm
 loky
 matplotlib
 mlinsights
@@ -23,3 +24,4 @@ sphinxcontrib-blockdiag
 sphinx-gallery
 tqdm
 wheel
+xgboost
