@@ -23,6 +23,7 @@ sphinx
 sphinx_readable_theme
 sphinxcontrib-blockdiag
 sphinx-gallery
+tabulate
 tqdm
 wheel
 xgboost
