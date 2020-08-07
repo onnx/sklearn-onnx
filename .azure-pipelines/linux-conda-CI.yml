@@ -273,11 +273,21 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
+      python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
+    displayName: 'build documentation'
+    condition: eq(variables['run.example'], '1')
+
+  - script: |
+      if [ '$(onnx.target_opset)' != '' ]
+      then
+        export TEST_TARGET_OPSET="$(onnx.target_opset)"
+      fi
       if [ '$(do.bench)' == '1' ]
         then
           python tests/benchmark.py
       fi
     displayName: 'benchmark'
+    condition: eq(variables['run.example'], '0')
 
   - task: PublishTestResults@2
     inputs:
