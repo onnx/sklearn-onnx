@@ -7,6 +7,7 @@ import os
 import sys
 import importlib
 import subprocess
+import numpy
 import onnxruntime
 
 
@@ -55,9 +56,6 @@ class TestDocumentationTutorial(unittest.TestCase):
                             # dot not installed, this part
                             # is tested in onnx framework
                             pass
-                        elif "No module named 'xgboost'" in st:
-                            # xgboost not installed on CI
-                            pass
                         elif ("cannot import name 'LightGbmModelContainer' "
                                 "from 'onnxmltools.convert.common."
                                 "_container'") in st:
@@ -69,10 +67,12 @@ class TestDocumentationTutorial(unittest.TestCase):
                             # still the same in released version on pypi
                             pass
                         else:
+                            installed = os.listdir(os.path.dirname(numpy.__file__))
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
-                                "failed due to\n{}"
-                                "".format(name, cmds, sys.exec_prefix, st))
+                                "failed due to\n{}\n----\n"
+                                "".format(name, cmds, sys.exec_prefix, st,
+                                          "\n".join(installed)))
                 tested += 1
         if tested == 0:
             raise RuntimeError("No example was tested.")
