@@ -20,6 +20,7 @@ pytest-cov
 scikit-learn
 skl2onnx
 sphinx
+sphinx_readable_theme
 sphinxcontrib-blockdiag
 sphinx-gallery
 tqdm
