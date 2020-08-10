@@ -124,9 +124,10 @@ def decorrelate_transformer_converter(scope, operator, container):
     op_name = scope.get_unique_operator_name('sub')
     sub_name = scope.get_unique_variable_name('sub')
     # This function is defined in package onnxconverter_common.
-    # Most common operator can be added to the graph with
+    # Most common operators can be added to the graph with
     # these functions. It handles the case when specifications
-    # changed accross various opset.
+    # changed accross opsets (a parameter becomes an input
+    # for example).
     apply_sub(scope, [X.full_name, mean_name], sub_name, container,
               operator_name=op_name)
 

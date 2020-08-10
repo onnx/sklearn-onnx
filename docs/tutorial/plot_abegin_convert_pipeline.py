@@ -76,7 +76,7 @@ pred_ort[:5], pred_skl[:5]
 # ++++++++++
 #
 # Before deploying, we need to compare that both
-# scikitl-learn and ONNX return the same predictions.
+# *scikit-learn* and *ONNX* return the same predictions.
 
 
 def diff(p1, p2):

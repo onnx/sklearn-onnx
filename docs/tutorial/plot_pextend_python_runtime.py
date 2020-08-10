@@ -7,7 +7,7 @@ Fast design with a python runtime
 
 .. index:: custom python runtime
 
-:epkg:`ONNX operators` does not contain operator
+:epkg:`ONNX operators` do not contain all operators
 from :epkg:`numpy`. There is no operator for
 `solve <https://numpy.org/doc/stable/reference/
 generated/numpy.linalg.solve.html>`_ but this one
@@ -140,20 +140,20 @@ test_live_decorrelate_transformer()
 # efficient to implement an algorithm with existing
 # ONNX operators to find eigen values.
 # A new operator must be
-# added, we give it the same name *Eig* as :epkg:`numpy`.
-# It would take a matrix and would produce two outputs,
+# added, we give it the same name *Eig* as in :epkg:`numpy`.
+# It would take a matrix and would produce one or two outputs,
 # the eigen values and the eigen vectors.
 # Just for the exercise, a parameter specifies
-# to output the eigen vectors as well.
+# to output the eigen vectors as a second output.
 #
 # New ONNX operator
 # ^^^^^^^^^^^^^^^^^
 #
-# ONNX is not strict, any unknown operator can be
-# added to a graph. Operators are grouped by domain,
+# Any unknown operator can be
+# added to an ONNX graph. Operators are grouped by domain,
 # `''` or `ai.onnx` refers to matrix computation.
 # `ai.onnx.ml` refers to usual machine learning models.
-# They officially supported by the :epkg:`onnx` package.
+# New domains are officially supported by :epkg:`onnx` package.
 # We want to create a new operator `Eig` of domain `onnxcustom`.
 # It must be declared in a class, then a converter can use it.
 
@@ -228,7 +228,7 @@ def live_decorrelate_transformer_converter(scope, operator, container):
     proto_dtype = guess_proto_type(X.type)
     dtype = guess_numpy_type(X.type)
 
-    # Lines in comment specifies the numpy computation
+    # Lines in comment specify the numpy computation
     # the ONNX code implements.
     # mean_ = numpy.mean(X, axis=0, keepdims=True)
     mean = OnnxReduceMean(X, axes=[0], keepdims=1, op_version=opv)
@@ -236,9 +236,9 @@ def live_decorrelate_transformer_converter(scope, operator, container):
     # This is trick I often use. The converter automatically
     # chooses a name for every output. In big graph,
     # it is difficult to know which operator is producing which output.
-    # This line just tells every node must name its ouput by this prefix.
+    # This line just tells every node must prefix its ouputs with this string.
     # It also applies to all inputs nodes unless this method
-    # is called to one of the node.
+    # was called for one of these nodes.
     mean.set_onnx_name_prefix('mean')
 
     # X2 = X - mean_
@@ -251,7 +251,7 @@ def live_decorrelate_transformer_converter(scope, operator, container):
         op_version=opv)
     Nf = OnnxCast(N, to=proto_dtype, op_version=opv)
 
-    # Every output involved in N and Nf will be prefixed by 'N'.
+    # Every output involved in N and Nf is prefixed by 'N'.
     Nf.set_onnx_name_prefix('N')
 
     V = OnnxDiv(
@@ -307,8 +307,8 @@ def live_decorrelate_transformer_converter(scope, operator, container):
 # Runtime for Eig
 # ^^^^^^^^^^^^^^^
 #
-# Here come the new part. The python runtime does not
-# implement any runtime for Eig. We need to tell the runtime
+# Here comes the new part. The python runtime does not
+# implement any runtime for *Eig*. We need to tell the runtime
 # to compute eigen values and vectors every time operator *Eig*
 # is called. That means implementing two methods,
 # one to compute, one to infer the shape of the results.

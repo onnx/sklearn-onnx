@@ -4,9 +4,10 @@ Dataframe as an input
 
 .. index:: dataframe
 
-A pipeline usually takes a matrix or is converted in a matrix
-if the data is held in a dataframe. However, multiple inputs
-are allowed. Let's see how.
+A pipeline usually ingests data as a matrix. It may be converted in a matrix
+if all the data share the same type. But data held in a dataframe
+have usually multiple types, float, integer or string for categories.
+ONNX also supports that case.
 
 .. contents::
     :local:
@@ -122,7 +123,7 @@ print(got['probabilities'])
 
 ######################################
 # It looks ok. Let's dig into the details to
-# directly use onnxruntime.
+# directly use *onnxruntime*.
 #
 # Unhide conversion logic with a dataframe
 # ++++++++++++++++++++++++++++++++++++++++
@@ -149,7 +150,7 @@ init = guess_schema_from_data(train_data)
 pprint.pprint(init)
 
 ##############################
-# Let's convert with skl2onnx only.
+# Let's convert with *skl2onnx* only.
 
 onx2 = to_onnx(
     pipe, initial_types=init,

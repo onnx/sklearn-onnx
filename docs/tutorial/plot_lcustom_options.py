@@ -8,14 +8,13 @@ A new converter with options
 
 Options are used to implement different conversion
 for a same model. The options can be used to replace
-an operator by the Einsum operator and compare the
+an operator *MatMul* by the *Gemm* operator and compare the
 processing time for both graph. Let's see how to retrieve
 the options within a converter.
 
 Example :ref:`l-plot-custom-converter` implements a converter
-which uses operator *MatMul*. We would like to compare
-with operator *Gemm*. That's a different way to convert
-the same transformer, it is selected by option *use_gemm*.
+which uses operator *MatMul*. Option *use_gemm* is used to
+replace *MatMul* by *Gemm*.
 
 .. contents::
     :local:
@@ -90,7 +89,7 @@ print(pred)
 # Conversion into ONNX
 # ++++++++++++++++++++
 #
-# Let's try to convert it to see what happens.
+# Let's try to convert it and see what happens.
 
 
 def decorrelate_transformer_shape_calculator(operator):
@@ -156,7 +155,7 @@ def diff(p1, p2):
 print(diff(exp, got))
 
 ############################################
-# We try the non default option, use_pca: False.
+# We try the non default option, `use_gemm: True`.
 
 onx2 = to_onnx(dec, X.astype(numpy.float32),
                options={'use_gemm': True})
