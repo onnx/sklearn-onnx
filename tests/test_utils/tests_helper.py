@@ -392,8 +392,7 @@ def dump_data_and_model(
                             basename,
                             str(e).replace("\n", " -- ")))
                         continue
-                    else:
-                        raise e
+                    raise e
 
             if output is not None:
                 dest = os.path.join(folder,
@@ -943,7 +942,8 @@ def make_report_backend(folder, as_df=False):
         df["ratio"] = df["onnxrt_time"] / df["original_time"]
         df["ratio_nodes"] = df["nb_onnx_nodes"] / df["nb_estimators"]
         df["CPU"] = platform.processor()
-        df["CPUI"] = cpuinfo.get_cpu_info()["brand"]
+        info = cpuinfo.get_cpu_info()
+        df["CPUI"] = info.get("brand", info.get('brand_raw', '?'))
         return df
     else:
         cpu = cpuinfo.get_cpu_info()["brand"]
@@ -966,3 +966,12 @@ def make_report_backend(folder, as_df=False):
             row["onnx-version"] = onnx.__version__
             row["onnxruntime-version"] = onnxruntime.__version__
         return aslist
+
+
+def binary_array_to_string(mat):
+    if not isinstance(mat, numpy.ndarray):
+        raise NotImplementedError()
+    if len(mat.shape) != 2:
+        raise NotImplementedError()
+    res = [[str(i) for i in row] for row in mat.tolist()]
+    return [''.join(row) for row in res]

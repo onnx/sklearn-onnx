@@ -140,8 +140,13 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     ````
     
     """ # noqa
-
     op = operator.raw_operator
+
+    if (container.target_opset is not None and
+            container.target_opset < 9):
+        raise RuntimeError(
+            "Converter for '{}' only works for opset >= 9."
+            "".format(op.__class__.__name__))
 
     if op.analyzer == "char_wb":
         raise NotImplementedError(
@@ -177,7 +182,6 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
                           "scikit-learn regular expression by default "
                           "in version 1.6.",
                           UserWarning)
-            default_separators = [' ', '.', '\\?', ',', ';', ':', '\\!']
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'
@@ -249,8 +253,9 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
         if stop_words:
             attrs['stopwords'] = list(sorted(stop_words))
+        opvs = 1 if domain == 'com.microsoft' else op_version
         container.add_node(op_type, flatten,
-                           normalized, op_version=op_version,
+                           normalized, op_version=opvs,
                            op_domain=domain, **attrs)
     else:
         normalized = operator.input_full_names

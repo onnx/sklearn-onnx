@@ -35,8 +35,13 @@ import numpy as np
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
-from sklearn.datasets.twenty_newsgroups import strip_newsgroup_footer
-from sklearn.datasets.twenty_newsgroups import strip_newsgroup_quoting
+try:
+    from sklearn.datasets._twenty_newsgroups import (
+        strip_newsgroup_footer, strip_newsgroup_quoting)
+except ImportError:
+    # scikit-learn < 0.24
+    from sklearn.datasets.twenty_newsgroups import (
+        strip_newsgroup_footer, strip_newsgroup_quoting)
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline

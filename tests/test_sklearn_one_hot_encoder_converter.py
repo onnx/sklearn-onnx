@@ -13,7 +13,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def one_hot_encoder_supports_string():
@@ -44,6 +44,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn one-hot encoder",
             [("input", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -68,6 +69,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn one-hot encoder",
             [("input", Int32TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         str_model_onnx = str(model_onnx)
         assert "int64_data" in str_model_onnx
@@ -92,6 +94,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn one-hot encoder",
             [("input", Int32TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         str_model_onnx = str(model_onnx)
         assert "int64_data" in str_model_onnx
@@ -123,7 +126,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input2", Int64TensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(
-            model, "one-hot encoder", inputs)
+            model, "one-hot encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test, model, model_onnx, verbose=False,
@@ -162,7 +165,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model.fit(data)
         inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(model, "one-hot encoder two string cats",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data,
@@ -188,7 +191,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input2", StringTensorType([None, 1])),
         ]
         model_onnx = convert_sklearn(
-            model, "one-hot encoder", inputs)
+            model, "one-hot encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test_data,
@@ -214,7 +217,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "scikit-learn one-hot encoder",
-            [("input1", Int64TensorType([None, 3]))]
+            [("input1", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -242,6 +246,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             model,
             "scikit-learn one-hot encoder",
             [("input", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -273,9 +278,9 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         inputs = [
             ("input1", Int64TensorType([None, 3])),
         ]
-        model_onnx = convert_sklearn(model,
-                                     "one-hot encoder",
-                                     inputs)
+        model_onnx = convert_sklearn(
+            model, "one-hot encoder", inputs,
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test,
@@ -308,7 +313,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input1", Int64TensorType([None, 3])),
         ]
         model_onnx = convert_sklearn(
-            model, "one-hot encoder", inputs)
+            model, "one-hot encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             test,
@@ -334,7 +339,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("input", StringTensorType([None, 2])),
         ]
         model_onnx = convert_sklearn(
-            model, "one-hot encoder", inputs)
+            model, "one-hot encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data,

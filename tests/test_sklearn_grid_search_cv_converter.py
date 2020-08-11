@@ -20,6 +20,7 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -31,12 +32,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -55,12 +56,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
             SVC(random_state=42, probability=True, gamma='auto'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=5)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -80,12 +81,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -105,12 +106,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='multinomial'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=4, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -126,11 +127,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_regression_int(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(Lasso(max_iter=100),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf, is_int=True)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -147,11 +149,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(LassoLars(max_iter=100),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -171,11 +174,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
-                           tuned_parameters, cv=5, iid=False)
+                           tuned_parameters, cv=5)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -196,12 +200,12 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_gaussian_regressor_double(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(),
-                           tuned_parameters, cv=3, iid=False)
+                           tuned_parameters, cv=3)
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
             [("input", DoubleTensorType([None, X.shape[1]]))],
-            dtype=np.float64)
+            dtype=np.float64, target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float64),
@@ -223,13 +227,13 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         clf = GridSearchCV(
             LogisticRegression(random_state=42, max_iter=100, solver='lbfgs',
                                multi_class='ovr'),
-            tuned_parameters, cv=5, iid=False)
+            tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(clf): {'zipmap': False, 'raw_scores': True}}
+            options={id(clf): {'zipmap': False, 'raw_scores': True}},
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         assert "zipmap" not in str(model_onnx).lower()
