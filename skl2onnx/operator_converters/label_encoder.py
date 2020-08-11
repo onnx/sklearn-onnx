@@ -21,6 +21,12 @@ def convert_sklearn_label_encoder(scope, operator, container):
         attrs['keys_strings'] = np.array([s.encode('utf-8') for s in classes])
     attrs['values_int64s'] = np.arange(len(classes))
 
+    cop = container.target_opset_any_domain('ai.onnx.ml')
+    if cop is not None and cop < 2:
+        raise RuntimeError(
+            "LabelEncoder requires at least opset 2 for domain 'ai.onnx.ml' "
+            "not {}".format(cop))
+
     container.add_node(op_type, operator.input_full_names,
                        operator.output_full_names, op_domain='ai.onnx.ml',
                        op_version=2, **attrs)

@@ -392,8 +392,7 @@ def dump_data_and_model(
                             basename,
                             str(e).replace("\n", " -- ")))
                         continue
-                    else:
-                        raise e
+                    raise e
 
             if output is not None:
                 dest = os.path.join(folder,
