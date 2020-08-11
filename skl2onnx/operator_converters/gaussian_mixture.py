@@ -13,6 +13,7 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
+from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
     OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
@@ -96,8 +97,8 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
         #             2. * np.dot(X, (means * precisions).T) +
         #             np.dot(X ** 2, precisions.T))
 
-        precisions = (precisions_chol ** 2)
-        mp = np.sum((means ** 2 * precisions), 1)
+        precisions = (precisions_chol ** 2).astype(dtype)
+        mp = np.sum((means ** 2 * precisions), 1).astype(dtype)
         zeros = np.zeros((n_components, ), dtype=dtype)
         xmp = OnnxGemm(
             X, (means * precisions).T.astype(dtype),
@@ -139,15 +140,75 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                            "to a more recent version of skearn-onnx "
                            "or raise an issue.".format(covariance_type))
     # -.5 * (cst + log_prob) + log_det
-    cst = np.array([n_features * np.log(2 * np.pi)])
-    add = OnnxAdd(cst.astype(dtype), log_prob, op_version=opv)
+    cst = np.array([n_features * np.log(2 * np.pi)]).astype(dtype)
+    add = OnnxAdd(cst, log_prob, op_version=opv)
     mul = OnnxMul(add, np.array([-0.5], dtype=dtype),
                   op_version=opv)
     if isinstance(log_det, float):
         log_det = np.array([log_det], dtype=dtype)
-    weighted_log_prob = OnnxAdd(
-        OnnxAdd(mul, log_det, op_version=opv),
-        log_weights.astype(dtype), op_version=opv)
+
+    return OnnxAdd(mul, log_det.astype(dtype), op_version=opv)
+
+
+def convert_sklearn_gaussian_mixture(scope, operator, container):
+    """
+    Converter for *GaussianMixture*,
+    *BayesianGaussianMixture*.
+    """
+    X = operator.inputs[0]
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
+    out = operator.outputs
+    op = operator.raw_operator
+    n_components = op.means_.shape[0]
+    opv = container.target_opset
+    options = container.get_options(op, dict(score_samples=None))
+    add_score = options.get('score_samples', False)
+    combined_reducesum = not container.is_allowed(
+        {'ReduceLogSumExp', 'ReduceSumSquare'})
+    if add_score and len(out) != 3:
+        raise RuntimeError("3 outputs are expected.")
+
+    if X.type is not None:
+        if X.type.shape[1] != op.means_.shape[1]:
+            raise RuntimeError(
+                "Dimension mismath between expected number of features {} "
+                "and ONNX graphs expectations {}.".format(
+                    op.means_.shape[1], X.type.shape[1]))
+    n_features = op.means_.shape[1]
+
+    # All comments come from scikit-learn code and tells
+    # which functions is being onnxified.
+    # def _estimate_weighted_log_prob(self, X):
+    log_weights = op._estimate_log_weights().astype(dtype)
+
+    log_gauss = _estimate_log_gaussian_prob(
+        X, op.means_, op.precisions_cholesky_, op.covariance_type,
+        dtype, opv, combined_reducesum)
+
+    if isinstance(op, BayesianGaussianMixture):
+        # log_gauss = (_estimate_log_gaussian_prob(
+        #   X, self.means_, self.precisions_cholesky_, self.covariance_type) -
+        #   .5 * n_features * np.log(self.degrees_of_freedom_))
+
+        log_lambda = n_features * np.log(2.) + np.sum(digamma(
+            .5 * (op.degrees_of_freedom_ -
+                  np.arange(0, n_features)[:, np.newaxis])), 0)
+        cst_log_lambda = .5 * (log_lambda - n_features / op.mean_precision_)
+        cst = cst_log_lambda - .5 * n_features * np.log(op.degrees_of_freedom_)
+        if isinstance(cst, np.ndarray):
+            cst_array = cst.astype(dtype)
+        else:
+            cst_array = np.array([cst], dtype=dtype)
+        log_gauss = OnnxAdd(log_gauss, cst_array, op_version=opv)
+    elif not isinstance(op, GaussianMixture):
+        raise RuntimeError(
+            "The converter does not support type {}.".format(
+                type(op)))
+
+    # self._estimate_log_prob(X) + self._estimate_log_weights()
+    weighted_log_prob = OnnxAdd(log_gauss, log_weights, op_version=opv)
 
     # labels
     if container.is_allowed('ArgMax'):
