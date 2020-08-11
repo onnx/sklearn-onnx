@@ -4,7 +4,7 @@ Black list operators when converting
 
 .. index:: black list, white list
 
-Some runtime do not implement a runtime for every
+Some runtimes do not implement a runtime for every
 available operator in ONNX. The converter does not know
 that but it is possible to black some operators. Most of
 the converters do not change their behaviour, they fail

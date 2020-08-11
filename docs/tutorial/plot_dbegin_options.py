@@ -19,7 +19,7 @@ Let's see how this may be done.
 Option *zipmap*
 +++++++++++++++
 
-Every classifier is by design converted into an ONNX which outputs
+Every classifier is by design converted into an ONNX graph which outputs
 two results: the predicted label and the prediction probabilites
 for every label. By default, the labels are integers and the
 probabilites are stored in dictionaries. That's the purpose
@@ -174,7 +174,7 @@ ax.get_yaxis().set_visible(False)
 #
 # Every classifier is converted in a graph which
 # returns probabilities by default. But many models
-# compute unscaled raw_scores.
+# compute unscaled *raw_scores*.
 # First, with probabilities:
 
 
@@ -249,46 +249,3 @@ for k, v in sorted(_converter_pool.items()):
         all_opts.add(o)
 
 print('all options:', pformat(list(sorted(all_opts))))
-
-##############################################
-# Black list, white list of operators
-# +++++++++++++++++++++++++++++++++++
-#
-# Some runtimes do not support a specific node
-# and the conversion needs to be aware of that constraint.
-# The converter may not be able to avoid such unwanted
-# ONNX operator. It fails in that case. It may be able
-# to produce a different graph, probably less efficient too.
-# That's the case of the converter for the model
-# in charge of *GaussianMixture*.
-
-
-data = load_iris()
-X = data.data
-model = GaussianMixture(n_components=2, covariance_type='full')
-model.fit(X)
-model_onnx = to_onnx(model, X.astype(numpy.float32),
-                     target_opset=12)
-print("nb_nodes:", len(model_onnx.graph.node))
-
-#################################
-# Without node *ReduceLogSumExp*.
-
-model_onnx = to_onnx(model, X.astype(numpy.float32),
-                     target_opset=12, black_op={'ReduceLogSumExp'})
-print("nb_nodes:", len(model_onnx.graph.node))
-
-#################################
-# The ONNX model contains more nodes and replaces
-# node *ReduceLogSumExp* by a combination of nodes
-# *ReduceSum*, *Exp*, *Sub*, *Add*, *ReduceMax*, *Log*.
-# Without node *Add*.
-
-try:
-    to_onnx(model, X.astype(numpy.float32),
-            target_opset=12, black_op={'Add'})
-except RuntimeError as e:
-    print(e)
-
-################################
-# It fails as expected.

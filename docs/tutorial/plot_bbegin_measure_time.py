@@ -83,7 +83,7 @@ df_skl.set_index('size')[['mean_obs']].plot(
 # ++++++++++++
 #
 # The same is done with the two ONNX runtime
-# available. the time
+# available.
 
 onx = to_onnx(ereg, X_train[:1].astype(numpy.float32))
 sess = InferenceSession(onx.SerializeToString())
@@ -122,7 +122,7 @@ df = DataFrame(obs)
 df
 
 #####################################
-# Graphe.
+# Graph.
 
 df.set_index('size')[['skl', 'ort', 'pyrt']].plot(
     title="Average prediction time per runtime",

@@ -102,7 +102,7 @@ print(pred)
 # Conversion into ONNX
 # ++++++++++++++++++++
 #
-# Let's try to convert it to see what happens.
+# Let's try to convert it and see what happens.
 
 
 try:
@@ -118,7 +118,7 @@ except Exception as e:
 # with the same signature as below.
 # First the shape calculator. We retrieve the input type
 # add tells the output type has the same type,
-# number of rows, and a specific number of columns.
+# the same number of rows and a specific number of columns.
 
 
 def decorrelate_transformer_shape_calculator(operator):

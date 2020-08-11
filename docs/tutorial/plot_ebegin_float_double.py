@@ -6,7 +6,7 @@ Issues when switching to float
 
 .. index:: float, double, discrepencies
 
-Most models in :epkg:`scikit-learn` compute with double,
+Most models in :epkg:`scikit-learn` do computation with double,
 not float. Most models in deep learning use float because
 that's the most common situation with GPU. ONNX was initially
 created to facilitate the deployment of deep learning models
@@ -37,7 +37,7 @@ More into the issue
 The below example is built to fail.
 It contains integer features with different order
 of magnitude rounded to integer. A decision tree compares
-features to threshold. In most cases, float and double
+features to thresholds. In most cases, float and double
 comparison gives the same result. We denote
 :math:`[x]_{f32}` the conversion (or cast)
 ``numpy.float32(x)``.
@@ -47,7 +47,7 @@ comparison gives the same result. We denote
     x \\leqslant y = [x]_{f32} \\leqslant [y]_{f32}
 
 However, the probability that both comparisons give
-different results is not null. The following shows
+different results is not null. The following graph shows
 the discord areas.
 """
 from mlprodict.sklapi import OnnxPipeline
@@ -106,9 +106,9 @@ ax.legend()
 # +++++++++++++++++++++++++
 #
 # We can now build an example where the learned decision tree
-# does many comparison in this discord area. This is done
+# does many comparisons in this discord area. This is done
 # by rounding features to integers, a frequent case
-# happening when dealing with categorica features.
+# happening when dealing with categorical features.
 
 
 X, y = make_regression(10000, 10)
@@ -247,7 +247,7 @@ print(diff(skl3, ort3))
 # ++++++++++++
 #
 # The idea here is to always train the next step based
-# on ONNX output. That way, every step of the pipeline
+# on ONNX outputs. That way, every step of the pipeline
 # is trained based on ONNX output.
 #
 # * Trains the first step.

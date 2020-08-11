@@ -17,7 +17,7 @@ which selects two ways to compute the same outputs.
 In this one, the converter produces both. That would not
 be a very efficient converter but that's just for the sake
 of using a parser. By default, a transformer only returns
-one output and but both are needed.
+one output but both are needed.
 
 .. contents::
     :local:
@@ -89,7 +89,7 @@ print(pred)
 # Conversion into ONNX with two outputs
 # +++++++++++++++++++++++++++++++++++++
 #
-# Let's try to convert it to see what happens.
+# Let's try to convert it and see what happens.
 
 
 def decorrelate_transformer_shape_calculator(operator):
@@ -142,8 +142,7 @@ def decorrelate_transformer_parser(
     return this_operator.outputs
 
 ###################################
-# The registration needs to declare the options
-# supported by the converted.
+# The registration needs to declare the parser as well.
 
 
 update_registered_converter(

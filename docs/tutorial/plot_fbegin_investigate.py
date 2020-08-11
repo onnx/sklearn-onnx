@@ -7,9 +7,13 @@ Intermediate results and investigation
 There are many reasons why a user wants more than using
 the converted model into ONNX. Intermediate results may be
 needed, the output of every node in the graph. The ONNX
-may need to be altered to remove some of nodes.
+may need to be altered to remove some nodes.
 Transfer learning is usually removing the last layers of
-a deep neural network.
+a deep neural network. Another reaason is debugging.
+It often happens that the runtime fails to compute the predictions
+due to a shape mismatch. Then it is useful the get the shape
+of every intermediate result. This example looks into two
+ways of doing it.
 
 .. contents::
     :local:
@@ -51,7 +55,7 @@ pipe.fit(X)
 #################################
 # The function goes through every step,
 # overloads the methods *transform* and
-# returns an ONNx graph for every step.
+# returns an ONNX graph for every step.
 steps = collect_intermediate_steps(
     pipe, "pipeline",
     [("X", FloatTensorType([None, X.shape[1]]))])
@@ -78,6 +82,12 @@ for step in steps:
     diff = numpy.abs(skl_outputs.ravel() - onnx_output.ravel()).max()
     print("difference", diff)
 
+# That was the first way: dynamically overwrite
+# every method transform or predict in a scikit-learn
+# pipeline to capture the input and output of every step,
+# compare them to the output produced by truncated ONNX
+# graphs built from the first one.
+#
 #####################################
 # Python runtime to look into every node
 # ++++++++++++++++++++++++++++++++++++++
@@ -100,6 +110,9 @@ oinf.run({'X': X[:2].astype(numpy.float32)},
 oinf.run({'X': X[:2].astype(numpy.float32)},
          verbose=3, fLOG=print)
 
+# This way is usually better if you need to investigate
+# issues within the code of the runtime for an operator.
+#
 #################################
 # Final graph
 # +++++++++++
