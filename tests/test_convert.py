@@ -87,7 +87,11 @@ class TestConvert(unittest.TestCase):
                 self.assertIn(dom[''], (i, i-1))
 
     def test_onehot(self):
-        model = OneHotEncoder(categories='auto')
+        try:
+            model = OneHotEncoder(categories='auto')
+        except TypeError:
+            # parameter categories added in 0.20
+            return
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
         model.fit(data)
