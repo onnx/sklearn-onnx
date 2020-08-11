@@ -61,11 +61,12 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                     continue
                 raise e
             self.assertTrue(model_onnx is not None)
-            dump_data_and_model(
-                corpus, vect, model_onnx,
-                basename="SklearnTfidfVectorizer11Rx%d-OneOff-SklCol" % opset,
-                allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                              "StrictVersion('0.4.0')")
+            if opset >= 10:
+                name = "SklearnTfidfVectorizer11Rx%d-OneOff-SklCol" % opset
+                dump_data_and_model(
+                    corpus, vect, model_onnx, basename=name,
+                    allow_failure="StrictVersion(onnxruntime.__version__) <= "
+                                  "StrictVersion('0.4.0')")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
