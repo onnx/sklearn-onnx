@@ -3,6 +3,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 import onnx
+import onnxruntime
 from sklearn import __version__ as sklearn_version
 try:
     from sklearn.preprocessing import OrdinalEncoder
@@ -19,6 +20,10 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 def ordinal_encoder_support():
     # StrictVersion does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
+    if StrictVersion(vers) < StrictVersion("0.20.0"):
+        return False
+    if StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"):
+        return False
     return StrictVersion(vers) >= StrictVersion("0.20.0")
 
 
