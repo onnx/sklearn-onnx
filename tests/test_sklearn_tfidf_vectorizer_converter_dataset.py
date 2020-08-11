@@ -33,6 +33,9 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')")
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_tfidf_20newsgroups_nolowercase(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
