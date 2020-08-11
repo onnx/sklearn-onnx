@@ -255,7 +255,12 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         self.node_domain_version_pair_sets = set()
         # The targeted ONNX operator set (referred to as opset) that
         # matches the ONNX version.
-        self.target_opset = target_opset
+        if isinstance(target_opset, dict):
+            self.target_opset_all = target_opset
+            self.target_opset = target_opset.get('', None)
+        else:
+            self.target_opset = target_opset
+            self.target_opset_all = {'': target_opset}
         # Additional options given to converters.
         self.options = options
         # All registered models.
@@ -568,14 +573,16 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                 op_version is not None and
                 op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
-                "Opset number {} is higher than targeted opset {} for "
+                "Opset number {} is higher than targeted opsets {} for "
                 "node '{}' (domain: '{}').".format(
-                    op_version, self.target_opset, node.op_type, op_domain))
+                    op_version, self.target_opset_all,
+                    node.op_type, op_domain))
 
     def target_opset_any_domain(self, domain):
-        if isinstance(self.target_opset, dict):
-            if domain in self.target_opset:
-                to = self.target_opset[domain]
+        target_opset = self.target_opset_all
+        if isinstance(target_opset, dict):
+            if domain in target_opset:
+                to = target_opset[domain]
             else:
                 to = None
             if to is None and domain == '':
