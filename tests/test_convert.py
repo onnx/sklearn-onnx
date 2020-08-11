@@ -53,8 +53,7 @@ class TestConvert(unittest.TestCase):
                 self.assertEqual(len(dom), 1)
                 assert dom[''] <= i
 
-    @unittest.skipIf(KBinsDiscretizer is None,
-                     reason="scikit-learn too old")
+    @unittest.skipIf(KBinsDiscretizer is None, "skl too old")
     def test_target_opset_dict_kbins(self):
         data = load_iris()
         X = data.data
@@ -91,7 +90,7 @@ class TestConvert(unittest.TestCase):
         try:
             model = OneHotEncoder(categories='auto')
         except TypeError:
-            # scikit-learn too old
+            # parameter categories added in 0.20
             return
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)

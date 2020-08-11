@@ -24,7 +24,7 @@ def ordinal_encoder_support():
         return False
     if StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"):
         return False
-    return True
+    return StrictVersion(vers) >= StrictVersion("0.20.0")
 
 
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
