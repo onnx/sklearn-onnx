@@ -273,6 +273,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
+      conda install -c anaconda graphviz
       python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
     displayName: 'build documentation'
     condition: eq(variables['run.example'], '1')
