@@ -48,9 +48,10 @@ class TestOp10(unittest.TestCase):
     def test_gaussian_mixture(self):
         model, X = fit_classification_model(GaussianMixture(), 3)
         target_opset = 10
-        model_onnx = convert_sklearn(model, "op10",
-                                     [("input", FloatTensorType([None, 3]))],
-                                     target_opset=target_opset)
+        model_onnx = convert_sklearn(
+            model, "op10",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=target_opset)
         self.check_domain(model_onnx, target_opset=target_opset)
 
     @unittest.skipIf(not onnx_built_with_ml(), reason="onnx-ml")
