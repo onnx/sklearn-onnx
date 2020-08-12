@@ -12,7 +12,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
-    OnnxSub, OnnxDiv,
+    OnnxSub, OnnxDiv, OnnxReshape,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul
@@ -46,7 +46,7 @@ class TestOnnxOperators(unittest.TestCase):
         z = tr.transform(mat)
 
         def conv(scope, operator, container):
-            W = operator.raw_operator.W
+            W = operator.raw_operator.W.astype(container.dtype)
             op = OnnxSub(
                 operator.inputs[0], W, output_names=operator.outputs,
                 op_version=TARGET_OPSET)
@@ -75,7 +75,8 @@ class TestOnnxOperators(unittest.TestCase):
         model_onnx = convert_sklearn(
             tr, 'a-sub', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
-            custom_conversion_functions={CustomOpTransformer: conv})
+            custom_conversion_functions={CustomOpTransformer: conv},
+            target_opset=TARGET_OPSET)
 
         sess = InferenceSession(model_onnx.SerializeToString())
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
@@ -102,8 +103,8 @@ class TestOnnxOperators(unittest.TestCase):
         z = tr.transform(mat)
 
         def conv(scope, operator, container):
-            W = operator.raw_operator.W
-            S = operator.raw_operator.S
+            W = operator.raw_operator.W.astype(np.float32)
+            S = operator.raw_operator.S.astype(np.float32)
             X = operator.inputs[0]
             out = operator.outputs
             op = OnnxDiv(
@@ -121,7 +122,7 @@ class TestOnnxOperators(unittest.TestCase):
             tr, 'a-sub-div', [('input', FloatTensorType([None, 2]))],
             custom_shape_calculators={CustomOpTransformer: shape},
             custom_conversion_functions={CustomOpTransformer: conv},
-            target_opset=None)
+            target_opset=TARGET_OPSET)
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
@@ -139,7 +140,8 @@ class TestOnnxOperators(unittest.TestCase):
             op = operator.raw_operator
 
             C = op.cluster_centers_
-            C2 = row_norms(C, squared=True)
+            C2 = row_norms(C, squared=True).astype(container.dtype)
+            C = C.astype(container.dtype)
 
             rs = OnnxReduceSumSquare(
                 X, axes=[1], keepdims=1,
@@ -249,11 +251,31 @@ class TestOnnxOperators(unittest.TestCase):
             output_names=['Y'], op_version=1)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
-                                outputs=[('Y', FloatTensorType([2]))])
+                                outputs=[('Y', FloatTensorType([2]))],
+                                target_opset=TARGET_OPSET)
         sess = InferenceSession(model_def.SerializeToString())
         got = sess.run(None, {'X': X})[0]
         self.assertEqual(got.shape, (2, 1))
         assert_almost_equal(X[:, 1:2], got)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_container_init(self):
+        onx = OnnxReshape(
+                OnnxReshape('X', np.array([1, -1], dtype=np.int64),
+                            op_version=TARGET_OPSET),
+                np.array([1, -1], dtype=np.int64),
+                output_names=['Y'], op_version=TARGET_OPSET)
+        X = np.array([[1, 2], [3, 4]], dtype=np.float32)
+        model_def = onx.to_onnx({'X': X},
+                                outputs=[('Y', FloatTensorType([None, 2]))],
+                                target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_def.SerializeToString())
+        got = sess.run(None, {'X': X})[0]
+        assert_almost_equal(X.reshape((1, -1)), got)
+        inits = [row for row in str(model_def).split('\n')
+                 if row.startswith("  initializer {")]
+        self.assertEqual(len(inits), 1)
 
 
 if __name__ == "__main__":

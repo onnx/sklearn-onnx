@@ -64,3 +64,5 @@ docs/tests/*.onnx
 docs/examples/validator_classifier.dot.png
 docs/examples/validator_classifier.dot
 docs/examples/mixture*.*
+docs/examples/cast1*
+docs/examples/cast2*

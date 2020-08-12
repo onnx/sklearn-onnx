@@ -127,7 +127,7 @@ def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, op_version=None,
     # It only works in two dimensions.
     t_sigma_0 = py_make_float_array(sigma_0 ** 2, dtype=dtype)
     if isinstance(Y, np.ndarray):
-        tr = Y.T
+        tr = Y.T.astype(dtype)
     else:
         tr = OnnxTranspose(Y, perm=[1, 0], op_version=op_version)
     matm = OnnxMatMul(X, tr, op_version=op_version)

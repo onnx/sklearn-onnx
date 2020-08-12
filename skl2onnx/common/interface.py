@@ -96,5 +96,3 @@ class OperatorBase:
 @six.add_metaclass(abc.ABCMeta)
 class ScopeBase:
     __metaclass__ = abc.ABCMeta
-
-    pass

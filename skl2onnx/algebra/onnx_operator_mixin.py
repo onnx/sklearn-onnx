@@ -33,16 +33,17 @@ class OnnxOperatorMixin:
             during the conversion
         """
         from .. import convert_sklearn
-        if name is None:
-            name = self.__class__.__name__
         if X is None:
             initial_types = self.infer_initial_types()
         else:
             initial_types = guess_initial_types(X, None)
         if not hasattr(self, 'op_version'):
+            if name is None:
+                name = self.__class__.__name__
             raise AttributeError(
-                "Attribute 'op_version' is missing for '{}'.".format(
-                    self.__class__.__name__))
+                "Attribute 'op_version' is missing for '{}' "
+                "(model: '{}').".format(
+                    self.__class__.__name__, name))
         return convert_sklearn(
             self, initial_types=initial_types, dtype=dtype,
             target_opset=self.op_version)
@@ -125,6 +126,11 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
+        if not hasattr(self, 'op_version'):
+            raise AttributeError(
+                "Class '{}' should have an attribute 'op_version'.".format(
+                    self.__class__.__name__))
+
         inputs = getattr(self, "parsed_inputs_", None)
         try:
             if inputs:

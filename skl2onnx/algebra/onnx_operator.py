@@ -5,13 +5,14 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from scipy.sparse import coo_matrix
+from onnxconverter_common.onnx_ops import apply_identity
 from ..proto import TensorProto
 from ..common._topology import (
     Variable, Scope, _update_domain_version,
-    _get_main_opset_version, OPSET_TO_IR_VERSION
-)
+    _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
@@ -79,6 +80,62 @@ class OnnxOperatorItem:
                 "type(self.onx_op.state)={}".format(
                     type(self), type(self.onx_op), type(self.onx_op.state)))
         return outputs[self.index:self.index + 1]
+
+
+class OnnxSubOperator:
+    """
+    Includes a sub operator in the ONNX graph.
+    """
+
+    def __init__(self, op, inputs, output_names=None, op_version=None,
+                 options=None):
+        self.op = op
+        self.output_names = output_names
+        if not isinstance(inputs, list):
+            inputs = [inputs]
+        self.inputs = inputs
+        self.op_version = op_version
+        self.options = options
+
+    def add_to(self, scope, container, operator=None):
+        """
+        Adds outputs to the container if not already added,
+        registered the outputs if the node is not final.
+
+        :param scope: scope
+        :param container: container
+        :param operator: overwrite inputs
+        """
+        if operator is not None:
+            raise RuntimeError(
+                "operator must be None, the operator to convert "
+                "is specified in member 'op'.")
+        try:
+            op_type = sklearn_operator_name_map[type(self.op)]
+        except KeyError:
+            raise RuntimeError(
+                "Unable to find a converter for model of type '{}'."
+                "".format(self.op.__class__.__name__))
+
+        this_operator = scope.declare_local_operator(op_type)
+        this_operator.raw_operator = self.op
+        this_operator.inputs = self.inputs
+        if self.output_names is None:
+            output = scope.declare_local_variable('sub_%s' % op_type)
+            this_operator.outputs.append(output)
+            self.outputs = [output]
+        else:
+            self.outputs = []
+            for v in self.output_names:
+                if isinstance(v, Variable):
+                    output = scope.declare_local_variable(
+                        '%s_%s' % (v.onnx_name, op_type))
+                    apply_identity(
+                        scope, output.onnx_name, v.onnx_name, container)
+                elif isinstance(v, str):
+                    output = scope.declare_local_variable(v)
+            self.outputs.append(output)
+            this_operator.outputs.extend(self.outputs)
 
 
 class OnnxOperator:
@@ -219,12 +276,12 @@ class OnnxOperator:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
                 elif isinstance(inp, (OnnxOperator, Variable,
-                                      OnnxOperatorItem)):
+                                      OnnxOperatorItem, OnnxSubOperator)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
                         OnnxOperator.ConstantVariable(
-                            inp, implicit_cast=True))
+                            inp, implicit_cast=False))
                 elif isinstance(inp, TensorProto):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
@@ -365,6 +422,12 @@ class OnnxOperator:
 
             if hasattr(self, 'output_names_'):
                 outputs = self.output_names_
+                if outputs is None or len(outputs) == 0:
+                    raise RuntimeError(
+                        "Empty cached outputs. The conversion was "
+                        "maybe triggered on some part "
+                        "of the graph before being applied "
+                        "on the whole graph.")
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
@@ -458,7 +521,8 @@ class OnnxOperator:
         :param domain: domain of the operator
         """
         if isinstance(target_opset, dict):
-            target_opset = target_opset.get(self.domain, None)
+            dom = self.domain or ''
+            target_opset = target_opset.get(dom, None)
         elif isinstance(target_opset, int):
             if self.domain not in ('', None):
                 # The target_opset is for the domain ''
@@ -697,7 +761,7 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **self.kwargs)
+                **kwargs)
             self.state.run(operator=operator)
 
     @property

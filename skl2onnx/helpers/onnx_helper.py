@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------
 
 from io import BytesIO
-import onnx
+import onnx # noqa
 from onnx import shape_inference
 from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,

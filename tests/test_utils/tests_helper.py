@@ -392,8 +392,7 @@ def dump_data_and_model(
                             basename,
                             str(e).replace("\n", " -- ")))
                         continue
-                    else:
-                        raise e
+                    raise e
 
             if output is not None:
                 dest = os.path.join(folder,
@@ -533,6 +532,7 @@ def dump_multiple_classification(
         allow_failure=None,
         verbose=False,
         label_string=False,
+        label_uint8=False,
         first_class=0,
         comparable_outputs=None,
         target_opset=None):
@@ -549,7 +549,14 @@ def dump_multiple_classification(
     y = [0, 1, 2, 1, 1, 2]
     y = [i + first_class for i in y]
     if label_string:
+        if label_uint8:
+            raise AssertionError(
+                "label_string and label_uint8 cannot be both True")
         y = ["l%d" % i for i in y]
+        suffix += 'String'
+    elif label_uint8:
+        y = numpy.array(y).astype(numpy.uint8)
+        suffix += 'Uint8'
     model.fit(X, y)
     if verbose:
         print("[dump_multiple_classification] model '{}'".format(
@@ -935,7 +942,8 @@ def make_report_backend(folder, as_df=False):
         df["ratio"] = df["onnxrt_time"] / df["original_time"]
         df["ratio_nodes"] = df["nb_onnx_nodes"] / df["nb_estimators"]
         df["CPU"] = platform.processor()
-        df["CPUI"] = cpuinfo.get_cpu_info()["brand"]
+        info = cpuinfo.get_cpu_info()
+        df["CPUI"] = info.get("brand", info.get('brand_raw', '?'))
         return df
     else:
         cpu = cpuinfo.get_cpu_info()["brand"]
@@ -958,3 +966,12 @@ def make_report_backend(folder, as_df=False):
             row["onnx-version"] = onnx.__version__
             row["onnxruntime-version"] = onnxruntime.__version__
         return aslist
+
+
+def binary_array_to_string(mat):
+    if not isinstance(mat, numpy.ndarray):
+        raise NotImplementedError()
+    if len(mat.shape) != 2:
+        raise NotImplementedError()
+    res = [[str(i) for i in row] for row in mat.tolist()]
+    return [''.join(row) for row in res]
