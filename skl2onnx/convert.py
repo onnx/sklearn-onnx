@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import warnings
 from uuid import uuid4
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
@@ -20,7 +20,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
                     intermediate=False,
-                    white_op=None, black_op=None, final_types=None):
+                    white_op=None, black_op=None, final_types=None,
+                    dtype=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -58,6 +59,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
+    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
+        converters may add operators Cast to switch to double when it is necessary
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -133,6 +136,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     if name is None:
         name = str(uuid4().hex)
+    if dtype is not None:
+        warnings.warn(DeprecationWarning, "Parameter dtype is no longer supported. It will be removed in 1.9.0.")
 
     target_opset = (target_opset
                     if target_opset else get_latest_tested_opset_version())
@@ -158,7 +163,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
 def to_onnx(model, X=None, name=None, initial_types=None,
             target_opset=None, options=None,
-            white_op=None, black_op=None, final_types=None):
+            white_op=None, black_op=None, final_types=None,
+            dtype=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -180,6 +186,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
+    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
+        converters may add operators Cast to switch to double when it is necessary
     :return: converted model
 
     This function checks if the model inherits from class
@@ -205,7 +213,7 @@ def to_onnx(model, X=None, name=None, initial_types=None,
                            target_opset=target_opset,
                            name=name, options=options,
                            white_op=white_op, black_op=black_op,
-                           final_types=final_types)
+                           final_types=final_types, dtype=dtype)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):
