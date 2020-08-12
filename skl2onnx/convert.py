@@ -59,8 +59,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
-        converters may add operators Cast to switch to double when it is necessary
+    :param dtype: removed in version 1.7.5, dtype is now inferred
+        from input types, converters may add operators Cast to
+        switch to double when it is necessary
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -137,7 +138,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     if name is None:
         name = str(uuid4().hex)
     if dtype is not None:
-        warnings.warn(DeprecationWarning, "Parameter dtype is no longer supported. It will be removed in 1.9.0.")
+        warnings.warn(
+            DeprecationWarning,
+            "Parameter dtype is no longer supported. "
+            "It will be removed in 1.9.0.")
 
     target_opset = (target_opset
                     if target_opset else get_latest_tested_opset_version())
@@ -186,8 +190,9 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
-        converters may add operators Cast to switch to double when it is necessary
+    :param dtype: removed in version 1.7.5, dtype is now inferred
+        from input types, converters may add operators Cast to
+        switch to double when it is necessary
     :return: converted model
 
     This function checks if the model inherits from class
