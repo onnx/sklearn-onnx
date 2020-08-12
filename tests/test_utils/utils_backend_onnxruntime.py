@@ -33,7 +33,8 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
         print('-')
         print("OUTPUT: {} from {}".format(out, node.name))
         step = select_model_inputs_outputs(model_onnx, out)
-        if disable_optimisation:
+        if (disable_optimisation and
+                hasattr(onnxruntime, 'GraphOptimizationLevel')):
             opts = onnxruntime.SessionOptions()
             opts.graph_optimization_level = (
                 onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
@@ -116,7 +117,8 @@ def compare_runtime(test,
     if verbose:
         print("[compare_runtime] InferenceSession('{}')".format(onx))
 
-    if disable_optimisation:
+    if (disable_optimisation and
+            hasattr(onnxruntime, 'GraphOptimizationLevel')):
         opts = onnxruntime.SessionOptions()
         opts.graph_optimization_level = (
             onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)

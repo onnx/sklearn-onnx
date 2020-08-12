@@ -24,8 +24,11 @@ from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
-from onnxruntime import (
-    InferenceSession, SessionOptions, GraphOptimizationLevel)
+from onnxruntime import InferenceSession, SessionOptions
+try:
+    from onnxruntime import GraphOptimizationLevel
+except ImportError:
+    GraphOptimizationLevel = None
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
 
@@ -104,7 +107,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         if predict_attributes is None:
             predict_attributes = {}
         exp = model.predict(Xtest, **predict_attributes)
-        if disable_optimisation:
+        if disable_optimisation and GraphOptimizationLevel is not None:
             opts = SessionOptions()
             opts.graph_optimization_level = (
                 GraphOptimizationLevel.ORT_ENABLE_ALL)
