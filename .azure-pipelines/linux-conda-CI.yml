@@ -23,6 +23,7 @@ jobs:
         sklearn.version: '==0.23.1'
         onnxcc.version: 'git'
         run.example: '1'
+        build.documentation: '0'
       Py37-Onnx170-Rt130-Skl0231:
         do.bench: '0'
         python.version: '3.7'
@@ -33,6 +34,7 @@ jobs:
         sklearn.version: '==0.23.1'
         onnxcc.version: '==1.7.0'
         run.example: '1'
+        build.documentation: '0'
       Py37-Onnx170-Rt120-Skl0230-Op11:
         do.bench: '0'
         python.version: '3.7'
@@ -43,6 +45,7 @@ jobs:
         onnxcc.version: 'git'
         sklearn.version: '==0.23.0'
         run.example: '0'
+        build.documentation: '0'
       Py37-Onnx160-Rt120-Skl0230:
         do.bench: '0'
         python.version: '3.7'
@@ -53,6 +56,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.2.0'
         sklearn.version: '==0.23.0'
         run.example: '0'
+        build.documentation: '0'
       Py37-Onnx160-Rt111-Skl0222:
         do.bench: '0'
         python.version: '3.7'
@@ -63,6 +67,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.1.1'
         sklearn.version: '==0.22.2'
         run.example: '0'
+        build.documentation: '0'
       Py37-Onnx160-Rt100-Skl0213:
         do.bench: '0'
         python.version: '3.7'
@@ -73,6 +78,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.0.0'
         sklearn.version: '==0.21.3'
         run.example: '0'
+        build.documentation: '0'
       Py37-Onnx150-Rt050-Skl0213:
         do.bench: '0'
         python.version: '3.7'
@@ -83,6 +89,7 @@ jobs:
         onnxrt.version: 'onnxruntime==0.5.0'
         sklearn.version: '==0.21.3'
         run.example: '0'
+        build.documentation: '0'
       Py37-Onnx150-Rt040-Skl0203:
         do.bench: '0'
         python.version: '3.7'
@@ -93,6 +100,7 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
+        build.documentation: '0'
       Py36-Onnx141-Rt030-Skl0203:
         do.bench: '0'
         python.version: '3.6'
@@ -102,6 +110,7 @@ jobs:
         onnxrt.version: 'onnxruntime==0.3.0'
         sklearn.version: '==0.20.3'
         run.example: '0'
+        build.documentation: '0'
       Py36-Onnx130-Rt021-Skl0203:
         do.bench: '0'
         python.version: '3.6'
@@ -112,6 +121,7 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
+        build.documentation: '0'
       Py35-Onnx150-Rt021-Skl0192:
         do.bench: '0'
         python.version: '3.5'
@@ -122,6 +132,7 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.19.2'
         run.example: '0'
+        build.documentation: '0'
     maxParallel: 3
 
   steps:
@@ -287,7 +298,7 @@ jobs:
       conda install -c anaconda graphviz
       python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
     displayName: 'build documentation'
-    condition: eq(variables['run.example'], '1')
+    condition: eq(variables['build.documentation'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
