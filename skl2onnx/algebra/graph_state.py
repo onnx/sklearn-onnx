@@ -57,12 +57,12 @@ class GraphState:
     def _get_var_name(self, var, unused, operator=None):
         if isinstance(var, Variable):
             return var.full_name
-        elif isinstance(var, (np.ndarray, np.bool, np.int64,
-                              np.float32, np.float64, np.bool)):
+        if isinstance(var, (np.ndarray, np.bool, np.int64,
+                            np.float32, np.float64, np.bool)):
             return self._add_constant(var)
-        elif hasattr(var, 'ConstantValue'):
+        if hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue, var.ImplicitCast)
-        elif hasattr(var, 'add_to'):
+        if hasattr(var, 'add_to'):
             var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
             if isinstance(outputs, list):
@@ -70,16 +70,15 @@ class GraphState:
                     var = outputs[0]
                     if isinstance(var, Variable):
                         return var.full_name
-                    elif isinstance(var, str):
+                    if isinstance(var, str):
                         return var
             raise RuntimeError("Unexpected output type {}".format(outputs))
-        elif hasattr(var, 'name') and isinstance(var.name, str) and var.name:
+        if hasattr(var, 'name') and isinstance(var.name, str) and var.name:
             return var.name
-        elif isinstance(var, str):
+        if isinstance(var, str):
             return var
-        else:
-            raise RuntimeError("Unexpected type for parameter 'var': {0}."
-                               "".format(type(var)))
+        raise RuntimeError("Unexpected type for parameter 'var': {0}."
+                           "".format(type(var)))
 
     def _add_constant(self, cst, can_cast=True):
 
@@ -125,7 +124,7 @@ class GraphState:
                 name, ty, shape, cst.flatten(),
                 can_cast=can_cast)
             return name
-        elif isinstance(cst, coo_matrix):
+        if isinstance(cst, coo_matrix):
             shape = cst.shape
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
@@ -134,12 +133,12 @@ class GraphState:
                 name, ty, shape, cst.astype(astype),
                 can_cast=can_cast)
             return name
-        elif isinstance(cst, TensorProto):
+        if isinstance(cst, TensorProto):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             self.container.add_initializer(name, None, None, cst)
             return name
-        elif isinstance(cst, np.int64):
+        if isinstance(cst, np.int64):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             ty = TensorProto.INT64
@@ -151,36 +150,34 @@ class GraphState:
             ty = TensorProto.BOOL
             self.container.add_initializer(name, ty, None, cst)
             return name
-        elif isinstance(cst, np.float64):
+        if isinstance(cst, np.float64):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             ty = TensorProto.DOUBLE
             self.container.add_initializer(name, ty, None, float(cst))
             return name
-        elif isinstance(cst, np.float32):
+        if isinstance(cst, np.float32):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             ty = TensorProto.FLOAT
             self.container.add_initializer(name, ty, None, float(cst))
             return name
-        else:
-            raise NotImplementedError(
-                "Unable to add a constant of type {}. "
-                "You may raise an issue at https://github.com/onnx/"
-                "sklearn-onnx/issues.".format(type(cst)))
+        raise NotImplementedError(
+            "Unable to add a constant of type {}. "
+            "You may raise an issue at https://github.com/onnx/"
+            "sklearn-onnx/issues.".format(type(cst)))
 
     def _get_output_name(self, output):
         if isinstance(output, Variable):
             return output.full_name
-        elif isinstance(output, str):
+        if isinstance(output, str):
             return output
-        elif isinstance(output, tuple):
+        if isinstance(output, tuple):
             return output[0]
-        else:
-            raise NotImplementedError(
-                "Unexpected output type {} [{}]. "
-                "You may raise an issue at https://github.com/onnx/"
-                "sklearn-onnx/issues.".format(type(output), output))
+        raise NotImplementedError(
+            "Unexpected output type {} [{}]. "
+            "You may raise an issue at https://github.com/onnx/"
+            "sklearn-onnx/issues.".format(type(output), output))
 
     def run(self, operator=None):
         if self.computed_outputs is None:
