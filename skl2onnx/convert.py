@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import warnings
 from uuid import uuid4
 import numpy as np
 from .proto import get_latest_tested_opset_version
