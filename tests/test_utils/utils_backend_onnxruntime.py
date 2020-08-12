@@ -4,11 +4,10 @@ Helpers to test runtimes.
 import numpy
 import pandas
 import warnings
+import onnx as onnx_package
 from skl2onnx.helpers.onnx_helper import (
-    select_model_inputs_outputs,
-    enumerate_model_node_outputs,
-    enumerate_model_initializers
-)
+    select_model_inputs_outputs, enumerate_model_node_outputs,
+    enumerate_model_initializers)
 from skl2onnx.algebra.type_helper import _guess_type
 
 from .utils_backend import (
@@ -17,8 +16,7 @@ from .utils_backend import (
     ExpectedAssertionError,
     OnnxRuntimeAssertionError,
     OnnxRuntimeMissingNewOnnxOperatorException,
-    compare_outputs,
-)
+    compare_outputs)
 
 
 def _display_intermediate_steps(model_onnx, inputs):
@@ -132,6 +130,11 @@ def compare_runtime(test,
                     "onnxruntime does not implement a new operator "
                     "'{0}'\n{1}\nONNX\n{2}".format(
                         onx, e, smodel))
+            if "is not a registered function/op" in str(e):
+                content = onnx_package.load(onx)
+                raise OnnxRuntimeAssertionError(
+                    "Missing op? '{0}'\nONNX\n{1}\n{2}\n---\n{3}".format(
+                        onx, smodel, e, content))
             raise OnnxRuntimeAssertionError(
                 "Unable to load onnx '{0}'\nONNX\n{1}\n{2}".format(
                     onx, smodel, e))

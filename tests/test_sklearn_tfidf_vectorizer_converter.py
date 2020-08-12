@@ -16,7 +16,7 @@ from skl2onnx.common.data_types import StringTensorType
 import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfVectorizer(unittest.TestCase):
@@ -41,7 +41,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType())],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -73,7 +74,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType())],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -110,7 +112,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         model.fit(corpus, y)
         model_onnx = convert_sklearn(model, "TfIdfcomp",
                                      [("input", StringTensorType([4, 2]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': corpus})[0]
         exp = model.transform(corpus)
@@ -130,7 +133,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus[:3].ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
 
         # TfidfVectorizer in onnxruntime fails with empty strings,
@@ -156,7 +160,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         # onnxruntime fails with empty strings
         dump_data_and_model(
@@ -182,7 +187,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         corpus = numpy.array([
             "AZZ ZZ This is the first document.",
@@ -213,7 +219,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -233,7 +240,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -258,7 +266,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -282,7 +291,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 2), norm="l1")
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))])
+                                     [("input", StringTensorType([1]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -307,7 +317,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -332,7 +343,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -367,6 +379,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
             options=extra,
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         # This test depends on this issue:
@@ -403,7 +416,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 vect,
                 "TfidfVectorizer",
                 [("input", StringTensorType([None, 1]))],
-                options=extra,
+                options=extra, target_opset=TARGET_OPSET
             )
         except (RuntimeError, NameError):
             pass
@@ -419,7 +432,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
-            options=extra,
+            options=extra, target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         # This test depends on this issue:
@@ -446,7 +459,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([1]))],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
@@ -474,7 +488,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType())],
-                                     options=self.get_options())
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,

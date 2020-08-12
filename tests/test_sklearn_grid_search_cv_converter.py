@@ -20,6 +20,7 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
+    TARGET_OPSET
 )
 
 
@@ -34,9 +35,9 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -58,9 +59,9 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=5)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -83,9 +84,9 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -108,9 +109,9 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=4, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -130,7 +131,8 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model, X = fit_regression_model(clf, is_int=True)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -151,7 +153,8 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -175,7 +178,8 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -200,7 +204,8 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model, X = fit_regression_model(clf)
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
-            [("input", DoubleTensorType([None, X.shape[1]]))])
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float64),
@@ -225,10 +230,10 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             tuned_parameters, cv=5)
         model, X = fit_classification_model(clf, n_classes=2)
         model_onnx = convert_sklearn(
-            model,
-            "GridSearchCV",
+            model, "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(clf): {'zipmap': False, 'raw_scores': True}}
+            options={id(clf): {'zipmap': False, 'raw_scores': True}},
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         assert "zipmap" not in str(model_onnx).lower()

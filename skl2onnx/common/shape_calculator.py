@@ -32,8 +32,16 @@ def calculate_linear_classifier_output_shapes(operator):
         1. [N, C] ---> [N, 1], A sequence of map
 
     """
+    _calculate_linear_classifier_output_shapes(operator)
+
+
+def _calculate_linear_classifier_output_shapes(operator, decision_path=False):
+    if decision_path:
+        out_range = [2, 3]
+    else:
+        out_range = [1, 2]
     check_input_and_output_numbers(operator, input_count_range=1,
-                                   output_count_range=[1, 2])
+                                   output_count_range=out_range)
     check_input_and_output_types(operator, good_input_types=[
         BooleanTensorType, DoubleTensorType,
         FloatTensorType, Int64TensorType])

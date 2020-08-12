@@ -392,8 +392,7 @@ def dump_data_and_model(
                             basename,
                             str(e).replace("\n", " -- ")))
                         continue
-                    else:
-                        raise e
+                    raise e
 
             if output is not None:
                 dest = os.path.join(folder,
@@ -967,3 +966,12 @@ def make_report_backend(folder, as_df=False):
             row["onnx-version"] = onnx.__version__
             row["onnxruntime-version"] = onnxruntime.__version__
         return aslist
+
+
+def binary_array_to_string(mat):
+    if not isinstance(mat, numpy.ndarray):
+        raise NotImplementedError()
+    if len(mat.shape) != 2:
+        raise NotImplementedError()
+    res = [[str(i) for i in row] for row in mat.tolist()]
+    return [''.join(row) for row in res]
