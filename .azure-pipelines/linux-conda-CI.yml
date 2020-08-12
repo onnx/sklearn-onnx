@@ -13,7 +13,7 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx170-Rt140-Skl0231:
+      Py37-Onnx170-Rt140-Skl0232:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '>=1.18.1'
