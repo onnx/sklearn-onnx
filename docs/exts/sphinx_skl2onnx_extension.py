@@ -459,9 +459,10 @@ def covered_opset_converters(app):
             return ":ref:`ONNX <{}>`".format(lab)
         return ""
 
-    rows = list(enumerate_validated_operator_opsets(verbose=1, debug=False,
-                                                    dot_graph=True,
-                                                    store_models=True))
+    OPSET_MAX = app.config.OPSET_MAX
+    rows = list(enumerate_validated_operator_opsets(
+        verbose=1, debug=False, dot_graph=True, store_models=True,
+        opset_max=OPSET_MAX))
     df = pandas.DataFrame(rows)
     piv = summary_report(df)
     piv['ONNX'] = piv.apply(create_onnx_link, axis=1)
@@ -565,6 +566,7 @@ def setup(app):
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     app.connect('builder-inited', covered_opset_converters)
+    app.add_config_value('OPSET_MAX', 12)
     return {'version': sphinx.__display_version__,
             'parallel_read_safe': False,
             'parallel_write_safe': False}

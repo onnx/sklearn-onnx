@@ -46,6 +46,10 @@ language = "en"
 exclude_patterns = []
 pygments_style = 'default'
 
+# -- Options for custom pages ------------------------------------------------
+
+OPSET_MAX = 12
+
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "sphinx_mo"
