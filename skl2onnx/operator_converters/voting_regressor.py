@@ -4,7 +4,6 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
 from .._supported_operators import sklearn_operator_name_map

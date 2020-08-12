@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from onnx.helper import make_tensor
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
 from ..common.utils_classifier import _finalize_converter_classes
