@@ -117,7 +117,8 @@ def compare_runtime(test,
     if verbose:
         print("[compare_runtime] InferenceSession('{}')".format(onx))
 
-    if disable_optimisation:
+    if (disable_optimisation and
+            hasattr(onnxruntime, 'GraphOptimizationLevel')):
         opts = onnxruntime.SessionOptions()
         opts.graph_optimization_level = (
             onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
