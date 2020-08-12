@@ -4,6 +4,7 @@ Tests scikit-learn's tfidf converter.
 import unittest
 from distutils.version import StrictVersion
 import numpy
+import onnxruntime
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
