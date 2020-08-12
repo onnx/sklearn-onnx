@@ -4,9 +4,6 @@ Functions in *onnxconverter-common* do not support
 opset < 9.
 """
 from onnx.helper import make_graph
-from onnxconverter_common.optimizer import (
-    RedundantOptimizer, _apply_optimization,
-    LinkedNode, reserve_node_for_embedded_graph)
 from ._onnx_optimisation_common import (
     _rename_node_input, _rename_node_output,
     _apply_optimisation_on_graph, _apply_remove_node_fct_node)
