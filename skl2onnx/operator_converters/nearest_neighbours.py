@@ -55,7 +55,8 @@ except ImportError:
 from ..algebra.complex_functions import onnx_cdist, _onnx_cdist_sqeuclidean
 from ..common._registration import register_converter
 from ..common.data_types import (
-    Int64TensorType, guess_numpy_type, guess_proto_type)
+    Int64TensorType, DoubleTensorType,
+    guess_numpy_type, guess_proto_type)
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 from ._gp_kernels import py_make_float_array
@@ -717,8 +718,13 @@ def convert_nca(scope, operator, container):
     components = nca_op.components_.T.astype(dtype)
 
     if isinstance(X.type, Int64TensorType):
-        X = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT,
-                     op_version=op_version)
+        X = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT, op_version=op_version)
+    elif isinstance(X.type, DoubleTensorType):
+        components = OnnxCast(
+            components, to=onnx_proto.TensorProto.DOUBLE,
+            op_version=op_version)
+    else:
+        components = components.astype(dtype)
     res = OnnxMatMul(
         X, components,
         output_names=out[:1], op_version=op_version)

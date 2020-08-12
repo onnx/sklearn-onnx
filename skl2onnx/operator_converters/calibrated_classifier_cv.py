@@ -265,8 +265,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
-    df_name = scope.declare_local_variable('probability_tensor',
-                                           FloatTensorType())
+    df_name = scope.declare_local_variable(
+        'probability_tensor', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name

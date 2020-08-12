@@ -85,6 +85,13 @@ def convert_sklearn_gradient_boosting_classifier(
                                             tree_weight, c, False, True,
                                             dtype=dtype)
 
+    if dtype is not None:
+        for k in attrs:
+            if k in ('nodes_values', 'class_weights',
+                     'target_weights', 'nodes_hitrates',
+                     'base_values'):
+                attrs[k] = np.array(attrs[k], dtype=dtype)
+
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == BooleanTensorType:
         cast_input_name = scope.get_unique_variable_name('cast_input')
@@ -127,13 +134,20 @@ def convert_sklearn_gradient_boosting_regressor(
     n_est = (op.n_estimators_ if hasattr(op, 'n_estimators_') else
              op.n_estimators)
     dtype = guess_numpy_type(operator.inputs[0].type)
-    if dtype != np.float32:
+    if dtype != np.float64:
         dtype = np.float32
     for i in range(n_est):
         tree = op.estimators_[i][0].tree_
         tree_id = i
         add_tree_to_attribute_pairs(attrs, False, tree, tree_id, tree_weight,
                                     0, False, True, dtype=dtype)
+
+    if dtype is not None:
+        for k in attrs:
+            if k in ('nodes_values', 'class_weights',
+                     'target_weights', 'nodes_hitrates',
+                     'base_values'):
+                attrs[k] = np.array(attrs[k], dtype=dtype)
 
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):

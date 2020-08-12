@@ -13,7 +13,7 @@ from ..common._apply_operation import (
     apply_mul, apply_reshape, apply_sub, apply_topk, apply_transpose
 )
 from ..common.data_types import (
-    FloatTensorType, DoubleTensorType, guess_proto_type)
+    FloatTensorType, DoubleTensorType, guess_proto_type, guess_numpy_type)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -55,7 +55,7 @@ def _samme_proba(scope, container, proba_name, weight,
     return samme_proba_name
 
 
-def _samme_r_proba(scope, container, proba_name, n_classes, proto_dtype):
+def _samme_r_proba(scope, container, proba_name, n_classes, dtype, pdtype):
     clipped_proba_name = scope.get_unique_variable_name('clipped_proba')
     log_proba_name = scope.get_unique_variable_name('log_proba')
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
@@ -69,18 +69,16 @@ def _samme_r_proba(scope, container, proba_name, n_classes, proto_dtype):
     samme_proba_name = scope.get_unique_variable_name('samme_proba')
 
     container.add_initializer(
-        inverted_n_classes_name, proto_dtype,
-        [], [1. / n_classes])
+        inverted_n_classes_name, pdtype, [], [1. / n_classes])
     container.add_initializer(
-        n_classes_minus_one_name, proto_dtype,
-        [], [n_classes - 1])
+        n_classes_minus_one_name, pdtype, [], [n_classes - 1])
 
     try:
-        cst_min = np.finfo(np.float64).eps.astype(container.dtype)
+        cst_min = np.finfo(np.float64).eps.astype(dtype)
     except TypeError:
         raise TypeError("Unable to convert {} (type {}) into {}.".format(
-            np.finfo(float).eps, type(np.finfo(float).eps),
-            container.dtype))
+            np.finfo(float).eps, type(np.finfo(float).eps), dtype))
+
     apply_clip(
         scope, proba_name, clipped_proba_name, container,
         operator_name=scope.get_unique_operator_name('Clip'),
@@ -258,10 +256,14 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
 
     for i_est, estimator in enumerate(op.estimators_):
         label_name = scope.declare_local_variable('elab_name_%d' % i_est)
-        proba_name = scope.declare_local_variable('eprob_name_%d' % i_est)
+        proba_name = scope.declare_local_variable(
+            'eprob_name_%d' % i_est, operator.inputs[0].type.__class__())
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
@@ -273,7 +275,7 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
         if op.algorithm == 'SAMME.R':
             cur_proba_name = _samme_r_proba(
                 scope, container, proba_name.onnx_name, len(classes),
-                proto_dtype)
+                dtype, proto_dtype)
         else:
             # SAMME
             if _scikit_learn_before_022() and not use_raw_scores:

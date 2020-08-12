@@ -27,7 +27,7 @@ from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
-def populate_tree_attributes(model, name):
+def populate_tree_attributes(model, name, dtype):
     """Construct attrs dictionary to be used in predict()
     while adding a node with TreeEnsembleClassifier ONNX op.
     """
@@ -75,6 +75,10 @@ def populate_tree_attributes(model, name):
             attrs['class_weights'].append(1.)
             attrs['class_treeids'].append(0)
             attrs['class_nodeids'].append(node_id)
+    if dtype is not None:
+        for k in attrs:
+            if k in ('node_values', 'class_weights', 'target_weights'):
+                attrs[k] = np.array(attrs[k], dtype=dtype)
     return attrs
 
 
@@ -99,16 +103,24 @@ def predict(model, scope, operator, container,
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+
+    container.add_initializer(
+        values_name, proto_dtype, value.shape, value.ravel())
+
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) == BooleanTensorType:
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, input_name, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
+                   container, to=proto_dtype)
         input_name = cast_input_name
+
     if model.tree_.node_count > 1:
         attrs = populate_tree_attributes(
-            model, scope.get_unique_operator_name(op_type))
+            model, scope.get_unique_operator_name(op_type), dtype)
         container.add_node(
             op_type, input_name,
             [indices_name, dummy_proba_name],
@@ -146,7 +158,7 @@ def predict(model, scope, operator, container,
                    container, to=onnx_proto.TensorProto.FLOAT)
         return proba_result_name
     apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+               container, to=proto_dtype)
     apply_transpose(scope, out_values_name, transposed_result_name,
                     container, perm=(2, 1, 0))
     return transposed_result_name
@@ -155,7 +167,11 @@ def predict(model, scope, operator, container,
 def convert_sklearn_decision_tree_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
-    dtype = guess_numpy_type(operator.inputs[0].type)
+    try:
+        dtype = guess_numpy_type(operator.inputs[0].type)
+    except NotImplementedError as e:
+        raise RuntimeError(
+            "Unknown variable {}.".format(operator.inputs[0])) from e
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
@@ -186,6 +202,14 @@ def convert_sklearn_decision_tree_classifier(
             apply_cast(scope, input_name, cast_input_name,
                        container, to=onnx_proto.TensorProto.FLOAT)
             input_name = cast_input_name
+
+        if dtype is not None:
+            for k in attrs:
+                if k in ('nodes_values', 'class_weights',
+                         'target_weights', 'nodes_hitrates',
+                         'base_values'):
+                    attrs[k] = np.array(attrs[k], dtype=dtype)
+
         container.add_node(
             op_type, input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
@@ -286,6 +310,13 @@ def convert_sklearn_decision_tree_regressor(
     add_tree_to_attribute_pairs(attrs, False, op.tree_, 0, 1., 0, False,
                                 True, dtype=dtype)
 
+    if dtype is not None:
+        for k in attrs:
+            if k in ('nodes_values', 'class_weights',
+                     'target_weights', 'nodes_hitrates',
+                     'base_values'):
+                attrs[k] = np.array(attrs[k], dtype=dtype)
+
     input_name = operator.input_full_names
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
@@ -308,7 +339,8 @@ def convert_sklearn_decision_tree_regressor(
     attrs['n_targets'] = 1
     attrs['post_transform'] = 'NONE'
     attrs['target_ids'] = [0 for _ in attrs['target_ids']]
-    attrs['target_weights'] = [float(_) for _ in attrs['target_nodeids']]
+    attrs['target_weights'] = np.array(
+        [float(_) for _ in attrs['target_nodeids']], dtype=dtype)
     dpath = scope.get_unique_variable_name("dpath")
     container.add_node(
         op_type, input_name, dpath,

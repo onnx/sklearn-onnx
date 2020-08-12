@@ -29,7 +29,7 @@ def convert_voting_regressor(scope, operator, container):
         this_operator.inputs = operator.inputs
 
         var_name = scope.declare_local_variable(
-            'var_%d' % i, FloatTensorType())
+            'var_%d' % i, operator.inputs[0].type.__class__())
         this_operator.outputs.append(var_name)
         var_name = var_name.onnx_name
 

@@ -26,8 +26,8 @@ def convert_sklearn_grid_search_cv(scope, operator, container):
     label_name = scope.declare_local_variable('label')
     grid_search_operator.outputs.append(label_name)
     if is_classifier(best_estimator):
-        proba_name = scope.declare_local_variable('probability_tensor',
-                                                  FloatTensorType())
+        proba_name = scope.declare_local_variable(
+            'probability_tensor', operator.inputs[0].type.__class__())
         grid_search_operator.outputs.append(proba_name)
     apply_identity(scope, label_name.full_name,
                    operator.outputs[0].full_name, container)
