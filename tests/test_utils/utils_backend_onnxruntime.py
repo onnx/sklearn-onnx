@@ -19,7 +19,7 @@ from .utils_backend import (
     compare_outputs)
 
 
-def _display_intermediate_steps(model_onnx, inputs):
+def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
     import onnxruntime
     print("[_display_intermediate_steps] BEGIN")
     if isinstance(model_onnx, str):
@@ -33,8 +33,15 @@ def _display_intermediate_steps(model_onnx, inputs):
         print('-')
         print("OUTPUT: {} from {}".format(out, node.name))
         step = select_model_inputs_outputs(model_onnx, out)
+        if disable_optimisation:
+            opts = onnxruntime.SessionOptions()
+            opts.graph_optimization_level = (
+                onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
+        else:
+            opts = None
         try:
-            step_sess = onnxruntime.InferenceSession(step.SerializeToString())
+            step_sess = onnxruntime.InferenceSession(
+                step.SerializeToString(), sess_options=opts)
         except Exception as e:
             raise RuntimeError("Unable to load ONNX model with onnxruntime. "
                                "Last added node is:\n{}".format(node)) from e
@@ -55,7 +62,8 @@ def compare_runtime(test,
                     context=None,
                     comparable_outputs=None,
                     intermediate_steps=False,
-                    classes=None):
+                    classes=None,
+                    disable_optimisation=False):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -74,6 +82,8 @@ def compare_runtime(test,
     :param intermediate_steps: displays intermediate steps
         in case of an error
     :param classes: classes names (if option 'nocl' is used)
+    :param disable_optimisation: disable optimisation onnxruntime
+        could do
     :return: tuple (outut, lambda function to run the predictions)
 
     The function does not return anything but raises an error
@@ -106,8 +116,15 @@ def compare_runtime(test,
     if verbose:
         print("[compare_runtime] InferenceSession('{}')".format(onx))
 
+    if disable_optimisation:
+        opts = onnxruntime.SessionOptions()
+        opts.graph_optimization_level = (
+            onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
+    else:
+        opts = None
+
     try:
-        sess = onnxruntime.InferenceSession(onx)
+        sess = onnxruntime.InferenceSession(onx, sess_options=opts)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -116,7 +133,7 @@ def compare_runtime(test,
                 "Unable to load onnx '{0}' due to\n{1}".format(onx, e))
         else:
             if intermediate_steps:
-                _display_intermediate_steps(onx, None)
+                _display_intermediate_steps(onx, None, disable_optimisation)
             if verbose:
                 import onnx
                 model = onnx.load(onx)
@@ -246,7 +263,8 @@ def compare_runtime(test,
                     raise expe
                 except Exception as e:
                     if intermediate_steps:
-                        _display_intermediate_steps(onx, {name: input})
+                        _display_intermediate_steps(
+                            onx, {name: input}, disable_optimisation)
                     raise OnnxRuntimeAssertionError(
                         "Unable to run onnx '{0}' due to {1}".format(onx, e))
                 res.append(one)
@@ -277,7 +295,8 @@ def compare_runtime(test,
                     raise expe
                 except Exception as e:
                     if intermediate_steps:
-                        _display_intermediate_steps(onx, iii)
+                        _display_intermediate_steps(
+                            onx, iii, disable_optimisation)
                     if verbose:
                         import onnx
                         model = onnx.load(onx)
@@ -322,7 +341,7 @@ def compare_runtime(test,
             raise expe
         except RuntimeError as e:
             if intermediate_steps:
-                _display_intermediate_steps(onx, inputs, run_options)
+                _display_intermediate_steps(onx, inputs, disable_optimisation)
             if "-Fail" in onx:
                 raise ExpectedAssertionError(
                     "onnxruntime cannot compute the prediction for '{0}'".

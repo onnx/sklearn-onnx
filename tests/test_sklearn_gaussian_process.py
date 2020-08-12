@@ -24,7 +24,8 @@ from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
-from onnxruntime import InferenceSession
+from onnxruntime import (
+    InferenceSession, SessionOptions, GraphOptimizationLevel)
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
 
@@ -99,11 +100,18 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
     def check_outputs(self, model, model_onnx, Xtest,
                       predict_attributes, decimal=5,
-                      skip_if_float32=False):
+                      skip_if_float32=False, disable_optimisation=True):
         if predict_attributes is None:
             predict_attributes = {}
         exp = model.predict(Xtest, **predict_attributes)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        if disable_optimisation:
+            opts = SessionOptions()
+            opts.graph_optimization_level = (
+                GraphOptimizationLevel.ORT_ENABLE_ALL)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), sess_options=opts)
+        else:
+            sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'X': Xtest})
         if isinstance(exp, tuple):
             if len(exp) != len(got):
