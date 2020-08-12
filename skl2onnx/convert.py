@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 import warnings
 from uuid import uuid4
+import numpy as np
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from ._parse import parse_sklearn_model
@@ -18,9 +19,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     target_opset=None, custom_conversion_functions=None,
                     custom_shape_calculators=None,
                     custom_parsers=None, options=None,
-                    intermediate=False,
-                    white_op=None, black_op=None, final_types=None,
-                    dtype=None):
+                    dtype=np.float32, intermediate=False,
+                    white_op=None, black_op=None, final_types=None):
     """
     This function produces an equivalent ONNX model of the given scikit-learn model.
     The supported converters is returned by function
@@ -49,6 +49,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
     :param options: specific options given to converters (see :ref:`l-conv-options`)
+    :param dtype: float type to use everywhere in the graph,
+        `np.float32` or `np.float64`
     :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
         it returns the converted model otherwise
     :param white_op: white list of ONNX nodes allowed while converting a pipeline,
@@ -135,11 +137,6 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     if name is None:
         name = str(uuid4().hex)
-    if dtype is not None:
-        warnings.warn(
-            DeprecationWarning,
-            "Parameter dtype is no longer supported. "
-            "It will be removed in 1.9.0.")
 
     target_opset = (target_opset
                     if target_opset else get_latest_tested_opset_version())
@@ -148,7 +145,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology = parse_sklearn_model(
         model, initial_types, target_opset, custom_conversion_functions,
         custom_shape_calculators, custom_parsers, options=options,
-        white_op=white_op, black_op=black_op,
+        dtype=dtype, white_op=white_op, black_op=black_op,
         final_types=final_types)
 
     # Infer variable shapes
@@ -156,15 +153,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
-                                  options=options)
+                                  dtype=dtype, options=options)
 
     return (onnx_model, topology) if intermediate else onnx_model
 
 
 def to_onnx(model, X=None, name=None, initial_types=None,
-            target_opset=None, options=None,
-            white_op=None, black_op=None, final_types=None,
-            dtype=None):
+            target_opset=None, options=None, dtype=np.float32,
+            white_op=None, black_op=None, final_types=None):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -177,6 +173,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param name: name of the model
+    :param dtype: float type to use everywhere in the graph,
+        `np.float32` or `np.float64`
     :param white_op: white list of ONNX nodes allowed
         while converting a pipeline, if empty, all are allowed
     :param black_op: black list of ONNX nodes allowed
@@ -184,9 +182,6 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred
-        from input types, converters may add operators Cast to switch
-        to double when it is necessary
     :return: converted model
 
     This function checks if the model inherits from class
@@ -200,15 +195,19 @@ def to_onnx(model, X=None, name=None, initial_types=None,
         if options is not None:
             raise NotImplementedError(
                 "options not yet implemented for OnnxOperatorMixin.")
-        return model.to_onnx(X=X, name=name, target_opset=target_opset)
+        return model.to_onnx(X=X, name=name, dtype=dtype,
+                             target_opset=target_opset)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
+    if dtype not in (np.float32, np.float64):
+        raise NotImplementedError(
+            "dtype should be real not {}".format(dtype))
     initial_types = guess_initial_types(X, initial_types)
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
-                           name=name, options=options,
+                           name=name, options=options, dtype=dtype,
                            white_op=white_op, black_op=black_op,
-                           final_types=final_types, dtype=dtype)
+                           final_types=final_types)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):
