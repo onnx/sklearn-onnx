@@ -95,9 +95,6 @@ def predict(model, scope, operator, container,
     cast_result_name = scope.get_unique_variable_name('cast_result')
     reshaped_indices_name = scope.get_unique_variable_name('reshaped_indices')
     value = model.tree_.value.transpose(1, 2, 0)
-    container.add_initializer(
-        values_name, onnx_proto.TensorProto.FLOAT,
-        value.shape, value.ravel())
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
