@@ -155,7 +155,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
-                                  dtype=dtype, options=options)
+                                  dtype=dtype, options=options,
+                                  remove_identity=not intermediate)
 
     return (onnx_model, topology) if intermediate else onnx_model
 
