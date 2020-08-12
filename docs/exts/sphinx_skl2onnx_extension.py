@@ -566,7 +566,7 @@ def setup(app):
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     app.connect('builder-inited', covered_opset_converters)
-    app.add_config_value('OPSET_MAX', 12)
+    app.add_config_value('OPSET_MAX', 12, '')
     return {'version': sphinx.__display_version__,
             'parallel_read_safe': False,
             'parallel_write_safe': False}
