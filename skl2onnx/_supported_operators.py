@@ -199,7 +199,7 @@ except ImportError:
 from sklearn.random_projection import GaussianRandomProjection
 
 # Custom extension
-from .sklapi import CastTransformer
+from .sklapi import CastRegressor, CastTransformer
 
 from .common._registration import register_converter, register_shape_calculator
 
@@ -264,6 +264,7 @@ def build_sklearn_operator_name_map():
                 Binarizer,
                 CalibratedClassifierCV,
                 CategoricalNB,
+                CastRegressor,
                 CastTransformer,
                 ComplementNB,
                 CountVectorizer,

@@ -39,6 +39,8 @@ def _has_predict_proba(model):
 def _has_decision_function(model):
     if hasattr(model, "voting"):
         return False
+    if hasattr(model, "dtype"):  # CastRegressor
+        return False
     return hasattr(model, "decision_function")
 
 
