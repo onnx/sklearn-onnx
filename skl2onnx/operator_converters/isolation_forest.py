@@ -30,6 +30,11 @@ def convert_sklearn_isolation_forest(
     op = operator.raw_operator
     outputs = operator.outputs
     opv = container.target_opset
+    opvml = container.target_opset_any_domain('ai.onnx.ml')
+    if opvml < 2:
+        raise RuntimeError(
+            "This converter requires at least opset 2 for "
+            "domain 'ai.onnx.ml'.")
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
@@ -73,27 +78,51 @@ def convert_sklearn_isolation_forest(
         # tree - retrieve node_sample
         labels = _build_labels(tree.tree_, output="node_sample")
         ordered = list(sorted(labels.items()))
-        keys = [float(_[0]) for _ in ordered]
         values = [float(_[1]) for _ in ordered]
-        node_sample = OnnxReshape(
-            OnnxLabelEncoder(
-                leave, op_version=2,
-                keys_floats=keys, values_floats=values),
-            np.array([-1, 1], dtype=np.int64),
-            op_version=opv)
+        if any(map(lambda i: int(i[0]) != i[0], ordered)):
+            keys = [float(_[0]) for _ in ordered]
+            node_sample = OnnxReshape(
+                OnnxLabelEncoder(
+                    leave, op_version=opvml,
+                    keys_floats=keys, values_floats=values),
+                np.array([-1, 1], dtype=np.int64),
+                op_version=opv)
+        else:
+            keys = [int(_[0]) for _ in ordered]
+            values = [float(_[1]) for _ in ordered]
+            node_sample = OnnxReshape(
+                OnnxLabelEncoder(
+                    OnnxCast(leave, op_version=opv,
+                             to=onnx_proto.TensorProto.INT64),
+                    op_version=opvml,
+                    keys_int64s=keys, values_floats=values),
+                np.array([-1, 1], dtype=np.int64),
+                op_version=opv)
         node_sample.set_onnx_name_prefix('node_sample%d' % i)
 
         # tree - retrieve path_length
         labels = _build_labels(tree.tree_, output="path_length")
         ordered = list(sorted(labels.items()))
-        keys = [float(_[0]) for _ in ordered]
         values = [float(_[1]) for _ in ordered]
-        path_length = OnnxReshape(
-            OnnxLabelEncoder(
-                leave, op_version=2,
-                keys_floats=keys, values_floats=values),
-            np.array([-1, 1], dtype=np.int64),
-            op_version=opv)
+        if any(map(lambda i: int(i[0]) != i[0], ordered)):
+            keys = [float(_[0]) for _ in ordered]
+            values = [float(_[1]) for _ in ordered]
+            path_length = OnnxReshape(
+                OnnxLabelEncoder(
+                    leave, op_version=opvml,
+                    keys_floats=keys, values_floats=values),
+                np.array([-1, 1], dtype=np.int64),
+                op_version=opv)
+        else:
+            keys = [int(_[0]) for _ in ordered]
+            path_length = OnnxReshape(
+                OnnxLabelEncoder(
+                    OnnxCast(leave, op_version=opv,
+                             to=onnx_proto.TensorProto.INT64),
+                    op_version=opvml,
+                    keys_int64s=keys, values_floats=values),
+                np.array([-1, 1], dtype=np.int64),
+                op_version=opv)
         path_length.set_onnx_name_prefix('path_length%d' % i)
 
         # score
