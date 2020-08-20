@@ -67,7 +67,6 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                     "<= StrictVersion('0.2.1')")
                 self._test_score(model, X, tg)
 
-    @unittest.skipIf(True, reason="Not implemented yet.")
     def test_model_bayesian_mixture_binary_classification(self):
         for cov in ["full", "tied", "diag", "spherical"]:
             with self.subTest(cov=cov):
