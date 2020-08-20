@@ -104,13 +104,15 @@ class TestSklearnGaussianProcess(unittest.TestCase):
     def check_outputs(self, model, model_onnx, Xtest,
                       predict_attributes, decimal=5,
                       skip_if_float32=False, disable_optimisation=True):
+        if "TransposeScaleMatMul" in str(model_onnx):
+            raise RuntimeError("This node must not be added.")
         if predict_attributes is None:
             predict_attributes = {}
         exp = model.predict(Xtest, **predict_attributes)
         if disable_optimisation and GraphOptimizationLevel is not None:
             opts = SessionOptions()
             opts.graph_optimization_level = (
-                GraphOptimizationLevel.ORT_ENABLE_ALL)
+                GraphOptimizationLevel.ORT_DISABLE_ALL)
             sess = InferenceSession(
                 model_onnx.SerializeToString(), sess_options=opts)
         else:

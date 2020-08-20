@@ -37,7 +37,7 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
                 hasattr(onnxruntime, 'GraphOptimizationLevel')):
             opts = onnxruntime.SessionOptions()
             opts.graph_optimization_level = (
-                onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
+                onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL)
         else:
             opts = None
         try:
@@ -121,7 +121,7 @@ def compare_runtime(test,
             hasattr(onnxruntime, 'GraphOptimizationLevel')):
         opts = onnxruntime.SessionOptions()
         opts.graph_optimization_level = (
-            onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL)
+            onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL)
     else:
         opts = None
 
