@@ -24,7 +24,11 @@ from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, SessionOptions
+try:
+    from onnxruntime import GraphOptimizationLevel
+except ImportError:
+    GraphOptimizationLevel = None
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
 
@@ -99,11 +103,20 @@ class TestSklearnGaussianProcess(unittest.TestCase):
 
     def check_outputs(self, model, model_onnx, Xtest,
                       predict_attributes, decimal=5,
-                      skip_if_float32=False):
+                      skip_if_float32=False, disable_optimisation=True):
+        if "TransposeScaleMatMul" in str(model_onnx):
+            raise RuntimeError("This node must not be added.")
         if predict_attributes is None:
             predict_attributes = {}
         exp = model.predict(Xtest, **predict_attributes)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        if disable_optimisation and GraphOptimizationLevel is not None:
+            opts = SessionOptions()
+            opts.graph_optimization_level = (
+                GraphOptimizationLevel.ORT_DISABLE_ALL)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), sess_options=opts)
+        else:
+            sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'X': Xtest})
         if isinstance(exp, tuple):
             if len(exp) != len(got):
@@ -533,10 +546,11 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
                              GaussianProcessRegressor],
-                           decimal=4)
+                           decimal=4, disable_optimisation=True)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
-                            basename="SklearnGaussianProcessRBFStd-Out0")
+                            basename="SklearnGaussianProcessRBFStd-Out0",
+                            disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -559,11 +573,12 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3")
+            basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3",
+            disable_optimisation=True)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
-                           decimal=4)
+                           decimal=4, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -613,11 +628,12 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec4")
+            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec4",
+            disable_optimisation=True)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
-                           decimal=4)
+                           decimal=4, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -639,11 +655,12 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
-            basename="SklearnGaussianProcessDotProductStdDouble-Out0-Dec3")
+            basename="SklearnGaussianProcessDotProductStdDouble-Out0-Dec3",
+            disable_optimisation=True)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
-                           decimal=3)
+                           decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -665,10 +682,12 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             Xtest_.astype(np.float64), gp, model_onnx,
-            basename="SklearnGaussianProcessRationalQuadraticStdDouble-Out0")
+            basename="SklearnGaussianProcessRationalQuadraticStdDouble-Out0",
+            disable_optimisation=True)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor])
+                             GaussianProcessRegressor],
+                           disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),

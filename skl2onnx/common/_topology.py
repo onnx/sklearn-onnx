@@ -29,6 +29,7 @@ from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
+from .onnx_optimisation_identity import onnx_remove_node_identity
 type_fct = type
 
 
@@ -279,6 +280,27 @@ class Scope:
         # Registered models
         self.registered_models = registered_models
 
+        # Reserved variables.
+        self.reserved = {}
+
+    def temp(self):
+        """
+        Creates a new Scope with the same options but no names.
+        """
+        scope = Scope(
+            'temp', parent_scopes=self.parent_scopes,
+            target_opset=self.target_opset,
+            custom_shape_calculators=self.custom_shape_calculators,
+            options=self.options, dtype=self.dtype,
+            registered_models=self.registered_models)
+        return scope
+
+    def has_variable_name(self, name):
+        """
+        Tells if a variable is already registered.
+        """
+        return name in self.onnx_variable_names
+
     def get_shape_calculator(self, model_type):
         """
         Returns the shape calculator for the given model type.
@@ -326,6 +348,26 @@ class Scope:
         else:
             self.variable_name_mapping[raw_name] = [onnx_name]
         return variable
+
+    def reserve_name(self, raw_name):
+        """
+        Keeps this name to be used by other converters.
+        """
+        if raw_name in self.reserved:
+            raise RuntimeError(
+                "Name '{}' already reserved.".format(raw_name))
+        self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
+        return self.reserved[raw_name]
+
+    def unreserve_name(self, name):
+        """
+        Deletes a name from the reserved list.
+        """
+        if name not in self.reserved:
+            raise RuntimeError(
+                "Name '{}' not reserved.".format(name))
+        self.onnx_variable_names.discard(name)
+        del self.reserved[name]
 
     def declare_local_operator(self, type, raw_model=None):
         """
@@ -881,7 +923,8 @@ class Topology:
 
 
 def convert_topology(topology, model_name, doc_string, target_opset,
-                     channel_first_inputs=None, options=None):
+                     channel_first_inputs=None,
+                     options=None, remove_identity=True):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
@@ -895,6 +938,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         a dictionary is used to indicate different opset for
         different domains
     :param options: see :ref:`l-conv-options`
+    :param remove_identity: removes identity nodes
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     """
@@ -946,9 +990,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             if variable.is_leaf:
                 if isinstance(variable.type, (TensorType, Int64Type,
                                               FloatType, StringType)):
-                    tensor_outputs[variable.raw_name] = variable
+                    tensor_outputs[variable.onnx_name] = variable
                 else:
-                    other_outputs[variable.raw_name] = variable
+                    other_outputs[variable.onnx_name] = variable
 
     # Add roots the graph according to their order in the original model
     invalid_name = []
@@ -1081,6 +1125,14 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model.domain = utils.get_domain()
     onnx_model.model_version = utils.get_model_version()
     onnx_model.doc_string = doc_string
+
+    # Removes many identity nodes,
+    # the converter may introduct identity nodes
+    # after a zipmap operator and onnx <= 1.7 does not
+    # support that. It does not use onnxconverter-common
+    # as the optimizer only support opset >= 9.
+    if remove_identity:
+        onnx_model = onnx_remove_node_identity(onnx_model)
 
     return onnx_model
 

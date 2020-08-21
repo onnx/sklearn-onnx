@@ -3,10 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import warnings
 from uuid import uuid4
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
+from .common.utils_sklearn import _process_options
 from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
@@ -58,9 +58,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred from
-        input types, converters may add operators Cast to switch to
-        double when it is necessary
+    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
+        converters may add operators Cast to switch to double when it is necessary
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -156,8 +155,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     topology.compile()
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
+    options = _process_options(model, options)
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
-                                  options=options)
+                                  options=options,
+                                  remove_identity=not intermediate)
 
     return (onnx_model, topology) if intermediate else onnx_model
 

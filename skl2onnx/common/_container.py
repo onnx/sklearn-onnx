@@ -179,11 +179,11 @@ class SklearnModelContainerNode(RawModelContainerNode):
 
     @property
     def input_names(self):
-        return [variable.raw_name for variable in self._inputs]
+        return [variable.onnx_name for variable in self._inputs]
 
     @property
     def output_names(self):
-        return [variable.raw_name for variable in self._outputs]
+        return [variable.onnx_name for variable in self._outputs]
 
     def add_input(self, variable):
         # The order of adding variables matters. The final model's

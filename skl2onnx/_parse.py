@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
 import numpy as np
 
 from sklearn import pipeline
@@ -43,6 +42,7 @@ from .common.data_types import (
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
+from .common.utils_sklearn import has_pipeline, _process_options
 
 
 do_not_merge_columns = tuple(
@@ -94,7 +94,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     this_operator.inputs = inputs
 
     if hasattr(model, 'onnx_parser'):
-        parser_names = model.onnx_parser(inputs=inputs)
+        parser_names = model.onnx_parser(scope=scope, inputs=inputs)
         if parser_names is not None:
             names = parser_names()
             for name in names:
@@ -191,8 +191,8 @@ def _parse_sklearn_pipeline(scope, model, inputs, custom_parsers=None):
     :return: A list of output variables produced by the input pipeline
     """
     for step in model.steps:
-        inputs = parse_sklearn(scope, step[1], inputs,
-                               custom_parsers=custom_parsers)
+        inputs = _parse_sklearn(scope, step[1], inputs,
+                                custom_parsers=custom_parsers)
     return inputs
 
 
@@ -294,7 +294,7 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
                                    "_supported_operators.py."
                                    "".format(model_obj))
         else:
-            var_out = parse_sklearn(
+            var_out = _parse_sklearn(
                 scope, model_obj,
                 transform_inputs, custom_parsers=custom_parsers)[0]
             if (model.transformer_weights is not None and name in
@@ -400,7 +400,8 @@ def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
-def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
+def _parse_sklearn(scope, model, inputs, custom_parsers=None,
+                   final_types=None):
     """
     This is a delegate function. It does nothing but invokes the
     correct parsing function according to the input model's type.
@@ -428,7 +429,7 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
                     "Unable to add duplicated output '{}', '{}'.".format(
                         var.onnx_name, name))
             outputs.append(var)
-        hidden_outputs = parse_sklearn(
+        hidden_outputs = _parse_sklearn(
             scope, model, inputs, custom_parsers=custom_parsers)
         if len(hidden_outputs) != len(outputs):
             raise RuntimeError(
@@ -459,6 +460,62 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
         outputs = _parse_sklearn_simple_model(scope, model, inputs,
                                               custom_parsers=custom_parsers)
     return outputs
+
+
+def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
+    """
+    This is a delegate function. It does nothing but invokes the
+    correct parsing function according to the input model's type.
+
+    :param scope: Scope object
+    :param model: A scikit-learn object (e.g., OneHotEncoder
+        and LogisticRegression)
+    :param inputs: A list of variables
+    :param custom_parsers: parsers determines which outputs is expected
+        for which particular task, default parsers are defined for
+        classifiers, regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
+        model, inputs, custom_parsers=None) }``
+    :param final_types: a python list. Works the same way as initial_types
+        but not mandatory, it is used to overwrites the type
+        (if type is not None) and the name of every output.
+    :return: The output variables produced by the input model
+    """
+    if final_types is None and has_pipeline(model):
+        try:
+            outputs = _parse_sklearn(
+                scope.temp(), model, inputs, custom_parsers=custom_parsers)
+        except RuntimeError:
+            return _parse_sklearn(
+                scope, model, inputs, custom_parsers=custom_parsers)
+
+        reserved = []
+        for o in outputs:
+            reserved.append(scope.reserve_name(o.raw_name))
+    else:
+        reserved = None
+
+    res = _parse_sklearn(
+        scope, model, inputs, custom_parsers=custom_parsers,
+        final_types=final_types)
+
+    if final_types is None and reserved is not None:
+        for r in reserved:
+            scope.unreserve_name(r)
+
+        outputs = []
+        for var, name in zip(res, reserved):
+            var2 = scope.declare_local_variable(name, var.type)
+            outputs.append(var2)
+
+        for h, o in zip(res, outputs):
+            iop = scope.declare_local_operator('SklearnIdentity')
+            iop.inputs = [h]
+            iop.outputs = [o]
+
+        return outputs
+
+    return res
 
 
 def parse_sklearn_model(model, initial_types=None, target_opset=None,
@@ -497,6 +554,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
         (if type is not None) and the name of every output.
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
     """
+    options = _process_options(model, options)
+
     raw_model_container = SklearnModelContainerNode(
         model, white_op=white_op, black_op=black_op)
 

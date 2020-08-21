@@ -196,8 +196,8 @@ class GraphState:
                 sub_op.inputs = self.inputs
                 if self.expected_outputs is None:
                     # output are not defined, we need to call a parser.
-                    from .._parse import parse_sklearn
-                    self.expected_outputs = parse_sklearn(
+                    from .._parse import _parse_sklearn
+                    self.expected_outputs = _parse_sklearn(
                         self.scope, self.operator_instance, self.inputs)
                     if (self.expected_outputs is None or
                             None in self.expected_outputs):
