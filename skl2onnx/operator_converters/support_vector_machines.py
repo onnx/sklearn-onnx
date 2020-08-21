@@ -17,7 +17,8 @@ try:
 except ImportError:
     # onnxconverter-common is too old
     apply_less = None
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_proto_type)
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
@@ -45,17 +46,17 @@ def convert_sklearn_svm_regressor(
     svm_attrs = {'name': scope.get_unique_operator_name('SVM')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
-        coef = op.dual_coef_.ravel().tolist()
+        coef = op.dual_coef_.ravel()
     else:
         coef = op.dual_coef_
     intercept = op.intercept_
     if isinstance(op.support_vectors_, np.ndarray):
-        support_vectors = op.support_vectors_.ravel().tolist()
+        support_vectors = op.support_vectors_.ravel()
     else:
         support_vectors = op.support_vectors_
 
     svm_attrs['kernel_type'] = op.kernel.upper()
-    svm_attrs['kernel_params'] = [float(_) for _ in
+    svm_attrs['kernel_params'] = [np.float32(_) for _ in
                                   [op._gamma, op.coef0, op.degree]]
     if isspmatrix(support_vectors):
         svm_attrs['support_vectors'] = support_vectors.toarray().ravel()
@@ -65,7 +66,14 @@ def convert_sklearn_svm_regressor(
         svm_attrs['coefficients'] = coef.toarray().ravel()
     else:
         svm_attrs['coefficients'] = coef
-    svm_attrs['rho'] = intercept
+    svm_attrs['rho'] = intercept.astype(np.float32)
+    svm_attrs['coefficients'] = svm_attrs['coefficients'].astype(np.float32)
+    svm_attrs['support_vectors'] = svm_attrs['support_vectors'].astype(
+        np.float32)
+
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
 
     if operator.type in ['SklearnSVR', 'SklearnNuSVR'] or isinstance(
             op, (SVR, NuSVR)):
@@ -78,7 +86,7 @@ def convert_sklearn_svm_regressor(
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, operator.input_full_names, cast_input_name,
-                       container, to=container.proto_dtype)
+                       container, to=proto_dtype)
             input_name = cast_input_name
 
         container.add_node(
@@ -95,7 +103,7 @@ def convert_sklearn_svm_regressor(
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, operator.input_full_names, cast_input_name,
-                       container, to=container.proto_dtype)
+                       container, to=proto_dtype)
             input_name = cast_input_name
 
         svm_out = operator.output_full_names[1]
@@ -133,14 +141,14 @@ def convert_sklearn_svm_classifier(
     svm_attrs = {'name': scope.get_unique_operator_name('SVMc')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
-        coef = op.dual_coef_.ravel().tolist()
+        coef = op.dual_coef_.ravel()
     else:
         coef = op.dual_coef_
     intercept = op.intercept_
     if isinstance(op.support_vectors_, np.ndarray):
-        support_vectors = op.support_vectors_.ravel().tolist()
+        support_vectors = op.support_vectors_.ravel()
     elif isspmatrix(op.support_vectors_):
-        support_vectors = op.support_vectors_.toarray().ravel().tolist()
+        support_vectors = op.support_vectors_.toarray().ravel()
     else:
         support_vectors = op.support_vectors_
 
@@ -153,10 +161,10 @@ def convert_sklearn_svm_classifier(
             op, (SVC, NuSVC))) and len(op.classes_) == 2:
         if isspmatrix(coef):
             coef_dense = coef.toarray().ravel()
-            svm_attrs['coefficients'] = [-v for v in coef_dense]
+            svm_attrs['coefficients'] = -coef_dense
         else:
-            svm_attrs['coefficients'] = [-v for v in coef]
-        svm_attrs['rho'] = [-v for v in intercept]
+            svm_attrs['coefficients'] = -coef
+        svm_attrs['rho'] = -intercept
     else:
         if isspmatrix(coef):
             svm_attrs['coefficients'] = coef.todense()
@@ -165,16 +173,20 @@ def convert_sklearn_svm_classifier(
         svm_attrs['rho'] = intercept
 
     handles_ovr = False
+    svm_attrs['coefficients'] = svm_attrs['coefficients'].astype(np.float32)
+    svm_attrs['support_vectors'] = svm_attrs['support_vectors'].astype(
+        np.float32)
+    svm_attrs['rho'] = svm_attrs['rho'].astype(np.float32)
 
     if operator.type in ['SklearnSVC', 'SklearnNuSVC'] or isinstance(
             op, (SVC, NuSVC)):
 
         if len(op.probA_) > 0:
-            svm_attrs['prob_a'] = op.probA_
+            svm_attrs['prob_a'] = op.probA_.astype(np.float32)
         else:
             handles_ovr = True
         if len(op.probB_) > 0:
-            svm_attrs['prob_b'] = op.probB_
+            svm_attrs['prob_b'] = op.probB_.astype(np.float32)
 
         if (hasattr(op, 'decision_function_shape') and
                 op.decision_function_shape == 'ovr') and handles_ovr:
@@ -237,22 +249,29 @@ def convert_sklearn_svm_classifier(
                 "Classes different from first n integers are not supported "
                 "in SVC converter.")
 
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
+        if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+            proto_dtype = onnx_proto.TensorProto.FLOAT
+
         cst3 = scope.get_unique_variable_name('cst3')
-        container.add_initializer(cst3, container.proto_dtype, [], [3])
+        container.add_initializer(cst3, proto_dtype, [], [3])
         cst1 = scope.get_unique_variable_name('cst1')
-        container.add_initializer(cst1, container.proto_dtype, [], [1])
+        container.add_initializer(cst1, proto_dtype, [], [1])
         cst0 = scope.get_unique_variable_name('cst0')
-        container.add_initializer(cst0, container.proto_dtype, [], [0])
+        container.add_initializer(cst0, proto_dtype, [], [0])
 
         prediction = scope.get_unique_variable_name('prediction')
         if apply_less is None:
             raise RuntimeError(
                 "Function apply_less is missing. "
                 "onnxconverter-common is too old.")
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
+        if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+            proto_dtype = onnx_proto.TensorProto.FLOAT
         apply_less(scope, [output_name, cst0], prediction, container)
         iprediction = scope.get_unique_variable_name('iprediction')
         apply_cast(scope, prediction, iprediction, container,
-                   to=container.proto_dtype)
+                   to=proto_dtype)
 
         n_classes = len(op.classes_)
         sumc_name = [scope.get_unique_variable_name('svcsumc_%d' % i)

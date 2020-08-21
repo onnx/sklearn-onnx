@@ -52,8 +52,6 @@ def make_node(
         **kwargs (dict): the attributes of the node.  The acceptable values
             are documented in :func:`make_attribute`.
     """
-    if _dtype is None:
-        raise ValueError("dtype cannot be None")
     node = NodeProto()
     node.op_type = op_type
     node.input.extend(inputs)
@@ -176,8 +174,9 @@ def make_attribute(
         else:
             raise ValueError(
                 "You passed in an iterable attribute but I cannot figure out "
-                "its applicable type, key='{}', type={}, types={}.".format(
-                    key, type(value),
+                "its applicable type, key='{}', type={}, dtype={}, "
+                "types={}.".format(
+                    key, type(value), dtype,
                     [type(_) for _, __ in zip(value, range(0, 5))]))
     else:
         raise ValueError(
