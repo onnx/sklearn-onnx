@@ -239,7 +239,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnSGDRegressorBool",
+            basename="SklearnSGDRegressorBool-Dec4",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",

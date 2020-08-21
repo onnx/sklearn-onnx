@@ -45,7 +45,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
             if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
                 raise RuntimeError("OneVsRestClassifier accepts "
                                    "regressor with only one target.")
-            p1 = score_name.raw_name
+            p1 = score_name.onnx_name
         else:
             if container.has_options(estimator, 'raw_scores'):
                 container.add_options(
@@ -58,7 +58,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
 
             # gets the probability for the class 1
             p1 = scope.get_unique_variable_name('probY_%d' % i)
-            apply_slice(scope, prob_name.raw_name, p1, container, starts=[1],
+            apply_slice(scope, prob_name.onnx_name, p1, container, starts=[1],
                         ends=[2], axes=[1],
                         operator_name=scope.get_unique_operator_name('Slice'))
 
