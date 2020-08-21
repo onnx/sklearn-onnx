@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import warnings
 from uuid import uuid4
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology

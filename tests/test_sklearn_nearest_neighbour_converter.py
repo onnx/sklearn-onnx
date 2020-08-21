@@ -275,9 +275,14 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
                 rows.append(str(res))
-            if (StrictVersion(onnxruntime.__version__) <
-                    StrictVersion("1.4.0")):
-                return
+            if onnxruntime.__version__.startswith('1.4.'):
+                # TODO: investigate the regression in onnxruntime 1.4
+                # One broadcasted multiplication unexpectedly produces nan.
+                whole = '\n'.join(rows)
+                if "[        nan" in whole:
+                    warnings.warn(whole)
+                    return
+                raise AssertionError(whole)
             raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp, got, decimal=5)
 
@@ -964,5 +969,4 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestNearestNeighbourConverter().test_model_knn_regressor_double()
     unittest.main()
