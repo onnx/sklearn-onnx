@@ -54,7 +54,9 @@ except ImportError:
     OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist, _onnx_cdist_sqeuclidean
 from ..common._registration import register_converter
-from ..common.data_types import DoubleTensorType, Int64TensorType
+from ..common.data_types import (
+    Int64TensorType, DoubleTensorType,
+    guess_numpy_type, guess_proto_type)
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 from ._gp_kernels import py_make_float_array
@@ -196,10 +198,15 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
     X = operator.inputs[0]
     op = operator.raw_operator
     opv = container.target_opset
-    dtype = container.dtype
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
+    proto_type = guess_proto_type(X.type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
 
     if isinstance(X.type, Int64TensorType):
-        X = OnnxCast(X, to=container.proto_dtype, op_version=opv)
+        X = OnnxCast(X, to=proto_type, op_version=opv)
 
     options = container.get_options(op, dict(optim=None))
 
@@ -209,7 +216,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
 
     metric = (op.effective_metric_ if hasattr(op, 'effective_metric_') else
               op.metric)
-    neighb = op._fit_X.astype(container.dtype)
+    neighb = op._fit_X.astype(dtype)
 
     if (hasattr(op, 'n_neighbors') and op.n_neighbors is not None and
             hasattr(op, 'radius') and op.radius is not None):
@@ -249,7 +256,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
         three = onnx_nearest_neighbors_indices_radius(
             X, neighb, radius, metric=metric, dtype=dtype,
             op_version=opv, keep_distances=True,
-            proto_dtype=container.proto_dtype,
+            proto_dtype=proto_type,
             optim=options.get('optim', None),
             **distance_kwargs)
         top_indices, top_distances, binary = three
@@ -333,12 +340,15 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
     """
     many = _convert_nearest_neighbors(operator, container)
     _, top_distances, reshaped, wei, norm, axis = many
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
 
     opv = container.target_opset
     out = operator.outputs
 
     reshaped_cast = OnnxCast(
-        reshaped, to=container.proto_dtype, op_version=opv)
+        reshaped, to=proto_type, op_version=opv)
     if top_distances is not None:
         # Multi-target
         if (hasattr(operator.raw_operator, '_y') and
@@ -383,7 +393,7 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
 
 
 def get_proba_and_label(container, nb_classes, reshaped,
-                        wei, axis, opv, keep_axis=True):
+                        wei, axis, opv, proto_type, keep_axis=True):
     """
     This function calculates the label by choosing majority label
     amongst the nearest neighbours.
@@ -393,8 +403,7 @@ def get_proba_and_label(container, nb_classes, reshaped,
         cst = np.array([cl], dtype=np.int64)
         mat_cast = OnnxCast(
             OnnxEqual(reshaped, cst, op_version=opv),
-            op_version=opv,
-            to=container.proto_dtype)
+            op_version=opv, to=proto_type)
         if wei is not None:
             if not keep_axis:
                 mat_cast = OnnxSqueeze(mat_cast, axes=[-1],
@@ -427,6 +436,9 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
     out = operator.outputs
     op = operator.raw_operator
     nb_classes = len(op.classes_)
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
 
     if axis == 0:
         raise RuntimeError(
@@ -453,7 +465,7 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
             extracted_name.set_onnx_name_prefix('tr%d' % index)
             all_together, sum_prob, res = get_proba_and_label(
                 container, len(cur_class), extracted_name,
-                wei, 1, opv, keep_axis=False)
+                wei, 1, opv, proto_type, keep_axis=False)
             probas = OnnxDiv(all_together, sum_prob, op_version=opv)
             res_name = OnnxArrayFeatureExtractor(
                 cur_class, res, op_version=opv)
@@ -476,7 +488,7 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
         final_proba.add_to(scope, container)
     else:
         all_together, sum_prob, res = get_proba_and_label(
-            container, nb_classes, reshaped, wei, axis, opv)
+            container, nb_classes, reshaped, wei, axis, opv, proto_type)
         probas = OnnxDiv(all_together, sum_prob, op_version=opv,
                          output_names=out[1:])
         probas.set_onnx_name_prefix('bprob')
@@ -497,13 +509,16 @@ def convert_nearest_neighbors_transform(scope, operator, container):
     """
     many = _convert_nearest_neighbors(operator, container)
     top_indices, top_distances = many[:2]
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
 
     out = operator.outputs
 
     ind = OnnxIdentity(top_indices, output_names=out[:1],
                        op_version=container.target_opset)
     dist = OnnxMul(
-        top_distances, np.array([-1], dtype=container.dtype),
+        top_distances, np.array([-1], dtype=dtype),
         output_names=out[1:], op_version=container.target_opset)
 
     dist.add_to(scope, container)
@@ -514,6 +529,12 @@ def convert_k_neighbours_transformer(scope, operator, container):
     """
     Converts *KNeighborsTransformer* into *ONNX*.
     """
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     transformer_op = operator.raw_operator
     op_version = container.target_opset
     k = (transformer_op.n_neighbors + 1 if transformer_op.mode == 'distance'
@@ -525,7 +546,7 @@ def convert_k_neighbours_transformer(scope, operator, container):
     top_indices, top_dist = many[:2]
     top_dist = (
         OnnxReshape(
-            OnnxMul(top_dist, np.array([-1], dtype=container.dtype),
+            OnnxMul(top_dist, np.array([-1], dtype=dtype),
                     op_version=op_version),
             np.array([-1, 1, k], dtype=np.int64),
             op_version=op_version)
@@ -538,8 +559,7 @@ def convert_k_neighbours_transformer(scope, operator, container):
         op_version=op_version)
     comparison_res = OnnxCast(
         OnnxEqual(fit_samples_indices, reshaped_ind, op_version=op_version),
-        op_version=op_version,
-        to=container.proto_dtype)
+        op_version=op_version, to=proto_type)
     if top_dist:
         comparison_res = OnnxMul(
             comparison_res, top_dist, op_version=op_version)
@@ -548,12 +568,12 @@ def convert_k_neighbours_transformer(scope, operator, container):
     res.add_to(scope, container)
 
 
-def _nan_euclidean_distance(container, model, input_name, op_version, optim):
-    training_data = model._fit_X.astype(container.dtype)
+def _nan_euclidean_distance(
+        container, model, input_name, op_version, optim, dtype, proto_type):
+    training_data = model._fit_X.astype(dtype)
     shape = OnnxShape(input_name, op_version=op_version)
     zero = OnnxConstantOfShape(
-        shape, value=make_tensor(
-            "value", container.proto_dtype, (1, ), [0]),
+        shape, value=make_tensor("value", proto_type, (1, ), [0]),
         op_version=op_version)
     missing_input_name = OnnxIsNaN(input_name, op_version=op_version)
     masked_input_name = OnnxWhere(missing_input_name, zero, input_name,
@@ -565,7 +585,7 @@ def _nan_euclidean_distance(container, model, input_name, op_version, optim):
 
     if optim is None:
         dist = _onnx_cdist_sqeuclidean(
-            masked_input_name, training_data, dtype=container.dtype,
+            masked_input_name, training_data, dtype=dtype,
             op_version=container.target_opset, dim_in=d_in, dim_out=d_out)
     elif optim == 'cdist':
         from skl2onnx.algebra.custom_ops import OnnxCDist
@@ -576,36 +596,35 @@ def _nan_euclidean_distance(container, model, input_name, op_version, optim):
         raise RuntimeError("Unexpected optimization '{}'.".format(optim))
     dist1 = OnnxMatMul(
         OnnxMul(masked_input_name, masked_input_name, op_version=op_version),
-        missing_y.T.astype(container.dtype), op_version=op_version)
+        missing_y.T.astype(dtype), op_version=op_version)
     dist2 = OnnxMatMul(
-        OnnxCast(missing_input_name, to=container.proto_dtype,
+        OnnxCast(missing_input_name, to=proto_type,
                  op_version=op_version),
-        (training_data * training_data).T.astype(container.dtype),
+        (training_data * training_data).T.astype(dtype),
         op_version=op_version)
     distances = OnnxSub(dist, OnnxAdd(dist1, dist2, op_version=op_version),
                         op_version=op_version)
     present_x = OnnxSub(
-        np.array([1], dtype=container.dtype),
-        OnnxCast(missing_input_name, to=container.proto_dtype,
+        np.array([1], dtype=dtype),
+        OnnxCast(missing_input_name, to=proto_type,
                  op_version=op_version),
         op_version=op_version)
-    present_y = (1. - missing_y).astype(container.dtype)
+    present_y = (1. - missing_y).astype(dtype)
     present_count = OnnxMatMul(
-        present_x, present_y.T.astype(container.dtype),
-        op_version=op_version)
-    present_count = OnnxMax(np.array([1], dtype=container.dtype),
+        present_x, present_y.T.astype(dtype), op_version=op_version)
+    present_count = OnnxMax(np.array([1], dtype=dtype),
                             present_count, op_version=op_version)
     dist = OnnxDiv(distances, present_count, op_version=op_version)
     return OnnxMul(
-        dist, np.array([d_in], dtype=container.dtype),
+        dist, np.array([d_in], dtype=dtype),
         op_version=op_version), missing_input_name
 
 
 def _nearest_neighbours(container, model, input_name,
-                        op_version, optim, **kwargs):
+                        op_version, optim, dtype, proto_type, **kwargs):
     dist, missing_input_name = _nan_euclidean_distance(
-        container, model, input_name, op_version, optim)
-    dtype = container.dtype
+        container, model, input_name, op_version, optim, dtype,
+        proto_type)
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array(
             [-1], dtype=dtype), op_version=op_version)
@@ -628,6 +647,12 @@ def convert_knn_imputer(scope, operator, container):
     """
     Converts *KNNImputer* into *ONNX*.
     """
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
     knn_op = operator.raw_operator
     if knn_op.metric != 'nan_euclidean':
         raise RuntimeError(
@@ -643,11 +668,12 @@ def convert_knn_imputer(scope, operator, container):
     options = container.get_options(knn_op, dict(optim=None))
     op_version = container.target_opset
     input_name = operator.inputs[0]
-    training_data = knn_op._fit_X.astype(container.dtype)
+    training_data = knn_op._fit_X.astype(dtype)
     training_data[np.isnan(training_data)] = 0
     out = operator.outputs
     top_indices, missing_input_name = _nearest_neighbours(
-        container, knn_op, input_name, op_version, options['optim'])
+        container, knn_op, input_name, op_version, options['optim'],
+        dtype, proto_type)
     flattened = OnnxFlatten(top_indices, op_version=op_version)
     extracted = OnnxArrayFeatureExtractor(
         training_data.T, flattened, op_version=op_version)
@@ -662,13 +688,13 @@ def convert_knn_imputer(scope, operator, container):
     cast_res = OnnxCast(
         OnnxCast(transpose_result, to=onnx_proto.TensorProto.BOOL,
                  op_version=op_version),
-        to=container.proto_dtype, op_version=op_version)
+        to=proto_type, op_version=op_version)
     deno = OnnxReduceSum(cast_res, op_version=op_version, axes=[1], keepdims=0)
     deno_updated = OnnxAdd(
         deno, OnnxCast(
             OnnxNot(OnnxCast(deno, to=onnx_proto.TensorProto.BOOL,
                              op_version=op_version), op_version=op_version),
-            to=container.proto_dtype, op_version=op_version),
+            to=proto_type, op_version=op_version),
         op_version=op_version)
     imputed_out = OnnxWhere(
         missing_input_name,
@@ -685,14 +711,19 @@ def convert_nca(scope, operator, container):
     nca_op = operator.raw_operator
     op_version = container.target_opset
     out = operator.outputs
-    components = nca_op.components_.T.astype(container.dtype)
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
+    components = nca_op.components_.T.astype(dtype)
 
     if isinstance(X.type, Int64TensorType):
-        X = OnnxCast(X, to=container.proto_dtype, op_version=op_version)
+        X = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT, op_version=op_version)
     elif isinstance(X.type, DoubleTensorType):
         components = OnnxCast(
             components, to=onnx_proto.TensorProto.DOUBLE,
             op_version=op_version)
+    else:
+        components = components.astype(dtype)
     res = OnnxMatMul(
         X, components,
         output_names=out[:1], op_version=op_version)
