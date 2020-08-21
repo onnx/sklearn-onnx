@@ -1,6 +1,7 @@
 """
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
+import warnings
 import unittest
 import functools
 from distutils.version import StrictVersion
