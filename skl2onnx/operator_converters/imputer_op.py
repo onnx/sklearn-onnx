@@ -20,7 +20,7 @@ def convert_sklearn_imputer(scope, operator, container):
     if not hasattr(op, 'statistics_'):
         raise RuntimeError("Member statistics_ is not present, was the "
                            "model fitted?")
-    attrs['imputed_value_floats'] = op.statistics_
+    attrs['imputed_value_floats'] = op.statistics_.astype(np.float32)
     if isinstance(op.missing_values, str) and op.missing_values == 'NaN':
         attrs['replaced_value_float'] = np.NaN
     elif isinstance(op.missing_values, float):

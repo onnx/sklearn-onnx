@@ -8,6 +8,7 @@ import warnings
 import numpy as np
 from ..common._apply_operation import apply_cast, apply_reshape
 from ..common._registration import register_converter
+from ..common.data_types import guess_proto_type
 from ..proto import onnx_proto
 
 
@@ -339,7 +340,11 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     output = (scope.get_unique_variable_name('output')
               if op.binary else operator.output_full_names)
 
-    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+
+    if proto_dtype == onnx_proto.TensorProto.DOUBLE:
         output_tf = scope.get_unique_variable_name('cast_result')
     else:
         output_tf = output
@@ -353,9 +358,9 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         container.add_node(op_type, tokenized, output_tf, op_domain='',
                            op_version=9, **attrs)
 
-    if container.proto_dtype == onnx_proto.TensorProto.DOUBLE:
+    if proto_dtype == onnx_proto.TensorProto.DOUBLE:
         apply_cast(scope, output_tf, output,
-                   container, to=container.proto_dtype)
+                   container, to=proto_dtype)
 
     if op.binary:
         cast_result_name = scope.get_unique_variable_name('cast_result')

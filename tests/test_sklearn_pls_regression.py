@@ -50,8 +50,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         pls2.fit(X, Y)
         model_onnx = convert_sklearn(
             pls2, "scikit-learn pls64",
-            [("input", DoubleTensorType([None, X.shape[1]]))],
-            dtype=numpy.float64)
+            [("input", DoubleTensorType([None, X.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
