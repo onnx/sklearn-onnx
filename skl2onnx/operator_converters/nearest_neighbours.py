@@ -625,7 +625,6 @@ def _nearest_neighbours(container, model, input_name,
     dist, missing_input_name = _nan_euclidean_distance(
         container, model, input_name, op_version, optim, dtype,
         proto_type)
-    dtype = dtype
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array(
             [-1], dtype=dtype), op_version=op_version)
