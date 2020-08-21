@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-import warnings
 from uuid import uuid4
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
@@ -59,9 +58,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred
-        from input types, converters may add operators Cast to
-        switch to double when it is necessary
+    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
+        converters may add operators Cast to switch to double when it is necessary
     :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
 
     Example of *initial_types*:
@@ -158,9 +156,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
-    onnx_model = convert_topology(
-        topology, name, doc_string, target_opset,
-        options=options, remove_identity=not intermediate)
+    onnx_model = convert_topology(topology, name, doc_string, target_opset,
+                                  dtype=dtype, options=options,
+                                  remove_identity=not intermediate)
 
     return (onnx_model, topology) if intermediate else onnx_model
 
@@ -213,6 +211,9 @@ def to_onnx(model, X=None, name=None, initial_types=None,
                              white_op=white_op, final_types=final_types)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
+    if dtype not in (np.float32, np.float64):
+        raise NotImplementedError(
+            "dtype should be real not {}".format(dtype))
     initial_types = guess_initial_types(X, initial_types)
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,

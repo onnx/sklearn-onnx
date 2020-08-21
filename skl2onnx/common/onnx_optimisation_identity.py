@@ -21,7 +21,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
     :param onnx_model: onnx model
     :param recursive: looks into subgraphs
     :param debug_info: debug information (private)
-    :return: new onnx _model
+    :return: new onnx model
     """
     if debug_info is None:
         debug_info = [str(type(onnx_model)).split('.')[-1].strip("'>")]
