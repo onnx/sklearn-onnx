@@ -27,8 +27,7 @@ def convert_truncated_svd(scope, operator, container):
     # Put the transformation into an ONNX tensor
     container.add_initializer(
         transform_matrix_name, proto_dtype,
-        transform_matrix.shape, transform_matrix.flatten(),
-        can_cast=False)
+        transform_matrix.shape, transform_matrix.flatten())
 
     input_name = operator.inputs[0].full_name
     if isinstance(operator.inputs[0].type, Int64TensorType):
@@ -49,8 +48,7 @@ def convert_truncated_svd(scope, operator, container):
             sub_result_name = scope.get_unique_variable_name('sub_result')
 
             container.add_initializer(mean_name, proto_dtype,
-                                      svd.mean_.shape, svd.mean_,
-                                      can_cast=False)
+                                      svd.mean_.shape, svd.mean_)
 
             # Subtract mean from input tensor
             apply_sub(scope, [input_name, mean_name],
