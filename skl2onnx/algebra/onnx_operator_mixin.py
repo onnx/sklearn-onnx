@@ -19,7 +19,9 @@ class OnnxOperatorMixin:
     sharing an API to convert object to *ONNX*.
     """
 
-    def to_onnx(self, X=None, name=None, dtype=np.float32):
+    def to_onnx(self, X=None, name=None, dtype=np.float32,
+                options=None, white_op=None, black_op=None,
+                final_types=None):
         """
         Converts the model in *ONNX* format.
         It calls method *_to_onnx* which must be
@@ -31,6 +33,15 @@ class OnnxOperatorMixin:
             it is replaced by the the class name.
         :param dtype: defines the type of floats to use
             during the conversion
+        :param options: specific options given to converters
+            (see :ref:`l-conv-options`)
+        :param white_op: white list of ONNX nodes allowed
+            while converting a pipeline, if empty, all are allowed
+        :param black_op: black list of ONNX nodes allowed
+            while converting a pipeline, if empty, none are blacklisted
+        :param final_types: a python list. Works the same way as initial_types
+            but not mandatory, it is used to overwrites the type
+            (if type is not None) and the name of every output.
         """
         from .. import convert_sklearn
         if X is None:
@@ -46,7 +57,9 @@ class OnnxOperatorMixin:
                     self.__class__.__name__, name))
         return convert_sklearn(
             self, initial_types=initial_types, dtype=dtype,
-            target_opset=self.op_version)
+            target_opset=self.op_version, options=options,
+            white_op=white_op, black_op=black_op,
+            final_types=final_types)
 
     def infer_initial_types(self):
         """
@@ -81,7 +94,7 @@ class OnnxOperatorMixin:
         """
         raise NotImplementedError()
 
-    def onnx_parser(self, inputs=None):
+    def onnx_parser(self, scope=None, inputs=None):
         """
         Returns a parser for this model.
         If not overloaded, it fetches the parser
