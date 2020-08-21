@@ -116,9 +116,9 @@ class TestSklearnPipeline(unittest.TestCase):
         itypes = set(_[1].__class__ for _ in initial_types)
         self.assertIn(BooleanTensorType, itypes)
         self.assertIn(FloatTensorType, itypes)
-        onnx = convert_sklearn(model, initial_types=initial_types)
+        onx = convert_sklearn(model, initial_types=initial_types)
 
-        session = rt.InferenceSession(onnx.SerializeToString())
+        session = rt.InferenceSession(onx.SerializeToString())
 
         pred_skl = model.predict(test_df)
         pred_onx = _predict(session, test_df)

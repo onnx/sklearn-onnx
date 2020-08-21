@@ -28,7 +28,7 @@ class TestAlgebraDouble(unittest.TestCase):
             output_names=['Y'],
             op_version=TARGET_OPSET)
         onnx_model = onnx_fct.to_onnx(
-            {'X': X_test}, dtype=numpy.float64, target_opset=TARGET_OPSET)
+            {'X': X_test}, target_opset=TARGET_OPSET)
 
         sess = InferenceSession(onnx_model.SerializeToString())
         ort_pred = sess.run(None, {'X': X_test})[0]

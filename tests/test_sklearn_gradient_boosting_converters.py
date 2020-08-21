@@ -99,9 +99,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gradient boosting classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -120,9 +118,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gradient boosting classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -141,9 +137,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gradient boosting classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -160,11 +154,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "gradient boosting classifier",
-            [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            model, "gradient boosting classifier",
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -181,11 +172,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5, is_bool=True)
         model_onnx = convert_sklearn(
-            model,
-            "gradient boosting classifier",
-            [("input", BooleanTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            model, "gradient boosting classifier",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -206,7 +194,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             "gradient boosting classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             options=options,
         )
         self.assertIsNotNone(model_onnx)
@@ -228,9 +215,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "gradient boosting classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -317,10 +302,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model, X = fit_regression_model(
             GradientBoostingRegressor(random_state=42), is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "gradient boosting regression",
-            [("input", Int64TensorType([None, X.shape[1]]))],
-        )
+            model, "gradient boosting regression",
+            [("input", Int64TensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -374,19 +357,14 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         model, X = fit_regression_model(
             GradientBoostingRegressor(random_state=42), is_bool=True)
         model_onnx = convert_sklearn(
-            model,
-            "gradient boosting regressor",
-            [("input", BooleanTensorType([None, X.shape[1]]))],
-        )
+            model, "gradient boosting regressor",
+            [("input", BooleanTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnGradientBoostingRegressorBool-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+                          " <= StrictVersion('0.2.1')")
 
 
 if __name__ == "__main__":

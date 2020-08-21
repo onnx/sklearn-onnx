@@ -179,17 +179,12 @@ class OnnxOperator:
             return "UnscopedVariable('%s')" % self.name
 
     class ConstantVariable:
-        def __init__(self, value, implicit_cast=True):
+        def __init__(self, value):
             self.value = value
-            self.implicit_cast = implicit_cast
 
         @property
         def ConstantValue(self):
             return self.value
-
-        @property
-        def ImplicitCast(self):
-            return self.implicit_cast
 
     def find_schema(self, op_version):
         """
@@ -280,8 +275,7 @@ class OnnxOperator:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
-                        OnnxOperator.ConstantVariable(
-                            inp, implicit_cast=False))
+                        OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, TensorProto):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
@@ -531,7 +525,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                dtype=np.float32, target_opset=None, domain=None):
+                target_opset=None, domain=None):
         """
         Converts this operator into an ONNX graph.
 
@@ -541,8 +535,6 @@ class OnnxOperator:
         :param other_outputs: additional outputs to consider
             as graph outputs but not outputs of this particular
             node
-        :param dtype: force the use of a specific float type,
-            either `np.float32` or `np.float64`, it must be specified
         :param target_opset: dictionary with target opset per domain,
             None for the default one
         :param domain: domain of the operator
@@ -594,8 +586,7 @@ class OnnxOperator:
                                    "input types.".format(
                                        name, self.__class__.__name__))
         target_opset = self.get_latest_tested_opset_version(target_opset)
-        container = ModelComponentContainer(
-            target_opset, dtype=dtype)
+        container = ModelComponentContainer(target_opset)
 
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,

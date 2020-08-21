@@ -44,27 +44,26 @@ And to predict on a test set:
 * k nearest neightbours, :math:`f(X') \\rightarrow X'_3`
 * final normalization, simple scaling :math:`X'_3 \\rightarrow X'_4`
 """
-
-import skl2onnx
-import onnx
-import sklearn
-from skl2onnx import update_registered_converter
+import inspect
 import os
+import numpy
+import onnx
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import convert_sklearn, get_model_alias
-from skl2onnx.common._registration import get_shape_calculator
-from skl2onnx.common.data_types import FloatTensorType
 from matplotlib import offsetbox
 import matplotlib.pyplot as plt
+import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
-import numpy
-import inspect
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
+from skl2onnx import update_registered_converter
+import skl2onnx
+from skl2onnx import convert_sklearn, get_model_alias
+from skl2onnx.common._registration import get_shape_calculator
+from skl2onnx.common.data_types import FloatTensorType
 
 
 class PredictableTSNE(BaseEstimator, TransformerMixin):
@@ -347,8 +346,8 @@ def predictable_tsne_converter(scope, operator, container):
     # The parameter follows the specifications of ONNX
     # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
     attrs = dict(name=name,
-                 scale=op.inv_std_.ravel().astype(float),
-                 offset=op.mean_.ravel().astype(float))
+                 scale=op.inv_std_.ravel().astype(numpy.float32),
+                 offset=op.mean_.ravel().astype(numpy.float32))
 
     # Let's finally add the scaler which connects the output
     # of the k-nearest neighbours model to output of the whole model

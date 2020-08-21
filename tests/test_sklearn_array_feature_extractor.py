@@ -59,7 +59,7 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
         # checks the first step
         model_onnx = to_onnx(
             clustering_pipeline.steps[0][1], initial_types=initial_type,
-            target_opset=TARGET_OPSET, dtype=np.float32)
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             data, clustering_pipeline.steps[0][1], model_onnx,
             basename="SklearnArrayFeatureExtractorStep0")
@@ -67,7 +67,7 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
         # checks the whole pipeline
         model_onnx = to_onnx(
             clustering_pipeline, initial_types=initial_type,
-            target_opset=TARGET_OPSET, dtype=np.float32)
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             data, clustering_pipeline, model_onnx,
             basename="SklearnArrayFeatureExtractor")
