@@ -11,14 +11,16 @@ from ..common._apply_operation import (
     apply_log, apply_mul, apply_pow, apply_sub, apply_reshape,
     apply_transpose,
 )
-from ..common.data_types import BooleanTensorType, Int64TensorType
+from ..common.data_types import (
+    BooleanTensorType, Int64TensorType, guess_numpy_type,
+    guess_proto_type)
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
 
 
 def _joint_log_likelihood_bernoulli(
         scope, container, input_name, feature_log_prob_name,
-        class_log_prior_name, binarize, feature_count, proto_type,
+        class_log_prior_name, binarize, feature_count, proto_dtype,
         sum_result_name):
     """
     Calculate joint log likelihood for Bernoulli Naive Bayes model.
@@ -35,7 +37,7 @@ def _joint_log_likelihood_bernoulli(
         'partial_sum_result')
     # Define constant slightly greater than 1 to avoid log 0
     # scenarios when calculating log (1 - x) and x=1 in line 70
-    container.add_initializer(constant_name, proto_type, [], [1.000000001])
+    container.add_initializer(constant_name, proto_dtype, [], [1.000000001])
 
     if binarize is not None:
         threshold_name = scope.get_unique_variable_name('threshold')
@@ -46,11 +48,11 @@ def _joint_log_likelihood_bernoulli(
             'binarised_input')
         num_features = feature_count.shape[1]
 
-        container.add_initializer(threshold_name, proto_type,
+        container.add_initializer(threshold_name, proto_dtype,
                                   [1], [binarize])
         container.add_initializer(
             zero_tensor_name,
-            proto_type, [1, num_features],
+            proto_dtype, [1, num_features],
             np.zeros((1, num_features)).ravel())
 
         container.add_node(
@@ -58,7 +60,7 @@ def _joint_log_likelihood_bernoulli(
             condition_name, name=scope.get_unique_operator_name('Greater'),
             op_version=9)
         apply_cast(scope, condition_name, cast_values_name, container,
-                   to=proto_type)
+                   to=proto_dtype)
         apply_add(scope, [zero_tensor_name, cast_values_name],
                   binarised_input_name, container, broadcast=1)
         input_name = binarised_input_name
@@ -84,7 +86,7 @@ def _joint_log_likelihood_bernoulli(
 
 
 def _joint_log_likelihood_gaussian(
-        scope, container, input_name, model, proto_type, sum_result_name):
+        scope, container, input_name, model, proto_dtype, sum_result_name):
     """
     Calculate joint log likelihood for Gaussian Naive Bayes model.
     """
@@ -109,17 +111,17 @@ def _joint_log_likelihood_gaussian(
     theta = model.theta_.reshape((1, -1, features))
     sigma = model.sigma_.reshape((1, -1, features))
 
-    container.add_initializer(theta_name, proto_type, theta.shape,
+    container.add_initializer(theta_name, proto_dtype, theta.shape,
                               theta.ravel())
-    container.add_initializer(sigma_name, proto_type, sigma.shape,
+    container.add_initializer(sigma_name, proto_dtype, sigma.shape,
                               sigma.ravel())
-    container.add_initializer(jointi_name, proto_type, [1, jointi.shape[0]],
+    container.add_initializer(jointi_name, proto_dtype, [1, jointi.shape[0]],
                               jointi)
     container.add_initializer(
-        sigma_sum_log_name, proto_type,
+        sigma_sum_log_name, proto_dtype,
         [1, sigma_sum_log.shape[0]], sigma_sum_log.ravel())
-    container.add_initializer(exponent_name, proto_type, [], [2])
-    container.add_initializer(prod_operand_name, proto_type, [], [0.5])
+    container.add_initializer(exponent_name, proto_dtype, [], [2])
+    container.add_initializer(prod_operand_name, proto_dtype, [], [0.5])
 
     apply_reshape(scope, input_name, reshaped_input_name, container,
                   desired_shape=[-1, 1, features])
@@ -223,7 +225,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #   input [M, N] -> MATMUL <- feature_log_prob.T [N, C]
     #                    |
     #                    V
-    #        matmul_result [M, C] -> CAST <- proto_type
+    #        matmul_result [M, C] -> CAST <- proto_dtype
     #                                |
     #                                V
     #                    cast_result [M, C] -> ADD <- class_log_prior [1, C]
@@ -240,7 +242,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     # array_feature_extractor_result [M, 1] --------------------------.
     #           (int labels) |                                        |
     #                        V                                        |
-    #              CAST(to=proto_type)              |
+    #              CAST(to=proto_dtype)              |
     #                        |                                        |
     #                        V                                        |
     #                  cast2_result [M, 1]                            |
@@ -299,7 +301,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #  array_feature_extractor_result [M, 1] ----------------.
     #          (int labels) |                                |
     #                       V                                |
-    #   CAST(to=proto_type)                |
+    #   CAST(to=proto_dtype)                |
     #                       |                                |
     #                       V                                |
     #                cast2_result [M, 1]                     |
@@ -320,7 +322,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #    input [M, N] -> GREATER <- threshold [1]
     #       |              |
     #       |              V
-    #       |       condition [M, N] -> CAST(to=proto_type)
+    #       |       condition [M, N] -> CAST(to=proto_dtype)
     #       |                             |
     #       |                             V
     #       |                          cast_values [M, N]
@@ -345,8 +347,13 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     #                     log_prob [M, C] -> EXP -> prob_tensor [M, C] -.
     #                                                                   |
     #         output_probability [M, C] <- ZIPMAP <---------------------'
-    float_dtype = container.dtype
-    proto_type = container.proto_dtype
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+    float_dtype = dtype
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
 
     nb_op = operator.raw_operator
     classes = get_label_classes(scope, nb_op)
@@ -385,10 +392,10 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         feature_log_prob = nb_op.feature_log_prob_.T.astype(float_dtype)
 
         container.add_initializer(
-            feature_log_prob_name, proto_type,
+            feature_log_prob_name, proto_dtype,
             feature_log_prob.shape, feature_log_prob.flatten())
         container.add_initializer(
-            class_log_prior_name, proto_type,
+            class_log_prior_name, proto_dtype,
             class_log_prior.shape, class_log_prior.flatten())
 
     input_name = operator.inputs[0].full_name
@@ -396,18 +403,18 @@ def convert_sklearn_naive_bayes(scope, operator, container):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=proto_type)
+                   container, to=proto_dtype)
         input_name = cast_input_name
 
     if operator.type == 'SklearnBernoulliNB':
         sum_result_name = _joint_log_likelihood_bernoulli(
             scope, container, input_name, feature_log_prob_name,
             class_log_prior_name, nb_op.binarize, nb_op.feature_count_,
-            proto_type, sum_result_name)
+            proto_dtype, sum_result_name)
     elif operator.type == 'SklearnGaussianNB':
         sum_result_name = _joint_log_likelihood_gaussian(
             scope, container, input_name, nb_op,
-            proto_type, sum_result_name)
+            proto_dtype, sum_result_name)
     elif operator.type == 'SklearnCategoricalNB':
         sum_result_name = _joint_log_likelihood_categorical(
             scope, container, input_name, nb_op, sum_result_name)
@@ -455,7 +462,7 @@ def convert_sklearn_naive_bayes(scope, operator, container):
     if class_type == onnx_proto.TensorProto.INT32:
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
-                   to=proto_type)
+                   to=proto_dtype)
         apply_reshape(scope, cast2_result_name, reshaped_result_name,
                       container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name,

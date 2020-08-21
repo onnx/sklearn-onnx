@@ -118,7 +118,6 @@ print('min(Y)-max(Y):', min(y_test), max(y_test))
 
 initial_type = [('X', DoubleTensorType([None, None]))]
 onx64 = convert_sklearn(gpr, initial_types=initial_type,
-                        dtype=numpy.float64,
                         target_opset=12)
 
 sess64 = rt.InferenceSession(onx64.SerializeToString())
@@ -164,8 +163,7 @@ initial_type = [('X', DoubleTensorType([None, None]))]
 options = {GaussianProcessRegressor: {'return_std': True}}
 try:
     onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                dtype=numpy.float64, options=options,
-                                target_opset=12)
+                                options=options, target_opset=12)
 except RuntimeError as e:
     print(e)
 
@@ -177,8 +175,7 @@ except RuntimeError as e:
 
 gpr.predict(X_test[:1], return_std=True)
 onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                            dtype=numpy.float64, options=options,
-                            target_opset=12)
+                            options=options, target_opset=12)
 
 sess64_std = rt.InferenceSession(onx64_std.SerializeToString())
 pred_onx64_std = sess64_std.run(None, {'X': X_test[:5]})
