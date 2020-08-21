@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-
+import pprint
 from collections import OrderedDict
 from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed # noqa
 from onnxconverter_common.utils import is_numeric_type, is_string_type # noqa
@@ -85,7 +85,6 @@ def get_column_index(i, inputs):
             vi += 1
             pos = end
             if vi >= len(inputs):
-                import pprint
                 raise RuntimeError(
                     "Input {} (i={}, end={}) is not available in\n{}".format(
                         vi, i, end, pprint.pformat(inputs)))
