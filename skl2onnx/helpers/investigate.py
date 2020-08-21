@@ -315,7 +315,7 @@ def compare_objects(o1, o2, decimal=4):
         try:
             res = c1 == c2
             reason = 'list-equal'
-        except ValueError:
+        except ValueError:  # lgtm [py/unreachable-statement]
             res = False
             reason = 'list'
     elif isinstance(c1, numpy.ndarray) and isinstance(c2, numpy.ndarray):

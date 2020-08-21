@@ -36,9 +36,8 @@ class TestInvestigate(unittest.TestCase):
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(model, "pipeline",
-                                           [("input",
-                                             FloatTensorType([None, 2]))])
+        steps = collect_intermediate_steps(
+            model, "pipeline", [("input", FloatTensorType([None, 2]))])
 
         assert len(steps) == 2
         assert len(all_models) == 3
