@@ -1,6 +1,7 @@
 """
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
+import warnings
 import unittest
 import functools
 from distutils.version import StrictVersion
@@ -279,15 +280,15 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
                 rows.append(str(res))
-            if (StrictVersion(onnxruntime.__version__) <
-                    StrictVersion("1.4.0")):
-                return
-            whole = '\n'.join(rows)
-            if "[        nan" in whole:
-                # One boradcasted multiplication unexpectedly produces nan.
-                warnings.warn(whole)
-                return
-            raise AssertionError(whole)
+            if onnxruntime.__version__.startswith('1.4.'):
+                # TODO: investigate the regression in onnxruntime 1.4
+                # One broadcasted multiplication unexpectedly produces nan.
+                whole = '\n'.join(rows)
+                if "[        nan" in whole:
+                    warnings.warn(whole)
+                    return
+                raise AssertionError(whole)
+            raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp, got, decimal=5)
 
     @unittest.skipIf(
