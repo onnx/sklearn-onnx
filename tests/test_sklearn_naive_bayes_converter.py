@@ -40,7 +40,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -66,7 +65,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -88,7 +86,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -110,7 +107,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -141,7 +137,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -167,7 +162,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -189,7 +183,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -211,7 +204,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
@@ -237,7 +229,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -263,7 +254,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "bernoulli naive bayes",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
@@ -285,7 +275,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "multinomial naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -332,7 +321,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "gaussian naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -354,7 +342,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "gaussian naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -376,7 +363,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "gaussian naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -398,7 +384,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "gaussian naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -420,7 +405,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "gaussian naive bayes",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
@@ -444,7 +428,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "complement naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -468,7 +451,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "complement naive bayes",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -492,7 +474,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "complement naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -516,7 +497,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "complement naive bayes",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
@@ -539,7 +519,6 @@ class TestNaiveBayesConverter(unittest.TestCase):
             model,
             "complement naive bayes",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            dtype=np.float32,
             target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
