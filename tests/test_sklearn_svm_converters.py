@@ -190,7 +190,8 @@ class TestSklearnSVM(unittest.TestCase):
 
     def test_convert_svc_multi_linear_ptrue(self):
         model, X = self._fit_multi_classification(
-            SVC(kernel="linear", probability=True))
+            SVC(kernel="linear", probability=True),
+            nbclass=3)
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))])
         nodes = model_onnx.graph.node

@@ -153,11 +153,9 @@ def convert_sklearn_isolation_forest(
 
         eqp_log = OnnxMul(
                     OnnxAdd(OnnxLog(eqp2p_m1, op_version=opv),
-                            np.array([np.euler_gamma],
-                                     dtype=dtype),
+                            np.array([np.euler_gamma], dtype=dtype),
                             op_version=opv),
-                    np.array([2], dtype=dtype),
-                    op_version=opv)
+                    np.array([2], dtype=dtype), op_version=opv)
         eqp_log.set_onnx_name_prefix('eqp_log%d' % i)
 
         # - 2.0 * (n_samples_leaf[not_mask] - 1.0) / n_samples_leaf[not_mask]
