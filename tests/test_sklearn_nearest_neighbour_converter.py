@@ -6,7 +6,6 @@ import warnings
 import unittest
 import functools
 from distutils.version import StrictVersion
-import warnings
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
