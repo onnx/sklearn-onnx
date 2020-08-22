@@ -6,11 +6,7 @@
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_concat,
-    apply_identity,
-    apply_mul,
-)
-from ..common._topology import FloatTensorType
+    apply_concat, apply_identity, apply_mul)
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import apply_slice, apply_sub, apply_clip
@@ -38,27 +34,27 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         this_operator.inputs = operator.inputs
 
         if is_regressor(estimator):
-            score_name = scope.declare_local_variable('score_%d' % i,
-                                                      FloatTensorType())
+            score_name = scope.declare_local_variable(
+                'score_%d' % i, operator.inputs[0].type.__class__())
             this_operator.outputs.append(score_name)
 
             if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
                 raise RuntimeError("OneVsRestClassifier accepts "
                                    "regressor with only one target.")
-            p1 = score_name.raw_name
+            p1 = score_name.onnx_name
         else:
             if container.has_options(estimator, 'raw_scores'):
                 container.add_options(
                     id(estimator), {'raw_scores': use_raw_scores})
             label_name = scope.declare_local_variable('label_%d' % i)
-            prob_name = scope.declare_local_variable('proba_%d' % i,
-                                                     FloatTensorType())
+            prob_name = scope.declare_local_variable(
+                'proba_%d' % i, operator.inputs[0].type.__class__())
             this_operator.outputs.append(label_name)
             this_operator.outputs.append(prob_name)
 
             # gets the probability for the class 1
             p1 = scope.get_unique_variable_name('probY_%d' % i)
-            apply_slice(scope, prob_name.raw_name, p1, container, starts=[1],
+            apply_slice(scope, prob_name.onnx_name, p1, container, starts=[1],
                         ends=[2], axes=[1],
                         operator_name=scope.get_unique_operator_name('Slice'))
 
