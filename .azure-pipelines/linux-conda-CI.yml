@@ -241,12 +241,6 @@ jobs:
       pip install --no-deps onnxmltools  # git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
 
-  # dot is not installed
-  #- script: |
-  #    pip install matplotlib pydot
-  #  displayName: 'install modules for examples'
-  #  condition: eq(variables['run.example'], '1')
-
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
@@ -279,15 +273,16 @@ jobs:
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 
-  - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
-      conda install -c anaconda graphviz
-      python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
-    displayName: 'build documentation'
-    condition: eq(variables['run.example'], '1')
+  # dot cannot be found but is missing to build the documentation
+  #- script: |
+  #    if [ '$(onnx.target_opset)' != '' ]
+  #    then
+  #      export TEST_TARGET_OPSET="$(onnx.target_opset)"
+  #    fi
+  #    conda install -c anaconda graphviz
+  #    python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
+  #  displayName: 'build documentation'
+  #  condition: eq(variables['run.example'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
