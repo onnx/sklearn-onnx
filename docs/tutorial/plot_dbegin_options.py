@@ -76,7 +76,6 @@ and which is not. So it is possible to specify options by id.
 """
 
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from sklearn.mixture import GaussianMixture
 from pprint import pformat
 from skl2onnx.common._registration import _converter_pool
 from sklearn.preprocessing import MinMaxScaler
