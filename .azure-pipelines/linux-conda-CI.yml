@@ -241,10 +241,11 @@ jobs:
       pip install --no-deps onnxmltools  # git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
 
-  - script: |
-      pip install matplotlib pydot
-    displayName: 'install modules for examples'
-    condition: eq(variables['run.example'], '1')
+  # dot is not installed
+  #- script: |
+  #    pip install matplotlib pydot
+  #  displayName: 'install modules for examples'
+  #  condition: eq(variables['run.example'], '1')
 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
