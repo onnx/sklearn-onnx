@@ -14,6 +14,7 @@ onnxruntime
 pillow
 py-spy
 pandas
+pydot
 pyinstrument
 pyquickhelper>=1.9.3359
 pytest
