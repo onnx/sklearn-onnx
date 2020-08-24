@@ -55,6 +55,7 @@ from sklearn.ensemble import (
     BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
+    IsolationForest,
     RandomForestClassifier, RandomForestRegressor,
     VotingClassifier
 )
@@ -247,7 +248,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM]
+outlier_list = [OneClassSVM, IsolationForest]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -287,6 +288,7 @@ def build_sklearn_operator_name_map():
                 HistGradientBoostingRegressor,
                 Imputer,
                 IncrementalPCA,
+                IsolationForest,
                 KMeans,
                 LabelBinarizer,
                 LabelEncoder,
@@ -455,7 +457,7 @@ def get_model_alias(model_type):
     if res is None:
         raise RuntimeError("Unable to find alias for model '{}'. "
                            "The converter is likely missing."
-                           "".format(type(model_type)))
+                           "".format(model_type))
     return res
 
 

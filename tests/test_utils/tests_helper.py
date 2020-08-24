@@ -115,7 +115,8 @@ def dump_data_and_model(
         intermediate_steps=False,
         fail_evenif_notimplemented=False,
         verbose=False,
-        classes=None):
+        classes=None,
+        disable_optimisation=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -162,6 +163,8 @@ def dump_data_and_model(
         of a new operator defiend in ONNX.
     :param classes: classes names
         (only for classifier, mandatory if option 'nocl' is used)
+    :param disable_optimisation: disable all optimisations *onnxruntime*
+        could do
     :return: the created files
 
     Some convention for the name,
@@ -369,6 +372,7 @@ def dump_data_and_model(
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
                     intermediate_steps=intermediate_steps,
+                    disable_optimisation=disable_optimisation
                 )
             else:
                 try:
@@ -378,7 +382,8 @@ def dump_data_and_model(
                         context=context, verbose=verbose,
                         comparable_outputs=comparable_outputs,
                         intermediate_steps=intermediate_steps,
-                        classes=classes)
+                        classes=classes,
+                        disable_optimisation=disable_optimisation)
                 except OnnxRuntimeMissingNewOnnxOperatorException as e:
                     if fail_evenif_notimplemented:
                         raise e

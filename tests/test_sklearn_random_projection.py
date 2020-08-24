@@ -39,8 +39,7 @@ class TestSklearnRandomProjection(unittest.TestCase):
         pt = GaussianRandomProjection(n_components=4)
         X = rng.rand(10, 5).astype(np.float64)
         model = pt.fit(X)
-        model_onnx = to_onnx(model, X[:1], dtype=np.float64,
-                             target_opset=TARGET_OPSET)
+        model_onnx = to_onnx(model, X[:1], target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model,
                             model_onnx, basename="GaussianRandomProjection64")

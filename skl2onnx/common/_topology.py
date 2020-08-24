@@ -29,6 +29,7 @@ from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
+from .onnx_optimisation_identity import onnx_remove_node_identity
 type_fct = type
 
 
@@ -147,7 +148,7 @@ class Operator(OperatorBase):
     """
 
     def __init__(self, onnx_name, scope, type, raw_operator,
-                 target_opset, dtype, scope_inst):
+                 target_opset, scope_inst):
         """
         :param onnx_name: A unique ID, which is a string
         :param scope: The name of the scope where this operator is
@@ -159,7 +160,6 @@ class Operator(OperatorBase):
         :param raw_operator: The original operator which defines this operator;
                              for example, a scikit-learn Imputer and
                              a CoreML Normalizer.
-        :param dtype: preferred output type
         :param target_opset: The target opset number for the converted model.
         :param scope_inst: :class:`Scope` instance the operator belongs to
         """
@@ -176,7 +176,6 @@ class Operator(OperatorBase):
         self.is_evaluated = None
         self.is_abandoned = False
         self.target_opset = target_opset
-        self.dtype = dtype
         self.scope_inst = scope_inst
 
     @property
@@ -221,23 +220,6 @@ class Operator(OperatorBase):
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
         shape_calc(self)
 
-    @property
-    def tensor_type(self):
-        if self.dtype == np.float32:
-            return FloatTensorType
-        if self.dtype == np.float64:
-            return FloatTensorType
-        raise NotImplementedError(
-            "Unable to guess the tensor type from [{}].".format(self.dtype))
-
-    @property
-    def proto_type(self):
-        if self.dtype == np.float32:
-            return onnx_proto.TensorProto.FLOAT
-        if self.dtype == np.float64:
-            return onnx_proto.TensorProto.DOUBLE
-        raise ValueError("dtype should be either np.float32 or np.float64.")
-
 
 class Scope:
     """
@@ -249,7 +231,7 @@ class Scope:
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 dtype=np.float32, registered_models=None):
+                 registered_models=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -266,8 +248,6 @@ class Scope:
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying
                                 the user customized shape calculator
-        :param dtype: select the computation for real type,
-            by default it is float but double is sometime needed
         :param options: see :ref:`l-conv-options`
         :param registered_models: registered models
         """
@@ -279,18 +259,6 @@ class Scope:
             operator_name_set if operator_name_set is not None else set())
         self.target_opset = target_opset
         self.custom_shape_calculators = custom_shape_calculators
-
-        self.dtype = dtype
-        if dtype == np.float32:
-            self.tensor_type = FloatTensorType
-        elif dtype == np.float64:
-            self.tensor_type = DoubleTensorType
-        elif dtype == np.int64:
-            self.tensor_type = Int64TensorType
-        else:
-            raise NotImplementedError(
-                "dtype must be either np.float32, np.float64, "
-                "np.int64.")
 
         # An one-to-many map from raw variable name to ONNX variable
         # names. It looks like
@@ -311,6 +279,27 @@ class Scope:
 
         # Registered models
         self.registered_models = registered_models
+
+        # Reserved variables.
+        self.reserved = {}
+
+    def temp(self):
+        """
+        Creates a new Scope with the same options but no names.
+        """
+        scope = Scope(
+            'temp', parent_scopes=self.parent_scopes,
+            target_opset=self.target_opset,
+            custom_shape_calculators=self.custom_shape_calculators,
+            options=self.options,
+            registered_models=self.registered_models)
+        return scope
+
+    def has_variable_name(self, name):
+        """
+        Tells if a variable is already registered.
+        """
+        return name in self.onnx_variable_names
 
     def get_shape_calculator(self, model_type):
         """
@@ -360,14 +349,33 @@ class Scope:
             self.variable_name_mapping[raw_name] = [onnx_name]
         return variable
 
+    def reserve_name(self, raw_name):
+        """
+        Keeps this name to be used by other converters.
+        """
+        if raw_name in self.reserved:
+            raise RuntimeError(
+                "Name '{}' already reserved.".format(raw_name))
+        self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
+        return self.reserved[raw_name]
+
+    def unreserve_name(self, name):
+        """
+        Deletes a name from the reserved list.
+        """
+        if name not in self.reserved:
+            raise RuntimeError(
+                "Name '{}' not reserved.".format(name))
+        self.onnx_variable_names.discard(name)
+        del self.reserved[name]
+
     def declare_local_operator(self, type, raw_model=None):
         """
         This function is used to declare new local operator.
         """
         onnx_name = self.get_unique_operator_name(str(type))
         operator = Operator(onnx_name, self.name, type, raw_model,
-                            self.target_opset, self.dtype,
-                            scope_inst=self)
+                            self.target_opset, scope_inst=self)
         self.operators[onnx_name] = operator
         return operator
 
@@ -548,8 +556,7 @@ class Topology:
     def get_unique_scope_name(self, seed):
         return Topology._generate_unique_name(seed, self.scope_names)
 
-    def declare_scope(self, seed, parent_scopes=None, options=None,
-                      dtype=np.float32):
+    def declare_scope(self, seed, parent_scopes=None, options=None):
         """
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
@@ -558,8 +565,7 @@ class Topology:
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options, dtype=dtype,
-            registered_models=self.registered_models)
+            options=options, registered_models=self.registered_models)
         self.scopes.append(scope)
         return scope
 
@@ -917,8 +923,8 @@ class Topology:
 
 
 def convert_topology(topology, model_name, doc_string, target_opset,
-                     channel_first_inputs=None, dtype=None,
-                     options=None):
+                     channel_first_inputs=None,
+                     options=None, remove_identity=True):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
@@ -931,14 +937,11 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
         a dictionary is used to indicate different opset for
         different domains
-    :param dtype: float type to use everywhere in the graph,
-        `np.float32` or `np.float64`
     :param options: see :ref:`l-conv-options`
+    :param remove_identity: removes identity nodes
     include '1.1.2', '1.2', and so on.
     :return: a ONNX ModelProto
     """
-    if dtype is None:
-        raise ValueError("dtype must be specified.")
     if target_opset is None:
         target_opset = get_latest_tested_opset_version()
     if isinstance(target_opset, dict):
@@ -965,7 +968,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     topology._initialize_graph_status_for_traversing()
 
     container = ModelComponentContainer(
-        target_opset, options=options, dtype=dtype,
+        target_opset, options=options,
         registered_models=topology.registered_models,
         white_op=topology.raw_model._white_op,
         black_op=topology.raw_model._black_op)
@@ -987,9 +990,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
             if variable.is_leaf:
                 if isinstance(variable.type, (TensorType, Int64Type,
                                               FloatType, StringType)):
-                    tensor_outputs[variable.raw_name] = variable
+                    tensor_outputs[variable.onnx_name] = variable
                 else:
-                    other_outputs[variable.raw_name] = variable
+                    other_outputs[variable.onnx_name] = variable
 
     # Add roots the graph according to their order in the original model
     invalid_name = []
@@ -1122,6 +1125,14 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model.domain = utils.get_domain()
     onnx_model.model_version = utils.get_model_version()
     onnx_model.doc_string = doc_string
+
+    # Removes many identity nodes,
+    # the converter may introduct identity nodes
+    # after a zipmap operator and onnx <= 1.7 does not
+    # support that. It does not use onnxconverter-common
+    # as the optimizer only support opset >= 9.
+    if remove_identity:
+        onnx_model = onnx_remove_node_identity(onnx_model)
 
     return onnx_model
 

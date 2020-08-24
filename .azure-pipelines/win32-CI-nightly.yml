@@ -19,7 +19,7 @@ jobs:
         numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.0'
+        sklearn.version: '==0.23.2'
       Py37-Onnx160-nightlyRT-Npy1180-Sk0230:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
@@ -61,7 +61,7 @@ jobs:
       pip install $(numpy.version)
       conda install $(scipy.version)
       pip install $(onnx.version)
-      pip install openpyxl
+      pip install openpyxl cerberus
     displayName: 'Install numpy, scipy, onnx'
 
   - script: |
