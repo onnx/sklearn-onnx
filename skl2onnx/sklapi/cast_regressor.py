@@ -4,39 +4,35 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.base import RegressorMixin, BaseEstimator
 try:
     from sklearn.utils.validation import _deprecate_positional_args
 except ImportError:
     _deprecate_positional_args = lambda x: x  # noqa
 
 
-class CastTransformer(TransformerMixin, BaseEstimator):
+class CastRegressor(RegressorMixin, BaseEstimator):
 
     """
-    Cast features into a specific types.
+    Cast predictions into a specific types.
     This should be used to minimize the conversion
-    of a pipeline using float32 instead of double.
+    of a pipeline using float32 instead of double
+    when onnx do not support double.
 
     Parameters
     ----------
+    estimator : regressor
+        wrapped regressor
     dtype : numpy type,
         output are cast into that type
     """  # noqa
 
     @_deprecate_positional_args
-    def __init__(self, *, dtype=np.float32):
+    def __init__(self, estimator, *, dtype=np.float32):
         self.dtype = dtype
+        self.estimator = estimator
 
     def _cast(self, a, name):
-        if not isinstance(a, np.ndarray):
-            if hasattr(a, 'values') and hasattr(a, 'iloc'):
-                # dataframe
-                a = a.values
-            else:
-                raise TypeError(
-                    "{} must be a numpy array or a dataframe.".format(
-                        name))
         try:
             a2 = a.astype(self.dtype)
         except ValueError:
@@ -49,11 +45,22 @@ class CastTransformer(TransformerMixin, BaseEstimator):
         """
         Does nothing except checking *dtype* may be applied.
         """
-        self._cast(X, 'X')
+        self.estimator.fit(X, y=y, sample_weight=sample_weight)
         return self
 
-    def transform(self, X, y=None):
+    def predict(self, X, y=None):
         """
-        Casts array X.
+        Predicts and casts the prediction.
         """
-        return self._cast(X, 'X')
+        return self._cast(self.estimator.predict(X), 'predict(X)')
+
+    def decision_function(self, X, y=None):
+        """
+        Calls *decision_function* and casts the outputs.
+        """
+        if not hasattr(self.estimator, 'decision_function'):
+            raise AttributeError(
+                "%r object has no attribute 'decision_function'." %
+                self.estimator.__class__.__name__)
+        return self._cast(self.estimator.decision_function(X),
+                          'decision_function(X)')

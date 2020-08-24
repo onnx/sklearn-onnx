@@ -7,6 +7,7 @@
 from ..common._registration import register_shape_calculator
 from ..common.utils import check_input_and_output_numbers
 from ..common.data_types import _guess_numpy_type
+from ..common.shape_calculator import calculate_linear_regressor_output_shapes
 
 
 def calculate_sklearn_cast(operator):
@@ -26,3 +27,5 @@ register_shape_calculator(
     'SklearnCast', calculate_sklearn_cast)
 register_shape_calculator(
     'SklearnCastTransformer', calculate_sklearn_cast_transformer)
+register_shape_calculator('SklearnCastRegressor',
+                          calculate_linear_regressor_output_shapes)
