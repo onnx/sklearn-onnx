@@ -208,7 +208,10 @@ def add_tree_to_attribute_pairs_hist_gradient_boosting(
         else:
             mode = 'BRANCH_LEQ'
             feat_id = node['feature_idx']
-            threshold = node['threshold']
+            try:
+                threshold = node['threshold']
+            except ValueError as e:
+                threshold = node['num_threshold']
             left_child_id = node['left']
             right_child_id = node['right']
             missing = node['missing_go_to_left']

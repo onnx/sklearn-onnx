@@ -654,14 +654,15 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_randomforestclassifier_decision_path(self):
-        model = RandomForestClassifier(max_depth=2, n_estimators=2)
+        model = RandomForestClassifier(max_depth=2, n_estimators=3)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_path': True, 'zipmap': False}})
+            options={id(model): {'decision_path': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -677,14 +678,15 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_extratreesclassifier_decision_path(self):
-        model = ExtraTreesClassifier(max_depth=2, n_estimators=2)
+        model = ExtraTreesClassifier(max_depth=2, n_estimators=3)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_path': True, 'zipmap': False}})
+            options={id(model): {'decision_path': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -698,5 +700,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnTreeEnsembleModels().test_randomforestclassifier_decision_path()
     unittest.main()
