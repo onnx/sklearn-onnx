@@ -16,7 +16,7 @@ from numpy.random import rand
 from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -26,6 +26,8 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
+import treelite.sklearn
+import treelite_runtime 
 
 
 ##############################
@@ -34,42 +36,39 @@ from onnxruntime import InferenceSession
 
 def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     "RandomForestClassifier."
-    rf = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators,
-                                n_jobs=n_jobs)
+    rf = RandomForestRegressor(max_depth=max_depth, n_estimators=n_estimators,
+                               n_jobs=n_jobs)
     rf.fit(X, y)
 
     initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
-    onx = convert_sklearn(rf, initial_types=initial_types,
-                          options={RandomForestClassifier: {'zipmap': False}})
+    onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
     sess = InferenceSession(content)
     outputs = [o.name for o in sess.get_outputs()]
 
+    lite = treelite.sklearn.import_model(rf)
+    name = "lite{}.dll".format(id(rf))
+    lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
+                    libpath=name, verbose=True)
+    lite_predictor = treelite_runtime.Predictor(name, verbose=True)
+
+
     def predict_skl_predict(X, model=rf):
         return rf.predict(X)
-
-    def predict_skl_predict_proba(X, model=rf):
-        return rf.predict_proba(X)
 
     def predict_onnxrt_predict(X, sess=sess):
         return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
 
-    def predict_onnxrt_predict_proba(X, sess=sess):
-        res = sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
-        # do not use DataFrame to convert the output into array,
-        # it takes too much time
-        out = numpy.empty((len(res), len(res[0])), dtype=numpy.float32)
-        for i, row in enumerate(res):
-            for k, v in row.items():
-                out[i, k] = v
-        return out
+    def predict_treelite_predict(X, sess=sess):
+        return numpy.array(
+            lite_predictor.predict(
+                tree_lite_runtime.Batch.from_npy2d(X.astype(np.float32))))
 
     return {'predict': (predict_skl_predict,
-                        predict_onnxrt_predict),
-            'predict_proba': (predict_skl_predict_proba,
-                              predict_onnxrt_predict_proba)}
+                        predict_onnxrt_predict,
+                        predict_treelite_predict)}
 
 
 ##############################
@@ -101,7 +100,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                     for n in n_obs:
                         for method in methods:
 
-                            fct1, fct2 = fcts[method]
+                            fct1, fct2, fct3 = fcts[method]
 
                             if not allow_configuration(n=n, nfeat=nfeat,
                                                        max_depth=max_depth,
@@ -141,6 +140,17 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                                     break
                             end = time()
                             obs["time_ort"] = (end - st) / repeated
+                            
+                            # measures treelite
+                            st = time()
+                            r2 = 0
+                            for X in Xs:
+                                p2 = fct3(X)
+                                r2 += 1
+                                if r2 >= repeated:
+                                    break
+                            end = time()
+                            obs["time_lite"] = (end - st) / repeated
                             
                             # final
                             res.append(obs)
@@ -193,6 +203,9 @@ def plot_results(df, verbose=False):
                     label = "ort ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
                                 logx=True, logy=True, c=color)
+                    label = "lite ne={}".format(n_estimators)
+                    subset.plot(x="nfeat", y="time_lite", label=label, ax=a,
+                                logx=True, logy=True, c=color)
 
                 a.legend(loc=0, fontsize='x-small')
                 if row == 0:
@@ -206,7 +219,7 @@ def plot_results(df, verbose=False):
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 100]
-    methods = ['predict', 'predict_proba']
+    methods = ['predict']
     n_features = [1, 5, 10, 20] # 50, 100]
     max_depths = [2, 5, 10]
     n_estimatorss = [1, 10] #, 100]
@@ -232,6 +245,8 @@ if __name__ == '__main__':
     import onnx
     import onnxruntime
     import skl2onnx
+    import treelite
+    import treelite_runtime
     df = pandas.DataFrame([
         {"name": "date", "version": str(datetime.now())},
         {"name": "numpy", "version": numpy.__version__},
@@ -239,10 +254,12 @@ if __name__ == '__main__':
         {"name": "onnx", "version": onnx.__version__},
         {"name": "onnxruntime", "version": onnxruntime.__version__},
         {"name": "skl2onnx", "version": skl2onnx.__version__},
+        {"name": "treelite", "version": treelite.__version__},
+        {"name": "treelite_runtime", "version": treelite_runtime.__version__},
     ])
-    df.to_csv("bench_plot_onnxruntime_decision_tree.time.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    plt.savefig("bench_plot_onnxruntime_random_forest.png")
-    df.to_csv("bench_plot_onnxruntime_random_forest.csv", index=False)
+    plt.savefig("bench_plot_onnxruntime_random_forest_reg.png")
+    df.to_csv("bench_plot_onnxruntime_random_forest_reg.csv", index=False)
     plt.show()
