@@ -64,7 +64,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     def predict_treelite_predict(X, sess=sess):
         return numpy.array(
             lite_predictor.predict(
-                tree_lite_runtime.Batch.from_npy2d(X.astype(np.float32))))
+                treelite_runtime.Batch.from_npy2d(X.astype(np.float32))))
 
     return {'predict': (predict_skl_predict,
                         predict_onnxrt_predict,
@@ -179,16 +179,17 @@ def plot_results(df, verbose=False):
     for n_obs in sorted(set(df.n_obs)):
         for max_depth in sorted(set(df.max_depth)):
             pos = 0
-            for method in sorted(set(df.method)):
+            for n_jobs in sorted(set(df.n_jobs)):
                 a = ax[row, pos]
                 if row == ax.shape[0] - 1:
                     a.set_xlabel("N features", fontsize='x-small')
                 if pos == 0:
-                    a.set_ylabel("Time (s) n_obs={}\nmax_depth={}".format(n_obs, max_depth),
-                                 fontsize='x-small')
+                    a.set_ylabel(
+                        "Time (s) n_obs={}\nmax_depth={} n_jobs={}".format(
+                            n_obs, max_depth, n_jobs), fontsize='x-small')
 
                 for color, n_estimators in zip('brgyc', sorted(set(df.n_estimators))):
-                    subset = df[(df.method == method) & (df.n_obs == n_obs)
+                    subset = df[(df.n_jobs == n_jobs) & (df.n_obs == n_obs)
                                 & (df.max_depth == max_depth)
                                 & (df.n_estimators == n_estimators)]
                     if subset.shape[0] == 0:
