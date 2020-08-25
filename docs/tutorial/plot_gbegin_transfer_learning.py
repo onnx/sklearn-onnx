@@ -74,7 +74,7 @@ for inp in sess.get_inputs():
 
 #####################################
 # The model expects a series of images of size
-# [3, 224, 224].
+# `[3, 224, 224]`.
 
 ##########################################
 # Classifying an image
@@ -207,7 +207,7 @@ selected = outputs[-3]
 print("selected", selected)
 
 #################################
-# And we tell OnnxTransformer to use that
+# And we tell *OnnxTransformer* to use that
 # specific one and to flatten the output
 # as the dimension is not a matrix.
 
