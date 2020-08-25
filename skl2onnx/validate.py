@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 import os
 from time import perf_counter
+import pprint
 import pickle
 import numpy
 import pandas
@@ -230,10 +231,9 @@ def enumerate_compatible_opset(model, opset_min=9, opset_max=None,
             except TypeError as e:
                 if debug:
                     raise
-                import pprint
-                raise RuntimeError(
-                    "Unable to instantiate model '{}'.\nextra=\n{}".format(
-                        model.__name__, pprint.pformat(extra))) from e
+                obs["_1inst"] = str(e)
+                yield obs
+                continue
 
             try:
                 if y_ is None:
@@ -406,7 +406,6 @@ def _call_runtime(obs_op, conv, opset, debug, inst, runtime,
     if debug and len(debug_exc) == 2:
         raise debug_exc[0]
     if debug:
-        import pprint
         pprint.pprint(obs_op)
     return obs_op
 
