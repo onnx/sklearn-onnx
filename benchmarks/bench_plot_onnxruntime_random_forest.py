@@ -4,13 +4,13 @@ Benchmark of onnxruntime on RandomForest.
 """
 # Authors: Xavier Dupré (benchmark)
 # License: MIT
-import matplotlib
-
+import sys
 from io import BytesIO
 from time import perf_counter as time
 from itertools import combinations, chain
 from itertools import combinations_with_replacement as combinations_w_r
 
+import matplotlib
 import numpy as np
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
@@ -26,25 +26,35 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
+import treelite.sklearn
+import treelite_runtime 
 
 
 ##############################
 # Implementations to benchmark.
 ##############################
 
-def fcts_model(X, y, max_depth, n_estimators):
+def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     "RandomForestClassifier."
-    rf = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators)
+    rf = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators,
+                                n_jobs=n_jobs)
     rf.fit(X, y)
 
     initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
-    onx = convert_sklearn(rf, initial_types=initial_types)
+    onx = convert_sklearn(rf, initial_types=initial_types,
+                          options={RandomForestClassifier: {'zipmap': False}})
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
     sess = InferenceSession(content)
-
     outputs = [o.name for o in sess.get_outputs()]
+
+    lite = treelite.sklearn.import_model(rf)
+    name = "lite{}.dll".format(id(rf))
+    lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
+                    libpath=name, verbose=True)
+    lite_predictor = treelite_runtime.Predictor(name, verbose=True)
+
 
     def predict_skl_predict(X, model=rf):
         return rf.predict(X)
@@ -65,10 +75,15 @@ def fcts_model(X, y, max_depth, n_estimators):
                 out[i, k] = v
         return out
 
+    def predict_treelite_predict(X, sess=sess):
+        return numpy.array(lite_predictor.predict_instance(X.astype(np.float32)))
+
     return {'predict': (predict_skl_predict,
-                        predict_onnxrt_predict),
+                        predict_onnxrt_predict,
+                        predict_treelite_predict),
             'predict_proba': (predict_skl_predict_proba,
-                              predict_onnxrt_predict_proba)}
+                              predict_onnxrt_predict_proba,
+                              predict_treelite_predict)}
 
 
 ##############################
@@ -79,8 +94,8 @@ def allow_configuration(**kwargs):
     return True
 
 
-def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
-          repeat=10, verbose=False):
+def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
+          methods, repeat=10, verbose=False):
     res = []
     for nfeat in n_features:
 
@@ -92,59 +107,76 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
         X_trainsum_ = X_trainsum + eps
         y_train = (X_trainsum_ >= X_trainsum).ravel().astype(int)
 
-        for max_depth in max_depths:
-            for n_estimators in n_estimatorss:
-                fcts = fcts_model(X_train, y_train, max_depth, n_estimators)
+        for n_jobs in n_jobss:
+            for max_depth in max_depths:
+                for n_estimators in n_estimatorss:
+                    fcts = fcts_model(X_train, y_train, max_depth, n_estimators, n_jobs)
 
-                for n in n_obs:
-                    for method in methods:
+                    for n in n_obs:
+                        for method in methods:
 
-                        fct1, fct2 = fcts[method]
+                            fct1, fct2, fct3 = fcts[method]
 
-                        if not allow_configuration(n=n, nfeat=nfeat,
-                                                   max_depth=max_depth, n_estimator=n_estimators):
-                            continue
+                            if not allow_configuration(n=n, nfeat=nfeat,
+                                                       max_depth=max_depth,
+                                                       n_estimator=n_estimators,
+                                                       n_jobs=n_jobs):
+                                continue
 
-                        obs = dict(n_obs=n, nfeat=nfeat, max_depth=max_depth,
-                                   n_estimators=n_estimators, method=method)
+                            obs = dict(n_obs=n, nfeat=nfeat, max_depth=max_depth,
+                                       n_estimators=n_estimators, method=method,
+                                       n_jobs=n_jobs)
 
-                        # creates different inputs to avoid caching in any ways
-                        Xs = []
-                        for r in range(repeat):
-                            x = np.empty((n, nfeat))
-                            x[:, :] = rand(n, nfeat)[:, :]
-                            Xs.append(x)
+                            # creates different inputs to avoid caching in any ways
+                            Xs = []
+                            for r in range(repeat):
+                                x = np.empty((n, nfeat))
+                                x[:, :] = rand(n, nfeat)[:, :]
+                                Xs.append(x)
 
-                        # measures the baseline
-                        st = time()
-                        repeated = 0
-                        for X in Xs:
-                            p1 = fct1(X)
-                            repeated += 1
-                            if time() - st >= 1:
-                                break  # stops if longer than a second
-                        end = time()
-                        obs["time_skl"] = (end - st) / repeated
+                            # measures the baseline
+                            st = time()
+                            repeated = 0
+                            for X in Xs:
+                                p1 = fct1(X)
+                                repeated += 1
+                                if time() - st >= 1:
+                                    break  # stops if longer than a second
+                            end = time()
+                            obs["time_skl"] = (end - st) / repeated
 
-                        # measures the new implementation
-                        st = time()
-                        r2 = 0
-                        for X in Xs:
-                            p2 = fct2(X)
-                            r2 += 1
-                            if r2 >= repeated:
-                                break
-                        end = time()
-                        obs["time_ort"] = (end - st) / repeated
-                        res.append(obs)
-                        if verbose and (len(res) % 1 == 0 or n >= 10000):
-                            print("bench", len(res), ":", obs)
+                            # measures the new implementation
+                            st = time()
+                            r2 = 0
+                            for X in Xs:
+                                p2 = fct2(X)
+                                r2 += 1
+                                if r2 >= repeated:
+                                    break
+                            end = time()
+                            obs["time_ort"] = (end - st) / repeated
+                            
+                            # measures the new implementation
+                            st = time()
+                            r2 = 0
+                            for X in Xs:
+                                p2 = fct3(X)
+                                r2 += 1
+                                if r2 >= repeated:
+                                    break
+                            end = time()
+                            obs["time_lite"] = (end - st) / repeated
+                            
+                            # final
+                            res.append(obs)
+                            if verbose and (len(res) % 1 == 0 or n >= 10000):
+                                print("bench", len(res), ":", obs)
 
-                        # checks that both produce the same outputs
-                        if n <= 10000:
-                            if len(p1.shape) == 1 and len(p2.shape) == 2:
-                                p2 = p2.ravel()
-                            assert_almost_equal(p1, p2, decimal=5)
+                            # checks that both produce the same outputs
+                            if n <= 10000:
+                                if len(p1.shape) == 1 and len(p2.shape) == 2:
+                                    p2 = p2.ravel()
+                                assert_almost_equal(p1, p2, decimal=5)
     return res
 
 
@@ -179,11 +211,15 @@ def plot_results(df, verbose=False):
                     subset = subset.sort_values("nfeat")
                     if verbose:
                         print(subset)
+
                     label = "skl ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_skl", label=label, ax=a,
                                 logx=True, logy=True, c=color, style='--')
                     label = "ort ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
+                                logx=True, logy=True, c=color)
+                    label = "lite ne={}".format(n_estimators)
+                    subset.plot(x="nfeat", y="time_lite", label=label, ax=a,
                                 logx=True, logy=True, c=color)
 
                 a.legend(loc=0, fontsize='x-small')
@@ -199,13 +235,14 @@ def plot_results(df, verbose=False):
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 100]
     methods = ['predict', 'predict_proba']
-    n_features = [1, 5, 10, 20, 50, 100]
+    n_features = [1, 5, 10, 20] # 50, 100]
     max_depths = [2, 5, 10]
-    n_estimatorss = [1, 10, 100]
+    n_estimatorss = [1, 10] #, 100]
+    n_jobss = [1, 3] #, 100]
 
     start = time()
-    results = bench(n_obs, n_features, max_depths, n_estimatorss, methods,
-                    repeat=repeat, verbose=verbose)
+    results = bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
+                    methods, repeat=repeat, verbose=verbose)
     end = time()
 
     results_df = pandas.DataFrame(results)
