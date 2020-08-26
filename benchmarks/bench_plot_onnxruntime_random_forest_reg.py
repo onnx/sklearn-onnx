@@ -219,11 +219,11 @@ def plot_results(df, verbose=False):
 
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
-    n_obs = [1, 100]
+    n_obs = [1, 10, 100, 1000, 10000]
     methods = ['predict']
-    n_features = [1, 5, 10, 20] # 50, 100]
-    max_depths = [2, 5, 10]
-    n_estimatorss = [1, 10] #, 100]
+    n_features = [1, 10, 20, 30]
+    max_depths = [5, 10]
+    n_estimatorss = [1, 10, 100]
     n_jobss = [1, 3] #, 100]
 
     start = time()

@@ -57,14 +57,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
         return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
 
     def predict_onnxrt_predict_proba(X, sess=sess):
-        res = sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
-        # do not use DataFrame to convert the output into array,
-        # it takes too much time
-        out = numpy.empty((len(res), len(res[0])), dtype=numpy.float32)
-        for i, row in enumerate(res):
-            for k, v in row.items():
-                out[i, k] = v
-        return out
+        return sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
 
     return {'predict': (predict_skl_predict,
                         predict_onnxrt_predict),
@@ -207,10 +200,10 @@ def plot_results(df, verbose=False):
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 100]
     methods = ['predict', 'predict_proba']
-    n_features = [1, 5, 10, 20] # 50, 100]
+    n_features = [1, 5, 10, 20, 50, 100]
     max_depths = [2, 5, 10]
-    n_estimatorss = [1, 10] #, 100]
-    n_jobss = [1, 3] #, 100]
+    n_estimatorss = [1, 10, 100]
+    n_jobss = [1, 3]
 
     start = time()
     results = bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
