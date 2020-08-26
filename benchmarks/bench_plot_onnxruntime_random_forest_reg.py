@@ -165,7 +165,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                                 try:
                                     assert_almost_equal(p1, p2, decimal=5)
                                 except AssertionError as e:
-                                    warnings.warn(e)
+                                    warnings.warn(str(e))
     return res
 
 
