@@ -204,13 +204,13 @@ def plot_results(df, verbose=False):
 
                     label = "skl ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_skl", label=label, ax=a,
-                                logx=True, logy=True, c=color, style='--')
+                                logx=True, logy=True, c=color, style='--', lw=5)
                     label = "ort ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
-                                logx=True, logy=True, c=color)
+                                logx=True, logy=True, c=color, lw=3)
                     label = "lite ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_lite", label=label, ax=a,
-                                logx=True, logy=True, c=color)
+                                logx=True, logy=True, c=color, style='-.', lw=3)
 
                 a.legend(loc=0, fontsize='x-small')
                 if row == 0:
