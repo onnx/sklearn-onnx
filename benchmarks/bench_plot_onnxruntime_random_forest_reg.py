@@ -171,7 +171,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
 
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.max_depth)) * len(set(df.n_obs)), 2)
-    ncols = max(len(set(df.method)), 2)
+    ncols = max(len(set(df.n_jobs)), 2)
     fig, ax = plt.subplots(nrows, ncols,
                            figsize=(ncols * 4, nrows * 4))
     pos = 0
@@ -210,7 +210,7 @@ def plot_results(df, verbose=False):
 
                 a.legend(loc=0, fontsize='x-small')
                 if row == 0:
-                    a.set_title("method={}".format(method), fontsize='x-small')
+                    a.set_title("n_jobs={}".format(n_jobs), fontsize='x-small')
                 pos += 1
             row += 1
 
