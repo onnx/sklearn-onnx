@@ -37,6 +37,8 @@ def dynamic_class_creation_sklearn():
     cls = {}
 
     for skl_obj, name in sklearn_operator_name_map.items():
+        if skl_obj is None:
+            continue
         conv = _converter_pool[name]
         shape_calc = _shape_calculator_pool[name]
         skl_name = skl_obj.__name__
