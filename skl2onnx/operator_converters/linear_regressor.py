@@ -8,19 +8,41 @@ try:
 except ImportError:
     import collections as cabc
 import numpy as np
-from ..common._apply_operation import apply_cast
+from ..common._apply_operation import (
+    apply_cast, apply_div, apply_sqrt, apply_sub, apply_add)
 from ..common.data_types import (
-    BooleanTensorType, Int64TensorType, guess_numpy_type)
+    BooleanTensorType, Int64TensorType, guess_numpy_type,
+    guess_proto_type, DoubleTensorType)
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
 
 def convert_sklearn_linear_regressor(scope, operator, container):
     op = operator.raw_operator
+
+    if type(operator.inputs[0].type) in (DoubleTensorType, ):
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
+        coef = scope.get_unique_variable_name('coef')
+        container.add_initializer(
+            coef, proto_dtype, op.coef_.shape, op.coef_.ravel().tolist())
+        intercept = scope.get_unique_variable_name('intercept')
+        container.add_initializer(
+            intercept, proto_dtype, op.intercept_.shape,
+            op.intercept_.ravel().tolist())
+        multiplied = scope.get_unique_variable_name('multiplied')
+        container.add_node(
+            'MatMul', [operator.inputs[0].full_name, coef], multiplied,
+            name=scope.get_unique_operator_name('MatMul'))
+        apply_add(scope, [multiplied, intercept],
+                  operator.outputs[0].full_name, container)
+        return
+
     op_type = 'LinearRegressor'
     dtype = guess_numpy_type(operator.inputs[0].type)
+
     if dtype not in (np.float32, np.float64):
         dtype = np.float32
+
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs['coefficients'] = op.coef_.astype(dtype).ravel()
     attrs['intercepts'] = (op.intercept_.astype(dtype)
@@ -39,10 +61,65 @@ def convert_sklearn_linear_regressor(scope, operator, container):
                        if dtype == np.float64
                        else onnx_proto.TensorProto.FLOAT))
         input_name = cast_input_name
+
     container.add_node(op_type, input_name,
-                       operator.output_full_names, op_domain='ai.onnx.ml',
+                       operator.outputs[0].full_name, op_domain='ai.onnx.ml',
                        **attrs)
+
+
+def convert_sklearn_bayesian_ridge(scope, operator, container):
+    convert_sklearn_linear_regressor(scope, operator, container)
+
+    op = operator.raw_operator
+    options = container.get_options(op, dict(return_std=False))
+    return_std = options['return_std']
+    if not return_std:
+        return
+
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if op.normalize:
+        # if self.normalize:
+        #     X = (X - self.X_offset_) / self.X_scale_
+        offset = scope.get_unique_variable_name('offset')
+        container.add_initializer(
+            offset, proto_dtype, op.X_offset_.shape,
+            op.X_offset_.ravel().tolist())
+        scale = scope.get_unique_variable_name('scale')
+        container.add_initializer(
+            scale, proto_dtype, op.X_scale_.shape,
+            op.X_scale_.ravel().tolist())
+        centered = scope.get_unique_variable_name('centered')
+        apply_sub(scope, [operator.inputs[0].full_name, offset],
+                  centered, container)
+        scaled = scope.get_unique_variable_name('scaled')
+        apply_div(scope, [centered, scale], scaled, container)
+        input_name = scaled
+    else:
+        input_name = operator.inputs[0].full_name
+
+    # sigmas_squared_data = (np.dot(X, self.sigma_) * X).sum(axis=1)
+    sigma = scope.get_unique_variable_name('sigma')
+    container.add_initializer(
+        sigma, proto_dtype, op.sigma_.shape, op.sigma_.ravel().tolist())
+    sigmaed0 = scope.get_unique_variable_name('sigma0')
+    container.add_node(
+        'MatMul', [input_name, sigma], sigmaed0,
+        name=scope.get_unique_operator_name('MatMul'))
+    sigmaed = scope.get_unique_variable_name('sigma')
+    container.add_node(
+        'ReduceSum', sigmaed0, sigmaed, axes=[1],
+        name=scope.get_unique_operator_name('ReduceSum'))
+
+    # y_std = np.sqrt(sigmas_squared_data + (1. / self.alpha_))
+    # return y_mean, y_std
+    std0 = scope.get_unique_variable_name('std0')
+    alphainv = scope.get_unique_variable_name('alphainv')
+    container.add_initializer(alphainv, proto_dtype, [1], [1 / op.alpha_])
+    apply_add(scope, [sigmaed, alphainv], std0, container)
+    apply_sqrt(scope, std0, operator.outputs[1].full_name, container)
 
 
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
+register_converter('SklearnBayesianRidge', convert_sklearn_bayesian_ridge,
+                   options={'return_std': [True, False]})
