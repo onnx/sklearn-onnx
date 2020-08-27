@@ -525,7 +525,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
         assert_almost_equal(std, outputs[1].ravel(), decimal=4)
 
-    @unittest.skipIf(StrictVersion(ort_version) >= StrictVersion("1.3.0"),
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
                      reason="output type")
     def test_model_bayesian_ridge_return_std_double(self):
         model, X = fit_regression_model(linear_model.BayesianRidge(),
@@ -560,7 +560,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
         assert_almost_equal(std, outputs[1].ravel(), decimal=4)
 
-    @unittest.skipIf(StrictVersion(ort_version) >= StrictVersion("1.3.0"),
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
                      reason="output type")
     def test_model_bayesian_ridge_return_std_normalize_double(self):
         model, X = fit_regression_model(
