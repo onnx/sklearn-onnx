@@ -288,8 +288,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     warnings.warn(whole)
                     return
                 raise AssertionError(whole)
-            if (onnxruntime.__version__.startswith('1.3.') and
-                    sys.platform == 'win32'):
+            if (onnxruntime.__version__.startswith('1.3.'):
                 # Same error but different line number for further
                 # investigation.
                 raise AssertionError(whole)
