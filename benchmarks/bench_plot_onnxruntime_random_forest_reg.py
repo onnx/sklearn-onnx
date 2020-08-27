@@ -106,7 +106,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                             if not allow_configuration(n=n, nfeat=nfeat,
                                                        max_depth=max_depth,
                                                        n_estimator=n_estimators,
-                                                       n_jobs=n_jobs):
+                                                       n_jobs=n_jobs, method=method):
                                 continue
 
                             obs = dict(n_obs=n, nfeat=nfeat, max_depth=max_depth,
@@ -143,15 +143,16 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                             obs["time_ort"] = (end - st) / repeated
                             
                             # measures treelite
-                            st = time()
-                            r2 = 0
-                            for X in Xs:
-                                p2 = fct3(X)
-                                r2 += 1
-                                if r2 >= repeated:
-                                    break
-                            end = time()
-                            obs["time_lite"] = (end - st) / repeated
+                            if n <= 1000:
+                                st = time()
+                                r2 = 0
+                                for X in Xs:
+                                    p2 = fct3(X)
+                                    r2 += 1
+                                    if r2 >= repeated:
+                                        break
+                                end = time()
+                                obs["time_lite"] = (end - st) / repeated
                             
                             # final
                             res.append(obs)
