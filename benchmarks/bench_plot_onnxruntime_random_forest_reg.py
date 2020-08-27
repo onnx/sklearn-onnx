@@ -49,12 +49,14 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     sess = InferenceSession(content)
     outputs = [o.name for o in sess.get_outputs()]
 
-    lite = treelite.sklearn.import_model(rf)
-    name = "lite{}.dll".format(id(rf))
-    lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
-                    libpath=name, verbose=True)
-    lite_predictor = treelite_runtime.Predictor(name, verbose=True)
-
+    try:
+        lite = treelite.sklearn.import_model(rf)
+        name = "lite{}.dll".format(id(rf))
+        lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
+                        libpath=name, verbose=False)
+        lite_predictor = treelite_runtime.Predictor(name, verbose=False)
+    except (treelite.util.TreeliteError, PermissionError, UnicodeDecodeError):
+        lite_predictor = None
 
     def predict_skl_predict(X, model=rf):
         return rf.predict(X)
@@ -67,9 +69,10 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
             lite_predictor.predict(
                 treelite_runtime.Batch.from_npy2d(X.astype(np.float32))))
 
-    return {'predict': (predict_skl_predict,
-                        predict_onnxrt_predict,
-                        predict_treelite_predict)}
+    return {'predict': (
+        predict_skl_predict,
+        predict_onnxrt_predict,
+        predict_treelite_predict if lite_predictor is not None else None)}
 
 
 ##############################
@@ -143,7 +146,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                             obs["time_ort"] = (end - st) / repeated
                             
                             # measures treelite
-                            if n <= 1000:
+                            if fct3 is not None:
                                 st = time()
                                 r2 = 0
                                 for X in Xs:
@@ -265,7 +268,7 @@ if __name__ == '__main__':
     ])
     df.to_csv("bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
     print(df)
-    df = run_bench(verbose=True)
+    df = run_bench(verbose=False)
     plt.savefig("bench_plot_onnxruntime_random_forest_reg.png")
     df.to_csv("bench_plot_onnxruntime_random_forest_reg.csv", index=False)
     plt.show()
