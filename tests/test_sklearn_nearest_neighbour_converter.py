@@ -430,7 +430,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
-    @unittest.skipIf(onnx_opset_version() < TARGET_OPSET,
+    @unittest.skipIf(onnx_opset_version() < 12,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_binary_class_radius(self):
         model, X = self._fit_model_binary_classification(
@@ -470,6 +470,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
+    @unittest.skipIf(onnx_opset_version() < 12,
+                     reason="needs higher target_opset")
     def test_model_knn_classifier_multi_class_radius(self):
         model, X = self._fit_model_multiclass_classification(
             RadiusNeighborsClassifier())
