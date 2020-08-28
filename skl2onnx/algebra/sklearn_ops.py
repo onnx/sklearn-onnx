@@ -48,9 +48,12 @@ def dynamic_class_creation_sklearn():
         doc = "\n".join(doc)
         prefix = "Sklearn" if "sklearn" in str(skl_obj) else ""
         class_name = "Onnx" + prefix + skl_name
-        cl = ClassFactorySklearn(skl_obj, class_name,
-                                 doc, conv, shape_calc,
-                                 name)
+        try:
+            cl = ClassFactorySklearn(skl_obj, class_name,
+                                     doc, conv, shape_calc,
+                                     name)
+        except TypeError:   
+            continue
         cls[class_name] = cl
     return cls
 
