@@ -210,7 +210,7 @@ def add_tree_to_attribute_pairs_hist_gradient_boosting(
             feat_id = node['feature_idx']
             try:
                 threshold = node['threshold']
-            except ValueError as e:
+            except ValueError:
                 threshold = node['num_threshold']
             left_child_id = node['left']
             right_child_id = node['right']
