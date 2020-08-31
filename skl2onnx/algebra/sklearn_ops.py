@@ -52,7 +52,7 @@ def dynamic_class_creation_sklearn():
             cl = ClassFactorySklearn(skl_obj, class_name,
                                      doc, conv, shape_calc,
                                      name)
-        except TypeError:   
+        except TypeError:
             continue
         cls[class_name] = cl
     return cls
