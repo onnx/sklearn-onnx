@@ -10,7 +10,7 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'vs2017-win2016'
   strategy:
     matrix:
       Py37-Onnx170-nightlyRT-Npy1180-Sk0230:

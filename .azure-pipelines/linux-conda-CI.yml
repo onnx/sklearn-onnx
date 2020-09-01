@@ -10,7 +10,7 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
       Py37-Onnx170-Rt140-Skl0232:
