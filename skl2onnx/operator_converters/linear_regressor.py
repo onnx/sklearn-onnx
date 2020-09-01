@@ -23,8 +23,9 @@ def convert_sklearn_linear_regressor(scope, operator, container):
     if type(operator.inputs[0].type) in (DoubleTensorType, ):
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name('coef')
+        model_coef = op.coef_.T
         container.add_initializer(
-            coef, proto_dtype, op.coef_.shape, op.coef_.ravel().tolist())
+            coef, proto_dtype, model_coef.shape, model_coef.ravel().tolist())
         intercept = scope.get_unique_variable_name('intercept')
         container.add_initializer(
             intercept, proto_dtype, op.intercept_.shape,

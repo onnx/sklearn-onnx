@@ -36,6 +36,23 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    def test_model_linear_regression_multi(self):
+        model, X = fit_regression_model(linear_model.LinearRegression(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(
+            model, "linear regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLinearRegressionMulti-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion("0.4.0"),
         reason="old onnxruntime does not support double")
@@ -45,6 +62,35 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                      [("input", DoubleTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         self.assertIn("elem_type: 11", str(model_onnx))
+        dump_data_and_model(
+            X.astype(numpy.float64),
+            model,
+            model_onnx,
+            basename="SklearnLinearRegression64-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="old onnxruntime does not support double")
+    def test_model_linear_regression64_multiple(self):
+        model, X = fit_regression_model(linear_model.LinearRegression(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(model, "linear regression",
+                                     [("input", DoubleTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        self.assertIn("elem_type: 11", str(model_onnx))
+        dump_data_and_model(
+            X.astype(numpy.float64),
+            model,
+            model_onnx,
+            basename="SklearnLinearRegression64Multi-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
 
     def test_model_linear_regression_int(self):
         model, X = fit_regression_model(
