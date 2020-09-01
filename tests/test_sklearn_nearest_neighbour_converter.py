@@ -287,7 +287,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             if onnxruntime.__version__.startswith('1.3.'):
                 # Same error but different line number for further
                 # investigation.
-                raise AssertionError(whole)
+                raise AssertionError('\n'.join(rows))
             raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp, got, decimal=5)
 
