@@ -36,6 +36,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        reason="old onnxruntime does not support double")
     def test_model_linear_regression_multi(self):
         model, X = fit_regression_model(linear_model.LinearRegression(),
                                         n_targets=2)
@@ -54,7 +57,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="old onnxruntime does not support double")
     def test_model_linear_regression64(self):
         model, X = fit_regression_model(linear_model.LinearRegression())
@@ -73,7 +76,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="old onnxruntime does not support double")
     def test_model_linear_regression64_multiple(self):
         model, X = fit_regression_model(linear_model.LinearRegression(),
