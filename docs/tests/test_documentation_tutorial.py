@@ -24,20 +24,16 @@ def import_source(module_file_path, module_name):
     return module_spec.loader.exec_module(module)
 
 
-class TestDocumentationExample(unittest.TestCase):
+class TestDocumentationTutorial(unittest.TestCase):
 
-    def test_documentation_examples(self):
+    def test_documentation_tutorial(self):
 
         this = os.path.abspath(os.path.dirname(__file__))
-        fold = os.path.normpath(os.path.join(this, '..', 'examples'))
+        fold = os.path.normpath(os.path.join(this, '..', 'tutorial'))
         found = os.listdir(fold)
         tested = 0
         for name in found:
             if name.startswith("plot_") and name.endswith(".py"):
-                if (name == "plot_pipeline_lightgbm.py" and
-                        StrictVersion(onnxruntime.__version__) <
-                            StrictVersion('1.0.0')):
-                    continue
                 print("run %r" % name)
                 try:
                     mod = import_source(fold, os.path.splitext(name)[0])
@@ -60,12 +56,18 @@ class TestDocumentationExample(unittest.TestCase):
                             # dot not installed, this part
                             # is tested in onnx framework
                             pass
+                        elif ("cannot import name 'LightGbmModelContainer' "
+                                "from 'onnxmltools.convert.common."
+                                "_container'") in st:
+                            # onnxmltools not recent enough
+                            pass
                         elif ('Please fix either the inputs or '
                                 'the model.') in st:
                             # onnxruntime datasets changed in master branch,
                             # still the same in released version on pypi
                             pass
                         else:
+                            installed = os.listdir(os.path.dirname(numpy.__file__))
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
                                 "failed due to\n{}"

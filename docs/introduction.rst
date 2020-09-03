@@ -1,7 +1,7 @@
 
-========
-Tutorial
-========
+============
+Introduction
+============
 
 .. contents::
     :local:
