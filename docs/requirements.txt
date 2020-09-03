@@ -6,8 +6,8 @@ joblib
 lightgbm
 loky
 matplotlib
-mlinsights
-mlprodict
+mlinsights>=0.2.508
+mlprodict>=0.4.1259
 nbsphinx
 onnx
 onnxruntime
@@ -19,7 +19,7 @@ pyinstrument
 pyquickhelper>=1.9.3359
 pytest
 pytest-cov
-scikit-learn
+scikit-learn>=0.23
 skl2onnx
 sphinx
 sphinx_readable_theme
