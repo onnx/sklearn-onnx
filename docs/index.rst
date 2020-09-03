@@ -20,7 +20,8 @@ toolkits into `ONNX <https://onnx.ai>`_.
 .. toctree::
     :maxdepth: 1
     
-    tutorial
+    introduction
+    index_tutorial
     api_summary
     auto_examples/index
     pipeline
