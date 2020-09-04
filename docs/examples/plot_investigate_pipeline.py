@@ -25,19 +25,17 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
-import skl2onnx
 import onnx
-import sklearn
 import numpy
 import pickle
 from skl2onnx.helpers import collect_intermediate_steps
 import onnxruntime as rt
 from onnxconverter_common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, __version__
 import numpy as np
 import pandas as pd
 
-from sklearn import datasets
+from sklearn import datasets, __version__ as skl_version
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -127,7 +125,7 @@ print(restored['model'].predict_proba(restored['data_input']['predict_proba']))
 # **Versions used for this example**
 
 print("numpy:", numpy.__version__)
-print("scikit-learn:", sklearn.__version__)
+print("scikit-learn:", skl_version)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)

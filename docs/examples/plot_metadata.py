@@ -17,10 +17,9 @@ logistic regression model trained with
 """
 
 import skl2onnx
-import onnxruntime
 import sklearn
 import numpy
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 import onnx
 from onnxruntime.datasets import get_example
 
@@ -55,5 +54,5 @@ print("version={}".format(meta.version))
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", ort_version)
 print("skl2onnx: ", skl2onnx.__version__)

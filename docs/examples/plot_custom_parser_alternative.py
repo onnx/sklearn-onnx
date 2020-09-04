@@ -30,7 +30,6 @@ the method *validate* mentioned above.
 """
 import inspect
 import numpy as np
-import skl2onnx
 import onnx
 import sklearn
 from sklearn.base import ClassifierMixin, BaseEstimator, clone
@@ -41,7 +40,7 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import to_onnx, get_model_alias
+from skl2onnx import to_onnx, get_model_alias, __version__
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.algebra.onnx_ops import (
@@ -142,7 +141,7 @@ def validator_classifier_converter(scope, operator, container):
     input0 = operator.inputs[0]         # first input in ONNX graph
     outputs = operator.outputs          # outputs in ONNX graph
     op = operator.raw_operator          # scikit-learn model (mmust be fitted)
-    opv = opv = container.target_opset
+    opv = container.target_opset
 
     # The model calls another one. The class `OnnxSubEstimator`
     # calls the converter for this operator.
@@ -274,4 +273,4 @@ print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)
