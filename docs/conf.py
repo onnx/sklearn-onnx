@@ -86,13 +86,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/{.major}'.format(
         sys.version_info), None),
     'matplotlib': ('https://matplotlib.org/', None),
-    'mlinsights': (
-        'http://www.xavierdupre.fr/app/mlinsights/helpsphinx/', None),
-    'mlprodict': (
-        'http://www.xavierdupre.fr/app/mlprodict/helpsphinx/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
-    'pyquickhelper': (
-        'http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/', None),
     'onnxruntime': (
         'https://microsoft.github.io/onnxruntime/python/index.html',
         None),
@@ -138,7 +132,7 @@ epkg_dictionary = {
     'LightGBM': 'https://lightgbm.readthedocs.io/en/latest/',
     'lightgbm': 'https://lightgbm.readthedocs.io/en/latest/',
     'mlprodict':
-        'http://www.xavierdupre.fr/app/mlprodict/helpsphinx/index.html',
+        'https://github.com/xadupre/mlprodict/',
     'NMF':
         'https://scikit-learn.org/stable/modules/generated/'
         'sklearn.decomposition.NMF.html',
@@ -152,8 +146,7 @@ epkg_dictionary = {
     'ONNX Zoo': 'https://github.com/onnx/models',
     'onnxmltools': 'https://github.com/onnx/onnxmltools',
     'OnnxPipeline':
-        'http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/'
-        'sklapi/onnx_pipeline.html?highlight=onnxpipeline',
+        'https://github.com/xadupre/mlprodict/blob/master/mlprodict/sklapi/onnx_pipeline.py',
     'onnxruntime': 'https://microsoft.github.io/onnxruntime/',
     'openmp': 'https://en.wikipedia.org/wiki/OpenMP',
     'pyinstrument': 'https://github.com/joerick/pyinstrument',
