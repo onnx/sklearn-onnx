@@ -61,3 +61,7 @@ docs/examples/validator_classifier.dot
 docs/examples/mixture*.*
 docs/examples/cast1*
 docs/examples/cast2*
+docs/auto_tutorial/*
+docs/tutorial/*.onnx
+docs/tutorial/East*.jpg
+html
