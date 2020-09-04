@@ -32,7 +32,7 @@ ONNX Python API
 +++++++++++++++
 
 Let's try the example given by ONNX documentation:
-`PythonAPIOverview.md
+`ONNX Model Using Helper Functions
 <https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md
 #creating-an-onnx-model-using-helper-functions>`_.
 It relies on *protobuf* whose definition can be found
