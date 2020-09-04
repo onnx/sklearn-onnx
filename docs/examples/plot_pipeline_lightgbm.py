@@ -40,7 +40,8 @@ from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_li
 import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
 import numpy
-from sklearn.datasets import load_iris, __version__ as skl_version
+from sklearn.datasets import load_iris
+from sklearn import __version__ as skl_version
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from lightgbm import LGBMClassifier
