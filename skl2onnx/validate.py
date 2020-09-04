@@ -240,7 +240,8 @@ def enumerate_compatible_opset(model, opset_min=9, opset_max=None,
                     t1 = _measure_time(lambda: inst.fit(X_train))[1]
                 else:
                     t1 = _measure_time(lambda: inst.fit(X_train, y_train))[1]
-            except (AttributeError, TypeError, ValueError, IndexError) as e:
+            except (AttributeError, TypeError, ValueError, IndexError,
+                    StopIteration) as e:
                 if debug:
                     raise
                 obs["_1training_time_exc"] = str(e)
