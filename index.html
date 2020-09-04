@@ -1,22 +1,25 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>sklearn-onnx: Convert your scikit-learn model into ONNX &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sklearn-onnx: Convert your scikit-learn model into ONNX &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="next" title="Introduction" href="introduction.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -33,9 +36,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tutorial.html" title="Tutorial"
+          <a href="introduction.html" title="Introduction"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">sklearn-onnx 1.6.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">sklearn-onnx: Convert your scikit-learn model into ONNX</a></li> 
       </ul>
     </div>  
 
@@ -51,7 +55,8 @@
 toolkits into <a class="reference external" href="https://onnx.ai">ONNX</a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a></li>
@@ -64,9 +69,17 @@ toolkits into <a class="reference external" href="https://onnx.ai">ONNX</a>.</p>
 or submit a new one. Sources are available on
 <a class="reference external" href="https://github.com/onnx/sklearn-onnx">onnx/sklearn-onnx</a>.</p>
 <p><strong>ONNX version</strong></p>
-<p>If you want the converted model is compatible with certain ONNX version,
-please specify the <em>target_opset</em> parameter on invoking convert function,
-and the following Keras converter example code shows how it works.</p>
+<p id="index-0">The converter can convert a model for a specific version of ONNX.
+Every ONNX release is labelled with an opset number
+returned by function <a class="reference external" href="https://github.com/onnx/onnx/blob/master/onnx/defs/__init__.py#L22">onnx_opset_version</a>.
+This function returns the default value for parameter
+target opset (parameter <em>target_opset</em>) if it is not specified
+when converting the model. Every operator is versioned.
+The library chooses the most recent version below or equal
+to the targetted opset number for every operator.
+The ONNX model has one opset number for every operator domain,
+this value is the maximum opset number among all
+onnx nodes.</p>
 <p><strong>Backend</strong></p>
 <p><em>sklearn-onnx</em> converts models in ONNX format which
 can be then used to compute predictions with the
@@ -76,9 +89,9 @@ to automatically check every converter with
 <a class="reference external" href="https://pypi.org/project/onnxruntime-gpu">onnxruntime-gpu</a>.
 Every converter is tested with this backend.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Train a model.</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 <span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
 <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -86,8 +99,8 @@ Every converter is tested with this backend.</p>
 <span class="n">clr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
 <span class="c1"># Convert into ONNX format</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="k">import</span> <span class="n">convert_sklearn</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="k">import</span> <span class="n">FloatTensorType</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 <span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;float_input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))]</span>
 <span class="n">onx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">)</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;rf_iris.onnx&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -121,6 +134,7 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -131,7 +145,7 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.</p>
             </a></p><h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation index</a><ul>
-      <li>Next: <a href="tutorial.html" title="next chapter">Tutorial</a></li>
+      <li>Next: <a href="introduction.html" title="next chapter">Introduction</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">
@@ -150,14 +164,14 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </div>

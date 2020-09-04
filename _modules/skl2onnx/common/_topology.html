@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -29,9 +32,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">skl2onnx.common._topology</a></li> 
       </ul>
     </div>  
 
@@ -50,8 +54,8 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="k">import</span> <span class="n">onnx_pb</span> <span class="k">as</span> <span class="n">onnx_proto</span>
-<span class="kn">from</span> <span class="nn">onnxconverter_common.data_types</span> <span class="k">import</span> <span class="p">(</span>  <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">onnx_pb</span> <span class="k">as</span> <span class="n">onnx_proto</span>
+<span class="kn">from</span> <span class="nn">onnxconverter_common.data_types</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa</span>
     <span class="n">DataType</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">,</span>
     <span class="n">FloatType</span><span class="p">,</span> <span class="n">Int64Type</span><span class="p">,</span> <span class="n">StringType</span><span class="p">,</span>
     <span class="n">DictionaryType</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">,</span>  <span class="c1"># noqa</span>
@@ -60,16 +64,31 @@
     <span class="n">Int32TensorType</span><span class="p">,</span> <span class="n">BooleanTensorType</span><span class="p">,</span>
     <span class="n">DoubleTensorType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..proto</span> <span class="k">import</span> <span class="n">get_opset_number_from_onnx</span>
-<span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_opset_number_from_onnx</span><span class="p">,</span>
+    <span class="n">get_latest_tested_opset_version</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">make_graph</span><span class="p">,</span> <span class="n">make_model</span><span class="p">,</span> <span class="n">make_tensor_value_info</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_registration</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">MissingShapeCalculator</span><span class="p">,</span> <span class="n">MissingConverter</span>
-<span class="kn">from</span> <span class="nn">._container</span> <span class="k">import</span> <span class="n">ModelComponentContainer</span><span class="p">,</span> <span class="n">_build_options</span>
-<span class="kn">from</span> <span class="nn">.interface</span> <span class="k">import</span> <span class="n">OperatorBase</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_registration</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">MissingShapeCalculator</span><span class="p">,</span> <span class="n">MissingConverter</span>
+<span class="kn">from</span> <span class="nn">._container</span> <span class="kn">import</span> <span class="n">ModelComponentContainer</span><span class="p">,</span> <span class="n">_build_options</span>
+<span class="kn">from</span> <span class="nn">.interface</span> <span class="kn">import</span> <span class="n">OperatorBase</span>
+<span class="kn">from</span> <span class="nn">.onnx_optimisation_identity</span> <span class="kn">import</span> <span class="n">onnx_remove_node_identity</span>
 <span class="n">type_fct</span> <span class="o">=</span> <span class="nb">type</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">onnxconverter_common.topology</span> <span class="kn">import</span> <span class="n">OPSET_TO_IR_VERSION</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">OPSET_TO_IR_VERSION</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="mi">7</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">7</span>
+    <span class="p">}</span>
+
+<span class="n">OPSET_ML_TO_OPSET</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="Variable"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Variable">[docs]</a><span class="k">class</span> <span class="nc">Variable</span><span class="p">:</span>
@@ -78,7 +97,7 @@
 <span class="sd">    from *ONNX* types.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param raw_name: A string indicating the variable&#39;s name in the</span>
 <span class="sd">                         original model. Usually, it&#39;s the seed string</span>
@@ -126,7 +145,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_name</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Variable(raw_name=&#39;</span><span class="si">{0}</span><span class="s2">&#39;, onnx_name=&#39;</span><span class="si">{1}</span><span class="s2">&#39;, type=</span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">raw_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
 
@@ -175,8 +194,8 @@
 <span class="sd">    Defines an operator available in *ONNX*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">raw_operator</span><span class="p">,</span>
-                 <span class="n">target_opset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">raw_operator</span><span class="p">,</span>
+                 <span class="n">target_opset</span><span class="p">,</span> <span class="n">scope_inst</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param onnx_name: A unique ID, which is a string</span>
 <span class="sd">        :param scope: The name of the scope where this operator is</span>
@@ -188,8 +207,8 @@
 <span class="sd">        :param raw_operator: The original operator which defines this operator;</span>
 <span class="sd">                             for example, a scikit-learn Imputer and</span>
 <span class="sd">                             a CoreML Normalizer.</span>
-<span class="sd">        :param dtype: preferred output type</span>
 <span class="sd">        :param target_opset: The target opset number for the converted model.</span>
+<span class="sd">        :param scope_inst: :class:`Scope` instance the operator belongs to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_operator</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Parameter raw_operator must be an object not &quot;</span>
@@ -204,7 +223,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_evaluated</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_abandoned</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope_inst</span> <span class="o">=</span> <span class="n">scope_inst</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -246,27 +265,7 @@
             <span class="k">raise</span> <span class="n">MissingShapeCalculator</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to find a shape calculator for alias &#39;</span><span class="si">{}</span><span class="s2">&#39; &quot;</span>
                 <span class="s2">&quot;and type &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_operator</span><span class="p">)))</span>
-        <span class="n">shape_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">tensor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">FloatTensorType</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">FloatTensorType</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Unable to guess the tensor type from </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">proto_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">DOUBLE</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dtype should be either np.float32 or &quot;</span>
-                             <span class="s2">&quot;np.float64.&quot;</span><span class="p">)</span></div>
+        <span class="n">shape_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Scope"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Scope">[docs]</a><span class="k">class</span> <span class="nc">Scope</span><span class="p">:</span>
@@ -276,10 +275,10 @@
 <span class="sd">    provides functions to create a unique unused name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variable_name_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variable_name_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">operator_name_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+                 <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param name: A string, the unique ID of this scope in a</span>
 <span class="sd">                     Topology object</span>
@@ -296,9 +295,8 @@
 <span class="sd">                                the user customized conversion function</span>
 <span class="sd">        :param custom_shape_calculators: a dictionary for specifying</span>
 <span class="sd">                                the user customized shape calculator</span>
-<span class="sd">        :param dtype: select the computation for real type,</span>
-<span class="sd">            by default it is float but double is sometime needed</span>
 <span class="sd">        :param options: see :ref:`l-conv-options`</span>
+<span class="sd">        :param registered_models: registered models</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent_scopes</span> <span class="o">=</span> <span class="n">parent_scopes</span> <span class="k">if</span> <span class="n">parent_scopes</span> <span class="k">else</span> <span class="nb">list</span><span class="p">()</span>
@@ -308,18 +306,6 @@
             <span class="n">operator_name_set</span> <span class="k">if</span> <span class="n">operator_name_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_shape_calculators</span> <span class="o">=</span> <span class="n">custom_shape_calculators</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
-        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tensor_type</span> <span class="o">=</span> <span class="n">FloatTensorType</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tensor_type</span> <span class="o">=</span> <span class="n">DoubleTensorType</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tensor_type</span> <span class="o">=</span> <span class="n">Int64TensorType</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;dtype must be either np.float32, np.float64, &quot;</span>
-                <span class="s2">&quot;np.int64.&quot;</span><span class="p">)</span>
 
         <span class="c1"># An one-to-many map from raw variable name to ONNX variable</span>
         <span class="c1"># names. It looks like</span>
@@ -337,6 +323,30 @@
 
         <span class="c1"># Additional options given to converters.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span>
+
+        <span class="c1"># Registered models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="o">=</span> <span class="n">registered_models</span>
+
+        <span class="c1"># Reserved variables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">temp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new Scope with the same options but no names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">Scope</span><span class="p">(</span>
+            <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_scopes</span><span class="p">,</span>
+            <span class="n">target_opset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
+            <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_shape_calculators</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">registered_models</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scope</span>
+
+    <span class="k">def</span> <span class="nf">has_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tells if a variable is already registered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span>
 
     <span class="k">def</span> <span class="nf">get_shape_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -386,13 +396,33 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">variable_name_mapping</span><span class="p">[</span><span class="n">raw_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">onnx_name</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">variable</span>
 
+    <span class="k">def</span> <span class="nf">reserve_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keeps this name to be used by other converters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">raw_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Name &#39;</span><span class="si">{}</span><span class="s2">&#39; already reserved.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">raw_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span><span class="p">[</span><span class="n">raw_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="n">raw_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span><span class="p">[</span><span class="n">raw_name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">unreserve_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes a name from the reserved list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Name &#39;</span><span class="si">{}</span><span class="s2">&#39; not reserved.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">declare_local_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">raw_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function is used to declare new local operator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">onnx_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_operator_name</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">))</span>
         <span class="n">operator</span> <span class="o">=</span> <span class="n">Operator</span><span class="p">(</span><span class="n">onnx_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">raw_model</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span> <span class="n">scope_inst</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">onnx_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">operator</span>
         <span class="k">return</span> <span class="n">operator</span>
 
@@ -418,16 +448,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variable_name_mapping</span><span class="p">[</span><span class="n">raw_name</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">onnx_name</span><span class="p">)</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">onnx_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_allowed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">fail</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                        <span class="s2">&quot;No registered models, no known allowed options &quot;</span>
+                        <span class="s2">&quot;for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+                <span class="k">return</span> <span class="p">{}</span>
+            <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">][</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)]</span>
+            <span class="n">conv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;conv&#39;</span><span class="p">][</span><span class="n">alias</span><span class="p">]</span>
+            <span class="n">allowed</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_allowed_options</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">allowed</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;No registered models, no known allowed options &quot;</span>
+            <span class="s2">&quot;for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns additional options for a model.</span>
 <span class="sd">        It first looks by class then by id (``id(model)``).</span>
 <span class="sd">        :param model: model being converted</span>
 <span class="sd">        :param default_values: default options (it is modified by</span>
 <span class="sd">                               the function)</span>
+<span class="sd">        :param fail: fails if option it not found</span>
 <span class="sd">        :return: dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_build_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_build_options</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_allowed_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">),</span>
+            <span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">:</span>
@@ -440,10 +490,10 @@
 <span class="sd">    must be called to convert the topological graph into *ONNX* graph.</span>
 <span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># noqa</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">reserved_variable_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reserved_operator_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata_props</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a *Topology* object, which is an intermediate</span>
 <span class="sd">        representation of a computational graph.</span>
@@ -467,6 +517,7 @@
 <span class="sd">                                the user customized conversion function</span>
 <span class="sd">        :param custom_shape_calculators: a dictionary for specifying the</span>
 <span class="sd">                                        user customized shape calculator</span>
+<span class="sd">        :param registered_models: registered models</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw_model</span> <span class="o">=</span> <span class="n">model</span>
@@ -478,7 +529,6 @@
                     <span class="n">reserved_operator_names</span>
                     <span class="k">if</span> <span class="n">reserved_operator_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_types</span> <span class="o">=</span> <span class="n">initial_types</span> <span class="k">if</span> <span class="n">initial_types</span> <span class="k">else</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata_props</span> <span class="o">=</span> <span class="n">metadata_props</span> <span class="k">if</span> <span class="n">metadata_props</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_batch_size</span> <span class="o">=</span> <span class="n">default_batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_conversion_functions</span> <span class="o">=</span> <span class="p">(</span>
@@ -512,6 +562,11 @@
         <span class="k">for</span> <span class="n">mtype</span> <span class="ow">in</span> <span class="n">all_model_types</span><span class="p">:</span>
             <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mtype</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_aliases</span><span class="p">[</span><span class="n">mtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">alias</span>
+
+        <span class="c1"># Registered models</span>
+        <span class="k">if</span> <span class="n">registered_models</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="o">=</span> <span class="n">registered_models</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_generate_unique_name</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">existing_names</span><span class="p">):</span>
@@ -548,8 +603,7 @@
     <span class="k">def</span> <span class="nf">get_unique_scope_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope_names</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">declare_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">declare_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new :class:`Scope &lt;skl2onnx.common._topology.Scope&gt;`</span>
 <span class="sd">        and appends it to the list of existing scopes.</span>
@@ -558,7 +612,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_scope_name</span><span class="p">(</span><span class="n">seed</span><span class="p">),</span> <span class="n">parent_scopes</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">variable_name_set</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_name_set</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
             <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_shape_calculators</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">registered_models</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scope</span>
 
@@ -591,6 +645,10 @@
             <span class="k">for</span> <span class="n">operator</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unordered_operator_iterator</span><span class="p">(),</span>
                                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">op</span><span class="p">:</span> <span class="n">priorities</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
                                    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="n">priorities</span> <span class="k">else</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;operator.inputs must be a list not </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)))</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
                         <span class="ow">and</span> <span class="ow">not</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_evaluated</span><span class="p">):</span>
                     <span class="c1"># Check if over-writing problem occurs (i.e., multiple</span>
@@ -600,15 +658,52 @@
                         <span class="c1"># an output somewhere</span>
                         <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                                <span class="s1">&#39;One variable can only be &#39;</span>
-                                <span class="s1">&#39;assigned once: </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
+                                <span class="s2">&quot;A variable is already assigned (</span><span class="si">{}</span><span class="s2">) &quot;</span>
+                                <span class="s2">&quot;for operator &#39;</span><span class="si">{}</span><span class="s2">&#39; (name=&#39;</span><span class="si">{}</span><span class="s2">&#39;). This &quot;</span>
+                                <span class="s2">&quot;may still happen if a converter is a &quot;</span>
+                                <span class="s2">&quot;combination of sub-operators and one of &quot;</span>
+                                <span class="s2">&quot;of them is producing this output. &quot;</span>
+                                <span class="s2">&quot;In that case, an identity node must be &quot;</span>
+                                <span class="s2">&quot;added.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="n">variable</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                                    <span class="n">operator</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">))</span>
                         <span class="c1"># Mark this variable as filled</span>
                         <span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="c1"># Make this operator as handled</span>
                     <span class="n">operator</span><span class="o">.</span><span class="n">is_evaluated</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">is_evaluation_happened</span> <span class="o">=</span> <span class="kc">True</span>
+
                     <span class="c1"># Send out an operator</span>
                     <span class="k">yield</span> <span class="n">operator</span>
+
+                    <span class="c1"># This step may create new nodes if the</span>
+                    <span class="c1"># the converter is called while looping on</span>
+                    <span class="c1"># the nodes. The outputs of an operator</span>
+                    <span class="c1"># are not necessary the inputs of the next</span>
+                    <span class="c1"># one and but can processed by other ONNX nodes</span>
+                    <span class="c1"># inserted in the container. As a result, some</span>
+                    <span class="c1"># variables never have is_fed set to True which</span>
+                    <span class="c1"># is updated now unless they are an operator</span>
+                    <span class="c1"># output.</span>
+                    <span class="n">known_outputs</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unordered_operator_iterator</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;onnx_name&#39;</span><span class="p">):</span>
+                                <span class="n">known_outputs</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">known_outputs</span><span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+                    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unordered_variable_iterator</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span> <span class="ow">in</span> <span class="n">known_outputs</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">update</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_names</span> <span class="ow">and</span>
+                                  <span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_names</span>
+                                  <span class="k">else</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+                            <span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">is_evaluation_happened</span> <span class="o">=</span> <span class="kc">True</span>
+
             <span class="c1"># After scanning through the whole computational graph, at</span>
             <span class="c1"># least one operator should be evaluated. If not, we need</span>
             <span class="c1"># to terminate this procedure to avoid dead lock.</span>
@@ -875,8 +970,8 @@
 
 
 <span class="k">def</span> <span class="nf">convert_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">doc_string</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">,</span>
-                     <span class="n">channel_first_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                     <span class="n">channel_first_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_identity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is used to convert our Topology object defined in</span>
 <span class="sd">    _parser.py into a ONNX model (type: ModelProto).</span>
@@ -885,31 +980,45 @@
 <span class="sd">                       returned model. The string &quot;model_name&quot; would be</span>
 <span class="sd">                       assigned to &quot;model.graph.name.&quot;</span>
 <span class="sd">    :param doc_string: A string attached to the produced model</span>
-<span class="sd">    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for</span>
-<span class="sd">                         ONNX 1.3.</span>
-<span class="sd">    :param dtype: float type to use everywhere in the graph,</span>
-<span class="sd">        `np.float32` or `np.float64`</span>
+<span class="sd">    :param target_opset: number or dictionary,</span>
+<span class="sd">        for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,</span>
+<span class="sd">        a dictionary is used to indicate different opset for</span>
+<span class="sd">        different domains</span>
 <span class="sd">    :param options: see :ref:`l-conv-options`</span>
+<span class="sd">    :param remove_identity: removes identity nodes</span>
 <span class="sd">    include &#39;1.1.2&#39;, &#39;1.2&#39;, and so on.</span>
 <span class="sd">    :return: a ONNX ModelProto</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dtype must be specified.&quot;</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">target_opset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">target_opset</span> <span class="o">=</span> <span class="n">get_opset_number_from_onnx</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">target_opset</span> <span class="o">&gt;</span> <span class="n">get_opset_number_from_onnx</span><span class="p">():</span>
+        <span class="n">target_opset</span> <span class="o">=</span> <span class="n">get_latest_tested_opset_version</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_opset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">onnx_target_opset</span> <span class="o">=</span> <span class="n">target_opset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">get_latest_tested_opset_version</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">onnx_target_opset</span> <span class="o">=</span> <span class="n">target_opset</span>
+    <span class="k">if</span> <span class="n">onnx_target_opset</span> <span class="o">&gt;</span> <span class="n">get_opset_number_from_onnx</span><span class="p">():</span>
         <span class="n">found</span> <span class="o">=</span> <span class="n">get_opset_number_from_onnx</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Parameter target_opset </span><span class="si">{}</span><span class="s2"> &gt; </span><span class="si">{}</span><span class="s2"> is higher than the &quot;</span>
-            <span class="s2">&quot;number of the installed onnx package. See &quot;</span>
-            <span class="s2">&quot;https://github.com/onnx/onnx/blob/master/docs/Versioning.md#released-versions&quot;</span> <span class="c1"># noqa</span>
-            <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target_opset</span><span class="p">,</span> <span class="n">found</span><span class="p">))</span>
+            <span class="s2">&quot;version of the installed onnx package. See &quot;</span>
+            <span class="s2">&quot;https://github.com/onnx/onnx/blob/master/docs/&quot;</span>
+            <span class="s2">&quot;Versioning.md#released-versions&quot;</span>
+            <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">onnx_target_opset</span><span class="p">,</span> <span class="n">found</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">onnx_target_opset</span> <span class="o">&gt;</span> <span class="n">get_latest_tested_opset_version</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Parameter target_opset </span><span class="si">{}</span><span class="s2"> &gt; </span><span class="si">{}</span><span class="s2"> is higher than the &quot;</span>
+            <span class="s2">&quot;the latest tested version&quot;</span>
+            <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">onnx_target_opset</span><span class="p">,</span>
+                <span class="n">get_latest_tested_opset_version</span><span class="p">()))</span>
 
     <span class="n">topology</span><span class="o">.</span><span class="n">_initialize_graph_status_for_traversing</span><span class="p">()</span>
 
     <span class="n">container</span> <span class="o">=</span> <span class="n">ModelComponentContainer</span><span class="p">(</span>
-        <span class="n">target_opset</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">target_opset</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+        <span class="n">registered_models</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">registered_models</span><span class="p">,</span>
+        <span class="n">white_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_white_op</span><span class="p">,</span>
+        <span class="n">black_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_black_op</span><span class="p">)</span>
 
     <span class="c1"># Put roots and leaves as ONNX&#39;s model into buffers. They will be</span>
     <span class="c1"># added into ModelComponentContainer later.</span>
@@ -928,9 +1037,9 @@
             <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">(</span><span class="n">TensorType</span><span class="p">,</span> <span class="n">Int64Type</span><span class="p">,</span>
                                               <span class="n">FloatType</span><span class="p">,</span> <span class="n">StringType</span><span class="p">)):</span>
-                    <span class="n">tensor_outputs</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">raw_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
+                    <span class="n">tensor_outputs</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">other_outputs</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">raw_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
+                    <span class="n">other_outputs</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
 
     <span class="c1"># Add roots the graph according to their order in the original model</span>
     <span class="n">invalid_name</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1003,10 +1112,11 @@
                     <span class="s2">&quot;https://github.com/onnx/sklearn-onnx/issues.&quot;</span>
                     <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                               <span class="nb">type</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="s1">&#39;raw_model&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))))</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">validate_options</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
         <span class="n">conv</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
 
     <span class="c1"># Create a graph from its main components</span>
-    <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_onnx</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
         <span class="c1"># When calling ModelComponentContainer&#39;s add_initializer(...),</span>
         <span class="c1"># nothing is added into the input list. However, for ONNX target</span>
         <span class="c1"># opset &lt; 9, initializers should also be a part of model&#39;s</span>
@@ -1049,6 +1159,32 @@
     <span class="c1"># Create model</span>
     <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 
+    <span class="c1"># Update domain version</span>
+    <span class="n">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">)</span>
+
+    <span class="c1"># Add extra information</span>
+    <span class="n">opv</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">onnx_target_opset</span><span class="p">,</span>
+              <span class="n">_get_main_opset_version</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span> <span class="ow">or</span> <span class="n">onnx_target_opset</span><span class="p">)</span>
+    <span class="n">irv</span> <span class="o">=</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">IR_VERSION</span><span class="p">)</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">irv</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer</span><span class="p">()</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer_version</span><span class="p">()</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_domain</span><span class="p">()</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">model_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">()</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">doc_string</span> <span class="o">=</span> <span class="n">doc_string</span>
+
+    <span class="c1"># Removes many identity nodes,</span>
+    <span class="c1"># the converter may introduct identity nodes</span>
+    <span class="c1"># after a zipmap operator and onnx &lt;= 1.7 does not</span>
+    <span class="c1"># support that. It does not use onnxconverter-common</span>
+    <span class="c1"># as the optimizer only support opset &gt;= 9.</span>
+    <span class="k">if</span> <span class="n">remove_identity</span><span class="p">:</span>
+        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">onnx_remove_node_identity</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">onnx_model</span>
+
+
+<span class="k">def</span> <span class="nf">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">):</span>
     <span class="c1"># Merge operator sets for the same domain, the largest version</span>
     <span class="c1"># number would be kept</span>
     <span class="n">purified_operator_set</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -1062,6 +1198,8 @@
     <span class="c1"># Fill operator sets</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span> <span class="ow">in</span> <span class="n">purified_operator_set</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># Overwrite the default operator set created by</span>
             <span class="c1"># make_model(...)</span>
@@ -1072,22 +1210,31 @@
         <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">op_domain</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">op_version</span>
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">&lt;</span> <span class="n">op_version</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s1">&#39;The specified opset </span><span class="si">%d</span><span class="s1"> is too low to convert &#39;</span>
-                                <span class="s1">&#39;this model, which requires at least opset &#39;</span>
-                                <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">op_version</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s1">&#39;The specified opset </span><span class="si">%d</span><span class="s1"> is too low to convert &#39;</span>
+                <span class="s1">&#39;this model, which requires at least opset &#39;</span>
+                <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">container</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">),</span>
+                    <span class="n">op_version</span><span class="p">))</span>
 
-    <span class="c1"># Add extra information</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">IR_VERSION</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer_version</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_domain</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">model_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">doc_string</span> <span class="o">=</span> <span class="n">doc_string</span>
 
-    <span class="k">return</span> <span class="n">onnx_model</span>
+<span class="k">def</span> <span class="nf">_get_main_opset_version</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the main opset version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mld</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">domain</span> <span class="o">==</span> <span class="s2">&quot;ai.onnx.ml&quot;</span><span class="p">:</span>
+            <span class="n">mld</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">version</span>
+    <span class="k">if</span> <span class="n">mld</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OPSET_ML_TO_OPSET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mld</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -1113,14 +1260,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

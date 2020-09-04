@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>onnxconverter_common.utils &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>onnxconverter_common.utils &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -29,8 +32,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">onnxconverter_common.utils</a></li> 
       </ul>
     </div>  
 
@@ -40,16 +44,15 @@
           <div class="body" role="main">
             
   <h1>Source code for onnxconverter_common.utils</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
+<span></span><span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
 <span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
 <span class="c1"># license information.</span>
-<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1">###############################################################################</span>
 
-<span class="kn">import</span> <span class="nn">numbers</span><span class="o">,</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">distutils.version</span> <span class="k">import</span> <span class="n">LooseVersion</span><span class="p">,</span> <span class="n">StrictVersion</span>
+<span class="kn">from</span> <span class="nn">distutils.version</span> <span class="kn">import</span> <span class="n">LooseVersion</span>
 
 
 <span class="k">def</span> <span class="nf">sparkml_installed</span><span class="p">():</span>
@@ -57,37 +60,40 @@
 <span class="sd">    Checks that *spark* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pyspark</span>
+        <span class="kn">import</span> <span class="nn">pyspark</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
+
 
 <span class="k">def</span> <span class="nf">sklearn_installed</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks that *scikit-learn* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">sklearn</span>
+        <span class="kn">import</span> <span class="nn">sklearn</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
+
 
 <span class="k">def</span> <span class="nf">skl2onnx_installed</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks that *skl2onnx* converter is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">skl2onnx</span>
+        <span class="kn">import</span> <span class="nn">skl2onnx</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
+
 
 <span class="k">def</span> <span class="nf">coreml_installed</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks that *coremltools* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">coremltools</span>
+        <span class="kn">import</span> <span class="nn">coremltools</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -98,7 +104,7 @@
 <span class="sd">    Checks that *keras2onnx* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">keras2onnx</span>
+        <span class="kn">import</span> <span class="nn">keras2onnx</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -109,7 +115,7 @@
 <span class="sd">    Checks that *pytorch* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
+        <span class="kn">import</span> <span class="nn">torch</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -120,7 +126,7 @@
 <span class="sd">    Checks that *caffe* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">caffe2</span>
+        <span class="kn">import</span> <span class="nn">caffe2</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -131,8 +137,8 @@
 <span class="sd">    Checks that *libsvm* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">svm</span>
-        <span class="kn">import</span> <span class="nn">svmutil</span>
+        <span class="kn">import</span> <span class="nn">svm</span>  <span class="c1"># noqa F401</span>
+        <span class="kn">import</span> <span class="nn">svmutil</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -143,18 +149,7 @@
 <span class="sd">    Checks that *lightgbm* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">lightgbm</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-
-
-<span class="k">def</span> <span class="nf">libsvm_installed</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks that *libsvm* is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">svmutil</span>
+        <span class="kn">import</span> <span class="nn">lightgbm</span>  <span class="c1"># noqa F401</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -165,17 +160,17 @@
 <span class="sd">    Checks that *xgboost* is available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">xgboost</span>
+        <span class="kn">import</span> <span class="nn">xgboost</span>  <span class="c1"># noqa F401</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="kn">from</span> <span class="nn">xgboost.core</span> <span class="k">import</span> <span class="n">_LIB</span>
+    <span class="kn">from</span> <span class="nn">xgboost.core</span> <span class="kn">import</span> <span class="n">_LIB</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">_LIB</span><span class="o">.</span><span class="n">XGBoosterDumpModelEx</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="c1"># The version is not recent enough even though it is version 0.6.</span>
         <span class="c1"># You need to install xgboost from github and not from pypi.</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="kn">from</span> <span class="nn">xgboost</span> <span class="k">import</span> <span class="n">__version__</span>
+    <span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">__version__</span>
     <span class="n">vers</span> <span class="o">=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
     <span class="n">allowed</span> <span class="o">=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="s1">&#39;0.7&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">vers</span> <span class="o">&lt;</span> <span class="n">allowed</span><span class="p">:</span>
@@ -183,11 +178,22 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
+<span class="k">def</span> <span class="nf">h2o_installed</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks that *h2o* is available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">h2o</span>  <span class="c1"># noqa F401</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
 <span class="k">def</span> <span class="nf">get_producer</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal helper function to return the producer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__producer__</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__producer__</span>
     <span class="k">return</span> <span class="n">__producer__</span>
 
 
@@ -195,7 +201,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal helper function to return the producer version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__producer_version__</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__producer_version__</span>
     <span class="k">return</span> <span class="n">__producer_version__</span>
 
 
@@ -203,7 +209,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal helper function to return the model domain</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__domain__</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__domain__</span>
     <span class="k">return</span> <span class="n">__domain__</span>
 
 
@@ -211,15 +217,12 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal helper function to return the model version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__model_version__</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__model_version__</span>
     <span class="k">return</span> <span class="n">__model_version__</span>
 
 
 <span class="k">def</span> <span class="nf">is_numeric_type</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">six</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
-        <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
+    <span class="n">numeric_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
     <span class="n">types</span> <span class="o">=</span> <span class="n">numeric_types</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -230,20 +233,18 @@
 
 
 <span class="k">def</span> <span class="nf">is_string_type</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-    <span class="n">types</span> <span class="o">=</span> <span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">item</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
-    
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">cast_list</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">convert_to_python_value</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">numbers</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
@@ -321,22 +322,22 @@
 
     <span class="k">if</span> <span class="n">min_input_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_input_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> input(s) is(are) required but we got </span><span class="si">%s</span><span class="s1"> input(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> input(s) is(are) required but we got </span><span class="si">%s</span><span class="s1"> input(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span>
             <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_input_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">max_input_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_input_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> input(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> input(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span>
             <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_input_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">min_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_output_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> output(s) is(are) produced but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at least </span><span class="si">%s</span><span class="s1"> output(s) is(are) produced but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span>
             <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">min_output_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">max_output_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_output_count</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> outputs(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span> \
+            <span class="s1">&#39;For operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">), at most </span><span class="si">%s</span><span class="s1"> outputs(s) is(are) supported but we got </span><span class="si">%s</span><span class="s1"> output(s) which are </span><span class="si">%s</span><span class="s1">&#39;</span>
             <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_output_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">))</span></div>
 
 
@@ -352,18 +353,19 @@
     <span class="k">if</span> <span class="n">good_input_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_input_types</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an input </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span> \
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an input </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span>
                                    <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
                                       <span class="n">good_input_types</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">good_output_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">good_output_types</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an output </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span> \
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an output </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span>
                                    <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
                                       <span class="n">good_output_types</span><span class="p">))</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -387,14 +389,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

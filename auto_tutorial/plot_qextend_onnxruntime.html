@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fast runtime with onnxruntime &#8212; sklearn-onnx 1.7.1 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Summary" href="../api_summary.html" />
+    <link rel="prev" title="Fast design with a python runtime" href="plot_pextend_python_runtime.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../api_summary.html" title="API Summary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot_pextend_python_runtime.html" title="Fast design with a python runtime"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tutorial_3_new_operator.html" accesskey="U">Extend ONNX, extend runtime</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Fast runtime with onnxruntime</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-qextend-onnxruntime-py"><span class="std std-ref">here</span></a>     to download the full example code or to run this example in your browser via Binder</p>
+</div>
+<div class="sphx-glr-example-title section" id="fast-runtime-with-onnxruntime">
+<span id="sphx-glr-auto-tutorial-plot-qextend-onnxruntime-py"></span><h1>Fast runtime with onnxruntime<a class="headerlink" href="#fast-runtime-with-onnxruntime" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators.md">ONNX operators</a> does not contain operator
+from <a class="reference external" href="https://numpy.org/">numpy</a>. There is no operator for
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html">solve</a> but this one
+is needed to implement the prediction function
+of model <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.NMF.html">NMF</a>. The converter can be written
+including a new ONNX operator but then it requires a
+runtime for it to be tested. Example
+<a class="reference internal" href="plot_pextend_python_runtime.html#l-extend-python-runtime"><span class="std std-ref">Fast design with a python runtime</span></a> shows how to do that
+with <a class="reference external" href="https://github.com/xadupre/mlprodict/">mlprodict</a>. Doing the same with
+<a class="reference external" href="https://microsoft.github.io/onnxruntime/">onnxruntime</a> is more ambitious as it requires
+C++…</p>
+<p><em>to be continued</em></p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-qextend-onnxruntime-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_qextend_onnxruntime.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/1c4a6522e6f9deca046d6c88edd3bb59/plot_qextend_onnxruntime.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_qextend_onnxruntime.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8a92d2a146ad695f5076e82a21f7caef/plot_qextend_onnxruntime.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_qextend_onnxruntime.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
+            </a></p><h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../index_tutorial.html">Tutorial</a><ul>
+  <li><a href="../tutorial_3_new_operator.html">Extend ONNX, extend runtime</a><ul>
+      <li>Previous: <a href="plot_pextend_python_runtime.html" title="previous chapter">Fast design with a python runtime</a></li>
+      <li>Next: <a href="../api_summary.html" title="next chapter">API Summary</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_tutorial/plot_qextend_onnxruntime.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+  </div>
+  
+  </body>
+</html>

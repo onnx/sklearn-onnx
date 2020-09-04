@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Change the number of outputs by adding a parser &#8212; sklearn-onnx 1.7.1 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Extend ONNX, extend runtime" href="../tutorial_3_new_operator.html" />
+    <link rel="prev" title="A new converter with options" href="plot_lcustom_options.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../tutorial_3_new_operator.html" title="Extend ONNX, extend runtime"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot_lcustom_options.html" title="A new converter with options"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tutorial_2_new_converter.html" accesskey="U">A custom converter for a custom model</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Change the number of outputs by adding a parser</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-mcustom-parser-py"><span class="std std-ref">here</span></a>     to download the full example code or to run this example in your browser via Binder</p>
+</div>
+<div class="sphx-glr-example-title section" id="change-the-number-of-outputs-by-adding-a-parser">
+<span id="sphx-glr-auto-tutorial-plot-mcustom-parser-py"></span><h1>Change the number of outputs by adding a parser<a class="headerlink" href="#change-the-number-of-outputs-by-adding-a-parser" title="Permalink to this headline">¶</a></h1>
+<p id="index-0">By default, <a class="reference external" href="https://github.com/onnx/sklearn-onnx">sklearn-onnx</a> assumes that a classifier
+has two outputs (label and probabilities), a regressor
+has one output (prediction), a transform has one output
+(the transformed data). What if it is not the case?
+The following example creates a custom converter
+and a custom parser which defines the number of outputs
+expected by the converted model.</p>
+<p>Example <a class="reference internal" href="plot_lcustom_options.html#l-plot-custom-options"><span class="std std-ref">A new converter with options</span></a> shows a converter
+which selects two ways to compute the same outputs.
+In this one, the converter produces both. That would not
+be a very efficient converter but that’s just for the sake
+of using a parser. By default, a transformer only returns
+one output but both are needed.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#a-new-transformer" id="id1">A new transformer</a></p></li>
+<li><p><a class="reference internal" href="#conversion-into-onnx-with-two-outputs" id="id2">Conversion into ONNX with two outputs</a></p></li>
+<li><p><a class="reference internal" href="#final-graph" id="id3">Final graph</a></p></li>
+</ul>
+</div>
+<div class="section" id="a-new-transformer">
+<h2><a class="toc-backref" href="#id1">A new transformer</a><a class="headerlink" href="#a-new-transformer" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyquickhelper.helpgen.graphviz_helper</span> <span class="kn">import</span> <span class="n">plot_graphviz</span>
+<span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <span class="n">OnnxInference</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">update_registered_converter</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">guess_numpy_type</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_ops</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OnnxSub</span><span class="p">,</span> <span class="n">OnnxMatMul</span><span class="p">,</span> <span class="n">OnnxGemm</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">get_model_alias</span>
+
+
+<span class="k">class</span> <span class="nc">DecorrelateTransformer</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorrelates correlated gaussian features.</span>
+
+<span class="sd">    :param alpha: avoids non inversible matrices</span>
+<span class="sd">        by adding *alpha* identity matrix</span>
+
+<span class="sd">    *Attributes*</span>
+
+<span class="sd">    * `self.mean_`: average</span>
+<span class="sd">    * `self.coef_`: square root of the coveriance matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+        <span class="n">BaseEstimator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">TransformerMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sample_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;sample_weights != None is not implemented.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_</span>
+        <span class="n">V</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">T</span></a> <span class="o">@</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">/</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">V</span> <span class="o">+=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.identity.html#numpy.identity" title="numpy.identity" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">identity</span></a><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">P</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html#numpy.linalg.eig" title="numpy.linalg.eig" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span></a><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">Linv</span> <span class="o">=</span> <span class="n">L</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">diag</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.diag.html#numpy.diag" title="numpy.diag" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">diag</span></a><span class="p">(</span><span class="n">Linv</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">diag</span> <span class="o">@</span> <span class="n">P</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span>
+
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a>
+
+<span class="n">dec</span> <span class="o">=</span> <span class="n">DecorrelateTransformer</span><span class="p">()</span>
+<span class="n">dec</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred</span></a> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[ 0.0167562   0.52111756 -1.24946737 -0.56194325]
+ [-0.0727878  -0.80853732 -1.43841018 -0.37441392]
+ [-0.69971891 -0.09950908 -1.2138161  -0.3499275 ]
+ [-1.13063404 -0.13540568 -0.79087008 -0.73938966]
+ [-0.35790036  0.91900236 -1.04034399 -0.6509266 ]]
+</pre></div>
+</div>
+</div>
+<div class="section" id="conversion-into-onnx-with-two-outputs">
+<h2><a class="toc-backref" href="#id2">Conversion into ONNX with two outputs</a><a class="headerlink" href="#conversion-into-onnx-with-two-outputs" title="Permalink to this headline">¶</a></h2>
+<p>Let’s try to convert it and see what happens.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decorrelate_transformer_shape_calculator</span><span class="p">(</span><span class="n">operator</span><span class="p">):</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span>
+    <span class="n">input_dim</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">output_type</span> <span class="o">=</span> <span class="n">input_type</span><span class="p">([</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">output_type</span>
+
+
+<span class="k">def</span> <span class="nf">decorrelate_transformer_converter</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
+    <span class="n">opv</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span>
+
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">guess_numpy_type</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">type</span></a><span class="p">)</span>
+
+    <span class="n">Y1</span> <span class="o">=</span> <span class="n">OnnxMatMul</span><span class="p">(</span>
+        <span class="n">OnnxSub</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">mean_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">out</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">Y2</span> <span class="o">=</span> <span class="n">OnnxGemm</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+                  <span class="p">(</span><span class="o">-</span> <span class="n">op</span><span class="o">.</span><span class="n">mean_</span> <span class="o">@</span> <span class="n">op</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+                  <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+                  <span class="n">output_names</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">Y1</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+    <span class="n">Y2</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">decorrelate_transformer_parser</span><span class="p">(</span>
+        <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">alias</span> <span class="o">=</span> <span class="n">get_model_alias</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+    <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># inputs</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># outputs</span>
+    <span class="n">cls_type</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span>
+    <span class="n">val_y1</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;nogemm&#39;</span><span class="p">,</span> <span class="n">cls_type</span><span class="p">())</span>
+    <span class="n">val_y2</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;gemm&#39;</span><span class="p">,</span> <span class="n">cls_type</span><span class="p">())</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_y1</span><span class="p">)</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_y2</span><span class="p">)</span>
+
+    <span class="c1"># ends</span>
+    <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
+</pre></div>
+</div>
+<p>The registration needs to declare the parser as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">update_registered_converter</span><span class="p">(</span>
+    <span class="n">DecorrelateTransformer</span><span class="p">,</span> <span class="s2">&quot;SklearnDecorrelateTransformer&quot;</span><span class="p">,</span>
+    <span class="n">decorrelate_transformer_shape_calculator</span><span class="p">,</span>
+    <span class="n">decorrelate_transformer_converter</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">=</span><span class="n">decorrelate_transformer_parser</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And conversion.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">exp</span></a> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results</span></a> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y1</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y2</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">results</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p1</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">exp</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y1</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">exp</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y2</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(1.0531815934911037e-06, 0.0003497831114202993)
+(2.0175704162905816e-06, 0.0005483764974245708)
+</pre></div>
+</div>
+<p>It works. The final looks like the following.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">onx</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s2">&quot;python_compiled&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OnnxInference(...)
+    def compiled_run(dict_inputs):
+        # init: Su_Subcst
+        # init: Ma_MatMulcst
+        # init: Ge_Gemmcst1
+        # inputs
+        X = dict_inputs[&#39;X&#39;]
+        (Su_C0, ) = n0_sub(X, Su_Subcst)
+        (nogemm, ) = n1_matmul(Su_C0, Ma_MatMulcst)
+        (gemm, ) = n2_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
+        return {
+            &#39;nogemm&#39;: nogemm,
+            &#39;gemm&#39;: gemm,
+        }
+</pre></div>
+</div>
+</div>
+<div class="section" id="final-graph">
+<h2><a class="toc-backref" href="#id3">Final graph</a><a class="headerlink" href="#final-graph" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="plot mcustom parser" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mcustom_parser_001.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.705 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-mcustom-parser-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_mcustom_parser.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8d7e7f9159c7d5c2ceb0a92bbf84f615/plot_mcustom_parser.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mcustom_parser.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/dee3d6abcabe2247c6b901ca5b9d137d/plot_mcustom_parser.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mcustom_parser.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Change the number of outputs by adding a parser</a><ul>
+<li><a class="reference internal" href="#a-new-transformer">A new transformer</a></li>
+<li><a class="reference internal" href="#conversion-into-onnx-with-two-outputs">Conversion into ONNX with two outputs</a></li>
+<li><a class="reference internal" href="#final-graph">Final graph</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../index_tutorial.html">Tutorial</a><ul>
+  <li><a href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><ul>
+      <li>Previous: <a href="plot_lcustom_options.html" title="previous chapter">A new converter with options</a></li>
+      <li>Next: <a href="../tutorial_3_new_operator.html" title="next chapter">Extend ONNX, extend runtime</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_tutorial/plot_mcustom_parser.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+  </div>
+  
+  </body>
+</html>

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_intermediate_outputs.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_intermediate_outputs.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_intermediate_outputs.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_intermediate_outputs.py:
 
 
 Walk through intermediate outputs
@@ -33,10 +35,10 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
+
 .. code-block:: default
 
     import skl2onnx
-    import onnxruntime
     import onnx
     import sklearn
     import matplotlib.pyplot as plt
@@ -101,6 +103,27 @@ and must be removed. Look for comment starting with ``---`` below.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Pipeline(steps=[('preprocessor',
+                     ColumnTransformer(transformers=[('num',
+                                                      Pipeline(steps=[('imputer',
+                                                                       SimpleImputer(strategy='median')),
+                                                                      ('scaler',
+                                                                       StandardScaler())]),
+                                                      ['age', 'fare']),
+                                                     ('cat',
+                                                      Pipeline(steps=[('onehot',
+                                                                       OneHotEncoder(handle_unknown='ignore'))]),
+                                                      ['embarked', 'sex',
+                                                       'pclass'])])),
+                    ('classifier', LogisticRegression())])
+
 
 
 Define the inputs of the ONNX graph
@@ -139,6 +162,8 @@ We simply reuse the dataframe column definition.
     body         float64
     home.dest     object
     dtype: object
+
+
 
 
 After conversion.
@@ -192,6 +217,8 @@ After conversion.
      ('home.dest', StringTensorType(shape=[None, 1]))]
 
 
+
+
 Merging single column into vectors is not
 the most efficient way to compute the prediction.
 It could be done before converting the pipeline into a graph.
@@ -204,7 +231,8 @@ Convert the pipeline into ONNX
 
 
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                                     target_opset=12)
     except Exception as e:
         print(e)
 
@@ -218,10 +246,9 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Columns must have the same type. C++ backends do not support mixed types. Inputs:
-    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[None, 1]))
+    Isolated variables exist: {'parch', 'ticket', 'name', 'cabin', 'body', 'boat', 'home_dest', 'sibsp'}
+
+
 
 
 *scikit-learn* does implicit conversions when it can.
@@ -238,7 +265,8 @@ must be applied on columns of the same type.
     to_drop = [c for c in X_train.columns if c not in white_list]
     inputs = convert_dataframe_schema(X_train, to_drop)
 
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                                 target_opset=12)
 
 
     # And save.
@@ -247,6 +275,26 @@ must be applied on columns of the same type.
 
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:144: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      X_train['pclass'] = X_train['pclass'].astype(str)
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:145: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      X_test['pclass'] = X_test['pclass'].astype(str)
 
 
 
@@ -275,8 +323,10 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [1 0 0 1 1]
-    predict_proba [[0.22374007 0.77625993]]
+    predict [0 1 1 0 1]
+    predict_proba [[0.91633434 0.08366566]]
+
+
 
 
 Predictions with onnxruntime.
@@ -306,6 +356,7 @@ with the *reshape*.
 
 
 
+
 We are ready to run *onnxruntime*.
 
 
@@ -328,8 +379,10 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [1 0 0 1 1]
-    predict_proba [{0: 0.22374004125595093, 1: 0.7762599587440491}]
+    predict [0 1 1 0 1]
+    predict_proba [{0: 0.9163275957107544, 1: 0.08367237448692322}]
+
+
 
 
 Compute intermediate outputs
@@ -358,24 +411,26 @@ Let's see first the list of intermediate output.
 
  .. code-block:: none
 
+    age_cast
+    fare_cast
     merged_columns
     variable
     variable1
-    merged_columns1
-    feature_column
-    ohe_output
-    feature_column1
-    ohe_output1
-    feature_column2
-    ohe_output2
+    embarkedout
+    sexout
+    pclassout
     concat_result
     variable2
+    variable1_cast
+    variable2_cast
     transformed_column
     label
     probability_tensor
     probabilities
     output_label
     output_probability
+
+
 
 
 Not that easy to tell which one is what as the *ONNX*
@@ -395,6 +450,15 @@ Let's look into the numerical pipeline first.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    b'\x08\x06\x12\x08skl2onnx\x1a\x051.7.1"\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=6.\xebA=\xc4:\x03B\xa0\x01\x06*\x14\n\x05scale=|\xe4\xa2==\x0b\xbc\x9a<\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x08B\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x02\x10\x0cB\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01'
 
 
 
@@ -418,7 +482,9 @@ Let's compute the numerical features.
 
  .. code-block:: none
 
-    numerical features [[-0.1765285  -0.49081543]]
+    numerical features [[ 2.5931118  -0.42135298]]
+
+
 
 
 We do the same for the textual features.
@@ -446,14 +512,38 @@ We do the same for the textual features.
 
     ir_version: 6
     producer_name: "skl2onnx"
-    producer_version: "1.5.2"
+    producer_version: "1.7.1"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
     graph {
       node {
         input: "age"
+        output: "age_cast"
+        name: "Cast"
+        op_type: "Cast"
+        attribute {
+          name: "to"
+          i: 1
+          type: INT
+        }
+        domain: ""
+      }
+      node {
         input: "fare"
+        output: "fare_cast"
+        name: "Cast1"
+        op_type: "Cast"
+        attribute {
+          name: "to"
+          i: 1
+          type: INT
+        }
+        domain: ""
+      }
+      node {
+        input: "age_cast"
+        input: "fare_cast"
         output: "merged_columns"
         name: "Concat"
         op_type: "Concat"
@@ -472,7 +562,7 @@ We do the same for the textual features.
         attribute {
           name: "imputed_value_floats"
           floats: 28.0
-          floats: 14.399999618530273
+          floats: 14.45419979095459
           type: FLOATS
         }
         attribute {
@@ -489,43 +579,21 @@ We do the same for the textual features.
         op_type: "Scaler"
         attribute {
           name: "offset"
-          floats: 29.21402359008789
-          floats: 32.0985221862793
+          floats: 29.397563934326172
+          floats: 32.80738830566406
           type: FLOATS
         }
         attribute {
           name: "scale"
-          floats: 0.07973198592662811
-          floats: 0.020303843542933464
+          floats: 0.07953736186027527
+          floats: 0.01888849399983883
           type: FLOATS
         }
         domain: "ai.onnx.ml"
       }
       node {
         input: "embarked"
-        input: "sex"
-        input: "pclass"
-        output: "merged_columns1"
-        name: "Concat1"
-        op_type: "Concat"
-        attribute {
-          name: "axis"
-          i: 1
-          type: INT
-        }
-        domain: ""
-      }
-      node {
-        input: "merged_columns1"
-        input: "index"
-        output: "feature_column"
-        name: "ArrayFeatureExtractor"
-        op_type: "ArrayFeatureExtractor"
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "feature_column"
-        output: "ohe_output"
+        output: "embarkedout"
         name: "OneHotEncoder"
         op_type: "OneHotEncoder"
         attribute {
@@ -533,7 +601,6 @@ We do the same for the textual features.
           strings: "C"
           strings: "Q"
           strings: "S"
-          strings: "missing"
           type: STRINGS
         }
         attribute {
@@ -544,16 +611,8 @@ We do the same for the textual features.
         domain: "ai.onnx.ml"
       }
       node {
-        input: "merged_columns1"
-        input: "index1"
-        output: "feature_column1"
-        name: "ArrayFeatureExtractor1"
-        op_type: "ArrayFeatureExtractor"
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "feature_column1"
-        output: "ohe_output1"
+        input: "sex"
+        output: "sexout"
         name: "OneHotEncoder1"
         op_type: "OneHotEncoder"
         attribute {
@@ -570,24 +629,16 @@ We do the same for the textual features.
         domain: "ai.onnx.ml"
       }
       node {
-        input: "merged_columns1"
-        input: "index2"
-        output: "feature_column2"
-        name: "ArrayFeatureExtractor2"
-        op_type: "ArrayFeatureExtractor"
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "feature_column2"
-        output: "ohe_output2"
+        input: "pclass"
+        output: "pclassout"
         name: "OneHotEncoder2"
         op_type: "OneHotEncoder"
         attribute {
-          name: "cats_int64s"
-          ints: 1
-          ints: 2
-          ints: 3
-          type: INTS
+          name: "cats_strings"
+          strings: "1"
+          strings: "2"
+          strings: "3"
+          type: STRINGS
         }
         attribute {
           name: "zeros"
@@ -597,11 +648,11 @@ We do the same for the textual features.
         domain: "ai.onnx.ml"
       }
       node {
-        input: "ohe_output"
-        input: "ohe_output1"
-        input: "ohe_output2"
+        input: "embarkedout"
+        input: "sexout"
+        input: "pclassout"
         output: "concat_result"
-        name: "Concat2"
+        name: "Concat1"
         op_type: "Concat"
         attribute {
           name: "axis"
@@ -620,9 +671,33 @@ We do the same for the textual features.
       }
       node {
         input: "variable1"
+        output: "variable1_cast"
+        name: "Cast2"
+        op_type: "Cast"
+        attribute {
+          name: "to"
+          i: 1
+          type: INT
+        }
+        domain: ""
+      }
+      node {
         input: "variable2"
+        output: "variable2_cast"
+        name: "Cast3"
+        op_type: "Cast"
+        attribute {
+          name: "to"
+          i: 1
+          type: INT
+        }
+        domain: ""
+      }
+      node {
+        input: "variable1_cast"
+        input: "variable2_cast"
         output: "transformed_column"
-        name: "Concat3"
+        name: "Concat2"
         op_type: "Concat"
         attribute {
           name: "axis"
@@ -645,34 +720,32 @@ We do the same for the textual features.
         }
         attribute {
           name: "coefficients"
-          floats: 0.37836185097694397
-          floats: 0.04174347594380379
-          floats: -0.2434970885515213
-          floats: 0.11049186438322067
-          floats: 0.3582465350627899
-          floats: -0.22541573643684387
-          floats: -1.287764549255371
-          floats: 1.2875901460647583
-          floats: -1.0456939935684204
-          floats: 0.00386146386153996
-          floats: 1.0416581630706787
-          floats: -0.37836185097694397
-          floats: -0.04174347594380379
-          floats: 0.2434970885515213
-          floats: -0.11049186438322067
-          floats: -0.3582465350627899
-          floats: 0.22541573643684387
-          floats: 1.287764549255371
-          floats: -1.2875901460647583
-          floats: 1.0456939935684204
-          floats: -0.00386146386153996
-          floats: -1.0416581630706787
+          floats: 0.37079209089279175
+          floats: -0.04415285587310791
+          floats: -0.32532787322998047
+          floats: -0.020567480474710464
+          floats: 0.3460143804550171
+          floats: -1.2111437320709229
+          floats: 1.211262822151184
+          floats: -0.9452930092811584
+          floats: -8.7733831605874e-05
+          floats: 0.9454997181892395
+          floats: -0.37079209089279175
+          floats: 0.04415285587310791
+          floats: 0.32532787322998047
+          floats: 0.020567480474710464
+          floats: -0.3460143804550171
+          floats: 1.2111437320709229
+          floats: -1.211262822151184
+          floats: 0.9452930092811584
+          floats: 8.7733831605874e-05
+          floats: -0.9454997181892395
           type: FLOATS
         }
         attribute {
           name: "intercepts"
-          floats: -0.22720441222190857
-          floats: 0.22720441222190857
+          floats: -0.1438337117433548
+          floats: 0.1438337117433548
           type: FLOATS
         }
         attribute {
@@ -702,7 +775,7 @@ We do the same for the textual features.
       node {
         input: "label"
         output: "output_label"
-        name: "Cast"
+        name: "Cast4"
         op_type: "Cast"
         attribute {
           name: "to"
@@ -726,25 +799,10 @@ We do the same for the textual features.
       }
       name: "pipeline_titanic"
       initializer {
-        data_type: 7
-        int64_data: 0
-        name: "index"
-      }
-      initializer {
-        data_type: 7
-        int64_data: 1
-        name: "index1"
-      }
-      initializer {
-        data_type: 7
-        int64_data: 2
-        name: "index2"
-      }
-      initializer {
         dims: 2
         data_type: 7
         int64_data: -1
-        int64_data: 9
+        int64_data: 8
         name: "shape_tensor"
       }
       input {
@@ -829,7 +887,6 @@ We do the same for the textual features.
             elem_type: 7
             shape {
               dim {
-                dim_value: 1
               }
             }
           }
@@ -862,7 +919,9 @@ We do the same for the textual features.
       version: 1
     }
 
-    textual features [[0. 0. 1. 0. 1. 0. 0. 0. 0.]]
+    textual features [[0. 0. 1. 0. 1. 0. 1. 0.]]
+
+
 
 
 Display the sub-ONNX graph
@@ -891,8 +950,18 @@ Finally, let's see both subgraphs. First, numerical pipeline.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_intermediate_outputs_001.png
+    :alt: plot intermediate outputs
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    (-0.5, 4393.5, 1033.5, -0.5)
 
 
 
@@ -919,8 +988,18 @@ Then textual pipeline.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_intermediate_outputs_002.png
+    :alt: plot intermediate outputs
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    (-0.5, 6847.5, 1121.5, -0.5)
 
 
 
@@ -933,7 +1012,7 @@ Then textual pipeline.
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
-    print("onnxruntime: ", onnxruntime.__version__)
+    print("onnxruntime: ", rt.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
 
 
@@ -945,17 +1024,19 @@ Then textual pipeline.
 
  .. code-block:: none
 
-    numpy: 1.17.0
-    scikit-learn: 0.22.dev0
-    onnx:  1.6.32
-    onnxruntime:  1.0.991
-    skl2onnx:  1.5.2
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.659 seconds)
+   **Total running time of the script:** ( 0 minutes  3.237 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_intermediate_outputs.py:
@@ -967,14 +1048,20 @@ Then textual pipeline.
     :class: sphx-glr-footer-example
 
 
+  .. container:: binder-badge
 
-  .. container:: sphx-glr-download
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_intermediate_outputs.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_intermediate_outputs.py <plot_intermediate_outputs.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_intermediate_outputs.ipynb <plot_intermediate_outputs.ipynb>`
 
@@ -983,4 +1070,4 @@ Then textual pipeline.
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
