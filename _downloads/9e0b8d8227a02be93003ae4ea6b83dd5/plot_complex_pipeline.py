@@ -32,16 +32,15 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
-import skl2onnx
+import pprint
+import os
 import onnx
 import sklearn
 import matplotlib.pyplot as plt
-import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import numpy
 import onnxruntime as rt
-from skl2onnx import convert_sklearn
-import pprint
+from skl2onnx import convert_sklearn, __version__
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.common.data_types import Int64TensorType
 import pandas as pd
@@ -132,8 +131,7 @@ pprint.pprint(inputs)
 # ++++++++++++++++++++++++++++++
 
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                                 target_opset=12)
+    convert_sklearn(clf, 'pipeline_titanic', inputs, target_opset=12)
 except Exception as e:
     print(e)
 
@@ -235,4 +233,4 @@ print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)

@@ -40,7 +40,6 @@ the method *validate* mentioned above.
 
     import inspect
     import numpy as np
-    import skl2onnx
     import onnx
     import sklearn
     from sklearn.base import ClassifierMixin, BaseEstimator, clone
@@ -51,7 +50,7 @@ the method *validate* mentioned above.
     import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import onnxruntime as rt
-    from skl2onnx import to_onnx, get_model_alias
+    from skl2onnx import to_onnx, get_model_alias, __version__
     from skl2onnx.proto import onnx_proto
     from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
     from skl2onnx.algebra.onnx_ops import (
@@ -134,7 +133,7 @@ a threshold.
 
  .. code-block:: none
 
-    [1 0 0 0 1 0 0 1 0 1 0 0 0 1 1 0 0 1 0 0 0 0 0 1 0 1 1 0 1 0 0 0 0 0 0 1 0
+    [0 0 0 1 1 1 1 0 1 1 0 1 1 0 1 1 0 0 1 1 1 0 0 0 0 0 0 0 1 0 0 1 1 0 0 1 1
      1]
 
 
@@ -229,7 +228,7 @@ Then the converter.
         input0 = operator.inputs[0]         # first input in ONNX graph
         outputs = operator.outputs          # outputs in ONNX graph
         op = operator.raw_operator          # scikit-learn model (mmust be fitted)
-        opv = opv = container.target_opset
+        opv = container.target_opset
 
         # The model calls another one. The class `OnnxSubEstimator`
         # calls the converter for this operator.
@@ -414,22 +413,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [0 1 2 1 2]
-    onnx [0 1 2 1 2]
+    sklearn [2 1 1 2 2]
+    onnx [2 1 1 2 2]
     --probabilities--
-    sklearn [[8.62797043e-01 1.37079562e-01 1.23394900e-04]
-     [3.93349303e-03 5.59488250e-01 4.36578257e-01]
-     [1.66094288e-03 3.17501574e-01 6.80837483e-01]
-     [2.38820815e-02 6.08201330e-01 3.67916589e-01]
-     [1.64276602e-03 1.66975080e-01 8.31382154e-01]]
-    onnx [[8.6279702e-01 1.3707954e-01 1.2339004e-04]
-     [3.9334348e-03 5.5948818e-01 4.3657845e-01]
-     [1.6609959e-03 3.1750163e-01 6.8083733e-01]
-     [2.3882136e-02 6.0820121e-01 3.6791670e-01]
-     [1.6427209e-03 1.6697513e-01 8.3138210e-01]]
+    sklearn [[2.47242971e-05 4.26262643e-01 5.73712632e-01]
+     [1.68001194e-02 6.31331745e-01 3.51868136e-01]
+     [3.90343968e-02 6.45165212e-01 3.15800391e-01]
+     [6.82773660e-04 2.31095290e-01 7.68221937e-01]
+     [2.92554785e-04 1.82745049e-01 8.16962396e-01]]
+    onnx [[2.4699006e-05 4.2626265e-01 5.7371265e-01]
+     [1.6800139e-02 6.3133174e-01 3.5186815e-01]
+     [3.9034408e-02 6.4516515e-01 3.1580046e-01]
+     [6.8277807e-04 2.3109525e-01 7.6822197e-01]
+     [2.9259056e-04 1.8274499e-01 8.1696236e-01]]
     --validation--
-    sklearn [1 0 0 0 1]
-    onnx [1 0 0 0 1]
+    sklearn [0 0 0 1 1]
+    onnx [0 0 0 1 1]
 
 
 
@@ -485,7 +484,7 @@ Display the ONNX graph
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -508,7 +507,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.079 seconds)
+   **Total running time of the script:** ( 0 minutes  2.967 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser_alternative.py:

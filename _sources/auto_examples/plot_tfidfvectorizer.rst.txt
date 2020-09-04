@@ -37,7 +37,6 @@ a custom converter. Let's get the data.
     import matplotlib.pyplot as plt
     import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-    import numpy
     import onnxruntime as rt
     from skl2onnx.common.data_types import StringTensorType
     from skl2onnx import convert_sklearn
@@ -179,12 +178,12 @@ we remove the custom features.
 
                   precision    recall  f1-score   support
 
-               0       0.69      0.77      0.73       286
-               1       0.74      0.65      0.70       284
+               0       0.69      0.78      0.73       285
+               1       0.75      0.66      0.70       285
 
-        accuracy                           0.71       570
-       macro avg       0.72      0.71      0.71       570
-    weighted avg       0.72      0.71      0.71       570
+        accuracy                           0.72       570
+       macro avg       0.72      0.72      0.71       570
+    weighted avg       0.72      0.72      0.71       570
 
 
 
@@ -276,7 +275,7 @@ Predictions with onnxruntime.
     --- [" Re: Jews can't hide from keith@cco."
      'Deletions...\n\nSo, you consider the german poster\'s remark anti-semitic?  Perhaps you\nimply that anyone in Germany who doesn\'t agree with israely policy in a\nnazi?  Pray tell, how does it even qualify as "casual anti-semitism"? \nIf the term doesn\'t apply, why then bring it up?\n\nYour own bigotry is shining through.  \n-- ']
     predict [1]
-    predict_proba [{0: 0.44015035033226013, 1: 0.5598496198654175}]
+    predict_proba [{0: 0.4389554560184479, 1: 0.5610445141792297}]
 
 
 
@@ -300,7 +299,7 @@ With *scikit-learn*:
  .. code-block:: none
 
     [0]
-    [[0.70897516 0.29102484]]
+    [[0.71418415 0.28581585]]
 
 
 
@@ -354,7 +353,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.195 seconds)
+   **Total running time of the script:** ( 0 minutes  9.513 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tfidfvectorizer.py:

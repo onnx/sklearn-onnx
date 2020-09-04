@@ -38,8 +38,7 @@ function computes pairwise distances.
     from tqdm import tqdm
     from pandas import DataFrame
     import onnx
-    import onnxruntime as rt
-    from onnxruntime import InferenceSession
+    from onnxruntime import InferenceSession, __version__ as ort_version
     import skl2onnx
     from skl2onnx.algebra.custom_ops import OnnxCDist
     from skl2onnx.common.data_types import FloatTensorType
@@ -240,10 +239,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': 1.871969783678651e-05,
-     'deviation': 2.077932281562963e-07,
-     'max_exec': 1.9706436432898045e-05,
-     'min_exec': 1.853120047599077e-05,
+    {'average': 1.8248839536681773e-05,
+     'deviation': 8.142077274849872e-07,
+     'max_exec': 2.1829712204635142e-05,
+     'min_exec': 1.738544087857008e-05,
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -274,10 +273,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': 1.5173771884292362e-05,
-     'deviation': 3.371901368640062e-07,
-     'max_exec': 1.760020386427641e-05,
-     'min_exec': 1.49998115375638e-05,
+    {'average': 1.3998891925439241e-05,
+     'deviation': 3.265265612733069e-07,
+     'max_exec': 1.537820789963007e-05,
+     'min_exec': 1.383586786687374e-05,
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -330,12 +329,12 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     50%|#####     | 2/4 [00:00<00:00, 12.71it/s]     75%|#######5  | 3/4 [00:00<00:00,  8.26it/s]    100%|##########| 4/4 [00:04<00:00,  1.33s/it]    100%|##########| 4/4 [00:04<00:00,  1.13s/it]
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|#####     | 2/4 [00:00<00:00, 13.57it/s]     75%|#######5  | 3/4 [00:00<00:00,  8.75it/s]    100%|##########| 4/4 [00:01<00:00,  2.03it/s]    100%|##########| 4/4 [00:01<00:00,  2.31it/s]
            N     scipy       ort  scipy/ort
-    0     10  0.000020  0.000015   1.269472
-    1    100  0.000025  0.000018   1.350016
-    2   1000  0.000070  0.000039   1.764336
-    3  10000  0.000496  0.001580   0.313807
+    0     10  0.000018  0.000015   1.222886
+    1    100  0.000023  0.000017   1.355840
+    2   1000  0.000067  0.000037   1.787412
+    3  10000  0.000476  0.000212   2.242213
 
 
 
@@ -348,7 +347,7 @@ Longer benchmark
 
     print("numpy:", np.__version__)
     print("onnx: ", onnx.__version__)
-    print("onnxruntime: ", rt.__version__)
+    print("onnxruntime: ", ort_version)
     print("skl2onnx: ", skl2onnx.__version__)
 
 
@@ -371,7 +370,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.947 seconds)
+   **Total running time of the script:** ( 0 minutes  1.933 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:

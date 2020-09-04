@@ -75,7 +75,6 @@ a custom converter. Let’s get the data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="kn">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">StringTensorType</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
@@ -186,12 +185,12 @@ we remove the custom features.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>              precision    recall  f1-score   support
 
-           0       0.69      0.77      0.73       286
-           1       0.74      0.65      0.70       284
+           0       0.69      0.78      0.73       285
+           1       0.75      0.66      0.70       285
 
-    accuracy                           0.71       570
-   macro avg       0.72      0.71      0.71       570
-weighted avg       0.72      0.71      0.71       570
+    accuracy                           0.72       570
+   macro avg       0.72      0.72      0.71       570
+weighted avg       0.72      0.72      0.71       570
 </pre></div>
 </div>
 </div>
@@ -241,7 +240,7 @@ in variable <em>seps</em>.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>--- [&quot; Re: Jews can&#39;t hide from keith@cco.&quot;
  &#39;Deletions...\n\nSo, you consider the german poster\&#39;s remark anti-semitic?  Perhaps you\nimply that anyone in Germany who doesn\&#39;t agree with israely policy in a\nnazi?  Pray tell, how does it even qualify as &quot;casual anti-semitism&quot;? \nIf the term doesn\&#39;t apply, why then bring it up?\n\nYour own bigotry is shining through.  \n-- &#39;]
 predict [1]
-predict_proba [{0: 0.44015035033226013, 1: 0.5598496198654175}]
+predict_proba [{0: 0.4389554560184479, 1: 0.5610445141792297}]
 </pre></div>
 </div>
 <p>With <em>scikit-learn</em>:</p>
@@ -251,7 +250,7 @@ predict_proba [{0: 0.44015035033226013, 1: 0.5598496198654175}]
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[0]
-[[0.70897516 0.29102484]]
+[[0.71418415 0.28581585]]
 </pre></div>
 </div>
 <p>There are discrepencies for this model because
@@ -282,7 +281,7 @@ This is a work in progress.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-0.5, 6614.5, 6723.5, -0.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.195 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.513 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tfidfvectorizer-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_tfidfvectorizer.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>

@@ -28,21 +28,20 @@ Train a LightGBM classifier
 """
 import lightgbm
 import onnxmltools
-import skl2onnx
 import onnx
-import sklearn
 import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import convert_sklearn, update_registered_converter, __version__
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
 import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
 import numpy
 from sklearn.datasets import load_iris
+from sklearn import __version__ as skl_version
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from lightgbm import LGBMClassifier
@@ -142,9 +141,9 @@ ax.axis('off')
 # **Versions used for this example**
 
 print("numpy:", numpy.__version__)
-print("scikit-learn:", sklearn.__version__)
+print("scikit-learn:", skl_version)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)
 print("onnxmltools: ", onnxmltools.__version__)
 print("lightgbm: ", lightgbm.__version__)

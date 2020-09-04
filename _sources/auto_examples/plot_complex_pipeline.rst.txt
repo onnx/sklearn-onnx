@@ -42,16 +42,15 @@ and must be removed. Look for comment starting with ``---`` below.
 
 .. code-block:: default
 
-    import skl2onnx
+    import pprint
+    import os
     import onnx
     import sklearn
     import matplotlib.pyplot as plt
-    import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import numpy
     import onnxruntime as rt
-    from skl2onnx import convert_sklearn
-    import pprint
+    from skl2onnx import convert_sklearn, __version__
     from skl2onnx.common.data_types import FloatTensorType, StringTensorType
     from skl2onnx.common.data_types import Int64TensorType
     import pandas as pd
@@ -232,8 +231,7 @@ Convert the pipeline into ONNX
 
 
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                                     target_opset=12)
+        convert_sklearn(clf, 'pipeline_titanic', inputs, target_opset=12)
     except Exception as e:
         print(e)
 
@@ -247,7 +245,7 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Isolated variables exist: {'parch', 'ticket', 'name', 'cabin', 'body', 'boat', 'home_dest', 'sibsp'}
+    Isolated variables exist: {'parch', 'boat', 'sibsp', 'cabin', 'ticket', 'home_dest', 'body', 'name'}
 
 
 
@@ -306,13 +304,13 @@ must be applied on columns of the same type.
 
  .. code-block:: none
 
-    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:159: SettingWithCopyWarning: 
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:157: SettingWithCopyWarning: 
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
 
     See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
       X_train['pclass'] = X_train['pclass'].astype(str)
-    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:160: SettingWithCopyWarning: 
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:158: SettingWithCopyWarning: 
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
 
@@ -346,8 +344,8 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [1 1 0 1 1]
-    predict_proba [[0.12802598 0.87197402]]
+    predict [0 0 1 0 0]
+    predict_proba [[0.65654207 0.34345793]]
 
 
 
@@ -401,8 +399,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [1 1 0 1 0]
-    predict_proba [{0: 0.04574897885322571, 1: 0.9542510509490967}]
+    predict [1 0 1 0 0]
+    predict_proba [{0: 0.4371914267539978, 1: 0.5628085732460022}]
 
 
 
@@ -462,7 +460,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -485,7 +483,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.000 seconds)
+   **Total running time of the script:** ( 0 minutes  7.743 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:

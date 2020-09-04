@@ -71,7 +71,7 @@ ax.get_yaxis().set_visible(False)
 
 
 try:
-    onx = to_onnx(pipe, train_data[:1])
+    to_onnx(pipe, train_data[:1])
 except NotImplementedError as e:
     print(e)
 

@@ -25,8 +25,8 @@ that on a simple example.
 .. contents::
     :local:
 
-Train a model and convert it.
-+++++++++++++++++++++++++++++
+Train a model and convert it
+++++++++++++++++++++++++++++
 
 
 .. code-block:: default
@@ -37,9 +37,8 @@ Train a model and convert it.
     from sklearn.model_selection import train_test_split
     import onnxruntime as rt
     import onnx
-    import skl2onnx
     from skl2onnx.common.data_types import FloatTensorType
-    from skl2onnx import convert_sklearn
+    from skl2onnx import convert_sklearn, __version__
     from sklearn.linear_model import LogisticRegression
 
     iris = load_iris()
@@ -93,8 +92,8 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    skl [[9.56398262e-01 4.36006698e-02 1.06786771e-06]]
-    onnx [{0: 0.9563983082771301, 1: 0.043600644916296005, 2: 1.0678666058083763e-06}, {0: 2.733732571869041e-06, 1: 0.007028332911431789, 2: 0.9929689764976501}]
+    skl [[9.52891741e-01 4.71071494e-02 1.10919339e-06]]
+    onnx [{0: 0.9528917074203491, 1: 0.047107137739658356, 2: 1.1091930218753987e-06}, {0: 0.007625982165336609, 1: 0.6066665053367615, 2: 0.3857075572013855}]
 
 
 
@@ -127,8 +126,8 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    skl [[ 5.59778925  2.50968734 -8.10747658]]
-    onnx [{0: 5.597789764404297, 1: 2.5096871852874756, 2: -8.107477188110352}, {0: -6.884941101074219, 1: 0.9670957326889038, 2: 5.917845726013184}]
+    skl [[ 5.55690001  2.54982349 -8.1067235 ]]
+    onnx [{0: 5.5569000244140625, 1: 2.54982328414917, 2: -8.10672378540039}, {0: -2.7666454315185547, 1: 1.6097724437713623, 2: 1.1568727493286133}]
 
 
 
@@ -143,7 +142,7 @@ Raw scores and decision_function
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -166,7 +165,7 @@ Raw scores and decision_function
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.055 seconds)
+   **Total running time of the script:** ( 0 minutes  0.053 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_decision_function.py:

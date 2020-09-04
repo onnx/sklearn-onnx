@@ -77,7 +77,6 @@ gradient descent.</p>
 <h2><a class="toc-backref" href="#id2">Building a simple model</a><a class="headerlink" href="#building-a-simple-model" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">skl2onnx</span>
-<span class="kn">import</span> <span class="nn">onnxruntime</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -87,7 +86,7 @@ gradient descent.</p>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_ops</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">OnnxArrayFeatureExtractor</span><span class="p">,</span> <span class="n">OnnxMul</span><span class="p">,</span> <span class="n">OnnxReduceSum</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
-<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span><span class="p">,</span> <span class="n">__version__</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ort_version</span></a>
 
 
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mat</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -110,7 +109,7 @@ gradient descent.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>original predictions
-[(0, 0, 1.8940267184935036), (0, 1, 0.10917445465120801), (0, 2, 0.30724964808202293), (0, 3, 0.30724964808202293), (1, 0, 1.0146841053708853), (1, 1, 0.9848723265608319), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066284500880117), (2, 1, 0.0), (2, 2, 0.19085159684386505), (2, 3, 0.19085159684386505), (3, 0, 1.1066284500880117), (3, 1, 0.0), (3, 2, 0.19085159684386505), (3, 3, 0.19085159684386505), (4, 0, 0.9470133592467518), (4, 1, 0.054587227325604004), (4, 2, 0.15362482404101147), (4, 3, 0.15362482404101147)]
+[(0, 0, 1.8940267184935033), (0, 1, 0.10917445465120829), (0, 2, 0.30724964808202293), (0, 3, 0.30724964808202293), (1, 0, 1.0146841053708857), (1, 1, 0.984872326560832), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066284500880117), (2, 1, 0.0), (2, 2, 0.19085159684386513), (2, 3, 0.19085159684386513), (3, 0, 1.1066284500880117), (3, 1, 0.0), (3, 2, 0.19085159684386513), (3, 3, 0.19085159684386513), (4, 0, 0.9470133592467517), (4, 1, 0.05458722732560414), (4, 2, 0.15362482404101147), (4, 3, 0.15362482404101147)]
 </pre></div>
 </div>
 <p>Let’s rewrite the prediction in a way it is closer
@@ -128,7 +127,7 @@ to the function we need to convert into ONNX.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(0, 0, 1.8940267184935036), (0, 1, 0.10917445465120801), (0, 2, 0.30724964808202293), (0, 3, 0.30724964808202293), (1, 0, 1.0146841053708853), (1, 1, 0.9848723265608319), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066284500880117), (2, 1, 0.0), (2, 2, 0.19085159684386505), (2, 3, 0.19085159684386505), (3, 0, 1.1066284500880117), (3, 1, 0.0), (3, 2, 0.19085159684386505), (3, 3, 0.19085159684386505), (4, 0, 0.9470133592467518), (4, 1, 0.054587227325604004), (4, 2, 0.15362482404101147), (4, 3, 0.15362482404101147)]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(0, 0, 1.8940267184935033), (0, 1, 0.10917445465120829), (0, 2, 0.30724964808202293), (0, 3, 0.30724964808202293), (1, 0, 1.0146841053708857), (1, 1, 0.984872326560832), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066284500880117), (2, 1, 0.0), (2, 2, 0.19085159684386513), (2, 3, 0.19085159684386513), (3, 0, 1.1066284500880117), (3, 1, 0.0), (3, 2, 0.19085159684386513), (3, 3, 0.19085159684386513), (4, 0, 0.9470133592467517), (4, 1, 0.05458722732560414), (4, 2, 0.15362482404101147), (4, 3, 0.15362482404101147)]
 </pre></div>
 </div>
 </div>
@@ -275,12 +274,12 @@ graph {
   }
 }
 opset_import {
-  domain: &quot;ai.onnx.ml&quot;
-  version: 1
-}
-opset_import {
   domain: &quot;&quot;
   version: 11
+}
+opset_import {
+  domain: &quot;ai.onnx.ml&quot;
+  version: 1
 }
 </pre></div>
 </div>
@@ -330,7 +329,7 @@ opset_import {
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnxruntime</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ort_version</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -342,7 +341,7 @@ onnxruntime:  1.4.0
 skl2onnx:  1.7.1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.456 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.355 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-nmf-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_nmf.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>

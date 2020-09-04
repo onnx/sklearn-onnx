@@ -38,7 +38,6 @@ and must be removed. Look for comment starting with ``---`` below.
 
 .. code-block:: default
 
-    import skl2onnx
     import onnx
     import sklearn
     import matplotlib.pyplot as plt
@@ -50,7 +49,7 @@ and must be removed. Look for comment starting with ``---`` below.
     from skl2onnx.helpers.onnx_helper import load_onnx_model
     import numpy
     import onnxruntime as rt
-    from skl2onnx import convert_sklearn
+    from skl2onnx import convert_sklearn, __version__
     import pprint
     from skl2onnx.common.data_types import FloatTensorType, StringTensorType
     from skl2onnx.common.data_types import Int64TensorType
@@ -246,7 +245,7 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Isolated variables exist: {'parch', 'ticket', 'name', 'cabin', 'body', 'boat', 'home_dest', 'sibsp'}
+    Isolated variables exist: {'parch', 'boat', 'sibsp', 'cabin', 'ticket', 'home_dest', 'body', 'name'}
 
 
 
@@ -283,13 +282,13 @@ must be applied on columns of the same type.
 
  .. code-block:: none
 
-    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:144: SettingWithCopyWarning: 
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:143: SettingWithCopyWarning: 
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
 
     See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
       X_train['pclass'] = X_train['pclass'].astype(str)
-    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:145: SettingWithCopyWarning: 
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:144: SettingWithCopyWarning: 
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
 
@@ -323,8 +322,8 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 1 1 0 1]
-    predict_proba [[0.91633434 0.08366566]]
+    predict [0 1 0 1 0]
+    predict_proba [[0.74757949 0.25242051]]
 
 
 
@@ -379,8 +378,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 1 1 0 1]
-    predict_proba [{0: 0.9163275957107544, 1: 0.08367237448692322}]
+    predict [0 1 0 1 0]
+    predict_proba [{0: 0.9081845283508301, 1: 0.09181544184684753}]
 
 
 
@@ -458,7 +457,7 @@ Let's look into the numerical pipeline first.
  .. code-block:: none
 
 
-    b'\x08\x06\x12\x08skl2onnx\x1a\x051.7.1"\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=6.\xebA=\xc4:\x03B\xa0\x01\x06*\x14\n\x05scale=|\xe4\xa2==\x0b\xbc\x9a<\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x08B\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x02\x10\x0cB\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01'
+    b'\x08\x06\x12\x08skl2onnx\x1a\x051.7.1"\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=_\xe4\xe8A=\xc5\x1e\x03B\xa0\x01\x06*\x14\n\x05scale=/\x83\x9c==\xfb\xf1\xa2<\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x02\x10\x0cB\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01'
 
 
 
@@ -482,7 +481,7 @@ Let's compute the numerical features.
 
  .. code-block:: none
 
-    numerical features [[ 2.5931118  -0.42135298]]
+    numerical features [[-0.6198985  -0.49189988]]
 
 
 
@@ -579,14 +578,14 @@ We do the same for the textual features.
         op_type: "Scaler"
         attribute {
           name: "offset"
-          floats: 29.397563934326172
-          floats: 32.80738830566406
+          floats: 29.111509323120117
+          floats: 32.78004837036133
           type: FLOATS
         }
         attribute {
           name: "scale"
-          floats: 0.07953736186027527
-          floats: 0.01888849399983883
+          floats: 0.07642208784818649
+          floats: 0.01989077590405941
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -601,6 +600,7 @@ We do the same for the textual features.
           strings: "C"
           strings: "Q"
           strings: "S"
+          strings: "missing"
           type: STRINGS
         }
         attribute {
@@ -720,32 +720,34 @@ We do the same for the textual features.
         }
         attribute {
           name: "coefficients"
-          floats: 0.37079209089279175
-          floats: -0.04415285587310791
-          floats: -0.32532787322998047
-          floats: -0.020567480474710464
-          floats: 0.3460143804550171
-          floats: -1.2111437320709229
-          floats: 1.211262822151184
-          floats: -0.9452930092811584
-          floats: -8.7733831605874e-05
-          floats: 0.9454997181892395
-          floats: -0.37079209089279175
-          floats: 0.04415285587310791
-          floats: 0.32532787322998047
-          floats: 0.020567480474710464
-          floats: -0.3460143804550171
-          floats: 1.2111437320709229
-          floats: -1.211262822151184
-          floats: 0.9452930092811584
-          floats: 8.7733831605874e-05
-          floats: -0.9454997181892395
+          floats: 0.4088466167449951
+          floats: 0.048030976206064224
+          floats: -0.3020475506782532
+          floats: 0.1128229945898056
+          floats: 0.4023498296737671
+          floats: -0.21311041712760925
+          floats: -1.2705841064453125
+          floats: 1.2705990076065063
+          floats: -1.084059238433838
+          floats: -0.121848464012146
+          floats: 1.2059226036071777
+          floats: -0.4088466167449951
+          floats: -0.048030976206064224
+          floats: 0.3020475506782532
+          floats: -0.1128229945898056
+          floats: -0.4023498296737671
+          floats: 0.21311041712760925
+          floats: 1.2705841064453125
+          floats: -1.2705990076065063
+          floats: 1.084059238433838
+          floats: 0.121848464012146
+          floats: -1.2059226036071777
           type: FLOATS
         }
         attribute {
           name: "intercepts"
-          floats: -0.1438337117433548
-          floats: 0.1438337117433548
+          floats: -0.3101347088813782
+          floats: 0.3101347088813782
           type: FLOATS
         }
         attribute {
@@ -802,7 +804,7 @@ We do the same for the textual features.
         dims: 2
         data_type: 7
         int64_data: -1
-        int64_data: 8
+        int64_data: 9
         name: "shape_tensor"
       }
       input {
@@ -919,7 +921,7 @@ We do the same for the textual features.
       version: 1
     }
 
-    textual features [[0. 0. 1. 0. 1. 0. 1. 0.]]
+    textual features [[0. 0. 1. 0. 0. 1. 0. 0. 1.]]
 
 
 
@@ -1013,7 +1015,7 @@ Then textual pipeline.
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -1036,7 +1038,7 @@ Then textual pipeline.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.237 seconds)
+   **Total running time of the script:** ( 0 minutes  3.102 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_intermediate_outputs.py:

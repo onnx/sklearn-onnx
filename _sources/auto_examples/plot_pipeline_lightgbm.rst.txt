@@ -38,21 +38,20 @@ Train a LightGBM classifier
 
     import lightgbm
     import onnxmltools
-    import skl2onnx
     import onnx
-    import sklearn
     import matplotlib.pyplot as plt
     import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import onnxruntime as rt
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
-    from skl2onnx import convert_sklearn, update_registered_converter
+    from skl2onnx import convert_sklearn, update_registered_converter, __version__
     from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
     from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
     import onnxmltools.convert.common.data_types
     from skl2onnx.common.data_types import FloatTensorType
     import numpy
     from sklearn.datasets import load_iris
+    from sklearn import __version__ as skl_version
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
     from lightgbm import LGBMClassifier
@@ -162,8 +161,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [1 1 0 2 1]
-    predict_proba [[0.23835631 0.43214878 0.32949491]]
+    predict [2 0 1 0 2]
+    predict_proba [[0.27391998 0.27510369 0.45097633]]
 
 
 
@@ -196,8 +195,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 1 0 2 1]
-    predict_proba [[0.23835632 0.43214878 0.32949492]]
+    predict [2 0 1 0 2]
+    predict_proba [[0.27391997 0.27510372 0.45097637]]
 
 
 
@@ -249,10 +248,10 @@ Display the ONNX graph
 
 
     print("numpy:", numpy.__version__)
-    print("scikit-learn:", sklearn.__version__)
+    print("scikit-learn:", skl_version)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
     print("onnxmltools: ", onnxmltools.__version__)
     print("lightgbm: ", lightgbm.__version__)
 
@@ -279,7 +278,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.551 seconds)
+   **Total running time of the script:** ( 0 minutes  4.125 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_lightgbm.py:

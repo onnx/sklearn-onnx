@@ -62,9 +62,8 @@ And to predict on a test set:
     import onnxruntime as rt
     from matplotlib import offsetbox
     import matplotlib.pyplot as plt
-    import sklearn
     from sklearn.model_selection import train_test_split
-    from sklearn import datasets
+    from sklearn import datasets, __version__ as skl_version
     from sklearn.base import BaseEstimator, TransformerMixin, clone
     from sklearn.manifold import TSNE
     from sklearn.metrics import mean_squared_error
@@ -524,8 +523,8 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[-1.762692   -0.16455133]
-     [-0.10639106 -1.061147  ]]
+     [[-0.8526263   1.4315    ]
+     [-0.28031436  1.7568095 ]]
 
 
 
@@ -551,7 +550,7 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[-1.762692   -0.16455133]]
+    transform [[-0.8526263  1.4315   ]]
 
 
 
@@ -577,7 +576,7 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[-0.10639106 -1.061147  ]]
+    transform [[-0.28031436  1.7568095 ]]
 
 
 
@@ -628,7 +627,7 @@ Display the ONNX graph
 
 
     print("numpy:", numpy.__version__)
-    print("scikit-learn:", sklearn.__version__)
+    print("scikit-learn:", skl_version)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -654,7 +653,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.401 seconds)
+   **Total running time of the script:** ( 0 minutes  10.797 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:

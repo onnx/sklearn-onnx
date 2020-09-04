@@ -28,8 +28,7 @@ from scipy.spatial.distance import cdist
 from tqdm import tqdm
 from pandas import DataFrame
 import onnx
-import onnxruntime as rt
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 import skl2onnx
 from skl2onnx.algebra.custom_ops import OnnxCDist
 from skl2onnx.common.data_types import FloatTensorType
@@ -130,5 +129,5 @@ df.plot(x='N', y=['scipy/ort'])
 
 print("numpy:", np.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", rt.__version__)
+print("onnxruntime: ", ort_version)
 print("skl2onnx: ", skl2onnx.__version__)

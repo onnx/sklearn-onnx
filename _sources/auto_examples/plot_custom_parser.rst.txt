@@ -35,14 +35,13 @@ the method *validate* mentioned above.
 
     import inspect
     import numpy as np
-    import skl2onnx
     import onnx
     import sklearn
     from sklearn.base import ClassifierMixin, BaseEstimator, clone
     from sklearn.datasets import load_iris
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import train_test_split
-    from skl2onnx import update_registered_converter
+    from skl2onnx import update_registered_converter, __version__
     import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import onnxruntime as rt
@@ -129,7 +128,7 @@ a threshold.
 
  .. code-block:: none
 
-    [0 1 0 1 1 1 0 1 0 1 1 1 1 1 0 1 0 1 0 0 1 0 0 0 1 1 1 0 1 0 1 0 0 0 1 1 0
+    [1 1 0 1 0 1 0 1 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1
      0]
 
 
@@ -423,22 +422,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [1 0 2 2 0]
-    onnx [1 0 2 2 0]
+    sklearn [2 0 2 0 1]
+    onnx [2 0 2 0 1]
     --probabilities--
-    sklearn [[1.64738901e-02 6.36476555e-01 3.47049555e-01]
-     [8.77268605e-01 1.22695141e-01 3.62542398e-05]
-     [1.59377940e-02 3.72565117e-01 6.11497089e-01]
-     [7.39127082e-04 1.65565758e-01 8.33695114e-01]
-     [8.61569352e-01 1.38341890e-01 8.87574536e-05]]
-    onnx [[1.6473914e-02 6.3647664e-01 3.4704947e-01]
-     [8.7726855e-01 1.2269518e-01 3.6271500e-05]
-     [1.5937768e-02 3.7256521e-01 6.1149704e-01]
-     [7.3911733e-04 1.6556579e-01 8.3369511e-01]
-     [8.6156934e-01 1.3834190e-01 8.8766792e-05]]
+    sklearn [[5.59330267e-04 1.83060389e-01 8.16380281e-01]
+     [9.49104605e-01 5.08708808e-02 2.45142487e-05]
+     [8.50252775e-03 2.76537973e-01 7.14959500e-01]
+     [9.58464325e-01 4.15246185e-02 1.10561539e-05]
+     [3.88530431e-02 7.47558156e-01 2.13588801e-01]]
+    onnx [[5.5932155e-04 1.8306038e-01 8.1638032e-01]
+     [9.4910455e-01 5.0870877e-02 2.4551691e-05]
+     [8.5024899e-03 2.7653793e-01 7.1495956e-01]
+     [9.5846438e-01 4.1524574e-02 1.1062362e-05]
+     [3.8853094e-02 7.4755824e-01 2.1358865e-01]]
     --validation--
-    sklearn [0 1 0 1 1]
-    onnx [0 1 0 1 1]
+    sklearn [1 1 0 1 0]
+    onnx [1 1 0 1 0]
 
 
 
@@ -494,7 +493,7 @@ Display the ONNX graph
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", rt.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -517,7 +516,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.858 seconds)
+   **Total running time of the script:** ( 0 minutes  1.723 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser.py:

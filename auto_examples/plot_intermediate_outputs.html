@@ -81,8 +81,7 @@ There is one change because
 <a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Imputer">ONNX-ML Imputer</a>
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with <code class="docutils literal notranslate"><span class="pre">---</span></code> below.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">skl2onnx</span>
-<span class="kn">import</span> <span class="nn">onnx</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">onnx</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -93,7 +92,7 @@ and must be removed. Look for comment starting with <code class="docutils litera
 <span class="kn">from</span> <span class="nn">skl2onnx.helpers.onnx_helper</span> <span class="kn">import</span> <span class="n">load_onnx_model</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">__version__</span></a>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span><span class="p">,</span> <span class="n">StringTensorType</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">Int64TensorType</span>
@@ -236,7 +235,7 @@ It could be done before converting the pipeline into a graph.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Isolated variables exist: {&#39;parch&#39;, &#39;ticket&#39;, &#39;name&#39;, &#39;cabin&#39;, &#39;body&#39;, &#39;boat&#39;, &#39;home_dest&#39;, &#39;sibsp&#39;}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Isolated variables exist: {&#39;parch&#39;, &#39;boat&#39;, &#39;sibsp&#39;, &#39;cabin&#39;, &#39;ticket&#39;, &#39;home_dest&#39;, &#39;body&#39;, &#39;name&#39;}
 </pre></div>
 </div>
 <p><em>scikit-learn</em> does implicit conversions when it can.
@@ -258,13 +257,13 @@ must be applied on columns of the same type.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:144: SettingWithCopyWarning:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:143: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   X_train[&#39;pclass&#39;] = X_train[&#39;pclass&#39;].astype(str)
-/home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:145: SettingWithCopyWarning:
+/home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_intermediate_outputs.py:144: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
@@ -283,8 +282,8 @@ Let’s start with <em>scikit-learn</em>.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 1 1 0 1]
-predict_proba [[0.91633434 0.08366566]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 1 0 1 0]
+predict_proba [[0.74757949 0.25242051]]
 </pre></div>
 </div>
 <p>Predictions with onnxruntime.
@@ -312,8 +311,8 @@ with the <em>reshape</em>.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 1 1 0 1]
-predict_proba [{0: 0.9163275957107544, 1: 0.08367237448692322}]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 1 0 1 0]
+predict_proba [{0: 0.9081845283508301, 1: 0.09181544184684753}]
 </pre></div>
 </div>
 </div>
@@ -360,7 +359,7 @@ Let’s look into the numerical pipeline first.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;\x08\x06\x12\x08skl2onnx\x1a\x051.7.1&quot;\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler&quot;\x06Scaler*\x15\n\x06offset=6.\xebA=\xc4:\x03B\xa0\x01\x06*\x14\n\x05scale=|\xe4\xa2==\x0b\xbc\x9a&lt;\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer&quot;\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat&quot;\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1&quot;\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast&quot;\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x08B\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x02\x10\x0cB\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01&#39;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;\x08\x06\x12\x08skl2onnx\x1a\x051.7.1&quot;\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler&quot;\x06Scaler*\x15\n\x06offset=_\xe4\xe8A=\xc5\x1e\x03B\xa0\x01\x06*\x14\n\x05scale=/\x83\x9c==\xfb\xf1\xa2&lt;\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer&quot;\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat&quot;\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1&quot;\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast&quot;\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x02\x10\x0cB\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01&#39;
 </pre></div>
 </div>
 <p>Let’s compute the numerical features.</p>
@@ -370,7 +369,7 @@ Let’s look into the numerical pipeline first.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numerical features [[ 2.5931118  -0.42135298]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numerical features [[-0.6198985  -0.49189988]]
 </pre></div>
 </div>
 <p>We do the same for the textual features.</p>
@@ -452,14 +451,14 @@ graph {
     op_type: &quot;Scaler&quot;
     attribute {
       name: &quot;offset&quot;
-      floats: 29.397563934326172
-      floats: 32.80738830566406
+      floats: 29.111509323120117
+      floats: 32.78004837036133
       type: FLOATS
     }
     attribute {
       name: &quot;scale&quot;
-      floats: 0.07953736186027527
-      floats: 0.01888849399983883
+      floats: 0.07642208784818649
+      floats: 0.01989077590405941
       type: FLOATS
     }
     domain: &quot;ai.onnx.ml&quot;
@@ -474,6 +473,7 @@ graph {
       strings: &quot;C&quot;
       strings: &quot;Q&quot;
       strings: &quot;S&quot;
+      strings: &quot;missing&quot;
       type: STRINGS
     }
     attribute {
@@ -593,32 +593,34 @@ graph {
     }
     attribute {
       name: &quot;coefficients&quot;
-      floats: 0.37079209089279175
-      floats: -0.04415285587310791
-      floats: -0.32532787322998047
-      floats: -0.020567480474710464
-      floats: 0.3460143804550171
-      floats: -1.2111437320709229
-      floats: 1.211262822151184
-      floats: -0.9452930092811584
-      floats: -8.7733831605874e-05
-      floats: 0.9454997181892395
-      floats: -0.37079209089279175
-      floats: 0.04415285587310791
-      floats: 0.32532787322998047
-      floats: 0.020567480474710464
-      floats: -0.3460143804550171
-      floats: 1.2111437320709229
-      floats: -1.211262822151184
-      floats: 0.9452930092811584
-      floats: 8.7733831605874e-05
-      floats: -0.9454997181892395
+      floats: 0.4088466167449951
+      floats: 0.048030976206064224
+      floats: -0.3020475506782532
+      floats: 0.1128229945898056
+      floats: 0.4023498296737671
+      floats: -0.21311041712760925
+      floats: -1.2705841064453125
+      floats: 1.2705990076065063
+      floats: -1.084059238433838
+      floats: -0.121848464012146
+      floats: 1.2059226036071777
+      floats: -0.4088466167449951
+      floats: -0.048030976206064224
+      floats: 0.3020475506782532
+      floats: -0.1128229945898056
+      floats: -0.4023498296737671
+      floats: 0.21311041712760925
+      floats: 1.2705841064453125
+      floats: -1.2705990076065063
+      floats: 1.084059238433838
+      floats: 0.121848464012146
+      floats: -1.2059226036071777
       type: FLOATS
     }
     attribute {
       name: &quot;intercepts&quot;
-      floats: -0.1438337117433548
-      floats: 0.1438337117433548
+      floats: -0.3101347088813782
+      floats: 0.3101347088813782
       type: FLOATS
     }
     attribute {
@@ -675,7 +677,7 @@ graph {
     dims: 2
     data_type: 7
     int64_data: -1
-    int64_data: 8
+    int64_data: 9
     name: &quot;shape_tensor&quot;
   }
   input {
@@ -792,7 +794,7 @@ opset_import {
   version: 1
 }
 
-textual features [[0. 0. 1. 0. 1. 0. 1. 0.]]
+textual features [[0. 0. 1. 0. 0. 1. 0. 0. 1.]]
 </pre></div>
 </div>
 </div>
@@ -843,7 +845,7 @@ textual features [[0. 0. 1. 0. 1. 0. 1. 0.]]
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rt</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -854,7 +856,7 @@ onnxruntime:  1.4.0
 skl2onnx:  1.7.1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.237 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.102 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-intermediate-outputs-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_intermediate_outputs.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>

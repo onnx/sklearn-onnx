@@ -78,8 +78,7 @@ function computes pairwise distances.</p>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a>
 <span class="kn">import</span> <span class="nn">onnx</span>
-<span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
-<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span><span class="p">,</span> <span class="n">__version__</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ort_version</span></a>
 <span class="kn">import</span> <span class="nn">skl2onnx</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra.custom_ops</span> <span class="kn">import</span> <span class="n">OnnxCDist</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
@@ -211,10 +210,10 @@ with onnxruntime.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;average&#39;: 1.871969783678651e-05,
- &#39;deviation&#39;: 2.077932281562963e-07,
- &#39;max_exec&#39;: 1.9706436432898045e-05,
- &#39;min_exec&#39;: 1.853120047599077e-05,
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;average&#39;: 1.8248839536681773e-05,
+ &#39;deviation&#39;: 8.142077274849872e-07,
+ &#39;max_exec&#39;: 2.1829712204635142e-05,
+ &#39;min_exec&#39;: 1.738544087857008e-05,
  &#39;name&#39;: &#39;scipy&#39;,
  &#39;ncols&#39;: 4,
  &#39;nrows&#39;: 2,
@@ -230,10 +229,10 @@ with onnxruntime.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;average&#39;: 1.5173771884292362e-05,
- &#39;deviation&#39;: 3.371901368640062e-07,
- &#39;max_exec&#39;: 1.760020386427641e-05,
- &#39;min_exec&#39;: 1.49998115375638e-05,
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;average&#39;: 1.3998891925439241e-05,
+ &#39;deviation&#39;: 3.265265612733069e-07,
+ &#39;max_exec&#39;: 1.537820789963007e-05,
+ &#39;min_exec&#39;: 1.383586786687374e-05,
  &#39;name&#39;: &#39;ort&#39;,
  &#39;ncols&#39;: 4,
  &#39;nrows&#39;: 2,
@@ -269,21 +268,21 @@ with onnxruntime.</p>
 <img alt="plot benchmark cdist" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_benchmark_cdist_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/4 [00:00&lt;?, ?it/s]
- 50%|#####     | 2/4 [00:00&lt;00:00, 12.71it/s]
- 75%|#######5  | 3/4 [00:00&lt;00:00,  8.26it/s]
-100%|##########| 4/4 [00:04&lt;00:00,  1.33s/it]
-100%|##########| 4/4 [00:04&lt;00:00,  1.13s/it]
+ 50%|#####     | 2/4 [00:00&lt;00:00, 13.57it/s]
+ 75%|#######5  | 3/4 [00:00&lt;00:00,  8.75it/s]
+100%|##########| 4/4 [00:01&lt;00:00,  2.03it/s]
+100%|##########| 4/4 [00:01&lt;00:00,  2.31it/s]
        N     scipy       ort  scipy/ort
-0     10  0.000020  0.000015   1.269472
-1    100  0.000025  0.000018   1.350016
-2   1000  0.000070  0.000039   1.764336
-3  10000  0.000496  0.001580   0.313807
+0     10  0.000018  0.000015   1.222886
+1    100  0.000023  0.000017   1.355840
+2   1000  0.000067  0.000037   1.787412
+3  10000  0.000476  0.000212   2.242213
 </pre></div>
 </div>
 <p><strong>Versions used for this example</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rt</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ort_version</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -294,7 +293,7 @@ onnxruntime:  1.4.0
 skl2onnx:  1.7.1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.947 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.933 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-benchmark-cdist-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_benchmark_cdist.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>

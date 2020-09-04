@@ -137,7 +137,7 @@ ONNX also supports that case.</p>
 <h2><a class="toc-backref" href="#id2">Conversion to ONNX</a><a class="headerlink" href="#conversion-to-onnx" title="Permalink to this headline">¶</a></h2>
 <p>Function <em>to_onnx</em> does not handle dataframes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
 <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </pre></div>
@@ -177,7 +177,7 @@ ONNX also supports that case.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>run(): incompatible function arguments. The following argument types are supported:
     1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -&gt; List[object]
 
-Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x7fd6c3a348b8&gt;, [&#39;label&#39;, &#39;probabilities&#39;],   CAT1 CAT2  num1  num2
+Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x7f1f9b1bf7d8&gt;, [&#39;label&#39;, &#39;probabilities&#39;],   CAT1 CAT2  num1  num2
 0    a    c  0.50  0.60
 1    b    d  0.40  0.80
 2    a    d  0.50  0.56
@@ -204,18 +204,18 @@ Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession o
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.87 0.13]
- [0.32 0.68]
- [0.74 0.26]
- [0.25 0.75]
- [0.69 0.31]
- [0.34 0.66]]
-[[0.87       0.12999998]
- [0.32000035 0.67999965]
- [0.74       0.26000002]
- [0.25000042 0.7499996 ]
- [0.69000006 0.30999997]
- [0.34000033 0.65999967]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.8  0.2 ]
+ [0.3  0.7 ]
+ [0.68 0.32]
+ [0.33 0.67]
+ [0.71 0.29]
+ [0.3  0.7 ]]
+[[0.79999995 0.20000002]
+ [0.30000037 0.69999963]
+ [0.68000007 0.31999996]
+ [0.33000034 0.66999966]
+ [0.71000004 0.29      ]
+ [0.30000037 0.69999963]]
 </pre></div>
 </div>
 <p>It looks ok. Let’s dig into the details to
@@ -236,9 +236,9 @@ the input type is the column type.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;CAT1&#39;, StringTensorType(shape=[None, 1])),
  (&#39;CAT2&#39;, StringTensorType(shape=[None, 1])),
  (&#39;num1&#39;,
-  &lt;onnxconverter_common.data_types.DoubleTensorType object at 0x7fd6f67ca320&gt;),
+  &lt;onnxconverter_common.data_types.DoubleTensorType object at 0x7f1f9925f710&gt;),
  (&#39;num2&#39;,
-  &lt;onnxconverter_common.data_types.DoubleTensorType object at 0x7fd6f6862b70&gt;)]
+  &lt;onnxconverter_common.data_types.DoubleTensorType object at 0x7f1f9925f0b8&gt;)]
 </pre></div>
 </div>
 <p>Let’s use float instead.</p>
@@ -319,21 +319,21 @@ values.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.87 0.13]
- [0.32 0.68]
- [0.74 0.26]
- [0.25 0.75]
- [0.69 0.31]
- [0.34 0.66]]
-[[0.87       0.12999998]
- [0.32000035 0.67999965]
- [0.74       0.26000002]
- [0.25000042 0.7499996 ]
- [0.69000006 0.30999997]
- [0.34000033 0.65999967]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.8  0.2 ]
+ [0.3  0.7 ]
+ [0.68 0.32]
+ [0.33 0.67]
+ [0.71 0.29]
+ [0.3  0.7 ]]
+[[0.79999995 0.20000002]
+ [0.30000037 0.69999963]
+ [0.68000007 0.31999996]
+ [0.33000034 0.66999966]
+ [0.71000004 0.29      ]
+ [0.30000037 0.69999963]]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.722 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.804 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-gbegin-dataframe-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_gbegin_dataframe.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>

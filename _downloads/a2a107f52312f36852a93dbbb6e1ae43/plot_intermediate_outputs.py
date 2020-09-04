@@ -28,7 +28,6 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
-import skl2onnx
 import onnx
 import sklearn
 import matplotlib.pyplot as plt
@@ -40,7 +39,7 @@ from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
 from skl2onnx.helpers.onnx_helper import load_onnx_model
 import numpy
 import onnxruntime as rt
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, __version__
 import pprint
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.common.data_types import Int64TensorType
@@ -276,4 +275,4 @@ print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)

@@ -87,9 +87,7 @@ on github <a class="reference external" href="https://github.com/onnx/onnx/blob/
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">onnx</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">helper</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">TensorProto</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">helper</span><span class="p">,</span> <span class="n">TensorProto</span><span class="p">,</span> <span class="n">checker</span>
 <span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="kn">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
 
 <span class="c1"># Create one input (ValueInfoProto)</span>
@@ -121,7 +119,7 @@ on github <a class="reference external" href="https://github.com/onnx/onnx/blob/
 <span class="n">model_def</span><span class="o">.</span><span class="n">opset_import</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="mi">10</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The model is:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_def</span><span class="p">))</span>
-<span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
+<span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The model is checked!&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -208,7 +206,7 @@ onnx package.</p>
 <span class="n">model_def</span> <span class="o">=</span> <span class="n">pad</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">},</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The model is:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_def</span><span class="p">))</span>
-<span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
+<span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The model is checked!&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -292,7 +290,7 @@ The model is checked!
 
 <span class="n">model_def</span> <span class="o">=</span> <span class="n">pad</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">({</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pad</span><span class="o">.</span><span class="n">inputs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">},</span>
                         <span class="n">target_opset</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
+<span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -313,7 +311,7 @@ The model is checked!
 <span class="n">original_model</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">producer_name</span><span class="o">=</span><span class="s1">&#39;onnx-examples&#39;</span><span class="p">)</span>
 
 <span class="c1"># Check the model and print Y&#39;s shape information</span>
-<span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">original_model</span><span class="p">)</span>
+<span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">original_model</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Which we translate into:</p>
@@ -324,7 +322,7 @@ The model is checked!
 
 <span class="c1"># numpy arrays are good enough to define the input shape</span>
 <span class="n">model_def</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">})</span>
-<span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
+<span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_def</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Let’s the output with onnxruntime</p>
@@ -399,7 +397,7 @@ onnxruntime:  1.4.0
 skl2onnx:  1.7.1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.965 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.993 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-onnx-operators-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_onnx_operators.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>
