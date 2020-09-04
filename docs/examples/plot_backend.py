@@ -24,12 +24,11 @@ import sklearn
 import numpy
 from onnxruntime import get_device
 import numpy as np
-from onnxruntime import datasets
 import onnxruntime.backend as backend
-from onnx import load
+from skl2onnx.tutorial import logreg_iris_onnx
 
-name = datasets.get_example("logreg_iris.onnx")
-model = load(name)
+
+model = logreg_iris_onnx()
 
 rep = backend.prepare(model, 'CPU')
 x = np.array([[-1.0, -2.0, 5.0, 6.0],
@@ -48,6 +47,9 @@ print(get_device())
 ########################################
 # The backend can also directly load the model
 # without using *onnx*.
+name = 'logreg_iris.onnx'
+with open(name, 'wb') as r:
+    r.write(model.SerializeToString())
 
 rep = backend.prepare(name, 'CPU')
 x = np.array([[-1.0, -2.0, -3.0, -4.0],
