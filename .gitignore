@@ -55,6 +55,7 @@ tests_onnxmltools/tests_dump/*
 docs/tests/*.dot*
 tests/*.dot*
 tests/*.onnx
+tests/*.xlsx
 docs/tests/*.onnx
 docs/examples/validator_classifier.dot.png
 docs/examples/validator_classifier.dot
