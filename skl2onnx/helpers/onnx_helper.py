@@ -247,7 +247,12 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
         else:
             op_set.version = get_latest_tested_opset_version()
 
-    inferred_model = shape_inference.infer_shapes(original_model)
+    try:
+        inferred_model = shape_inference.infer_shapes(original_model)
+    except RuntimeError as e:
+        raise RuntimeError(
+            "Unable to infer shape of node '{}'\n{}".format(
+                op_type, original_model)) from e
     shapes = Variable.from_pb(inferred_model.graph.value_info)
     if len(shapes) == 0:
         raise RuntimeError("Shape inference fails.\n"
