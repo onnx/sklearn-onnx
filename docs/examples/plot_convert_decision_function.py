@@ -18,8 +18,8 @@ that on a simple example.
 .. contents::
     :local:
 
-Train a model and convert it.
-+++++++++++++++++++++++++++++
+Train a model and convert it
+++++++++++++++++++++++++++++
 
 """
 import numpy
@@ -28,9 +28,8 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 import onnxruntime as rt
 import onnx
-import skl2onnx
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, __version__
 from sklearn.linear_model import LogisticRegression
 
 iris = load_iris()
@@ -78,4 +77,4 @@ print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", skl2onnx.__version__)
+print("skl2onnx: ", __version__)

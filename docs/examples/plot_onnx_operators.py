@@ -42,9 +42,7 @@ on github `onnx.proto
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import onnx
-from onnx import helper
-from onnx import TensorProto
+from onnx import helper, TensorProto, checker
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
@@ -76,7 +74,7 @@ model_def = helper.make_model(graph_def, producer_name='onnx-example')
 model_def.opset_import[0].version = 10
 
 print('The model is:\n{}'.format(model_def))
-onnx.checker.check_model(model_def)
+checker.check_model(model_def)
 print('The model is checked!')
 
 #####################################
@@ -97,7 +95,7 @@ pad = OnnxPad('X', output_names=['Y'],
 model_def = pad.to_onnx({'X': X}, target_opset=10)
 
 print('The model is:\n{}'.format(model_def))
-onnx.checker.check_model(model_def)
+checker.check_model(model_def)
 print('The model is checked!')
 
 ####################################
@@ -108,7 +106,7 @@ pad = OnnxPad(mode='constant', value=1.5,
 
 model_def = pad.to_onnx({pad.inputs[0]: X},
                         target_opset=10)
-onnx.checker.check_model(model_def)
+checker.check_model(model_def)
 
 ########################################
 # Multiple operators
@@ -131,7 +129,7 @@ graph = helper.make_graph(
 original_model = helper.make_model(graph, producer_name='onnx-examples')
 
 # Check the model and print Y's shape information
-onnx.checker.check_model(original_model)
+checker.check_model(original_model)
 
 #####################################
 # Which we translate into:
@@ -143,7 +141,7 @@ X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape
 model_def = node.to_onnx({'X': X})
-onnx.checker.check_model(model_def)
+checker.check_model(model_def)
 
 ######################################
 # Let's the output with onnxruntime

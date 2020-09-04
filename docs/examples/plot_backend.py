@@ -18,11 +18,10 @@ Let's use the API to compute the prediction
 of a simple logistic regression model.
 """
 import skl2onnx
-import onnxruntime
 import onnx
 import sklearn
 import numpy
-from onnxruntime import get_device
+from onnxruntime import get_device, __version__ as ort_version
 import numpy as np
 import onnxruntime.backend as backend
 from skl2onnx.tutorial import logreg_iris_onnx
@@ -71,5 +70,5 @@ print("probabilities={}".format(proba))
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", onnxruntime.__version__)
+print("onnxruntime: ", ort_version)
 print("skl2onnx: ", skl2onnx.__version__)

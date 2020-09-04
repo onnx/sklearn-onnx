@@ -27,8 +27,7 @@ import numpy
 import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-from onnx import ModelProto
-import onnx
+from onnx import ModelProto, __version__ as onnx_version
 
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 
@@ -81,6 +80,6 @@ plt.axis('off')
 
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-print("onnx: ", onnx.__version__)
+print("onnx: ", onnx_version)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
