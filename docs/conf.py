@@ -93,11 +93,8 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'pyquickhelper': (
         'http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/', None),
-    'onnxmltools': (
-        'http://www.xavierdupre.fr/app/onnxmltools/helpsphinx/index.html',
-        None),
     'onnxruntime': (
-        'http://www.xavierdupre.fr/app/onnxruntime/helpsphinx/index.html',
+        'https://microsoft.github.io/onnxruntime/python/index.html',
         None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
@@ -109,10 +106,10 @@ intersphinx_mapping = {
         'https://scikit-learn.org/stable/',
         None),
     'skl2onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
+        'http://onnx.ai/sklearn-onnx/',
         None),
     'sklearn-onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
+        'http://onnx.ai/sklearn-onnx/',
         None),
 }
 
@@ -152,6 +149,7 @@ epkg_dictionary = {
         'https://github.com/onnx/onnx/blob/master/docs/Operators.md',
     'ONNX ML operators':
         'https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md',
+    'ONNX Zoo': 'https://github.com/onnx/models',
     'onnxmltools': 'https://github.com/onnx/onnxmltools',
     'OnnxPipeline':
         'http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/'
@@ -165,6 +163,9 @@ epkg_dictionary = {
     'skorch': 'https://skorch.readthedocs.io/en/stable/',
     'sklearn-onnx': 'https://github.com/onnx/sklearn-onnx',
     'sphinx-gallery': 'https://github.com/sphinx-gallery/sphinx-gallery',
+    'TreeEnsembleRegressor':
+        'https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md'
+        '#ai.onnx.ml.TreeEnsembleRegressor',
     'xgboost': 'https://xgboost.readthedocs.io/en/latest/',
     'XGBoost': 'https://xgboost.readthedocs.io/en/latest/',
 }
