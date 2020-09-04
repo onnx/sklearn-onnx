@@ -2,7 +2,6 @@
 Tests examples from the documentation.
 """
 import unittest
-from distutils.version import StrictVersion
 import os
 import sys
 import importlib
@@ -67,7 +66,8 @@ class TestDocumentationTutorial(unittest.TestCase):
                             # still the same in released version on pypi
                             pass
                         else:
-                            installed = os.listdir(os.path.dirname(numpy.__file__))
+                            installed = os.listdir(
+                                os.path.dirname(numpy.__file__))
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
                                 "failed due to\n{}"
