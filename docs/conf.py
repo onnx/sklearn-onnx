@@ -141,7 +141,7 @@ epkg_dictionary = {
     'ONNX': 'https://onnx.ai/',
     'ONNX operators':
         'https://github.com/onnx/onnx/blob/master/docs/Operators.md',
-    'ONNX ML operators':
+    'ONNX ML Operators':
         'https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md',
     'ONNX Zoo': 'https://github.com/onnx/models',
     'onnxmltools': 'https://github.com/onnx/onnxmltools',
