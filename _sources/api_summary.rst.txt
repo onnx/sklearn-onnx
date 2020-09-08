@@ -9,6 +9,12 @@ in *scikit-onnx*.
 .. contents::
     :local:
 
+
+Version
+=======
+
+.. autofunction:: skl2onnx.get_latest_tested_opset_version
+
 Converters
 ==========
 

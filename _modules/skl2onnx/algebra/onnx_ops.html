@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>skl2onnx.algebra.onnx_ops &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skl2onnx.algebra.onnx_ops &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -29,9 +32,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">skl2onnx.algebra.onnx_ops</a></li> 
       </ul>
     </div>  
 
@@ -46,7 +50,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">onnx</span>
-<span class="kn">from</span> <span class="nn">.automation</span> <span class="k">import</span> <span class="n">get_rst_doc</span>
+<span class="kn">from</span> <span class="nn">.automation</span> <span class="kn">import</span> <span class="n">get_rst_doc</span>
 
 
 <span class="k">def</span> <span class="nf">ClassFactory</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span>
@@ -54,11 +58,13 @@
                  <span class="n">domain</span><span class="p">,</span> <span class="n">attr_names</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span>
                  <span class="n">deprecated</span><span class="p">,</span> <span class="n">since_version</span><span class="p">,</span>
                  <span class="n">past_version</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="k">import</span> <span class="n">OnnxOperator</span>
+    <span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="kn">import</span> <span class="n">OnnxOperator</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="n">op_version</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">op_version</span> <span class="o">=</span> <span class="n">op_version</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">input_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">input_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -72,9 +78,25 @@
         <span class="n">attr_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_names</span>
         <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
             <span class="n">op_version_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">op_version</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="n">op_version_class</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">op_version</span> <span class="o">=</span> <span class="n">op_version_class</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">op_version</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="n">op_version_class</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Could not compare versions </span><span class="si">{}</span><span class="s2"> ? </span><span class="si">{}</span><span class="s2"> for &quot;</span>
+                    <span class="s2">&quot;class &#39;</span><span class="si">{}</span><span class="s2">&#39; since_version </span><span class="si">{}</span><span class="s2">. Parameter &#39;op_version&#39; &quot;</span>
+                    <span class="s2">&quot;is probably missing when the class &quot;</span>
+                    <span class="s2">&quot;is instantiated.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">op_version</span><span class="p">,</span> <span class="n">op_version_class</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span>
+                        <span class="n">since_version</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op_version_class</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># By default, the op_version is None.</span>
+        <span class="c1"># None means the latest available.</span>
+        <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">op_version</span> <span class="o">=</span> <span class="n">since_version</span>
 
         <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -92,7 +114,7 @@
                 <span class="s2">&quot;op_version=</span><span class="si">{}</span><span class="s2"> does not refer to the same opset as the class &quot;</span>
                 <span class="s2">&quot;name (&#39;</span><span class="si">{}</span><span class="s2">&#39;).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;output_names&#39;</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">}:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;output_names&#39;</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">,</span> <span class="s1">&#39;ir_version&#39;</span><span class="p">}:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;</span><span class="si">%s</span><span class="s2">&#39; not valid for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
@@ -193,6 +215,7 @@
 <span class="n">_update_module</span><span class="p">()</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -218,14 +241,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

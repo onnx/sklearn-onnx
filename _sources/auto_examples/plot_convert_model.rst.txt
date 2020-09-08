@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_convert_model.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_convert_model.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_convert_model.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_convert_model.py:
 
 
 .. _l-rf-iris-example:
@@ -28,11 +30,11 @@ Train a model
 A very basic example using random forest and
 the iris dataset.
 
+
 .. code-block:: default
 
 
     import skl2onnx
-    import onnxruntime
     import onnx
     import sklearn
     from sklearn.linear_model import LogisticRegression
@@ -60,14 +62,9 @@ the iris dataset.
 
  .. code-block:: none
 
-    RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
-                           criterion='gini', max_depth=None, max_features='auto',
-                           max_leaf_nodes=None, max_samples=None,
-                           min_impurity_decrease=0.0, min_impurity_split=None,
-                           min_samples_leaf=1, min_samples_split=2,
-                           min_weight_fraction_leaf=0.0, n_estimators=100,
-                           n_jobs=None, oob_score=False, random_state=None,
-                           verbose=0, warm_start=False)
+    RandomForestClassifier()
+
+
 
 
 Convert a model into ONNX
@@ -78,10 +75,12 @@ Convert a model into ONNX
 
 
     initial_type = [('float_input', FloatTensorType([None, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type)
+    onx = convert_sklearn(clr, initial_types=initial_type,
+                          target_opset=12)
 
     with open("rf_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
+
 
 
 
@@ -112,8 +111,10 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [0 0 0 2 0 0 2 0 0 1 2 2 1 0 1 2 2 2 2 0 2 0 1 2 2 2 1 0 2 2 0 0 0 1 1 2 0
-     2]
+    [1 2 0 0 2 1 0 0 1 0 0 1 2 1 2 0 2 1 0 0 1 1 1 0 0 1 1 0 1 2 0 0 0 0 2 2 0
+     0]
+
+
 
 
 Full example with a logistic regression
@@ -125,7 +126,8 @@ Full example with a logistic regression
     clr = LogisticRegression()
     clr.fit(X_train, y_train)
     initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
-    onx = convert_sklearn(clr, initial_types=initial_type)
+    onx = convert_sklearn(clr, initial_types=initial_type,
+                          target_opset=12)
     with open("logreg_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
 
@@ -147,8 +149,18 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    [0 0 0 2 0 0 2 0 0 1 2 2 1 0 1 2 2 2 2 0 2 0 1 2 2 2 1 0 2 2 0 0 0 1 1 2 0
-     2]
+    /home/dupre/github_xadupre/cus/lib/python3.7/site-packages/sklearn/linear_model/_logistic.py:764: ConvergenceWarning: lbfgs failed to converge (status=1):
+    STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+    Increase the number of iterations (max_iter) or scale the data as shown in:
+        https://scikit-learn.org/stable/modules/preprocessing.html
+    Please also refer to the documentation for alternative solver options:
+        https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+      extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)
+    [1 2 0 0 2 1 0 0 1 0 0 1 2 1 2 0 2 1 0 0 1 1 1 0 0 1 2 0 1 2 0 0 0 0 2 2 0
+     0]
+
+
 
 
 **Versions used for this example**
@@ -160,7 +172,7 @@ Full example with a logistic regression
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
-    print("onnxruntime: ", onnxruntime.__version__)
+    print("onnxruntime: ", rt.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
 
 
@@ -172,17 +184,19 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    numpy: 1.17.0
-    scikit-learn: 0.22.dev0
-    onnx:  1.6.32
-    onnxruntime:  1.0.991
-    skl2onnx:  1.5.2
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.343 seconds)
+   **Total running time of the script:** ( 0 minutes  0.323 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:
@@ -194,14 +208,20 @@ Full example with a logistic regression
     :class: sphx-glr-footer-example
 
 
+  .. container:: binder-badge
 
-  .. container:: sphx-glr-download
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_convert_model.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_convert_model.py <plot_convert_model.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_convert_model.ipynb <plot_convert_model.ipynb>`
 
@@ -210,4 +230,4 @@ Full example with a logistic regression
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_gpr.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_gpr.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_gpr.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_gpr.py:
 
 
 .. _l-gpr-example:
@@ -28,6 +30,7 @@ Train a model
 
 A very basic example using *GaussianProcessRegressor*
 on the Boston dataset.
+
 
 .. code-block:: default
 
@@ -61,10 +64,10 @@ on the Boston dataset.
 
  .. code-block:: none
 
-    GaussianProcessRegressor(alpha=1.0, copy_X_train=True,
-                             kernel=DotProduct(sigma_0=1) + RBF(length_scale=1),
-                             n_restarts_optimizer=0, normalize_y=False,
-                             optimizer='fmin_l_bfgs_b', random_state=None)
+    GaussianProcessRegressor(alpha=1.0,
+                             kernel=DotProduct(sigma_0=1) + RBF(length_scale=1))
+
+
 
 
 First attempt to convert a model into ONNX
@@ -78,7 +81,8 @@ convert a model into ONNX.
 
 
     initial_type = [('X', FloatTensorType([None, X_train.shape[1]]))]
-    onx = convert_sklearn(gpr, initial_types=initial_type)
+    onx = convert_sklearn(gpr, initial_types=initial_type,
+                          target_opset=12)
 
     sess = rt.InferenceSession(onx.SerializeToString())
     try:
@@ -86,6 +90,7 @@ convert a model into ONNX.
             None, {'X': X_test.astype(numpy.float32)})[0]
     except RuntimeError as e:
         print(str(e))
+
 
 
 
@@ -111,7 +116,8 @@ the fixed dimensions by an empty value.
 
 
     initial_type = [('X', FloatTensorType([None, None]))]
-    onx = convert_sklearn(gpr, initial_types=initial_type)
+    onx = convert_sklearn(gpr, initial_types=initial_type,
+                          target_opset=12)
 
     sess = rt.InferenceSession(onx.SerializeToString())
     pred_onx = sess.run(
@@ -131,10 +137,12 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [14.05772787 14.44215276 17.02879039 19.90702387 10.95859338 33.84342298
-     14.7270215  20.47784486  6.79244911 12.90633491]
-    [13.625  13.875  20.375  16.375  13.875  33.8125 16.625  23.125   9.5
-     11.625 ]
+    [19.31167715 16.50846442 23.49000142 18.51457635  8.42066095 26.41539942
+     29.60405739 13.33343228 28.68116695 24.36466454]
+    [18.125   16.59375 23.      18.53125  9.78125 24.9375  30.46875 11.03125
+     28.      23.125  ]
+
+
 
 
 The differences seems quite important.
@@ -160,8 +168,10 @@ differences.
 
  .. code-block:: none
 
-    [3.53202387 3.80010574 3.85431083 4.1184217  4.47964531]
+    [2.773486   2.99130079 3.12749888 3.20009654 3.42657914]
     min(Y)-max(Y): 7.0 50.0
+
+
 
 
 Third attempt: use of double
@@ -187,7 +197,7 @@ will be dumped as doubles and not as floats anymore.
 
     initial_type = [('X', DoubleTensorType([None, None]))]
     onx64 = convert_sklearn(gpr, initial_types=initial_type,
-                            dtype=numpy.float64)
+                            target_opset=12)
 
     sess64 = rt.InferenceSession(onx64.SerializeToString())
     pred_onx64 = sess64.run(None, {'X': X_test})[0]
@@ -204,8 +214,10 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [14.05772787 14.44215276 17.02879039 19.90702386 10.95859338 33.84342297
-     14.72702149 20.47784486  6.79244911 12.9063349 ]
+    [19.31167715 16.50846441 23.49000141 18.51457635  8.42066094 26.41539942
+     29.60405739 13.33343229 28.68116695 24.36466454]
+
+
 
 
 The new differences look much better.
@@ -229,9 +241,11 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [9.75687087e-09 1.04438662e-08 1.10682521e-08 1.11500960e-08
-     1.38785126e-08]
+    [1.15251169e-08 1.26310624e-08 1.38534233e-08 1.60071068e-08
+     2.07801349e-08]
     min(Y)-max(Y): 7.0 50.0
+
+
 
 
 Size increase
@@ -260,8 +274,10 @@ and not as floats anymore.
 
  .. code-block:: none
 
-    ONNX with floats: 42865
-    ONNX with doubles: 83869
+    ONNX with floats: 42723
+    ONNX with doubles: 83727
+
+
 
 
 return_std=True
@@ -284,7 +300,7 @@ That's done through the option mechanism
     options = {GaussianProcessRegressor: {'return_std': True}}
     try:
         onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                    dtype=numpy.float64, options=options)
+                                    options=options, target_opset=12)
     except RuntimeError as e:
         print(e)
 
@@ -301,6 +317,8 @@ That's done through the option mechanism
     The method *predict* must be called once with parameter return_std=True to compute internal variables. They cannot be computed here as the same operation (matrix inversion) produces too many discrepencies if done with single floats than double floats.
 
 
+
+
 This error highlights the fact that the *scikit-learn*
 computes internal variables on first call to method predict.
 The converter needs them to be initialized by calling method
@@ -312,7 +330,7 @@ predict at least once and then converting again.
 
     gpr.predict(X_test[:1], return_std=True)
     onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                dtype=numpy.float64, options=options)
+                                options=options, target_opset=12)
 
     sess64_std = rt.InferenceSession(onx64_std.SerializeToString())
     pred_onx64_std = sess64_std.run(None, {'X': X_test[:5]})
@@ -329,8 +347,10 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[14.05772787, 14.44215276, 17.02879039, 19.90702386, 10.95859338]]),
-     array([1.00661945, 0.66786596, 1.0379498 , 1.02736796, 0.49518638])]
+    [array([[19.31167715, 16.50846441, 23.49000141, 18.51457635,  8.42066094]]),
+     array([0.79381404, 1.04565067, 1.01796157, 1.04859644, 0.95063572])]
+
+
 
 
 Let's compare with *scikit-learn* prediction.
@@ -351,8 +371,10 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([14.05772787, 14.44215276, 17.02879039, 19.90702387, 10.95859338]),
-     array([1.00654958, 0.66811878, 1.03783621, 1.02750042, 0.49471966]))
+    (array([19.31167715, 16.50846442, 23.49000142, 18.51457635,  8.42066094]),
+     array([0.79360762, 1.04569317, 1.01824567, 1.04841356, 0.95047268]))
+
+
 
 
 It looks good. Let's do a better checks.
@@ -380,7 +402,9 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [0.00070554 0.0007456  0.00096494 0.0012141  0.00132711]
+    [0.00086765 0.00097114 0.00107633 0.00122894 0.00155228]
+
+
 
 
 There are some discrepencies but it seems reasonable.
@@ -406,17 +430,19 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 1.17.0
-    scikit-learn: 0.22.dev0
-    onnx:  1.6.32
-    onnxruntime:  1.0.991
-    skl2onnx:  1.5.2
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.714 seconds)
+   **Total running time of the script:** ( 0 minutes  0.997 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:
@@ -428,14 +454,20 @@ There are some discrepencies but it seems reasonable.
     :class: sphx-glr-footer-example
 
 
+  .. container:: binder-badge
 
-  .. container:: sphx-glr-download
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_gpr.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_gpr.py <plot_gpr.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_gpr.ipynb <plot_gpr.ipynb>`
 
@@ -444,4 +476,4 @@ There are some discrepencies but it seems reasonable.
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

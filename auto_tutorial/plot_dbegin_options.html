@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One model, many possible conversions with options &#8212; sklearn-onnx 1.7.1 documentation</title>
+    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Black list operators when converting" href="plot_dbegin_options_list.html" />
+    <link rel="prev" title="What is the opset number?" href="plot_cbegin_opset.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="plot_dbegin_options_list.html" title="Black list operators when converting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plot_cbegin_opset.html" title="What is the opset number?"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tutorial_1_simple.html" accesskey="U">The easy case</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">One model, many possible conversions with options</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-dbegin-options-py"><span class="std std-ref">here</span></a>     to download the full example code or to run this example in your browser via Binder</p>
+</div>
+<div class="sphx-glr-example-title section" id="one-model-many-possible-conversions-with-options">
+<span id="sphx-glr-auto-tutorial-plot-dbegin-options-py"></span><h1>One model, many possible conversions with options<a class="headerlink" href="#one-model-many-possible-conversions-with-options" title="Permalink to this headline">¶</a></h1>
+<p id="index-0">There is not one way to convert a model. A new operator
+might have been added in a newer version of <a class="reference external" href="https://onnx.ai/">ONNX</a>
+and that speeds up the converted model. The rational choice
+would be to use this new operator but what means the associated
+runtime has an implementation for it. What if two different
+users needs two different conversion for the same model?
+Let’s see how this may be done.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#option-zipmap" id="id1">Option <em>zipmap</em></a></p></li>
+<li><p><a class="reference internal" href="#option-in-a-pipeline" id="id2">Option in a pipeline</a></p></li>
+<li><p><a class="reference internal" href="#option-raw-scores" id="id3">Option <em>raw_scores</em></a></p></li>
+<li><p><a class="reference internal" href="#list-of-available-options" id="id4">List of available options</a></p></li>
+</ul>
+</div>
+<div class="section" id="option-zipmap">
+<h2><a class="toc-backref" href="#id1">Option <em>zipmap</em></a><a class="headerlink" href="#option-zipmap" title="Permalink to this headline">¶</a></h2>
+<p>Every classifier is by design converted into an ONNX graph which outputs
+two results: the predicted label and the prediction probabilites
+for every label. By default, the labels are integers and the
+probabilites are stored in dictionaries. That’s the purpose
+of operator <em>ZipMap</em> added at the end of the following graph.</p>
+
+    <div id="gdot-140163903328096-cont"><div id="gdot-140163903328096" style="width:100%;height:100%;"></div>
+    <script>
+
+    require(['http://www.xavierdupre.fr/js/vizjs/viz.js'], function() { var svgGraph = Viz(" digraph{\n  orientation=portrait;\n  ranksep=0.25;\n  nodesep=0.05;\n\n  X [shape=box color=red label=\"X\\nfloat((0, 4))\" fontsize=10];\n\n  output_label [shape=box color=green label=\"output_label\\nint64((0,))\" fontsize=10];\n  output_probability [shape=box color=green label=\"output_probability\\n[{int64, {'kind': 'tensor', 'elem': 'float', 'shape': }}]\" fontsize=10];\n\n\n  label [shape=box label=\"label\" fontsize=10];\n  probability_tensor [shape=box label=\"probability_tensor\" fontsize=10];\n  LinearClassifier [shape=box style=\"filled,rounded\" color=orange label=\"LinearClassifier\\n(LinearClassifier)\\nclasslabels_ints=[0 1 2]\\ncoefficients=[-0.375644    0.88...\\nintercepts=[  8.587113    2.949...\\nmulti_class=1\\npost_transform=b'SOFTMAX'\" fontsize=10];\n  X -> LinearClassifier;\n  LinearClassifier -> label;\n  LinearClassifier -> probability_tensor;\n\n  probabilities [shape=box label=\"probabilities\" fontsize=10];\n  Normalizer [shape=box style=\"filled,rounded\" color=orange label=\"Normalizer\\n(Normalizer)\\nnorm=b'L1'\" fontsize=10];\n  probability_tensor -> Normalizer;\n  Normalizer -> probabilities;\n\n  Cast [shape=box style=\"filled,rounded\" color=orange label=\"Cast\\n(Cast)\\nto=7\" fontsize=10];\n  label -> Cast;\n  Cast -> output_label;\n\n  ZipMap [shape=box style=\"filled,rounded\" color=orange label=\"ZipMap\\n(ZipMap)\\nclasslabels_int64s=[0 1 2]\" fontsize=10];\n  probabilities -> ZipMap;\n  ZipMap -> output_probability;\n}\n");
+    document.getElementById('gdot-140163903328096').innerHTML = svgGraph; });
+    
+</script>
+</div><p>This operator is not really efficient as it copies every probabilies and
+labels in a different container. This time is usually significant for
+small classifiers. Then it makes sense to remove it.</p>
+
+    <div id="gdot-140163903000136-cont"><div id="gdot-140163903000136" style="width:100%;height:100%;"></div>
+    <script>
+
+    require(['http://www.xavierdupre.fr/js/vizjs/viz.js'], function() { var svgGraph = Viz(" digraph{\n  orientation=portrait;\n  ranksep=0.25;\n  nodesep=0.05;\n\n  X [shape=box color=red label=\"X\\nfloat((0, 4))\" fontsize=10];\n\n  label [shape=box color=green label=\"label\\nint64((0,))\" fontsize=10];\n  probabilities [shape=box color=green label=\"probabilities\\nfloat((0, 3))\" fontsize=10];\n\n\n  probability_tensor [shape=box label=\"probability_tensor\" fontsize=10];\n  LinearClassifier [shape=box style=\"filled,rounded\" color=orange label=\"LinearClassifier\\n(LinearClassifier)\\nclasslabels_ints=[0 1 2]\\ncoefficients=[-0.375644    0.88...\\nintercepts=[  8.587113    2.949...\\nmulti_class=1\\npost_transform=b'SOFTMAX'\" fontsize=10];\n  X -> LinearClassifier;\n  LinearClassifier -> label;\n  LinearClassifier -> probability_tensor;\n\n  Normalizer [shape=box style=\"filled,rounded\" color=orange label=\"Normalizer\\n(Normalizer)\\nnorm=b'L1'\" fontsize=10];\n  probability_tensor -> Normalizer;\n  Normalizer -> probabilities;\n}\n");
+    document.getElementById('gdot-140163903000136').innerHTML = svgGraph; });
+    
+</script>
+</div><p>There might be in the graph many classifiers, it is important to have
+a way to specify which classifier should keep its <em>ZipMap</em>
+and which is not. So it is possible to specify options by id.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyquickhelper.helpgen.graphviz_helper</span> <span class="kn">import</span> <span class="n">plot_graphviz</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/pprint.html#pprint.pformat" title="pprint.pformat" class="sphx-glr-backref-module-pprint sphx-glr-backref-type-py-function"><a href="https://docs.python.org/3/library/pprint.html#pprint.pformat" title="pprint.pformat" class="sphx-glr-backref-module-pprint sphx-glr-backref-type-py-function"><span class="n">pformat</span></a></a>
+<span class="kn">from</span> <span class="nn">skl2onnx.common._registration</span> <span class="kn">import</span> <span class="n">_converter_pool</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
+<span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <span class="n">OnnxInference</span>
+
+<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">data</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">target</span></a></a>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">__</span></a></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a></a><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">clr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">clr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a></a><span class="p">)</span>
+
+<span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">clr</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/dupre/github_xadupre/cus/lib/python3.7/site-packages/sklearn/linear_model/_logistic.py:764: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)
+OnnxInference(...)
+    def compiled_run(dict_inputs):
+        # inputs
+        X = dict_inputs[&#39;X&#39;]
+        (label, probability_tensor, ) = n0_linearclassifier(X)
+        (probabilities, ) = n1_normalizer(probability_tensor)
+        return {
+            &#39;label&#39;: label,
+            &#39;probabilities&#39;: probabilities,
+        }
+</pre></div>
+</div>
+<p>Visually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="plot dbegin options" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_dbegin_options_001.png" />
+<p>We need to compare that kind of visualisation to
+what it would give with operator <em>ZipMap</em>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">))</span>
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OnnxInference(...)
+    def compiled_run(dict_inputs):
+        # inputs
+        X = dict_inputs[&#39;X&#39;]
+        (label, probability_tensor, ) = n0_linearclassifier(X)
+        (probabilities, ) = n1_normalizer(probability_tensor)
+        (output_label, ) = n2_cast(label)
+        (output_probability, ) = n3_zipmap(probabilities)
+        return {
+            &#39;output_label&#39;: output_label,
+            &#39;output_probability&#39;: output_probability,
+        }
+</pre></div>
+</div>
+<p>Visually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="plot dbegin options" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_dbegin_options_002.png" />
+<p>Using function <em>id</em> has one flaw: it is not pickable.
+It is just better to use strings.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OnnxInference(...)
+    def compiled_run(dict_inputs):
+        # inputs
+        X = dict_inputs[&#39;X&#39;]
+        (label, probability_tensor, ) = n0_linearclassifier(X)
+        (probabilities, ) = n1_normalizer(probability_tensor)
+        return {
+            &#39;label&#39;: label,
+            &#39;probabilities&#39;: probabilities,
+        }
+</pre></div>
+</div>
+<p>Visually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="plot dbegin options" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_dbegin_options_003.png" />
+</div>
+<div class="section" id="option-in-a-pipeline">
+<h2><a class="toc-backref" href="#id2">Option in a pipeline</a><a class="headerlink" href="#option-in-a-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>In a pipeline, <a class="reference external" href="https://github.com/onnx/sklearn-onnx">sklearn-onnx</a> uses the same
+name convention.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;norm&#39;</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;clr&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
+<span class="p">])</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a></a><span class="p">)</span>
+
+<span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;clr__zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OnnxInference(...)
+    def compiled_run(dict_inputs):
+        # inputs
+        X = dict_inputs[&#39;X&#39;]
+        (variable, ) = n0_scaler(X)
+        (label, probability_tensor, ) = n1_linearclassifier(variable)
+        (probabilities, ) = n2_normalizer(probability_tensor)
+        return {
+            &#39;label&#39;: label,
+            &#39;probabilities&#39;: probabilities,
+        }
+</pre></div>
+</div>
+<p>Visually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="plot dbegin options" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_dbegin_options_004.png" />
+</div>
+<div class="section" id="option-raw-scores">
+<h2><a class="toc-backref" href="#id3">Option <em>raw_scores</em></a><a class="headerlink" href="#option-raw-scores" title="Permalink to this headline">¶</a></h2>
+<p>Every classifier is converted in a graph which
+returns probabilities by default. But many models
+compute unscaled <em>raw_scores</em>.
+First, with probabilities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;norm&#39;</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;clr&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
+<span class="p">])</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a></a><span class="p">)</span>
+
+<span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
+    <span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">pipe</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">)[:</span><span class="mi">5</span><span class="p">]}))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;label&#39;: array([0, 0, 0, 0, 0]), &#39;probabilities&#39;: array([[0.88268614, 0.10948392, 0.00782984],
+       [0.7944385 , 0.19728662, 0.00827491],
+       [0.85557765, 0.1379205 , 0.00650185],
+       [0.8262804 , 0.16634218, 0.00737738],
+       [0.9005015 , 0.092388  , 0.00711049]], dtype=float32)}
+</pre></div>
+</div>
+<p>Then with raw scores:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
+    <span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">pipe</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;raw_scores&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">)[:</span><span class="mi">5</span><span class="p">]}))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;label&#39;: array([0, 0, 0, 0, 0]), &#39;probabilities&#39;: array([[0.88268614, 0.10948392, 0.00782984],
+       [0.7944385 , 0.19728662, 0.00827491],
+       [0.85557765, 0.1379205 , 0.00650185],
+       [0.8262804 , 0.16634218, 0.00737738],
+       [0.9005015 , 0.092388  , 0.00711049]], dtype=float32)}
+</pre></div>
+</div>
+<p>It did not seem to work… We need to tell
+that applies on a specific part of the pipeline
+and not the whole pipeline.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
+    <span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span><span class="o">.</span><span class="n">steps</span></a></a><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]):</span> <span class="p">{</span><span class="s1">&#39;raw_scores&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">)[:</span><span class="mi">5</span><span class="p">]}))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;label&#39;: array([0, 0, 0, 0, 0]), &#39;probabilities&#39;: array([[ 2.2707398 ,  0.18354774, -2.4542873 ],
+       [ 1.9857951 ,  0.5928171 , -2.5786123 ],
+       [ 2.2349298 ,  0.4098304 , -2.6447601 ],
+       [ 2.1071343 ,  0.50424725, -2.6113815 ],
+       [ 2.3727787 ,  0.095824  , -2.4686024 ]], dtype=float32)}
+</pre></div>
+</div>
+<p>There are negative values. That works.
+Strings are still easier to use.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_def</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
+    <span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;clr__raw_scores&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;clr__zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+
+<span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">model_def</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s1">&#39;python_compiled&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><a href="https://numpy.org/doc/stable/reference/generated/numpy.generic.html#numpy.generic" title="numpy.generic" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a></a><span class="p">)[:</span><span class="mi">5</span><span class="p">]}))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;label&#39;: array([0, 0, 0, 0, 0]), &#39;probabilities&#39;: array([[ 2.2707398 ,  0.18354774, -2.4542873 ],
+       [ 1.9857951 ,  0.5928171 , -2.5786123 ],
+       [ 2.2349298 ,  0.4098304 , -2.6447601 ],
+       [ 2.1071343 ,  0.50424725, -2.6113815 ],
+       [ 2.3727787 ,  0.095824  , -2.4686024 ]], dtype=float32)}
+</pre></div>
+</div>
+<p>Negative figures. We still have raw scores.</p>
+</div>
+<div class="section" id="list-of-available-options">
+<h2><a class="toc-backref" href="#id4">List of available options</a><a class="headerlink" href="#list-of-available-options" title="Permalink to this headline">¶</a></h2>
+<p>Options are registered for every converted to detect any
+supported options while running the conversion.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_opts</span></a></a> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a></a><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_converter_pool</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opts</span></a></a> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_allowed_options</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opts</span></a></a><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a></a><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Sklearn&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1"> </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a></a><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="mi">30</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a></a><span class="p">)),</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opts</span></a></a><span class="p">))</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">o</span></a></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opts</span></a></a><span class="p">:</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_opts</span></a></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">o</span></a></a><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all options:&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/pprint.html#pprint.pformat" title="pprint.pformat" class="sphx-glr-backref-module-pprint sphx-glr-backref-type-py-function"><a href="https://docs.python.org/3/library/pprint.html#pprint.pformat" title="pprint.pformat" class="sphx-glr-backref-module-pprint sphx-glr-backref-type-py-function"><span class="n">pformat</span></a></a><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_opts</span></a></a><span class="p">))))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LightGbmLGBMClassifier         {&#39;nocl&#39;: [True, False], &#39;zipmap&#39;: [True, False]}
+AdaBoostClassifier             {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+BaggingClassifier              {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+BayesianGaussianMixture        {&#39;score_samples&#39;: [True, False]}
+BernoulliNB                    {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+CalibratedClassifierCV         {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+CategoricalNB                  {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+ComplementNB                   {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+CountVectorizer                {&#39;tokenexp&#39;: None, &#39;separators&#39;: None}
+DecisionTreeClassifier         {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;decision_path&#39;: [True, False]}
+DecisionTreeRegressor          {&#39;decision_path&#39;: [True, False]}
+ExtraTreeClassifier            {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;decision_path&#39;: [True, False]}
+ExtraTreeRegressor             {&#39;decision_path&#39;: [True, False]}
+ExtraTreesClassifier           {&#39;zipmap&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;decision_path&#39;: [True, False]}
+ExtraTreesRegressor            {&#39;decision_path&#39;: [True, False]}
+GaussianMixture                {&#39;score_samples&#39;: [True, False]}
+GaussianNB                     {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+GaussianProcessRegressor       {&#39;return_cov&#39;: [False, True], &#39;return_std&#39;: [False, True], &#39;optim&#39;: [None, &#39;cdist&#39;]}
+GradientBoostingClassifier     {&#39;zipmap&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+HistGradientBoostingClassifier {&#39;zipmap&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+HistGradientBoostingRegressor  {&#39;zipmap&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+KNNImputer                     {&#39;optim&#39;: [None, &#39;cdist&#39;]}
+KNeighborsClassifier           {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;optim&#39;: [None, &#39;cdist&#39;]}
+KNeighborsRegressor            {&#39;optim&#39;: [None, &#39;cdist&#39;]}
+KNeighborsTransformer          {&#39;optim&#39;: [None, &#39;cdist&#39;]}
+LinearClassifier               {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+LinearSVC                      {&#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+MLPClassifier                  {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+MaxAbsScaler                   {&#39;div&#39;: [&#39;std&#39;, &#39;div&#39;, &#39;div_cast&#39;]}
+MultinomialNB                  {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+NearestNeighbors               {&#39;optim&#39;: [None, &#39;cdist&#39;]}
+OneVsRestClassifier            {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+RadiusNeighborsClassifier      {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;optim&#39;: [None, &#39;cdist&#39;]}
+RadiusNeighborsRegressor       {&#39;optim&#39;: [None, &#39;cdist&#39;]}
+RandomForestClassifier         {&#39;zipmap&#39;: [True, False], &#39;raw_scores&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;decision_path&#39;: [True, False]}
+RandomForestRegressor          {&#39;decision_path&#39;: [True, False]}
+RobustScaler                   {&#39;div&#39;: [&#39;std&#39;, &#39;div&#39;, &#39;div_cast&#39;]}
+SGDClassifier                  {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+SVC                            {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+Scaler                         {&#39;div&#39;: [&#39;std&#39;, &#39;div&#39;, &#39;div_cast&#39;]}
+StackingClassifier             {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False], &#39;raw_scores&#39;: [True, False]}
+TfidfVectorizer                {&#39;tokenexp&#39;: None, &#39;separators&#39;: None}
+VotingClassifier               {&#39;zipmap&#39;: [True, False], &#39;nocl&#39;: [True, False]}
+XGBoostXGBClassifier           {&#39;nocl&#39;: [True, False], &#39;zipmap&#39;: [True, False]}
+all options: [&#39;decision_path&#39;,
+ &#39;div&#39;,
+ &#39;nocl&#39;,
+ &#39;optim&#39;,
+ &#39;raw_scores&#39;,
+ &#39;return_cov&#39;,
+ &#39;return_std&#39;,
+ &#39;score_samples&#39;,
+ &#39;separators&#39;,
+ &#39;tokenexp&#39;,
+ &#39;zipmap&#39;]
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.181 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-dbegin-options-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_dbegin_options.ipynb"><img alt="../_images/binder_badge_logo.svg" src="../_images/binder_badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/df9658e30a7503e053e8e21c98657d85/plot_dbegin_options.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dbegin_options.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8e8cf26a019bd3a2954fe2ccb430d818/plot_dbegin_options.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dbegin_options.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">One model, many possible conversions with options</a><ul>
+<li><a class="reference internal" href="#option-zipmap">Option <em>zipmap</em></a></li>
+<li><a class="reference internal" href="#option-in-a-pipeline">Option in a pipeline</a></li>
+<li><a class="reference internal" href="#option-raw-scores">Option <em>raw_scores</em></a></li>
+<li><a class="reference internal" href="#list-of-available-options">List of available options</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../index_tutorial.html">Tutorial</a><ul>
+  <li><a href="../tutorial_1_simple.html">The easy case</a><ul>
+      <li>Previous: <a href="plot_cbegin_opset.html" title="previous chapter">What is the opset number?</a></li>
+      <li>Next: <a href="plot_dbegin_options_list.html" title="next chapter">Black list operators when converting</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_tutorial/plot_dbegin_options.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+  </div>
+  
+  </body>
+</html>

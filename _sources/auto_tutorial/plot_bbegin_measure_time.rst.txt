@@ -1,0 +1,439 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_tutorial_plot_bbegin_measure_time.py:
+
+
+Benchmark ONNX conversion
+=========================
+
+.. index:: benchmark
+
+Example :ref:`l-simple-deploy-1` converts a simple model.
+This example takes a similar example but on random data
+and compares the processing time required by each option
+to compute predictions.
+
+.. contents::
+    :local:
+
+
+Training a pipeline
++++++++++++++++++++
+
+
+.. code-block:: default
+
+    import numpy
+    from pandas import DataFrame
+    from tqdm import tqdm
+    from sklearn import config_context
+    from sklearn.datasets import make_regression
+    from sklearn.ensemble import (
+        GradientBoostingRegressor, RandomForestRegressor,
+        VotingRegressor)
+    from sklearn.linear_model import LinearRegression
+    from sklearn.model_selection import train_test_split
+    from mlprodict.onnxrt import OnnxInference
+    from onnxruntime import InferenceSession
+    from skl2onnx import to_onnx
+    from skl2onnx.tutorial import measure_time
+
+
+    N = 11000
+    X, y = make_regression(N, n_features=10)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, train_size=0.01)
+    print("Train shape", X_train.shape)
+    print("Test shape", X_test.shape)
+
+    reg1 = GradientBoostingRegressor(random_state=1)
+    reg2 = RandomForestRegressor(random_state=1)
+    reg3 = LinearRegression()
+    ereg = VotingRegressor([('gb', reg1), ('rf', reg2), ('lr', reg3)])
+    ereg.fit(X_train, y_train)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Train shape (110, 10)
+    Test shape (10890, 10)
+
+    VotingRegressor(estimators=[('gb', GradientBoostingRegressor(random_state=1)),
+                                ('rf', RandomForestRegressor(random_state=1)),
+                                ('lr', LinearRegression())])
+
+
+
+Measure the processing time
++++++++++++++++++++++++++++
+
+We use function :func:`skl2onnx.tutorial.measure_time`.
+The page about `assume_finite <https://scikit-learn.org/
+stable/modules/generated/sklearn.config_context.html>`_
+may be useful if you need to optimize the prediction.
+We measure the processing time per observation whether
+or not an observation belongs to a batch or is a single one.
+
+
+.. code-block:: default
+
+
+    sizes = [(1, 50), (10, 50), (1000, 10), (10000, 5)]
+
+    with config_context(assume_finite=True):
+        obs = []
+        for batch_size, repeat in tqdm(sizes):
+            context = {"ereg": ereg, 'X': X_test[:batch_size]}
+            mt = measure_time(
+                "ereg.predict(X)", context, div_by_number=True,
+                number=10, repeat=repeat)
+            mt['size'] = context['X'].shape[0]
+            mt['mean_obs'] = mt['average'] / mt['size']
+            obs.append(mt)
+
+    df_skl = DataFrame(obs)
+    df_skl
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:04<00:12,  4.21s/it]     50%|#####     | 2/4 [00:08<00:08,  4.19s/it]     75%|#######5  | 3/4 [00:11<00:03,  3.84s/it]    100%|##########| 4/4 [00:15<00:00,  4.05s/it]    100%|##########| 4/4 [00:15<00:00,  3.98s/it]
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>average</th>
+          <th>deviation</th>
+          <th>min_exec</th>
+          <th>max_exec</th>
+          <th>repeat</th>
+          <th>number</th>
+          <th>size</th>
+          <th>mean_obs</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.008405</td>
+          <td>0.000238</td>
+          <td>0.008316</td>
+          <td>0.009575</td>
+          <td>50</td>
+          <td>10</td>
+          <td>1</td>
+          <td>0.008405</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.008324</td>
+          <td>0.000284</td>
+          <td>0.008227</td>
+          <td>0.009480</td>
+          <td>50</td>
+          <td>10</td>
+          <td>10</td>
+          <td>0.000832</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.030176</td>
+          <td>0.004913</td>
+          <td>0.021941</td>
+          <td>0.034865</td>
+          <td>10</td>
+          <td>10</td>
+          <td>1000</td>
+          <td>0.000030</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.090920</td>
+          <td>0.002840</td>
+          <td>0.087017</td>
+          <td>0.094217</td>
+          <td>5</td>
+          <td>10</td>
+          <td>10000</td>
+          <td>0.000009</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <br />
+    <br />
+
+Graphe.
+
+
+.. code-block:: default
+
+
+    df_skl.set_index('size')[['mean_obs']].plot(
+        title="scikit-learn", logx=True, logy=True)
+
+
+
+
+.. image:: /auto_tutorial/images/sphx_glr_plot_bbegin_measure_time_001.png
+    :alt: scikit-learn
+    :class: sphx-glr-single-img
+
+
+
+
+
+ONNX runtime
+++++++++++++
+
+The same is done with the two ONNX runtime
+available.
+
+
+.. code-block:: default
+
+
+    onx = to_onnx(ereg, X_train[:1].astype(numpy.float32))
+    sess = InferenceSession(onx.SerializeToString())
+    oinf = OnnxInference(onx, runtime="python_compiled")
+
+    obs = []
+    for batch_size, repeat in tqdm(sizes):
+
+        # scikit-learn
+        context = {"ereg": ereg, 'X': X_test[:batch_size].astype(numpy.float32)}
+        mt = measure_time(
+            "ereg.predict(X)", context, div_by_number=True,
+            number=10, repeat=repeat)
+        mt['size'] = context['X'].shape[0]
+        mt['skl'] = mt['average'] / mt['size']
+
+        # onnxruntime
+        context = {"sess": sess, 'X': X_test[:batch_size].astype(numpy.float32)}
+        mt2 = measure_time(
+            "sess.run(None, {'X': X})[0]", context, div_by_number=True,
+            number=10, repeat=repeat)
+        mt['ort'] = mt2['average'] / mt['size']
+
+        # mlprodict
+        context = {"oinf": oinf, 'X': X_test[:batch_size].astype(numpy.float32)}
+        mt2 = measure_time(
+            "oinf.run({'X': X})['variable']", context, div_by_number=True,
+            number=10, repeat=repeat)
+        mt['pyrt'] = mt2['average'] / mt['size']
+
+        # end
+        obs.append(mt)
+
+
+    df = DataFrame(obs)
+    df
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:04<00:13,  4.54s/it]     50%|#####     | 2/4 [00:08<00:09,  4.51s/it]     75%|#######5  | 3/4 [00:15<00:05,  5.15s/it]    100%|##########| 4/4 [00:27<00:00,  7.19s/it]    100%|##########| 4/4 [00:27<00:00,  6.90s/it]
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>average</th>
+          <th>deviation</th>
+          <th>min_exec</th>
+          <th>max_exec</th>
+          <th>repeat</th>
+          <th>number</th>
+          <th>size</th>
+          <th>skl</th>
+          <th>ort</th>
+          <th>pyrt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.008586</td>
+          <td>0.000175</td>
+          <td>0.008536</td>
+          <td>0.009801</td>
+          <td>50</td>
+          <td>10</td>
+          <td>1</td>
+          <td>0.008586</td>
+          <td>0.000037</td>
+          <td>0.000451</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.008548</td>
+          <td>0.000144</td>
+          <td>0.008395</td>
+          <td>0.009365</td>
+          <td>50</td>
+          <td>10</td>
+          <td>10</td>
+          <td>0.000855</td>
+          <td>0.000014</td>
+          <td>0.000019</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.033979</td>
+          <td>0.000518</td>
+          <td>0.033153</td>
+          <td>0.034990</td>
+          <td>10</td>
+          <td>10</td>
+          <td>1000</td>
+          <td>0.000034</td>
+          <td>0.000012</td>
+          <td>0.000021</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.092128</td>
+          <td>0.002898</td>
+          <td>0.088940</td>
+          <td>0.097156</td>
+          <td>5</td>
+          <td>10</td>
+          <td>10000</td>
+          <td>0.000009</td>
+          <td>0.000006</td>
+          <td>0.000009</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <br />
+    <br />
+
+Graph.
+
+
+.. code-block:: default
+
+
+    df.set_index('size')[['skl', 'ort', 'pyrt']].plot(
+        title="Average prediction time per runtime",
+        logx=True, logy=True)
+
+
+
+
+.. image:: /auto_tutorial/images/sphx_glr_plot_bbegin_measure_time_002.png
+    :alt: Average prediction time per runtime
+    :class: sphx-glr-single-img
+
+
+
+
+
+:epkg:`ONNX` runtimes are much faster than :epkg:`scikit-learn`
+to predict one observation. :epkg:`scikit-learn` is optimized
+for training, for batch prediction. That explains why
+:epkg:`scikit-learn` and ONNX runtimes seem to converge
+for big batches. They use similar implementation,
+parallelization and languages (:epkg:`C++`, :epkg:`openmp`).
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  45.604 seconds)
+
+
+.. _sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+  .. container:: binder-badge
+
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_bbegin_measure_time.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_bbegin_measure_time.py <plot_bbegin_measure_time.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_bbegin_measure_time.ipynb <plot_bbegin_measure_time.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

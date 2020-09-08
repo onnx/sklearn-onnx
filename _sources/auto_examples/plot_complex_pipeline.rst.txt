@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_complex_pipeline.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_complex_pipeline.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_complex_pipeline.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_complex_pipeline.py:
 
 
 .. _example-complex-pipeline:
@@ -37,19 +39,18 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
+
 .. code-block:: default
 
-    import skl2onnx
-    import onnxruntime
+    import pprint
+    import os
     import onnx
     import sklearn
     import matplotlib.pyplot as plt
-    import os
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import numpy
     import onnxruntime as rt
-    from skl2onnx import convert_sklearn
-    import pprint
+    from skl2onnx import convert_sklearn, __version__
     from skl2onnx.common.data_types import FloatTensorType, StringTensorType
     from skl2onnx.common.data_types import Int64TensorType
     import pandas as pd
@@ -102,6 +103,27 @@ and must be removed. Look for comment starting with ``---`` below.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Pipeline(steps=[('preprocessor',
+                     ColumnTransformer(transformers=[('num',
+                                                      Pipeline(steps=[('imputer',
+                                                                       SimpleImputer(strategy='median')),
+                                                                      ('scaler',
+                                                                       StandardScaler())]),
+                                                      ['age', 'fare']),
+                                                     ('cat',
+                                                      Pipeline(steps=[('onehot',
+                                                                       OneHotEncoder(handle_unknown='ignore'))]),
+                                                      ['embarked', 'sex',
+                                                       'pclass'])])),
+                    ('classifier', LogisticRegression())])
+
 
 
 Define the inputs of the ONNX graph
@@ -140,6 +162,8 @@ We simply reuse the dataframe column definition.
     body         float64
     home.dest     object
     dtype: object
+
+
 
 
 After conversion.
@@ -193,6 +217,8 @@ After conversion.
      ('home.dest', StringTensorType(shape=[None, 1]))]
 
 
+
+
 Merging single column into vectors is not
 the most efficient way to compute the prediction.
 It could be done before converting the pipeline into a graph.
@@ -205,7 +231,7 @@ Convert the pipeline into ONNX
 
 
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+        convert_sklearn(clf, 'pipeline_titanic', inputs, target_opset=12)
     except Exception as e:
         print(e)
 
@@ -219,10 +245,9 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Columns must have the same type. C++ backends do not support mixed types. Inputs:
-    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[None, 1]))
+    Isolated variables exist: {'parch', 'boat', 'sibsp', 'cabin', 'ticket', 'home_dest', 'body', 'name'}
+
+
 
 
 Predictions are more efficient if the graph is small.
@@ -237,7 +262,8 @@ They need to be removed from the graph inputs.
                'name', 'body', 'home.dest', 'boat'}
     inputs = convert_dataframe_schema(X_train, to_drop)
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+        model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                                     target_opset=12)
     except Exception as e:
         print(e)
 
@@ -245,16 +271,7 @@ They need to be removed from the graph inputs.
 
 
 
-.. rst-class:: sphx-glr-script-out
 
- Out:
-
- .. code-block:: none
-
-    Columns must have the same type. C++ backends do not support mixed types. Inputs:
-    Variable(raw_name='embarked', onnx_name='embarked', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='sex', onnx_name='sex', type=StringTensorType(shape=[None, 1]))
-    Variable(raw_name='pclass', onnx_name='pclass', type=Int64TensorType(shape=[None, 1]))
 
 
 *scikit-learn* does implicit conversions when it can.
@@ -269,7 +286,8 @@ must be applied on columns of the same type.
     X_test['pclass'] = X_test['pclass'].astype(str)
     inputs = convert_dataframe_schema(X_train, to_drop)
 
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs)
+    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+                                 target_opset=12)
 
 
     # And save.
@@ -278,6 +296,26 @@ must be applied on columns of the same type.
 
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:157: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      X_train['pclass'] = X_train['pclass'].astype(str)
+    /home/dupre/github_xadupre/sklearn-onnx/docs/examples/plot_complex_pipeline.py:158: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      X_test['pclass'] = X_test['pclass'].astype(str)
 
 
 
@@ -306,8 +344,10 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 1 0 1 0]
-    predict_proba [[0.86980035 0.13019965]]
+    predict [0 0 1 0 0]
+    predict_proba [[0.65654207 0.34345793]]
+
+
 
 
 Predictions with onnxruntime.
@@ -337,6 +377,7 @@ with the *reshape*.
 
 
 
+
 We are ready to run *onnxruntime*.
 
 
@@ -358,8 +399,10 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 1 0 1 0]
-    predict_proba [{0: 0.8698002696037292, 1: 0.13019973039627075}]
+    predict [1 0 1 0 0]
+    predict_proba [{0: 0.4371914267539978, 1: 0.5628085732460022}]
+
+
 
 
 .. _l-plot-complex-pipeline-graph:
@@ -392,8 +435,18 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_complex_pipeline_001.png
+    :alt: plot complex pipeline
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    (-0.5, 5708.5, 7574.5, -0.5)
 
 
 
@@ -406,8 +459,8 @@ Finally, let's see the graph converted with *sklearn-onnx*.
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
     print("onnx: ", onnx.__version__)
-    print("onnxruntime: ", onnxruntime.__version__)
-    print("skl2onnx: ", skl2onnx.__version__)
+    print("onnxruntime: ", rt.__version__)
+    print("skl2onnx: ", __version__)
 
 
 
@@ -418,17 +471,19 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.17.0
-    scikit-learn: 0.22.dev0
-    onnx:  1.6.32
-    onnxruntime:  1.0.991
-    skl2onnx:  1.5.2
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.042 seconds)
+   **Total running time of the script:** ( 0 minutes  7.743 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:
@@ -440,14 +495,20 @@ Finally, let's see the graph converted with *sklearn-onnx*.
     :class: sphx-glr-footer-example
 
 
+  .. container:: binder-badge
 
-  .. container:: sphx-glr-download
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_complex_pipeline.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_complex_pipeline.py <plot_complex_pipeline.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_complex_pipeline.ipynb <plot_complex_pipeline.ipynb>`
 
@@ -456,4 +517,4 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

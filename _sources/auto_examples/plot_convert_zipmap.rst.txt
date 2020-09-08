@@ -1,0 +1,250 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_convert_zipmap.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_convert_zipmap.py:
+
+
+.. _l-rf-example-zipmap:
+
+Probabilities as a vector or as a ZipMap
+========================================
+
+A classifier usually returns a matrix of probabilities.
+By default, *sklearn-onnx* converts that matrix
+into a list of dictionaries where each probabilies is mapped
+to its class id or name. That mechanism retains the class names.
+This conversion increases the prediction time and is not
+always needed. Let's see how to deactivate this behaviour
+on the Iris example.
+
+.. contents::
+    :local:
+
+Train a model and convert it
+++++++++++++++++++++++++++++
+
+
+.. code-block:: default
+
+    from timeit import repeat
+    import numpy
+    import sklearn
+    from sklearn.datasets import load_iris
+    from sklearn.model_selection import train_test_split
+    import onnxruntime as rt
+    import onnx
+    from skl2onnx.common.data_types import FloatTensorType
+    from skl2onnx import convert_sklearn, __version__
+    from sklearn.linear_model import LogisticRegression
+
+    iris = load_iris()
+    X, y = iris.data, iris.target
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+    clr = LogisticRegression(max_iter=500)
+    clr.fit(X_train, y_train)
+    print(clr)
+
+    initial_type = [('float_input', FloatTensorType([None, 4]))]
+    onx = convert_sklearn(clr, initial_types=initial_type,
+                          target_opset=12)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    LogisticRegression(max_iter=500)
+
+
+
+
+Output type
++++++++++++
+
+Let's confirm the output type of the probabilities
+is a list of dictionaries with onnxruntime.
+
+
+.. code-block:: default
+
+
+    sess = rt.InferenceSession(onx.SerializeToString())
+    res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
+    print(res[1][:2])
+    print("probabilities type:", type(res[1]))
+    print("type for the first observations:", type(res[1][0]))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [{0: 0.003932362422347069, 1: 0.831932783126831, 2: 0.1641348898410797}, {0: 0.012753540650010109, 1: 0.6854870319366455, 2: 0.3017594516277313}]
+    probabilities type: <class 'list'>
+    type for the first observations: <class 'dict'>
+
+
+
+
+Without ZipMap
+++++++++++++++
+
+Let's remove the ZipMap operator.
+
+
+.. code-block:: default
+
+
+    initial_type = [('float_input', FloatTensorType([None, 4]))]
+    options = {id(clr): {'zipmap': False}}
+    onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
+                           target_opset=12)
+
+    sess2 = rt.InferenceSession(onx2.SerializeToString())
+    res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
+    print(res2[1][:2])
+    print("probabilities type:", type(res2[1]))
+    print("type for the first observations:", type(res2[1][0]))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[0.00393236 0.8319328  0.16413489]
+     [0.01275354 0.68548703 0.30175945]]
+    probabilities type: <class 'numpy.ndarray'>
+    type for the first observations: <class 'numpy.ndarray'>
+
+
+
+
+Let's compare prediction time
++++++++++++++++++++++++++++++
+
+
+.. code-block:: default
+
+
+    X32 = X_test.astype(numpy.float32)
+
+    print("Time with ZipMap:")
+    print(repeat(lambda: sess.run(None, {'float_input': X32}),
+                 number=100, repeat=3))
+
+    print("Time without ZipMap:")
+    print(repeat(lambda: sess2.run(None, {'float_input': X32}),
+                 number=100, repeat=3))
+
+    # The prediction is much faster on this example.
+    # The optimisation is even faster when the classes
+    # are described with strings and not integers
+    # as the final result (list of dictionaries) may copy
+    # many times the same information with onnxruntime.
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Time with ZipMap:
+    [0.00354093499481678, 0.0034662168473005295, 0.0034918910823762417]
+    Time without ZipMap:
+    [0.0018417290411889553, 0.0017822920344769955, 0.0018146331422030926]
+
+
+
+
+**Versions used for this example**
+
+
+.. code-block:: default
+
+
+    print("numpy:", numpy.__version__)
+    print("scikit-learn:", sklearn.__version__)
+    print("onnx: ", onnx.__version__)
+    print("onnxruntime: ", rt.__version__)
+    print("skl2onnx: ", __version__)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.058 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_convert_zipmap.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+  .. container:: binder-badge
+
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_convert_zipmap.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_convert_zipmap.py <plot_convert_zipmap.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_convert_zipmap.ipynb <plot_convert_zipmap.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

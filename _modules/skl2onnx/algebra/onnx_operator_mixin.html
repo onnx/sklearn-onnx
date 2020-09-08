@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>skl2onnx.algebra.onnx_operator_mixin &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skl2onnx.algebra.onnx_operator_mixin &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -29,9 +32,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">skl2onnx.algebra.onnx_operator_mixin</a></li> 
       </ul>
     </div>  
 
@@ -46,14 +50,13 @@
 <span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
 <span class="c1"># license information.</span>
 <span class="c1"># --------------------------------------------------------------------------</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="k">import</span> <span class="n">shape_inference</span>
-<span class="kn">from</span> <span class="nn">..common._registration</span> <span class="k">import</span> <span class="n">get_converter</span><span class="p">,</span> <span class="n">get_shape_calculator</span>
-<span class="kn">from</span> <span class="nn">..common._topology</span> <span class="k">import</span> <span class="n">Variable</span>
-<span class="kn">from</span> <span class="nn">.._supported_operators</span> <span class="k">import</span> <span class="n">sklearn_operator_name_map</span>
-<span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="k">import</span> <span class="n">OnnxOperator</span>
-<span class="kn">from</span> <span class="nn">.type_helper</span> <span class="k">import</span> <span class="n">guess_initial_types</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">shape_inference</span>
+<span class="kn">from</span> <span class="nn">..common._registration</span> <span class="kn">import</span> <span class="n">get_converter</span><span class="p">,</span> <span class="n">get_shape_calculator</span>
+<span class="kn">from</span> <span class="nn">..common._topology</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">.._supported_operators</span> <span class="kn">import</span> <span class="n">sklearn_operator_name_map</span>
+<span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="kn">import</span> <span class="n">OnnxOperator</span>
+<span class="kn">from</span> <span class="nn">.type_helper</span> <span class="kn">import</span> <span class="n">guess_initial_types</span>
 
 
 <span class="k">class</span> <span class="nc">OnnxOperatorMixin</span><span class="p">:</span>
@@ -62,7 +65,9 @@
 <span class="sd">    sharing an API to convert object to *ONNX*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">to_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the model in *ONNX* format.</span>
 <span class="sd">        It calls method *_to_onnx* which must be</span>
@@ -72,17 +77,33 @@
 <span class="sd">            it is used to guess the type of the input data.</span>
 <span class="sd">        :param name: name of the model, if None,</span>
 <span class="sd">            it is replaced by the the class name.</span>
-<span class="sd">        :param dtype: defines the type of floats to use</span>
-<span class="sd">            during the conversion</span>
+<span class="sd">        :param options: specific options given to converters</span>
+<span class="sd">            (see :ref:`l-conv-options`)</span>
+<span class="sd">        :param white_op: white list of ONNX nodes allowed</span>
+<span class="sd">            while converting a pipeline, if empty, all are allowed</span>
+<span class="sd">        :param black_op: black list of ONNX nodes allowed</span>
+<span class="sd">            while converting a pipeline, if empty, none are blacklisted</span>
+<span class="sd">        :param final_types: a python list. Works the same way as initial_types</span>
+<span class="sd">            but not mandatory, it is used to overwrites the type</span>
+<span class="sd">            (if type is not None) and the name of every output.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">convert_sklearn</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">initial_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_initial_types</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">initial_types</span> <span class="o">=</span> <span class="n">guess_initial_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Attribute &#39;op_version&#39; is missing for &#39;</span><span class="si">{}</span><span class="s2">&#39; &quot;</span>
+                <span class="s2">&quot;(model: &#39;</span><span class="si">{}</span><span class="s2">&#39;).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">convert_sklearn</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
+            <span class="n">target_opset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">op_version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span>
+            <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">infer_initial_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -117,7 +138,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">onnx_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">onnx_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a parser for this model.</span>
 <span class="sd">        If not overloaded, it fetches the parser</span>
@@ -162,6 +183,11 @@
 <span class="sd">        mapped to the first *scikit-learn* parent</span>
 <span class="sd">        it can find.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Class &#39;</span><span class="si">{}</span><span class="s2">&#39; should have an attribute &#39;op_version&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
         <span class="n">inputs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;parsed_inputs_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
@@ -175,7 +201,8 @@
             <span class="k">return</span> <span class="n">get_shape_calculator</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">shape_calculator</span><span class="p">(</span><span class="n">operator</span><span class="p">):</span>
-            <span class="n">onx</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
+            <span class="n">onx</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">to_onnx</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
+                             <span class="n">target_opset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">op_version</span><span class="p">)</span>
             <span class="n">inferred_model</span> <span class="o">=</span> <span class="n">shape_inference</span><span class="o">.</span><span class="n">infer_shapes</span><span class="p">(</span><span class="n">onx</span><span class="p">)</span>
             <span class="n">shapes</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_pb</span><span class="p">(</span><span class="n">inferred_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">value_info</span><span class="p">)</span>
             <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">shape</span><span class="o">.</span><span class="n">onnx_name</span><span class="p">:</span> <span class="n">shape</span> <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">}</span>
@@ -214,6 +241,7 @@
         <span class="k">return</span> <span class="n">converter</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -239,14 +267,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

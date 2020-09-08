@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_custom_model.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_custom_model.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_custom_model.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_custom_model.py:
 
 
 .. _l-custom-model:
@@ -49,31 +51,28 @@ And to predict on a test set:
 * k nearest neightbours, :math:`f(X') \rightarrow X'_3`
 * final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
 
+
 .. code-block:: default
 
-
-    import skl2onnx
-    import onnxruntime
-    import onnx
-    import sklearn
-    from skl2onnx import update_registered_converter
+    import inspect
     import os
+    import numpy
+    import onnx
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import onnxruntime as rt
-    from skl2onnx import convert_sklearn
-    from skl2onnx._parse import _get_sklearn_operator_name
-    from skl2onnx.common._registration import get_shape_calculator
-    from skl2onnx.common.data_types import FloatTensorType
     from matplotlib import offsetbox
     import matplotlib.pyplot as plt
     from sklearn.model_selection import train_test_split
-    from sklearn import datasets
-    import numpy
-    import inspect
+    from sklearn import datasets, __version__ as skl_version
     from sklearn.base import BaseEstimator, TransformerMixin, clone
     from sklearn.manifold import TSNE
     from sklearn.metrics import mean_squared_error
     from sklearn.neighbors import KNeighborsRegressor
+    from skl2onnx import update_registered_converter
+    import skl2onnx
+    from skl2onnx import convert_sklearn, get_model_alias
+    from skl2onnx.common._registration import get_shape_calculator
+    from skl2onnx.common.data_types import FloatTensorType
 
 
     class PredictableTSNE(BaseEstimator, TransformerMixin):
@@ -223,6 +222,7 @@ And to predict on a test set:
 
 
 
+
 Experimentation on MNIST
 ++++++++++++++++++++++++
 
@@ -284,8 +284,19 @@ Let's fit t-SNE...
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_custom_model_001.png
+    :alt: t-SNE embedding of the digits
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    array([<AxesSubplot:title={'center':'t-SNE embedding of the digits'}>,
+           <AxesSubplot:>], dtype=object)
 
 
 
@@ -310,8 +321,19 @@ Just to check it is working.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_custom_model_002.png
+    :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    array([<AxesSubplot:title={'center':'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
+           <AxesSubplot:>], dtype=object)
 
 
 
@@ -331,8 +353,19 @@ We check on test set.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_custom_model_003.png
+    :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    array([<AxesSubplot:title={'center':'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
+           <AxesSubplot:>], dtype=object)
 
 
 
@@ -369,6 +402,7 @@ conversion of the model.
 
 
 
+
 Then the converter model. We
 reuse existing converter.
 
@@ -390,9 +424,9 @@ reuse existing converter.
 
         # First step is the k nearest-neighbours,
         # we reuse existing converter and declare it as local
-        # operator
+        # operator.
         model = op.estimator_
-        alias = _get_sklearn_operator_name(type(model))
+        alias = get_model_alias(type(model))
         knn_op = scope.declare_local_operator(alias, model)
         knn_op.inputs = operator.inputs
 
@@ -410,14 +444,15 @@ reuse existing converter.
         # The parameter follows the specifications of ONNX
         # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
         attrs = dict(name=name,
-                     scale=op.inv_std_.ravel().astype(float),
-                     offset=op.mean_.ravel().astype(float))
+                     scale=op.inv_std_.ravel().astype(numpy.float32),
+                     offset=op.mean_.ravel().astype(numpy.float32))
 
         # Let's finally add the scaler which connects the output
         # of the k-nearest neighbours model to output of the whole model
         # declared in ONNX graph
         container.add_node('Scaler', [knn_output.onnx_name], [output.full_name],
                            op_domain='ai.onnx.ml', **attrs)
+
 
 
 
@@ -442,6 +477,7 @@ We now need to declare the new converter.
 
 
 
+
 Conversion to ONNX
 ++++++++++++++++++
 
@@ -454,11 +490,13 @@ to convert.
 
     model_onnx = convert_sklearn(
         ptsne_knn, 'predictable_tsne',
-        [('input', FloatTensorType([None, X_test.shape[1]]))])
+        [('input', FloatTensorType([None, X_test.shape[1]]))],
+        target_opset=12)
 
     # And save.
     with open("predictable_tsne.onnx", "wb") as f:
         f.write(model_onnx.SerializeToString())
+
 
 
 
@@ -485,8 +523,10 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[-0.70585287  0.35271505]
-     [ 1.1791929   0.4950012 ]]
+     [[-0.8526263   1.4315    ]
+     [-0.28031436  1.7568095 ]]
+
+
 
 
 Predictions with onnxruntime.
@@ -510,7 +550,9 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[-0.70585287  0.35271505]]
+    transform [[-0.8526263  1.4315   ]]
+
+
 
 
 The converter for the nearest neighbours produces an ONNX graph
@@ -534,7 +576,9 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[1.1791929 0.4950012]]
+    transform [[-0.28031436  1.7568095 ]]
+
+
 
 
 Display the ONNX graph
@@ -561,8 +605,18 @@ Display the ONNX graph
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_custom_model_004.png
+    :alt: plot custom model
     :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    (-0.5, 2026.5, 8337.5, -0.5)
 
 
 
@@ -573,9 +627,9 @@ Display the ONNX graph
 
 
     print("numpy:", numpy.__version__)
-    print("scikit-learn:", sklearn.__version__)
+    print("scikit-learn:", skl_version)
     print("onnx: ", onnx.__version__)
-    print("onnxruntime: ", onnxruntime.__version__)
+    print("onnxruntime: ", rt.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
 
 
@@ -587,17 +641,19 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.17.0
-    scikit-learn: 0.22.dev0
-    onnx:  1.6.32
-    onnxruntime:  1.0.991
-    skl2onnx:  1.5.2
+    numpy: 1.19.1
+    scikit-learn: 0.23.2
+    onnx:  1.7.0
+    onnxruntime:  1.4.0
+    skl2onnx:  1.7.1
+
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  14.353 seconds)
+   **Total running time of the script:** ( 0 minutes  10.797 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:
@@ -609,14 +665,20 @@ Display the ONNX graph
     :class: sphx-glr-footer-example
 
 
+  .. container:: binder-badge
 
-  .. container:: sphx-glr-download
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_examples/plot_custom_model.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_custom_model.py <plot_custom_model.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_custom_model.ipynb <plot_custom_model.ipynb>`
 
@@ -625,4 +687,4 @@ Display the ONNX graph
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

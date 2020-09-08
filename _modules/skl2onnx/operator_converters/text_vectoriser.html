@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>skl2onnx.operator_converters.text_vectoriser &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skl2onnx.operator_converters.text_vectoriser &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -29,9 +32,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">skl2onnx.operator_converters.text_vectoriser</a></li> 
       </ul>
     </div>  
 
@@ -48,9 +52,11 @@
 <span class="c1"># --------------------------------------------------------------------------</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">..common._apply_operation</span> <span class="k">import</span> <span class="n">apply_cast</span><span class="p">,</span> <span class="n">apply_reshape</span>
-<span class="kn">from</span> <span class="nn">..common._registration</span> <span class="k">import</span> <span class="n">register_converter</span>
-<span class="kn">from</span> <span class="nn">..proto</span> <span class="k">import</span> <span class="n">onnx_proto</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..common._apply_operation</span> <span class="kn">import</span> <span class="n">apply_cast</span><span class="p">,</span> <span class="n">apply_reshape</span>
+<span class="kn">from</span> <span class="nn">..common._registration</span> <span class="kn">import</span> <span class="n">register_converter</span>
+<span class="kn">from</span> <span class="nn">..common.data_types</span> <span class="kn">import</span> <span class="n">guess_proto_type</span>
+<span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="n">onnx_proto</span>
 
 
 <span class="k">def</span> <span class="nf">_intelligent_split</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
@@ -163,7 +169,7 @@
 <span class="sd">    `onnxruntime &lt;https://github.com/Microsoft/onnxruntime&gt;`_ uses</span>
 <span class="sd">    `re2 &lt;https://github.com/google/re2&gt;`_. You may need to switch</span>
 <span class="sd">    to a custom tokenizer based on</span>
-<span class="sd">    `python wrapper for re2 &lt;https://pypi.org/project/re2/&gt;_`</span>
+<span class="sd">    `python wrapper for re2 &lt;https://pypi.org/project/re2/&gt;`_</span>
 <span class="sd">    or its sources `pyre2 &lt;https://github.com/facebook/pyre2&gt;`_</span>
 <span class="sd">    (`syntax &lt;https://github.com/google/re2/blob/master/doc/syntax.txt&gt;`_).</span>
 <span class="sd">    If the regular expression is not specified and if</span>
@@ -182,15 +188,27 @@
 <span class="sd">    ````</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># noqa</span>
-
     <span class="n">op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">target_opset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Converter for &#39;</span><span class="si">{}</span><span class="s2">&#39; only works for opset &gt;= 9.&quot;</span>
+            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">==</span> <span class="s2">&quot;char_wb&quot;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;CountVectorizer cannot be converted, &quot;</span>
-            <span class="s2">&quot;only tokenizer=&#39;word&#39; is supported. &quot;</span>
+            <span class="s2">&quot;only tokenizer=&#39;word&#39; is fully supported. &quot;</span>
             <span class="s2">&quot;You may raise an issue at &quot;</span>
             <span class="s2">&quot;https://github.com/onnx/sklearn-onnx/issues.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">==</span> <span class="s2">&quot;char&quot;</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The conversion of CountVectorizer may not work. &quot;</span>
+            <span class="s2">&quot;only tokenizer=&#39;word&#39; is fully supported. &quot;</span>
+            <span class="s2">&quot;You may raise an issue at &quot;</span>
+            <span class="s2">&quot;https://github.com/onnx/sklearn-onnx/issues.&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">strip_accents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;CountVectorizer cannot be converted, &quot;</span>
@@ -211,8 +229,7 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Converter for TfidfVectorizer will use &quot;</span>
                           <span class="s2">&quot;scikit-learn regular expression by default &quot;</span>
                           <span class="s2">&quot;in version 1.6.&quot;</span><span class="p">,</span>
-                          <span class="ne">DeprecationWarning</span><span class="p">)</span>
-            <span class="n">default_separators</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">?&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">!&#39;</span><span class="p">]</span>
+                          <span class="ne">UserWarning</span><span class="p">)</span>
             <span class="n">regex</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">token_pattern</span>
             <span class="k">if</span> <span class="n">regex</span> <span class="o">==</span> <span class="n">default_pattern</span><span class="p">:</span>
                 <span class="n">regex</span> <span class="o">=</span> <span class="s1">&#39;[a-zA-Z0-9_]+&#39;</span>
@@ -251,8 +268,10 @@
             <span class="s2">&quot;You may raise an issue at &quot;</span>
             <span class="s2">&quot;https://github.com/onnx/sklearn-onnx/issues.&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">lowercase</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">stop_words_</span><span class="p">:</span>
+    <span class="n">stop_words</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">stop_words_</span> <span class="o">|</span> <span class="p">(</span>
+        <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">stop_words</span><span class="p">)</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">stop_words</span> <span class="k">else</span> <span class="nb">set</span><span class="p">())</span>
 
+    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">lowercase</span> <span class="ow">or</span> <span class="n">stop_words</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Only one input is allowed, found </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span><span class="p">))</span>
@@ -280,10 +299,11 @@
             <span class="n">op_version</span> <span class="o">=</span> <span class="mi">9</span>
             <span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;com.microsoft&#39;</span>
 
-        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">stop_words_</span><span class="p">:</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;stopwords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">stop_words_</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">stop_words</span><span class="p">:</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;stopwords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stop_words</span><span class="p">))</span>
+        <span class="n">opvs</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;com.microsoft&#39;</span> <span class="k">else</span> <span class="n">op_version</span>
         <span class="n">container</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">flatten</span><span class="p">,</span>
-                           <span class="n">normalized</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                           <span class="n">normalized</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opvs</span><span class="p">,</span>
                            <span class="n">op_domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">normalized</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">input_full_names</span>
@@ -362,19 +382,33 @@
         <span class="s1">&#39;pool_strings&#39;</span><span class="p">:</span> <span class="n">words</span><span class="p">,</span>
         <span class="s1">&#39;ngram_indexes&#39;</span><span class="p">:</span> <span class="n">key_indices</span><span class="p">,</span>
         <span class="s1">&#39;ngram_counts&#39;</span><span class="p">:</span> <span class="n">ngcounts</span><span class="p">,</span>
-        <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">weights</span><span class="p">,</span>
+        <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">weights</span><span class="p">)),</span>
     <span class="p">})</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
               <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">binary</span> <span class="k">else</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">)</span>
 
+    <span class="n">proto_dtype</span> <span class="o">=</span> <span class="n">guess_proto_type</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">proto_dtype</span> <span class="o">!=</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">:</span>
+        <span class="n">proto_dtype</span> <span class="o">=</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span>
+
+    <span class="k">if</span> <span class="n">proto_dtype</span> <span class="o">==</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">:</span>
+        <span class="n">output_tf</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="s1">&#39;cast_result&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output_tf</span> <span class="o">=</span> <span class="n">output</span>
+
     <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
         <span class="n">op_type</span> <span class="o">=</span> <span class="s1">&#39;Ngram&#39;</span>
-        <span class="n">container</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">tokenized</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">tokenized</span><span class="p">,</span> <span class="n">output_tf</span><span class="p">,</span>
                            <span class="n">op_domain</span><span class="o">=</span><span class="s1">&#39;com.microsoft&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">op_type</span> <span class="o">=</span> <span class="s1">&#39;TfIdfVectorizer&#39;</span>
-        <span class="n">container</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">tokenized</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">op_domain</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">tokenized</span><span class="p">,</span> <span class="n">output_tf</span><span class="p">,</span> <span class="n">op_domain</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                            <span class="n">op_version</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">proto_dtype</span> <span class="o">==</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">:</span>
+        <span class="n">apply_cast</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">output_tf</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span>
+                   <span class="n">container</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">proto_dtype</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">binary</span><span class="p">:</span>
         <span class="n">cast_result_name</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="s1">&#39;cast_result&#39;</span><span class="p">)</span>
 
@@ -384,9 +418,11 @@
                    <span class="n">container</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">onnx_proto</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span></div>
 
 
-<span class="n">register_converter</span><span class="p">(</span><span class="s1">&#39;SklearnCountVectorizer&#39;</span><span class="p">,</span> <span class="n">convert_sklearn_text_vectorizer</span><span class="p">)</span>
+<span class="n">register_converter</span><span class="p">(</span><span class="s1">&#39;SklearnCountVectorizer&#39;</span><span class="p">,</span> <span class="n">convert_sklearn_text_vectorizer</span><span class="p">,</span>
+                   <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;tokenexp&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -412,14 +448,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extend ONNX, extend runtime &#8212; sklearn-onnx 1.7.1 documentation</title>
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Fast design with a python runtime" href="auto_tutorial/plot_pextend_python_runtime.html" />
+    <link rel="prev" title="Change the number of outputs by adding a parser" href="auto_tutorial/plot_mcustom_parser.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="auto_tutorial/plot_pextend_python_runtime.html" title="Fast design with a python runtime"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="auto_tutorial/plot_mcustom_parser.html" title="Change the number of outputs by adding a parser"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index_tutorial.html" accesskey="U">Tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Extend ONNX, extend runtime</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="extend-onnx-extend-runtime">
+<h1>Extend ONNX, extend runtime<a class="headerlink" href="#extend-onnx-extend-runtime" title="Permalink to this headline">¶</a></h1>
+<p>Existing converters assume it is possible to convert
+a model with the current list of <a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators.md">ONNX operators</a>.
+This list is growing at every version but it may happen
+a new node is needed. It could be added to ONNX specifications,
+it requires a new release, but that’s not mandatory.
+New nodes can easily be created by using a different domain.
+A domain defines a set of operators, there are currently two
+officially supported domains: <a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators.md">ONNX operators</a> and
+<a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md">ONNX ML Operators</a>. Custom domains can be used.
+Once this new node is defined, a converter can use it.
+That leaves the last issue: the runtime must be aware
+of the implementation attached to this new node.
+That’s the difficult part.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_pextend_python_runtime.html">Fast design with a python runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_qextend_onnxruntime.html">Fast runtime with onnxruntime</a></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_main.png" alt="Logo"/>
+            </a></p><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+  <li><a href="index_tutorial.html">Tutorial</a><ul>
+      <li>Previous: <a href="auto_tutorial/plot_mcustom_parser.html" title="previous chapter">Change the number of outputs by adding a parser</a></li>
+      <li>Next: <a href="auto_tutorial/plot_pextend_python_runtime.html" title="next chapter">Fast design with a python runtime</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tutorial_3_new_operator.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+  </div>
+  
+  </body>
+</html>

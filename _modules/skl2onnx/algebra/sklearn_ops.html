@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>skl2onnx.algebra.sklearn_ops &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skl2onnx.algebra.sklearn_ops &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -29,9 +32,10 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">skl2onnx.algebra.sklearn_ops</a></li> 
       </ul>
     </div>  
 
@@ -46,17 +50,17 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="k">import</span> <span class="n">ColumnTransformer</span>
+    <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># ColumnTransformer was introduced in 0.20.</span>
     <span class="n">ColumnTransformer</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="kn">from</span> <span class="nn">.onnx_subgraph_operator_mixin</span> <span class="k">import</span> <span class="n">OnnxSubGraphOperatorMixin</span>
+<span class="kn">from</span> <span class="nn">.onnx_subgraph_operator_mixin</span> <span class="kn">import</span> <span class="n">OnnxSubGraphOperatorMixin</span>
 
 
-<span class="k">def</span> <span class="nf">ClassFactorySklearn</span><span class="p">(</span><span class="n">skl_obj</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">shape_calc</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">.onnx_subgraph_operator_mixin</span> <span class="k">import</span> <span class="n">OnnxSubGraphOperatorMixin</span>
+<span class="k">def</span> <span class="nf">ClassFactorySklearn</span><span class="p">(</span><span class="n">skl_obj</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">shape_calc</span><span class="p">,</span> <span class="n">alias</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">.onnx_subgraph_operator_mixin</span> <span class="kn">import</span> <span class="n">OnnxSubGraphOperatorMixin</span>
 
     <span class="n">newclass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="p">(</span><span class="n">OnnxSubGraphOperatorMixin</span><span class="p">,</span> <span class="n">skl_obj</span><span class="p">),</span>
                     <span class="p">{</span><span class="s1">&#39;__doc__&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="p">,</span>
@@ -64,7 +68,9 @@
                      <span class="s1">&#39;_fct_converter&#39;</span><span class="p">:</span> <span class="n">conv</span><span class="p">,</span>
                      <span class="s1">&#39;_fct_shape_calc&#39;</span><span class="p">:</span> <span class="n">shape_calc</span><span class="p">,</span>
                      <span class="s1">&#39;input_range&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">],</span>
-                     <span class="s1">&#39;output_range&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">]})</span>
+                     <span class="s1">&#39;output_range&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">],</span>
+                     <span class="s1">&#39;op_version&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="s1">&#39;alias&#39;</span><span class="p">:</span> <span class="n">alias</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">newclass</span>
 
 
@@ -72,8 +78,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Automatically generates classes for each of the converter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">..common._registration</span> <span class="k">import</span> <span class="n">_shape_calculator_pool</span><span class="p">,</span> <span class="n">_converter_pool</span>
-    <span class="kn">from</span> <span class="nn">.._supported_operators</span> <span class="k">import</span> <span class="n">sklearn_operator_name_map</span>
+    <span class="kn">from</span> <span class="nn">..common._registration</span> <span class="kn">import</span> <span class="n">_shape_calculator_pool</span><span class="p">,</span> <span class="n">_converter_pool</span>
+    <span class="kn">from</span> <span class="nn">.._supported_operators</span> <span class="kn">import</span> <span class="n">sklearn_operator_name_map</span>
 
     <span class="bp">cls</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -88,7 +94,8 @@
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Sklearn&quot;</span> <span class="k">if</span> <span class="s2">&quot;sklearn&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">skl_obj</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;Onnx&quot;</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">skl_name</span>
         <span class="n">cl</span> <span class="o">=</span> <span class="n">ClassFactorySklearn</span><span class="p">(</span><span class="n">skl_obj</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span>
-                                 <span class="n">doc</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">shape_calc</span><span class="p">)</span>
+                                 <span class="n">doc</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">shape_calc</span><span class="p">,</span>
+                                 <span class="n">name</span><span class="p">)</span>
         <span class="bp">cls</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cl</span>
     <span class="k">return</span> <span class="bp">cls</span>
 
@@ -115,8 +122,9 @@
     <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">full_name</span><span class="p">):</span>
         <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">n</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to find a class for &#39;</span><span class="si">{}</span><span class="s2">&#39; in</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">skl_cl</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to find a class for &#39;</span><span class="si">{}</span><span class="s2">&#39; in</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">skl_cl</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available</span><span class="p">)))</span>
     <span class="n">cl</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">full_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;automation&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cl</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Dynamic operation issue with class &quot;</span>
@@ -131,7 +139,10 @@
 <span class="sd">    sklearn.pipeline.Pipeline.html&gt;`_ and</span>
 <span class="sd">    :class:`OnnxSubGraphOperatorMixin`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">Pipeline</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">OnnxSubGraphOperatorMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_version</span> <span class="o">=</span> <span class="n">op_version</span></div>
 
 
 <span class="k">if</span> <span class="n">ColumnTransformer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -144,7 +155,9 @@
 <span class="sd">        sklearn.compose.ColumnTransformer.html&gt;`_ and</span>
 <span class="sd">        :class:`OnnxSubGraphOperatorMixin`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_version</span> <span class="o">=</span> <span class="n">op_version</span></div>
 
 
 <div class="viewcode-block" id="OnnxSklearnFeatureUnion"><a class="viewcode-back" href="../../../supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion">[docs]</a><span class="k">class</span> <span class="nc">OnnxSklearnFeatureUnion</span><span class="p">(</span><span class="n">FeatureUnion</span><span class="p">,</span> <span class="n">OnnxSubGraphOperatorMixin</span><span class="p">):</span>
@@ -154,12 +167,15 @@
 <span class="sd">    sklearn.pipeline.FeatureUnion.html&gt;`_ and</span>
 <span class="sd">    :class:`OnnxSubGraphOperatorMixin`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_version</span> <span class="o">=</span> <span class="n">op_version</span></div>
 
 
 <span class="n">_update_module</span><span class="p">()</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -185,14 +201,14 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

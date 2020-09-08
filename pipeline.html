@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Convert a pipeline &#8212; sklearn-onnx 1.6.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convert a pipeline &#8212; sklearn-onnx 1.7.1 documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Converters with options" href="parameterized.html" />
@@ -37,7 +40,8 @@
         <li class="right" >
           <a href="auto_examples/plot_custom_model.html" title="Write your own converter for your own model"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.6.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Convert a pipeline</a></li> 
       </ul>
     </div>  
 
@@ -106,7 +110,7 @@ useful to build complex pipelines such as the following one:</p>
 </div>
 <p>It can be represented as a
 <a class="reference external" href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">DOT</a> graph:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="k">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="kn">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
 <span class="n">pydot_graph</span> <span class="o">=</span> <span class="n">GetPydotGraph</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rankdir</span><span class="o">=</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span>
                             <span class="n">node_producer</span><span class="o">=</span><span class="n">GetOpNodeProducer</span><span class="p">(</span><span class="s2">&quot;docstring&quot;</span><span class="p">))</span>
 <span class="n">pydot_graph</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="s2">&quot;graph.dot&quot;</span><span class="p">)</span>
@@ -187,24 +191,24 @@ or update an existing one. Four elements are registered:</p>
 <li><p>a model converter</p></li>
 </ul>
 <p>The following lines shows what these four elements are for a random forest:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="k">import</span> <span class="n">calculate_linear_classifier_output_shapes</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.operator_converters.RandomForest</span> <span class="k">import</span> <span class="n">convert_sklearn_random_forest_classifier</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="k">import</span> <span class="n">update_registered_converter</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="kn">import</span> <span class="n">calculate_linear_classifier_output_shapes</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.operator_converters.RandomForest</span> <span class="kn">import</span> <span class="n">convert_sklearn_random_forest_classifier</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">update_registered_converter</span>
 <span class="n">update_registered_converter</span><span class="p">(</span><span class="n">SGDClassifier</span><span class="p">,</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
                             <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span>
                             <span class="n">convert_sklearn_random_forest_classifier</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>See example <a class="reference internal" href="auto_examples/plot_pipeline_lightgbm.html#example-lightgbm"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> to see a complete example
+<p>See example <a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm.html#example-lightgbm"><span class="std std-ref">Convert a pipeline with a LightGBM model</span></a> to see a complete example
 with a <em>LightGbm</em> model.</p>
 </div>
 <div class="section" id="titanic-example">
 <h2><a class="toc-backref" href="#id4">Titanic example</a><a class="headerlink" href="#titanic-example" title="Permalink to this headline">¶</a></h2>
 <p>The first example was a simplified pipeline coming from <em>scikit-learn</em>’s documentation:
 <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py">Column Transformer with Mixed Types</a>.
-The full story is available in a runable exemple: <a class="reference internal" href="auto_examples/plot_complex_pipeline.html#example-complex-pipeline"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a>
+The full story is available in a runnable example: <a class="reference internal" href="auto_examples/plot_complex_pipeline.html#example-complex-pipeline"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a>
 which also shows up some mistakes that a user could come accross
-when trying to convert his pipeline.</p>
+when trying to convert a pipeline.</p>
 </div>
 <div class="section" id="parameterize-the-conversion">
 <h2><a class="toc-backref" href="#id5">Parameterize the conversion</a><a class="headerlink" href="#parameterize-the-conversion" title="Permalink to this headline">¶</a></h2>
@@ -228,11 +232,11 @@ The following piece of code is extracted from unit test
 <a class="reference external" href="https://github.com/onnx/sklearn-onnx/blob/master/tests/test_investigate.py">test_investigate.py</a> and converts
 a pipeline and each of its components independently.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="k">import</span> <span class="n">assert_almost_equal</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="k">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span>
 
 <span class="c1"># Let&#39;s fit a model.</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
@@ -283,11 +287,11 @@ raised when the first missing one is found.
 The previous snippet of code can be modified to find all of
 them.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="k">import</span> <span class="n">assert_almost_equal</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="k">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span>
 
 <span class="k">class</span> <span class="nc">MyScaler</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">):</span>
     <span class="k">pass</span>
@@ -349,6 +353,7 @@ them.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -393,14 +398,14 @@ them.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2019, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    &copy; Copyright 2018-2020, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
   </div>
   
   </body>

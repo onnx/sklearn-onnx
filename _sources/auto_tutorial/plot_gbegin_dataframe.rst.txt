@@ -1,0 +1,529 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_tutorial_plot_gbegin_dataframe.py:
+
+
+Dataframe as an input
+=====================
+
+.. index:: dataframe
+
+A pipeline usually ingests data as a matrix. It may be converted in a matrix
+if all the data share the same type. But data held in a dataframe
+have usually multiple types, float, integer or string for categories.
+ONNX also supports that case.
+
+.. contents::
+    :local:
+
+A dataset with categories
++++++++++++++++++++++++++
+
+
+.. code-block:: default
+
+    from mlinsights.plotting import pipeline2dot
+    import numpy
+    import pprint
+    from mlprodict.onnx_conv import guess_schema_from_data
+    from onnxruntime import InferenceSession
+    from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
+    from mlprodict.onnxrt import OnnxInference
+    from mlprodict.onnx_conv import to_onnx as to_onnx_ext
+    from skl2onnx import to_onnx
+    from pandas import DataFrame
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.ensemble import RandomForestClassifier
+
+
+    data = DataFrame([
+        dict(CAT1='a', CAT2='c', num1=0.5, num2=0.6, y=0),
+        dict(CAT1='b', CAT2='d', num1=0.4, num2=0.8, y=1),
+        dict(CAT1='a', CAT2='d', num1=0.5, num2=0.56, y=0),
+        dict(CAT1='a', CAT2='d', num1=0.55, num2=0.56, y=1),
+        dict(CAT1='a', CAT2='c', num1=0.35, num2=0.86, y=0),
+        dict(CAT1='a', CAT2='c', num1=0.5, num2=0.68, y=1),
+    ])
+
+    cat_cols = ['CAT1', 'CAT2']
+    train_data = data.drop('y', axis=1)
+
+
+    categorical_transformer = Pipeline([
+        ('onehot', OneHotEncoder(sparse=False, handle_unknown='ignore'))])
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('cat', categorical_transformer, cat_cols)],
+        remainder='passthrough')
+    pipe = Pipeline([('preprocess', preprocessor),
+                     ('rf', RandomForestClassifier())])
+    pipe.fit(train_data, data['y'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Pipeline(steps=[('preprocess',
+                     ColumnTransformer(remainder='passthrough',
+                                       transformers=[('cat',
+                                                      Pipeline(steps=[('onehot',
+                                                                       OneHotEncoder(handle_unknown='ignore',
+                                                                                     sparse=False))]),
+                                                      ['CAT1', 'CAT2'])])),
+                    ('rf', RandomForestClassifier())])
+
+
+
+Display.
+
+
+.. code-block:: default
+
+
+    dot = pipeline2dot(pipe, train_data)
+    ax = plot_graphviz(dot)
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+
+
+
+.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_001.png
+    :alt: plot gbegin dataframe
+    :class: sphx-glr-single-img
+
+
+
+
+
+Conversion to ONNX
+++++++++++++++++++
+
+Function *to_onnx* does not handle dataframes.
+
+
+.. code-block:: default
+
+
+
+    try:
+        to_onnx(pipe, train_data[:1])
+    except NotImplementedError as e:
+        print(e)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Unsupported type '<class 'pandas.core.frame.DataFrame'>'. You may raise an issue at https://github.com/onnx/sklearn-onnx/issues.
+
+
+
+
+But it possible to use an extended one.
+
+
+.. code-block:: default
+
+
+
+    onx = to_onnx_ext(
+        pipe, train_data[:1],
+        options={RandomForestClassifier: {'zipmap': False}})
+
+
+
+
+
+
+
+
+Graph
++++++
+
+
+.. code-block:: default
+
+
+
+    oinf = OnnxInference(onx)
+    ax = plot_graphviz(oinf.to_dot())
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+
+
+
+
+.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_002.png
+    :alt: plot gbegin dataframe
+    :class: sphx-glr-single-img
+
+
+
+
+
+Prediction with ONNX
+++++++++++++++++++++
+
+*onnxruntime* does not support dataframes.
+
+
+.. code-block:: default
+
+
+
+    sess = InferenceSession(onx.SerializeToString())
+    try:
+        sess.run(None, train_data)
+    except Exception as e:
+        print(e)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    run(): incompatible function arguments. The following argument types are supported:
+        1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -> List[object]
+
+    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x7f1f9b1bf7d8>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
+    0    a    c  0.50  0.60
+    1    b    d  0.40  0.80
+    2    a    d  0.50  0.56
+    3    a    d  0.55  0.56
+    4    a    c  0.35  0.86
+    5    a    c  0.50  0.68, None
+
+
+
+
+Let's use a shortcut
+
+
+.. code-block:: default
+
+
+    oinf = OnnxInference(onx)
+    got = oinf.run(train_data)
+    print(pipe.predict(train_data))
+    print(got['label'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [0 1 0 1 0 1]
+    [0 1 0 1 0 1]
+
+
+
+
+And probilities.
+
+
+.. code-block:: default
+
+
+    print(pipe.predict_proba(train_data))
+    print(got['probabilities'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[0.8  0.2 ]
+     [0.3  0.7 ]
+     [0.68 0.32]
+     [0.33 0.67]
+     [0.71 0.29]
+     [0.3  0.7 ]]
+    [[0.79999995 0.20000002]
+     [0.30000037 0.69999963]
+     [0.68000007 0.31999996]
+     [0.33000034 0.66999966]
+     [0.71000004 0.29      ]
+     [0.30000037 0.69999963]]
+
+
+
+
+It looks ok. Let's dig into the details to
+directly use *onnxruntime*.
+
+Unhide conversion logic with a dataframe
+++++++++++++++++++++++++++++++++++++++++
+
+A dataframe can be seen as a set of columns with
+different types. That's what ONNX should see:
+a list of inputs, the input name is the column name,
+the input type is the column type.
+
+
+.. code-block:: default
+
+
+
+    init = guess_schema_from_data(train_data)
+
+    pprint.pprint(init)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [('CAT1', StringTensorType(shape=[None, 1])),
+     ('CAT2', StringTensorType(shape=[None, 1])),
+     ('num1',
+      <onnxconverter_common.data_types.DoubleTensorType object at 0x7f1f9925f710>),
+     ('num2',
+      <onnxconverter_common.data_types.DoubleTensorType object at 0x7f1f9925f0b8>)]
+
+
+
+
+Let's use float instead.
+
+
+.. code-block:: default
+
+
+
+    for c in train_data.columns:
+        if c not in cat_cols:
+            train_data[c] = train_data[c].astype(numpy.float32)
+
+    init = guess_schema_from_data(train_data)
+    pprint.pprint(init)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [('CAT1', StringTensorType(shape=[None, 1])),
+     ('CAT2', StringTensorType(shape=[None, 1])),
+     ('num1', FloatTensorType(shape=[None, 1])),
+     ('num2', FloatTensorType(shape=[None, 1]))]
+
+
+
+
+Let's convert with *skl2onnx* only.
+
+
+.. code-block:: default
+
+
+    onx2 = to_onnx(
+        pipe, initial_types=init,
+        options={RandomForestClassifier: {'zipmap': False}})
+
+
+
+
+
+
+
+
+Let's run it with onnxruntime.
+We need to convert the dataframe into a dictionary
+where column names become keys, and column values become
+values.
+
+
+.. code-block:: default
+
+
+    inputs = {c: train_data[c].values.reshape((-1, 1))
+              for c in train_data.columns}
+    pprint.pprint(inputs)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    {'CAT1': array([['a'],
+           ['b'],
+           ['a'],
+           ['a'],
+           ['a'],
+           ['a']], dtype=object),
+     'CAT2': array([['c'],
+           ['d'],
+           ['d'],
+           ['d'],
+           ['c'],
+           ['c']], dtype=object),
+     'num1': array([[0.5 ],
+           [0.4 ],
+           [0.5 ],
+           [0.55],
+           [0.35],
+           [0.5 ]], dtype=float32),
+     'num2': array([[0.6 ],
+           [0.8 ],
+           [0.56],
+           [0.56],
+           [0.86],
+           [0.68]], dtype=float32)}
+
+
+
+
+Inference.
+
+
+.. code-block:: default
+
+
+    sess2 = InferenceSession(onx2.SerializeToString())
+
+    got2 = sess2.run(None, inputs)
+
+    print(pipe.predict(train_data))
+    print(got2[0])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [0 1 0 1 0 1]
+    [0 1 0 1 0 1]
+
+
+
+
+And probilities.
+
+
+.. code-block:: default
+
+
+    print(pipe.predict_proba(train_data))
+    print(got2[1])
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[0.8  0.2 ]
+     [0.3  0.7 ]
+     [0.68 0.32]
+     [0.33 0.67]
+     [0.71 0.29]
+     [0.3  0.7 ]]
+    [[0.79999995 0.20000002]
+     [0.30000037 0.69999963]
+     [0.68000007 0.31999996]
+     [0.33000034 0.66999966]
+     [0.71000004 0.29      ]
+     [0.30000037 0.69999963]]
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  1.804 seconds)
+
+
+.. _sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+  .. container:: binder-badge
+
+    .. image:: /../../cus/lib/python3.7/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
+      :target: https://mybinder.org/v2/gh/microsoft/skl2onnx/master?urlpath=lab/tree/notebooks/auto_tutorial/plot_gbegin_dataframe.ipynb
+      :width: 150 px
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_gbegin_dataframe.py <plot_gbegin_dataframe.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_gbegin_dataframe.ipynb <plot_gbegin_dataframe.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
