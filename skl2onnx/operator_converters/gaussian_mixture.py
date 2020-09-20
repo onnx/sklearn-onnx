@@ -17,7 +17,7 @@ from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
     OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
-    OnnxReduceSum, OnnxLog, OnnxReduceMax, OnnxEqual, OnnxCast
+    OnnxReduceSumApi11, OnnxLog, OnnxReduceMax, OnnxEqual, OnnxCast
 )
 from ..proto import onnx_proto
 
@@ -56,7 +56,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                          cst.astype(dtype), alpha=1.,
                          beta=1., op_version=opv)
             if combined_reducesum:
-                y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
+                y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
                                     axes=[1], op_version=opv)
             else:
                 y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
@@ -80,7 +80,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                          cst.astype(dtype),
                          alpha=1., beta=1., op_version=opv)
             if combined_reducesum:
-                y2s = OnnxReduceSum(OnnxMul(y, y, op_version=opv),
+                y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
                                     axes=[1], op_version=opv)
             else:
                 y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
@@ -122,7 +122,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
         zeros = np.zeros((n_components, ), dtype=dtype)
         precisions = (precisions_chol ** 2).astype(dtype)
         if combined_reducesum:
-            normX = OnnxReduceSum(OnnxMul(X, X, op_version=opv),
+            normX = OnnxReduceSumApi11(OnnxMul(X, X, op_version=opv),
                                   axes=[1], op_version=opv)
         else:
             normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
@@ -242,7 +242,7 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     if combined_reducesum:
         max_weight = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
         log_prob_norm_demax = OnnxLog(
-            OnnxReduceSum(
+            OnnxReduceSumApi11(
                 OnnxExp(
                     OnnxSub(weighted_log_prob, max_weight, op_version=opv),
                     op_version=opv),
