@@ -57,7 +57,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                          beta=1., op_version=opv)
             if combined_reducesum:
                 y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
-                                    axes=[1], op_version=opv)
+                                         axes=[1], op_version=opv)
             else:
                 y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
@@ -81,7 +81,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                          alpha=1., beta=1., op_version=opv)
             if combined_reducesum:
                 y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
-                                    axes=[1], op_version=opv)
+                                         axes=[1], op_version=opv)
             else:
                 y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
             ys.append(y2s)
@@ -123,7 +123,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
         precisions = (precisions_chol ** 2).astype(dtype)
         if combined_reducesum:
             normX = OnnxReduceSumApi11(OnnxMul(X, X, op_version=opv),
-                                  axes=[1], op_version=opv)
+                                       axes=[1], op_version=opv)
         else:
             normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
         outer = OnnxGemm(
