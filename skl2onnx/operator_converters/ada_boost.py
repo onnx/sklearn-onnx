@@ -475,8 +475,9 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
                            selected,
                            name=scope.get_unique_operator_name('Where'))
         if container.target_opset < 13:
-            container.add_node('ReduceSum', selected, output, axes=[1],
-                               name=scope.get_unique_operator_name('ReduceSum'))
+            container.add_node(
+                'ReduceSum', selected, output, axes=[1],
+                name=scope.get_unique_operator_name('ReduceSum'))
         else:
             raise NotImplementedError(
                 "ReduceSum for opset>=13 is not implemented yet.")

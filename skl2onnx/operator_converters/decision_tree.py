@@ -134,8 +134,8 @@ def predict(model, scope, operator, container,
                   zero_matrix_name, container, broadcast=1)
         if container.target_opset:
             container.add_node(
-                'ReduceSum', zero_matrix_name, reduced_zero_matrix_name, axes=[1],
-                name=scope.get_unique_operator_name('ReduceSum'))
+                'ReduceSum', zero_matrix_name, reduced_zero_matrix_name,
+                axes=[1], name=scope.get_unique_operator_name('ReduceSum'))
         else:
             raise NotImplementedError(
                 "ReduceSum for opset>=13 is not implemented yet.")
