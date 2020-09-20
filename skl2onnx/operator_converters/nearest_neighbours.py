@@ -360,14 +360,14 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             weighted = OnnxTranspose(weighted_rs, perm=[1, 0, 2],
                                      op_version=opv)
             res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
-                                keepdims=0)
+                                     keepdims=0)
             norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),
                                 op_version=opv)
             res = OnnxDiv(res, norm2, op_version=opv, output_names=out)
         else:
             weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
             res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
-                                keepdims=0)
+                                     keepdims=0)
             res.set_onnx_name_prefix('final')
             if opv >= 12:
                 shape = OnnxShape(res, op_version=opv)
@@ -563,8 +563,9 @@ def convert_k_neighbours_transformer(scope, operator, container):
     if top_dist:
         comparison_res = OnnxMul(
             comparison_res, top_dist, op_version=op_version)
-    res = OnnxReduceSumApi11(comparison_res, op_version=op_version, axes=[2],
-                        keepdims=0, output_names=out[:1])
+    res = OnnxReduceSumApi11(
+        comparison_res, op_version=op_version, axes=[2],
+        keepdims=0, output_names=out[:1])
     res.add_to(scope, container)
 
 
@@ -689,7 +690,8 @@ def convert_knn_imputer(scope, operator, container):
         OnnxCast(transpose_result, to=onnx_proto.TensorProto.BOOL,
                  op_version=op_version),
         to=proto_type, op_version=op_version)
-    deno = OnnxReduceSumApi11(cast_res, op_version=op_version, axes=[1], keepdims=0)
+    deno = OnnxReduceSumApi11(
+        cast_res, op_version=op_version, axes=[1], keepdims=0)
     deno_updated = OnnxAdd(
         deno, OnnxCast(
             OnnxNot(OnnxCast(deno, to=onnx_proto.TensorProto.BOOL,
