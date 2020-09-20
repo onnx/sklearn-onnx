@@ -297,11 +297,12 @@ class OnnxOperator:
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or
                     len(self.inputs) > self.input_range[1]):
-                raise RuntimeError("Operator '{}' expects a number of inputs "
-                                   "in [{}, {}] not {}".format(
-                                       self.operator_name,
-                                       *self.input_range,
-                                       len(self.inputs)))
+                raise RuntimeError(
+                    "Operator '{}' expects a number of inputs "
+                    "in [{}, {}] not {} (expected opset={}, "
+                    "class opset={})".format(
+                        self.operator_name, *self.input_range,
+                        len(self.inputs), op_version, self.op_version))
 
         # check output
         if (hasattr(output_names, 'outputs') and
