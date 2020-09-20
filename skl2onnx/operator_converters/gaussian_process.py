@@ -8,7 +8,7 @@ from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
+    OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSumApi11,
     OnnxMul, OnnxMax
 )
 try:
@@ -125,7 +125,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             #       np.dot(K_trans, self._K_inv), K_trans)
             k_dot = OnnxMatMul(k_trans, _K_inv.astype(dtype), op_version=opv)
             ys_var = OnnxSub(
-                y_var, OnnxReduceSum(
+                y_var, OnnxReduceSumApi11(
                     OnnxMul(k_dot, k_trans, op_version=opv),
                     axes=[1], keepdims=0, op_version=opv),
                 op_version=opv)

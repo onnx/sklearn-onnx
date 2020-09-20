@@ -97,9 +97,13 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
         apply_concat(scope, [sub_result_name, proba],
                      operator.outputs[1].full_name, container, axis=1)
     else:
-        container.add_node('ReduceSum', proba,
-                           reduced_proba_name, axes=[1],
-                           name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset < 13:
+            container.add_node('ReduceSum', proba,
+                               reduced_proba_name, axes=[1],
+                               name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            raise NotImplementedError(
+                "ReduceSum for opset>=13 is not implemented yet.")
         proba_updated, reduced_proba_updated = _handle_zeros(
             scope, container, proba, reduced_proba_name, num_classes)
         apply_div(scope, [proba_updated, reduced_proba_updated],

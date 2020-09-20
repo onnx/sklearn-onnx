@@ -36,7 +36,7 @@ import matplotlib.pyplot as plt
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnx
 from skl2onnx.algebra.onnx_ops import (
-    OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
+    OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSumApi11)
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
 
@@ -99,7 +99,7 @@ def nmf_to_onnx(W, H, op_version=12):
     col = OnnxArrayFeatureExtractor(H, 'col')
     row = OnnxArrayFeatureExtractor(W.T, 'row')
     dot = OnnxMul(col, row, op_version=op_version)
-    res = OnnxReduceSum(dot, output_names="rec", op_version=op_version)
+    res = OnnxReduceSumApi11(dot, output_names="rec", op_version=op_version)
     indices_type = np.array([0], dtype=np.int64)
     onx = res.to_onnx(inputs={'col': indices_type,
                               'row': indices_type},
