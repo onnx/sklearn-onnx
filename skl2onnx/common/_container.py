@@ -513,8 +513,11 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         dtypes = set()
         for k, v in attrs.items():
             if v is None:
-                raise ValueError('Failed to create ONNX node. Undefined '
-                                 'attribute pair (%s, %s) found' % (k, v))
+                raise ValueError(
+                    'Failed to create ONNX node. Undefined '
+                    'attribute pair (%s, %s) found for type %r and '
+                    'version %r' % (
+                        k, v, op_type, op_version))
             if isinstance(v, np.ndarray):
                 upd[k] = v
                 dtypes.add(v.dtype)
