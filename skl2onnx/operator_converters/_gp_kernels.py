@@ -15,7 +15,7 @@ from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd,
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
-    OnnxReduceSum, OnnxSqueeze,
+    OnnxReduceSumApi11, OnnxSqueeze,
     OnnxIdentity, OnnxReduceSumSquare
 )
 from ..algebra.custom_ops import OnnxCDist
@@ -305,14 +305,14 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
     if keepdims is None:
         raise ValueError("Default for keepdims is not allowed.")
     if dtype == np.float32:
-        res = OnnxReduceSum(
+        res = OnnxReduceSumApi11(
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version),
                 op_version=op_version),
             axes=[1-axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     elif dtype in (np.float64, np.int32, np.int64):
-        res = OnnxReduceSum(
+        res = OnnxReduceSumApi11(
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version), value=py_make_float_array(
                     0, dtype=dtype, as_tensor=True), op_version=op_version),
