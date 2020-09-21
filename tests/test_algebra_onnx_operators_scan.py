@@ -102,7 +102,12 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(model_def.SerializeToString())
+        except Exception as e:
+            if "Current official support for domain ai.onnx" in str(e):
+                return
+            raise e
         res = sess.run(None, {'initial': initial, 'x': x})
 
         y = np.array([9, 12]).astype(np.float32).reshape((2,))

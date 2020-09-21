@@ -16,10 +16,9 @@ from skl2onnx.helpers import collect_intermediate_steps, compare_objects
 from skl2onnx.helpers import enumerate_pipeline_models
 from skl2onnx.helpers.investigate import _alter_model_for_debugging
 from skl2onnx.common import MissingShapeCalculator
-from skl2onnx.common.data_types import (
-    FloatTensorType,
-)
+from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import guess_data_type
+from test_utils import TARGET_OPSET
 
 
 class MyScaler(StandardScaler):
@@ -37,7 +36,8 @@ class TestInvestigate(unittest.TestCase):
         all_models = list(enumerate_pipeline_models(model))
 
         steps = collect_intermediate_steps(
-            model, "pipeline", [("input", FloatTensorType([None, 2]))])
+            model, "pipeline", [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -65,8 +65,10 @@ class TestInvestigate(unittest.TestCase):
         all_models = list(enumerate_pipeline_models(model))
 
         try:
-            collect_intermediate_steps(model, "pipeline",
-                                       [("input", FloatTensorType([None, 2]))])
+            collect_intermediate_steps(
+                model, "pipeline",
+                [("input", FloatTensorType([None, 2]))],
+                target_opset=TARGET_OPSET)
         except MissingShapeCalculator as e:
             assert "MyScaler" in str(e)
             assert "gallery" in str(e)
@@ -105,9 +107,10 @@ class TestInvestigate(unittest.TestCase):
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(model, "coulmn transformer",
-                                           [("input",
-                                             FloatTensorType([None, 2]))])
+        steps = collect_intermediate_steps(
+            model, "coulmn transformer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -129,9 +132,10 @@ class TestInvestigate(unittest.TestCase):
                              ("scaler2", RobustScaler())])
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
-        steps = collect_intermediate_steps(model, "feature union",
-                                           [("input",
-                                             FloatTensorType([None, 2]))])
+        steps = collect_intermediate_steps(
+            model, "feature union",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -156,7 +160,8 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType((None, X.shape[1])))])
+            [("input", FloatTensorType((None, X.shape[1])))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -183,7 +188,8 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
