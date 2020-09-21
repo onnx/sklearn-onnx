@@ -165,6 +165,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
                         len(onnx_model.input), len(model.input)))
 
     # fix opset import
+    del onnx_model.opset_import[:]
     for oimp in model.opset_import:
         op_set = onnx_model.opset_import.add()
         op_set.domain = oimp.domain
