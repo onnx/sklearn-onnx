@@ -29,6 +29,8 @@ class TestInvestigate(unittest.TestCase):
 
     def test_simple_pipeline(self):
         for opset in (11, TARGET_OPSET):
+            if opset > TARGET_OPSET:
+                continue
             data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
                                dtype=numpy.float32)
             model = Pipeline([("scaler1", StandardScaler()),
