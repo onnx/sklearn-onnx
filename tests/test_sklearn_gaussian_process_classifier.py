@@ -32,7 +32,8 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
         gp.fit(X_train, y_train)
         return gp, X_test.astype(np.float32)
 
-    def common_test_gpc(self, dtype=np.float32, n_classes=2):
+    def common_test_gpc(self, dtype=np.float32, n_classes=2,
+                        opset=TARGET_OPSET):
 
         gp = GaussianProcessClassifier()
         gp, X = self.fit_classification_model(gp, n_classes=n_classes)
@@ -44,18 +45,32 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
             cls = DoubleTensorType
         model_onnx = to_onnx(
             gp, initial_types=[('X', cls([None, None]))],
-            target_opset=TARGET_OPSET,
+            target_opset=opset,
             options={GaussianProcessClassifier: {
                 'zipmap': False, 'optim': 'cdist'}})
         self.assertTrue(model_onnx is not None)
+        text = str(model_onnx).replace("\n", "")
+        expected = 'opset_import {  domain: ""  version: %d}' % opset
+        if expected not in text:
+            raise AssertionError("opset %d not found in onnx model" % opset)
 
         try:
             from mlprodict.onnxrt import OnnxInference
+        except RuntimeError as ee:
+            if "Attribute 'noop_with_empty_axes'" in str(ee):
+                return
+            raise ee
         except ImportError:
             OnnxInference = None
         if OnnxInference is not None:
             # onnx misses solve operator
-            oinf = OnnxInference(model_onnx)
+            try:
+                oinf = OnnxInference(model_onnx)
+            except RuntimeError as e:
+                if ("Attribute 'noop_with_empty_axes' "
+                        "is expected based" in str(e)):
+                    return
+                raise e
             res = oinf.run({'X': X.astype(dtype)})
             assert_almost_equal(res['label'].ravel(), gp.predict(X).ravel())
             assert_almost_equal(res['probabilities'], gp.predict_proba(X),

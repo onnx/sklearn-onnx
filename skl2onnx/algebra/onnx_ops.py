@@ -176,7 +176,7 @@ def OnnxReduceSumApi11(*x, axes=None, keepdims=1, op_version=None,
     """
     if op_version is None:
         raise RuntimeError("op_version must be specified.")
-    if op_version is None or op_version >= 13:
+    if op_version >= 13:
         return OnnxReduceSum(  # noqa
             *x, np.array(axes, dtype=np.int64),
             keepdims=keepdims, op_version=op_version,
