@@ -13,6 +13,7 @@ from sklearn.feature_selection import SelectKBest
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 import onnx
+from test_utils import TARGET_OPSET
 
 
 class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
@@ -72,7 +73,8 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
         initial_type = [('input', StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(
             model_pipeline, "cv", initial_types=initial_type,
-            options={SVC: {'zipmap': False}})
+            options={SVC: {'zipmap': False}},
+            target_opset=TARGET_OPSET)
 
         if kind in (None, 'stop'):
             exp = [model_pipeline.transform(X_train.ravel()).toarray()]
