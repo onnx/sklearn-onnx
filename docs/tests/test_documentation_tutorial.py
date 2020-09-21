@@ -6,6 +6,7 @@ import os
 import sys
 import importlib
 import subprocess
+from distutils.version import StrictVersion
 
 
 def import_source(module_file_path, module_name):
@@ -21,8 +22,17 @@ def import_source(module_file_path, module_name):
     return module_spec.loader.exec_module(module)
 
 
+def skipif_wrong_version():
+    try:
+        import mlprodict
+    except ImportError:
+        return False
+    return StrictVersion(mlprodict.__version__) <= StrictVersion("0.4.1266")
+
+
 class TestDocumentationTutorial(unittest.TestCase):
 
+    @unittest.skipIf(skipif_wrong_version(), reason="opset mismatch")
     def test_documentation_tutorial(self):
 
         this = os.path.abspath(os.path.dirname(__file__))
