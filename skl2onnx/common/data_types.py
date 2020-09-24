@@ -11,6 +11,14 @@ from onnxconverter_common.data_types import (  # noqa
     Int64TensorType, Int32TensorType, BooleanTensorType,
     FloatTensorType, StringTensorType, DoubleTensorType,
     DictionaryType, SequenceType)
+
+try:
+    from onnxconverter_common.data_types import (  # noqa
+        Complex64TensorType, Complex128TensorType)
+except ImportError:
+    Complex64TensorType = None
+    Complex128TensorType = None
+
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 
 
@@ -75,6 +83,13 @@ def _guess_numpy_type(data_type, dims):
         return Int32TensorType(dims)
     if data_type == np.bool:
         return BooleanTensorType(dims)
+
+    if Complex64TensorType is not None:
+        if data_type == np.complex64:
+            return Complex128TensorType(dims)
+        if data_type == np.complex128:
+            return Complex128TensorType(dims)
+
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
@@ -153,6 +168,9 @@ def guess_tensor_type(data_type):
         return DoubleTensorType()
     if isinstance(data_type, DictionaryType):
         return guess_tensor_type(data_type.value_type)
+    if Complex64TensorType is not None:
+        if isinstance(data_type, (Complex64TensorType, Complex128TensorType)):
+            return data_type.__class__()
     if not isinstance(data_type, (
             Int64TensorType, Int32TensorType, BooleanTensorType,
             FloatTensorType, StringTensorType, DoubleTensorType)):
