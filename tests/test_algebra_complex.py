@@ -20,10 +20,9 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraComplex(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.7.0"),
+    @unittest.skipIf(Complex64TensorType is None,
                      reason="not available")
     def test_complex(self):
-        assert Complex64TensorType is not None
         for dt, var, pr in ((np.complex64, Complex64TensorType, 14),
                             (np.complex128, Complex128TensorType, 15)):
             X = np.array([[1-2j, -12j],
