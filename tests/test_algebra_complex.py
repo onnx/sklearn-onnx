@@ -1,8 +1,6 @@
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
-import onnx
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -14,7 +12,6 @@ except ImportError:
 from skl2onnx.common.data_types import (
     Complex64TensorType, Complex128TensorType)
 from skl2onnx.algebra.onnx_ops import OnnxAdd
-from skl2onnx import to_onnx
 from test_utils import TARGET_OPSET
 
 
@@ -33,7 +30,7 @@ class TestAlgebraComplex(unittest.TestCase):
                     continue
                 out = OnnxAdd('X', np.array([1+2j]), output_names=['Y'])
                 onx = out.to_onnx([('X', var((None, 2)))],
-                                   outputs=[('Y', var())],
+                                  outputs=[('Y', var())],
                                   target_opset=opv)
                 self.assertIn('elem_type: %d' % pr, str(onx))
 
@@ -44,6 +41,8 @@ class TestAlgebraComplex(unittest.TestCase):
                         continue
                     raise e
                 assert ort is not None
+                got = ort.run(None, {'X': X})[0]
+                assert_almost_equal(X + np.array([1+2j]), got)
 
 
 if __name__ == "__main__":
