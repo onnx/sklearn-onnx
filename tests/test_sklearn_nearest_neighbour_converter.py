@@ -121,6 +121,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
+        reason="not available")
     def test_model_knn_regressor_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(model, "KNN regressor",
