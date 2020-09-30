@@ -120,6 +120,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
         reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
+        reason="not available")
     def test_model_knn_regressor_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -280,7 +283,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 rows.append('--{}--'.format(out))
                 rows.append(str(res))
             if (onnxruntime.__version__.startswith('1.4.') or
-                    onnxruntime.__version__.startswith('1.3.')):
+                    onnxruntime.__version__.startswith('1.3.') or:
+                    onnxruntime.__version__.startswith('1.5.')):
                 # TODO: investigate the regression in onnxruntime 1.4
                 # One broadcasted multiplication unexpectedly produces nan.
                 whole = '\n'.join(rows)

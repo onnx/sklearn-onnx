@@ -13,6 +13,16 @@ jobs:
     vmImage: 'windows-2019'
   strategy:
     matrix:
+      Py37-Onnx170-Rt151-Skl0232:
+        python.version: '3.7'
+        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.7.0'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: 'onnxruntime==1.5.1'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        sklearn.version: '==0.23.2'
       Py37-Onnx170-Rt140-Skl0232:
         python.version: '3.7'
         # onnx.version: '-i https://test.pypi.org/simple/ onnx'
