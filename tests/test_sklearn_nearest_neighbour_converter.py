@@ -282,6 +282,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             if (onnxruntime.__version__.startswith('1.4.') or
                     onnxruntime.__version__.startswith('1.3.')):
                     # onnxruntime.__version__.startswith('1.5.')):
+                    # onnxruntime.__version__.startswith('1.5.')):
                 # TODO: investigate the regression in onnxruntime 1.4
                 # One broadcasted multiplication unexpectedly produces nan.
                 whole = '\n'.join(rows)
