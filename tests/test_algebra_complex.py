@@ -29,9 +29,16 @@ class TestAlgebraComplex(unittest.TestCase):
                 if opv > TARGET_OPSET:
                     continue
                 out = OnnxAdd('X', np.array([1+2j]), output_names=['Y'])
-                onx = out.to_onnx([('X', var((None, 2)))],
-                                  outputs=[('Y', var())],
-                                  target_opset=opv)
+                try:
+                    onx = out.to_onnx([('X', var((None, 2)))],
+                                      outputs=[('Y', var())],
+                                      target_opset=opv)
+                except TypeError as e:
+                    if "True has type <class 'numpy.bool_'>" in str(e):
+                        if TARGET_OPSET >= 13:
+                            raise e
+                        return
+                    raise e
                 self.assertIn('elem_type: %d' % pr, str(onx))
 
                 try:
