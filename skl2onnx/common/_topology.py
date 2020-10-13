@@ -16,7 +16,7 @@ from onnxconverter_common.data_types import (  # noqa
     StringTensorType, DoubleTensorType,
     Int32TensorType, BooleanTensorType,
     DoubleTensorType,
-)
+    Int8TensorType, UInt8TensorType)
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
@@ -130,6 +130,12 @@ class Variable:
                 ty = Int64TensorType(shape)
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
+            elif elem == onnx_proto.TensorProto.UINT8:
+                ty = UInt8TensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT8:
+                ty = Int8TensorType(shape)
+            elif elem == 0:
+                ty = FloatTensorType(shape)
             else:
                 raise NotImplementedError(
                     "Unsupported type '{}' (elem_type={}).".format(
