@@ -38,7 +38,8 @@ def fcts_model(X, y, fit_intercept):
     rf.fit(X, y)
 
     initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
-    onx = convert_sklearn(rf, initial_types=initial_types)
+    onx = convert_sklearn(rf, initial_types=initial_types,
+                          options={DecisionTreeClassifier: {'zipmap': False}})
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
@@ -56,14 +57,7 @@ def fcts_model(X, y, fit_intercept):
         return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
 
     def predict_onnxrt_predict_proba(X, sess=sess):
-        res = sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
-        # do not use DataFrame to convert the output into array,
-        # it takes too much time
-        out = numpy.empty((len(res), len(res[0])), dtype=numpy.float32)
-        for i, row in enumerate(res):
-            for k, v in row.items():
-                out[i, k] = v
-        return out
+        return sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
 
     return {'predict': (predict_skl_predict,
                         predict_onnxrt_predict),
