@@ -176,14 +176,14 @@ def convert_gaussian_process_classifier(scope, operator, container):
     use this converter which does not behave exactly
     as the others.
     """
-    dtype = container.dtype
-    if dtype is None:
-        raise RuntimeError("dtype cannot be None")
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
     op_est = operator.raw_operator.base_estimator_
     opv = container.target_opset
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
     if OnnxEinsum is None or OnnxErf is None:
