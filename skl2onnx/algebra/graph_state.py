@@ -96,7 +96,7 @@ class GraphState:
                 astype = np.int64
             elif dtype == np.int32:
                 ty = onnx_proto.TensorProto.INT32
-                astype = np.int64
+                astype = np.int32
             elif dtype == np.int8:
                 ty = onnx_proto.TensorProto.INT8
                 astype = np.int8

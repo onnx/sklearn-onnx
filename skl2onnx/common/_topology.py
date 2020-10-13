@@ -132,6 +132,10 @@ class Variable:
                 ty = Int8TensorType(shape)
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
+            elif elem == onnx_proto.TensorProto.UINT8:
+                ty = UInt8TensorType(shape)
+            elif elem == onnx_proto.TensorProto.INT8:
+                ty = Int8TensorType(shape)
             elif elem == 0:
                 ty = FloatTensorType(shape)
             else:
