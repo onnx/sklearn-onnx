@@ -135,6 +135,7 @@ class Variable:
                 ty = Int64TensorType(shape)
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
+
             elif (UInt8TensorType is not None and
                     elem == onnx_proto.TensorProto.UINT8):
                 ty = UInt8TensorType(shape)
