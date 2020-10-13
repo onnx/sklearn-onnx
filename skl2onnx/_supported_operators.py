@@ -381,6 +381,8 @@ def build_sklearn_operator_name_map():
         StandardScaler: 'SklearnScaler',
         TheilSenRegressor: 'SklearnLinearRegressor',
     })
+    if None in res:
+        del res[None]
     return res
 
 
