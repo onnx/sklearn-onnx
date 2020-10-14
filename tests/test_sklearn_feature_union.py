@@ -103,7 +103,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnFeatureUnionTransformerWeights2-Dec4",
+            basename="SklearnFeatureUnionTransformerWeights2-Dec3",
             allow_failure="StrictVersion("
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
