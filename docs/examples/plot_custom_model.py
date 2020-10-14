@@ -52,7 +52,6 @@ from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from matplotlib import offsetbox
 import matplotlib.pyplot as plt
-import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn import datasets, __version__ as skl_version
 from sklearn.base import BaseEstimator, TransformerMixin, clone
