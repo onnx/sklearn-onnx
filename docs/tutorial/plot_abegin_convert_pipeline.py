@@ -1,6 +1,9 @@
 """
+<<<<<<< HEAD
 .. _l-simple-deploy-1:
 
+=======
+>>>>>>> b7eeb6ce63953c2d3434750596eda7aebad50316
 Train and deploy a scikit-learn pipeline
 ========================================
 

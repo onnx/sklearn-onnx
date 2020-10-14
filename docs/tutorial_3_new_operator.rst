@@ -10,7 +10,11 @@ it requires a new release, but that's not mandatory.
 New nodes can easily be created by using a different domain.
 A domain defines a set of operators, there are currently two
 officially supported domains: :epkg:`ONNX operators` and
+<<<<<<< HEAD
 :epkg:`ONNX ML Operators`. Custom domains can be used.
+=======
+:epkg:`ONNX ML operators`. Custom domains can be used.
+>>>>>>> b7eeb6ce63953c2d3434750596eda7aebad50316
 Once this new node is defined, a converter can use it.
 That leaves the last issue: the runtime must be aware
 of the implementation attached to this new node.

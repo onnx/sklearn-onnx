@@ -71,7 +71,11 @@ ax.get_yaxis().set_visible(False)
 
 
 try:
+<<<<<<< HEAD
     to_onnx(pipe, train_data[:1])
+=======
+    onx = to_onnx(pipe, train_data[:1])
+>>>>>>> b7eeb6ce63953c2d3434750596eda7aebad50316
 except NotImplementedError as e:
     print(e)
 

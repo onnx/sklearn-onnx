@@ -18,7 +18,11 @@ That assumption is usually true if the prediction
 function is continuous, :math:`y = f(x)`, then
 :math:`dy = f'(x) dx`. We can determine an upper bound
 to the discrepencies :
+<<<<<<< HEAD
 :math:`\\Delta(y) \\leqslant \\sup_x \\left\\Vert f'(x)\\right\\Vert dx`.
+=======
+:math:`\\Delta(y) \\leqslant \\sup_x \\norm{f'(x)} dx`.
+>>>>>>> b7eeb6ce63953c2d3434750596eda7aebad50316
 *dx* is the discrepency introduced by a float conversion,
 ``dx = x - numpy.float32(x)``.
 
@@ -301,6 +305,16 @@ print(diff(skl4, ort4))
 # What can we do to solve it?
 # What if we could extend ONNX specifications to support
 # double instead of floats.
+<<<<<<< HEAD
+=======
+# We reuse what was developped in example
+# `Other way to convert <http://www.xavierdupre.fr/app/
+# mlprodict/helpsphinx/notebooks/onnx_discrepencies.html
+# ?highlight=treeensembleregressordouble#other-way-to-convert>`_
+# and a custom ONNX node `TreeEnsembleRegressorDouble
+# <http://www.xavierdupre.fr/app/mlprodict/helpsphinx/api/onnxrt_ops.html
+# ?highlight=treeensembleregressordouble#treeensembleregressordouble>`_.
+>>>>>>> b7eeb6ce63953c2d3434750596eda7aebad50316
 
 
 tree = DecisionTreeRegressor(max_depth=max_depth)
