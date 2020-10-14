@@ -86,7 +86,7 @@ class TestExampleAzure(unittest.TestCase):
         sklearn_r2_score = r2_score(y_train, y_pred)
         sklearn_mse = mean_squared_error(y_train, y_pred)
         self.assertEqual(int(abs(sklearn_r2_score - onnx_r2_score) * 1e7), 0)
-        self.assertEqual(int(abs(sklearn_mse - onnx_mse) * 1e6), 0)
+        self.assertEqual(int(abs(sklearn_mse - onnx_mse) * 1e5), 0)
 
 
 if __name__ == "__main__":
