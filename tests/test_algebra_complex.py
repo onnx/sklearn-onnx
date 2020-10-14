@@ -28,7 +28,8 @@ class TestAlgebraComplex(unittest.TestCase):
             for opv in (10, 11, 12, 13, TARGET_OPSET):
                 if opv > TARGET_OPSET:
                     continue
-                out = OnnxAdd('X', np.array([1+2j]), output_names=['Y'])
+                out = OnnxAdd('X', np.array([1+2j]), output_names=['Y'],
+                              op_version=opv)
                 try:
                     onx = out.to_onnx([('X', var((None, 2)))],
                                       outputs=[('Y', var())],
