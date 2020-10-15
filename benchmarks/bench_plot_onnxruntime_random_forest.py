@@ -39,7 +39,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
 
     initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types,
-                          options={DecisionTreeClassifier: {'zipmap': False}})
+                          options={RandomForestClassifier: {'zipmap': False}})
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
