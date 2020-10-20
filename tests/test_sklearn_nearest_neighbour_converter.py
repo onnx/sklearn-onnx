@@ -1,7 +1,6 @@
 """
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
-import sys
 import warnings
 import unittest
 import functools
@@ -266,6 +265,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
         if any(numpy.isnan(got.ravel())):
+            with open("bug_radius.onnx", "wb") as f:
+                f.write(model_onnx.SerializeToString())
             # The model is unexpectedly producing nan values
             # not on all platforms.
             # It happens when two matrices are multiplied,
@@ -283,19 +284,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
                 rows.append(str(res))
-            if onnxruntime.__version__.startswith('1.4.'):
-                # TODO: investigate the regression in onnxruntime 1.4
-                # One broadcasted multiplication unexpectedly produces nan.
-                whole = '\n'.join(rows)
-                if "[        nan" in whole:
-                    warnings.warn(whole)
-                    return
-                raise AssertionError(whole)
-            if (onnxruntime.__version__.startswith('1.3.') and
-                    sys.platform == 'win32'):
-                # Same error but different line number for further
-                # investigation.
-                raise AssertionError(whole)
             raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp, got, decimal=5)
 
@@ -984,4 +972,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # TestNearestNeighbourConverter().test_model_knn_regressor2_1_radius()
     unittest.main()
