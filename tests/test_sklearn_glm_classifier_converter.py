@@ -2,6 +2,7 @@ from distutils.version import StrictVersion
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -818,6 +819,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
+                     reason="Requires onnx 1.6")
     def test_model_classifier_multi_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,
@@ -840,6 +843,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
+                     reason="Requires onnx 1.6")
     def test_model_classifier_multi_class_string_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,
