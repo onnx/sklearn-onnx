@@ -825,8 +825,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model,
             "multi-class ridge classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={linear_model.LogisticRegression: {'zipmap': 'columns'}}
-        )
+            options={linear_model.LogisticRegression: {'zipmap': 'columns'}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
         names = [_.name for _ in sess.get_outputs()]
@@ -847,8 +847,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model,
             "multi-class ridge classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={linear_model.LogisticRegression: {'zipmap': 'columns'}}
-        )
+            options={linear_model.LogisticRegression: {'zipmap': 'columns'}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
         names = [_.name for _ in sess.get_outputs()]
