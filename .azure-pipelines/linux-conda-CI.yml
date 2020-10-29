@@ -19,7 +19,7 @@ jobs:
         numpy.version: '>=1.18.1'
         onnx.version: 'test'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.5.2'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
         run.example: '1'
