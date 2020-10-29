@@ -19,7 +19,7 @@ jobs:
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.5.2'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
         sklearn.version: '==0.23.2'
       Py37-Onnx170-Rt140-Skl0232:
