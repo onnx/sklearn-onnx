@@ -391,7 +391,7 @@ def _build_labels(tree):
 
 register_converter('SklearnDecisionTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
                             'decision_path': [True, False]})
 register_converter('SklearnDecisionTreeRegressor',
@@ -399,7 +399,7 @@ register_converter('SklearnDecisionTreeRegressor',
                    options={'decision_path': [True, False]})
 register_converter('SklearnExtraTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
                             'decision_path': [True, False]})
 register_converter('SklearnExtraTreeRegressor',

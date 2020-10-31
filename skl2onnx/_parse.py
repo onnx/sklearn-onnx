@@ -339,12 +339,19 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     if model.__class__ in [NuSVC, SVC] and not model.probability:
         return probability_tensor
     options = scope.get_options(model, dict(zipmap=True))
-    if not options['zipmap']:
+    if isinstance(options['zipmap'], bool) and not options['zipmap']:
         return probability_tensor
-    this_operator = scope.declare_local_operator('SklearnZipMap')
+
+    if options['zipmap'] == 'columns':
+        this_operator = scope.declare_local_operator('SklearnZipMapColumns')
+        classes = get_label_classes(scope, model)
+        classes_names = get_label_classes(scope, model, node_names=True)
+    else:
+        this_operator = scope.declare_local_operator('SklearnZipMap')
+        classes = get_label_classes(scope, model)
+
     this_operator.inputs = probability_tensor
     label_type = Int64TensorType([None])
-    classes = get_label_classes(scope, model)
 
     if (isinstance(model.classes_, list) and
             isinstance(model.classes_[0], np.ndarray)):
@@ -368,13 +375,20 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         label_type = StringTensorType([None])
 
     output_label = scope.declare_local_variable('output_label', label_type)
-    output_probability = scope.declare_local_variable(
-        'output_probability',
-        SequenceType(
-            DictionaryType(
-                label_type, guess_tensor_type(inputs[0].type))))
     this_operator.outputs.append(output_label)
-    this_operator.outputs.append(output_probability)
+
+    if options['zipmap'] == 'columns':
+        prob_type = probability_tensor[1].type
+        for cl in classes_names:
+            output_cl = scope.declare_local_variable(cl, prob_type.__class__())
+            this_operator.outputs.append(output_cl)
+    else:
+        output_probability = scope.declare_local_variable(
+            'output_probability',
+            SequenceType(
+                DictionaryType(
+                    label_type, guess_tensor_type(inputs[0].type))))
+        this_operator.outputs.append(output_probability)
     return this_operator.outputs
 
 
