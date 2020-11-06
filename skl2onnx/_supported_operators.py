@@ -418,7 +418,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
         update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                     calculate_linear_classifier_output_shapes,
                                     convert_sklearn_random_forest_classifier,
-                                    options={'zipmap': [True, False],
+                                    options={'zipmap': [True, False, 'columns'],
                                              'raw_scores': [True, False]})
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
