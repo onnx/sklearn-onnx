@@ -370,7 +370,7 @@ class Scope:
             raise RuntimeError(
                 "Name '{}' already reserved.".format(raw_name))
         self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
-        return self.reserved[raw_name]
+        return raw_name
 
     def unreserve_name(self, name):
         """

@@ -354,6 +354,6 @@ def convert_sklearn_svm_classifier(
 
 register_converter('SklearnOneClassSVM', convert_sklearn_svm_regressor)
 register_converter('SklearnSVC', convert_sklearn_svm_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnSVR', convert_sklearn_svm_regressor)
