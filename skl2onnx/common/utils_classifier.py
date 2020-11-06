@@ -9,10 +9,10 @@ from ._apply_operation import apply_cast, apply_reshape
 from ..proto import onnx_proto
 
 
-def get_label_classes(scope, op):
+def get_label_classes(scope, op, node_names=False):
     """
     Extracts the model classes,
-    handles option ``nocl``.
+    handles option ``nocl`` and ``zipmap=='columns'``
     """
     options = scope.get_options(op, dict(nocl=False))
     if options['nocl']:
@@ -21,6 +21,20 @@ def get_label_classes(scope, op):
                 "Options 'nocl=True' is not implemented for multi-label "
                 "classification (class: {}).".format(op.__class__.__name__))
         classes = np.arange(0, len(op.classes_))
+    elif node_names:
+        try:
+            options = scope.get_options(op, dict(zipmap=False))
+            zipcol = options['zipmap'] == 'columns'
+        except NameError:
+            zipcol = False
+        if zipcol:
+            clnames = op.classes_.ravel()
+            if np.issubdtype(clnames.dtype, np.integer):
+                classes = np.array(['i%d' % c for c in clnames])
+            else:
+                classes = np.array(['s%s' % c for c in clnames])
+        else:
+            classes = op.classes_
     else:
         classes = op.classes_
     return classes

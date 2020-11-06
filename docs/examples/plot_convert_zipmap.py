@@ -75,6 +75,25 @@ print("probabilities type:", type(res2[1]))
 print("type for the first observations:", type(res2[1][0]))
 
 ###################################
+# One output per class
+# ++++++++++++++++++++
+#
+# This options removes the final operator ZipMap and splits
+# the probabilities into columns. The final model produces
+# one output for the label, and one output per class.
+
+options = {id(clr): {'zipmap': 'columns'}}
+onx3 = convert_sklearn(clr, initial_types=initial_type, options=options,
+                       target_opset=12)
+
+sess3 = rt.InferenceSession(onx3.SerializeToString())
+res3 = sess3.run(None, {'float_input': X_test.astype(numpy.float32)})
+for i, out in enumerate(sess3.get_outputs()):
+    print("output: '{}' shape={} values={}...".format(
+        out.name, res3[i].shape, res3[i][:2]))
+
+
+###################################
 # Let's compare prediction time
 # +++++++++++++++++++++++++++++
 
@@ -82,13 +101,18 @@ X32 = X_test.astype(numpy.float32)
 
 print("Time with ZipMap:")
 print(repeat(lambda: sess.run(None, {'float_input': X32}),
-             number=100, repeat=3))
+             number=100, repeat=10))
 
 print("Time without ZipMap:")
 print(repeat(lambda: sess2.run(None, {'float_input': X32}),
-             number=100, repeat=3))
+             number=100, repeat=10))
 
-# The prediction is much faster on this example.
+print("Time without ZipMap but with columns:")
+print(repeat(lambda: sess3.run(None, {'float_input': X32}),
+             number=100, repeat=10))
+
+# The prediction is much faster without ZipMap
+# on this example.
 # The optimisation is even faster when the classes
 # are described with strings and not integers
 # as the final result (list of dictionaries) may copy
