@@ -1,6 +1,8 @@
 from distutils.version import StrictVersion
 import unittest
 import numpy as np
+from numpy.testing import assert_almost_equal
+import onnx
 import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -17,6 +19,7 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
+    TARGET_OPSET
 )
 
 
@@ -813,6 +816,54 @@ class TestGLMClassifierConverter(unittest.TestCase):
             allow_failure="StrictVersion("
             "onnxruntime.__version__)<= StrictVersion('0.2.1')",
         )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
+                     reason="Requires onnx 1.6")
+    def test_model_classifier_multi_zipmap_columns(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 3,
+            n_features=4, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={linear_model.LogisticRegression: {'zipmap': 'columns'}},
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        names = [_.name for _ in sess.get_outputs()]
+        self.assertEqual(['output_label', 'scl0', 'scl1', 'scl2'], names)
+        xt = X[:10].astype(np.float32)
+        got = sess.run(None, {'input': xt})
+        prob = model.predict_proba(xt)
+        for i in range(prob.shape[1]):
+            assert_almost_equal(prob[:, i], got[i+1])
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
+                     reason="Requires onnx 1.6")
+    def test_model_classifier_multi_class_string_zipmap_columns(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(), 3,
+            n_features=4, label_string=False)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class ridge classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={linear_model.LogisticRegression: {'zipmap': 'columns'}},
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        names = [_.name for _ in sess.get_outputs()]
+        self.assertEqual(['output_label', 'i0', 'i1', 'i2'], names)
+        xt = X[:10].astype(np.float32)
+        got = sess.run(None, {'input': xt})
+        prob = model.predict_proba(xt)
+        for i in range(prob.shape[1]):
+            assert_almost_equal(prob[:, i], got[i+1])
 
 
 if __name__ == "__main__":
