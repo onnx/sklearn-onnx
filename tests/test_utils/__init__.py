@@ -6,6 +6,8 @@
 import os
 import numpy as np
 import onnx
+from skl2onnx import __max_supported_opset__ as max_opset
+from skl2onnx.common._topology import OPSET_TO_IR_VERSION
 from .tests_helper import dump_data_and_model  # noqa
 from .tests_helper import (  # noqa
     dump_one_class_classification,
@@ -47,7 +49,14 @@ def _get_ir_version(opv):
     return 3
 
 
-TARGET_OPSET = min(12, int(os.environ.get('TEST_TARGET_OPSET',
-                           onnx.defs.onnx_opset_version())))
-TARGET_IR = min(7, int(os.environ.get('TEST_TARGET_IR',
-                       _get_ir_version(TARGET_OPSET))))
+TARGET_OPSET = int(
+    os.environ.get(
+        'TEST_TARGET_OPSET',
+        min(max_opset,
+            onnx.defs.onnx_opset_version())))
+
+TARGET_IR = int(
+    os.environ.get(
+        'TEST_TARGET_IR',
+        min(OPSET_TO_IR_VERSION[TARGET_OPSET],
+            _get_ir_version(TARGET_OPSET))))
