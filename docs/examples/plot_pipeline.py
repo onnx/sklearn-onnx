@@ -28,7 +28,6 @@ import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnx import ModelProto, __version__ as onnx_version
-import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 from skl2onnx import __max_supported_opset__ as max_opset
 

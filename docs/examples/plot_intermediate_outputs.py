@@ -39,7 +39,9 @@ from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
 from skl2onnx.helpers.onnx_helper import load_onnx_model
 import numpy
 import onnxruntime as rt
-from skl2onnx import convert_sklearn, __max_supported_opset__ as max_opset
+from skl2onnx import (
+    convert_sklearn, __max_supported_opset__ as max_opset,
+    __version__)
 import pprint
 from skl2onnx.common.data_types import (
     FloatTensorType, StringTensorType, Int64TensorType)

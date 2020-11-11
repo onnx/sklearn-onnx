@@ -31,7 +31,9 @@ import pickle
 from skl2onnx.helpers import collect_intermediate_steps
 import onnxruntime as rt
 from onnxconverter_common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, __max_supported_opset__ as max_opset
+from skl2onnx import (
+    convert_sklearn, __max_supported_opset__ as max_opset,
+    __version__)
 import numpy as np
 import pandas as pd
 
