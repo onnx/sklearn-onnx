@@ -33,6 +33,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from skl2onnx import to_onnx
+from skl2onnx import __max_supported_opset__ as max_opset
 from mlprodict.onnxrt import OnnxInference
 
 
@@ -59,7 +60,8 @@ ereg.fit(X_train, y_train)
 # into single float and ONNX runtimes may not fully
 # support doubles.
 
-onx = to_onnx(ereg, X_train[:1].astype(numpy.float32))
+onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
+              target_opset=max_opset)
 
 ###################################
 # Prediction with ONNX
