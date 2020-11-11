@@ -255,7 +255,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
-    n_classes = len(model.classes_)
+    n_classes = (len(model.classes_) if hasattr(model, 'classes_') else
+                 len(base_model.classes_))
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type)
