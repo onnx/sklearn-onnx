@@ -10,16 +10,16 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx170-Rt151-Skl0232:
+      Py37-Onnx180-Rt152-Skl0232:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '>=1.18.1'
-        onnx.version: '==1.7.0'
+        onnx.version: '==1.8.0'  # 'test'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.5.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
         run.example: '1'
@@ -32,7 +32,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.4.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
-        run.example: '0'
+        run.example: '1'
       Py37-Onnx170-Rt130-Skl0231:
         do.bench: '0'
         python.version: '3.7'
@@ -138,7 +138,6 @@ jobs:
   - script: |
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
-
   - task: CondaEnvironment@1
     inputs:
       createCustomEnvironment: true
@@ -152,11 +151,9 @@ jobs:
       conda install protobuf
       python -m pip install --upgrade pip
     displayName: 'Install environment'
-
   - script: |
       conda install "numpy$(numpy.version)"
     displayName: 'install numpy'
-
   - script: |
       if [ '$(sklearn.version)' == 'git' ]
         then
@@ -166,7 +163,6 @@ jobs:
           pip install scikit-learn$(sklearn.version)
       fi
     displayName: 'install scikit-learn'
-
   - script: |
       if [ '$(onnx.version)' == 'git' ]
         then
@@ -185,15 +181,12 @@ jobs:
           fi
       fi
     displayName: 'install onnx'
-
   - script: |
       pip install flake8
     displayName: 'install flake8'
-
   - script: |
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
-
   - script: |
       if [ '$(onnxcc.version)' == 'git' ]
       then
@@ -202,16 +195,13 @@ jobs:
         pip install onnxconverter-common$(onnxcc.version)
       fi
     displayName: 'install onnxconverter-common'
-
   - script: |
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
     displayName: 'install requirements'
-
   - script: |
       pip install -e .
     displayName: 'install'
-
   - script: |
       echo "---------------"
       pip show numpy
@@ -227,7 +217,6 @@ jobs:
       pip show scikit-learn
       echo "---------------"
     displayName: 'version'
-
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
@@ -237,7 +226,6 @@ jobs:
       python -c "import test_utils;print(test_utils.TARGET_OPSET, test_utils.TARGET_IR)"
       cd ..
     displayName: 'target_opset'
-
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
@@ -245,18 +233,15 @@ jobs:
       fi
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
-
   - script: |
       conda install -c conda-forge lightgbm xgboost --no-deps
       pip install --no-deps onnxmltools  # git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
-
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
-
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
@@ -270,7 +255,6 @@ jobs:
           coverage html
       fi
     displayName: 'coverage'
-
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
@@ -282,7 +266,6 @@ jobs:
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
-
   # dot cannot be found but is missing to build the documentation
   #- script: |
   #    if [ '$(onnx.target_opset)' != '' ]
@@ -305,7 +288,6 @@ jobs:
       fi
     displayName: 'benchmark'
     condition: eq(variables['run.example'], '0')
-
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'
