@@ -7,7 +7,6 @@ import os
 import sys
 import importlib
 import subprocess
-import numpy
 import onnxruntime
 
 
@@ -67,8 +66,8 @@ class TestDocumentationExample(unittest.TestCase):
                             pass
                         elif ('Current official support for domain ai.onnx '
                               'is till opset 12.') in st:
-                            # one example is using opset 13 but onnxruntime only
-                            # support up to opset 12.
+                            # one example is using opset 13 but onnxruntime
+                            # only support up to opset 12.
                             pass
                         else:
                             raise RuntimeError(

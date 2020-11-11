@@ -33,7 +33,7 @@ import pickle
 from skl2onnx.helpers import collect_intermediate_steps
 import onnxruntime as rt
 from onnxconverter_common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, __max_supported_opset__ as max_opset
 import numpy as np
 import pandas as pd
 
@@ -58,7 +58,7 @@ pipe.fit(X_digits, y_digits)
 
 initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
 model_onnx = convert_sklearn(pipe, initial_types=initial_types,
-                             target_opset=12)
+                             target_opset=max_opset)
 
 sess = rt.InferenceSession(model_onnx.SerializeToString())
 print("skl predict_proba")
