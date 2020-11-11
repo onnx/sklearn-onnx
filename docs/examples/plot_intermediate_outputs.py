@@ -39,11 +39,10 @@ from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
 from skl2onnx.helpers.onnx_helper import load_onnx_model
 import numpy
 import onnxruntime as rt
-from skl2onnx import convert_sklearn, __version__
+from skl2onnx import convert_sklearn, __max_supported_opset__ as max_opset
 import pprint
 from skl2onnx.common.data_types import (
     FloatTensorType, StringTensorType, Int64TensorType)
-from skl2onnx import __max_supported_opset__ as max_opset
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
