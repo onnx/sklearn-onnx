@@ -87,6 +87,11 @@ Once fitted, the model is converted into *ONNX*:
                     ('strfeat', StringTensorType([None, 2]))]
     model_onnx = convert_sklearn(model, initial_types=initial_type)
 
+.. note::
+    The error ``AttributeError: 'ColumnTransformer' object has no attribute 'transformers_'``
+    means the model was not trained. The converter tries to access an attribute
+    created by method `fit`.
+
 It can be represented as a 
 `DOT <https://en.wikipedia.org/wiki/DOT_(graph_description_language)>`_ graph:
 
