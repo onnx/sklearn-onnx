@@ -23,6 +23,13 @@ useful to build complex pipelines such as the following one:
 
 ::
 
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder
+    from sklearn.impute import SimpleImputer
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.compose import ColumnTransformer
+
     numeric_features = [0, 1, 2] # ["vA", "vB", "vC"]
     categorical_features = [3, 4] # ["vcat", "vcat2"]
     
@@ -72,6 +79,9 @@ Which we can represents as:
 Once fitted, the model is converted into *ONNX*:
 
 ::
+
+    from skl2onnx import convert_sklearn
+    from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 
     initial_type = [('numfeat', FloatTensorType([None, 3])),
                     ('strfeat', StringTensorType([None, 2]))]
@@ -225,6 +235,7 @@ a pipeline and each of its components independently.
     from sklearn.preprocessing import StandardScaler
     import onnxruntime
     from skl2onnx.helpers import collect_intermediate_steps, compare_objects
+    from skl2onnx.common.data_types import FloatTensorType
 
     # Let's fit a model.
     data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
@@ -282,7 +293,11 @@ them.
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
     import onnxruntime
-    from skl2onnx.helpers import collect_intermediate_steps, compare_objects
+    from skl2onnx.common.data_types import guess_data_type
+    from skl2onnx.common.exceptions import MissingShapeCalculator
+    from skl2onnx.helpers import collect_intermediate_steps, compare_objects, enumerate_pipeline_models
+    from skl2onnx.helpers.investigate import _alter_model_for_debugging
+    from skl2onnx import convert_sklearn
 
     class MyScaler(StandardScaler):
         pass
