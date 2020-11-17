@@ -69,3 +69,4 @@ html
 benchmarks/bench_*.xlsx
 benchmarks/bench_*.csv
 benchmarks/bench_*.png
+benchmarks/results/*.png
