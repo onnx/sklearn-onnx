@@ -189,10 +189,10 @@ def plot_results(df, verbose=False):
 
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
-    n_obs = [1, 10]
+    n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict', 'predict_proba']
     n_features = [1, 5, 10, 20, 50, 100, 200]
-    fit_intercepts = [True, False]
+    fit_intercepts = [True]
 
     start = time()
     results = bench(n_obs, n_features, fit_intercepts, methods,
@@ -227,4 +227,5 @@ if __name__ == '__main__':
     df = run_bench(verbose=True)
     plt.savefig("bench_plot_onnxruntime_logreg.png")
     df.to_csv("bench_plot_onnxruntime_logreg.csv", index=False)
+    df.to_excel("bench_plot_onnxruntime_logreg.xlsx", index=False)
     plt.show()

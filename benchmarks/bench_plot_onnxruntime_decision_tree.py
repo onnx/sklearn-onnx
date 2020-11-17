@@ -188,7 +188,7 @@ def plot_results(df, verbose=False):
 
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
-    n_obs = [1, 10]
+    n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict', 'predict_proba']
     n_features = [1, 5, 10, 20, 50, 100, 200]
     max_depths = [2, 5, 10, 20]
@@ -226,4 +226,5 @@ if __name__ == '__main__':
     df = run_bench(verbose=True)
     plt.savefig("bench_plot_onnxruntime_decision_tree.png")
     df.to_csv("bench_plot_onnxruntime_decision_tree.csv", index=False)
+    df.to_excel("bench_plot_onnxruntime_decision_tree.xlsx", index=False)
     plt.show()

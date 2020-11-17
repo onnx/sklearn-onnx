@@ -1,0 +1,1 @@
+Processeur	Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, 2112 MHz, 4 cœur(s), 8 processeur(s) logique(s)

@@ -18,12 +18,7 @@ from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
 from sklearn.ensemble import RandomForestRegressor
-try:
-    # scikit-learn >= 0.22
-    from sklearn.utils._testing import ignore_warnings
-except ImportError:
-    # scikit-learn < 0.22
-    from sklearn.utils.testing import ignore_warnings
+from sklearn.utils._testing import ignore_warnings
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
@@ -49,14 +44,15 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     sess = InferenceSession(content)
     outputs = [o.name for o in sess.get_outputs()]
 
-    try:
-        lite = treelite.sklearn.import_model(rf)
-        name = "lite{}.dll".format(id(rf))
-        lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
-                        libpath=name, verbose=False)
-        lite_predictor = treelite_runtime.Predictor(name, verbose=False)
-    except (treelite.util.TreeliteError, PermissionError, UnicodeDecodeError):
-        lite_predictor = None
+    if False:
+        try:
+            lite = treelite.sklearn.import_model(rf)
+            name = "lite{}.dll".format(id(rf))
+            lite.export_lib(toolchain='msvc' if sys.platform == "win32" else "gcc",
+                            libpath=name, verbose=False)
+            lite_predictor = treelite_runtime.Predictor(name, verbose=False)
+        except (treelite.util.TreeliteError, PermissionError, UnicodeDecodeError):
+            lite_predictor = None
 
     def predict_skl_predict(X, model=rf):
         return rf.predict(X)
@@ -72,7 +68,8 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     return {'predict': (
         predict_skl_predict,
         predict_onnxrt_predict,
-        predict_treelite_predict if lite_predictor is not None else None)}
+        None, # predict_treelite_predict if lite_predictor is not None else None
+    )}
 
 
 ##############################
@@ -91,10 +88,8 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
         ntrain = 100000
         X_train = np.empty((ntrain, nfeat))
         X_train[:, :] = rand(ntrain, nfeat)[:, :]
-        X_trainsum = X_train.sum(axis=1)
         eps = rand(ntrain) - 0.5
-        X_trainsum_ = X_trainsum + eps
-        y_train = (X_trainsum_ >= X_trainsum).ravel().astype(int)
+        y_train = X_train.sum(axis=1) + eps
 
         for n_jobs in n_jobss:
             for max_depth in max_depths:
@@ -167,7 +162,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                                 if len(p1.shape) == 1 and len(p2.shape) == 2:
                                     p2 = p2.ravel()
                                 try:
-                                    assert_almost_equal(p1, p2, decimal=5)
+                                    assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
                                 except AssertionError as e:
                                     warnings.warn(str(e))
     return res
@@ -227,9 +222,9 @@ def plot_results(df, verbose=False):
 
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
-    n_obs = [1, 10, 100, 1000, 10000]
+    n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
-    n_features = [1, 10, 20, 30]
+    n_features = [1, 10, 20, 30, 100]
     max_depths = [5, 10]
     n_estimatorss = [1, 10, 100]
     n_jobss = [1, 3] #, 100]
@@ -268,7 +263,8 @@ if __name__ == '__main__':
     ])
     df.to_csv("bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
     print(df)
-    df = run_bench(verbose=False)
+    df = run_bench(verbose=True)
     plt.savefig("bench_plot_onnxruntime_random_forest_reg.png")
     df.to_csv("bench_plot_onnxruntime_random_forest_reg.csv", index=False)
+    df.to_excel("bench_plot_onnxruntime_random_forest_reg.xlsx", index=False)
     plt.show()

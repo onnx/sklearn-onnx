@@ -66,3 +66,6 @@ docs/auto_tutorial/*
 docs/tutorial/*.onnx
 docs/tutorial/East*.jpg
 html
+benchmarks/bench_*.xlsx
+benchmarks/bench_*.csv
+benchmarks/bench_*.png
