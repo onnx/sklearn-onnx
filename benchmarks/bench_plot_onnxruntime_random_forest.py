@@ -227,10 +227,10 @@ if __name__ == '__main__':
         {"name": "onnxruntime", "version": onnxruntime.__version__},
         {"name": "skl2onnx", "version": skl2onnx.__version__},
     ])
-    df.to_csv("bench_plot_onnxruntime_decision_tree.time.csv", index=False)
+    df.to_csv("results/bench_plot_onnxruntime_decision_tree.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    plt.savefig("bench_plot_onnxruntime_random_forest.png")
-    df.to_csv("bench_plot_onnxruntime_random_forest.csv", index=False)
-    df.to_excel("bench_plot_onnxruntime_random_excel.xlsx", index=False)
-    plt.show()
+    plt.savefig("results/bench_plot_onnxruntime_random_forest.png")
+    df.to_csv("results/bench_plot_onnxruntime_random_forest.csv", index=False)
+    df.to_excel("results/bench_plot_onnxruntime_random_excel.xlsx", index=False)
+    # plt.show()

@@ -1,0 +1,9 @@
+name,version
+date,2020-11-18 13:06:47.281131
+numpy,1.19.1
+scikit-learn,0.23.2
+onnx,1.7.0
+onnxruntime,1.5.2
+skl2onnx,1.7.1
+treelite,0.93
+treelite_runtime,0.93

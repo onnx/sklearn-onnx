@@ -22,8 +22,6 @@ from sklearn.utils._testing import ignore_warnings
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
-import treelite.sklearn
-import treelite_runtime 
 
 
 ##############################
@@ -45,6 +43,8 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     outputs = [o.name for o in sess.get_outputs()]
 
     if False:
+        import treelite.sklearn
+        import treelite_runtime 
         try:
             lite = treelite.sklearn.import_model(rf)
             name = "lite{}.dll".format(id(rf))
@@ -224,10 +224,10 @@ def plot_results(df, verbose=False):
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
-    n_features = [1, 10, 20, 30, 100]
-    max_depths = [5, 10]
-    n_estimatorss = [1, 10, 100]
-    n_jobss = [1, 3] #, 100]
+    n_features = [30, 100]
+    max_depths = [10, 15]
+    n_estimatorss = [100, 200]
+    n_jobss = [4] #, 100]
 
     start = time()
     results = bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
@@ -238,7 +238,7 @@ def run_bench(repeat=100, verbose=False):
     print("Total time = %0.3f sec\n" % (end - start))
 
     # plot the results
-    plot_results(results_df, verbose=verbose)
+    #plot_results(results_df, verbose=verbose)
     return results_df
 
 
@@ -261,10 +261,10 @@ if __name__ == '__main__':
         {"name": "treelite", "version": treelite.__version__},
         {"name": "treelite_runtime", "version": treelite_runtime.__version__},
     ])
-    df.to_csv("bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
+    df.to_csv("results/bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    plt.savefig("bench_plot_onnxruntime_random_forest_reg.png")
-    df.to_csv("bench_plot_onnxruntime_random_forest_reg.csv", index=False)
-    df.to_excel("bench_plot_onnxruntime_random_forest_reg.xlsx", index=False)
-    plt.show()
+    #plt.savefig("results/bench_plot_onnxruntime_random_forest_reg.png")
+    df.to_csv("results/bench_plot_onnxruntime_random_forest_reg.csv", index=False)
+    df.to_excel("results/bench_plot_onnxruntime_random_forest_reg.xlsx", index=False)
+    # plt.show()

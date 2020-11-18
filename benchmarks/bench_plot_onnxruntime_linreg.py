@@ -49,19 +49,11 @@ def fcts_model(X, y, fit_intercept):
     def predict_skl_predict(X, model=rf):
         return rf.predict(X)
 
-    def predict_skl_predict_proba(X, model=rf):
-        return rf.predict_proba(X)
-
     def predict_onnxrt_predict(X, sess=sess):
         return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
 
-    def predict_onnxrt_predict_proba(X, sess=sess):
-        return sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
-
     return {'predict': (predict_skl_predict,
-                        predict_onnxrt_predict),
-            'predict_proba': (predict_skl_predict_proba,
-                              predict_onnxrt_predict_proba)}
+                        predict_onnxrt_predict)}
 
 
 ##############################
@@ -77,7 +69,7 @@ def bench(n_obs, n_features, fit_intercepts, methods,
     res = []
     for nfeat in n_features:
 
-        ntrain = 100000
+        ntrain = 10000
         X_train = np.empty((ntrain, nfeat))
         X_train[:, :] = rand(ntrain, nfeat)[:, :]
         eps = rand(ntrain) - 0.5
@@ -87,6 +79,12 @@ def bench(n_obs, n_features, fit_intercepts, methods,
             fcts = fcts_model(X_train, y_train, fit_intercept)
 
             for n in n_obs:
+                if n > 100:
+                    loop_repeat = repeat // 10
+                elif n > 1000:
+                    loop_repeat = repeat // 20
+                else:
+                    loop_repeat = repeat
                 for method in methods:
 
                     fct1, fct2 = fcts[method]
@@ -95,11 +93,12 @@ def bench(n_obs, n_features, fit_intercepts, methods,
                         continue
 
                     obs = dict(n_obs=n, nfeat=nfeat,
-                               fit_intercept=fit_intercept, method=method)
+                               fit_intercept=fit_intercept, method=method,
+                               repeat=loop_repeat)
 
                     # creates different inputs to avoid caching in any ways
                     Xs = []
-                    for r in range(repeat):
+                    for r in range(loop_repeat):
                         x = np.empty((n, nfeat))
                         x[:, :] = rand(n, nfeat)[:, :]
                         Xs.append(x)
@@ -110,8 +109,6 @@ def bench(n_obs, n_features, fit_intercepts, methods,
                     for X in Xs:
                         p1 = fct1(X)
                         repeated += 1
-                        if time() - st >= 1:
-                            break  # stops if longer than a second
                     end = time()
                     obs["time_skl"] = (end - st) / repeated
 
@@ -121,8 +118,6 @@ def bench(n_obs, n_features, fit_intercepts, methods,
                     for X in Xs:
                         p2 = fct2(X)
                         r2 += 1
-                        if r2 >= repeated:
-                            break
                     end = time()
                     obs["time_ort"] = (end - st) / repeated
                     res.append(obs)
@@ -188,10 +183,10 @@ def plot_results(df, verbose=False):
 
 
 @ignore_warnings(category=FutureWarning)
-def run_bench(repeat=100, verbose=False):
+def run_bench(repeat=1000, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
-    n_features = [1, 5, 10, 20, 50, 100, 200]
+    n_features = [10, 100, 200]
     fit_intercepts = [True]
 
     start = time()
@@ -222,10 +217,10 @@ if __name__ == '__main__':
         {"name": "onnxruntime", "version": onnxruntime.__version__},
         {"name": "skl2onnx", "version": skl2onnx.__version__},
     ])
-    df.to_csv("bench_plot_onnxruntime_logreg.time.csv", index=False)
+    df.to_csv("results/bench_plot_onnxruntime_logreg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    plt.savefig("bench_plot_onnxruntime_linreg.png")
-    df.to_csv("bench_plot_onnxruntime_linreg.csv", index=False)
-    df.to_excel("bench_plot_onnxruntime_linreg.xlsx", index=False)
-    plt.show()
+    plt.savefig("results/bench_plot_onnxruntime_linreg.png")
+    df.to_csv("results/bench_plot_onnxruntime_linreg.csv", index=False)
+    df.to_excel("results/bench_plot_onnxruntime_linreg.xlsx", index=False)
+    # plt.show()

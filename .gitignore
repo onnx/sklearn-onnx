@@ -70,3 +70,6 @@ benchmarks/bench_*.xlsx
 benchmarks/bench_*.csv
 benchmarks/bench_*.png
 benchmarks/results/*.png
+benchmarks/results/*.xlsx
+benchmarks/tmp*
+benchmarks/*.py.txt
