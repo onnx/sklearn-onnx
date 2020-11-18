@@ -143,4 +143,4 @@ if __name__ == "__main__":
     linear_models()
     svm_models()
     rf_models()
-    plt.show()
+    # plt.show()
