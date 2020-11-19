@@ -177,7 +177,7 @@ def plot_results(df, verbose=False):
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
-    n_features = [10, 100, 200]
+    n_features = [10, 50]
     kernels = ["linear", "poly", "rbf", "sigmoid"]
 
     start = time()
