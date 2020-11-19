@@ -225,9 +225,9 @@ def run_bench(repeat=100, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
     n_features = [30, 100]
-    max_depths = [10, 15]
+    max_depths = [10]
     n_estimatorss = [100, 200]
-    n_jobss = [4] #, 100]
+    n_jobss = [4]
 
     start = time()
     results = bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
