@@ -482,7 +482,6 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                            predict_attributes=options[
                              GaussianProcessRegressor])
 
-    @unittest.skipIf(True, reason="shape_inference fails")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
@@ -498,7 +497,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X, gp, model_onnx,
+        dump_data_and_model(X.astype(np.float64), gp, model_onnx,
                             verbose=False,
                             basename="SklearnGaussianProcessRBFT")
 

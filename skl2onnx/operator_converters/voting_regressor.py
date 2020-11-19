@@ -6,8 +6,8 @@
 
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
+from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
-from ..proto import onnx_proto
 
 
 def convert_voting_regressor(scope, operator, container):
@@ -38,8 +38,9 @@ def convert_voting_regressor(scope, operator, container):
             val = 1. / len(op.estimators_)
 
         weights_name = scope.get_unique_variable_name('w%d' % i)
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
         container.add_initializer(
-            weights_name, onnx_proto.TensorProto.FLOAT, [1], [val])
+            weights_name, proto_dtype, [1], [val])
         wvar_name = scope.get_unique_variable_name('wvar_%d' % i)
         apply_mul(scope, [var_name, weights_name],
                   wvar_name, container, broadcast=1)
