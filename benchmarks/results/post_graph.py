@@ -20,7 +20,7 @@ def linear_models():
     dfc = dfc[(dfc.method == "predict_proba") & (dfc.fit_intercept == True)]
     dfc["speedup"] = dfc["time_skl"] / dfc["time_ort"]
 
-    nfeats = [10, 100]
+    nfeats = [10, 50]
     fig, axs = plt.subplots(1, len(nfeats) * 2, figsize=(14, 4), sharey=True)
 
     names = ["LinearRegression", "LogisticRegression"]
