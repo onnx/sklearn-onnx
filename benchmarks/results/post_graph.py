@@ -63,7 +63,7 @@ def svm_models():
     fig, axs = plt.subplots(1, ncols, figsize=(14, 4), sharey=True)
 
     name = "SVR"
-    nf = 100
+    nf = 50
     pos = 0
     for kernel in sorted(set(dfr['kernel'])):
         sub = dfr[(dfr.kernel == kernel) & (dfr.nfeat == nf)]
@@ -104,9 +104,9 @@ def rf_models():
     name = "RandomForestRegressor"
     pos = 0
     for max_depth in [10]:
-        for nf in [10, 100]:
-            for est in [10, 100]:
-                for n_jobs in [3]:
+        for nf in [30, 100]:
+            for est in [100, 200]:
+                for n_jobs in [4]:
                     sub = dfr[(dfr.max_depth == max_depth) & (dfr.nfeat == nf) &
                               (dfr.n_estimators == est) & (dfr.n_jobs == n_jobs)]
                     ax = axs[pos]

@@ -27,6 +27,7 @@ toolkits into `ONNX <https://onnx.ai>`_.
     pipeline
     parameterized
     supported
+    benchmark/index
 
 **Issues, questions**
 
