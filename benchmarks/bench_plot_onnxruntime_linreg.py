@@ -6,6 +6,7 @@ Benchmark of onnxruntime on LinearRegression.
 # License: MIT
 import matplotlib
 
+import warnings
 from io import BytesIO
 from time import perf_counter as time
 from itertools import combinations, chain
