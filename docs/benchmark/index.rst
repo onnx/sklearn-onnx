@@ -16,11 +16,11 @@ This page tracks graphs produced for publication.
     onnxruntime==1.5.994
     skl2onnx==1.7.1092
 
-.. image:: linear_model.png
+.. image:: 202011/linear_model.png
 
-.. image:: rf_model.png
+.. image:: 202011/rf_model.png
 
-.. image:: svm_model.png
+.. image:: 202011/svm_model.png
 
 To replicate:
 
