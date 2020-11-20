@@ -54,10 +54,10 @@ def fcts_model(X, y, fit_intercept):
         return rf.predict_proba(X)
 
     def predict_onnxrt_predict(X, sess=sess):
-        return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
+        return sess.run(outputs[:1], {'X': X})[0]
 
     def predict_onnxrt_predict_proba(X, sess=sess):
-        return sess.run(outputs[1:], {'X': X.astype(np.float32)})[0]
+        return sess.run(outputs[1:], {'X': X})[0]
 
     return {'predict': (predict_skl_predict,
                         predict_onnxrt_predict),
@@ -80,7 +80,7 @@ def bench(n_obs, n_features, fit_intercepts, methods,
 
         ntrain = 10000
         X_train = np.empty((ntrain, nfeat))
-        X_train[:, :] = rand(ntrain, nfeat)[:, :]
+        X_train[:, :] = rand(ntrain, nfeat)[:, :].astype(np.float32)
         X_trainsum = X_train.sum(axis=1)
         eps = rand(ntrain) - 0.5
         X_trainsum_ = X_trainsum + eps
@@ -112,7 +112,7 @@ def bench(n_obs, n_features, fit_intercepts, methods,
                     for r in range(repeat):
                         x = np.empty((n, nfeat))
                         x[:, :] = rand(n, nfeat)[:, :]
-                        Xs.append(x)
+                        Xs.append(x.astype(np.float32))
 
                     # measures the baseline
                     st = time()

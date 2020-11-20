@@ -58,7 +58,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
         return rf.predict(X)
 
     def predict_onnxrt_predict(X, sess=sess):
-        return numpy.array(sess.run(outputs[:1], {'X': X.astype(np.float32)}))
+        return sess.run(outputs[:1], {'X': X})[0]
 
     def predict_treelite_predict(X, sess=sess):
         return numpy.array(
@@ -86,7 +86,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
     for nfeat in n_features:
 
         ntrain = 100000
-        X_train = np.empty((ntrain, nfeat))
+        X_train = np.empty((ntrain, nfeat)).astype(np.float32)
         X_train[:, :] = rand(ntrain, nfeat)[:, :]
         eps = rand(ntrain) - 0.5
         y_train = X_train.sum(axis=1) + eps
@@ -116,7 +116,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, n_jobss,
                             for r in range(repeat):
                                 x = np.empty((n, nfeat))
                                 x[:, :] = rand(n, nfeat)[:, :]
-                                Xs.append(x)
+                                Xs.append(x.astype(np.float32))
 
                             # measures the baseline
                             st = time()
