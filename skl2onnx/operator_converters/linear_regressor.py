@@ -11,8 +11,8 @@ import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_div, apply_sqrt, apply_sub, apply_add)
 from ..common.data_types import (
-    BooleanTensorType, Int64TensorType, guess_numpy_type,
-    guess_proto_type, DoubleTensorType)
+    BooleanTensorType, Int64TensorType, DoubleTensorType,
+    guess_numpy_type, guess_proto_type)
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
