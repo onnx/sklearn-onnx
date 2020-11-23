@@ -483,7 +483,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                              GaussianProcessRegressor])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion(1.6.0),
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
         reason="shape_inference fails")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
