@@ -23,6 +23,9 @@ TARGET_OPSET = 12  # change when PR 551
 
 
 class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("1.2.0"),
+        reason="onnxruntime misses implementation for double")
     def test_model_linear_regression_64(self):
         model, X = fit_regression_model(LinearRegression())
         model_onnx = convert_sklearn(
@@ -72,6 +75,9 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             X.astype(np.float64), model, model_onnx,
             basename="SklearnBaggingRegressorSGDDouble")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("1.2.0"),
+        reason="onnxruntime misses implementation for double")
     def test_model_sgd_regressor_64(self):
         model, X = fit_regression_model(SGDRegressor())
         model_onnx = convert_sklearn(
