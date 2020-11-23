@@ -483,6 +483,9 @@ class TestSklearnGaussianProcess(unittest.TestCase):
                              GaussianProcessRegressor])
 
     @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(1.6.0),
+        reason="shape_inference fails")
+    @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_true(self):
@@ -499,7 +502,7 @@ class TestSklearnGaussianProcess(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X.astype(np.float64), gp, model_onnx,
                             verbose=False,
-                            basename="SklearnGaussianProcessRBFT")
+                            basename="SklearnGaussianProcessRBFTDouble")
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),

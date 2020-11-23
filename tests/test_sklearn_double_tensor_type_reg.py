@@ -83,6 +83,9 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             X.astype(np.float64), model, model_onnx,
             basename="SklearnLinearSGDRegressorDouble")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="shape_inference fails")
     def test_gpr_rbf_fitted_true_double(self):
         gp = GaussianProcessRegressor(
             alpha=1e-7, n_restarts_optimizer=15, normalize_y=True)
