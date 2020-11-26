@@ -16,6 +16,7 @@ from numpy.random import rand
 from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
+from sklearn import config_context
 from sklearn.tree import DecisionTreeClassifier
 try:
     # scikit-learn >= 0.22
@@ -108,15 +109,16 @@ def bench(n_obs, n_features, max_depths, methods,
                         Xs.append(x.astype(np.float32))
 
                     # measures the baseline
-                    st = time()
-                    repeated = 0
-                    for X in Xs:
-                        p1 = fct1(X)
-                        repeated += 1
-                        if time() - st >= 1:
-                            break  # stops if longer than a second
-                    end = time()
-                    obs["time_skl"] = (end - st) / repeated
+                    with config_context(assume_finite=True):
+                        st = time()
+                        repeated = 0
+                        for X in Xs:
+                            p1 = fct1(X)
+                            repeated += 1
+                            if time() - st >= 1:
+                                break  # stops if longer than a second
+                        end = time()
+                        obs["time_skl"] = (end - st) / repeated
 
                     # measures the new implementation
                     st = time()
