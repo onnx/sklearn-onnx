@@ -125,7 +125,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
         diff = np.sort(
             np.abs(np.squeeze(pred_skl) - np.squeeze(pred_onx)))
-        self.assertEqual(diff[0], diff[-1])
+        if diff[0] != diff[-1]:
+            raise AssertionError(
+                "Discrepencies\nSKL\n{}\nORT\n{}".format(pred_skl, pred_onx))
 
 
 if __name__ == "__main__":

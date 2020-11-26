@@ -28,8 +28,7 @@ def model_to_test():
 
 class TestVotingRegressorConverter(unittest.TestCase):
 
-    @unittest.skipIf(VotingRegressor is None,
-                     reason="new in 0.21")
+    @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression(self):
         model, X = fit_regression_model(model_to_test())
         model_onnx = convert_sklearn(
@@ -48,8 +47,7 @@ class TestVotingRegressorConverter(unittest.TestCase):
             comparable_outputs=[0]
         )
 
-    @unittest.skipIf(VotingRegressor is None,
-                     reason="new in 0.21")
+    @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression_int(self):
         model, X = fit_regression_model(model_to_test(), is_int=True)
         model_onnx = convert_sklearn(
@@ -68,8 +66,7 @@ class TestVotingRegressorConverter(unittest.TestCase):
             comparable_outputs=[0]
         )
 
-    @unittest.skipIf(VotingRegressor is None,
-                     reason="new in 0.21")
+    @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression_bool(self):
         model, X = fit_regression_model(model_to_test(), is_bool=True)
         model_onnx = convert_sklearn(
