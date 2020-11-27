@@ -9,7 +9,7 @@ except ImportError:
     import collections as cabc
 import numpy as np
 from ..common._apply_operation import (
-    apply_cast, apply_add, apply_sqrt, apply_sub)
+    apply_cast, apply_add, apply_sqrt, apply_sub, apply_div)
 from ..common.data_types import (
     BooleanTensorType, Int64TensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
