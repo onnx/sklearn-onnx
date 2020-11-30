@@ -35,11 +35,14 @@ def calculate_linear_classifier_output_shapes(operator):
     _calculate_linear_classifier_output_shapes(operator)
 
 
-def _calculate_linear_classifier_output_shapes(operator, decision_path=False):
+def _calculate_linear_classifier_output_shapes(
+        operator, decision_path=False, decision_leaf=False):
+    n_out = 0
     if decision_path:
-        out_range = [2, 3]
-    else:
-        out_range = [1, 2]
+        n_out += 1
+    if decision_leaf:
+        n_out += 1
+    out_range = [2, 2 + n_out]
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=out_range)
     check_input_and_output_types(operator, good_input_types=[
@@ -95,6 +98,10 @@ def _calculate_linear_classifier_output_shapes(operator, decision_path=False):
     else:
         raise ValueError('Label types must be all integers or all strings.')
 
+    # decision_path, decision_leaf
+    for n in range(2, len(operator.outputs)):
+        operator.outputs[n].type.shape = [N, 1]
+
 
 def calculate_linear_regressor_output_shapes(operator):
     """
@@ -124,3 +131,7 @@ def calculate_linear_regressor_output_shapes(operator):
             N, operator.raw_operator.coef_.shape[1]])
     else:
         operator.outputs[0].type = cls_type([N, 1])
+
+    # decision_path, decision_leaf
+    for n in range(1, len(operator.outputs)):
+        operator.outputs[n].type.shape = [N, 1]

@@ -24,7 +24,7 @@ from ..common.tree_ensemble import (
 )
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
-from .decision_tree import predict, _build_labels
+from .decision_tree import predict, _build_labels_path
 
 
 def _num_estimators(op):
@@ -253,7 +253,7 @@ def convert_sklearn_random_forest_classifier(
                 op_type.replace("Classifier", "Regressor"), input_name, dpath,
                 op_domain=op_domain, op_version=op_version, **attrs)
 
-            labels = _build_labels(tree.tree_)
+            labels = _build_labels_path(tree.tree_)
             ordered = list(sorted(labels.items()))
             keys = [float(_[0]) for _ in ordered]
             values = [_[1] for _ in ordered]
@@ -420,7 +420,7 @@ def convert_sklearn_random_forest_regressor_converter(
             op_type, input_name, dpath,
             op_domain=op_domain, op_version=op_version, **attrs)
 
-        labels = _build_labels(tree.tree_)
+        labels = _build_labels_path(tree.tree_)
         ordered = list(sorted(labels.items()))
         keys = [float(_[0]) for _ in ordered]
         values = [_[1] for _ in ordered]

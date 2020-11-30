@@ -982,3 +982,19 @@ def binary_array_to_string(mat):
         raise NotImplementedError()
     res = [[str(i) for i in row] for row in mat.tolist()]
     return [''.join(row) for row in res]
+
+
+def path_to_leaf(tree, mat):
+    leave = set([i for i in range(tree.node_count)
+                 if tree.children_left[i] <= i])
+    res = []
+    for row in range(mat.shape[0]):
+        leaf = None
+        for i in range(mat.shape[1]):
+            if mat[row, i] == 1 and i in leave:
+                leaf = i
+                break
+        if leaf is None:
+            raise AssertionError("Path does not end with a leaf.")
+        res.append(leaf)
+    return numpy.array(res, numpy.int64)
