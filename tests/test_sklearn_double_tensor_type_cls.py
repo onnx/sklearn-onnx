@@ -40,8 +40,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                 LogisticRegression(), n_cl, n_features=4)
             pmethod = ('decision_function_binary' if n_cl == 2 else
                        'decision_function')
-            for b in [True]:  # , False]:
-                for z in [False]:  #, True]:
+            for b in [True, False]:
+                for z in [False]:
+                    # zipmap does not allow tensor(double) as inputs
                     with self.subTest(n_classes=n_cl, raw_score=b):
                         model_onnx = convert_sklearn(
                             model, "model",
@@ -51,11 +52,16 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                                  "zipmap": z}})
                         self.assertIn("elem_type: 11", str(model_onnx))
                         methods = None if not b else ['predict', pmethod]
+                        if not b and n_cl == 2:
+                            # onnxruntime does not support sigmoid for
+                            # DoubleTensorType
+                            continue
                         dump_data_and_model(
                             X.astype(np.float64), model, model_onnx,
                             methods=methods,
                             basename="SklearnLogisticRegressionDouble2RAW{}"
-                                     "ZIP{}CL{}".format(b, n_cl, z))
+                                     "ZIP{}CL{}".format(
+                                        1 if b else 0, 1 if z else 0, n_cl))
 
     """
     @unittest.skipIf(
