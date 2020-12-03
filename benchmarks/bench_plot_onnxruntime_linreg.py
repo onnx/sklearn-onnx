@@ -186,7 +186,7 @@ def plot_results(df, verbose=False):
 
 
 @ignore_warnings(category=FutureWarning)
-def run_bench(repeat=1000, verbose=False):
+def run_bench(repeat=2000, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
     methods = ['predict']
     n_features = [10, 50, 100]
