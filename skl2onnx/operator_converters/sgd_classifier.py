@@ -207,7 +207,8 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
                                    len(classes), proto_type)
     elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
         proba = _predict_proba_modified_huber(
-            scope, operator, container, scores, len(classes))
+            scope, operator, container, scores, len(classes),
+            proto_type)
     else:
         if len(classes) == 2:
             negate_name = scope.get_unique_variable_name('negate')
