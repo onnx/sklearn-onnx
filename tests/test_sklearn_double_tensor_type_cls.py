@@ -31,8 +31,8 @@ TARGET_OPSET = 12  # change when PR 551
 
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("1.2.0"),
-        reason="onnxruntime misses implementation for double")
+        StrictVersion(ort_version) < StrictVersion("1.5.0"),
+        reason="ArgMax is missing")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_logistic_regression_64_binary(self):
         for n_cl in [2, 3]:
