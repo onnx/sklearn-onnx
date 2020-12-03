@@ -4,13 +4,14 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
-# from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import BaggingClassifier, StackingClassifier
 # Requires PR #488.
 # from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import SVC
 try:
     from sklearn.ensemble import VotingClassifier
@@ -23,6 +24,11 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
+    # scikit-learn versions <= 0.19
+    ComplementNB = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
@@ -36,7 +42,8 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
 
     def _common_classifier(
-            self, model_cls_set, name_root=None, debug=False, raw_scores=True):
+            self, model_cls_set, name_root=None, debug=False,
+            raw_scores=True, pos_features=False, is_int=False):
         for model_cls in model_cls_set:
             if name_root is None:
                 name = model_cls.__name__
@@ -44,7 +51,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                 name = name_root
             for n_cl in [2, 3]:
                 model, X = fit_classification_model(
-                    model_cls(), n_cl, n_features=4)
+                    model_cls(), n_cl, n_features=4,
+                    pos_features=pos_features, is_int=is_int)
                 pmethod = ('decision_function_binary' if n_cl == 2 else
                            'decision_function')
                 bs = [True, False] if raw_scores else [False]
@@ -214,8 +222,46 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             [lambda: SVC(kernel='sigmoid')], "SVCsigmoid",
             raw_scores=False)
 
-    # BernoulliNB, CategoricalNB, ComplementNB
-    # BaggingClassifier StackingClassifier
+    @unittest.skipIf(
+        BernoulliNB is None, reason="new in scikit version 0.20")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="ArgMax, Log are missing")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_bernoullinb_64(self):
+        self._common_classifier(
+            [lambda: BernoulliNB()], "BernoulliNB", raw_scores=False)
+
+    @unittest.skipIf(
+        ComplementNB is None, reason="new in scikit version 0.20")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="ArgMax, ReduceLogSumExp are missing")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_complementnb_64(self):
+        self._common_classifier(
+            [lambda: ComplementNB()], "ComplementNB",
+            raw_scores=False, pos_features=True)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="ArgMax, ReduceMean are missing")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_bagging_64(self):
+        self._common_classifier(
+            [lambda: BaggingClassifier(LogisticRegression())],
+            "BaggingClassifier")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="ArgMax, Sigmoid are missing")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_stacking_64(self):
+        self._common_classifier(
+            [lambda: StackingClassifier([
+                ('a', LogisticRegression()),
+                ('b', LogisticRegression())])],
+            "StackingClassifier")
 
 
 if __name__ == "__main__":
