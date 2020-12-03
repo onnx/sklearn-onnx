@@ -248,7 +248,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor2")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.5.0"),
         reason="not available")
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
