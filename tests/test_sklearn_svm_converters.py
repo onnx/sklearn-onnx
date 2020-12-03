@@ -209,6 +209,9 @@ class TestSklearnSVM(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.4.0')")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="use of recent Cast operator")
     def test_convert_svr_linear(self):
         model, X = self._fit_binary_classification(SVR(kernel="linear"))
         model_onnx = convert_sklearn(
@@ -395,6 +398,9 @@ class TestSklearnSVM(unittest.TestCase):
                           " <= StrictVersion('0.4.0')"
         )
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="use of recent Cast operator")
     def test_convert_nusvr(self):
         model, X = self._fit_binary_classification(NuSVR())
         model_onnx = convert_sklearn(
@@ -415,6 +421,9 @@ class TestSklearnSVM(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx,
                             basename="SklearnRegNuSVR")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="use of recent Cast operator")
     def test_convert_nusvr_default(self):
         model, X = self._fit_binary_classification(NuSVR())
         model_onnx = convert_sklearn(
