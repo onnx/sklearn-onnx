@@ -171,7 +171,7 @@ def _predict_proba_modified_huber(scope, operator, container,
     apply_div(scope, [add_result_name, constant_name],
               proba_name, container, broadcast=1)
     return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes, unity_name)
+                            num_classes, unity_name, proto_type)
 
 
 def convert_sklearn_sgd_classifier(scope, operator, container):
