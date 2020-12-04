@@ -4,7 +4,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.ensemble import BaggingClassifier, StackingClassifier
+from sklearn.ensemble import BaggingClassifier
 # Requires PR #488.
 # from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
@@ -16,7 +16,6 @@ from sklearn.svm import SVC
 try:
     from sklearn.ensemble import VotingClassifier
 except ImportError:
-    # New in 0.21
     VotingClassifier = None
 try:
     # scikit-learn >= 0.22
@@ -27,8 +26,11 @@ except ImportError:
 try:
     from sklearn.naive_bayes import ComplementNB
 except ImportError:
-    # scikit-learn versions <= 0.19
     ComplementNB = None
+try:
+    from sklearn.ensemble import StackingClassifier
+except ImportError:
+    StackingClassifier = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
