@@ -18,8 +18,7 @@ from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
-from test_utils import (
-    dump_data_and_model, fit_classification_model)  # , TARGET_OPSET)
+from test_utils import dump_data_and_model  # , TARGET_OPSET
 
 TARGET_OPSET = 12  # change when PR 551
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
@@ -34,7 +33,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 name = model_cls.__name__
             else:
                 name = name_root
-            
+
             model = model_cls()
             X = np.random.randn(100, 4).astype(np.float64)
             model.fit(X)
