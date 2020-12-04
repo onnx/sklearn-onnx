@@ -18,9 +18,8 @@ from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model  # , TARGET_OPSET
+from test_utils import dump_data_and_model, TARGET_OPSET
 
-TARGET_OPSET = 12  # change when PR 551
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
