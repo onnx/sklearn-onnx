@@ -32,10 +32,7 @@ def convert_voting_classifier(scope, operator, container):
     op = operator.raw_operator
     n_classes = len(op.classes_)
 
-    classes_ind_name = scope.get_unique_variable_name('classes_ind')
-    container.add_initializer(classes_ind_name, onnx_proto.TensorProto.INT64,
-                              (1, n_classes), list(range(n_classes)))
-
+    classes_ind_name = None
     probs_names = []
     one_name = None
     for i, estimator in enumerate(op.estimators_):
@@ -79,6 +76,12 @@ def convert_voting_classifier(scope, operator, container):
                                argmax_output_name,
                                name=scope.get_unique_operator_name('ArgMax'),
                                axis=1)
+
+            if classes_ind_name is None:
+                classes_ind_name = scope.get_unique_variable_name('classes_ind')
+                container.add_initializer(
+                    classes_ind_name, onnx_proto.TensorProto.INT64,
+                    (1, n_classes), list(range(n_classes)))
 
             equal_name = scope.get_unique_variable_name('equal')
             container.add_node('Equal', [argmax_output_name, classes_ind_name],
