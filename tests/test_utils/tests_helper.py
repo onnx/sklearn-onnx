@@ -618,7 +618,8 @@ def dump_multilabel_classification(
         label_string=False,
         first_class=0,
         comparable_outputs=None,
-        target_opset=None):
+        target_opset=None,
+        is_int=False):
     """
     Trains and dumps a model for a binary classification problem.
     The function trains a model and calls
