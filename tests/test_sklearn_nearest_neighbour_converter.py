@@ -53,6 +53,12 @@ from test_utils import (
     TARGET_OPSET)
 
 
+def dont_test_radius():
+    return (
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0") or
+        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"))
+
+
 class TestNearestNeighbourConverter(unittest.TestCase):
 
     @functools.lru_cache(maxsize=1)
@@ -117,17 +123,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsRegressor-Dec4")
 
-    @unittest.skipIf(True, reason=(
-        "The failure randomly happens in onnxruntime. "
-        "At some point in graph, some nan or inf values appear. "
-        "But not all the time even though the test is using the same "
-        "random numbers."))
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
-        reason="not available")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_regressor_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -183,12 +179,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsRegressor64")
 
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
-        reason="not available")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_regressor_double_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(
@@ -221,9 +212,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsRegressorYInt")
 
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_regressor_yint_radius(self):
         model, X = self._fit_model(
             RadiusNeighborsRegressor(), label_int=True)
@@ -251,17 +240,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsRegressor2")
 
-    @unittest.skipIf(True, reason=(
-        "The failure randomly happens in onnxruntime. "
-        "At some point in graph, some nan or inf values appear. "
-        "But not all the time even though the test is using the same "
-        "random numbers."))
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
-        reason="fails for earlier version of onnx (NaN)")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_regressor2_1_radius(self):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(algorithm="brute"),
@@ -377,11 +356,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     model, model_onnx,
                     basename="SklearnKNeighborsRegressorWDist%d-Dec3" % op)
 
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(TARGET_OPSET < 11,
-                     reason="needs higher target_opset")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_regressor_weights_distance_11_radius(self):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(
@@ -436,11 +411,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsClassifierBinary")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(onnx_opset_version() < 12,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_binary_class_radius(self):
@@ -476,11 +447,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnKNeighborsClassifierMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(onnx_opset_version() < 12,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_multi_class_radius(self):
@@ -887,13 +854,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnKNeighborsRegressorMReg")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 11,
-                     reason="needs higher target_opset")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_iris_regressor_multi_reg_radius(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
@@ -938,13 +899,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnKNeighborsClassifierMReg2-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.2.0"),
-        reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 11,
-                     reason="needs higher target_opset")
+    @unittest.skipIf(dont_test_radius(), reason="not available")
     def test_model_knn_iris_classifier_multi_reg2_weight_radius(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
