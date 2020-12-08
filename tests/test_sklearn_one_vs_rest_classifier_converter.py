@@ -36,6 +36,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.4.0'),
+        reason="onnxruntime too old")
     def test_ovr_rf(self):
         model = OneVsRestClassifier(
             RandomForestClassifier(n_estimators=2, max_depth=3))
