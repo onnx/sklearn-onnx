@@ -4,9 +4,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.ensemble import (
-    GradientBoostingClassifier,
-    GradientBoostingRegressor,
-)
+    GradientBoostingClassifier, GradientBoostingRegressor)
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.neural_network import MLPClassifier, MLPRegressor
@@ -15,8 +13,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
-    onnx_built_with_ml,
-)
+    onnx_built_with_ml)
 from test_utils import (
     dump_data_and_model,
     dump_multiple_classification,
@@ -53,6 +50,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
     def test_ovr_rf_multilabel_float(self):
         for opset in [9, 12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
@@ -72,6 +72,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
     def test_ovr_rf_multilabel_int(self):
         for opset in [9, 12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
