@@ -6,7 +6,7 @@
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_concat, apply_identity, apply_mul)
+    apply_concat, apply_identity, apply_mul, apply_reshape)
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import (
@@ -88,6 +88,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         apply_cast(scope, signed_input, signed_input_cast,
                    container, to=onnx_proto.TensorProto.INT64)
 
+        label_name = scope.get_unique_variable_name('label')
         if container.target_opset < 11:
             abs_name = scope.get_unique_variable_name('abs')
             add_name = scope.get_unique_variable_name('add')
@@ -98,7 +99,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
             apply_add(scope, [signed_input_cast, abs_name], [add_name],
                       container)
             apply_div(
-                scope, [add_name, cst_2], [operator.outputs[0].full_name],
+                scope, [add_name, cst_2], [label_name],
                 container)
         else:
             zero_cst = scope.get_unique_variable_name('zero')
@@ -106,8 +107,10 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                 zero_cst, onnx_proto.TensorProto.INT64, [], [0])
             container.add_node(
                 'Clip', [signed_input_cast, zero_cst],
-                [operator.outputs[0].full_name],
-                name=scope.get_unique_operator_name('Sign'))
+                [label_name],
+                name=scope.get_unique_operator_name('Clip'))
+        apply_reshape(scope, [label_name], [operator.outputs[0].full_name],
+                      container, desired_shape=(-1, op.n_classes_))
     else:
         # concatenates outputs
         conc_name = scope.get_unique_variable_name('concatenated')
