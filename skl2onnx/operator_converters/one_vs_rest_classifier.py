@@ -30,8 +30,8 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     for i, estimator in enumerate(op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(
+            op_type, raw_model=estimator)
         this_operator.inputs = operator.inputs
 
         if is_regressor(estimator):
