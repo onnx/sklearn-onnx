@@ -255,7 +255,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
-    n_classes = len(model.classes_)
+    n_classes = (len(model.classes_) if hasattr(model, 'classes_') else
+                 len(base_model.classes_))
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type)
@@ -446,5 +447,5 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
 register_converter('SklearnCalibratedClassifierCV',
                    convert_sklearn_calibrated_classifier_cv,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
