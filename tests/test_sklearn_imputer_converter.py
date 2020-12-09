@@ -2,8 +2,10 @@
 Tests scikit-imputer converter.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnxruntime
 from onnxruntime import InferenceSession
 try:
     from sklearn.preprocessing import Imputer
@@ -32,7 +34,10 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     @unittest.skipIf(Imputer is None,
                      reason="Imputer removed in 0.21")
-    def test_model_imputer(self):
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
+        reason="onnxruntime too old")
+    def test_model_imputer_int(self):
         model = Imputer(missing_values="NaN", strategy="mean", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]
         model.fit(data)
@@ -46,6 +51,9 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     @unittest.skipIf(Imputer is None,
                      reason="Imputer removed in 0.21")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
+        reason="onnxruntime too old")
     def test_imputer_int_inputs(self):
         model = Imputer(missing_values="NaN", strategy="most_frequent", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]
