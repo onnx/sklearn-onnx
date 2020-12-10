@@ -214,11 +214,43 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X[:5], model, model_onnx, classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=True,
+            basename="SklearnRFMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_multi_class_nocl_all(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(random_state=42),
+            2, label_string=True)
+        model_onnx = convert_sklearn(
+            model,
+            "multi-class nocl",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'nocl': True, 'zipmap': False}})
+        self.assertIsNotNone(model_onnx)
+        sonx = str(model_onnx)
+        assert 'classlabels_strings' not in sonx
+        assert 'cl0' not in sonx
+        exp_label = model.predict(X)
+        exp_proba = model.predict_proba(X)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})
+        exp_label = numpy.array([int(cl[2:]) for cl in exp_label])
+        assert_almost_equal(exp_proba, got[1], decimal=5)
+        diff = numpy.abs(exp_label - got[0]).sum()
+        if diff >= 3:
+            # Both scikit-learn and onnxruntime do the computation
+            # by parallelizing by trees. However, scikit-learn
+            # always adds tree outputs in the same order,
+            # onnxruntime does not. It may lead to small discrepencies.
+            # This test ensures that probabilities are almost the same.
+            # But a discrepencies around 0.5 may change the label.
+            # That explains why the test allows less than 3 differences.
+            assert_almost_equal(exp_label, got[0])
 
     def test_random_forest_classifier_int(self):
         model, X = fit_classification_model(
