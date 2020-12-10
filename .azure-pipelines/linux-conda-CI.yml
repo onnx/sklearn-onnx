@@ -236,7 +236,7 @@ jobs:
           python tests/benchmark.py
       fi
     displayName: 'benchmark'
-    condition: eq(variables['run.example'], '0')
+    condition: eq(variables['do.bench'], '1')
 
   - task: PublishTestResults@2
     inputs:
