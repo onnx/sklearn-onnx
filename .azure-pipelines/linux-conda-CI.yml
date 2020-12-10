@@ -32,7 +32,7 @@ jobs:
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
-        run.example: '1'
+        run.example: '0'  # 
       Py38-Onnx170-RtTST-Skl0232:
         do.bench: '0'
         python.version: '3.8'
