@@ -25,6 +25,9 @@ def _scikit_learn_before_022():
     if '.post' in __version__:
         return StrictVersion(
             __version__.split(".post")[0]) < StrictVersion("0.22")
+    if 'rc' in __version__:
+        return StrictVersion(
+            __version__.split("rc")[0]) < StrictVersion("0.22")
     return StrictVersion(__version__) < StrictVersion("0.22")
 
 
