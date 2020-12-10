@@ -549,8 +549,10 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                   "r", encoding='utf-8') as f:
             content = f.readlines()
         corpus = numpy.array([c.strip('\n') for c in content]).reshape((-1, 1))
-        vect = TfidfVectorizer(max_features=100)
+        vect = TfidfVectorizer(max_features=10)
         vect.fit(corpus.ravel())
+        new_list = list(corpus.ravel()) + ['abcdefghj aert', ' ', ',aaaa', '']
+        corpus = numpy.array(new_list).reshape((-1, 1))
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
                                      [("input", StringTensorType([None, 1]))],
                                      # options=self.get_options(),
@@ -562,6 +564,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         r = numpy.abs(res - exp).ravel()
         diff = list(sorted(r))
         assert diff[-50] <= 0.01
+        assert all(res[-3:].ravel() == 0)
 
 
 if __name__ == "__main__":
