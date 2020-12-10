@@ -580,6 +580,12 @@ def _compare_expected(expected,
                                   verbose=verbose,
                                   **kwargs)
             if msg:
+                try:
+                    assert_almost_equal_detailed(
+                        dense, one_array, decimal=decimal,
+                        verbose=verbose, **kwargs)
+                except AssertionError as e:
+                    msg += "\n----------------\n" + str(e)
                 raise OnnxRuntimeAssertionError(
                     "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
             tested += 1
@@ -589,3 +595,31 @@ def _compare_expected(expected,
                 format(onnx, type(expected)))
     if tested == 0:
         raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))
+
+
+def assert_almost_equal_detailed(expected, value, **kwargs):
+    """
+    Calls :epkg:`numpy:testing:assert_almost_equal`.
+    Add more informations in the exception message.
+
+    :param expected: expected value
+    :param value: value
+    :raises: AssertionError
+    """
+    from numpy.testing import assert_almost_equal
+    try:
+        assert_almost_equal(expected, value, **kwargs)
+    except AssertionError as e:
+        if expected.shape[0] != value.shape[0]:
+            raise e
+        rows = ['INNER EXCEPTION:', str(e), '------', 'ROWS BY ROWS']
+        for i, (r1, r2) in enumerate(zip(expected, value)):
+            try:
+                assert_almost_equal(r1, r2, **kwargs)
+            except AssertionError as e:
+                rows.append('----------------------')
+                rows.append("ISSUE WITH ROW {}/{}:0 {}".format(
+                    i, expected.shape[0], str(e)))
+                if len(rows) > 10:
+                    break
+        raise AssertionError("\n".join(rows))
