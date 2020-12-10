@@ -207,14 +207,16 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model,
             "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True}})
+            options={id(model): {'nocl': True, 'zipmap': False}})
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
+        from mlprodict.onnxrt import OnnxInference
+        oinf = OnnxInference(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=False,
+            basename="SklearnRFMultiNoCl", verbose=True,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -698,5 +700,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnTreeEnsembleModels().test_randomforestclassifier_decision_path()
     unittest.main()
