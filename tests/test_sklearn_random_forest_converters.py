@@ -212,8 +212,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
-        from mlprodict.onnxrt import OnnxInference
-        oinf = OnnxInference(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
             basename="SklearnRFMultiNoCl", verbose=True,
