@@ -42,6 +42,7 @@ from test_utils import (
     fit_regression_model,
     TARGET_OPSET,
 )
+from test_utils.utils_backend_onnxruntime import assert_almost_equal_detailed
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
     from sklearn.ensemble import (
@@ -235,14 +236,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
-        dump_data_and_model(
-            X.astype(numpy.float32), model, model_onnx,
-            classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=False,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+        exp_label = model.predict(X)
+        exp_proba = model.predict_proba(X)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'input': X.astype(numpy.float32)})
+        exp_label = numpy.array([int(cl[2:]) for cl in exp_label])
+        assert_almost_equal_detailed(exp_proba, got[1], decimal=5)
+        assert_almost_equal_detailed(exp_label, got[0])
 
     def test_random_forest_classifier_int(self):
         model, X = fit_classification_model(
