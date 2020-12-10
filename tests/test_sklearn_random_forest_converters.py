@@ -214,7 +214,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X[:5], model, model_onnx, classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=True,
+            basename="SklearnRFMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
@@ -222,7 +222,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    def test_model_multi_class_nocl_50(self):
+    def test_model_multi_class_nocl_all(self):
         model, X = fit_classification_model(
             RandomForestClassifier(random_state=42),
             2, label_string=True)
@@ -236,8 +236,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
         dump_data_and_model(
-            X[:50], model, model_onnx, classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=True,
+            X.astype(numpy.float32), model, model_onnx,
+            classes=model.classes_,
+            basename="SklearnRFMultiNoCl", verbose=False,
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
                           "StrictVersion(onnxruntime.__version__)"
