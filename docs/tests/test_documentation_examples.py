@@ -52,7 +52,7 @@ class TestDocumentationExample(unittest.TestCase):
                     out, err = res
                     st = err.decode('ascii', errors='ignore')
                     if len(st) > 0 and 'Traceback' in st:
-                        if "No such file or directory: 'dot': 'dot'" in st:
+                        if "No such file or directory: 'dot'" in st:
                             # dot not installed, this part
                             # is tested in onnx framework
                             pass
