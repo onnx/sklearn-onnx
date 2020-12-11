@@ -445,7 +445,7 @@ def convert_sklearn_random_forest_regressor_converter(
 
 register_converter('SklearnRandomForestClassifier',
                    convert_sklearn_random_forest_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False],
                             'decision_path': [True, False]})
@@ -454,7 +454,7 @@ register_converter('SklearnRandomForestRegressor',
                    options={'decision_path': [True, False]})
 register_converter('SklearnExtraTreesClassifier',
                    convert_sklearn_random_forest_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False],
                             'decision_path': [True, False]})
@@ -463,11 +463,11 @@ register_converter('SklearnExtraTreesRegressor',
                    options={'decision_path': [True, False]})
 register_converter('SklearnHistGradientBoostingClassifier',
                    convert_sklearn_random_forest_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False]})
 register_converter('SklearnHistGradientBoostingRegressor',
                    convert_sklearn_random_forest_regressor_converter,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False]})

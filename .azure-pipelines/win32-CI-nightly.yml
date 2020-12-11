@@ -81,6 +81,7 @@ jobs:
     displayName: 'install onnxruntime'
 
   - script: |
+      call activate py$(python.version)
       pip install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
