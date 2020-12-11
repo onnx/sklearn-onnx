@@ -34,9 +34,6 @@ class TestAlgebraComplex(unittest.TestCase):
                                   outputs=[('Y', var())],
                                   target_opset=opv)
                 self.assertIn('elem_type: %d' % pr, str(onx))
-                if opv <= 13:
-                    sonx = str(onx)
-                    assert "version: 7" in sonx
 
                 try:
                     ort = InferenceSession(onx.SerializeToString())
