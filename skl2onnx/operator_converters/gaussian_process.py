@@ -176,9 +176,6 @@ def convert_gaussian_process_classifier(scope, operator, container):
     use this converter which does not behave exactly
     as the others.
     """
-    dtype = container.dtype
-    if dtype is None:
-        raise RuntimeError("dtype cannot be None")
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
@@ -204,6 +201,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
     if not hasattr(op_est, 'X_train_'):
         raise NotImplementedError("Only binary classification is iplemented.")
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
     K_starT = convert_kernel(
         kernel, X, x_train=op_est.X_train_.astype(dtype), dtype=dtype,
         optim=options.get('optim', None), op_version=opv)
@@ -255,7 +255,7 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
     # gamma = LAMBDAS * f_star
     gamma = OnnxMul(LAMBDAS.astype(dtype),
-                    OnnxReshape(f_star, np.array([1, -1], dtype=np.int32),
+                    OnnxReshape(f_star, np.array([1, -1], dtype=np.int64),
                                 op_version=opv),
                     op_version=opv)
     gamma.set_onnx_name_prefix('gamma')
