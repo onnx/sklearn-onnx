@@ -92,7 +92,7 @@ from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 pad = OnnxPad('X', output_names=['Y'],
               mode='constant', value=1.5,
               pads=[0, 1, 0, 1],
-              op_version=2)
+              op_version=10)
 
 model_def = pad.to_onnx({'X': X}, target_opset=10)
 
@@ -104,7 +104,7 @@ print('The model is checked!')
 # Inputs and outputs can also be skipped.
 
 pad = OnnxPad(mode='constant', value=1.5,
-              pads=[0, 1, 0, 1], op_version=2)
+              pads=[0, 1, 0, 1], op_version=10)
 
 model_def = pad.to_onnx({pad.inputs[0]: X},
                         target_opset=10)
@@ -138,7 +138,9 @@ onnx.checker.check_model(original_model)
 
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
-node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
+node = OnnxTranspose(
+    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
+    perm=[1, 0, 2], op_version=12)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape

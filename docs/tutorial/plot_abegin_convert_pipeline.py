@@ -54,7 +54,8 @@ ereg.fit(X_train, y_train)
 # into single float and ONNX runtimes may not fully
 # support doubles.
 
-onx = to_onnx(ereg, X_train[:1].astype(numpy.float32))
+onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
+              target_opset=12)
 
 ###################################
 # Prediction with ONNX
