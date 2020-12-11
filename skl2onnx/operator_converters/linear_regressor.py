@@ -60,9 +60,63 @@ def convert_sklearn_linear_regressor(scope, operator, container):
                        else onnx_proto.TensorProto.FLOAT))
         input_name = cast_input_name
     container.add_node(op_type, input_name,
-                       operator.output_full_names, op_domain='ai.onnx.ml',
+                       operator.outputs[0].full_name, op_domain='ai.onnx.ml',
                        **attrs)
+
+
+def convert_sklearn_bayesian_ridge(scope, operator, container):
+    convert_sklearn_linear_regressor(scope, operator, container)
+
+    op = operator.raw_operator
+    options = container.get_options(op, dict(return_std=False))
+    return_std = options['return_std']
+    if not return_std:
+        return
+
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if op.normalize:
+        # if self.normalize:
+        #     X = (X - self.X_offset_) / self.X_scale_
+        offset = scope.get_unique_variable_name('offset')
+        container.add_initializer(
+            offset, proto_dtype, op.X_offset_.shape,
+            op.X_offset_.ravel().tolist())
+        scale = scope.get_unique_variable_name('scale')
+        container.add_initializer(
+            scale, proto_dtype, op.X_scale_.shape,
+            op.X_scale_.ravel().tolist())
+        centered = scope.get_unique_variable_name('centered')
+        apply_sub(scope, [operator.inputs[0].full_name, offset],
+                  centered, container)
+        scaled = scope.get_unique_variable_name('scaled')
+        apply_div(scope, [centered, scale], scaled, container)
+        input_name = scaled
+    else:
+        input_name = operator.inputs[0].full_name
+
+    # sigmas_squared_data = (np.dot(X, self.sigma_) * X).sum(axis=1)
+    sigma = scope.get_unique_variable_name('sigma')
+    container.add_initializer(
+        sigma, proto_dtype, op.sigma_.shape, op.sigma_.ravel().tolist())
+    sigmaed0 = scope.get_unique_variable_name('sigma0')
+    container.add_node(
+        'MatMul', [input_name, sigma], sigmaed0,
+        name=scope.get_unique_operator_name('MatMul'))
+    sigmaed = scope.get_unique_variable_name('sigma')
+    container.add_node(
+        'ReduceSum', sigmaed0, sigmaed, axes=[1],
+        name=scope.get_unique_operator_name('ReduceSum'))
+
+    # y_std = np.sqrt(sigmas_squared_data + (1. / self.alpha_))
+    # return y_mean, y_std
+    std0 = scope.get_unique_variable_name('std0')
+    alphainv = scope.get_unique_variable_name('alphainv')
+    container.add_initializer(alphainv, proto_dtype, [1], [1 / op.alpha_])
+    apply_add(scope, [sigmaed, alphainv], std0, container)
+    apply_sqrt(scope, std0, operator.outputs[1].full_name, container)
 
 
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
+register_converter('SklearnBayesianRidge', convert_sklearn_bayesian_ridge,
+                   options={'return_std': [True, False]})
