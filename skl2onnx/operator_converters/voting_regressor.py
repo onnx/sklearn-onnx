@@ -4,11 +4,11 @@
 # license information.
 # --------------------------------------------------------------------------
 
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
+from ..common.data_types import (
+    guess_proto_type, FloatTensorType, DoubleTensorType)
 from .._supported_operators import sklearn_operator_name_map
-from ..proto import onnx_proto
 
 
 def convert_voting_regressor(scope, operator, container):
@@ -16,6 +16,17 @@ def convert_voting_regressor(scope, operator, container):
     Converts a *VotingRegressor* into *ONNX* format.
     """
     op = operator.raw_operator
+
+    if not isinstance(operator.inputs[0].type,
+                      (FloatTensorType, DoubleTensorType)):
+        this_operator = scope.declare_local_operator('SklearnCast')
+        this_operator.raw_operator = None
+        this_operator.inputs = operator.inputs
+        var_name = scope.declare_local_variable('cast', FloatTensorType())
+        this_operator.outputs.append(var_name)
+        inputs = this_operator.outputs
+    else:
+        inputs = operator.inputs
 
     vars_names = []
     for i, estimator in enumerate(op.estimators_):
@@ -26,10 +37,10 @@ def convert_voting_regressor(scope, operator, container):
 
         this_operator = scope.declare_local_operator(op_type)
         this_operator.raw_operator = estimator
-        this_operator.inputs = operator.inputs
+        this_operator.inputs = inputs
 
         var_name = scope.declare_local_variable(
-            'var_%d' % i, FloatTensorType())
+            'var_%d' % i, inputs[0].type.__class__())
         this_operator.outputs.append(var_name)
         var_name = var_name.onnx_name
 
@@ -39,8 +50,9 @@ def convert_voting_regressor(scope, operator, container):
             val = 1. / len(op.estimators_)
 
         weights_name = scope.get_unique_variable_name('w%d' % i)
+        proto_dtype = guess_proto_type(inputs[0].type)
         container.add_initializer(
-            weights_name, onnx_proto.TensorProto.FLOAT, [1], [val])
+            weights_name, proto_dtype, [1], [val])
         wvar_name = scope.get_unique_variable_name('wvar_%d' % i)
         apply_mul(scope, [var_name, weights_name],
                   wvar_name, container, broadcast=1)

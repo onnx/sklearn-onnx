@@ -111,8 +111,7 @@ class TestSklearnPCAConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             initial_types=[("input",
-                            Int64TensorType([None, X_test.shape[1]]))],
-        )
+                            Int64TensorType([None, X_test.shape[1]]))])
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test.astype(np.int64),

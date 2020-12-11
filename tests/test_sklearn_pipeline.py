@@ -1,6 +1,8 @@
 import unittest
+import urllib.error as url_error
 from distutils.version import StrictVersion
 from io import StringIO
+import warnings
 import numpy
 from numpy.testing import assert_almost_equal
 import pandas
@@ -268,21 +270,24 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         not check_scikit_version(),
-        reason="Scikit 0.20 causes some mismatches",
-    )
+        reason="Scikit 0.20 causes some mismatches")
     def test_pipeline_column_transformer_titanic(self):
 
         # fit
-        titanic_url = (
-            "https://raw.githubusercontent.com/amueller/"
-            "scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv")
-        data = pandas.read_csv(titanic_url)
+        try:
+            titanic_url = (
+                "https://raw.githubusercontent.com/amueller/"
+                "scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv")
+            data = pandas.read_csv(titanic_url)
+        except url_error.URLError:
+            # Do not fail the test if the data cannot be fetched.
+            warnings.warn("Unable to fetch titanic data.")
+            return
         X = data.drop("survived", axis=1)
         y = data["survived"]
 
@@ -389,9 +394,7 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer weights",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=numpy.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -417,9 +420,7 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer drop",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=numpy.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -446,9 +447,7 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=numpy.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -474,9 +473,7 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            dtype=numpy.float32,
-        )
+            [("input", FloatTensorType([None, X.shape[1]]))])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

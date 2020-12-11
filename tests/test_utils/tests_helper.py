@@ -39,6 +39,8 @@ def _has_predict_proba(model):
 def _has_decision_function(model):
     if hasattr(model, "voting"):
         return False
+    if hasattr(model, "dtype"):  # CastRegressor
+        return False
     return hasattr(model, "decision_function")
 
 
@@ -52,10 +54,10 @@ def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
                              random_state=42, is_bool=False,
                              n_features=20):
-    X, y = make_classification(n_classes=n_classes, n_features=n_features,
-                               n_samples=500,
-                               random_state=random_state,
-                               n_informative=7)
+    X, y = make_classification(
+        n_classes=n_classes, n_features=n_features, n_samples=500,
+        random_state=random_state, n_informative=min(7, n_features),
+        n_redundant=min(2, n_features - min(7, n_features)))
     if label_string:
         y = numpy.array(['cl%d' % cl for cl in y])
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
@@ -113,7 +115,8 @@ def dump_data_and_model(
         intermediate_steps=False,
         fail_evenif_notimplemented=False,
         verbose=False,
-        classes=None):
+        classes=None,
+        disable_optimisation=False):
     """
     Saves data with pickle, saves the model with pickle and *onnx*,
     runs and saves the predictions for the given model.
@@ -160,6 +163,8 @@ def dump_data_and_model(
         of a new operator defiend in ONNX.
     :param classes: classes names
         (only for classifier, mandatory if option 'nocl' is used)
+    :param disable_optimisation: disable all optimisations *onnxruntime*
+        could do
     :return: the created files
 
     Some convention for the name,
@@ -367,6 +372,7 @@ def dump_data_and_model(
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
                     intermediate_steps=intermediate_steps,
+                    disable_optimisation=disable_optimisation
                 )
             else:
                 try:
@@ -376,7 +382,8 @@ def dump_data_and_model(
                         context=context, verbose=verbose,
                         comparable_outputs=comparable_outputs,
                         intermediate_steps=intermediate_steps,
-                        classes=classes)
+                        classes=classes,
+                        disable_optimisation=disable_optimisation)
                 except OnnxRuntimeMissingNewOnnxOperatorException as e:
                     if fail_evenif_notimplemented:
                         raise e
@@ -392,8 +399,7 @@ def dump_data_and_model(
                             basename,
                             str(e).replace("\n", " -- ")))
                         continue
-                    else:
-                        raise e
+                    raise e
 
             if output is not None:
                 dest = os.path.join(folder,

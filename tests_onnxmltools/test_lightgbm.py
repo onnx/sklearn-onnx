@@ -36,7 +36,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             LGBMClassifier, 'LightGbmLGBMClassifier',
             calculate_linear_classifier_output_shapes,
             convert_lightgbm, options={
-                'zipmap': [True, False], 'nocl': [True, False]})
+                'zipmap': [True, False, 'columns'], 'nocl': [True, False]})
 
         update_registered_converter(
             LGBMRegressor, 'LgbmRegressor',

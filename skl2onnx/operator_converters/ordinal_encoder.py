@@ -52,7 +52,8 @@ def convert_sklearn_ordinal_encoder(scope, operator, container):
             else:
                 attrs['keys_strings'] = np.array(
                     [str(s).encode('utf-8') for s in categories])
-            attrs['values_int64s'] = np.arange(len(categories))
+            attrs['values_int64s'] = np.arange(
+                len(categories)).astype(np.int64)
 
             index_name = scope.get_unique_variable_name('index')
             feature_column_name = scope.get_unique_variable_name(

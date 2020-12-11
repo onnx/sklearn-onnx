@@ -8,11 +8,7 @@ import numpy as np
 
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_cast,
-    apply_concat,
-    apply_reshape,
-)
-from ..common._topology import FloatTensorType
+    apply_cast, apply_concat, apply_reshape)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -31,14 +27,14 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
         output_proba = label_name
     else:
         output_proba = scope.declare_local_variable(
-            'probability_tensor', FloatTensorType())
+            'probability_tensor', inputs.type.__class__())
         this_operator.outputs.append(output_proba)
     return output_proba.full_name
 
 
 def _transform_regressor(scope, operator, container, model):
     merged_prob_tensor = scope.declare_local_variable(
-        'merged_probability_tensor', FloatTensorType())
+        'merged_probability_tensor', operator.inputs[0].type.__class__())
 
     predictions = [
         _fetch_scores(
@@ -53,7 +49,7 @@ def _transform_regressor(scope, operator, container, model):
 
 def _transform(scope, operator, container, model):
     merged_prob_tensor = scope.declare_local_variable(
-        'merged_probability_tensor', FloatTensorType())
+        'merged_probability_tensor', operator.inputs[0].type.__class__())
 
     predictions = [
         _fetch_scores(scope, container, est, operator.inputs[0],
@@ -72,7 +68,8 @@ def _transform(scope, operator, container, model):
                                   onnx_proto.TensorProto.INT64, [], [1])
         new_predictions = []
         for pred in predictions:
-            prob1 = scope.declare_local_variable('prob1')
+            prob1 = scope.declare_local_variable(
+                'prob1', operator.inputs[0].type.__class__())
             container.add_node(
                 'ArrayFeatureExtractor',
                 [pred, column_index_name], prob1.onnx_name,
@@ -159,7 +156,7 @@ def convert_sklearn_stacking_regressor(scope, operator, container):
 
 register_converter('SklearnStackingClassifier',
                    convert_sklearn_stacking_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
                             'raw_scores': [True, False]})
 register_converter('SklearnStackingRegressor',

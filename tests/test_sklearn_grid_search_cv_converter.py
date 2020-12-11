@@ -205,7 +205,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "GridSearchCV",
             [("input", DoubleTensorType([None, X.shape[1]]))],
-            dtype=np.float64, target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float64),

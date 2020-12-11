@@ -9,7 +9,7 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
-from ..common._topology import FloatTensorType
+from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -85,7 +85,7 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     return sigmoid_predict_result_name
 
 
-def _transform_isotonic(scope, container, model, T, k):
+def _transform_isotonic(scope, container, model, T, k, dtype):
     """
     Isotonic calibration method
     This function can only handle one instance at a time because
@@ -97,9 +97,9 @@ def _transform_isotonic(scope, container, model, T, k):
         apply_clip(scope, T, clipped_df_name, container,
                    operator_name=scope.get_unique_operator_name('Clip'),
                    max=np.array(model.calibrators_[k].X_max_,
-                                dtype=container.dtype),
+                                dtype=dtype),
                    min=np.array(model.calibrators_[k].X_min_,
-                                dtype=container.dtype))
+                                dtype=dtype))
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
@@ -249,10 +249,14 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
 
     base_model = model.base_estimator
     op_type = sklearn_operator_name_map[type(base_model)]
-    n_classes = len(model.classes_)
+    n_classes = (len(model.classes_) if hasattr(model, 'classes_') else
+                 len(base_model.classes_))
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type)
@@ -261,8 +265,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
-    df_name = scope.declare_local_variable('probability_tensor',
-                                           FloatTensorType())
+    df_name = scope.declare_local_variable(
+        'probability_tensor', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name
@@ -298,7 +302,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
             op_domain='ai.onnx.ml')
         T = (_transform_sigmoid(scope, container, model, df_col_name, k)
              if model.method == 'sigmoid' else
-             _transform_isotonic(scope, container, model, df_col_name, k))
+             _transform_isotonic(
+                scope, container, model, df_col_name, k, dtype))
 
         prob_name[k] = T
         if n_classes == 2:
@@ -442,5 +447,5 @@ def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
 
 register_converter('SklearnCalibratedClassifierCV',
                    convert_sklearn_calibrated_classifier_cv,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})

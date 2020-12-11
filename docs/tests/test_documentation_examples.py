@@ -7,6 +7,7 @@ import os
 import sys
 import importlib
 import subprocess
+import numpy
 import onnxruntime
 
 
@@ -58,14 +59,6 @@ class TestDocumentationExample(unittest.TestCase):
                         elif '"dot" not found in path.' in st:
                             # dot not installed, this part
                             # is tested in onnx framework
-                            pass
-                        elif "No module named 'xgboost'" in st:
-                            # xgboost not installed on CI
-                            pass
-                        elif ("cannot import name 'LightGbmModelContainer' "
-                                "from 'onnxmltools.convert.common."
-                                "_container'") in st:
-                            # onnxmltools not recent enough
                             pass
                         elif ('Please fix either the inputs or '
                                 'the model.') in st:
