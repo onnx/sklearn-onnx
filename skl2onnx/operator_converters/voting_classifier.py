@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 
 from onnx.helper import make_tensor
-from ..common._topology import FloatTensorType
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
 from ..common.utils_classifier import _finalize_converter_classes
@@ -50,8 +49,8 @@ def convert_voting_classifier(scope, operator, container):
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % i)
-        prob_name = scope.declare_local_variable('proba_%d' % i,
-                                                 FloatTensorType())
+        prob_name = scope.declare_local_variable(
+            'proba_%d' % i, operator.inputs[0].type.__class__())
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(prob_name)
 
@@ -128,5 +127,5 @@ def convert_voting_classifier(scope, operator, container):
 
 register_converter('SklearnVotingClassifier',
                    convert_voting_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})

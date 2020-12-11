@@ -70,7 +70,7 @@ def validator_classifier_converter(scope, operator, container):
     input = operator.inputs[0]      # input in ONNX graph
     outputs = operator.outputs      # outputs in ONNX graph
     op = operator.raw_operator      # scikit-learn model (mmust be fitted)
-    opv = opv = container.target_opset
+    opv = container.target_opset
 
     # We reuse existing converter and declare it as local
     # operator.
@@ -223,7 +223,6 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         X32 = X_test[:5].astype(np.float32)
         model_onnx = to_onnx(
             model, X32, target_opset=TARGET_OPSET)
-
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.predict(X32), res[0])

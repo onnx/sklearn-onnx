@@ -56,6 +56,7 @@ from sklearn.ensemble import (
     BaggingClassifier, BaggingRegressor,
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
+    IsolationForest,
     RandomForestClassifier, RandomForestRegressor,
     VotingClassifier
 )
@@ -202,7 +203,7 @@ except ImportError:
 from sklearn.random_projection import GaussianRandomProjection
 
 # Custom extension
-from .sklapi import CastTransformer
+from .sklapi import CastRegressor, CastTransformer
 
 from .common._registration import register_converter, register_shape_calculator
 
@@ -251,7 +252,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM]
+outlier_list = [OneClassSVM, IsolationForest]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -268,6 +269,7 @@ def build_sklearn_operator_name_map():
                 Binarizer,
                 CalibratedClassifierCV,
                 CategoricalNB,
+                CastRegressor,
                 CastTransformer,
                 ComplementNB,
                 CountVectorizer,
@@ -291,6 +293,7 @@ def build_sklearn_operator_name_map():
                 HistGradientBoostingRegressor,
                 Imputer,
                 IncrementalPCA,
+                IsolationForest,
                 KMeans,
                 LabelBinarizer,
                 LabelEncoder,
@@ -415,7 +418,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
         update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
                                     calculate_linear_classifier_output_shapes,
                                     convert_sklearn_random_forest_classifier,
-                                    options={'zipmap': [True, False],
+                                    options={'zipmap': [True, False, 'columns'],
                                              'raw_scores': [True, False]})
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
@@ -459,7 +462,7 @@ def get_model_alias(model_type):
     if res is None:
         raise RuntimeError("Unable to find alias for model '{}'. "
                            "The converter is likely missing."
-                           "".format(type(model_type)))
+                           "".format(model_type))
     return res
 
 

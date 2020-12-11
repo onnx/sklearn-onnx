@@ -9,6 +9,7 @@ from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
 from ..algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxCast
 from ..common._registration import register_converter
+from ..common.data_types import guess_numpy_type, guess_proto_type
 from ..proto import onnx_proto
 from .common import concatenate_variables
 
@@ -55,11 +56,17 @@ def convert_sklearn_scaler(scope, operator, container):
                          'https://github.com/onnx/sklearn-onnx/issues.'
                          '' % type(op))
 
-    # ONNX does not convert arrays of float32.
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
     for k in attrs:
         v = attrs[k]
-        if isinstance(v, np.ndarray) and v.dtype == np.float32:
-            attrs[k] = v.astype(np.float64)
+        if isinstance(v, np.ndarray) and v.dtype != dtype:
+            attrs[k] = v.astype(dtype)
 
     if inv_scale is not None:
         options = container.get_options(op, dict(div='std'))
@@ -67,9 +74,9 @@ def convert_sklearn_scaler(scope, operator, container):
         if div == 'div':
             opv = container.target_opset
             sub = OnnxSub(
-                feature_name, attrs['offset'].astype(container.dtype),
+                feature_name, attrs['offset'].astype(dtype),
                 op_version=opv)
-            div = OnnxDiv(sub, inv_scale.astype(container.dtype),
+            div = OnnxDiv(sub, inv_scale.astype(dtype),
                           op_version=opv,
                           output_names=[operator.outputs[0].full_name])
             div.add_to(scope, container)
@@ -81,7 +88,7 @@ def convert_sklearn_scaler(scope, operator, container):
             sub = OnnxSub(cast, attrs['offset'].astype(np.float64),
                           op_version=opv)
             div = OnnxDiv(sub, inv_scale.astype(np.float64), op_version=opv)
-            cast = OnnxCast(div, to=container.proto_dtype, op_version=opv,
+            cast = OnnxCast(div, to=proto_dtype, op_version=opv,
                             output_names=[operator.outputs[0].full_name])
             cast.add_to(scope, container)
             return

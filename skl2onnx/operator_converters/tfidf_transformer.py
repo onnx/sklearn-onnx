@@ -5,15 +5,22 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from ..proto import onnx_proto
+from ..common.data_types import guess_numpy_type, guess_proto_type
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul, apply_identity
 
 
 def convert_sklearn_tfidf_transformer(scope, operator, container):
     # TODO: use sparse containers when available
-    float_type = container.dtype
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+    float_type = dtype
     # onnx_proto.TensorProto.FLOAT
-    proto_type = container.proto_dtype
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
     data = operator.input_full_names
     final = operator.output_full_names
@@ -36,7 +43,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         #     loggedplus1 = scope.get_unique_variable_name('loggedplus1')
         # ones = scope.get_unique_variable_name('ones')
         # cst = np.ones((C,), dtype=float_type)
-        # container.add_initializer(ones, proto_type, [C], cst.flatten())
+        # container.add_initializer(ones, proto_dtype, [C], cst.flatten())
         # apply_add(scope, [logged, ones], loggedplus1, container, broadcast=1)
         # data = [loggedplus1]
 
@@ -47,7 +54,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         cst = cst.ravel().flatten()
         shape = [len(cst)]
         idfcst = scope.get_unique_variable_name('idfcst')
-        container.add_initializer(idfcst, proto_type, shape, cst)
+        container.add_initializer(idfcst, proto_dtype, shape, cst)
         idfed = (final if op.norm is None
                  else scope.get_unique_variable_name('idfed'))
         apply_mul(scope, data + [idfcst], idfed, container, broadcast=1)

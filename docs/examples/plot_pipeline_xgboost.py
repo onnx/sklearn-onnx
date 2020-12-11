@@ -97,7 +97,7 @@ except Exception as e:
 update_registered_converter(
     XGBClassifier, 'XGBoostXGBClassifier',
     calculate_linear_classifier_output_shapes, convert_xgboost,
-    options={'nocl': [True, False], 'zipmap': [True, False]})
+    options={'nocl': [True, False], 'zipmap': [True, False, 'columns']})
 
 ##################################
 # Convert again

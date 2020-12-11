@@ -5,3 +5,4 @@
 # --------------------------------------------------------------------------
 
 from .cast_transformer import CastTransformer  # noqa
+from .cast_regressor import CastRegressor  # noqa

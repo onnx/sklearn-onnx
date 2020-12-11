@@ -116,16 +116,18 @@ class TestSklearnPipeline(unittest.TestCase):
         itypes = set(_[1].__class__ for _ in initial_types)
         self.assertIn(BooleanTensorType, itypes)
         self.assertIn(FloatTensorType, itypes)
-        onnx = convert_sklearn(model, initial_types=initial_types)
+        onx = convert_sklearn(model, initial_types=initial_types)
 
-        session = rt.InferenceSession(onnx.SerializeToString())
+        session = rt.InferenceSession(onx.SerializeToString())
 
         pred_skl = model.predict(test_df)
         pred_onx = _predict(session, test_df)
 
         diff = np.sort(
             np.abs(np.squeeze(pred_skl) - np.squeeze(pred_onx)))
-        self.assertEqual(diff[0], diff[-1])
+        if diff[0] != diff[-1]:
+            raise AssertionError(
+                "Discrepencies\nSKL\n{}\nORT\n{}".format(pred_skl, pred_onx))
 
 
 if __name__ == "__main__":
