@@ -186,7 +186,7 @@ def convert_sklearn_mlp_regressor(scope, operator, container):
 
 register_converter('SklearnMLPClassifier',
                    convert_sklearn_mlp_classifier,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnMLPRegressor',
                    convert_sklearn_mlp_regressor)

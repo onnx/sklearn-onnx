@@ -734,13 +734,13 @@ def convert_nca(scope, operator, container):
 
 register_converter(
     'SklearnKNeighborsClassifier', convert_nearest_neighbors_classifier,
-    options={'zipmap': [True, False],
+    options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnRadiusNeighborsClassifier', convert_nearest_neighbors_classifier,
-    options={'zipmap': [True, False],
+    options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
              'optim': [None, 'cdist']})

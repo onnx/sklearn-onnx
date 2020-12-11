@@ -482,17 +482,17 @@ def convert_sklearn_naive_bayes(scope, operator, container):
 
 
 register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnCategoricalNB', convert_sklearn_naive_bayes,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnComplementNB', convert_sklearn_naive_bayes,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnGaussianNB', convert_sklearn_naive_bayes,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
 register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes,
-                   options={'zipmap': [True, False],
+                   options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False]})
