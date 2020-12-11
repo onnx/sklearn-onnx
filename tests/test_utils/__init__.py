@@ -47,7 +47,8 @@ def _get_ir_version(opv):
     return 3
 
 
-TARGET_OPSET = int(os.environ.get('TEST_TARGET_OPSET',
-                                  onnx.defs.onnx_opset_version()))
-TARGET_IR = int(os.environ.get('TEST_TARGET_IR',
-                               _get_ir_version(TARGET_OPSET)))
+TARGET_OPSET = int(
+    os.environ.get('TEST_TARGET_OPSET',
+                   min(12, onnx.defs.onnx_opset_version())))
+TARGET_IR = int(
+    os.environ.get('TEST_TARGET_IR', _get_ir_version(TARGET_OPSET)))
