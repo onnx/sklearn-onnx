@@ -9,7 +9,10 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import scipy
 from onnxruntime import InferenceSession, SessionOptions
-from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+except ImportError:
+    OrtFail = RuntimeError
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 try:
