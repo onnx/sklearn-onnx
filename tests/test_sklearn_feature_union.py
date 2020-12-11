@@ -93,7 +93,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                                                random_state=42)
         model = FeatureUnion([('pca', PCA()),
                               ('svd', TruncatedSVD())],
-                             transformer_weights={'pca': 10, 'svd': 3}
+                             transformer_weights={'pca1': 10, 'svd2': 3}
                              ).fit(X_train)
         model_onnx = convert_sklearn(
             model, 'feature union',
