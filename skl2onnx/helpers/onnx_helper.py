@@ -260,20 +260,3 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
                            "*Inputs*\n{}\n*Model*\n{}'".format(
                             onnx_inputs, original_model))
     return shapes
-
-
-def to_dot(model_onnx):
-    """
-    Converts a model into *DOT*.
-
-    :param model_onnx: ONNX model
-    :return: string
-    """
-    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-
-    pydot_graph = GetPydotGraph(
-        model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-        node_producer=GetOpNodeProducer(
-            "docstring", fillcolor="orange", style="filled",
-            shape="box"))
-    return pydot_graph.to_string()
