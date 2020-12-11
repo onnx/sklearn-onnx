@@ -1,6 +1,8 @@
+from distutils.version import StrictVersion
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -19,6 +21,8 @@ class TestAlgebraComplex(unittest.TestCase):
 
     @unittest.skipIf(Complex64TensorType is None,
                      reason="not available")
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.8.0'),
+                     reason="not implemented")
     def test_complex(self):
         for dt, var, pr in ((np.complex64, Complex64TensorType, 14),
                             (np.complex128, Complex128TensorType, 15)):
