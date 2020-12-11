@@ -13,8 +13,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-<<<<<<< HEAD
-=======
       Py37-Onnx170-Rt151-Skl0232:
         python.version: '3.7'
         # onnx.version: '-i https://test.pypi.org/simple/ onnx'
@@ -25,7 +23,6 @@ jobs:
         onnxrt.version: 'onnxruntime==1.5.1'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
         sklearn.version: '==0.23.2'
->>>>>>> 1e13814d9ef4457176dd919c38796fa4664a9281
       Py37-Onnx170-Rt140-Skl0232:
         python.version: '3.7'
         # onnx.version: '-i https://test.pypi.org/simple/ onnx'
