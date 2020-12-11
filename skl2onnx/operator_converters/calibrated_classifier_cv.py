@@ -331,9 +331,14 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
         apply_concat(scope, prob_name, concatenated_prob_name,
                      container, axis=1)
-        container.add_node('ReduceSum', concatenated_prob_name,
-                           reduced_prob_name, axes=[1],
-                           name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset < 13:
+            container.add_node(
+                'ReduceSum', concatenated_prob_name,
+                reduced_prob_name, axes=[1],
+                name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            raise NotImplementedError(
+                "ReduceSum for opset>=13 is not implemented yet.")
         num, deno = _handle_zeros(scope, container, concatenated_prob_name,
                                   reduced_prob_name, n_classes)
         apply_div(scope, [num, deno],

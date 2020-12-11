@@ -132,9 +132,13 @@ def predict(model, scope, operator, container,
             zero_name, proto_dtype, [], [0])
         apply_mul(scope, [input_name[0], zero_name],
                   zero_matrix_name, container, broadcast=1)
-        container.add_node(
-            'ReduceSum', zero_matrix_name, reduced_zero_matrix_name, axes=[1],
-            name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset:
+            container.add_node(
+                'ReduceSum', zero_matrix_name, reduced_zero_matrix_name,
+                axes=[1], name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            raise NotImplementedError(
+                "ReduceSum for opset>=13 is not implemented yet.")
         apply_cast(scope, reduced_zero_matrix_name, indices_name,
                    container, to=onnx_proto.TensorProto.INT64)
     apply_reshape(scope, indices_name, reshaped_indices_name,

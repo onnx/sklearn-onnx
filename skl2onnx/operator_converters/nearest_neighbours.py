@@ -24,7 +24,7 @@ from ..algebra.onnx_ops import (
     OnnxNot,
     OnnxReciprocal,
     OnnxReduceMean,
-    OnnxReduceSum,
+    OnnxReduceSumApi11,
     OnnxReshape,
     OnnxShape,
     OnnxSqueeze,
@@ -311,12 +311,12 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
                                op_version=opv)
             wei = OnnxMul(binary, OnnxReciprocal(modified, op_version=opv),
                           op_version=opv)
-        norm = OnnxReduceSum(wei, op_version=opv, axes=[1], keepdims=0)
+        norm = OnnxReduceSumApi11(wei, op_version=opv, axes=[1], keepdims=0)
     elif top_distances is not None:
         modified = OnnxMax(top_distances, np.array([1e-6], dtype=dtype),
                            op_version=opv)
         wei = OnnxReciprocal(modified, op_version=opv)
-        norm = OnnxReduceSum(wei, op_version=opv, axes=[1], keepdims=0)
+        norm = OnnxReduceSumApi11(wei, op_version=opv, axes=[1], keepdims=0)
     else:
         norm = None
         wei = None
@@ -359,15 +359,15 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             weighted_rs = OnnxMul(rs, wei, op_version=opv)
             weighted = OnnxTranspose(weighted_rs, perm=[1, 0, 2],
                                      op_version=opv)
-            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
-                                keepdims=0)
+            res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
+                                     keepdims=0)
             norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),
                                 op_version=opv)
             res = OnnxDiv(res, norm2, op_version=opv, output_names=out)
         else:
             weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
-            res = OnnxReduceSum(weighted, axes=[axis], op_version=opv,
-                                keepdims=0)
+            res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
+                                     keepdims=0)
             res.set_onnx_name_prefix('final')
             if opv >= 12:
                 shape = OnnxShape(res, op_version=opv)
@@ -409,10 +409,10 @@ def get_proba_and_label(container, nb_classes, reshaped,
                 mat_cast = OnnxSqueeze(mat_cast, axes=[-1],
                                        op_version=opv)
             mat_cast = OnnxMul(mat_cast, wei, op_version=opv)
-        wh = OnnxReduceSum(mat_cast, axes=[1], op_version=opv)
+        wh = OnnxReduceSumApi11(mat_cast, axes=[1], op_version=opv)
         conc.append(wh)
     all_together = OnnxConcat(*conc, axis=1, op_version=opv)
-    sum_prob = OnnxReduceSum(
+    sum_prob = OnnxReduceSumApi11(
         all_together, axes=[1], op_version=opv, keepdims=1)
     res = OnnxArgMax(all_together, axis=axis, op_version=opv,
                      keepdims=0)
@@ -563,8 +563,9 @@ def convert_k_neighbours_transformer(scope, operator, container):
     if top_dist:
         comparison_res = OnnxMul(
             comparison_res, top_dist, op_version=op_version)
-    res = OnnxReduceSum(comparison_res, op_version=op_version, axes=[2],
-                        keepdims=0, output_names=out[:1])
+    res = OnnxReduceSumApi11(
+        comparison_res, op_version=op_version, axes=[2],
+        keepdims=0, output_names=out[:1])
     res.add_to(scope, container)
 
 
@@ -683,13 +684,14 @@ def convert_knn_imputer(scope, operator, container):
         op_version=op_version)
     transpose_result = OnnxTranspose(
         reshaped, op_version=op_version, perm=[1, 2, 0])
-    reduced = OnnxReduceSum(
+    reduced = OnnxReduceSumApi11(
         transpose_result, op_version=op_version, axes=[1], keepdims=0)
     cast_res = OnnxCast(
         OnnxCast(transpose_result, to=onnx_proto.TensorProto.BOOL,
                  op_version=op_version),
         to=proto_type, op_version=op_version)
-    deno = OnnxReduceSum(cast_res, op_version=op_version, axes=[1], keepdims=0)
+    deno = OnnxReduceSumApi11(
+        cast_res, op_version=op_version, axes=[1], keepdims=0)
     deno_updated = OnnxAdd(
         deno, OnnxCast(
             OnnxNot(OnnxCast(deno, to=onnx_proto.TensorProto.BOOL,

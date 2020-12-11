@@ -69,9 +69,13 @@ def _joint_log_likelihood_bernoulli(
     apply_sub(scope, [constant_name, exp_result_name], sub_result_name,
               container, broadcast=1)
     apply_log(scope, sub_result_name, neg_prob_name, container)
-    container.add_node('ReduceSum', neg_prob_name,
-                       sum_neg_prob_name, axes=[0],
-                       name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node('ReduceSum', neg_prob_name,
+                           sum_neg_prob_name, axes=[0],
+                           name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        raise NotImplementedError(
+            "ReduceSum for opset>=13 is not implemented yet.")
     apply_sub(scope, [feature_log_prob_name, neg_prob_name],
               difference_matrix_name, container)
     container.add_node(
@@ -131,9 +135,13 @@ def _joint_log_likelihood_gaussian(
               container, broadcast=1)
     apply_div(scope, [pow_result_name, sigma_name], div_result_name,
               container, broadcast=1)
-    container.add_node('ReduceSum', div_result_name,
-                       reduced_sum_name, axes=[2], keepdims=0,
-                       name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node('ReduceSum', div_result_name,
+                           reduced_sum_name, axes=[2], keepdims=0,
+                           name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        raise NotImplementedError(
+            "Opset 13 of ReduceSum is not implemented yet.")
     apply_mul(scope, [reduced_sum_name, prod_operand_name], mul_result_name,
               container, broadcast=1)
     apply_sub(scope, [sigma_sum_log_name, mul_result_name],

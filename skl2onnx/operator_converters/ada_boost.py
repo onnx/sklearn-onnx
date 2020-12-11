@@ -89,9 +89,13 @@ def _samme_r_proba(scope, container, proba_name, n_classes, dtype, pdtype):
     container.add_node(
         'Log', clipped_proba_name, log_proba_name,
         name=scope.get_unique_operator_name('Log'))
-    container.add_node(
-        'ReduceSum', log_proba_name, reduced_proba_name, axes=[1],
-        name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node(
+            'ReduceSum', log_proba_name, reduced_proba_name, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        raise NotImplementedError(
+            "ReduceSum for opset>=13 is not implemented yet.")
     apply_reshape(scope, reduced_proba_name,
                   reshaped_result_name, container,
                   desired_shape=(-1, 1))
@@ -144,9 +148,13 @@ def _normalise_probability(scope, container, operator, proba_names_list,
     apply_mul(scope, [div_result_name, mul_operand_name],
               exp_operand_name, container, broadcast=1)
     apply_exp(scope, exp_operand_name, exp_result_name, container)
-    container.add_node(
-        'ReduceSum', exp_result_name, reduced_exp_result_name, axes=[1],
-        name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node(
+            'ReduceSum', exp_result_name, reduced_exp_result_name, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        raise NotImplementedError(
+            "ReduceSum for opset>=13 is not implemented yet.")
     apply_reshape(scope, reduced_exp_result_name,
                   normaliser_name, container,
                   desired_shape=(-1, 1))
@@ -201,9 +209,13 @@ def _generate_raw_scores(scope, container, operator, proba_names_list, model):
                   div_res_name, container, broadcast=1)
         apply_mul(scope, [div_res_name, operand_name],
                   mul_res_name, container, broadcast=1)
-        container.add_node(
-            'ReduceSum', mul_res_name, pos_class_scores_name, axes=[1],
-            name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset < 13:
+            container.add_node(
+                'ReduceSum', mul_res_name, pos_class_scores_name, axes=[1],
+                name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            raise NotImplementedError(
+                "ReduceSum for opset>=13 is not implemented yet.")
         apply_mul(scope, [pos_class_scores_name, neg_name],
                   neg_class_scores_name, container, broadcast=1)
         apply_concat(
@@ -465,8 +477,13 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
         container.add_node('Where', [equal_name, inputs[0], zero_name],
                            selected,
                            name=scope.get_unique_operator_name('Where'))
-        container.add_node('ReduceSum', selected, output, axes=[1],
-                           name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset < 13:
+            container.add_node(
+                'ReduceSum', selected, output, axes=[1],
+                name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            raise NotImplementedError(
+                "ReduceSum for opset>=13 is not implemented yet.")
 
 
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
