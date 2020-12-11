@@ -56,7 +56,7 @@ from test_utils import (
 
 def dont_test_radius():
     return (
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.3.0") or
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.6.0") or
         StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"))
 
 
