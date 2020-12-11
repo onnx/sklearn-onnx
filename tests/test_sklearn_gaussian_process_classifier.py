@@ -33,15 +33,15 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
             return
 
         @onnx_op(op_type="SolveFloat",
-            inputs=[PyCustomOpDef.dt_float, PyCustomOpDef.dt_float],
-            outputs=[PyCustomOpDef.dt_float])
+                 inputs=[PyCustomOpDef.dt_float, PyCustomOpDef.dt_float],
+                 outputs=[PyCustomOpDef.dt_float])
         def solveopf(a, b):
             # The user custom op implementation here.
             return scipy.linalg.solve(a, b).astype(np.float32)
 
         @onnx_op(op_type="SolveDouble",
-            inputs=[PyCustomOpDef.dt_double, PyCustomOpDef.dt_double],
-            outputs=[PyCustomOpDef.dt_double])
+                 inputs=[PyCustomOpDef.dt_double, PyCustomOpDef.dt_double],
+                 outputs=[PyCustomOpDef.dt_double])
         def solveopd(a, b):
             # The user custom op implementation here.
             return scipy.linalg.solve(a, b).astype(np.float64)
