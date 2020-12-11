@@ -30,16 +30,15 @@ from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnx import ModelProto
 import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
-from skl2onnx import __max_supported_opset__ as max_opset
 
 onnx_fct = OnnxAdd(
     OnnxMul('X', numpy.array([2], dtype=numpy.float32),
-            op_version=max_opset),
+            op_version=12),
     numpy.array([[1, 0], [0, 1]], dtype=numpy.float32),
-    output_names=['Y'], op_version=max_opset)
+    output_names=['Y'], op_version=12)
 
 X = numpy.array([[4, 5], [-2, 3]], dtype=numpy.float32)
-model = onnx_fct.to_onnx({'X': X}, target_opset=max_opset)
+model = onnx_fct.to_onnx({'X': X}, target_opset=12)
 print(model)
 
 filename = "example1.onnx"

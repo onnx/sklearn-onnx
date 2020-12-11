@@ -46,7 +46,6 @@ import onnx
 from onnx import helper
 from onnx import TensorProto
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-from skl2onnx import __max_supported_opset__ as max_opset
 
 # Create one input (ValueInfoProto)
 X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
@@ -140,8 +139,8 @@ onnx.checker.check_model(original_model)
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
 node = OnnxTranspose(
-    OnnxTranspose('X', perm=[1, 0, 2], op_version=max_opset),
-    perm=[1, 0, 2], op_version=max_opset)
+    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
+    perm=[1, 0, 2], op_version=12)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape

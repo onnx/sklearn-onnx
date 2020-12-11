@@ -40,10 +40,10 @@ from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
 from skl2onnx.helpers.onnx_helper import load_onnx_model
 import numpy
 import onnxruntime as rt
-from skl2onnx import convert_sklearn, __max_supported_opset__ as max_opset
+from skl2onnx import convert_sklearn
 import pprint
-from skl2onnx.common.data_types import (
-    FloatTensorType, StringTensorType, Int64TensorType)
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
+from skl2onnx.common.data_types import Int64TensorType
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -132,7 +132,7 @@ pprint.pprint(inputs)
 
 try:
     model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                                 target_opset=max_opset)
+                                 target_opset=12)
 except Exception as e:
     print(e)
 
@@ -148,7 +148,7 @@ to_drop = [c for c in X_train.columns if c not in white_list]
 inputs = convert_dataframe_schema(X_train, to_drop)
 
 model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                             target_opset=max_opset)
+                             target_opset=12)
 
 
 # And save.
