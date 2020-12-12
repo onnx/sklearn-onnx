@@ -85,9 +85,11 @@ def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
 
 
 def fit_regression_model(model, is_int=False, n_targets=1, is_bool=False,
-                         factor=1.):
-    X, y = make_regression(n_features=10, n_samples=500,
-                           n_targets=n_targets, random_state=42)
+                         factor=1., n_features=10, n_samples=500,
+                         n_informative=10):
+    X, y = make_regression(n_features=n_features, n_samples=n_samples,
+                           n_targets=n_targets, random_state=42,
+                           n_informative=n_informative)
     y *= factor
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
     if is_bool:

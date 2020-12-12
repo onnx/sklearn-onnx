@@ -138,9 +138,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         name = str(uuid4().hex)
     if dtype is not None:
         warnings.warn(
-            DeprecationWarning,
             "Parameter dtype is no longer supported. "
-            "It will be removed in 1.9.0.")
+            "It will be removed in 1.9.0.",
+            DeprecationWarning)
 
     target_opset = (target_opset
                     if target_opset else get_latest_tested_opset_version())
