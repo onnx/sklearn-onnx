@@ -340,6 +340,7 @@ class OnnxOperator:
             for inp in self.inputs:
                 if hasattr(inp, 'onnx_prefix_name'):
                     inp.set_onnx_name_prefix(onnx_prefix_name)
+        return self
 
     @property
     def onnx_prefix(self):
