@@ -2,6 +2,8 @@
 
 import unittest
 from distutils.version import StrictVersion
+import numpy
+from numpy.testing import assert_almost_equal
 from sklearn import linear_model
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
@@ -13,7 +15,7 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from onnxruntime import __version__ as ort_version
+from onnxruntime import __version__ as ort_version, InferenceSession
 from test_utils import dump_data_and_model, fit_regression_model
 
 
@@ -35,7 +37,27 @@ class TestGLMRegressorConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        reason="old onnxruntime does not support double")
+    def test_model_linear_regression_multi(self):
+        model, X = fit_regression_model(linear_model.LinearRegression(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(
+            model, "linear regression",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnLinearRegressionMulti-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="old onnxruntime does not support double")
     def test_model_linear_regression64(self):
         model, X = fit_regression_model(linear_model.LinearRegression())
@@ -43,6 +65,35 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                      [("input", DoubleTensorType(X.shape))])
         self.assertIsNotNone(model_onnx)
         self.assertIn("elem_type: 11", str(model_onnx))
+        dump_data_and_model(
+            X.astype(numpy.float64),
+            model,
+            model_onnx,
+            basename="SklearnLinearRegression64-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        reason="old onnxruntime does not support double")
+    def test_model_linear_regression64_multiple(self):
+        model, X = fit_regression_model(linear_model.LinearRegression(),
+                                        n_targets=2)
+        model_onnx = convert_sklearn(model, "linear regression",
+                                     [("input", DoubleTensorType(X.shape))])
+        self.assertIsNotNone(model_onnx)
+        self.assertIn("elem_type: 11", str(model_onnx))
+        dump_data_and_model(
+            X.astype(numpy.float64),
+            model,
+            model_onnx,
+            basename="SklearnLinearRegression64Multi-Dec4",
+            allow_failure="StrictVersion("
+            "onnxruntime.__version__)"
+            "<= StrictVersion('0.2.1')",
+        )
 
     def test_model_linear_regression_int(self):
         model, X = fit_regression_model(
@@ -507,6 +558,75 @@ class TestGLMRegressorConverter(unittest.TestCase):
             "onnxruntime.__version__)"
             "<= StrictVersion('0.2.1')",
         )
+
+    def test_model_bayesian_ridge_return_std(self):
+        model, X = fit_regression_model(linear_model.BayesianRidge(),
+                                        n_features=2, n_samples=20)
+        model_onnx = convert_sklearn(
+            model, "bayesian ridge",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={linear_model.BayesianRidge: {'return_std': True}})
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        outputs = sess.run(None, {'input': X})
+        pred, std = model.predict(X, return_std=True)
+        assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
+        assert_almost_equal(std, outputs[1].ravel(), decimal=4)
+
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
+                     reason="output type")
+    def test_model_bayesian_ridge_return_std_double(self):
+        model, X = fit_regression_model(linear_model.BayesianRidge(),
+                                        n_features=2, n_samples=100,
+                                        n_informative=1)
+        model_onnx = convert_sklearn(
+            model, "bayesian ridge",
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            options={linear_model.BayesianRidge: {'return_std': True}})
+        self.assertIsNotNone(model_onnx)
+
+        X = X.astype(numpy.float64)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        outputs = sess.run(None, {'input': X})
+        pred, std = model.predict(X, return_std=True)
+        assert_almost_equal(pred, outputs[0].ravel())
+        assert_almost_equal(std, outputs[1].ravel(), decimal=4)
+
+    def test_model_bayesian_ridge_return_std_normalize(self):
+        model, X = fit_regression_model(
+            linear_model.BayesianRidge(normalize=True),
+            n_features=2, n_samples=50)
+        model_onnx = convert_sklearn(
+            model, "bayesian ridge",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={linear_model.BayesianRidge: {'return_std': True}})
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        outputs = sess.run(None, {'input': X})
+        pred, std = model.predict(X, return_std=True)
+        assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
+        assert_almost_equal(std, outputs[1].ravel(), decimal=4)
+
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
+                     reason="output type")
+    def test_model_bayesian_ridge_return_std_normalize_double(self):
+        model, X = fit_regression_model(
+            linear_model.BayesianRidge(normalize=True),
+            n_features=2, n_samples=50)
+        model_onnx = convert_sklearn(
+            model, "bayesian ridge",
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            options={linear_model.BayesianRidge: {'return_std': True}})
+        self.assertIsNotNone(model_onnx)
+
+        X = X.astype(numpy.float64)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        outputs = sess.run(None, {'input': X})
+        pred, std = model.predict(X, return_std=True)
+        assert_almost_equal(pred, outputs[0].ravel())
+        assert_almost_equal(std, outputs[1].ravel(), decimal=4)
 
     def test_model_huber_regressor(self):
         model, X = fit_regression_model(linear_model.HuberRegressor())
