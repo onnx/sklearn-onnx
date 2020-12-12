@@ -10,7 +10,7 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'Ubuntu-18.04'
+    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
       Py38-Onnx180-RtTST-Skldev:
@@ -19,7 +19,7 @@ jobs:
         numpy.version: '>=1.19'
         onnx.version: '==1.8.0'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.5.2'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: 'git'
         onnxcc.version: 'git'
         run.example: '1'
@@ -29,7 +29,7 @@ jobs:
         numpy.version: '>=1.19'
         onnx.version: '==1.8.0'
         onnx.target_opset: ''
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: 'onnxruntime==1.6.0'
         sklearn.version: 'git'
         onnxcc.version: 'git'
         run.example: '1'
