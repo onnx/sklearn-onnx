@@ -261,6 +261,7 @@ def build_sklearn_operator_name_map():
                 BaggingClassifier,
                 BaggingRegressor,
                 BayesianGaussianMixture,
+                BayesianRidge,
                 BernoulliNB,
                 Binarizer,
                 CalibratedClassifierCV,
@@ -346,7 +347,6 @@ def build_sklearn_operator_name_map():
     ] if k is not None}
     res.update({
         ARDRegression: 'SklearnLinearRegressor',
-        BayesianRidge: 'SklearnLinearRegressor',
         ElasticNet: 'SklearnLinearRegressor',
         ElasticNetCV: 'SklearnLinearRegressor',
         GridSearchCV: 'SklearnGridSearchCV',
