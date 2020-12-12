@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 import unittest
+import warnings
 import numpy
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.cluster import KMeans
@@ -14,7 +15,7 @@ except ImportError:
     KBinsDiscretizer = None
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.datasets import load_iris
-from skl2onnx import to_onnx
+from skl2onnx import to_onnx, convert_sklearn
 from test_utils import TARGET_OPSET
 
 
@@ -126,6 +127,16 @@ class TestConvert(unittest.TestCase):
                 dom = get_domain_opset(model_onnx)
                 self.assertEqual(len(dom), 1)
                 self.assertEqual(dom['ai.onnx.ml'], 2)
+
+    def test_warnings(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            try:
+                convert_sklearn(None, initial_types=[], dtype=numpy.float64)
+            except IndexError:
+                pass
+            assert len(w) == 1
+            assert "Parameter dtype is no longer supported." in str(w[0])
 
 
 if __name__ == "__main__":

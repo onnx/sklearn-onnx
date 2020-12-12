@@ -17,6 +17,7 @@ except ImportError:
         pass
 
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
@@ -430,6 +431,23 @@ def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
+def _parse_sklearn_bayesian_ridge(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(model, dict(return_std=False))
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
+    mean_tensor = scope.declare_local_variable(
+        "variable", guess_tensor_type(inputs[0].type))
+    this_operator.inputs = inputs
+    this_operator.outputs.append(mean_tensor)
+
+    if options['return_std']:
+        # covariance or standard deviation
+        covstd_tensor = scope.declare_local_variable(
+            'std', guess_tensor_type(inputs[0].type))
+        this_operator.outputs.append(covstd_tensor)
+    return this_operator.outputs
+
+
 def _parse_sklearn(scope, model, inputs, custom_parsers=None,
                    final_types=None):
     """
@@ -635,6 +653,7 @@ def build_sklearn_parsers_map():
     map_parser = {
         pipeline.Pipeline: _parse_sklearn_pipeline,
         pipeline.FeatureUnion: _parse_sklearn_feature_union,
+        BayesianRidge: _parse_sklearn_bayesian_ridge,
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
         GridSearchCV: _parse_sklearn_grid_search_cv,
     }
