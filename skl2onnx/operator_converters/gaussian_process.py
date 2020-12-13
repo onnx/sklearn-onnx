@@ -299,7 +299,7 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
     # pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
     pi_star = OnnxAdd(
-                OnnxReduceSum(
+                OnnxReduceSumApi11(
                     OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
                     op_version=opv, axes=[0]),
                 (.5 * COEFS.sum()).astype(dtype),
