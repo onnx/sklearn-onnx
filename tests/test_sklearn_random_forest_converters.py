@@ -42,7 +42,6 @@ from test_utils import (
     fit_regression_model,
     TARGET_OPSET,
 )
-from test_utils.utils_backend_onnxruntime import assert_almost_equal_detailed
 try:
     from sklearn.experimental import enable_hist_gradient_boosting  # noqa
     from sklearn.ensemble import (
