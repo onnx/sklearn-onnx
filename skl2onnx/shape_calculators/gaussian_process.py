@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 
 from ..common._registration import register_shape_calculator
+from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 from ..common.data_types import FloatTensorType, DoubleTensorType
 from ..common.utils import check_input_and_output_types
 
@@ -36,3 +37,5 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
 
 register_shape_calculator('SklearnGaussianProcessRegressor',
                           calculate_sklearn_gaussian_process_regressor_shape)
+register_shape_calculator('SklearnGaussianProcessClassifier',
+                          calculate_linear_classifier_output_shapes)

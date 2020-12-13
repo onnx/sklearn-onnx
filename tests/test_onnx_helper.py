@@ -14,6 +14,7 @@ from skl2onnx.helpers.onnx_helper import (
     load_onnx_model,
     save_onnx_model,
     select_model_inputs_outputs,
+    change_onnx_domain
 )
 from test_utils import TARGET_OPSET
 
@@ -102,6 +103,17 @@ class TestOnnxHelper(unittest.TestCase):
         new_model = select_model_inputs_outputs(model_onnx, "variable")
         vals = {p.key: p.value for p in new_model.metadata_props}
         assert vals == meta
+
+    def test_change_onnx_domain(self):
+        model = make_pipeline(StandardScaler())
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", FloatTensorType([None, 2]))])
+        model_onnx = change_onnx_domain(
+            model_onnx, {'Scaler': ('ScalerNew', 'ML2')})
+        self.assertIn('domain: "ML2"', str(model_onnx))
+        self.assertIn('op_type: "ScalerNew"', str(model_onnx))
 
 
 if __name__ == "__main__":

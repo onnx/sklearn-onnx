@@ -21,8 +21,8 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
     def common_test_model_tfidf_vectorizer_pipeline_cls(
             self, kind=None, verbose=False):
         if kind == 'stop':
-            if ort_version.startswith('1.4') or ort_version.startswith('1.5'):
-                # regression with stopwords in onnxruntime 1.4, 1.5
+            if StrictVersion(ort_version) >= StrictVersion('1.4.0'):
+                # regression with stopwords in onnxruntime 1.4+
                 stopwords = ['theh']
             else:
                 stopwords = ['the', 'and', 'is']
