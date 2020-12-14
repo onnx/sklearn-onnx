@@ -1,6 +1,7 @@
 """
 Tests scikit-learn's tfidf converter.
 """
+import os
 import unittest
 from distutils.version import StrictVersion
 import numpy
@@ -56,6 +57,39 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Requires opset 9.")
+    def test_model_tfidf_vectorizer11_max_features(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, max_features=3)
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType())],
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11MX-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
+        )
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': corpus.ravel()})[0]
+        assert res.shape == (4, 3)
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
@@ -503,6 +537,34 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        reason="Requires opset 9.")
+    def test_model_tfidf_vectorizer_max_features(self):
+        with open(os.path.join(os.path.dirname(__file__), "sentances.csv"),
+                  "r", encoding='utf-8') as f:
+            content = f.readlines()
+        corpus = numpy.array([c.strip('\n') for c in content]).reshape((-1, 1))
+        vect = TfidfVectorizer(max_features=10)
+        vect.fit(corpus.ravel())
+        new_list = list(corpus.ravel()) + ['abcdefghj aert', ' ', ',aaaa', '']
+        corpus = numpy.array(new_list).reshape((-1, 1))
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType([None, 1]))],
+                                     # options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': corpus.reshape((-1, 1))})[0]
+        exp = numpy.asarray(vect.transform(corpus.ravel()).todense())
+        assert res.shape == exp.shape
+        r = numpy.abs(res - exp).ravel()
+        diff = list(sorted(r))
+        assert diff[-50] <= 0.01
+        assert all(res[-3:].ravel() == 0)
 
 
 if __name__ == "__main__":
