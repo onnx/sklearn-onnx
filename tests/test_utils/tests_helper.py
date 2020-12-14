@@ -986,17 +986,28 @@ def binary_array_to_string(mat):
     return [''.join(row) for row in res]
 
 
-def path_to_leaf(tree, mat):
-    leave = set([i for i in range(tree.node_count)
-                 if tree.children_left[i] <= i])
-    res = []
-    for row in range(mat.shape[0]):
-        leaf = None
-        for i in range(mat.shape[1]):
-            if mat[row, i] == 1 and i in leave:
-                leaf = i
-                break
-        if leaf is None:
-            raise AssertionError("Path does not end with a leaf.")
-        res.append(leaf)
-    return numpy.array(res, numpy.int64)
+def path_to_leaf(tree, mat, tree_indices=None):
+    if tree_indices is None:
+        # single tree
+        leave = set([i for i in range(tree.node_count)
+                     if tree.children_left[i] <= i])
+        res = []
+        for row in range(mat.shape[0]):
+            leaf = None
+            for i in range(mat.shape[1]):
+                if mat[row, i] == 1 and i in leave:
+                    leaf = i
+                    break
+            if leaf is None:
+                raise AssertionError("Path does not end with a leaf.")
+            res.append(leaf)
+        return numpy.array(res, numpy.int64)
+
+    leaves = []
+    for i in range(0, len(tree)):
+        mm = mat[:, tree_indices[i]:tree_indices[i+1]]
+        tt = tree[i].tree_ if hasattr(tree[i], 'tree_') else tree[i]
+        res = path_to_leaf(tt, mm)
+        leaves.append(numpy.array(res, dtype=numpy.int64))
+    res = numpy.vstack(leaves)
+    return res.T

@@ -165,7 +165,8 @@ def _append_decision_output(
         input_name, attrs, fct_label, n_out, scope, operator, container,
         op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1,
-        cast_encode=False, regression=False, dtype=np.float32):
+        cast_encode=False, regression=False, dtype=np.float32,
+        overwrite_tree=None):
 
     attrs = attrs.copy()
     attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -188,14 +189,20 @@ def _append_decision_output(
         op_type.replace("Classifier", "Regressor"), input_name, dpath,
         op_domain=op_domain, op_version=op_version, **attrs)
 
+    if n_out is None:
+        final_name = scope.get_unique_variable_name("dpatho")
+    else:
+        final_name = operator.outputs[n_out].full_name
+
     if cast_encode:
         apply_cast(
-            scope, dpath, operator.outputs[n_out].full_name,
+            scope, dpath, final_name,
             container, to=onnx_proto.TensorProto.INT64,
             operator_name=scope.get_unique_operator_name('TreePathType'))
     else:
         op = operator.raw_operator
-        labels = fct_label(op.tree_)
+        labels = fct_label(
+            overwrite_tree if overwrite_tree is not None else op.tree_)
         ordered = list(sorted(labels.items()))
         keys = [float(_[0]) for _ in ordered]
         values = [_[1] for _ in ordered]
@@ -206,9 +213,11 @@ def _append_decision_output(
             default_string='0', keys_floats=keys, values_strings=values,
             name=scope.get_unique_operator_name('TreePath'))
         apply_reshape(
-            scope, name, operator.outputs[n_out].full_name,
+            scope, name, final_name,
             container, desired_shape=(-1, 1),
             operator_name=scope.get_unique_operator_name('TreePathShape'))
+
+    return final_name
 
 
 def convert_sklearn_decision_tree_classifier(
@@ -387,35 +396,6 @@ def convert_sklearn_decision_tree_regressor(
             op_type=op_type, op_domain=op_domain,
             op_version=op_version, regression=True, cast_encode=True)
         n_out += 1
-
-    """
-    attrs = attrs.copy()
-    attrs['name'] = scope.get_unique_operator_name(op_type)
-    attrs['n_targets'] = 1
-    attrs['post_transform'] = 'NONE'
-    attrs['target_ids'] = [0 for _ in attrs['target_ids']]
-    attrs['target_weights'] = np.array(
-        [float(_) for _ in attrs['target_nodeids']], dtype=dtype)
-    dpath = scope.get_unique_variable_name("dpath")
-    container.add_node(
-        op_type, input_name, dpath,
-        op_domain=op_domain, op_version=op_version, **attrs)
-
-    labels = _build_labels_path(op.tree_)
-    ordered = list(sorted(labels.items()))
-    keys = [float(_[0]) for _ in ordered]
-    values = [_[1] for _ in ordered]
-    name = scope.get_unique_variable_name("spath")
-    container.add_node(
-        'LabelEncoder', dpath, name,
-        op_domain=op_domain, op_version=2,
-        default_string='0', keys_floats=keys, values_strings=values,
-        name=scope.get_unique_operator_name('TreePath'))
-    apply_reshape(
-        scope, name, operator.outputs[1].full_name,
-        container, desired_shape=(-1, 1),
-        operator_name=scope.get_unique_operator_name('TreePathShape'))
-    """
 
 
 def _recursive_build_labels(tree, index, current):
