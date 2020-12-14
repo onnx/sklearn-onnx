@@ -43,7 +43,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         model = OneVsRestClassifier(
             RandomForestClassifier(n_estimators=2, max_depth=3))
         model, X = fit_classification_model(
-            model, 3, is_int=True, n_features=5)
+            model, 3, is_int=True, n_features=3)
         model_onnx = convert_sklearn(
             model, initial_types=[
                 ('input', Int64TensorType([None, X.shape[1]]))],
