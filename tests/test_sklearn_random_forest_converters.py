@@ -686,8 +686,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_randomforestclassifier_decision_path(self):
-        model = RandomForestClassifier(max_depth=2, n_estimators=3)
-        X, y = make_classification(10, n_features=4, random_state=42)
+        model = RandomForestClassifier(max_depth=2, n_estimators=2)
+        X, y = make_classification(3, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
