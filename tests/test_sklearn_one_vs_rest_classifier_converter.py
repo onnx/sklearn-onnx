@@ -1,26 +1,25 @@
 from distutils.version import StrictVersion
 import unittest
+import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.ensemble import (
-    GradientBoostingClassifier,
-    GradientBoostingRegressor,
-)
+    GradientBoostingClassifier, GradientBoostingRegressor)
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.ensemble import RandomForestClassifier
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
-    onnx_built_with_ml,
-)
+    onnx_built_with_ml)
 from test_utils import (
     dump_data_and_model,
     dump_multiple_classification,
     fit_classification_model,
-    TARGET_OPSET
-)
+    fit_multilabel_classification_model,
+    TARGET_OPSET)
 
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
@@ -34,6 +33,67 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                           " <= StrictVersion('0.2.1')",
             target_opset=TARGET_OPSET
         )
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.4.0'),
+        reason="onnxruntime too old")
+    def test_ovr_rf(self):
+        model = OneVsRestClassifier(
+            RandomForestClassifier(n_estimators=2, max_depth=3))
+        model, X = fit_classification_model(
+            model, 3, is_int=True, n_features=5)
+        model_onnx = convert_sklearn(
+            model, initial_types=[
+                ('input', Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(np.int64), model, model_onnx)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
+    def test_ovr_rf_multilabel_float(self):
+        for opset in [9, 12, TARGET_OPSET]:
+            if opset > TARGET_OPSET:
+                continue
+            with self.subTest(opset=opset):
+                model = OneVsRestClassifier(
+                    RandomForestClassifier(n_estimators=2, max_depth=3))
+                model, X = fit_multilabel_classification_model(
+                    model, 3, is_int=False, n_features=5)
+                model_onnx = convert_sklearn(
+                    model, initial_types=[
+                        ('input', FloatTensorType([None, X.shape[1]]))],
+                    target_opset=opset)
+                dump_data_and_model(
+                    X.astype(np.float32), model, model_onnx,
+                    basename="SklearnOVRRFMultiLabelFloat%d" % opset)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
+    def test_ovr_rf_multilabel_int(self):
+        for opset in [9, 12, TARGET_OPSET]:
+            if opset > TARGET_OPSET:
+                continue
+            with self.subTest(opset=opset):
+                model = OneVsRestClassifier(
+                    RandomForestClassifier(n_estimators=2, max_depth=3))
+                model, X = fit_multilabel_classification_model(
+                    model, 3, is_int=True, n_features=5)
+                model_onnx = convert_sklearn(
+                    model, initial_types=[
+                        ('input', Int64TensorType([None, X.shape[1]]))],
+                    target_opset=opset)
+                dump_data_and_model(
+                    X.astype(np.int64), model, model_onnx,
+                    basename="SklearnOVRRFMultiLabelInt64%d" % opset)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")

@@ -282,8 +282,7 @@ def convert_sklearn_ada_boost_classifier(scope, operator, container):
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = operator.inputs
         this_operator.outputs.extend([label_name, proba_name])
 
@@ -387,8 +386,7 @@ def _get_estimators_label(scope, operator, container, model):
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = input_name
         this_operator.outputs.append(estimator_label_name)
 
