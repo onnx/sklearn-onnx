@@ -13,11 +13,26 @@ from sklearn.linear_model import (
     RidgeClassifierCV,
 )
 from sklearn.svm import LinearSVC
-from ..common._apply_operation import apply_cast
+from ..common._apply_operation import (
+    apply_cast, apply_add, apply_sigmoid, apply_softmax)
 from ..common._registration import register_converter
-from ..common.data_types import BooleanTensorType
-from ..common.utils_classifier import get_label_classes
+from ..common.data_types import (
+    BooleanTensorType, DoubleTensorType, guess_proto_type)
+from ..common.utils_classifier import (
+    get_label_classes, _finalize_converter_classes)
 from ..proto import onnx_proto
+
+
+def apply_logistic(scope, input_name, output_name, container):
+    sig_name = scope.get_unique_variable_name(input_name + "sig")
+    apply_sigmoid(scope, input_name, sig_name, container)
+
+    normalizer_type = 'Normalizer'
+    normalizer_attrs = {
+        'name': scope.get_unique_operator_name(input_name + "norm"),
+        'norm': 'L1'}
+    container.add_node(normalizer_type, sig_name, output_name,
+                       op_domain='ai.onnx.ml', **normalizer_attrs)
 
 
 def convert_sklearn_linear_classifier(scope, operator, container):
@@ -77,6 +92,57 @@ def convert_sklearn_linear_classifier(scope, operator, container):
     else:
         raise RuntimeError('Label vector must be a string or a integer '
                            'tensor.')
+
+    if type(operator.inputs[0].type) in (DoubleTensorType, ):
+        # Double -> double parameters not supported in ONNX LinearClassifier
+        proto_dtype = guess_proto_type(operator.inputs[0].type)
+        coef = scope.get_unique_variable_name('coef')
+        model_coef = np.array(
+            classifier_attrs['coefficients'], dtype=np.float64)
+        model_coef = model_coef.reshape((number_of_classes, -1)).T
+        container.add_initializer(
+            coef, proto_dtype, model_coef.shape, model_coef.ravel().tolist())
+        intercept = scope.get_unique_variable_name('intercept')
+        model_intercept = np.array(
+            classifier_attrs['intercepts'], dtype=np.float64)
+        model_intercept = model_intercept.reshape((number_of_classes, -1)).T
+        container.add_initializer(
+            intercept, proto_dtype, model_intercept.shape,
+            model_intercept.ravel().tolist())
+        multiplied = scope.get_unique_variable_name('multiplied')
+        container.add_node(
+            'MatMul', [operator.inputs[0].full_name, coef], multiplied,
+            name=scope.get_unique_operator_name('MatMul'))
+
+        if use_raw_scores:
+            raw_score_name = operator.outputs[1].full_name
+        else:
+            raw_score_name = scope.get_unique_variable_name('raw_scores')
+        apply_add(scope, [multiplied, intercept], raw_score_name, container)
+
+        argmax_output_name = scope.get_unique_variable_name('label')
+        container.add_node('ArgMax', raw_score_name, argmax_output_name,
+                           name=scope.get_unique_operator_name('ArgMax'),
+                           axis=1)
+        _finalize_converter_classes(
+            scope, argmax_output_name, operator.outputs[0].full_name,
+            container, np.array(class_labels))
+
+        if use_raw_scores:
+            return
+
+        if classifier_attrs['post_transform'] == 'LOGISTIC':
+            apply_logistic(scope, raw_score_name,
+                           operator.outputs[1].full_name, container)
+            return
+        elif classifier_attrs['post_transform'] == 'SOFTMAX':
+            apply_softmax(scope, raw_score_name,
+                          operator.outputs[1].full_name, container)
+            return
+
+        raise NotImplementedError(
+            "post_transform '{}' is not supported with double.".format(
+                classifier_attrs['post_transform']))
 
     label_name = operator.outputs[0].full_name
     input_name = operator.inputs[0].full_name
