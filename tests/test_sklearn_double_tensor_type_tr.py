@@ -62,6 +62,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                     methods=methods,
                     basename="Sklearn{}Double".format(name))
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_scaler_64(self):
         self._common_transform([StandardScaler])
@@ -397,6 +400,10 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             X[40:60], model, model_onnx,
             basename="SklearnKMeansDoubleNoGemm-Dec4")
 
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_pca_default(self):
 
         def _fit_model_pca(model):
