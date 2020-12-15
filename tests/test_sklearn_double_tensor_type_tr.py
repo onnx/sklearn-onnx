@@ -1,26 +1,34 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
 from sklearn.exceptions import ConvergenceWarning
 try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
     from sklearn.utils.testing import ignore_warnings
 from sklearn.datasets import load_iris
+from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.preprocessing import Binarizer
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
+    from onnxruntime.capi.onnxruntime_pybind11_state import (
+        NotImplemented as OrtNotImplemented)
 except ImportError:
     OrtFail = RuntimeError
+    OrtNotImplemented = RuntimeError
 from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
+warnings_to_skip = (
+    DeprecationWarning, FutureWarning, ConvergenceWarning, UserWarning)
 
 
 class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
@@ -93,8 +101,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             exp.ravel(), got[2].ravel(), decimal=decimal)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture(), load_iris())
@@ -111,8 +120,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 self._test_score(model, X, tg)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_model_bayesian_mixture_binary_classification(self):
         for cov in ["full", "tied", "diag", "spherical"]:
             with self.subTest(cov=cov):
@@ -130,8 +140,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_model_gaussian_mixture_multiclass(self):
         model, X = self._fit_model_multiclass_classification(
             GaussianMixture(), load_iris())
@@ -146,8 +157,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_comp2(self):
         data = load_iris()
         X = data.data
@@ -164,8 +176,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full(self):
         data = load_iris()
         X = data.data
@@ -182,8 +195,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_tied(self):
         data = load_iris()
         X = data.data
@@ -200,8 +214,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_diag(self):
         data = load_iris()
         X = data.data
@@ -219,8 +234,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_spherical(self):
         data = load_iris()
         X = data.data
@@ -237,8 +253,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full_black_op(self):
         data = load_iris()
         X = data.data
@@ -260,10 +277,11 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full_black_op_noargmax(self):
         data = load_iris()
         X = data.data
@@ -287,10 +305,11 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Gemm for double")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
+    @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full_black_op_noargmax_inf(self):
         data = load_iris()
         X = data.data
@@ -325,8 +344,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             decimal=2)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses Where for double")
+    @ignore_warnings(category=warnings_to_skip)
     def test_binarizer(self):
         data = np.array([[1., -1., 2.],
                          [2., 0., 0.],
@@ -340,15 +360,79 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnBinarizerDouble-SkipDim1")
 
-    # DictVectorizer
-    # FunctionTransformer
-    # GaussianRandomProjection, IncrementalPCA, KBinsDiscretizer
-    # KMeans, KNNImputer, KNeighborsTransformer,
-    # LabelBinarizer, LabelEncoder, LinearDiscriminantAnalysis
-    # NeighborhoodComponentsAnalysis, OneClassSVM
-    # OneHotEncoder, OrdinalEncoder, OrthogonalMatchingPursuit
-    # PCA, PolynomialFeatures, PowerTransformer, RFE, SelectFdr
-    # SimpleImputer, TruncatedSVD, VarianceThreshold
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        reason="onnxruntime misses Gemm for double")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_kmeans_clustering(self):
+        data = load_iris()
+        X = data.data
+        model = KMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = convert_sklearn(
+            model, "kmeans",
+            [("input", DoubleTensorType([None, 4]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[40:60], model, model_onnx,
+            basename="SklearnKMeansDoubleGemm-Dec4")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        reason="onnxruntime misses ArgMin for double")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_kmeans_clustering_nogemm(self):
+        data = load_iris()
+        X = data.data
+        model = KMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = convert_sklearn(
+            model, "kmeans",
+            [("input", DoubleTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'gemm': False}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[40:60], model, model_onnx,
+            basename="SklearnKMeansDoubleNoGemm-Dec4")
+
+    def test_pca_default(self):
+
+        def _fit_model_pca(model):
+            data = load_diabetes()
+            X_train, X_test, *_ = train_test_split(
+                data.data, data.target, test_size=0.2, random_state=42)
+            model.fit(X_train)
+            return model, X_test.astype(np.float64)
+
+        model, X_test = _fit_model_pca(PCA(random_state=42))
+        model_onnx = convert_sklearn(
+            model, initial_types=[
+                ("input", DoubleTensorType([None, X_test.shape[1]]))])
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnPCADoubleDefault")
+
+    # Untested operators:
+    # * float parameters only:
+    #    * OneHotEncoder
+    #    * OrdinalEncoder
+    #    * SimpleImputer
+    #    * LabelEncoder
+    #    * OneClassSVM
+    # Others:
+    # * FunctionTransformer
+    # * GaussianRandomProjection
+    # * KBinsDiscretizer
+    # * KNNImputer, KNeighborsTransformer, NeighborhoodComponentsAnalysis
+    # * LabelBinarizer
+    # * LinearDiscriminantAnalysis
+    # * OrthogonalMatchingPursuit
+    # * PolynomialFeatures
+    # * PowerTransformer
+    # * RFE, SelectFdr
+    # * VarianceThreshold
 
 
 if __name__ == "__main__":
