@@ -18,7 +18,7 @@ That assumption is usually true if the prediction
 function is continuous, :math:`y = f(x)`, then
 :math:`dy = f'(x) dx`. We can determine an upper bound
 to the discrepencies :
-:math:`\\Delta(y) \\leqslant \\sup_x \\norm{f'(x)} dx`.
+:math:`\\Delta(y) \\leqslant \\sup_x \\left\\Vert f'(x)\\right\\Vert dx`.
 *dx* is the discrepency introduced by a float conversion,
 ``dx = x - numpy.float32(x)``.
 

@@ -1,4 +1,6 @@
 """
+.. _l-simple-deploy-1:
+
 Train and deploy a scikit-learn pipeline
 ========================================
 
