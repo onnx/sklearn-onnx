@@ -262,8 +262,8 @@ if __name__ == '__main__':
         {"name": "treelite", "version": treelite.__version__},
         {"name": "treelite_runtime", "version": treelite_runtime.__version__},
     ])
-    df.to_csv("results/bench_plot_onnxruntime_decision_tree_reg.time.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_random_forest_reg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    df.to_csv("results/bench_plot_onnxruntime_random_forest_reg.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_random_forest_reg.csv", index=False)
     # plt.show()

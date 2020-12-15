@@ -219,8 +219,8 @@ if __name__ == '__main__':
         {"name": "onnxruntime", "version": onnxruntime.__version__},
         {"name": "skl2onnx", "version": skl2onnx.__version__},
     ])
-    df.to_csv("results/bench_plot_onnxruntime_logreg.time.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_linreg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
-    df.to_csv("results/bench_plot_onnxruntime_linreg.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_linreg.csv", index=False)
     # plt.show()
