@@ -29,30 +29,38 @@ def calculate_tree_regressor_output_shapes(operator):
     [N, 1].
     """
     check_input_and_output_numbers(operator, input_count_range=1,
-                                   output_count_range=[1, 2])
+                                   output_count_range=[1, 3])
     check_input_and_output_types(operator, good_input_types=[
         BooleanTensorType, DoubleTensorType,
         FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].type.shape[0]
     operator.outputs[0].type.shape = [N, 1]
-    if len(operator.outputs) == 2:
+
+    # decision_path, decision_leaf
+    for n in range(2, len(operator.outputs)):
         if hasattr(operator.raw_operator, 'estimators_'):
-            operator.outputs[1].type.shape = [
+            # random forest
+            operator.outputs[n].type.shape = [
                 N, len(operator.raw_operator.estimators_)]
         else:
-            operator.outputs[1].type.shape = [N, 1]
+            # single tree
+            operator.outputs[n].type.shape = [N, 1]
 
 
 def calculate_tree_classifier_output_shapes(operator):
-    _calculate_linear_classifier_output_shapes(operator, True)
-    if len(operator.outputs) == 3:
-        N = operator.inputs[0].type.shape[0]
+    _calculate_linear_classifier_output_shapes(operator, True, True)
+    N = operator.inputs[0].type.shape[0]
+
+    # decision_path, decision_leaf
+    for n in range(2, len(operator.outputs)):
         if hasattr(operator.raw_operator, 'estimators_'):
-            operator.outputs[2].type.shape = [
+            # random forest
+            operator.outputs[n].type.shape = [
                 N, len(operator.raw_operator.estimators_)]
         else:
-            operator.outputs[2].type.shape = [N, 1]
+            # single tree
+            operator.outputs[n].type.shape = [N, 1]
 
 
 register_shape_calculator('SklearnDecisionTreeRegressor',

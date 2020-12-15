@@ -33,6 +33,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    path_to_leaf,
     TARGET_OPSET,
 )
 
@@ -95,6 +96,49 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_regressor_decision_leaf(self):
+        model = DecisionTreeRegressor(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp = path_to_leaf(model.tree_, dec.todense())
+        assert exp.tolist() == res[1].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_regressor_decision_path_leaf(self):
+        model = DecisionTreeRegressor(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True,
+                                 'decision_path': True}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp_leaf = path_to_leaf(model.tree_, dec.todense())
+        exp_path = binary_array_to_string(dec.todense())
+        assert exp_path == res[1].ravel().tolist()
+        assert exp_leaf.tolist() == res[2].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_classifier_decision_path(self):
         model = DecisionTreeClassifier(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
@@ -113,6 +157,55 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         dec = model.decision_path(X)
         exp = binary_array_to_string(dec.todense())
         assert exp == res[2].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_classifier_decision_leaf(self):
+        model = DecisionTreeClassifier(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True, 'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict_proba(X)
+        assert_almost_equal(prob, res[1])
+        dec = model.decision_path(X)
+        exp = path_to_leaf(model.tree_, dec.todense())
+        assert exp.tolist() == res[2].ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_decisiontree_classifier_decision_path_leaf(self):
+        model = DecisionTreeClassifier(max_depth=2)
+        X, y = make_classification(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True, 'decision_path': True,
+                                 'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        prob = model.predict_proba(X)
+        assert_almost_equal(prob, res[1])
+
+        dec = model.decision_path(X)
+
+        exp_path = binary_array_to_string(dec.todense())
+        exp_leaf = path_to_leaf(model.tree_, dec.todense())
+        assert exp_path == res[2].ravel().tolist()
+        assert exp_leaf.tolist() == res[3].ravel().tolist()
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
