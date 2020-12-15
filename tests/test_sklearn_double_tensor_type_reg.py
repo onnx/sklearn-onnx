@@ -44,7 +44,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnLinearRegressionDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses implementation for "
                "Relu, Tanh, Sigmoid for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -66,7 +66,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
                     basename="SklearnMLPRegressorDouble%s" % activation)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses implementation for "
                "ReduceMean for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -99,7 +99,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnLinearSGDRegressorDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="shape_inference fails")
     @ignore_warnings(category=warnings_to_skip)
     def test_gpr_rbf_fitted_true_double(self):
@@ -114,7 +114,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnGaussianProcessRBFTDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses implementation for "
                "TopK for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -132,7 +132,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
 
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        StrictVersion(ort_version) < StrictVersion("1.7.0"),
         reason="onnxruntime misses implementation for "
                "Sum for double")
     @ignore_warnings(category=warnings_to_skip)
