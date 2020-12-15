@@ -122,9 +122,9 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
-      Py35-Onnx150-Rt021-Skl0192:
+      Py36-Onnx150-Rt021-Skl0192:
         do.bench: '0'
-        python.version: '3.5'
+        python.version: '3.6'
         numpy.version: '<=1.16.5'
         onnx.version: '==1.5.0'
         onnx.target_opset: ''
