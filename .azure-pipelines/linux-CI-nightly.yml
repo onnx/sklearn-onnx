@@ -13,9 +13,9 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx170-Sk0230:
-        python.version: '3.7'
-        numpy.version: '==1.18.3'
+      Py38-Onnx170-Sk0232:
+        python.version: '3.8'
+        numpy.version: '>=1.18.3'
         onnx.version: '==1.7.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
