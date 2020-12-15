@@ -352,7 +352,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             tensor.dims.extend(content.dims)
         elif shape is None and isinstance(
                 content, (np.float32, np.float64, np.int32,
-                          np.int64, float, nb.bool_)):
+                          np.int64, float,
+                          np.bool_)):
             tensor = make_tensor(name, onnx_type, [], [content])
         elif (SparseTensorProto is not None and
                 isinstance(content, SparseTensorProto)):
@@ -388,7 +389,13 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None.')
-            tensor = make_tensor(name, onnx_type, shape, content)
+            try:
+                tensor = make_tensor(name, onnx_type, shape, content)
+            except TypeError as e:
+                raise TypeError(
+                    "Unable to make a tensor name=%r "
+                    "onnx_type=%r shape=%r content-type=%r." % (
+                        name, onnx_type, shape, type(content))) from e
 
         if tensor is not None:
             if cached_value is None:
