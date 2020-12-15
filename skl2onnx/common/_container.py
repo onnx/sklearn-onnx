@@ -389,7 +389,13 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None.')
-            tensor = make_tensor(name, onnx_type, shape, content)
+            try:
+                tensor = make_tensor(name, onnx_type, shape, content)
+            except TypeError as e:
+                raise TypeError(
+                    "Unable to make a tensor name=%r "
+                    "onnx_type=%r shape=%r content-type=%r." % (
+                        name, onnx_type, shape, type(content))) from e
 
         if tensor is not None:
             if cached_value is None:
