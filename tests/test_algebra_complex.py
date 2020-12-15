@@ -1,4 +1,5 @@
 from distutils.version import StrictVersion
+import sys
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -23,6 +24,8 @@ class TestAlgebraComplex(unittest.TestCase):
                      reason="not available")
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.8.0'),
                      reason="not implemented")
+    @unittest.skipIf(sys.platform == 'win32',
+                     reason="complex not recognized on Windows")
     def test_complex(self):
         for dt, var, pr in ((np.complex64, Complex64TensorType, 14),
                             (np.complex128, Complex128TensorType, 15)):
