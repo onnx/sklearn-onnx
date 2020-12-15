@@ -353,7 +353,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         elif shape is None and isinstance(
                 content, (np.float32, np.float64, np.int32,
                           np.int64, float, np.int8, np.uint8,
-                          nb.bool_)):
+                          np.bool_)):
             tensor = make_tensor(name, onnx_type, [], [content])
         elif (SparseTensorProto is not None and
                 isinstance(content, SparseTensorProto)):
