@@ -59,7 +59,7 @@ def linear_models():
             pos += 1
 
     fig.tight_layout()
-    fig.savefig("linear_model.png")
+    fig.savefig("linear_model.png", dpi=1000)
 
 
 def svm_models():
@@ -101,7 +101,7 @@ def svm_models():
         pos += 1
 
     fig.tight_layout()
-    fig.savefig("svm_model.png")
+    fig.savefig("svm_model.png", dpi=1000)
 
 
 def rf_models():
@@ -150,7 +150,7 @@ def rf_models():
                     pos += 1
 
     fig.tight_layout()
-    fig.savefig("rf_model.png")
+    fig.savefig("rf_model.png", dpi=1000)
 
 
 if __name__ == "__main__":
