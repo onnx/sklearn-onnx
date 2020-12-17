@@ -4,7 +4,7 @@ Benchmark of onnxruntime on LinearRegression.
 """
 # License: MIT
 import matplotlib
-
+import multiprocessing
 import warnings
 from io import BytesIO
 from time import perf_counter as time
@@ -211,6 +211,7 @@ if __name__ == '__main__':
     import onnx
     import onnxruntime
     import skl2onnx
+    print("number of cores: ", multiprocessing.cpu_count())
     df = pandas.DataFrame([
         {"name": "date", "version": str(datetime.now())},
         {"name": "numpy", "version": numpy.__version__},
@@ -223,4 +224,6 @@ if __name__ == '__main__':
     print(df)
     df = run_bench(verbose=True)
     df.to_csv("bench_plot_onnxruntime_linreg.csv", index=False)
+    with open("bench_plot_onnxruntime_linreg.csv", "r") as f:
+        print(f.read())
     # plt.show()

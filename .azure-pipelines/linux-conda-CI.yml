@@ -13,125 +13,46 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx170-Rt151-Skl0232:
+      Py37-Onnx170-Rt160-Skl0232:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '>=1.18.1'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.5.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: 'onnxruntime==1.6.0'
         sklearn.version: '==0.23.2'
-        onnxcc.version: 'git'
-        run.example: '1'
-      Py37-Onnx170-Rt140-Skl0232:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.7.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.4.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.2'
-        onnxcc.version: 'git'
-        run.example: '0'
-      Py37-Onnx170-Rt130-Skl0231:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.7.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.3.0'
-        sklearn.version: '==0.23.1'
         onnxcc.version: '==1.7.0'
         run.example: '1'
-      Py37-Onnx170-Rt120-Skl0230-Op11:
+      Py37-Onnx170-Rt152-Skl0232:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '>=1.18.1'
         onnx.version: '==1.7.0'
-        onnx.target_opset: '11'
-        onnxrt.version: 'onnxruntime==1.2.0'
-        onnxcc.version: 'git'
-        sklearn.version: '==0.23.0'
-        run.example: '0'
-      Py37-Onnx160-Rt120-Skl0230:
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.5.2'
+        sklearn.version: '==0.23.2'
+        onnxcc.version: '==1.7.0'
+        run.example: '1'
+      Py38-Onnx170-Rt160-Skl0232:
         do.bench: '0'
-        python.version: '3.7'
+        python.version: '3.8'
         numpy.version: '>=1.18.1'
-        onnx.version: '==1.6.0'
+        onnx.version: '==1.7.0'
         onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.2.0'
-        sklearn.version: '==0.23.0'
-        run.example: '0'
-      Py37-Onnx160-Rt111-Skl0222:
+        onnxrt.version: 'onnxruntime==1.6.0'
+        sklearn.version: '==0.23.2'
+        onnxcc.version: '==1.7.0'
+        run.example: '1'
+      Py38-Onnx170-Rt152-Skl0232:
         do.bench: '0'
-        python.version: '3.7'
+        python.version: '3.8'
         numpy.version: '>=1.18.1'
-        onnx.version: '==1.6.0'
+        onnx.version: '==1.7.0'
         onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.1.1'
-        sklearn.version: '==0.22.2'
-        run.example: '0'
-      Py37-Onnx160-Rt100-Skl0213:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.0.0'
-        sklearn.version: '==0.21.3'
-        run.example: '0'
-      Py37-Onnx150-Rt050-Skl0213:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.17.4'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==0.5.0'
-        sklearn.version: '==0.21.3'
-        run.example: '0'
-      Py37-Onnx150-Rt040-Skl0203:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.17.4'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.4.0'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
-      Py36-Onnx141-Rt030-Skl0203:
-        do.bench: '0'
-        python.version: '3.6'
-        numpy.version: '==1.16.5'
-        onnx.version: '==1.4.1'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.3.0'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
-      Py36-Onnx130-Rt021-Skl0203:
-        do.bench: '0'
-        python.version: '3.6'
-        numpy.version: '==1.16.5'
-        onnx.version: '==1.3.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.2.1'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
-      Py35-Onnx150-Rt021-Skl0192:
-        do.bench: '0'
-        python.version: '3.5'
-        numpy.version: '<=1.16.5'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.2.1'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.19.2'
-        run.example: '0'
+        onnxrt.version: 'onnxruntime==1.5.2'
+        sklearn.version: '==0.23.2'
+        onnxcc.version: '==1.7.0'
+        run.example: '1'
     maxParallel: 3
 
   steps:
@@ -239,6 +160,30 @@ jobs:
     displayName: 'target_opset'
 
   - script: |
+      cd benchmarks
+      python -u bench_plot_onnxruntime_linreg.py
+      cd ..
+    displayName: 'bench_plot_onnxruntime_linreg.py'
+
+  - script: |
+      cd benchmarks
+      python -u bench_plot_onnxruntime_logreg.py
+      cd ..
+    displayName: 'bench_plot_onnxruntime_logreg.py'
+
+  - script: |
+      cd benchmarks
+      python -u bench_plot_onnxruntime_random_forest_reg.py
+      cd ..
+    displayName: 'bench_plot_onnxruntime_random_forest_reg.py'
+
+  - script: |
+      cd benchmarks
+      python -u bench_plot_onnxruntime_svm_reg.py
+      cd ..
+    displayName: 'bench_plot_onnxruntime_svm_reg.py'
+
+  - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
@@ -246,65 +191,11 @@ jobs:
       pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
-  - script: |
-      conda install -c conda-forge lightgbm xgboost --no-deps
-      pip install --no-deps onnxmltools  # git+https://github.com/onnx/onnxmltools.git
-    displayName: 'install onnxmltools'
-
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
   - script: |
       flake8 skl2onnx tests tests_onnxmltools
     displayName: 'flake8'
-
-  - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
-      if [ '$(do.bench)' == '1' ]
-        then
-          pip install openpyxl
-          coverage run --include=skl2onnx/** tests/benchmark.py
-          coverage report -m
-          coverage html
-      fi
-    displayName: 'coverage'
-
-  - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
-      pip install -r docs/requirements.txt
-      pip uninstall -y skl2onnx
-      python setup.py install
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
-    displayName: 'run documentation examples'
-    condition: eq(variables['run.example'], '1')
-
-  # dot cannot be found but is missing to build the documentation
-  #- script: |
-  #    if [ '$(onnx.target_opset)' != '' ]
-  #    then
-  #      export TEST_TARGET_OPSET="$(onnx.target_opset)"
-  #    fi
-  #    conda install -c anaconda graphviz
-  #    python -m sphinx -j2 -v -N -T -b html -d build/doctrees docs dist/html
-  #  displayName: 'build documentation'
-  #  condition: eq(variables['run.example'], '1')
-
-  - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
-      if [ '$(do.bench)' == '1' ]
-        then
-          python tests/benchmark.py
-      fi
-    displayName: 'benchmark'
-    condition: eq(variables['run.example'], '0')
 
   - task: PublishTestResults@2
     inputs:

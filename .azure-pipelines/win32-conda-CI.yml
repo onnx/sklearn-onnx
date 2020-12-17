@@ -13,90 +13,42 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py37-Onnx170-Rt151-Skl0232:
+      Py37-Onnx170-Rt160-Skl0232:
         python.version: '3.7'
-        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
         onnx.version: 'onnx==1.7.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.5.1'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
-        sklearn.version: '==0.23.2'
-      Py37-Onnx170-Rt140-Skl0232:
-        python.version: '3.7'
-        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
-        onnx.version: 'onnx==1.7.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.4.0'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
-        sklearn.version: '==0.23.2'
-      Py37-Onnx170-Rt130-Skl0231:
-        python.version: '3.7'
-        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
-        onnx.version: 'onnx==1.7.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.3.0'
+        onnxrt.version: 'onnxruntime==1.6.0'
         onnxcc.version: 'onnxconverter-common==1.7.0'
-        sklearn.version: '==0.23.1'
-      Py37-Onnx160-Rt120-Skl0221:
+        sklearn.version: '==0.23.2'
+      Py37-Onnx170-Rt152-Skl0232:
         python.version: '3.7'
-        onnx.version: 'onnx==1.6.0'
+        onnx.version: 'onnx==1.7.0'
         onnx.target_opset: ''
-        numpy.version: 'numpy==1.18.1'
+        numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.2.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.22.1'
-      Py37-Onnx160-Rt110-Skl0220:
-        python.version: '3.7'
-        onnx.version: 'onnx==1.6.0'
+        onnxrt.version: 'onnxruntime==1.5.2'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
+        sklearn.version: '==0.23.2'
+      Py38-Onnx170-Rt160-Skl0232:
+        python.version: '3.8'
+        onnx.version: 'onnx==1.7.0'
         onnx.target_opset: ''
-        numpy.version: 'numpy>=1.17.0'
+        numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.1.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.22.0'
-      Py37-Onnx160-Rt100-Skl0213:
-        python.version: '3.7'
-        onnx.version: 'onnx==1.6.0'
+        onnxrt.version: 'onnxruntime==1.6.0'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
+        sklearn.version: '==0.23.2'
+      Py38-Onnx170-Rt152-Skl0232:
+        python.version: '3.8'
+        onnx.version: 'onnx==1.7.0'
         onnx.target_opset: ''
-        numpy.version: 'numpy>=1.17.0'
+        numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.0.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.21.3'
-      Py37-Onnx150-Rt050-Skl0213:
-        python.version: '3.7'
-        onnx.version: 'onnx==1.5.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.17.0'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==0.5.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.21.3'
-      Py36-Onnx141-Rt040-Skl0213:
-        python.version: '3.6'
-        onnx.version: 'onnx==1.4.1'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.17.0'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==0.4.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.21.3'
-      Py36-Onnx130-Rt021-Skl0203:
-        python.version: '3.6'
-        onnx.version: 'onnx==1.3.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.16.0'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==0.2.1'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.20.3'        
+        onnxrt.version: 'onnxruntime==1.5.2'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
+        sklearn.version: '==0.23.2'
     maxParallel: 3
 
   steps:
@@ -172,6 +124,34 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      cd benchmarks
+      python -u bench_plot_onnxruntime_linreg.py
+      cd ..
+    displayName: 'bench bench_plot_onnxruntime_linreg.py'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      cd benchmarks
+      python -u bench_plot_onnxruntime_logreg.py
+      cd ..
+    displayName: 'bench bench_plot_onnxruntime_logreg.py'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      cd benchmarks
+      python -u bench_plot_onnxruntime_random_forest_reg.py
+      cd ..
+    displayName: 'bench bench_plot_onnxruntime_random_forest_reg.py'
+
+  - script: |
+      call activate skl2onnxEnvironment
+      cd benchmarks
+      python -u bench_plot_onnxruntime_svm_reg.py
+      cd ..
+    displayName: 'bench bench_plot_onnxruntime_svm_reg.py'
+
+  - script: |
+      call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       cd tests
       python -c "import test_utils;print(test_utils.TARGET_OPSET, test_utils.TARGET_IR)"
@@ -183,13 +163,6 @@ jobs:
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
-
-  - script: |
-      call activate skl2onnxEnvironment
-      if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
-      pip install lightgbm xgboost
-      pip install --no-deps onnxmltools
-    displayName: 'install onnxmltools'
 
   - task: PublishTestResults@2
     inputs:
