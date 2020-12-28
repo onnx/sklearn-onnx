@@ -33,14 +33,14 @@ jobs:
         sklearn.version: 'git'
         onnxcc.version: 'git'
         run.example: '1'
-      Py38-Onnx180-RtTST-Skl0232:
+      Py38-Onnx180-RtTST-Skl0240:
         do.bench: '0'
         python.version: '3.8'
         numpy.version: '>=1.19'
         onnx.version: '==1.8.0'
         onnx.target_opset: ''
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.2'
+        sklearn.version: '==0.24.0'
         onnxcc.version: 'git'
         run.example: '0'  # 
       Py38-Onnx170-RtTST-Skl0232:
