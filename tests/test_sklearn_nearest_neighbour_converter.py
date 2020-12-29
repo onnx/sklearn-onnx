@@ -298,7 +298,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     def test_model_knn_regressor2_1_opset(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
-        for op in [12, 11, 10, 9]:
+        for op in [TARGET_OPSET, 12, 11, 10, 9]:
             if op > TARGET_OPSET:
                 continue
             with self.subTest(opset=op):
@@ -789,7 +789,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             [[1.3, 2.4, numpy.nan, 1], [-1.3, numpy.nan, 3.1, numpy.nan]],
             dtype=numpy.float32)
         model = KNNImputer(n_neighbors=3, metric='nan_euclidean').fit(x_train)
-        for opset in [9, 10, 11, 12]:
+        for opset in [TARGET_OPSET, 9, 10, 11, 12]:
             if opset > TARGET_OPSET:
                 continue
             model_onnx = convert_sklearn(
@@ -822,7 +822,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 target_opset=TARGET_OPSET,
                 options={id(model): {'optim2': 'cdist'}})
 
-        for opset in [12, 11, 10, 9]:
+        for opset in [TARGET_OPSET, 12, 11, 10, 9]:
             if opset > TARGET_OPSET:
                 continue
             model_onnx = convert_sklearn(
