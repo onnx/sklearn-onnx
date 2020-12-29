@@ -27,7 +27,7 @@ from ..algebra.onnx_ops import (
     OnnxReduceSumApi11,
     OnnxReshape,
     OnnxShape,
-    OnnxSqueeze,
+    OnnxSqueezeApi11,
     OnnxSub,
     OnnxTopK_1,
     OnnxTranspose,
@@ -406,8 +406,8 @@ def get_proba_and_label(container, nb_classes, reshaped,
             op_version=opv, to=proto_type)
         if wei is not None:
             if not keep_axis:
-                mat_cast = OnnxSqueeze(mat_cast, axes=[-1],
-                                       op_version=opv)
+                mat_cast = OnnxSqueezeApi11(mat_cast, axes=[-1],
+                                            op_version=opv)
             mat_cast = OnnxMul(mat_cast, wei, op_version=opv)
         wh = OnnxReduceSumApi11(mat_cast, axes=[1], op_version=opv)
         conc.append(wh)

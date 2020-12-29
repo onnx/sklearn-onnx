@@ -187,3 +187,22 @@ def OnnxReduceSumApi11(*x, axes=None, keepdims=1, op_version=None,
             op_version=op_version, output_names=output_names)
     return OnnxReduceSum_1(*x, axes=axes, keepdims=keepdims,  # noqa
                            op_version=op_version, output_names=output_names)
+
+
+def OnnxSqueezeApi11(*x, axes=None, op_version=None,
+                     output_names=None):
+    """
+    Adds operator Squeeze with opset>=13 following API from opset 11.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 13:
+        return OnnxSqueeze(  # noqa
+            *x, np.array(axes, dtype=np.int64),
+            op_version=op_version, output_names=output_names)
+    if op_version >= 11:
+        return OnnxSqueeze_11(  # noqa
+            *x, axes=axes, op_version=op_version,
+            output_names=output_names)
+    return OnnxSqueeze_1(*x, axes=axes, # noqa
+                         op_version=op_version, output_names=output_names)

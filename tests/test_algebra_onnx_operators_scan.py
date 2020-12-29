@@ -12,8 +12,7 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
     OnnxSub, OnnxReduceSumSquare,
-    OnnxSqueeze, OnnxShape
-)
+    OnnxSqueezeApi11, OnnxShape)
 from skl2onnx.algebra.custom_ops import OnnxCDist
 try:
     from skl2onnx.algebra.onnx_ops import OnnxConstantOfShape
@@ -167,7 +166,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         norm = OnnxReduceSumSquare(
             diff, output_names=['norm'], axes=[1],
             op_version=opv)
-        flat = OnnxSqueeze(
+        flat = OnnxSqueezeApi11(
             norm, output_names=['scan_out'], axes=[1],
             op_version=opv)
         scan_body = id_next.to_onnx(
