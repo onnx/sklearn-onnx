@@ -254,7 +254,13 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
-            self.op_version = self.since_version
+            if self.__class__.__name__ not in {'Scan', 'Loop', 'If'}:
+                # TODO: the minimum opset depends on embedded graph
+                # by default, it takes the given op_version but the
+                # optimal value could be lower.
+                self.op_version = self.since_version
+            if self.op_version is None:
+                self.op_version = self.since_version
 
         if (self.op_version is not None and
                 self.op_version < self.since_version):
