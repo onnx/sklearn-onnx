@@ -102,8 +102,12 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
                 'ReduceSum', proba, reduced_proba_name, axes=[1],
                 name=scope.get_unique_operator_name('ReduceSum'))
         else:
-            raise NotImplementedError(
-                "ReduceSum for opset>=13 is not implemented yet.")
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                'ReduceSum', [proba, axis_name], reduced_proba_name,
+                name=scope.get_unique_operator_name('ReduceSum'))
         proba_updated, reduced_proba_updated = _handle_zeros(
             scope, container, proba, reduced_proba_name, num_classes)
         apply_div(scope, [proba_updated, reduced_proba_updated],
