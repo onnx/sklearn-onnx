@@ -94,8 +94,12 @@ def _samme_r_proba(scope, container, proba_name, n_classes, dtype, pdtype):
             'ReduceSum', log_proba_name, reduced_proba_name, axes=[1],
             name=scope.get_unique_operator_name('ReduceSum'))
     else:
-        raise NotImplementedError(
-            "ReduceSum for opset>=13 is not implemented yet.")
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceSum', [log_proba_name, axis_name], reduced_proba_name,
+            name=scope.get_unique_operator_name('ReduceSum'))
     apply_reshape(scope, reduced_proba_name,
                   reshaped_result_name, container,
                   desired_shape=(-1, 1))
@@ -153,8 +157,12 @@ def _normalise_probability(scope, container, operator, proba_names_list,
             'ReduceSum', exp_result_name, reduced_exp_result_name, axes=[1],
             name=scope.get_unique_operator_name('ReduceSum'))
     else:
-        raise NotImplementedError(
-            "ReduceSum for opset>=13 is not implemented yet.")
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceSum', [exp_result_name, axis_name], reduced_exp_result_name,
+            name=scope.get_unique_operator_name('ReduceSum'))
     apply_reshape(scope, reduced_exp_result_name,
                   normaliser_name, container,
                   desired_shape=(-1, 1))
@@ -214,8 +222,12 @@ def _generate_raw_scores(scope, container, operator, proba_names_list, model):
                 'ReduceSum', mul_res_name, pos_class_scores_name, axes=[1],
                 name=scope.get_unique_operator_name('ReduceSum'))
         else:
-            raise NotImplementedError(
-                "ReduceSum for opset>=13 is not implemented yet.")
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                'ReduceSum', [mul_res_name, axis_name], pos_class_scores_name,
+                name=scope.get_unique_operator_name('ReduceSum'))
         apply_mul(scope, [pos_class_scores_name, neg_name],
                   neg_class_scores_name, container, broadcast=1)
         apply_concat(
@@ -480,8 +492,12 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
                 'ReduceSum', selected, output, axes=[1],
                 name=scope.get_unique_operator_name('ReduceSum'))
         else:
-            raise NotImplementedError(
-                "ReduceSum for opset>=13 is not implemented yet.")
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                'ReduceSum', [selected, axis_name], output,
+                name=scope.get_unique_operator_name('ReduceSum'))
 
 
 def convert_sklearn_ada_boost_regressor(scope, operator, container):
