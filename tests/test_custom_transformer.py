@@ -164,14 +164,17 @@ class TestCustomTransformer(unittest.TestCase):
             [("input", FloatTensorType([None, Xd.shape[1]]))],
         )
 
-        dump_data_and_model(
-            Xd.astype(numpy.float32)[:7],
-            ptsne_knn,
-            model_onnx,
-            basename="CustomTransformerTSNEkNN-OneOffArray",
-            allow_failure="StrictVersion(onnx.__version__) "
-                          "<= StrictVersion('1.5')",
-        )
+        try:
+            dump_data_and_model(
+                Xd.astype(numpy.float32)[:7],
+                ptsne_knn,
+                model_onnx,
+                basename="CustomTransformerTSNEkNN-OneOffArray",
+                allow_failure="StrictVersion(onnx.__version__) "
+                              "<= StrictVersion('1.5')")
+        except Exception as e:
+            raise AssertionError(
+                "Unexpected issue:\n{}".format(model_onnx)) from e
 
         trace_line = []
 
