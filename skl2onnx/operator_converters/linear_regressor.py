@@ -9,7 +9,8 @@ except ImportError:
     import collections as cabc
 import numpy as np
 from ..common._apply_operation import (
-    apply_cast, apply_add, apply_sqrt, apply_div, apply_sub)
+    apply_cast, apply_add, apply_sqrt, apply_div, apply_sub,
+    apply_reshape)
 from ..common.data_types import (
     BooleanTensorType, Int64TensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
@@ -34,8 +35,12 @@ def convert_sklearn_linear_regressor(scope, operator, container):
         container.add_node(
             'MatMul', [operator.inputs[0].full_name, coef], multiplied,
             name=scope.get_unique_operator_name('MatMul'))
+        resh = scope.get_unique_variable_name('resh')
         apply_add(scope, [multiplied, intercept],
-                  operator.outputs[0].full_name, container)
+                  resh, container)
+        last_dim = 1 if len(model_coef.shape) == 1 else model_coef.shape[-1]
+        apply_reshape(scope, resh, operator.outputs[0].full_name,
+                      container, desired_shape=(-1, last_dim))
         return
 
     op_type = 'LinearRegressor'
