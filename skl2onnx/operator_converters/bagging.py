@@ -83,8 +83,13 @@ def _calculate_proba(scope, operator, container, model):
                 name=scope.get_unique_operator_name('ReduceSum'),
                 axes=[0], keepdims=0)
         else:
-            raise NotImplementedError(
-                "ReduceSum for opset>=13 is not implemented yet.")
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                'ReduceSum', [cast_output_name, axis_name],
+                reduced_proba_name, keepdims=0,
+                name=scope.get_unique_operator_name('ReduceSum'))
         apply_div(scope, [reduced_proba_name, n_estimators_name],
                   final_proba_name, container, broadcast=1)
     return final_proba_name

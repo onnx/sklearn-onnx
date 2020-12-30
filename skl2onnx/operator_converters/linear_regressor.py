@@ -104,9 +104,17 @@ def convert_sklearn_bayesian_ridge(scope, operator, container):
         'MatMul', [input_name, sigma], sigmaed0,
         name=scope.get_unique_operator_name('MatMul'))
     sigmaed = scope.get_unique_variable_name('sigma')
-    container.add_node(
-        'ReduceSum', sigmaed0, sigmaed, axes=[1],
-        name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node(
+            'ReduceSum', sigmaed0, sigmaed, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceSum', [sigmaed0, axis_name], sigmaed,
+            name=scope.get_unique_operator_name('ReduceSum'))
 
     # y_std = np.sqrt(sigmas_squared_data + (1. / self.alpha_))
     # return y_mean, y_std
