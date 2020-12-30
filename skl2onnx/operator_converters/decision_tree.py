@@ -132,7 +132,7 @@ def predict(model, scope, operator, container,
             zero_name, proto_dtype, [], [0])
         apply_mul(scope, [input_name[0], zero_name],
                   zero_matrix_name, container, broadcast=1)
-        if container.target_opset:
+        if container.target_opset < 13:
             container.add_node(
                 'ReduceSum', zero_matrix_name, reduced_zero_matrix_name,
                 axes=[1], name=scope.get_unique_operator_name('ReduceSum'))
