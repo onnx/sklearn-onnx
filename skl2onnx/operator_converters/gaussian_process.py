@@ -103,8 +103,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
         if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
-            y_mean = OnnxAdd(y_mean_b, mean_y, output_names=out[:1],
-                             op_version=opv)
+            y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
             # the predictions when return_std is True.
@@ -115,10 +114,13 @@ def convert_gaussian_process_regressor(scope, operator, container):
                 var_y = var_y.reshape(var_y.shape + (1,))
             y_mean = OnnxAdd(
                 OnnxMul(y_mean_b, var_y, op_version=opv),
-                mean_y, output_names=out[:1], op_version=opv)
+                mean_y, op_version=opv)
 
         y_mean.set_onnx_name_prefix('gpr')
-        outputs = [y_mean]
+        y_mean_reshaped = OnnxReshape(
+            y_mean, np.array([-1, 1], dtype=np.int64),
+            op_version=opv, output_names=out[:1])
+        outputs = [y_mean_reshaped]
 
         if options['return_cov']:
             raise NotImplementedError()
