@@ -747,7 +747,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         try:
             to_onnx(
                 gp, initial_types=[('X', FloatTensorType([None, None]))],
-                options={GaussianProcessRegressor: {'optim': 'CDIST'}})
+                options={GaussianProcessRegressor: {'optim': 'CDIST'}},
+                target_opset=TARGET_OPSET)
             raise AssertionError("CDIST is not implemented")
         except ValueError:
             pass
@@ -769,7 +770,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             assert "Max relative difference:" in str(e)
 
         model_onnx = to_onnx(
-            gp, initial_types=[('X', DoubleTensorType([None, None]))])
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
