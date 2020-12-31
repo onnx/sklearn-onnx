@@ -17,7 +17,7 @@ from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx._parse import _get_sklearn_operator_name
 from skl2onnx._parse import _parse_sklearn_simple_model
 from skl2onnx._parse import update_registered_parser
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class PredictableTSNE(BaseEstimator, TransformerMixin):
@@ -162,19 +162,15 @@ class TestCustomTransformer(unittest.TestCase):
             ptsne_knn,
             "predictable_tsne",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
 
-        try:
-            dump_data_and_model(
-                Xd.astype(numpy.float32)[:7],
-                ptsne_knn,
-                model_onnx,
-                basename="CustomTransformerTSNEkNN-OneOffArray",
-                allow_failure="StrictVersion(onnx.__version__) "
-                              "<= StrictVersion('1.5')")
-        except Exception as e:
-            raise AssertionError(
-                "Unexpected issue:\n{}".format(model_onnx)) from e
+        dump_data_and_model(
+            Xd.astype(numpy.float32)[:7],
+            ptsne_knn,
+            model_onnx,
+            basename="CustomTransformerTSNEkNN-OneOffArray",
+            allow_failure="StrictVersion(onnx.__version__) "
+                          "<= StrictVersion('1.5')")
 
         trace_line = []
 
@@ -188,7 +184,7 @@ class TestCustomTransformer(unittest.TestCase):
             "predictable_tsne",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
             custom_parsers={PredictableTSNE: my_parser},
-        )
+            target_opset=TARGET_OPSET)
         assert len(trace_line) == 1
 
         dump_data_and_model(
@@ -205,7 +201,7 @@ class TestCustomTransformer(unittest.TestCase):
             ptsne_knn,
             "predictable_tsne",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
 
         assert len(trace_line) == 2
 
