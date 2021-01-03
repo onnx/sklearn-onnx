@@ -177,16 +177,47 @@ def OnnxReduceSumApi11(*x, axes=None, keepdims=1, op_version=None,
     if op_version is None:
         raise RuntimeError("op_version must be specified.")
     if op_version is None or op_version >= 13:
+        if axes is None:
+            return OnnxReduceSum(  # noqa
+                *x, keepdims=keepdims, op_version=op_version,
+                output_names=output_names)
         return OnnxReduceSum(  # noqa
             *x, np.array(axes, dtype=np.int64),
             keepdims=keepdims, op_version=op_version,
             output_names=output_names)
     if op_version >= 11:
+        if axes is None:
+            return OnnxReduceSum_11(  # noqa
+                *x, keepdims=keepdims,
+                op_version=op_version, output_names=output_names)
         return OnnxReduceSum_11(  # noqa
             *x, axes=axes, keepdims=keepdims,
             op_version=op_version, output_names=output_names)
+    if axes is None:
+        return OnnxReduceSum_1(*x, keepdims=keepdims,  # noqa
+                               op_version=op_version,
+                               output_names=output_names)
     return OnnxReduceSum_1(*x, axes=axes, keepdims=keepdims,  # noqa
                            op_version=op_version, output_names=output_names)
+
+
+def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
+                   output_names=None):
+    """
+    Adds operator Split with opset>=13 following API from opset 11.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 13:
+        return OnnxSplit(  # noqa
+            *x, np.array(split, dtype=np.int64), axis=axis,
+            op_version=op_version, output_names=output_names)
+    if op_version >= 11:
+        return OnnxSqueeze_11(  # noqa
+            *x, split=split, axis=axis, op_version=op_version,
+            output_names=output_names)
+    return OnnxSqueeze_1(*x, split=split, axis=axis, # noqa
+                         op_version=op_version, output_names=output_names)
 
 
 def OnnxSqueezeApi11(*x, axes=None, op_version=None,
@@ -206,3 +237,22 @@ def OnnxSqueezeApi11(*x, axes=None, op_version=None,
             output_names=output_names)
     return OnnxSqueeze_1(*x, axes=axes, # noqa
                          op_version=op_version, output_names=output_names)
+
+
+def OnnxUnsqueezeApi11(*x, axes=None, op_version=None,
+                       output_names=None):
+    """
+    Adds operator Unsqueeze with opset>=13 following API from opset 11.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 13:
+        return OnnxUnsqueeze(  # noqa
+            *x, np.array(axes, dtype=np.int64),
+            op_version=op_version, output_names=output_names)
+    if op_version >= 11:
+        return OnnxUnsqueeze_11(  # noqa
+            *x, axes=axes, op_version=op_version,
+            output_names=output_names)
+    return OnnxUnsqueeze_1(*x, axes=axes, # noqa
+                           op_version=op_version, output_names=output_names)
