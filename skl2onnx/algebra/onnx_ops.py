@@ -213,11 +213,11 @@ def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
             *x, np.array(split, dtype=np.int64), axis=axis,
             op_version=op_version, output_names=output_names)
     if op_version >= 11:
-        return OnnxSqueeze_11(  # noqa
+        return OnnxSplit_11(  # noqa
             *x, split=split, axis=axis, op_version=op_version,
             output_names=output_names)
-    return OnnxSqueeze_1(*x, split=split, axis=axis, # noqa
-                         op_version=op_version, output_names=output_names)
+    return OnnxSplit_2(*x, split=split, axis=axis, # noqa
+                       op_version=op_version, output_names=output_names)
 
 
 def OnnxSqueezeApi11(*x, axes=None, op_version=None,
