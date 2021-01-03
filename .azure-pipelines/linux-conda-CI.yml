@@ -168,6 +168,8 @@ jobs:
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
+      pip show joblib
+      echo "---------------"
     displayName: 'version'
 
   - script: |
