@@ -209,13 +209,24 @@ def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
     if op_version is None:
         raise RuntimeError("op_version must be specified.")
     if op_version is None or op_version >= 13:
+        if split is None:
+            return OnnxSplit(  # noqa
+                *x, axis=axis, op_version=op_version,
+                output_names=output_names)
         return OnnxSplit(  # noqa
             *x, np.array(split, dtype=np.int64), axis=axis,
             op_version=op_version, output_names=output_names)
     if op_version >= 11:
+        if split is None:
+            return OnnxSplit_11(  # noqa
+                *x, axis=axis, op_version=op_version,
+                output_names=output_names)
         return OnnxSplit_11(  # noqa
             *x, split=split, axis=axis, op_version=op_version,
             output_names=output_names)
+    if split is None:
+        return OnnxSplit_2( # noqa
+            *x, axis=axis, op_version=op_version, output_names=output_names)
     return OnnxSplit_2(*x, split=split, axis=axis, # noqa
                        op_version=op_version, output_names=output_names)
 
