@@ -11,7 +11,7 @@ from distutils.version import StrictVersion
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_regression
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
     Sum, DotProduct, ExpSineSquared, RationalQuadratic,
@@ -559,25 +559,27 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
 
+        X, y = make_regression(n_features=5, n_informative=4, random_state=2)
+        X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
                                       alpha=1e-5,
                                       n_restarts_optimizer=25,
                                       normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
+        gp.fit(X_train, y_train)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=4, disable_optimisation=True)
@@ -587,24 +589,26 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
 
+        X, y = make_regression(n_features=2, n_informative=2, random_state=2)
+        X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-5,
-                                      n_restarts_optimizer=25,
+                                      alpha=1e-2,
+                                      n_restarts_optimizer=20,
                                       normalize_y=False)
-        gp.fit(Xtrain_, Ytrain_)
+        gp.fit(X_train, y_train)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdF-Out0-Dec3")
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=4)
@@ -780,7 +784,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
         data = load_iris()
-        X = data.data
+        X = data.data[:, :2]
         y = data.target
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(), alpha=100.)
