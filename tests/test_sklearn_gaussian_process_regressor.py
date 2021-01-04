@@ -437,8 +437,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         kernel = (Sum(se, C(0.1, (1e-3, 1e3)) *
                   RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
 
-        gp = GaussianProcessRegressor(alpha=1e-7, kernel=kernel,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5, kernel=kernel,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
 
         # return_cov=False, return_std=False
@@ -490,8 +490,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_true(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp, X = fit_regression_model(gp)
 
@@ -509,8 +509,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_false(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=False)
         gp.fit(Xtrain_, Ytrain_)
 
@@ -527,8 +527,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_true(self):
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
 
@@ -560,8 +560,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
+                                      alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
 
@@ -670,8 +670,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std_rational_quadratic_true(self):
 
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
+                                      alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
         gp.predict(Xtrain_, return_std=True)
