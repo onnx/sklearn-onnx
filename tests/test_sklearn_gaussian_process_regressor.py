@@ -588,8 +588,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
 
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
+                                      alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=False)
         gp.fit(Xtrain_, Ytrain_)
 
