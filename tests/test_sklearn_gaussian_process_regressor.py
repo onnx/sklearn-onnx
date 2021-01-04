@@ -11,7 +11,7 @@ from distutils.version import StrictVersion
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_regression
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
     Sum, DotProduct, ExpSineSquared, RationalQuadratic,
@@ -437,8 +437,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         kernel = (Sum(se, C(0.1, (1e-3, 1e3)) *
                   RBF(length_scale=1, length_scale_bounds=(1e-3, 1e3))))
 
-        gp = GaussianProcessRegressor(alpha=1e-7, kernel=kernel,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5, kernel=kernel,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
 
         # return_cov=False, return_std=False
@@ -490,8 +490,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_true(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp, X = fit_regression_model(gp)
 
@@ -509,8 +509,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_false(self):
 
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=False)
         gp.fit(Xtrain_, Ytrain_)
 
@@ -527,8 +527,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_true(self):
-        gp = GaussianProcessRegressor(alpha=1e-7,
-                                      n_restarts_optimizer=15,
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
         gp.fit(Xtrain_, Ytrain_)
 
@@ -558,26 +558,33 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
-
-        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
-                                      normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
+        X = 15 * np.random.rand(100, 2)
+        y = np.sin(X[:, 0] - X[:, 1]).ravel()
+        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        X_train, X_test, y_train, _ = train_test_split(X, y)
+        gp = GaussianProcessRegressor(
+            kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
+            alpha=1e-7, n_restarts_optimizer=25, normalize_y=True,
+            random_state=0)
+        try:
+            gp.fit(X_train, y_train)
+        except (AttributeError, TypeError):
+            # unstable bug in scikit-learn, fixed in 0.24
+            return
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=4, disable_optimisation=True)
@@ -586,25 +593,32 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
-
-        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
-                                      normalize_y=False)
-        gp.fit(Xtrain_, Ytrain_)
+        X = 15 * np.random.rand(100, 2)
+        y = np.sin(X[:, 0] - X[:, 1]).ravel()
+        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        X_train, X_test, y_train, _ = train_test_split(X, y)
+        gp = GaussianProcessRegressor(
+            kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
+            alpha=1e-7, n_restarts_optimizer=20, normalize_y=False,
+            random_state=0)
+        try:
+            gp.fit(X_train, y_train)
+        except (AttributeError, TypeError):
+            # unstable bug in scikit-learn, fixed in 0.24
+            return
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdF-Out0-Dec3")
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=4)
@@ -613,41 +627,57 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_double_true(self):
-
-        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
-                                      normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
+        X = 15 * np.random.rand(100, 2)
+        y = np.sin(X[:, 0] - X[:, 1]).ravel()
+        y += 3 * (0.5 - np.random.rand(X.shape[0]))
+        X_train, X_test, y_train, _ = train_test_split(X, y)
+        gp = GaussianProcessRegressor(
+            kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
+            alpha=1e-2, n_restarts_optimizer=25, normalize_y=True,
+            random_state=0)
+        try:
+            gp.fit(X_train, y_train)
+        except (AttributeError, TypeError):
+            # unstable bug in scikit-learn, fixed in 0.24
+            return
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec4",
+            basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec3",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
-                           decimal=4, disable_optimisation=True)
+                           decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_dot_product_true(self):
-
+        X = 15 * np.random.rand(100, 2)
+        y = np.sin(X[:, 0] - X[:, 1]).ravel()
+        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=DotProduct(),
-                                      alpha=1.,
-                                      n_restarts_optimizer=15,
-                                      normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
-        gp.predict(Xtrain_, return_std=True)
+                                      alpha=1e-2,
+                                      n_restarts_optimizer=25,
+                                      normalize_y=True,
+                                      random_state=0)
+        try:
+            gp.fit(X_train, y_train)
+        except (AttributeError, TypeError):
+            # unstable bug in scikit-learn, fixed in 0.24
+            return
+
+        gp.predict(X_train, return_std=True)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
@@ -656,10 +686,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             basename="SklearnGaussianProcessDotProductStdDouble-Out0-Dec3",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=3, disable_optimisation=True)
@@ -669,12 +699,14 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_rational_quadratic_true(self):
 
+        X, y = make_regression(n_features=2, n_informative=2, random_state=2)
+        X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
-                                      alpha=1e-7,
-                                      n_restarts_optimizer=15,
+                                      alpha=1e-3,
+                                      n_restarts_optimizer=25,
                                       normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
-        gp.predict(Xtrain_, return_std=True)
+        gp.fit(X_train, y_train)
+        gp.predict(X_train, return_std=True)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
@@ -683,10 +715,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             basename="SklearnGaussianProcessRationalQuadraticStdDouble-Out0",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            disable_optimisation=True)
@@ -780,7 +812,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
         data = load_iris()
-        X = data.data
+        X = data.data[:, :2]
         y = data.target
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(), alpha=100.)
