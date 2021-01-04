@@ -559,10 +559,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
 
-        X, y = make_regression(n_features=5, n_informative=4, random_state=2)
+        X, y = make_regression(n_features=2, n_informative=2, random_state=2)
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
-                                      alpha=1e-5,
+                                      alpha=1e-2,
                                       n_restarts_optimizer=25,
                                       normalize_y=True)
         gp.fit(X_train, y_train)
