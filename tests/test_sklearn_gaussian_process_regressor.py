@@ -673,12 +673,14 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_rational_quadratic_true(self):
 
+        X, y = make_regression(n_features=2, n_informative=2, random_state=2)
+        X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(kernel=RationalQuadratic(),
-                                      alpha=1e-5,
+                                      alpha=1e-3,
                                       n_restarts_optimizer=25,
                                       normalize_y=True)
-        gp.fit(Xtrain_, Ytrain_)
-        gp.predict(Xtrain_, return_std=True)
+        gp.fit(X_train, y_train)
+        gp.predict(X_train, return_std=True)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
@@ -687,10 +689,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            Xtest_.astype(np.float64), gp, model_onnx,
+            X_test.astype(np.float64), gp, model_onnx,
             basename="SklearnGaussianProcessRationalQuadraticStdDouble-Out0",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
+        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            disable_optimisation=True)
