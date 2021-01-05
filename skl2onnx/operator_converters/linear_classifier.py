@@ -126,7 +126,8 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                            axis=1)
         _finalize_converter_classes(
             scope, argmax_output_name, operator.outputs[0].full_name,
-            container, np.array(class_labels))
+            container, np.array(class_labels),
+            onnx_proto.TensorProto.DOUBLE)
 
         if use_raw_scores:
             return
