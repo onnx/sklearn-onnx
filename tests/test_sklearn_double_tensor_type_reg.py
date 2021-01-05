@@ -122,7 +122,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
         # Could not find an implementation for the node To_TopK:TopK(11)
         model, X = fit_regression_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(
-            model, "KNN regressor", [("input", DoubleTensorType([None, 4]))],
+            model, "KNN regressor", [("input", DoubleTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
             options={id(model): {'optim': 'cdist'}})
         dump_data_and_model(
