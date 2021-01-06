@@ -753,13 +753,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         )
 
     def test_model_ransac_regressor_mlp(self):
-        try:
-            model, X = fit_regression_model(
-                linear_model.RANSACRegressor(
-                    base_estimator=MLPRegressor(solver='lbfgs')))
-        except (AttributeError, TypeError):
-            # unstable bug fixed in scikit-learn 0.24
-            return
+        model, X = fit_regression_model(
+            linear_model.RANSACRegressor(
+                base_estimator=MLPRegressor(solver='sgd', max_iter=20)))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
             [("input", FloatTensorType([None, X.shape[1]]))])
