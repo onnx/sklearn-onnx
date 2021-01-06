@@ -68,9 +68,8 @@ class TestDocumentationTutorial(unittest.TestCase):
                             # one example is using opset 13 but onnxruntime
                             # only support up to opset 12.
                             pass
-                        elif ("AttributeError: 'str' object has no attribute "
-                              "'decode") in st:
-                            # a bug in scikit-learn<0.24
+                        elif "'str' object has no attribute 'decode'" in st:
+                            # unstable bug in scikit-learn<0.24
                             pass
                         else:
                             raise RuntimeError(
