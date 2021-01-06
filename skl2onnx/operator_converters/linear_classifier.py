@@ -14,7 +14,8 @@ from sklearn.linear_model import (
 )
 from sklearn.svm import LinearSVC
 from ..common._apply_operation import (
-    apply_cast, apply_add, apply_sigmoid, apply_softmax)
+    apply_cast, apply_add, apply_sigmoid, apply_softmax,
+    apply_normalizer)
 from ..common._registration import register_converter
 from ..common.data_types import (
     BooleanTensorType, DoubleTensorType, guess_proto_type)
@@ -23,16 +24,13 @@ from ..common.utils_classifier import (
 from ..proto import onnx_proto
 
 
-def apply_logistic(scope, input_name, output_name, container):
+def apply_logistic(scope, input_name, output_name, container,
+                   proto_dtype):
     sig_name = scope.get_unique_variable_name(input_name + "sig")
     apply_sigmoid(scope, input_name, sig_name, container)
-
-    normalizer_type = 'Normalizer'
-    normalizer_attrs = {
-        'name': scope.get_unique_operator_name(input_name + "norm"),
-        'norm': 'L1'}
-    container.add_node(normalizer_type, sig_name, output_name,
-                       op_domain='ai.onnx.ml', **normalizer_attrs)
+    apply_normalizer(
+        scope, sig_name, output_name, container, norm='L1',
+        use_float=proto_dtype == onnx_proto.TensorProto.FLOAT)
 
 
 def convert_sklearn_linear_classifier(scope, operator, container):
@@ -126,14 +124,16 @@ def convert_sklearn_linear_classifier(scope, operator, container):
                            axis=1)
         _finalize_converter_classes(
             scope, argmax_output_name, operator.outputs[0].full_name,
-            container, np.array(class_labels))
+            container, np.array(class_labels),
+            onnx_proto.TensorProto.DOUBLE)
 
         if use_raw_scores:
             return
 
         if classifier_attrs['post_transform'] == 'LOGISTIC':
             apply_logistic(scope, raw_score_name,
-                           operator.outputs[1].full_name, container)
+                           operator.outputs[1].full_name, container,
+                           proto_dtype=onnx_proto.TensorProto.DOUBLE)
             return
         elif classifier_attrs['post_transform'] == 'SOFTMAX':
             apply_softmax(scope, raw_score_name,
@@ -200,14 +200,11 @@ def convert_sklearn_linear_classifier(scope, operator, container):
             container.add_node(classifier_type, input_name,
                                [label_name, probability_tensor_name],
                                op_domain='ai.onnx.ml', **classifier_attrs)
-            normalizer_type = 'Normalizer'
-            normalizer_attrs = {
-                'name': scope.get_unique_operator_name(normalizer_type),
-                'norm': 'L1'
-            }
-            container.add_node(normalizer_type, probability_tensor_name,
-                               operator.outputs[1].full_name,
-                               op_domain='ai.onnx.ml', **normalizer_attrs)
+            use_float = type(operator.inputs[0].type) not in (
+                DoubleTensorType, )
+            apply_normalizer(
+                scope, probability_tensor_name, operator.outputs[1].full_name,
+                container, norm='L1', use_float=use_float)
         elif (hasattr(op, '_label_binarizer') and
               op._label_binarizer.y_type_ == 'multilabel-indicator'):
             y_pred_name = scope.get_unique_variable_name('y_pred')

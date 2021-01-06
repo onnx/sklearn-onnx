@@ -40,11 +40,15 @@ from test_utils import (
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
+ORT_VERSION = '1.6.0'
+
+
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
 
     def _common_classifier(
             self, model_cls_set, name_root=None, debug=False,
-            raw_scores=True, pos_features=False, is_int=False):
+            raw_scores=True, pos_features=False, is_int=False,
+            comparable_outputs=None):
         for model_cls in model_cls_set:
             if name_root is None:
                 name = model_cls.__name__
@@ -82,8 +86,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 # DoubleTensorType
                                 continue
                             dump_data_and_model(
-                                X.astype(np.float64), model, model_onnx,
+                                X.astype(np.float64)[:7], model, model_onnx,
                                 methods=methods,
+                                comparable_outputs=comparable_outputs,
                                 basename="Sklearn{}Double2RAW{}"
                                          "ZIP{}CL{}".format(
                                             name,
@@ -91,14 +96,14 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                             1 if z else 0, n_cl))
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax is missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_logistic_64(self):
         self._common_classifier([LogisticRegression])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax is missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_modelsgd_64(self):
@@ -109,7 +114,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 "SGDClassifierPerceptron")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Reciprocal are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_modelsgdlog_64(self):
@@ -117,16 +122,16 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 "SGDClassifierLog")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Relu are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_mlpclassifier_relu_64(self):
         self._common_classifier(
-            [lambda: MLPClassifier(activation='Relu')],
+            [lambda: MLPClassifier(activation='relu')],
             "MLPClassifierRelu", raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Tanh are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_mlpclassifier_tanh_64(self):
@@ -136,7 +141,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             "MLPClassifierTanh", raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sigmoid are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_mlpclassifier_logistic_64(self):
@@ -146,7 +151,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             "MLPClassifierLogistic", raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax is missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_mlpclassifier_identity_64(self):
@@ -156,7 +161,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             "MLPClassifierIdentity", raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, TopK are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_knn_64(self):
@@ -167,7 +172,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @unittest.skipIf(
         VotingClassifier is None, reason="scikit-learn too old")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sum are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_voting_64(self):
@@ -176,10 +181,11 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         self._common_classifier(
             [lambda: VotingClassifier(estimators,
                                       flatten_transform=False)],
-            "VotingClassifier", raw_scores=False)
+            "VotingClassifier", raw_scores=False,
+            comparable_outputs=[0])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, LpNormalization are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_64(self):
@@ -188,7 +194,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             "VotingClassifier", raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, LpNormalization are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_svc_linear_64(self):
@@ -197,7 +203,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sum are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_svc_poly_64(self):
@@ -206,7 +212,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sum are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_svc_rbf_64(self):
@@ -215,7 +221,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             raw_scores=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sum are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_svc_sigmoid_64(self):
@@ -226,7 +232,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @unittest.skipIf(
         BernoulliNB is None, reason="new in scikit version 0.20")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Log are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_bernoullinb_64(self):
@@ -236,7 +242,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @unittest.skipIf(
         ComplementNB is None, reason="new in scikit version 0.20")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, ReduceLogSumExp are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_complementnb_64(self):
@@ -245,7 +251,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             raw_scores=False, pos_features=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, ReduceMean are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_bagging_64(self):
@@ -254,7 +260,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             "BaggingClassifier")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sigmoid are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_stacking_64(self):
