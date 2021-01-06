@@ -40,7 +40,7 @@ from test_utils import (
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
-ORT_VERSION = '1.6.0'
+ORT_VERSION = '1.7.0'
 
 
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
