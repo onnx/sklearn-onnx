@@ -47,7 +47,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
 
     def _common_classifier(
             self, model_cls_set, name_root=None, debug=False,
-            raw_scores=True, pos_features=False, is_int=False):
+            raw_scores=True, pos_features=False, is_int=False,
+            comparable_outputs=None):
         for model_cls in model_cls_set:
             if name_root is None:
                 name = model_cls.__name__
@@ -85,8 +86,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 # DoubleTensorType
                                 continue
                             dump_data_and_model(
-                                X.astype(np.float64), model, model_onnx,
+                                X.astype(np.float64)[:7], model, model_onnx,
                                 methods=methods,
+                                comparable_outputs=comparable_outputs,
                                 basename="Sklearn{}Double2RAW{}"
                                          "ZIP{}CL{}".format(
                                             name,
@@ -179,7 +181,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         self._common_classifier(
             [lambda: VotingClassifier(estimators,
                                       flatten_transform=False)],
-            "VotingClassifier", raw_scores=False)
+            "VotingClassifier", raw_scores=False,
+            comparable_outputs=[0])
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
@@ -269,5 +272,4 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnDoubleTensorTypeClassifier().test_ovr_64()
     unittest.main()
