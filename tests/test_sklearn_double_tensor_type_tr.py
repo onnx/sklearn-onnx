@@ -31,6 +31,9 @@ warnings_to_skip = (
     DeprecationWarning, FutureWarning, ConvergenceWarning, UserWarning)
 
 
+ORT_VERSION = "1.7.0"
+
+
 class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
 
     def _common_transform(
@@ -76,16 +79,16 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         y[y < mid_point] = 0
         y[y >= mid_point] = 1
         model.fit(X, y)
-        return model, X.astype(np.float32)
+        return model, X.astype(np.float64)
 
     def _fit_model_multiclass_classification(self, model, data):
         X = data.data
         y = data.target
         model.fit(X, y)
-        return model, X.astype(np.float32)
+        return model, X.astype(np.float64)
 
     def _test_score(self, model, X, tg, decimal=5, black_op=None):
-        X = X.astype(np.float32)
+        X = X.astype(np.float64)
         exp = model.score_samples(X)
         expp = model.predict_proba(X)
         onx = to_onnx(
@@ -104,14 +107,22 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             exp.ravel(), got[2].ravel(), decimal=decimal)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture(), load_iris())
-        for tg in range(min(9, TARGET_OPSET), TARGET_OPSET):
+        for tg in range(min(9, TARGET_OPSET), TARGET_OPSET + 1):
             with self.subTest(target_opset=tg):
+                if tg < 11:
+                    with self.assertRaises(RuntimeError):
+                        model_onnx = convert_sklearn(
+                            model, "gaussian_mixture",
+                            [("input", DoubleTensorType([
+                                None, X.shape[1]]))],
+                            target_opset=tg)
+                    continue
                 model_onnx = convert_sklearn(
                     model, "gaussian_mixture",
                     [("input", DoubleTensorType([None, X.shape[1]]))],
@@ -123,7 +134,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 self._test_score(model, X, tg)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_bayesian_mixture_binary_classification(self):
@@ -143,7 +154,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_gaussian_mixture_multiclass(self):
@@ -160,7 +171,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_comp2(self):
@@ -173,13 +184,13 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[40:60], model, model_onnx,
+            X.astype(np.float64)[40:60], model, model_onnx,
             basename="GaussianMixtureC2Double",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full(self):
@@ -192,13 +203,13 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[40:60], model, model_onnx,
+            X.astype(np.float64)[40:60], model, model_onnx,
             basename="GaussianMixtureC2FullDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_tied(self):
@@ -211,13 +222,13 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[40:60],
+            X.astype(np.float64)[40:60],
             model, model_onnx, basename="GaussianMixtureC2TiedDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_diag(self):
@@ -231,13 +242,13 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self.assertIn('ReduceLogSumExp', str(model_onnx))
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[40:60],
+            X.astype(np.float64)[40:60],
             model, model_onnx, basename="GaussianMixtureC2DiagDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_spherical(self):
@@ -250,16 +261,16 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[40:60],
+            X.astype(np.float64)[40:60],
             model, model_onnx, basename="GaussianMixtureC2SphericalDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
-    def test_gaussian_mixture_full_black_op(self):
+    def _test_gaussian_mixture_full_black_op(self):
         data = load_iris()
         X = data.data
         model = GaussianMixture(n_components=2, covariance_type='full')
@@ -274,18 +285,18 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         self.assertNotIn('ReduceLogSumExp', str(model_onnx))
         dump_data_and_model(
-            X.astype(np.float32)[40:60],
+            X.astype(np.float64)[40:60],
             model, model_onnx, basename="GaussianMixtureC2FullBLDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
     @ignore_warnings(category=warnings_to_skip)
-    def test_gaussian_mixture_full_black_op_noargmax(self):
+    def _test_gaussian_mixture_full_black_op_noargmax(self):
         data = load_iris()
         X = data.data
         model = GaussianMixture(n_components=2, covariance_type='full')
@@ -301,14 +312,14 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         self.assertNotIn('ArgMax', str(model_onnx))
         dump_data_and_model(
-            X.astype(np.float32)[40:60],
+            X.astype(np.float64)[40:60],
             model, model_onnx,
             basename="GaussianMixtureC2FullBLNMDouble",
             intermediate_steps=False)
         self._test_score(model, X, TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
@@ -328,13 +339,12 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             options={id(model): {'score_samples': True}},
             black_op={'ReduceLogSumExp', 'ArgMax'})
         self.assertNotIn('ArgMax', str(model_onnx2))
-
         sess1 = InferenceSession(model_onnx1.SerializeToString())
-        res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float64)})
         a1, b1, c1 = res1
 
         sess2 = InferenceSession(model_onnx2.SerializeToString())
-        res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
+        res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float64)})
         a2, b2, c2 = res2
 
         self.assertEqual(b1.max(), b2.max())
@@ -347,13 +357,13 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             decimal=2)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Where for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_binarizer(self):
         data = np.array([[1., -1., 2.],
                          [2., 0., 0.],
-                         [0., 1., -1.]], dtype=np.float32)
+                         [0., 1., -1.]], dtype=np.float64)
         model = Binarizer(threshold=0.5)
         model_onnx = convert_sklearn(
             model, "scikit-learn binarizer",
@@ -364,7 +374,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             basename="SklearnBinarizerDouble-SkipDim1")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_kmeans_clustering(self):
@@ -382,7 +392,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             basename="SklearnKMeansDoubleGemm-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses ArgMin for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_kmeans_clustering_nogemm(self):
@@ -443,4 +453,4 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
