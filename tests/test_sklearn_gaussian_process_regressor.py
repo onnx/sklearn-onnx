@@ -568,7 +568,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             gp.fit(Xtrain_, Ytrain_)
         except (AttributeError, TypeError):
             # unstable bug in scikit-learn, fixed in 0.24
-            return            
+            return
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
@@ -600,7 +600,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             gp.fit(Xtrain_, Ytrain_)
         except (AttributeError, TypeError):
             # unstable bug in scikit-learn, fixed in 0.24
-            return            
+            return
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
