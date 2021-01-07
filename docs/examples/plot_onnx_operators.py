@@ -32,7 +32,7 @@ ONNX Python API
 +++++++++++++++
 
 Let's try the example given by ONNX documentation:
-`PythonAPIOverview.md
+`ONNX Model Using Helper Functions
 <https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md
 #creating-an-onnx-model-using-helper-functions>`_.
 It relies on *protobuf* whose definition can be found
@@ -138,11 +138,13 @@ onnx.checker.check_model(original_model)
 
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
-node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
+node = OnnxTranspose(
+    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
+    perm=[1, 0, 2], op_version=12)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape
-model_def = node.to_onnx({'X': X})
+model_def = node.to_onnx({'X': X}, target_opset=12)
 onnx.checker.check_model(model_def)
 
 ######################################
