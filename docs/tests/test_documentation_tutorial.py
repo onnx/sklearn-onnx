@@ -2,13 +2,10 @@
 Tests examples from the documentation.
 """
 import unittest
-from distutils.version import StrictVersion
 import os
 import sys
 import importlib
 import subprocess
-import numpy
-import onnxruntime
 
 
 def import_source(module_file_path, module_name):
@@ -70,7 +67,6 @@ class TestDocumentationTutorial(unittest.TestCase):
                             # unstable bug in scikit-learn<0.24
                             pass
                         else:
-                            installed = os.listdir(os.path.dirname(numpy.__file__))
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
                                 "failed due to\n{}"
