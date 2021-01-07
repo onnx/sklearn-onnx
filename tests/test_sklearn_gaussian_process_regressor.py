@@ -6,6 +6,7 @@
 
 import unittest
 import inspect
+import warnings
 from io import StringIO
 from distutils.version import StrictVersion
 import numpy as np
