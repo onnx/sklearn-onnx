@@ -18,8 +18,8 @@ that on a simple example.
 .. contents::
     :local:
 
-Train a model and convert it.
-+++++++++++++++++++++++++++++
+Train a model and convert it
+++++++++++++++++++++++++++++
 
 """
 import numpy

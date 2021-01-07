@@ -254,3 +254,57 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
                            "*Inputs*\n{}\n*Model*\n{}'".format(
                             onnx_inputs, original_model))
     return shapes
+
+
+def change_onnx_domain(model, ops):
+    """
+    Takes a model and changes its outputs.
+
+    :param model: *ONNX* model
+    :param ops: dictionary { optype: ('optype', 'new domain') }
+    :return: modified model
+
+    The function removes unneeded files.
+    """
+    nodes = model.graph.node
+    for node in nodes:
+        rep = ops.get(node.op_type, None)
+        if rep is None:
+            continue
+        node.op_type = rep[0]
+        node.domain = rep[1]
+
+    graph = make_graph(nodes, model.graph.name, model.graph.input,
+                       model.graph.output, model.graph.initializer)
+    onnx_model = make_model(graph)
+    onnx_model.ir_version = model.ir_version
+    onnx_model.producer_name = model.producer_name
+    onnx_model.producer_version = model.producer_version
+    onnx_model.domain = model.domain
+    onnx_model.model_version = model.model_version
+    onnx_model.doc_string = model.doc_string
+    if len(model.metadata_props) > 0:
+        values = {p.key: p.value for p in model.metadata_props}
+        onnx.helper.set_model_props(onnx_model, values)
+
+    if len(onnx_model.graph.input) != len(model.graph.input):
+        raise RuntimeError("Input mismatch {} != {}".format(
+                        len(onnx_model.input), len(model.input)))
+
+    # fix opset import
+    domain_set = set()
+    has_domain = False
+    del onnx_model.opset_import[:]
+    for oimp in model.opset_import:
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = oimp.domain
+        op_set.version = oimp.version
+        domain_set.add(oimp.domain)
+        if not has_domain:
+            has_domain = oimp.domain in domain_set
+    for v in ops.values():
+        if v[1] not in domain_set:
+            op_set = onnx_model.opset_import.add()
+            op_set.domain = v[1]
+            op_set.version = 1
+    return onnx_model
