@@ -142,7 +142,7 @@ def validator_classifier_converter(scope, operator, container):
     input0 = operator.inputs[0]         # first input in ONNX graph
     outputs = operator.outputs          # outputs in ONNX graph
     op = operator.raw_operator          # scikit-learn model (mmust be fitted)
-    opv = opv = container.target_opset
+    opv = container.target_opset
 
     # The model calls another one. The class `OnnxSubEstimator`
     # calls the converter for this operator.
