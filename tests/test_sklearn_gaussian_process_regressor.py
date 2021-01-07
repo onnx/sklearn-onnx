@@ -6,6 +6,7 @@
 
 import unittest
 import inspect
+import warnings
 from io import StringIO
 from distutils.version import StrictVersion
 import numpy as np
@@ -627,18 +628,18 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_double_true(self):
-        X = 15 * np.random.rand(100, 2)
-        y = np.sin(X[:, 0] - X[:, 1]).ravel()
-        y += 3 * (0.5 - np.random.rand(X.shape[0]))
-        X_train, X_test, y_train, _ = train_test_split(X, y)
-        gp = GaussianProcessRegressor(
-            kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
-            alpha=1e-2, n_restarts_optimizer=25, normalize_y=True,
-            random_state=0)
+
+        gp = GaussianProcessRegressor(kernel=ExpSineSquared(),
+                                      alpha=1e-7,
+                                      n_restarts_optimizer=15,
+                                      normalize_y=True)
         try:
-            gp.fit(X_train, y_train)
-        except (AttributeError, TypeError):
-            # unstable bug in scikit-learn, fixed in 0.24
+            gp.fit(Xtrain_, Ytrain_)
+        except (AttributeError, TypeError) as e:
+            # unstable issue fixed with scikit-learn>=0.24
+            warnings.warn(
+                "Training did not converge but fails at raising "
+                "a warning: %r." % e)
             return
 
         # return_cov=False, return_std=False
