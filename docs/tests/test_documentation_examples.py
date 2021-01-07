@@ -65,6 +65,9 @@ class TestDocumentationExample(unittest.TestCase):
                             # onnxruntime datasets changed in master branch,
                             # still the same in released version on pypi
                             pass
+                        elif "'str' object has no attribute 'decode'" in st:
+                            # unstable bug in scikit-learn<0.24
+                            pass
                         else:
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "
