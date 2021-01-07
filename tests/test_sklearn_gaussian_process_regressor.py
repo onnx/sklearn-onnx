@@ -644,17 +644,17 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
-        gp.predict(X_train, return_std=True)
+        gp.predict(Xtrain_, return_std=True)
         model_onnx = to_onnx(
             gp, initial_types=[('X', DoubleTensorType([None, None]))],
             options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.float64), gp, model_onnx,
+            Xtest_.astype(np.float64), gp, model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdDouble-Out0-Dec3",
             disable_optimisation=True)
-        self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
+        self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
                              GaussianProcessRegressor],
                            decimal=3, disable_optimisation=True)
