@@ -560,7 +560,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
         X = 15 * np.random.rand(100, 2)
-        y = np.sin(X[:, 0] - X[:, 1]).ravel()
+        y = np.sin(X[:, 0] - X[:, 1]).ravel() + 3
         y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(
