@@ -359,6 +359,16 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             weighted_rs = OnnxMul(rs, wei, op_version=opv)
             weighted = OnnxTranspose(weighted_rs, perm=[1, 0, 2],
                                      op_version=opv)
+
+            if OnnxIsNaN is not None:
+                # This steps sometimes produces nan (bug in onnxuntime)
+                # They are replaced by null values.
+                isnan = OnnxIsNaN(weighted, op_version=opv)
+                shape = OnnxShape(weighted, op_version=opv)
+                csts0 = OnnxConstantOfShape(shape, op_version=opv)
+                weighted = OnnxWhere(isnan, csts0, weighted, op_version=opv)
+                # Back to original plan.
+
             res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
                                      keepdims=0)
             norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),

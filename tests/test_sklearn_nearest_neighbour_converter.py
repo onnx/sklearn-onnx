@@ -246,6 +246,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(algorithm="brute"),
             n_targets=2)
+        X = X[:-1]
         model_onnx = convert_sklearn(
             model, "KNN regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
