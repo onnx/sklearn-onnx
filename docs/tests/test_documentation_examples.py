@@ -68,6 +68,7 @@ class TestDocumentationExample(unittest.TestCase):
                               'is till opset 12.') in st:
                             # one example is using opset 13 but onnxruntime
                             # only support up to opset 12.
+                            pass
                         elif "'str' object has no attribute 'decode'" in st:
                             # unstable bug in scikit-learn<0.24
                             pass
