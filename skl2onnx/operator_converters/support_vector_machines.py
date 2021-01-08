@@ -244,10 +244,6 @@ def convert_sklearn_svm_classifier(
         #     transformed_confidences = (
         #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
         #     return votes + transformed_confidences
-        # if list(op.classes_) != list(range(len(op.classes_))):
-        #     raise RuntimeError(
-        #         "Classes different from first n integers are not supported "
-        #         "in SVC converter.")
 
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         if proto_dtype != onnx_proto.TensorProto.DOUBLE:
