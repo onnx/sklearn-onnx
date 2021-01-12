@@ -42,8 +42,8 @@ import numpy
 import onnxruntime as rt
 from skl2onnx import convert_sklearn
 import pprint
-from skl2onnx.common.data_types import FloatTensorType, StringTensorType
-from skl2onnx.common.data_types import Int64TensorType
+from skl2onnx.common.data_types import (
+    FloatTensorType, StringTensorType, Int64TensorType)
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
