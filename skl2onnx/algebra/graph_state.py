@@ -108,10 +108,10 @@ class GraphState:
                 astype = np.bool
             elif dtype == np.complex64:
                 ty = onnx_proto.TensorProto.COMPLEX64
-                astype = np.bool
+                astype = np.complex64
             elif dtype == np.complex128:
                 ty = onnx_proto.TensorProto.COMPLEX128
-                astype = np.bool
+                astype = np.complex128
             else:
                 st = str(dtype).lower()
                 if st.startswith('u') or st.startswith("<u"):
