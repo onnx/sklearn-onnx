@@ -4,6 +4,7 @@ Tests examples from scikit-learn documentation.
 import unittest
 import urllib.error
 from distutils.version import StrictVersion
+import warnings
 import numpy as np
 import onnx
 
