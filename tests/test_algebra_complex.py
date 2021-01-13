@@ -1,5 +1,4 @@
 from distutils.version import StrictVersion
-import sys
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
