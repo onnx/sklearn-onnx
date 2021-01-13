@@ -509,7 +509,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.3.0"),
         reason="Requires opset 9.")
     def test_tfidf_svm(self):
         data = [
@@ -534,7 +534,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         exp = clf.predict(embeddings)
 
         initial_type = [('input', FloatTensorType([None, dim]))]
-        model_onnx = convert_sklearn(clf, initial_types=initial_type)
+        model_onnx = convert_sklearn(clf, initial_types=initial_type,
+                                     target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': embeddings})[0]
         assert_almost_equal(exp, res)
