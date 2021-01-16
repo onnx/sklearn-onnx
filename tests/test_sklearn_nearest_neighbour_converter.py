@@ -12,7 +12,6 @@ import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
 from pandas import DataFrame
-from onnx.defs import onnx_opset_version
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
