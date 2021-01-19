@@ -12,7 +12,6 @@ import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
 from pandas import DataFrame
-from onnx.defs import onnx_opset_version
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
@@ -401,7 +400,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(onnx_opset_version() < TARGET_OPSET,
+    @unittest.skipIf(TARGET_OPSET < TARGET_OPSET,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(
@@ -419,7 +418,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierBinary")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 12,
+    @unittest.skipIf(TARGET_OPSET < 12,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_binary_class_radius(self):
         model, X = self._fit_model_binary_classification(
@@ -455,7 +454,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierMulti")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 12,
+    @unittest.skipIf(TARGET_OPSET < 12,
                      reason="needs higher target_opset")
     def test_model_knn_classifier_multi_class_radius(self):
         model, X = self._fit_model_multiclass_classification(
@@ -650,7 +649,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         clr.fit(X_train)
 
         for to in (9, 10, 11):
-            if to > onnx_opset_version():
+            if to > TARGET_OPSET:
                 break
             model_def = to_onnx(clr, X_train.astype(numpy.float32),
                                 target_opset=to)
@@ -843,7 +842,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 11,
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
     def test_model_knn_iris_regressor_multi_reg(self):
         iris = datasets.load_iris()
@@ -887,7 +886,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 11,
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
     def test_model_knn_iris_classifier_multi_reg2_weight(self):
         iris = datasets.load_iris()
@@ -929,7 +928,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(onnx_opset_version() < 11,
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
     def test_model_knn_iris_classifier_multi_reg3_weight(self):
         iris = datasets.load_iris()
