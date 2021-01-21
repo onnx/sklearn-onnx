@@ -65,8 +65,8 @@ def _guess_numpy_type(data_type, dims):
         return FloatTensorType(dims)
     if data_type == np.float64:
         return DoubleTensorType(dims)
-    if data_type in (np.str, str, object) or str(
-        data_type) in ('<U1', ): # noqa
+    if data_type in (np.str, str, object) or str(data_type) in ('<U1', ) or (
+            hasattr(data_type, 'type') and data_type.type is np.str_): # noqa
         return StringTensorType(dims)
     if data_type in (np.int64, np.uint64) or str(data_type) == '<U6':
         return Int64TensorType(dims)
@@ -109,6 +109,9 @@ def guess_numpy_type(data_type):
     """
     Guess the corresponding numpy type based on data_type.
     """
+    if data_type in (np.float64, np.float32, np.int8, np.uint8,
+                     np.str, np.bool, np.int32, np.int64):
+        return data_type
     if isinstance(data_type, FloatTensorType):
         return np.float32
     if isinstance(data_type, DoubleTensorType):
