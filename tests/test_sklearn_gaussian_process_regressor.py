@@ -707,11 +707,11 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                                       n_restarts_optimizer=25,
                                       normalize_y=True)
         try:
-            gp.fit(Xtrain_, Ytrain_)
+            gp.fit(X_train, y_train)
         except (AttributeError, TypeError):
             # unstable bug fixed in scikit-learn 0.24
             return
-        gp.predict(Xtrain_, return_std=True)
+        gp.predict(X_train, return_std=True)
 
         # return_cov=False, return_std=False
         options = {GaussianProcessRegressor: {"return_std": True}}
