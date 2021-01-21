@@ -58,7 +58,8 @@ class GraphState:
         if isinstance(var, Variable):
             return var.full_name
         if isinstance(var, (np.ndarray, np.bool, np.int64,
-                            np.float32, np.float64, np.bool)):
+                            np.float32, np.float64, np.bool,
+                            np.int8, np.uint8)):
             return self._add_constant(var)
         elif hasattr(var, 'ConstantValue'):
             return self._add_constant(var.ConstantValue)
@@ -95,7 +96,13 @@ class GraphState:
                 astype = np.int64
             elif dtype == np.int32:
                 ty = onnx_proto.TensorProto.INT32
-                astype = np.int64
+                astype = np.int32
+            elif dtype == np.int8:
+                ty = onnx_proto.TensorProto.INT8
+                astype = np.int8
+            elif dtype == np.uint8:
+                ty = onnx_proto.TensorProto.UINT8
+                astype = np.uint8
             elif dtype == np.bool:
                 ty = onnx_proto.TensorProto.BOOL
                 astype = np.bool
@@ -142,7 +149,7 @@ class GraphState:
             ty = TensorProto.INT64
             self.container.add_initializer(name, ty, None, cst)
             return name
-        elif isinstance(cst, np.bool):
+        if isinstance(cst, np.bool):
             name = self.scope.get_unique_variable_name(
                 self.onnx_prefix + 'cst')
             ty = TensorProto.BOOL
@@ -159,6 +166,18 @@ class GraphState:
                 self.onnx_prefix + 'cst')
             ty = TensorProto.FLOAT
             self.container.add_initializer(name, ty, None, float(cst))
+            return name
+        if isinstance(cst, np.int8):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = TensorProto.INT8
+            self.container.add_initializer(name, ty, None, cst)
+            return name
+        if isinstance(cst, np.uint8):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = TensorProto.UINT8
+            self.container.add_initializer(name, ty, None, cst)
             return name
         raise NotImplementedError(
             "Unable to add a constant of type {}. "
