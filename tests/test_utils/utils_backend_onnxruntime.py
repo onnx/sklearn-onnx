@@ -494,8 +494,6 @@ def _compare_expected(expected,
                 output = output.reshape(
                     (len(expected), len(output.ravel()) // len(expected)))
             if len(expected) != len(output):
-                print(expected)
-                print(output)
                 raise OnnxRuntimeAssertionError(
                     "Unexpected number of outputs '{0}', expected={1}, got={2}"
                     .format(onnx, len(expected), len(output)))
