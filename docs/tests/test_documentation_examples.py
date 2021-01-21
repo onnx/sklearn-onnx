@@ -7,7 +7,6 @@ import os
 import sys
 import importlib
 import subprocess
-import numpy
 import onnxruntime
 
 

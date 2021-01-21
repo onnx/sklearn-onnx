@@ -566,8 +566,6 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         diff = list(sorted(r))
         assert diff[-50] <= 0.01
         assert all(res[-3:].ravel() == 0)
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.3.0"),
-        reason="Requires opset 9.")
 
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
