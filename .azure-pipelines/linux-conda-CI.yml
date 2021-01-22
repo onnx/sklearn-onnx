@@ -142,6 +142,22 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.19.2'
         run.example: '0'
+      Py37-Onnx160-Sk0213:
+        python.version: '3.7'
+        numpy.version: '==1.18.1'
+        onnx.version: '==1.6.0'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.21.3'
+        onnx.target_opset: ''
+        onnxcc.version: '==1.7.0'
+      Py37-Onnx150:
+        python.version: '3.7'
+        numpy.version: '==1.18.1'
+        onnx.version: '==1.6.0'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.21.3'
+        onnx.target_opset: ''
+        onnxcc.version: '==1.7.0'
     maxParallel: 3
 
   steps:
