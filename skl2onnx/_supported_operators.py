@@ -434,6 +434,10 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
+    if options is not None and 'zipmap' in options:
+        from ._parse import (
+            _parse_sklearn_classifier, update_registered_parser)
+        update_registered_parser(model, _parse_sklearn_classifier)
 
 
 def _get_sklearn_operator_name(model_type):
