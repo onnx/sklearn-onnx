@@ -35,13 +35,19 @@ def get_label_classes(scope, op, node_names=False):
                 classes = np.array(['s%s' % c for c in clnames])
         else:
             classes = op.classes_
-    else:
+    elif hasattr(op, 'classes_'):
         classes = op.classes_
+    elif hasattr(op, 'intercept_'):
+        classes = len(op.intercept_)
+    else:
+        raise RuntimeError(
+            "No known ways to retrieve the number of classes for class %r."
+            "" % type(op))
     return classes
 
 
 def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
-                                container, classes):
+                                container, classes, proto_dtype):
     """
     See :func:`convert_voting_classifier`.
     """
@@ -71,7 +77,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
                                                 'reshaped_result')
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
-                   to=onnx_proto.TensorProto.FLOAT)
+                   to=proto_dtype)
         apply_reshape(scope, cast2_result_name, reshaped_result_name,
                       container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, output_full_name, container,
