@@ -47,7 +47,7 @@ def get_label_classes(scope, op, node_names=False):
 
 
 def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
-                                container, classes, proto_dtype):
+                                container, classes):
     """
     See :func:`convert_voting_classifier`.
     """
@@ -77,7 +77,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
                                                 'reshaped_result')
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
-                   to=proto_dtype)
+                   to=onnx_proto.TensorProto.FLOAT)
         apply_reshape(scope, cast2_result_name, reshaped_result_name,
                       container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, output_full_name, container,
