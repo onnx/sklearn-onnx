@@ -171,6 +171,10 @@ def make_attribute(
         elif all(isinstance(v, GraphProto) for v in value):
             attr.graphs.extend(value)
             attr.type = AttributeProto.GRAPHS
+        elif isinstance(value, np.matrix):
+            return make_attribute(
+                key, np.asarray(value).ravel(), dtype=dtype, domain=domain,
+                doc_string=doc_string)
         else:
             raise ValueError(
                 "You passed in an iterable attribute but I cannot figure out "

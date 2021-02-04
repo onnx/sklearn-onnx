@@ -37,6 +37,8 @@ def dynamic_class_creation_sklearn():
     cls = {}
 
     for skl_obj, name in sklearn_operator_name_map.items():
+        if skl_obj is None:
+            continue
         conv = _converter_pool[name]
         shape_calc = _shape_calculator_pool[name]
         skl_name = skl_obj.__name__
@@ -46,9 +48,12 @@ def dynamic_class_creation_sklearn():
         doc = "\n".join(doc)
         prefix = "Sklearn" if "sklearn" in str(skl_obj) else ""
         class_name = "Onnx" + prefix + skl_name
-        cl = ClassFactorySklearn(skl_obj, class_name,
-                                 doc, conv, shape_calc,
-                                 name)
+        try:
+            cl = ClassFactorySklearn(skl_obj, class_name,
+                                     doc, conv, shape_calc,
+                                     name)
+        except TypeError:
+            continue
         cls[class_name] = cl
     return cls
 
