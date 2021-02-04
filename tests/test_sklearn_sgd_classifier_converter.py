@@ -220,7 +220,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
     def test_model_sgd_multi_class_log_l1_no_intercept(self):
         model, X = fit_classification_model(
             SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
-                          random_state=42), 5, n_features=50)
+                          random_state=43), 3, n_features=7)
         X = np.array([X[4], X[4]])
         model_onnx = convert_sklearn(
             model,
@@ -232,7 +232,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(np.float32),
             model,
-            model_onnx,
+            model_onnx, verbose=True,
             basename="SklearnSGDClassifierMultiLogL1NoIntercept-Dec4",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.2') or "
