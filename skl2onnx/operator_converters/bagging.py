@@ -8,8 +8,7 @@ import numpy as np
 from .._supported_operators import sklearn_operator_name_map
 from ..common._apply_operation import (
     apply_cast, apply_concat,
-    apply_div, apply_reshape
-)
+    apply_div, apply_reshape)
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 
