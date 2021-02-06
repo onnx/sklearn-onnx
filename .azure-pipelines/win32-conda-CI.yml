@@ -8,7 +8,7 @@ trigger:
 
 jobs:
 
-- job: 'CI-Windows'
+- job: 'CI_Windows'
   pool:
     vmImage: 'vs2017-win2016'
   strategy:

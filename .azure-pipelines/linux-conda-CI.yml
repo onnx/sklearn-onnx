@@ -8,7 +8,7 @@ trigger:
 
 jobs:
 
-- job: 'CI-Linux'
+- job: 'CI_Linux'
   pool:
     vmImage: 'Ubuntu-16.04'
   strategy:
