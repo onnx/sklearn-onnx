@@ -73,7 +73,7 @@ X = np.arange(20).reshape(10, 2)
 tr = KMeans(n_clusters=2)
 tr.fit(X)
 
-tr_mixin = wrap_as_onnx_mixin(tr)
+tr_mixin = wrap_as_onnx_mixin(tr, target_opset=12)
 
 onx = tr_mixin.to_onnx(X.astype(np.float32))
 print(predict_with_onnxruntime(onx, X))
@@ -83,7 +83,8 @@ print(predict_with_onnxruntime(onx, X))
 # before fitting the model.
 
 X = np.arange(20).reshape(10, 2)
-tr = wrap_as_onnx_mixin(KMeans(n_clusters=2))
+tr = wrap_as_onnx_mixin(KMeans(n_clusters=2),
+                        target_opset=12)
 tr.fit(X)
 
 onx = tr.to_onnx(X.astype(np.float32))
@@ -157,7 +158,7 @@ X = np.arange(20).reshape(10, 2)
 tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
-tr_mixin = wrap_as_onnx_mixin(tr)
+tr_mixin = wrap_as_onnx_mixin(tr, target_opset=12)
 tr_mixin.to_onnx(X.astype(np.float32))
 
 print(predict_with_onnxruntime(onx, X))

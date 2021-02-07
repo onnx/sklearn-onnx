@@ -7,13 +7,14 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import SVC
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
     # Old scikit-learn
     ColumnTransformer = None
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import StringTensorType
+from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
@@ -565,6 +566,41 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         diff = list(sorted(r))
         assert diff[-50] <= 0.01
         assert all(res[-3:].ravel() == 0)
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.3.0"),
+        reason="Requires opset 9.")
+    def test_tfidf_svm(self):
+        data = [
+            ["schedule a meeting", 0],
+            ["schedule a sync with the team", 0],
+            ["slot in a meeting", 0],
+            ["call ron", 1],
+            ["make a phone call", 1],
+            ["call in on the phone", 2]
+        ]
+        docs = [doc for (doc, _) in data]
+        labels = [label for (_, label) in data]
+
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit_transform(docs)
+        embeddings = vectorizer.transform(docs)
+        dim = embeddings.shape[1]
+
+        clf = SVC()
+        clf.fit(embeddings, labels)
+        embeddings = embeddings.astype(numpy.float32).todense()
+        exp = clf.predict(embeddings)
+
+        initial_type = [('input', FloatTensorType([None, dim]))]
+        model_onnx = convert_sklearn(clf, initial_types=initial_type,
+                                     target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': embeddings})[0]
+        assert_almost_equal(exp, res)
 
 
 if __name__ == "__main__":
