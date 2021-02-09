@@ -121,6 +121,6 @@ def calculate_linear_regressor_output_shapes(operator):
     if (hasattr(operator.raw_operator, 'coef_') and
             len(operator.raw_operator.coef_.shape) > 1):
         operator.outputs[0].type = cls_type([
-            N, operator.raw_operator.coef_.shape[1]])
+            N, operator.raw_operator.coef_.shape[0]])
     else:
         operator.outputs[0].type = cls_type([N, 1])

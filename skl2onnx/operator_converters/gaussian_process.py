@@ -13,7 +13,7 @@ from ..proto import onnx_proto
 from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSum,
+    OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSumApi11,
     OnnxMul, OnnxMax, OnnxReshape, OnnxDiv, OnnxNot,
     OnnxReciprocal, OnnxCast, OnnxLess,
     OnnxPow, OnnxNeg, OnnxConcat, OnnxArrayFeatureExtractor,
@@ -103,8 +103,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
         if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
-            y_mean = OnnxAdd(y_mean_b, mean_y, output_names=out[:1],
-                             op_version=opv)
+            y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
             # the predictions when return_std is True.
@@ -115,10 +114,13 @@ def convert_gaussian_process_regressor(scope, operator, container):
                 var_y = var_y.reshape(var_y.shape + (1,))
             y_mean = OnnxAdd(
                 OnnxMul(y_mean_b, var_y, op_version=opv),
-                mean_y, output_names=out[:1], op_version=opv)
+                mean_y, op_version=opv)
 
         y_mean.set_onnx_name_prefix('gpr')
-        outputs = [y_mean]
+        y_mean_reshaped = OnnxReshape(
+            y_mean, np.array([-1, 1], dtype=np.int64),
+            op_version=opv, output_names=out[:1])
+        outputs = [y_mean_reshaped]
 
         if options['return_cov']:
             raise NotImplementedError()
@@ -141,7 +143,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
             #       np.dot(K_trans, self._K_inv), K_trans)
             k_dot = OnnxMatMul(k_trans, _K_inv.astype(dtype), op_version=opv)
             ys_var = OnnxSub(
-                y_var, OnnxReduceSum(
+                y_var, OnnxReduceSumApi11(
                     OnnxMul(k_dot, k_trans, op_version=opv),
                     axes=[1], keepdims=0, op_version=opv),
                 op_version=opv)
@@ -299,7 +301,7 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
     # pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
     pi_star = OnnxAdd(
-                OnnxReduceSum(
+                OnnxReduceSumApi11(
                     OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
                     op_version=opv, axes=[0]),
                 (.5 * COEFS.sum()).astype(dtype),

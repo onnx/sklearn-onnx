@@ -16,10 +16,9 @@ from skl2onnx.helpers import collect_intermediate_steps, compare_objects
 from skl2onnx.helpers import enumerate_pipeline_models
 from skl2onnx.helpers.investigate import _alter_model_for_debugging
 from skl2onnx.common import MissingShapeCalculator
-from skl2onnx.common.data_types import (
-    FloatTensorType,
-)
+from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.data_types import guess_data_type
+from test_utils import TARGET_OPSET
 
 
 class MyScaler(StandardScaler):
@@ -29,31 +28,43 @@ class MyScaler(StandardScaler):
 class TestInvestigate(unittest.TestCase):
 
     def test_simple_pipeline(self):
-        data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
-                           dtype=numpy.float32)
-        model = Pipeline([("scaler1", StandardScaler()),
-                          ("scaler2", StandardScaler())])
-        model.fit(data)
-        all_models = list(enumerate_pipeline_models(model))
+        for opset in (11, TARGET_OPSET):
+            if opset > TARGET_OPSET:
+                continue
+            data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
+                               dtype=numpy.float32)
+            model = Pipeline([("scaler1", StandardScaler()),
+                              ("scaler2", StandardScaler())])
+            model.fit(data)
+            all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(
-            model, "pipeline", [("input", FloatTensorType([None, 2]))])
+            steps = collect_intermediate_steps(
+                model, "pipeline", [("input", FloatTensorType([None, 2]))],
+                target_opset=opset)
 
-        assert len(steps) == 2
-        assert len(all_models) == 3
+            assert len(steps) == 2
+            assert len(all_models) == 3
 
-        model.transform(data)
-        for step in steps:
-            onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
-            onnx_outputs = sess.run(None, {'input': data})
-            onnx_output = onnx_outputs[0]
-            skl_outputs = step['model']._debug.outputs['transform']
-            assert str(step['model']._debug) is not None
-            sdt = step['model']._debug.display(data, 5)
-            assert 'shape' in sdt
-            assert_almost_equal(onnx_output, skl_outputs)
-            compare_objects(onnx_output, skl_outputs)
+            expected = 'opset_import{domain:""version:%d}' % opset
+            expected1 = 'opset_import{domain:""version:1}'
+            model.transform(data)
+            for step in steps:
+                onnx_step = step['onnx_step']
+                text = str(onnx_step).replace('\n', ' ').replace(' ', '')
+                if expected not in text and expected1 not in text:
+                    raise AssertionError(
+                        "Unable to find '{}'\n'{}'\n".format(
+                            expected, text))
+                sess = onnxruntime.InferenceSession(
+                    onnx_step.SerializeToString())
+                onnx_outputs = sess.run(None, {'input': data})
+                onnx_output = onnx_outputs[0]
+                skl_outputs = step['model']._debug.outputs['transform']
+                assert str(step['model']._debug) is not None
+                sdt = step['model']._debug.display(data, 5)
+                assert 'shape' in sdt
+                assert_almost_equal(onnx_output, skl_outputs)
+                compare_objects(onnx_output, skl_outputs)
 
     def test_missing_converter(self):
         data = numpy.array([[0, 0], [0, 0], [2, 1], [2, 1]],
@@ -65,8 +76,10 @@ class TestInvestigate(unittest.TestCase):
         all_models = list(enumerate_pipeline_models(model))
 
         try:
-            collect_intermediate_steps(model, "pipeline",
-                                       [("input", FloatTensorType([None, 2]))])
+            collect_intermediate_steps(
+                model, "pipeline",
+                [("input", FloatTensorType([None, 2]))],
+                target_opset=TARGET_OPSET)
         except MissingShapeCalculator as e:
             assert "MyScaler" in str(e)
             assert "gallery" in str(e)
@@ -105,9 +118,10 @@ class TestInvestigate(unittest.TestCase):
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
 
-        steps = collect_intermediate_steps(model, "coulmn transformer",
-                                           [("input",
-                                             FloatTensorType([None, 2]))])
+        steps = collect_intermediate_steps(
+            model, "coulmn transformer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -129,9 +143,10 @@ class TestInvestigate(unittest.TestCase):
                              ("scaler2", RobustScaler())])
         model.fit(data)
         all_models = list(enumerate_pipeline_models(model))
-        steps = collect_intermediate_steps(model, "feature union",
-                                           [("input",
-                                             FloatTensorType([None, 2]))])
+        steps = collect_intermediate_steps(
+            model, "feature union",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -156,7 +171,8 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType((None, X.shape[1])))])
+            [("input", FloatTensorType((None, X.shape[1])))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
@@ -183,7 +199,8 @@ class TestInvestigate(unittest.TestCase):
 
         steps = collect_intermediate_steps(
             model, "pipeline",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
 
         assert len(steps) == 2
         assert len(all_models) == 3
