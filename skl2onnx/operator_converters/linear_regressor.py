@@ -9,7 +9,8 @@ except ImportError:
     import collections as cabc
 import numpy as np
 from ..common._apply_operation import (
-    apply_cast, apply_add, apply_sqrt, apply_div, apply_sub)
+    apply_cast, apply_add, apply_sqrt, apply_div, apply_sub,
+    apply_reshape)
 from ..common.data_types import (
     BooleanTensorType, Int64TensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
@@ -34,8 +35,12 @@ def convert_sklearn_linear_regressor(scope, operator, container):
         container.add_node(
             'MatMul', [operator.inputs[0].full_name, coef], multiplied,
             name=scope.get_unique_operator_name('MatMul'))
+        resh = scope.get_unique_variable_name('resh')
         apply_add(scope, [multiplied, intercept],
-                  operator.outputs[0].full_name, container)
+                  resh, container)
+        last_dim = 1 if len(model_coef.shape) == 1 else model_coef.shape[-1]
+        apply_reshape(scope, resh, operator.outputs[0].full_name,
+                      container, desired_shape=(-1, last_dim))
         return
 
     op_type = 'LinearRegressor'
@@ -104,9 +109,17 @@ def convert_sklearn_bayesian_ridge(scope, operator, container):
         'MatMul', [input_name, sigma], sigmaed0,
         name=scope.get_unique_operator_name('MatMul'))
     sigmaed = scope.get_unique_variable_name('sigma')
-    container.add_node(
-        'ReduceSum', sigmaed0, sigmaed, axes=[1],
-        name=scope.get_unique_operator_name('ReduceSum'))
+    if container.target_opset < 13:
+        container.add_node(
+            'ReduceSum', sigmaed0, sigmaed, axes=[1],
+            name=scope.get_unique_operator_name('ReduceSum'))
+    else:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceSum', [sigmaed0, axis_name], sigmaed,
+            name=scope.get_unique_operator_name('ReduceSum'))
 
     # y_std = np.sqrt(sigmas_squared_data + (1. / self.alpha_))
     # return y_mean, y_std
