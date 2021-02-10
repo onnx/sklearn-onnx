@@ -18,8 +18,8 @@ def convert_sklearn_grid_search_cv(scope, operator, container):
     grid_search_op = operator.raw_operator
     best_estimator = grid_search_op.best_estimator_
     op_type = sklearn_operator_name_map[type(best_estimator)]
-    grid_search_operator = scope.declare_local_operator(op_type)
-    grid_search_operator.raw_operator = best_estimator
+    grid_search_operator = scope.declare_local_operator(
+        op_type, best_estimator)
     container.add_options(id(best_estimator), opts)
     grid_search_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')

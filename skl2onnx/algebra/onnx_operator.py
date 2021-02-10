@@ -123,8 +123,7 @@ class OnnxSubOperator:
                 "Unable to find a converter for model of type '{}'."
                 "".format(self.op.__class__.__name__))
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = self.op
+        this_operator = scope.declare_local_operator(op_type, self.op)
         this_operator.inputs = self.inputs
         if self.output_names is None:
             output = scope.declare_local_variable('sub_%s' % op_type)
