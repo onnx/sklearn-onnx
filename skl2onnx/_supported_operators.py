@@ -428,7 +428,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     The function does not update the parser if not specified except if
     option `'zipmap'` is added to the list. Every classifier
     must declare this option to let the default parser
-    autmatically handle that option.
+    automatically handle that option.
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
             and alias != sklearn_operator_name_map[model]):
