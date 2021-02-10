@@ -30,8 +30,7 @@ def _calculate_proba(scope, operator, container, model):
     for index, estimator in enumerate(model.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         if container.has_options(estimator, 'raw_scores'):
             container.add_options(
                 id(estimator), {'raw_scores': use_raw_scores})
@@ -184,8 +183,7 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
     proba_list = []
     for index, estimator in enumerate(bagging_op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = operator.inputs
         label_name = scope.declare_local_variable('label_%d' % index)
         this_operator.outputs.append(label_name)

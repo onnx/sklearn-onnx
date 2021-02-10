@@ -559,14 +559,15 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
-        X = 15 * np.random.rand(100, 2)
+        state = np.random.RandomState(0)
+        X = 15 * state.rand(100, 2)
         y = np.sin(X[:, 0] - X[:, 1]).ravel()
-        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        y += 0.5 * (0.5 - state.rand(X.shape[0]))
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(
             kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
             alpha=1e-7, n_restarts_optimizer=25, normalize_y=True,
-            random_state=0)
+            random_state=1)
         try:
             gp.fit(X_train, y_train)
         except (AttributeError, TypeError):

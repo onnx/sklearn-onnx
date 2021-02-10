@@ -29,7 +29,6 @@ import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnx import ModelProto
 import onnx
-
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 
 onnx_fct = OnnxAdd(
