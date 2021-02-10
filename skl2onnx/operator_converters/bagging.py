@@ -173,6 +173,7 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
     for index, estimator in enumerate(bagging_op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
         this_operator = scope.declare_local_operator(op_type, estimator)
+        this_operator.inputs = operator.inputs
         label_name = scope.declare_local_variable('label_%d' % index)
 
         features = bagging_op.estimators_features_[index]
