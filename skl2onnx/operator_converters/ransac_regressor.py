@@ -15,8 +15,7 @@ def convert_sklearn_ransac_regressor(scope, operator, container):
     """
     ransac_op = operator.raw_operator
     op_type = sklearn_operator_name_map[type(ransac_op.estimator_)]
-    this_operator = scope.declare_local_operator(op_type)
-    this_operator.raw_operator = ransac_op.estimator_
+    this_operator = scope.declare_local_operator(op_type, ransac_op.estimator_)
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label')
     this_operator.outputs.append(label_name)

@@ -180,7 +180,10 @@ class Operator(OperatorBase):
         if isinstance(raw_operator, str):
             raise RuntimeError("Parameter raw_operator must be an object not "
                                "a string '{0}'.".format(raw_operator))
-        # operator name in the converted model
+        # operator name in the converted model, if raw_operator
+        # is not None, output_shapes can be guessed
+        # from the raw model. Otherwise, it can be guessed
+        # from the input shapes.
         self.onnx_name = onnx_name
         self.scope = scope
         self.type = type
