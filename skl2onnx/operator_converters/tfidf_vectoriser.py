@@ -19,8 +19,7 @@ def convert_sklearn_tfidf_vectoriser(scope, operator, container):
     tfidf_op = operator.raw_operator
 
     op_type = sklearn_operator_name_map[CountVectorizer]
-    cv_operator = scope.declare_local_operator(op_type)
-    cv_operator.raw_operator = tfidf_op
+    cv_operator = scope.declare_local_operator(op_type, tfidf_op)
     cv_operator.inputs = operator.inputs
     cv_output_name = scope.declare_local_variable('count_vec_output')
     columns = max(operator.raw_operator.vocabulary_.values()) + 1
@@ -39,8 +38,7 @@ def convert_sklearn_tfidf_vectoriser(scope, operator, container):
     cv_operator.outputs.append(cv_output_name)
 
     op_type = sklearn_operator_name_map[TfidfTransformer]
-    tfidf_operator = scope.declare_local_operator(op_type)
-    tfidf_operator.raw_operator = tfidf_op
+    tfidf_operator = scope.declare_local_operator(op_type, tfidf_op)
     tfidf_operator.inputs.append(cv_output_name)
     tfidf_output_name = scope.declare_local_variable('tfidf_output')
     tfidf_operator.outputs.append(tfidf_output_name)

@@ -48,8 +48,7 @@ def convert_voting_classifier(scope, operator, container):
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % i)

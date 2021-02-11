@@ -6,10 +6,11 @@
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
 from ..common._apply_operation import (
-    apply_concat, apply_identity, apply_mul)
+    apply_concat, apply_identity, apply_mul, apply_reshape)
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_normalization
-from ..common._apply_operation import apply_slice, apply_sub, apply_clip
+from ..common._apply_operation import (
+    apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
 from ..common.utils_classifier import _finalize_converter_classes
 from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
@@ -33,8 +34,8 @@ def convert_one_vs_rest_classifier(scope, operator, container):
     for i, estimator in enumerate(op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(
+            op_type, raw_model=estimator)
         this_operator.inputs = operator.inputs
 
         if is_regressor(estimator):
@@ -87,8 +88,33 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         container.add_node('Sign', [scores], [signed_input],
                            name=scope.get_unique_operator_name('Sign'))
         # clip
-        apply_clip(scope, signed_input, operator.outputs[0].full_name,
-                   container, operator_name=None, max=None, min=0)
+        signed_input_cast = scope.get_unique_variable_name('signed_int64')
+        apply_cast(scope, signed_input, signed_input_cast,
+                   container, to=onnx_proto.TensorProto.INT64)
+
+        label_name = scope.get_unique_variable_name('label')
+        if container.target_opset < 11:
+            abs_name = scope.get_unique_variable_name('abs')
+            add_name = scope.get_unique_variable_name('add')
+            cst_2 = scope.get_unique_variable_name('cst2')
+            container.add_initializer(
+                cst_2, onnx_proto.TensorProto.INT64, [1], [2])
+            apply_abs(scope, [signed_input_cast], [abs_name], container)
+            apply_add(scope, [signed_input_cast, abs_name], [add_name],
+                      container)
+            apply_div(
+                scope, [add_name, cst_2], [label_name],
+                container)
+        else:
+            zero_cst = scope.get_unique_variable_name('zero')
+            container.add_initializer(
+                zero_cst, onnx_proto.TensorProto.INT64, [], [0])
+            container.add_node(
+                'Clip', [signed_input_cast, zero_cst],
+                [label_name],
+                name=scope.get_unique_operator_name('Clip'))
+        apply_reshape(scope, [label_name], [operator.outputs[0].full_name],
+                      container, desired_shape=(-1, op.n_classes_))
     else:
         # concatenates outputs
         conc_name = scope.get_unique_variable_name('concatenated')
