@@ -285,7 +285,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
     def test_bagging_regressor_max_features(self):
         model, X = fit_regression_model(
-            BaggingRegressor(max_features=0.5))
+            BaggingRegressor(max_features=0.5, n_estimators=3))
         model_onnx = convert_sklearn(
             model, "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],

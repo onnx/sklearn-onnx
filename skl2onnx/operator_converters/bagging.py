@@ -173,8 +173,6 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
     for index, estimator in enumerate(bagging_op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
         this_operator = scope.declare_local_operator(op_type, estimator)
-        this_operator.inputs = operator.inputs
-        label_name = scope.declare_local_variable('label_%d' % index)
 
         features = bagging_op.estimators_features_[index]
         if (len(features) == bagging_op.n_features_ and
@@ -194,6 +192,7 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
                 name=scope.get_unique_operator_name('GatherBG'), axis=1)
             this_operator.inputs.append(feat_name)
 
+        label_name = scope.declare_local_variable('label_%d' % index)
         this_operator.outputs.append(label_name)
         reshaped_proba_name = scope.get_unique_variable_name('reshaped_proba')
         apply_reshape(scope, label_name.onnx_name, reshaped_proba_name,
