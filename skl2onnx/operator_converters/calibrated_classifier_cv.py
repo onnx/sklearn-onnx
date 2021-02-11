@@ -259,8 +259,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                  len(base_model.classes_))
     prob_name = [None] * n_classes
 
-    this_operator = scope.declare_local_operator(op_type)
-    this_operator.raw_operator = base_model
+    this_operator = scope.declare_local_operator(op_type, base_model)
     if container.has_options(base_model, 'raw_scores'):
         container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
@@ -331,9 +330,19 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
 
         apply_concat(scope, prob_name, concatenated_prob_name,
                      container, axis=1)
-        container.add_node('ReduceSum', concatenated_prob_name,
-                           reduced_prob_name, axes=[1],
-                           name=scope.get_unique_operator_name('ReduceSum'))
+        if container.target_opset < 13:
+            container.add_node(
+                'ReduceSum', concatenated_prob_name,
+                reduced_prob_name, axes=[1],
+                name=scope.get_unique_operator_name('ReduceSum'))
+        else:
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                'ReduceSum', [concatenated_prob_name, axis_name],
+                reduced_prob_name,
+                name=scope.get_unique_operator_name('ReduceSum'))
         num, deno = _handle_zeros(scope, container, concatenated_prob_name,
                                   reduced_prob_name, n_classes)
         apply_div(scope, [num, deno],

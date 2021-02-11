@@ -24,8 +24,7 @@ def convert_sklearn_cast_regressor(scope, operator, container):
     estimator = op.estimator
 
     op_type = sklearn_operator_name_map[type(estimator)]
-    this_operator = scope.declare_local_operator(op_type)
-    this_operator.raw_operator = estimator
+    this_operator = scope.declare_local_operator(op_type, estimator)
     this_operator.inputs = operator.inputs
 
     cls = operator.inputs[0].type.__class__

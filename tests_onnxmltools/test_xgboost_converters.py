@@ -56,9 +56,7 @@ class TestXGBoostModels(unittest.TestCase):
         update_registered_converter(
             XGBRegressor, 'XGBRegressor',
             calculate_linear_regressor_output_shapes,
-            convert_xgboost,
-            options={'zipmap': [True, False, 'columns'],
-                     'nocl': [True, False]})
+            convert_xgboost)
 
     def test_xgb_regressor(self):
         iris = load_iris()

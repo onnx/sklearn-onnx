@@ -422,6 +422,11 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
                                     convert_sklearn_random_forest_classifier,
                                     options={'zipmap': [True, False, 'columns'],
                                              'raw_scores': [True, False]})
+
+    The function does not update the parser if not specified except if
+    option `'zipmap'` is added to the list. Every classifier
+    must declare this option to let the default parser
+    automatically handle that option.
     """ # noqa
     if (not overwrite and model in sklearn_operator_name_map
             and alias != sklearn_operator_name_map[model]):
@@ -434,6 +439,10 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
+    if options is not None and 'zipmap' in options:
+        from ._parse import (
+            _parse_sklearn_classifier, update_registered_parser)
+        update_registered_parser(model, _parse_sklearn_classifier)
 
 
 def _get_sklearn_operator_name(model_type):
