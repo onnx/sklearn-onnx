@@ -15,6 +15,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType, FloatTensorType,
     Int64TensorType, StringTensorType)
+from test_utils import TARGET_OPSET
 
 
 def _column_tranformer_fitted_from_df(data):
@@ -116,7 +117,8 @@ class TestSklearnPipeline(unittest.TestCase):
         itypes = set(_[1].__class__ for _ in initial_types)
         self.assertIn(BooleanTensorType, itypes)
         self.assertIn(FloatTensorType, itypes)
-        onx = convert_sklearn(model, initial_types=initial_types)
+        onx = convert_sklearn(model, initial_types=initial_types,
+                              target_opset=TARGET_OPSET)
 
         session = rt.InferenceSession(onx.SerializeToString())
 

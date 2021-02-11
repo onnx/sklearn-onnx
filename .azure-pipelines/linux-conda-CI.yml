@@ -13,17 +13,37 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py37-Onnx170-RtTST-Skl0232:
+      Py38-Onnx181-Rtn-Skl0240:
         do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.19'
-        onnx.version: '==1.7.0'
+        python.version: '3.8'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.8.1'
         onnx.target_opset: ''
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.2'
+        sklearn.version: '==0.24.0'
         onnxcc.version: 'git'
         run.example: '1'
-      Py37-Onnx170-Rt152-Skl0232:
+      Py38-Onnx181-Rt160-Skl0240:
+        do.bench: '0'
+        python.version: '3.8'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.8.1'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.24.0'
+        onnxcc.version: 'git'
+        run.example: '1'
+      Py38-Onnx170-Rt160-Skl0240:
+        do.bench: '0'
+        python.version: '3.8'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.7.0'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.24.0'
+        onnxcc.version: 'git'
+        run.example: '1'
+      Py37-Onnx170-Rt151-Skl0232:
         do.bench: '0'
         python.version: '3.7'
         numpy.version: '>=1.18.1'
@@ -132,32 +152,6 @@ jobs:
         onnxcc.version: '==1.6.1'
         sklearn.version: '==0.20.3'
         run.example: '0'
-      Py35-Onnx150-Rt021-Skl0192:
-        do.bench: '0'
-        python.version: '3.5'
-        numpy.version: '<=1.16.5'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.2.1'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.19.2'
-        run.example: '0'
-      Py37-Onnx160-Sk0213:
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.7.0'
-      Py37-Onnx150:
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.7.0'
     maxParallel: 3
 
   steps:
