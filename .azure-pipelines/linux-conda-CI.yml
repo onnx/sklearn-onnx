@@ -258,7 +258,8 @@ jobs:
 
   - script: |
       conda install -c conda-forge lightgbm xgboost --no-deps
-      pip install --no-deps onnxmltools xgboost lightgbm  # git+https://github.com/onnx/onnxmltools.git
+      pip install xgboost lightgbm
+      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
 
   - script: |
