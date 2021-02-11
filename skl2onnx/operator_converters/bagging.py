@@ -8,10 +8,8 @@ import numpy as np
 from .._supported_operators import sklearn_operator_name_map
 from ..common._apply_operation import (
     apply_cast, apply_concat,
-    apply_div, apply_reshape,
-)
+    apply_div, apply_reshape)
 from ..common._registration import register_converter
-from ..common._topology import FloatTensorType
 from ..proto import onnx_proto
 
 
@@ -34,11 +32,29 @@ def _calculate_proba(scope, operator, container, model):
         if container.has_options(estimator, 'raw_scores'):
             container.add_options(
                 id(estimator), {'raw_scores': use_raw_scores})
-        this_operator.inputs = operator.inputs
 
         label_name = scope.declare_local_variable('label_%d' % index)
-        proba_name = scope.declare_local_variable('proba_%d' % index,
-                                                  FloatTensorType())
+        proba_name = scope.declare_local_variable(
+            'proba_%d' % index, operator.inputs[0].type.__class__())
+
+        features = model.estimators_features_[index]
+        if (len(features) == model.n_features_ and
+                list(features) == list(range(model.n_features_))):
+            this_operator.inputs = operator.inputs
+        else:
+            # subset of features
+            feat_name = scope.declare_local_variable(
+                'fsel_%d' % index, operator.inputs[0].type.__class__())
+            index_name = scope.get_unique_variable_name('index_name')
+            container.add_initializer(
+                index_name, onnx_proto.TensorProto.INT64,
+                (len(features), ), list(features))
+            container.add_node(
+                'Gather', [operator.inputs[0].full_name, index_name],
+                [feat_name.full_name],
+                name=scope.get_unique_operator_name('GatherBG'), axis=1)
+            this_operator.inputs.append(feat_name)
+
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(proba_name)
         proba_output_name = (proba_name.onnx_name if has_proba
@@ -104,20 +120,6 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
                 operator.raw_operator.__class__.__name__))
 
     bagging_op = operator.raw_operator
-    if (not (isinstance(bagging_op.max_features, float) and
-             bagging_op.max_features == 1.0)):
-        raise NotImplementedError(
-            "Not default values for max_features is "
-            "not supported with BaggingClassifier yet. "
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues")
-    if bagging_op.bootstrap_features:
-        raise NotImplementedError(
-            "bootstrap_features=True is "
-            "not supported with BaggingClassifier yet. "
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues")
-
     classes = bagging_op.classes_
     output_shape = (-1,)
     classes_name = scope.get_unique_variable_name('classes')
@@ -167,30 +169,36 @@ def convert_sklearn_bagging_regressor(scope, operator, container):
     Converter for BaggingRegressor.
     """
     bagging_op = operator.raw_operator
-    if (not (isinstance(bagging_op.max_features, float) and
-             bagging_op.max_features == 1.0)):
-        raise NotImplementedError(
-            "Not default values for max_features is "
-            "not supported with BaggingRegressor yet. "
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues")
-    if bagging_op.bootstrap_features:
-        raise NotImplementedError(
-            "bootstrap_features=True is "
-            "not supported with BaggingRegressor yet. "
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues")
     proba_list = []
     for index, estimator in enumerate(bagging_op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
         this_operator = scope.declare_local_operator(op_type, estimator)
-        this_operator.inputs = operator.inputs
+
+        features = bagging_op.estimators_features_[index]
+        if (len(features) == bagging_op.n_features_ and
+                list(features) == list(range(bagging_op.n_features_))):
+            this_operator.inputs = operator.inputs
+        else:
+            # subset of features
+            feat_name = scope.declare_local_variable(
+                'fsel_%d' % index, operator.inputs[0].type.__class__())
+            index_name = scope.get_unique_variable_name('index_name')
+            container.add_initializer(
+                index_name, onnx_proto.TensorProto.INT64,
+                (len(features), ), list(features))
+            container.add_node(
+                'Gather', [operator.inputs[0].full_name, index_name],
+                [feat_name.full_name],
+                name=scope.get_unique_operator_name('GatherBG'), axis=1)
+            this_operator.inputs.append(feat_name)
+
         label_name = scope.declare_local_variable('label_%d' % index)
         this_operator.outputs.append(label_name)
         reshaped_proba_name = scope.get_unique_variable_name('reshaped_proba')
         apply_reshape(scope, label_name.onnx_name, reshaped_proba_name,
                       container, desired_shape=(1, -1, 1))
         proba_list.append(reshaped_proba_name)
+
     merged_proba_name = scope.get_unique_variable_name('merged_proba')
     apply_concat(scope, proba_list,
                  merged_proba_name, container, axis=0)
