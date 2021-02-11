@@ -123,8 +123,7 @@ class OnnxSubOperator:
                 "Unable to find a converter for model of type '{}'."
                 "".format(self.op.__class__.__name__))
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = self.op
+        this_operator = scope.declare_local_operator(op_type, self.op)
         this_operator.inputs = self.inputs
         if self.output_names is None:
             output = scope.declare_local_variable('sub_%s' % op_type)
@@ -255,7 +254,14 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
-            self.op_version = self.since_version
+            if self.__class__.__name__ not in {
+                    'OnnxScan', 'OnnxLoop', 'OnnxIf'}:
+                # TODO: the minimum opset depends on embedded graph
+                # by default, it takes the given op_version but the
+                # optimal value could be lower.
+                self.op_version = self.since_version
+            if self.op_version is None:
+                self.op_version = self.since_version
 
         if (self.op_version is not None and
                 self.op_version < self.since_version):
@@ -310,11 +316,12 @@ class OnnxOperator:
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or
                     len(self.inputs) > self.input_range[1]):
-                raise RuntimeError("Operator '{}' expects a number of inputs "
-                                   "in [{}, {}] not {}".format(
-                                       self.operator_name,
-                                       *self.input_range,
-                                       len(self.inputs)))
+                raise RuntimeError(
+                    "Operator '{}' expects a number of inputs "
+                    "in [{}, {}] not {} (expected opset={}, "
+                    "class opset={})".format(
+                        self.operator_name, *self.input_range,
+                        len(self.inputs), op_version, self.op_version))
 
         # check output
         if (hasattr(output_names, 'outputs') and
