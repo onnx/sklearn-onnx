@@ -13,8 +13,38 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
-      Py38-Onnx180-RtTST-Skl0240:
+      Py38-Onnx181-Rtn-Skl0240:
         python.version: '3.8'
+        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.8.1'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        sklearn.version: '==0.24.0'
+      Py38-Onnx181-Rt160-Skl0240:
+        python.version: '3.8'
+        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.8.1'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: 'onnxruntime==1.6.0'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        sklearn.version: '==0.24.0'
+      Py38-Onnx170-Rt160-Skl0240:
+        python.version: '3.8'
+        # onnx.version: '-i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.7.0'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: 'onnxruntime==1.6.0'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        sklearn.version: '==0.24.0'
+      Py37-Onnx170-Rt151-Skl0232:
+        python.version: '3.7'
         # onnx.version: '-i https://test.pypi.org/simple/ onnx'
         onnx.version: 'onnx==1.8.0'
         onnx.target_opset: ''
