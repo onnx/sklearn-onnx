@@ -2,13 +2,10 @@
 Tests examples from the documentation.
 """
 import unittest
-from distutils.version import StrictVersion
 import os
 import sys
 import importlib
 import subprocess
-import numpy
-import onnxruntime
 
 
 def import_source(module_file_path, module_name):
@@ -65,6 +62,11 @@ class TestDocumentationTutorial(unittest.TestCase):
                                 'the model.') in st:
                             # onnxruntime datasets changed in master branch,
                             # still the same in released version on pypi
+                            pass
+                        elif ('Current official support for domain ai.onnx '
+                              'is till opset 12.') in st:
+                            # one example is using opset 13 but onnxruntime
+                            # only support up to opset 12.
                             pass
                         elif "'str' object has no attribute 'decode'" in st:
                             # unstable bug in scikit-learn<0.24
