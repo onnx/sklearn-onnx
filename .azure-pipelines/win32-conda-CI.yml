@@ -207,7 +207,7 @@ jobs:
   - script: |
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
-      pip install lightgbm xgboost hummingbird
+      pip install lightgbm xgboost hummingbird-ml hummingbird
       pip install --no-deps git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
 
