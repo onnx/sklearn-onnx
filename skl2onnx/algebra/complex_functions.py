@@ -8,8 +8,8 @@ import numpy as np
 from ..common.data_types import FloatTensorType, DoubleTensorType
 from .onnx_ops import (
     OnnxIdentity, OnnxScan, OnnxTranspose,
-    OnnxSub, OnnxReduceSumSquare, OnnxSqueeze,
-    OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSum
+    OnnxSub, OnnxReduceSumSquare, OnnxSqueezeApi11,
+    OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSumApi11
 )
 
 
@@ -43,8 +43,8 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
                            op_version=op_version)
     norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1],
                                op_version=op_version)
-    flat = OnnxSqueeze(norm, output_names=['scan_out'], axes=[1],
-                       op_version=op_version)
+    flat = OnnxSqueezeApi11(norm, output_names=['scan_out'], axes=[1],
+                            op_version=op_version)
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
     id_next.set_onnx_name_prefix('pdistsqe')
     scan_body = id_next.to_onnx(
@@ -158,7 +158,7 @@ def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2,
     diff, id_next = _onnx_cdist_begin(op_version)
     diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
                        np.array([p], dtype=dtype), op_version=op_version)
-    norm = OnnxReduceSum(
+    norm = OnnxReduceSumApi11(
         diff_pow, axes=[1], output_names=['norm'],
         keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
@@ -174,7 +174,7 @@ def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None,
     """
     diff, id_next = _onnx_cdist_begin(op_version)
     diff_pow = OnnxAbs(diff, op_version=op_version)
-    norm = OnnxReduceSum(diff_pow, axes=[1], output_names=[
+    norm = OnnxReduceSumApi11(diff_pow, axes=[1], output_names=[
                          'norm'], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,

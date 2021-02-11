@@ -43,10 +43,11 @@ try:
 except ImportError:
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
-        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
+        13: 7
     }
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 12}
+OPSET_ML_TO_OPSET = {1: 11, 2: 13}
 
 
 class Variable:
@@ -179,7 +180,10 @@ class Operator(OperatorBase):
         if isinstance(raw_operator, str):
             raise RuntimeError("Parameter raw_operator must be an object not "
                                "a string '{0}'.".format(raw_operator))
-        # operator name in the converted model
+        # operator name in the converted model, if raw_operator
+        # is not None, output_shapes can be guessed
+        # from the raw model. Otherwise, it can be guessed
+        # from the input shapes.
         self.onnx_name = onnx_name
         self.scope = scope
         self.type = type

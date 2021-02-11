@@ -20,7 +20,6 @@ def convert_voting_regressor(scope, operator, container):
     if not isinstance(operator.inputs[0].type,
                       (FloatTensorType, DoubleTensorType)):
         this_operator = scope.declare_local_operator('SklearnCast')
-        this_operator.raw_operator = None
         this_operator.inputs = operator.inputs
         var_name = scope.declare_local_variable('cast', FloatTensorType())
         this_operator.outputs.append(var_name)
@@ -35,8 +34,7 @@ def convert_voting_regressor(scope, operator, container):
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = estimator
+        this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = inputs
 
         var_name = scope.declare_local_variable(
