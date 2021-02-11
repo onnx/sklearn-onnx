@@ -2,13 +2,10 @@
 Tests examples from the documentation.
 """
 import unittest
-from distutils.version import StrictVersion
 import os
 import sys
 import importlib
 import subprocess
-import numpy
-import onnxruntime
 
 
 def import_source(module_file_path, module_name):
