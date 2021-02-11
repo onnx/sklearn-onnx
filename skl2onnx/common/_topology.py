@@ -15,8 +15,13 @@ from onnxconverter_common.data_types import (  # noqa
     Int64TensorType, SequenceType,  # noqa
     StringTensorType, DoubleTensorType,
     Int32TensorType, BooleanTensorType,
-    DoubleTensorType,
-)
+    DoubleTensorType)
+try:
+    from onnxconverter_common.data_types import (
+        Int8TensorType, UInt8TensorType)
+except ImportError:
+    Int8TensorType = None
+    UInt8TensorType = None
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
@@ -38,10 +43,11 @@ try:
 except ImportError:
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
-        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7
+        7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
+        13: 7
     }
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 12}
+OPSET_ML_TO_OPSET = {1: 11, 2: 13}
 
 
 class Variable:
@@ -130,6 +136,14 @@ class Variable:
                 ty = Int64TensorType(shape)
             elif elem == onnx_proto.TensorProto.INT32:
                 ty = Int32TensorType(shape)
+            elif (UInt8TensorType is not None and
+                    elem == onnx_proto.TensorProto.UINT8):
+                ty = UInt8TensorType(shape)
+            elif (Int8TensorType is not None and
+                    elem == onnx_proto.TensorProto.INT8):
+                ty = Int8TensorType(shape)
+            elif elem == 0:
+                ty = FloatTensorType(shape)
             else:
                 raise NotImplementedError(
                     "Unsupported type '{}' (elem_type={}).".format(
@@ -166,7 +180,10 @@ class Operator(OperatorBase):
         if isinstance(raw_operator, str):
             raise RuntimeError("Parameter raw_operator must be an object not "
                                "a string '{0}'.".format(raw_operator))
-        # operator name in the converted model
+        # operator name in the converted model, if raw_operator
+        # is not None, output_shapes can be guessed
+        # from the raw model. Otherwise, it can be guessed
+        # from the input shapes.
         self.onnx_name = onnx_name
         self.scope = scope
         self.type = type

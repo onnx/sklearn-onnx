@@ -351,7 +351,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             tensor.raw_data = content.raw_data
             tensor.dims.extend(content.dims)
         elif shape is None and isinstance(
-                content, (np.float32, np.float64, np.int32, np.int64, float)):
+                content, (np.float32, np.float64, np.int32, np.int64,
+                          float, np.int8, np.uint8)):
             tensor = make_tensor(name, onnx_type, [], [content])
         elif (SparseTensorProto is not None and
                 isinstance(content, SparseTensorProto)):
@@ -513,8 +514,11 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         dtypes = set()
         for k, v in attrs.items():
             if v is None:
-                raise ValueError('Failed to create ONNX node. Undefined '
-                                 'attribute pair (%s, %s) found' % (k, v))
+                raise ValueError(
+                    'Failed to create ONNX node. Undefined '
+                    'attribute pair (%s, %s) found for type %r and '
+                    'version %r' % (
+                        k, v, op_type, op_version))
             if isinstance(v, np.ndarray):
                 upd[k] = v
                 dtypes.add(v.dtype)

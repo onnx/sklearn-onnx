@@ -33,6 +33,12 @@ class OnnxOperatorItem:
         self.onx_op = onx_op
         self.index = index
 
+    def __str__(self):
+        """
+        usual
+        """
+        return "%s[%d]" % (str(self.onx_op), self.index)
+
     def get_latest_tested_opset_version(self):
         """
         Returns ``get_latest_tested_opset_version()``
@@ -117,8 +123,7 @@ class OnnxSubOperator:
                 "Unable to find a converter for model of type '{}'."
                 "".format(self.op.__class__.__name__))
 
-        this_operator = scope.declare_local_operator(op_type)
-        this_operator.raw_operator = self.op
+        this_operator = scope.declare_local_operator(op_type, self.op)
         this_operator.inputs = self.inputs
         if self.output_names is None:
             output = scope.declare_local_variable('sub_%s' % op_type)
@@ -186,6 +191,12 @@ class OnnxOperator:
         def ConstantValue(self):
             return self.value
 
+        def __str__(self):
+            """
+            usual
+            """
+            return "Cst({})".format(self.value)
+
     def find_schema(self, op_version):
         """
         Checks if there is an existing schema for a
@@ -243,7 +254,14 @@ class OnnxOperator:
             self.expected_outputs = self.__class__.expected_outputs
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
-            self.op_version = self.since_version
+            if self.__class__.__name__ not in {
+                    'OnnxScan', 'OnnxLoop', 'OnnxIf'}:
+                # TODO: the minimum opset depends on embedded graph
+                # by default, it takes the given op_version but the
+                # optimal value could be lower.
+                self.op_version = self.since_version
+            if self.op_version is None:
+                self.op_version = self.since_version
 
         if (self.op_version is not None and
                 self.op_version < self.since_version):
@@ -282,7 +300,8 @@ class OnnxOperator:
                                       OnnxOperator.ConstantVariable)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.int64, np.float32,
-                                      np.float64, np.bool)):
+                                      np.float64, np.bool,
+                                      np.int8, np.uint8)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (float, )):
                     self.inputs.append(np.float64(inp))
@@ -297,11 +316,12 @@ class OnnxOperator:
         if self.inputs is not None:
             if (len(self.inputs) < self.input_range[0] or
                     len(self.inputs) > self.input_range[1]):
-                raise RuntimeError("Operator '{}' expects a number of inputs "
-                                   "in [{}, {}] not {}".format(
-                                       self.operator_name,
-                                       *self.input_range,
-                                       len(self.inputs)))
+                raise RuntimeError(
+                    "Operator '{}' expects a number of inputs "
+                    "in [{}, {}] not {} (expected opset={}, "
+                    "class opset={})".format(
+                        self.operator_name, *self.input_range,
+                        len(self.inputs), op_version, self.op_version))
 
         # check output
         if (hasattr(output_names, 'outputs') and
@@ -327,6 +347,16 @@ class OnnxOperator:
                                         i, type(name)))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
+
+    def __str__(self):
+        """
+        usual
+        """
+        return "{}({} in) -> {}".format(
+            self.__class__.__name__,
+            len(self.inputs) if self.inputs is not None else 0,
+            [str(o) for o in self.output_names]
+            if self.output_names is not None else "?")
 
     def set_onnx_name_prefix(self, onnx_prefix_name):
         """
@@ -501,6 +531,16 @@ class OnnxOperator:
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 **kwargs)
             self.state.run(operator=operator)
+        self._verify_add_to_()
+
+    def _verify_add_to_(self):
+        if self.state is None:
+            raise RuntimeError(
+                "Graph was not produced for operator '{}': {}."
+                "".format(self.__class__.__name__, self))
+        for i in self.inputs:
+            if hasattr(i, '_verify_add_to_'):
+                i._verify_add_to_()
 
     @property
     def outputs(self):
@@ -605,6 +645,8 @@ class OnnxOperator:
 
         # infer shapes
         if outputs:
+            if isinstance(outputs, dict):
+                outputs = [(k, v) for k, v in outputs.items()]
             shapes = []
             for o in outputs:
                 if isinstance(o, Variable):
