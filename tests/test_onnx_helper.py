@@ -16,6 +16,7 @@ from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs,
     change_onnx_domain
 )
+from test_utils import TARGET_OPSET
 
 
 def one_hot_encoder_supports_string():
@@ -41,7 +42,8 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "binarizer",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         filename = "temp_onnx_helper_load_save.onnx"
         save_onnx_model(model_onnx, filename)
         model = load_onnx_model(filename)
@@ -68,7 +70,8 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         filename = "temp_onnx_helper_load_save.onnx"
         save_onnx_model(model_onnx, filename)
         model = load_onnx_model(filename)
@@ -93,7 +96,8 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         meta = {'pA': 'one', 'pB': 'two'}
         onnx.helper.set_model_props(model_onnx, meta)
         new_model = select_model_inputs_outputs(model_onnx, "variable")

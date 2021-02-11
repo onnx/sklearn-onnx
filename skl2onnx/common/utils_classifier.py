@@ -35,8 +35,14 @@ def get_label_classes(scope, op, node_names=False):
                 classes = np.array(['s%s' % c for c in clnames])
         else:
             classes = op.classes_
-    else:
+    elif hasattr(op, 'classes_'):
         classes = op.classes_
+    elif hasattr(op, 'intercept_'):
+        classes = len(op.intercept_)
+    else:
+        raise RuntimeError(
+            "No known ways to retrieve the number of classes for class %r."
+            "" % type(op))
     return classes
 
 
