@@ -48,7 +48,8 @@ class TestShapes(unittest.TestCase):
         clr = RandomForestClassifier(max_depth=1)
         clr.fit(X_train, y_train)
         initial_type = [('float_input', FloatTensorType([None, 4]))]
-        onx = convert_sklearn(clr, initial_types=initial_type)
+        onx = convert_sklearn(clr, initial_types=initial_type,
+                              options={id(clr): {'zipmap': False}})
         sess = rt.InferenceSession(onx.SerializeToString())
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
@@ -69,7 +70,10 @@ class TestShapes(unittest.TestCase):
         else:
             dims = ishape.graph.output[0].type.tensor_type.shape.dim
             oshape = [d.dim_value for d in dims]
-        assert oshape in (None, [0, 1])
+            self.assertIn(oshape, (None, [0]))
+            dims = ishape.graph.output[1].type.tensor_type.shape.dim
+            oshape = [d.dim_value for d in dims]
+            self.assertIn(oshape, (None, [0, 3]))
 
 
 if __name__ == "__main__":
