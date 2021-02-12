@@ -32,7 +32,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.24.0'
         onnxcc.version: 'git'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx170-Rt151-Skl0232:
         do.bench: '0'
         python.version: '3.7'
@@ -42,7 +42,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.5.1'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx170-Rt140-Skl0232:
         do.bench: '0'
         python.version: '3.7'
@@ -299,6 +299,8 @@ jobs:
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
       python setup.py install
+      pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
+      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
