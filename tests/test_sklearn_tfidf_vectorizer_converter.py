@@ -575,6 +575,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert all(res[-3:].ravel() == 0)
 
     @unittest.skipIf(
+        apply_less is None, reason="onnxconverter-common too old")
+    @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
     @unittest.skipIf(
