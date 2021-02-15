@@ -85,7 +85,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_float(self):
-        for opset in [11, 12, TARGET_OPSET]:
+        for opset in [12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
@@ -107,8 +107,32 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion('1.3.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
+    def test_ovr_rf_multilabel_float_11(self):
+        for opset in [9, 10, 11]:
+            if opset > TARGET_OPSET:
+                continue
+            with self.subTest(opset=opset):
+                model = OneVsRestClassifier(
+                    RandomForestClassifier(n_estimators=2, max_depth=3))
+                model, X = fit_multilabel_classification_model(
+                    model, 3, is_int=False, n_features=5)
+                model_onnx = convert_sklearn(
+                    model, initial_types=[
+                        ('input', FloatTensorType([None, X.shape[1]]))],
+                    target_opset=opset)
+                self.assertNotIn('"Clip"', str(model_onnx))
+                dump_data_and_model(
+                    X.astype(np.float32), model, model_onnx,
+                    basename="SklearnOVRRFMultiLabelFloat%d" % opset)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
+    @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_int(self):
-        for opset in [11, 12, TARGET_OPSET]:
+        for opset in [12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
@@ -120,6 +144,30 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     model, initial_types=[
                         ('input', Int64TensorType([None, X.shape[1]]))],
                     target_opset=opset)
+                dump_data_and_model(
+                    X.astype(np.int64), model, model_onnx,
+                    basename="SklearnOVRRFMultiLabelInt64%d" % opset)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        reason="onnxruntime too old")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_ovr_rf_multilabel_int_11(self):
+        for opset in [9, 10, 11]:
+            if opset > TARGET_OPSET:
+                continue
+            with self.subTest(opset=opset):
+                model = OneVsRestClassifier(
+                    RandomForestClassifier(n_estimators=2, max_depth=3))
+                model, X = fit_multilabel_classification_model(
+                    model, 3, is_int=True, n_features=5)
+                model_onnx = convert_sklearn(
+                    model, initial_types=[
+                        ('input', Int64TensorType([None, X.shape[1]]))],
+                    target_opset=opset)
+                self.assertNotIn('"Clip"', str(model_onnx))
                 dump_data_and_model(
                     X.astype(np.int64), model, model_onnx,
                     basename="SklearnOVRRFMultiLabelInt64%d" % opset)
