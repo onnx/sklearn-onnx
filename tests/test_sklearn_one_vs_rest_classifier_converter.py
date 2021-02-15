@@ -85,7 +85,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_float(self):
-        for opset in [9, 12, TARGET_OPSET]:
+        for opset in [11, 12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
@@ -108,7 +108,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_int(self):
-        for opset in [9, 12, TARGET_OPSET]:
+        for opset in [11, 12, TARGET_OPSET]:
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
