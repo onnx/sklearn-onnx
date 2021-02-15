@@ -13,6 +13,16 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
+      Py38-OnnxGit-Rtn-Skl0240:
+        do.bench: '0'
+        python.version: '3.8'
+        numpy.version: '>=1.18.1'
+        onnx.version: 'git'
+        onnx.target_opset: ''
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.24.0'
+        onnxcc.version: 'git'
+        run.example: '1'
       Py38-Onnx181-Rtn-Skl0240:
         do.bench: '0'
         python.version: '3.8'
