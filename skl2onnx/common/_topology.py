@@ -44,7 +44,7 @@ except ImportError:
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7
+        13: 7, 14: 7
     }
 
 OPSET_ML_TO_OPSET = {1: 11, 2: 13}
