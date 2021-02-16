@@ -21,7 +21,7 @@ from ..algebra.onnx_ops import (
     OnnxTreeEnsembleRegressor, OnnxLog,
     OnnxCast, OnnxLess, OnnxLabelEncoder, OnnxMul,
     OnnxGreater, OnnxAdd, OnnxDiv, OnnxSum, OnnxNeg,
-    OnnxReshape, OnnxEqual, OnnxPow, OnnxGather, OnnxMax)
+    OnnxReshapeApi13, OnnxEqual, OnnxPow, OnnxGather, OnnxMax)
 
 
 def convert_sklearn_isolation_forest(
@@ -75,7 +75,7 @@ def convert_sklearn_isolation_forest(
         values = [float(_[1]) for _ in ordered]
         if any(map(lambda i: int(i[0]) != i[0], ordered)):
             keys = [float(_[0]) for _ in ordered]
-            node_sample = OnnxReshape(
+            node_sample = OnnxReshapeApi13(
                 OnnxLabelEncoder(
                     leave, op_version=opvml,
                     keys_floats=keys, values_floats=values),
@@ -84,7 +84,7 @@ def convert_sklearn_isolation_forest(
         else:
             keys = [int(_[0]) for _ in ordered]
             values = [float(_[1]) for _ in ordered]
-            node_sample = OnnxReshape(
+            node_sample = OnnxReshapeApi13(
                 OnnxLabelEncoder(
                     OnnxCast(leave, op_version=opv,
                              to=onnx_proto.TensorProto.INT64),
@@ -101,7 +101,7 @@ def convert_sklearn_isolation_forest(
         if any(map(lambda i: int(i[0]) != i[0], ordered)):
             keys = [float(_[0]) for _ in ordered]
             values = [float(_[1]) for _ in ordered]
-            path_length = OnnxReshape(
+            path_length = OnnxReshapeApi13(
                 OnnxLabelEncoder(
                     leave, op_version=opvml,
                     keys_floats=keys, values_floats=values),
@@ -109,7 +109,7 @@ def convert_sklearn_isolation_forest(
                 op_version=opv)
         else:
             keys = [int(_[0]) for _ in ordered]
-            path_length = OnnxReshape(
+            path_length = OnnxReshapeApi13(
                 OnnxLabelEncoder(
                     OnnxCast(leave, op_version=opv,
                              to=onnx_proto.TensorProto.INT64),

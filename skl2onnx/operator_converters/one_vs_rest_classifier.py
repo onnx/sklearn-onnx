@@ -93,7 +93,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                    container, to=onnx_proto.TensorProto.INT64)
 
         label_name = scope.get_unique_variable_name('label')
-        if container.target_opset < 11:
+        if container.target_opset <= 11:
             abs_name = scope.get_unique_variable_name('abs')
             add_name = scope.get_unique_variable_name('add')
             cst_2 = scope.get_unique_variable_name('cst2')
