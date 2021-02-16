@@ -25,7 +25,7 @@ from ..algebra.onnx_ops import (
     OnnxReciprocal,
     OnnxReduceMean,
     OnnxReduceSumApi11,
-    OnnxReshape,
+    OnnxReshapeApi13,
     OnnxShape,
     OnnxSqueezeApi11,
     OnnxSub,
@@ -293,7 +293,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
         flattened = OnnxFlatten(top_indices, op_version=opv)
         extracted = OnnxArrayFeatureExtractor(
             training_labels, flattened, op_version=opv)
-        reshaped = OnnxReshape(extracted, shape, op_version=opv)
+        reshaped = OnnxReshapeApi13(extracted, shape, op_version=opv)
 
         if ndim > 1:
             reshaped = OnnxTranspose(reshaped, op_version=opv, perm=[1, 0, 2])
@@ -371,8 +371,8 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
 
             res = OnnxReduceSumApi11(weighted, axes=[axis], op_version=opv,
                                      keepdims=0)
-            norm2 = OnnxReshape(norm, np.array([-1, 1], dtype=np.int64),
-                                op_version=opv)
+            norm2 = OnnxReshapeApi13(norm, np.array([-1, 1], dtype=np.int64),
+                                     op_version=opv)
             res = OnnxDiv(res, norm2, op_version=opv, output_names=out)
         else:
             weighted = OnnxMul(reshaped_cast, wei, op_version=opv)
@@ -381,14 +381,14 @@ def convert_nearest_neighbors_regressor(scope, operator, container):
             res.set_onnx_name_prefix('final')
             if opv >= 12:
                 shape = OnnxShape(res, op_version=opv)
-                norm = OnnxReshape(norm, shape, op_version=opv)
+                norm = OnnxReshapeApi13(norm, shape, op_version=opv)
                 norm.set_onnx_name_prefix('normr')
             if opv >= 12:
                 res = OnnxDiv(res, norm, op_version=opv, output_names=out)
             else:
                 res = OnnxDiv(res, norm, op_version=opv)
-                res = OnnxReshape(res, np.array([-1, 1], dtype=np.int64),
-                                  output_names=out, op_version=opv)
+                res = OnnxReshapeApi13(res, np.array([-1, 1], dtype=np.int64),
+                                       output_names=out, op_version=opv)
     else:
         if (hasattr(operator.raw_operator, '_y') and
                 len(np.squeeze(operator.raw_operator._y).shape) == 1):
@@ -480,9 +480,9 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
             res_name = OnnxArrayFeatureExtractor(
                 cur_class, res, op_version=opv)
             res_name.set_onnx_name_prefix('div%d' % index)
-            reshaped_labels = OnnxReshape(
+            reshaped_labels = OnnxReshapeApi13(
                 res_name, np.array([-1, 1], dtype=np.int64), op_version=opv)
-            reshaped_probas = OnnxReshape(
+            reshaped_probas = OnnxReshapeApi13(
                 probas, np.array([1, -1, len(cur_class)], dtype=np.int64),
                 op_version=opv)
             out_labels.append(reshaped_labels)
@@ -506,8 +506,8 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
         if is_integer:
             res_name = OnnxCast(
                 res_name, to=onnx_proto.TensorProto.INT64, op_version=opv)
-        out_labels = OnnxReshape(res_name, np.array([-1], dtype=np.int64),
-                                 output_names=out[:1], op_version=opv)
+        out_labels = OnnxReshapeApi13(res_name, np.array([-1], dtype=np.int64),
+                                      output_names=out[:1], op_version=opv)
         out_labels.set_onnx_name_prefix('blab')
         out_labels.add_to(scope, container)
         probas.add_to(scope, container)
@@ -555,7 +555,7 @@ def convert_k_neighbours_transformer(scope, operator, container):
         operator, container, k=k)
     top_indices, top_dist = many[:2]
     top_dist = (
-        OnnxReshape(
+        OnnxReshapeApi13(
             OnnxMul(top_dist, np.array([-1], dtype=dtype),
                     op_version=op_version),
             np.array([-1, 1, k], dtype=np.int64),
@@ -564,7 +564,7 @@ def convert_k_neighbours_transformer(scope, operator, container):
     fit_samples_indices = np.array(
         np.arange(transformer_op.n_samples_fit_).reshape((1, -1, 1)),
         dtype=np.int64)
-    reshaped_ind = OnnxReshape(
+    reshaped_ind = OnnxReshapeApi13(
         top_indices, np.array([-1, 1, k], dtype=np.int64),
         op_version=op_version)
     comparison_res = OnnxCast(
@@ -688,7 +688,7 @@ def convert_knn_imputer(scope, operator, container):
     flattened = OnnxFlatten(top_indices, op_version=op_version)
     extracted = OnnxArrayFeatureExtractor(
         training_data.T, flattened, op_version=op_version)
-    reshaped = OnnxReshape(
+    reshaped = OnnxReshapeApi13(
         extracted, np.array([training_data.shape[1], -1, knn_op.n_neighbors],
                             dtype=np.int64),
         op_version=op_version)
