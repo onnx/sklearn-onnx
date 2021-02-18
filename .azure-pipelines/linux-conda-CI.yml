@@ -31,7 +31,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.24.0'
-        onnxcc.version: 'git'
+        onnxcc.version: '==1.7.0'
         run.example: '0'
       Py37-Onnx170-Rt151-Skl0232:
         do.bench: '0'
@@ -41,7 +41,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.5.1'
         sklearn.version: '==0.23.2'
-        onnxcc.version: 'git'
+        onnxcc.version: '==1.7.0'
         run.example: '0'
       Py37-Onnx170-Rt140-Skl0232:
         do.bench: '0'
@@ -51,7 +51,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.4.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.23.2'
-        onnxcc.version: 'git'
+        onnxcc.version: '==1.7.0'
         run.example: '0'
       Py37-Onnx170-Rt130-Skl0231:
         do.bench: '0'
@@ -70,7 +70,7 @@ jobs:
         onnx.version: '==1.7.0'
         onnx.target_opset: '11'
         onnxrt.version: 'onnxruntime==1.2.0'
-        onnxcc.version: 'git'
+        onnxcc.version: '==1.7.0'
         sklearn.version: '==0.23.0'
         run.example: '0'
       Py37-Onnx160-Rt120-Skl0230:
