@@ -7,6 +7,8 @@
 import unittest
 import numbers
 import numpy as np
+from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 from sklearn.datasets import load_iris
 from skl2onnx import update_registered_converter, convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
@@ -29,7 +31,7 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
-from test_utils import dump_binary_classification, dump_multiple_classification
+from test_utils import dump_multiple_classification
 
 
 class TestXGBoostModels(unittest.TestCase):
@@ -72,18 +74,20 @@ class TestXGBoostModels(unittest.TestCase):
         dump_single_regression(xgb, suffix="-Dec4")
 
     def test_xgb_classifier(self):
+        xgb = XGBClassifier(n_estimators=2, max_depth=2)
         iris = load_iris()
         X = iris.data[:, :2]
         y = iris.target
         y[y == 2] = 0
-
-        xgb = XGBClassifier(n_estimators=3)
         xgb.fit(X, y)
         conv_model = convert_sklearn(
             xgb, initial_types=[
-                ('input', FloatTensorType(shape=[None, X.shape[1]]))])
-        self.assertTrue(conv_model is not None)
-        dump_binary_classification(xgb, label_string=False)
+                ('input', FloatTensorType(shape=[None, X.shape[1]]))],
+            options={id(xgb): {'zipmap': False}})
+        sess = InferenceSession(conv_model.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        assert_almost_equal(xgb.predict_proba(X), res[1])
+        assert_almost_equal(xgb.predict(X), res[0])
 
     def test_xgb_classifier_multi(self):
         iris = load_iris()
@@ -121,14 +125,17 @@ class TestXGBoostModels(unittest.TestCase):
         X = iris.data[:, :2]
         y = iris.target
         y[y == 2] = 0
-
-        xgb = XGBClassifier(objective='reg:logistic')
+        xgb = XGBClassifier(objective='binary:logistic')
         xgb.fit(X, y)
         conv_model = convert_sklearn(
             xgb, initial_types=[
-                ('input', FloatTensorType(shape=[None, X.shape[1]]))])
+                ('input', FloatTensorType(shape=[None, X.shape[1]]))],
+            options={id(xgb): {'zipmap': False}})
         self.assertTrue(conv_model is not None)
-        dump_binary_classification(xgb, suffix="RegLog", label_string=False)
+        sess = InferenceSession(conv_model.SerializeToString())
+        res = sess.run(None, {'input': X.astype(np.float32)})
+        assert_almost_equal(xgb.predict_proba(X), res[1])
+        assert_almost_equal(xgb.predict(X), res[0])
 
 
 if __name__ == "__main__":

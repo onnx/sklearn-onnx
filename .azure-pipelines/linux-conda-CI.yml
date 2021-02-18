@@ -32,7 +32,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '==0.24.0'
         onnxcc.version: 'git'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx170-Rt151-Skl0232:
         do.bench: '0'
         python.version: '3.7'
@@ -42,7 +42,7 @@ jobs:
         onnxrt.version: 'onnxruntime==1.5.1'
         sklearn.version: '==0.23.2'
         onnxcc.version: 'git'
-        run.example: '1'
+        run.example: '0'
       Py37-Onnx170-Rt140-Skl0232:
         do.bench: '0'
         python.version: '3.7'
@@ -258,8 +258,18 @@ jobs:
 
   - script: |
       conda install -c conda-forge lightgbm xgboost --no-deps
-      pip install --no-deps onnxmltools  # git+https://github.com/onnx/onnxmltools.git
+      pip install xgboost lightgbm hummingbird-ml hummingbird
+      pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
+      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
     displayName: 'install onnxmltools'
+
+  - script: |
+      if [ '$(onnx.target_opset)' != '' ]
+      then
+        export TEST_TARGET_OPSET="$(onnx.target_opset)"
+      fi
+      pytest tests_onnxmltools --durations=0 --basetemp=temp
+    displayName: 'pytest-onnxmltools'
 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
@@ -289,6 +299,8 @@ jobs:
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
       python setup.py install
+      pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
+      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
