@@ -292,6 +292,8 @@ jobs:
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
       python setup.py install
+      pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
+      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
