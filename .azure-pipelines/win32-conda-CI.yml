@@ -31,7 +31,7 @@ jobs:
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.6.0'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        onnxcc.version: 'onnxconverter-common==1.7.0'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.0'
       Py38-Onnx170-Rt160-Skl0240:
         python.version: '3.8'
@@ -41,7 +41,7 @@ jobs:
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.6.0'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'git+https://github.com/microsoft/onnxconverter-common.git'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
         sklearn.version: '==0.24.0'
       Py37-Onnx170-Rt151-Skl0232:
         python.version: '3.7'
