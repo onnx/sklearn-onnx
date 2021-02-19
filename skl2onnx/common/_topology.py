@@ -41,7 +41,7 @@ type_fct = type
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
     assert OPSET_TO_IR_VERSION[14] is not None
-except (ImportError, KeyError, AssertionError):
+except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
