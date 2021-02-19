@@ -12,6 +12,11 @@ try:
 except ImportError:
     # Old scikit-learn
     ColumnTransformer = None
+try:
+    from ..common._apply_operation import apply_less
+except ImportError:
+    # onnxconverter-common is too old
+    apply_less = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 import onnx
@@ -505,6 +510,8 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
 
+    @unittest.skipIf(
+        apply_less is None, reason="onnxconverter-common too old")
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Requires opset 9.")
