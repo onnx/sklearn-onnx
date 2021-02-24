@@ -13,156 +13,46 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py38-OnnxGit-Rtn-Skl0240:
+      Py38-OnnxGit-Rtn-Skl0241:
         do.bench: '0'
         python.version: '3.8'
         numpy.version: '>=1.18.1'
         onnx.version: 'git'
         onnx.target_opset: '13'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
+        sklearn.version: '==0.24.1'
         onnxcc.version: '==1.7.0'  # git
         run.example: '1'
-      Py38-Onnx181-Rtn-Skl0240:
+      Py38-Onnx181-Rtn-Skl0241:
         do.bench: '0'
         python.version: '3.8'
         numpy.version: '>=1.18.1'
         onnx.version: '==1.8.1'
         onnx.target_opset: '13'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
-<<<<<<< HEAD
+        sklearn.version: '==0.24.1'
         onnxcc.version: 'git'
         run.example: '1'
-      Py38-Onnx181-Rt160-Skl0240:
-=======
-        onnxcc.version: '==1.7.0'
-        run.example: '0'
-      Py37-Onnx170-Rt151-Skl0232:
->>>>>>> 6f3952ebf84a6e4df19504f050661680bc990450
+      Py38-Onnx181-Rt160-Skl0241:
         do.bench: '0'
         python.version: '3.8'
         numpy.version: '>=1.18.1'
         onnx.version: '==1.8.1'
         onnx.target_opset: ''
-<<<<<<< HEAD
         onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
+        sklearn.version: '==0.24.1'
         onnxcc.version: 'git'
         run.example: '1'
-      Py38-Onnx170-Rt160-Skl0240:
-=======
-        onnxrt.version: 'onnxruntime==1.5.1'
-        sklearn.version: '==0.23.2'
-        onnxcc.version: '==1.7.0'
-        run.example: '0'
-      Py37-Onnx170-Rt140-Skl0232:
->>>>>>> 6f3952ebf84a6e4df19504f050661680bc990450
+      Py38-Onnx170-Rt160-Skl0241:
         do.bench: '0'
         python.version: '3.8'
         numpy.version: '>=1.18.1'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
-<<<<<<< HEAD
         onnxrt.version: 'onnxruntime==1.6.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
+        sklearn.version: '==0.24.1'
         onnxcc.version: 'git'
         run.example: '1'
-=======
-        onnxrt.version: 'onnxruntime==1.4.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.2'
-        onnxcc.version: '==1.7.0'
-        run.example: '0'
-      Py37-Onnx170-Rt130-Skl0231:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.7.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.3.0'
-        sklearn.version: '==0.23.1'
-        onnxcc.version: '==1.7.0'
-        run.example: '1'
-      Py37-Onnx170-Rt120-Skl0230-Op11:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.7.0'
-        onnx.target_opset: '11'
-        onnxrt.version: 'onnxruntime==1.2.0'
-        onnxcc.version: '==1.7.0'
-        sklearn.version: '==0.23.0'
-        run.example: '0'
-      Py37-Onnx160-Rt120-Skl0230:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.6.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.2.0'
-        sklearn.version: '==0.23.0'
-        run.example: '0'
-      Py37-Onnx160-Rt111-Skl0222:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '>=1.18.1'
-        onnx.version: '==1.6.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.1.1'
-        sklearn.version: '==0.22.2'
-        run.example: '0'
-      Py37-Onnx160-Rt100-Skl0213:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==1.0.0'
-        sklearn.version: '==0.21.3'
-        run.example: '0'
-      Py37-Onnx150-Rt050-Skl0213:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.17.4'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxcc.version: '==1.6.1'
-        onnxrt.version: 'onnxruntime==0.5.0'
-        sklearn.version: '==0.21.3'
-        run.example: '0'
-      Py37-Onnx150-Rt040-Skl0203:
-        do.bench: '0'
-        python.version: '3.7'
-        numpy.version: '==1.17.4'
-        onnx.version: '==1.5.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.4.0'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
-      Py36-Onnx141-Rt030-Skl0203:
-        do.bench: '0'
-        python.version: '3.6'
-        numpy.version: '==1.16.5'
-        onnx.version: '==1.4.1'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.3.0'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
-      Py36-Onnx130-Rt021-Skl0203:
-        do.bench: '0'
-        python.version: '3.6'
-        numpy.version: '==1.16.5'
-        onnx.version: '==1.3.0'
-        onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==0.2.1'
-        onnxcc.version: '==1.6.1'
-        sklearn.version: '==0.20.3'
-        run.example: '0'
->>>>>>> 6f3952ebf84a6e4df19504f050661680bc990450
     maxParallel: 3
 
   steps:
