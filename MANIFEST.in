@@ -10,3 +10,7 @@ include requirements.txt
 # exclude from sdist
 recursive-exclude benchmarks *
 recursive-exclude .azure-pipelines *
+recursive-exclude tests/tests_dump *
+recursive-exclude tests_onnxmltools/tests_dump *
+recursive-exclude tests/test_utils/__pycache__ *
+exclude *.onnx
