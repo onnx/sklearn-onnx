@@ -1,0 +1,12 @@
+# include
+include *.rst
+recursive-include docs *
+recursive-include tests *
+include LICENSE
+include README.md
+include MANIFEST.in
+include requirements.txt
+
+# exclude from sdist
+recursive-exclude benchmarks *
+recursive-exclude .azure-pipelines *
