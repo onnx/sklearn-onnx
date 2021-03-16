@@ -7,7 +7,6 @@ include README.md
 include MANIFEST.in
 include requirements.txt
 
-
 # exclude from sdist
 recursive-exclude benchmarks *
 recursive-exclude .azure-pipelines *
