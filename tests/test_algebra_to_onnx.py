@@ -26,7 +26,8 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                      reason="not available")
     def test_onnx_ml(self):
         def generate_onnx_graph(opv):
-            node = OnnxAdd('X1', np.array([0.1], dtype=np.float32),
+            node = OnnxAdd(('X1', FloatTensorType()),
+                           np.array([0.1], dtype=np.float32),
                            op_version=opv)
             out = OnnxLinearRegressor(
                 node, coefficients=[0.3, 0.3, 0.4, 0.5, 0.6],
@@ -35,7 +36,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
             onx = last.to_onnx([('X1', FloatTensorType((None, 5)))],
                                outputs=[('Y', FloatTensorType())],
                                target_opset=opv)
-            return onx
+            return onx, (node, out, last)
 
         for opv in ({'': 10}, 9, 10, 11, 12, TARGET_OPSET):
             if isinstance(opv, dict):
@@ -44,7 +45,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
             elif opv is not None and opv > get_latest_tested_opset_version():
                 continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
-                onx = generate_onnx_graph(opv=opv)
+                onx, nodes = generate_onnx_graph(opv=opv)
                 if opv == {'': 10}:
                     for im in onx.opset_import:
                         if im.version > 10:
@@ -75,12 +76,21 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                 assert len(res_out) == 1
                 res = res_out[0]
                 self.assertEqual(res.shape, (1, 1))
+                inputs = None
+                expected = [[('C0', FloatTensorType(shape=[]))],
+                            [('Y0', FloatTensorType(shape=[]))],
+                            [('output0', FloatTensorType(shape=[]))]]
+                for i, node in enumerate(nodes):
+                    shape = node.get_type_inference(inputs)
+                    self.assertEqual(str(expected[i]), str(shape))
+                    inputs = shape
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
     def test_sub_graph(self):
         def generate_onnx_graph(opv):
-            node = OnnxAdd('X1', np.array([0.1], dtype=np.float32),
+            node = OnnxAdd(('X1', FloatTensorType()),
+                           np.array([0.1], dtype=np.float32),
                            op_version=opv)
             lr = LinearRegression()
             lr.fit(np.ones([10, 5]), np.arange(0, 10))

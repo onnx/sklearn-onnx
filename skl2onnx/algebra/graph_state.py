@@ -204,8 +204,8 @@ class GraphState:
             if isinstance(inp, Variable):
                 new_inputs.append(inputs)
                 continue
-            if hasattr(inp, 'get_shape_inference'):
-                new_inputs.extend(inp.get_shape_inference())
+            if hasattr(inp, 'get_type_inference'):
+                new_inputs.extend(inp.get_type_inference())
                 continue
             raise TypeError(
                 "Unable to infer shape of inputs %r (type is %r)"

@@ -7,6 +7,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from onnxconverter_common.onnx_ops import apply_identity
 from ..proto import TensorProto
+from ..common.data_types import _guess_type_proto_str
 from ..common._topology import (
     Variable, Scope, _update_domain_version,
     _get_main_opset_version, OPSET_TO_IR_VERSION)
@@ -577,7 +578,7 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
-    def get_shape_inference(self):
+    def get_type_inference(self, input_shapes=None):
         """
         Returns the expected output variables in a list.
         """
@@ -586,7 +587,42 @@ class OnnxOperator:
         if self.operator_name is None:
             raise RuntimeError(
                 "operator_name cannot be None in class %r." % self)
-        raise NotImplementedError("%r" % self)
+        # Shape inference only work on a full graph.
+        if input_shapes is None:
+            input_shapes = self.inputs
+
+        given = {}
+        for i, inp in enumerate(input_shapes):
+            if isinstance(inp, tuple):
+                given[i] = inp[1]
+        rev = {}
+        for i, (name, v) in enumerate(self.expected_inputs):
+            if v in rev:
+                rev[v].append(i)
+            else:
+                rev[v] = [i]
+
+        res = []
+        for name, ct in self.expected_outputs:
+            if isinstance(ct, str) and ct[0] == 'T':
+                if ('T' not in rev or
+                        all(map(lambda k: k not in given, rev[ct]))):
+                    raise NotImplementedError(
+                        "Unable to guess output type for (%r, %r) - "
+                        "given=%r - rev=%r input_shapes=%r expected_inputs"
+                        "=%r." % (
+                            name, ct, given, rev, input_shapes,
+                            self.expected_inputs))
+                res.append((name, given[rev[ct][0]]))
+                continue
+            if isinstance(ct, str):
+                dt = _guess_type_proto_str(ct, None)
+                res.append((name, dt))
+                continue
+            raise NotImplementedError(
+                "Unable to guess output type for (%r, %r) - given=%r - "
+                "rev=%r." % (name, ct, given, rev))
+        return res
 
     def _clean_attributes(self, *args, recursive=True):
         """
