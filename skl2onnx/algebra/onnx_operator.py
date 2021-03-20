@@ -89,6 +89,27 @@ class OnnxOperatorItem:
                     type(self), type(self.onx_op), type(self.onx_op.state)))
         return outputs[self.index:self.index + 1]
 
+    def get_shape_inference(self):
+        """
+        Returns the inferred shape.
+        """
+        if self.onx_op is None:
+            raise RuntimeError(
+                "self.onx_op cannot be None, type(self)={}".format(
+                    type(self)))
+        if self.index is None:
+            raise RuntimeError(
+                "self.index cannot be None, type(self)={}".format(
+                    type(self)))
+        outputs = self.onx_op.get_shape_inference()
+        if outputs is None:
+            raise RuntimeError(
+                "self.onx_op.outputs cannot be None, "
+                "type(self)={}, type(self.onx_op)={}, "
+                "type(self.onx_op.state)={}".format(
+                    type(self), type(self.onx_op), type(self.onx_op.state)))
+        return outputs[self.index:self.index + 1]
+
 
 class OnnxSubOperator:
     """
@@ -277,6 +298,7 @@ class OnnxOperator:
         self.domain = domain
         self.kwargs = kwargs
         self.onnx_prefix_name = None
+        self.infered_shapes = None
 
         # check inputs
         if len(inputs) == 0:
@@ -555,6 +577,17 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
+    def get_shape_inference(self):
+        """
+        Returns the expected output variables in a list.
+        """
+        if self.infered_shapes is not None:
+            return self.infered_shapes
+        if self.operator_name is None:
+            raise RuntimeError(
+                "operator_name cannot be None in class %r." % self)
+        raise NotImplementedError("%r" % self)
+
     def _clean_attributes(self, *args, recursive=True):
         """
         Removes attributes in this node and its parents.
@@ -679,6 +712,10 @@ class OnnxOperator:
         # add the output to the container
         for shape in shapes:
             container.add_output(shape)
+
+        # fills subgraphs
+        topo = OnnxOperatorTopology(scope, container)
+        topo.run()
 
         # convert the graph
         graph = make_graph(
@@ -844,3 +881,110 @@ class OnnxSubEstimator(OnnxOperator):
         if self.state is None:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
+
+
+class OnnxOperatorTopology:
+
+    def __init__(self, scope, container):
+        self.scope = scope
+        self.container = container
+        self.root_names = list()
+
+    def run(self):
+        return list(self._to_onnx_recursive())
+
+    def unordered_operator_iterator(self):
+        for operator in self.scope.operators.values():
+            yield operator
+
+    def unordered_variable_iterator(self):
+        for variable in self.scope.variables.values():
+            yield variable
+
+    def _initialize_graph_status_for_traversing(self):
+        """
+        Initializes the status of all variables and operators for
+        traversing the underline graph.
+        """
+        for variable in self.unordered_variable_iterator():
+            variable.is_fed = (False if self.root_names and variable.onnx_name
+                               not in self.root_names else True)
+            variable.is_root = True
+            variable.is_leaf = True
+
+        for operator in self.unordered_operator_iterator():
+            operator.is_evaluated = False
+            for variable in operator.outputs:
+                variable.is_fed = False
+                variable.is_root = False
+            for variable in operator.inputs:
+                variable.is_leaf = False
+
+    def _to_onnx_recursive(self):
+        """
+        Iterates over subgraphs and make sure all of them are
+        converted into nodes.
+        """
+        self._initialize_graph_status_for_traversing()
+        priorities = {
+            'tensorToProbabilityMap': 2,
+            'tensorToLabel': 1
+        }
+        while not all(operator.is_evaluated
+                      for operator in self.scope.operators.values()):
+            is_evaluation_happened = False
+            for operator in sorted(self.unordered_operator_iterator(),
+                                   key=lambda op: priorities[op.type]
+                                   if op.type in priorities else 0):
+                if not isinstance(operator.inputs, list):
+                    raise TypeError(
+                        "operator.inputs must be a list not {}".format(
+                            type(operator.inputs)))
+                if (all(variable.is_fed for variable in operator.inputs)
+                        and not operator.is_evaluated):
+                    # Check if over-writing problem occurs (i.e., multiple
+                    # operators produce results on one variable).
+                    for variable in operator.outputs:
+                        # Throw an error if this variable has been treated as
+                        # an output somewhere
+                        if variable.is_fed:
+                            raise RuntimeError(
+                                "A variable is already assigned ({}) "
+                                "for operator '{}' (name='{}'). This "
+                                "may still happen if a converter is a "
+                                "combination of sub-operators and one of "
+                                "of them is producing this output. "
+                                "In that case, an identity node must be "
+                                "added.".format(
+                                    variable, operator.type,
+                                    operator.onnx_name))
+                        # Mark this variable as filled
+                        variable.is_fed = True
+                    # Make this operator as handled
+                    operator.is_evaluated = True
+                    is_evaluation_happened = True
+
+                    # Send out an operator
+                    yield operator
+
+                    known_outputs = {}
+                    for op in self.unordered_operator_iterator():
+                        for out in op.outputs:
+                            if hasattr(out, 'onnx_name'):
+                                known_outputs[out.onnx_name] = out
+                            else:
+                                known_outputs[out] = out
+                    for variable in self.unordered_variable_iterator():
+                        if variable.is_fed:
+                            continue
+                        if variable.onnx_name in known_outputs:
+                            continue
+                        update = (False if self.root_names and
+                                  variable.onnx_name not in self.root_names
+                                  else True)
+                        if update:
+                            variable.is_fed = True
+                            is_evaluation_happened = True
+
+            if not is_evaluation_happened:
+                break

@@ -1,0 +1,135 @@
+import unittest
+from distutils.version import StrictVersion
+import numpy as np
+import onnx
+from onnx.defs import onnx_opset_version
+from onnxruntime import InferenceSession
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import (
+        InvalidGraph, Fail, InvalidArgument)
+except ImportError:
+    InvalidGraph = RuntimeError
+    InvalidArgument = RuntimeError
+    Fail = RuntimeError
+from sklearn.linear_model import LinearRegression
+from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.algebra.onnx_ops import (
+    OnnxAdd, OnnxLinearRegressor, OnnxIdentity)
+from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
+from skl2onnx.proto import get_latest_tested_opset_version
+from test_utils import TARGET_OPSET
+
+
+class TestOnnxOperatorsToOnnx(unittest.TestCase):
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_onnx_ml(self):
+        def generate_onnx_graph(opv):
+            node = OnnxAdd('X1', np.array([0.1], dtype=np.float32),
+                           op_version=opv)
+            out = OnnxLinearRegressor(
+                node, coefficients=[0.3, 0.3, 0.4, 0.5, 0.6],
+                intercepts=[-50.], op_version=1)
+            last = OnnxIdentity(out, output_names=['Y'], op_version=opv)
+            onx = last.to_onnx([('X1', FloatTensorType((None, 5)))],
+                               outputs=[('Y', FloatTensorType())],
+                               target_opset=opv)
+            return onx
+
+        for opv in ({'': 10}, 9, 10, 11, 12, TARGET_OPSET):
+            if isinstance(opv, dict):
+                if opv[''] > get_latest_tested_opset_version():
+                    continue
+            elif opv is not None and opv > get_latest_tested_opset_version():
+                continue
+            for i, nbnode in enumerate((1, 2, 3, 100)):
+                onx = generate_onnx_graph(opv=opv)
+                if opv == {'': 10}:
+                    for im in onx.opset_import:
+                        if im.version > 10:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
+                else:
+                    for im in onx.opset_import:
+                        if im.version > opv:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
+                as_string = onx.SerializeToString()
+                try:
+                    ort = InferenceSession(as_string)
+                except (InvalidGraph, InvalidArgument) as e:
+                    if (isinstance(opv, dict) and
+                            opv[''] >= onnx_opset_version()):
+                        continue
+                    if (isinstance(opv, int) and
+                            opv >= onnx_opset_version()):
+                        continue
+                    raise AssertionError(
+                        "Unable to load opv={}\n---\n{}\n---".format(
+                            opv, onx)) from e
+                X = (np.ones((1, 5)) * nbnode).astype(np.float32)
+                res_out = ort.run(None, {'X1': X})
+                assert len(res_out) == 1
+                res = res_out[0]
+                self.assertEqual(res.shape, (1, 1))
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph(self):
+        def generate_onnx_graph(opv):
+            node = OnnxAdd('X1', np.array([0.1], dtype=np.float32),
+                           op_version=opv)
+            lr = LinearRegression()
+            lr.fit(np.ones([10, 5]), np.arange(0, 10))
+            out = OnnxSubEstimator(lr, node, op_version=1)
+            last = OnnxIdentity(out, output_names=['Y'], op_version=opv)
+            onx = last.to_onnx([('X1', FloatTensorType((None, 5)))],
+                               outputs=[('Y', FloatTensorType())],
+                               target_opset=opv)
+            return onx
+
+        for opv in ({'': 10}, 9, 10, 11, 12, TARGET_OPSET):
+            if isinstance(opv, dict):
+                if opv[''] > get_latest_tested_opset_version():
+                    continue
+            elif opv is not None and opv > get_latest_tested_opset_version():
+                continue
+            for i, nbnode in enumerate((1, 2, 3, 100)):
+                onx = generate_onnx_graph(opv=opv)
+                if opv == {'': 10}:
+                    for im in onx.opset_import:
+                        if im.version > 10:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
+                else:
+                    for im in onx.opset_import:
+                        if im.version > opv:
+                            raise AssertionError(
+                                "Wrong final opset\nopv={}\n{}".format(
+                                    opv, onx))
+                as_string = onx.SerializeToString()
+                try:
+                    ort = InferenceSession(as_string)
+                except (InvalidGraph, InvalidArgument) as e:
+                    if (isinstance(opv, dict) and
+                            opv[''] >= onnx_opset_version()):
+                        continue
+                    if (isinstance(opv, int) and
+                            opv >= onnx_opset_version()):
+                        continue
+                    raise AssertionError(
+                        "Unable to load opv={}\n---\n{}\n---".format(
+                            opv, onx)) from e
+                X = (np.ones((1, 5)) * nbnode).astype(np.float32)
+                res_out = ort.run(None, {'X1': X})
+                assert len(res_out) == 1
+                res = res_out[0]
+                self.assertEqual(res.shape, (1, 1))
+
+
+if __name__ == "__main__":
+    unittest.main()

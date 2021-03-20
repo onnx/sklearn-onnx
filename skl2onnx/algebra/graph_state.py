@@ -198,6 +198,20 @@ class GraphState:
             "You may raise an issue at https://github.com/onnx/"
             "sklearn-onnx/issues.".format(type(output), output))
 
+    def _update_inputs(self, inputs):
+        new_inputs = []
+        for inp in inputs:
+            if isinstance(inp, Variable):
+                new_inputs.append(inputs)
+                continue
+            if hasattr(inp, 'get_shape_inference'):
+                new_inputs.extend(inp.get_shape_inference())
+                continue
+            raise TypeError(
+                "Unable to infer shape of inputs %r (type is %r)"
+                "." % (inp, type(inp)))
+        return new_inputs
+
     def run(self, operator=None):
         if self.computed_outputs is None:
             if self.expected_outputs is not None:
@@ -214,7 +228,7 @@ class GraphState:
                 # a model is converted into a subgraph
                 sub_op = self.scope.declare_local_operator(
                     self.operator_name, self.operator_instance)
-                sub_op.inputs = self.inputs
+                sub_op.inputs = self._update_inputs(self.inputs)
                 if self.expected_outputs is None:
                     # output are not defined, we need to call a parser.
                     from .._parse import _parse_sklearn
