@@ -12,6 +12,7 @@ from ..common._topology import (
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
@@ -27,11 +28,12 @@ class OnnxOperatorItem:
     :param onx_op: OnnxOperator
     :param index: integer
     """
-    def __init__(self, onx_op, index):
+    def __init__(self, onx_op, index, op_version=None):
         if not isinstance(index, int):
             raise TypeError("index must be an integer.")
         self.onx_op = onx_op
         self.index = index
+        self.op_version = op_version
 
     def __str__(self):
         """
@@ -290,6 +292,8 @@ class OnnxOperator:
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
                 elif isinstance(inp, (OnnxOperator, Variable,
                                       OnnxOperatorItem, OnnxSubOperator)):
+                    self.inputs.append(inp)
+                elif isinstance(inp, tuple) and len(inp) == 2:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
@@ -631,7 +635,10 @@ class OnnxOperator:
 
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,
-                      variable_name_set=set(_[0] for _ in inputs))
+                      variable_name_set=set(_[0] for _ in inputs),
+                      registered_models=dict(
+                        conv=_converter_pool, shape=_shape_calculator_pool,
+                        aliases=sklearn_operator_name_map))
         for inp in inputs:
             container.add_input(Variable(inp[0], inp[0],
                                          scope=scope, type=inp[1]))
@@ -816,6 +823,10 @@ class OnnxSubEstimator(OnnxOperator):
                                              operator.inputs))
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
+                elif isinstance(input, tuple) and len(input) == 2:
+                    inputs.append(
+                        Variable(
+                            input[0], input[0], scope=scope, type=input[1]))
                 else:
                     inputs.append(input)
             self.state = GraphState(

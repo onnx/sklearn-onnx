@@ -78,6 +78,8 @@ class GraphState:
             return var.name
         if isinstance(var, str):
             return var
+        if isinstance(var, tuple) and len(var) == 2:
+            return var[0]
         raise RuntimeError("Unexpected type for parameter 'var': {0}."
                            "".format(type(var)))
 
