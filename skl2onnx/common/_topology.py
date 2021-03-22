@@ -445,6 +445,26 @@ class Scope:
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__))
 
+    def add_options(self, model_id, options):
+        """
+        Adds an option, for example,
+        ``add_options(id(clr), {'raw_scores': True})``
+        tells the converter associated to ``clr`` to
+        use raw score instead of probabilities.
+
+        :param model_id: class or ``id(instance)``
+        :param options: dictionary with the new values
+        """
+        if options is None:
+            return
+        if self.options is None:
+            self.options = {}
+        if model_id not in self.options:
+            self.options[model_id] = None
+        if self.options[model_id] is None:
+            self.options[model_id] = {}
+        self.options[model_id].update(options)
+
     def get_options(self, model, default_values=None, fail=True):
         """
         Returns additional options for a model.

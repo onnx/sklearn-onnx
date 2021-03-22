@@ -11,8 +11,8 @@ except ImportError:
     InvalidGraph = RuntimeError
     InvalidArgument = RuntimeError
     Fail = RuntimeError
-from sklearn.linear_model import LinearRegression
-from skl2onnx.common.data_types import FloatTensorType
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxLinearRegressor, OnnxIdentity)
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
@@ -85,19 +85,21 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                     self.assertEqual(str(expected[i]), str(shape))
                     inputs = shape
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
-    def test_sub_graph(self):
+    def common_test_sub_graph(self, first_input, model, options=None,
+                              cls_type=FloatTensorType):
         def generate_onnx_graph(opv):
-            node = OnnxAdd(('X1', FloatTensorType()),
+            node = OnnxAdd(first_input,
                            np.array([0.1], dtype=np.float32),
                            op_version=opv)
-            lr = LinearRegression()
-            lr.fit(np.ones([10, 5]), np.arange(0, 10))
-            out = OnnxSubEstimator(lr, node, op_version=1)
-            last = OnnxIdentity(out, output_names=['Y'], op_version=opv)
-            onx = last.to_onnx([('X1', FloatTensorType((None, 5)))],
-                               outputs=[('Y', FloatTensorType())],
+            lr = model()
+            lr.fit(np.ones([10, 5]), np.arange(0, 10) % 3)
+            out = OnnxSubEstimator(lr, node, op_version=1, options=options)
+            if model == LogisticRegression:
+                last = OnnxIdentity(out[1], output_names=['Y'], op_version=opv)
+            else:
+                last = OnnxIdentity(out, output_names=['Y'], op_version=opv)
+            onx = last.to_onnx([('X1', cls_type((None, 5)))],
+                               outputs=[('Y', cls_type())],
                                target_opset=opv)
             return onx
 
@@ -121,10 +123,11 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                             raise AssertionError(
                                 "Wrong final opset\nopv={}\n{}".format(
                                     opv, onx))
+                self.assertNotIn('zipmap', str(onx))
                 as_string = onx.SerializeToString()
                 try:
                     ort = InferenceSession(as_string)
-                except (InvalidGraph, InvalidArgument) as e:
+                except (InvalidGraph, InvalidArgument, Fail) as e:
                     if (isinstance(opv, dict) and
                             opv[''] >= onnx_opset_version()):
                         continue
@@ -138,8 +141,63 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                 res_out = ort.run(None, {'X1': X})
                 assert len(res_out) == 1
                 res = res_out[0]
-                self.assertEqual(res.shape, (1, 1))
+                if model == LogisticRegression:
+                    self.assertEqual(res.shape, (1, 3))
+                else:
+                    self.assertEqual(res.shape, (1, 1))
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_tuple(self):
+        self.common_test_sub_graph(
+            ('X1', FloatTensorType()), LinearRegression)
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_tuple_double(self):
+        self.common_test_sub_graph(
+            ('X1', DoubleTensorType()), LinearRegression,
+            cls_type=DoubleTensorType)
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_str(self):
+        self.common_test_sub_graph('X1', LinearRegression)
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_str_double(self):
+        self.common_test_sub_graph('X1', LinearRegression,
+                                   cls_type=DoubleTensorType)
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_tuple_cls(self):
+        self.common_test_sub_graph(
+            ('X1', FloatTensorType()), LogisticRegression,
+            {'zipmap': False})
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_tuple_cls_double(self):
+        self.common_test_sub_graph(
+            ('X1', DoubleTensorType()), LogisticRegression,
+            options={'zipmap': False}, cls_type=DoubleTensorType)
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_str_cls(self):
+        self.common_test_sub_graph('X1', LogisticRegression,
+                                   {'zipmap': False})
+
+    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+                     reason="not available")
+    def test_sub_graph_str_cls_double(self):
+        self.common_test_sub_graph(
+            'X1', LogisticRegression, options={'zipmap': False},
+            cls_type=DoubleTensorType)
 
 
 if __name__ == "__main__":
+    TestOnnxOperatorsToOnnx().test_sub_graph_str_cls()
     unittest.main()

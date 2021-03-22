@@ -7,15 +7,18 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import onnx_proto, TensorProto
 from ..common._topology import Variable
+from ..common._registration import get_shape_calculator, get_converter
+
+
+class GraphStateVar:
+    pass
 
 
 class GraphState:
 
-    def __init__(self, inputs, outputs,
-                 operator_name, scope,
-                 container, converter,
-                 onnx_prefix_name=None,
-                 **attrs):
+    def __init__(self, inputs, outputs, operator_name, scope,
+                 container, converter, onnx_prefix_name=None,
+                 options=None, **attrs):
         self.inputs = inputs
         self.scope = scope
         if hasattr(operator_name, 'fit'):
@@ -32,6 +35,7 @@ class GraphState:
         self.computed_outputs = None
         self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
+        self.options = options
         if isinstance(self.inputs, tuple):
             raise TypeError("Parameter inputs must be a list or a string or a "
                             "Variable not tuple.")
@@ -67,12 +71,14 @@ class GraphState:
             var.add_to(self.scope, self.container, operator=operator)
             outputs = var.outputs
             if isinstance(outputs, list):
-                if len(outputs) == 1:
+                vars = []
+                for var in outputs:
                     var = outputs[0]
                     if isinstance(var, Variable):
-                        return var.full_name
-                    if isinstance(var, str):
-                        return var
+                        vars.append(var.full_name)
+                    elif isinstance(var, str):
+                        vars.append(var)
+                return vars
             raise RuntimeError("Unexpected output type {}".format(outputs))
         if hasattr(var, 'name') and isinstance(var.name, str) and var.name:
             return var.name
@@ -198,11 +204,11 @@ class GraphState:
             "You may raise an issue at https://github.com/onnx/"
             "sklearn-onnx/issues.".format(type(output), output))
 
-    def _update_inputs(self, inputs):
+    def _update_inputs(self, inputs, names, scope):
         new_inputs = []
         for inp in inputs:
-            if isinstance(inp, Variable):
-                new_inputs.append(inputs)
+            if isinstance(inp, (Variable, tuple, GraphStateVar)):
+                new_inputs.append(inp)
                 continue
             if hasattr(inp, 'get_type_inference'):
                 new_inputs.extend(inp.get_type_inference())
@@ -210,30 +216,58 @@ class GraphState:
             raise TypeError(
                 "Unable to infer shape of inputs %r (type is %r)"
                 "." % (inp, type(inp)))
+        for i in range(0, len(new_inputs)):
+            inp = new_inputs[i]
+            if isinstance(inp, tuple) and len(inp) == 2:
+                new_inputs[i] = Variable(
+                    inp[0], inp[0], type=inp[1], scope=scope)
+                inp = new_inputs[i]
+            elif isinstance(inp, GraphStateVar):
+                new_inputs[i] = inp.as_variable(scope)
+                inp = new_inputs[i]
+            elif not isinstance(inp, Variable):
+                raise TypeError(
+                    "Inputs %d - %r must be of type Variable." % (i, inp))
+            if names is not None:
+                inp.onnx_name = names[i]
         return new_inputs
 
     def run(self, operator=None):
         if self.computed_outputs is None:
+            sub_graphs = []
             if self.expected_outputs is not None:
-                eoli = [self._get_var_name(o, True, operator=operator)
-                        for o in self.expected_outputs]
+                eoli = []
+                for o in self.expected_outputs:
+                    v = self._get_var_name(o, True, operator=operator)
+                    if v is not None:
+                        if isinstance(v, list):
+                            eoli.extend(v)
+                        else:
+                            eoli.append(v)
                 self.expected_outputs = eoli
             inputs = []
             for i in self.inputs:
                 v = self._get_var_name(i, False, operator=operator)
                 if v is not None:
-                    inputs.append(v)
+                    if isinstance(v, list):
+                        inputs.extend(v)
+                    else:
+                        inputs.append(v)
+            self.computed_inputs = self._update_inputs(
+                self.inputs, inputs, scope=self.scope)
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
                 # a model is converted into a subgraph
                 sub_op = self.scope.declare_local_operator(
                     self.operator_name, self.operator_instance)
-                sub_op.inputs = self._update_inputs(self.inputs)
+                sub_op.inputs = self.computed_inputs
                 if self.expected_outputs is None:
                     # output are not defined, we need to call a parser.
                     from .._parse import _parse_sklearn
+                    self.scope.add_options(
+                        id(sub_op.raw_operator), self.options)
                     self.expected_outputs = _parse_sklearn(
-                        self.scope, self.operator_instance, self.inputs)
+                        self.scope, self.operator_instance, sub_op.inputs)
                     if (self.expected_outputs is None or
                             None in self.expected_outputs):
                         raise RuntimeError(
@@ -245,11 +279,30 @@ class GraphState:
                                     v.raw_name),
                                  self.scope, v.type)
                         for v in self.expected_outputs]
+                    sub_op.outputs = self.expected_outputs
+                    shape_calc = get_shape_calculator(self.operator_name)
+                    shape_calc(sub_op)
+                    self.computed_expected_inputs = [
+                        (v.raw_name, v.type) for v in sub_op.inputs]
+                    self.computed_expected_outputs = [
+                        (v.raw_name, v.type) for v in self.expected_outputs]
+                    self.sub_op_ = sub_op
                 sub_op.outputs = self.expected_outputs
+                sub_graphs.append(sub_op)
             else:
                 # only one node is added
+                if self.options is not None:
+                    raise RuntimeError(
+                        "Options must be empty for node %r but is it %r." % (
+                            self.operator_name, self.options))
                 outputs = [self._get_output_name(o)
                            for o in self.expected_outputs]
                 self.container.add_node(self.operator_name, inputs, outputs,
                                         name=name, **self.attrs)
             self.computed_outputs = self.expected_outputs
+
+            # The parser was run on sub-operators and neither the shape
+            # calcutor nor the converter.
+            for sub_op in sub_graphs:
+                conv = get_converter(self.operator_name)
+                conv(self.scope, sub_op, self.container)

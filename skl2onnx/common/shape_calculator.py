@@ -46,13 +46,6 @@ def _calculate_linear_classifier_output_shapes(operator, decision_path=False):
         BooleanTensorType, DoubleTensorType,
         FloatTensorType, Int64TensorType])
 
-    if len(operator.inputs[0].type.shape) != 2:
-        raise RuntimeError(
-            "Inputs must be a [N, C]-tensor for model '{}' "
-            "(input: {}).".format(
-                operator.raw_operator.__class__.__name__,
-                operator.inputs[0]))
-
     N = operator.inputs[0].get_first_dimension()
     op = operator.raw_operator
     class_labels = get_label_classes(operator.scope_inst, op)
