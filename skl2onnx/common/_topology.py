@@ -98,6 +98,16 @@ class Variable:
                     raise TypeError("shape must contains integers not "
                                     "'{}'.".format(dim))
 
+    def get_first_dimension(self):
+        """
+        Returns the first dimension (batch dimension) or
+        None if not specified (shape is empty).
+        """
+        if (self.type is None or self.type.shape is None or
+                len(self.type.shape) == 0):
+            return None
+        return self.type.shape[0]
+
     @property
     def full_name(self):
         """
