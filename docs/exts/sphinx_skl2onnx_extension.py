@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Extension for sphinx.
 """
@@ -214,7 +214,7 @@ def missing_ops():
                 found.append((cl.__name__, sub, cl))
     found.sort()
     return found
-    
+
 
 class AllSklearnOpsDirective(Directive):
     """
@@ -242,7 +242,7 @@ class AllSklearnOpsDirective(Directive):
                 nbconverters += 1
             else:
                 rows.append("      -")
-            
+
         rows.append("")
         rows.append("scikit-learn's version is **{0}**.".format(skver))
         rows.append("{0}/{1} models are covered.".format(nbconverters, len(found)))
@@ -253,7 +253,7 @@ class AllSklearnOpsDirective(Directive):
         main = nodes.container()
         main += node
         return [main]
-    
+
 
 def setup(app):
     # Placeholder to initialize the folder before

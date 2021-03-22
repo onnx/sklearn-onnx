@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # Modified file from
 # https://github.com/onnx/onnx/blob/master/onnx/helper.py.
 import collections

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Optimization of :epkg:`ONNX` graphs.
 Functions in *onnxconverter-common* do not support
