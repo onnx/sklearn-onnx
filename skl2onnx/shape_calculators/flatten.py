@@ -13,7 +13,7 @@ def calculate_sklearn_flatten(operator):
     check_input_and_output_numbers(operator, output_count_range=1,
                                    input_count_range=1)
     i = operator.inputs[0]
-    N = i.type.shape[0]
+    N = i.get_first_dimension()
     if isinstance(i.type, TensorType):
         if i.type.shape[1] is None:
             C = None

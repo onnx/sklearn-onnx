@@ -23,7 +23,7 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
 
     variable = operator.inputs[0]
 
-    N = variable.type.shape[0] if len(variable.type.shape) > 0 else 1
+    N = variable.get_first_dimension()
     op = operator.raw_operator
 
     # Output 1 is mean
