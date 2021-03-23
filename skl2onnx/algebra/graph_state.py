@@ -321,23 +321,26 @@ class GraphState:
 
     def run(self, operator=None):
         if self.computed_outputs_ is None:
-            if self._expected_outputs is not None:
-                eoli = []
-                for o in self._expected_outputs:
-                    v = self._get_var_name(o, True, operator=operator)
-                    if v is not None:
-                        if not isinstance(v, list):
-                            raise TypeError(
-                                "Unexpected output type %r - %s." % (
-                                    type(v), v))
-                        eoli.extend(v)
-                expected_outputs = eoli
+            if operator is not None:
+                expected_outputs = operator.outputs
             else:
-                expected_outputs = None
+                if self._expected_outputs is not None:
+                    eoli = []
+                    for o in self._expected_outputs:
+                        v = self._get_var_name(o, True)
+                        if v is not None:
+                            if not isinstance(v, list):
+                                raise TypeError(
+                                    "Unexpected output type %r - %s." % (
+                                        type(v), v))
+                            eoli.extend(v)
+                    expected_outputs = eoli
+                else:
+                    expected_outputs = None
 
             inputs = []
             for i in self.inputs:
-                v = self._get_var_name(i, False, operator=operator)
+                v = self._get_var_name(i, False)
                 if v is not None:
                     if not isinstance(v, list):
                         raise TypeError(
