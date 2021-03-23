@@ -91,7 +91,7 @@ class OnnxOperatorItem:
                     type(self), type(self.onx_op), type(self.onx_op.state)))
         return outputs[self.index:self.index + 1]
 
-    def get_type_inference(self):
+    def get_output_type_inference(self, input_shapes=None):
         """
         Returns the inferred shape.
         """
@@ -103,7 +103,7 @@ class OnnxOperatorItem:
             raise RuntimeError(
                 "self.index cannot be None, type(self)={}".format(
                     type(self)))
-        outputs = self.onx_op.get_type_inference()
+        outputs = self.onx_op.get_output_type_inference(input_shapes)
         if outputs is None:
             raise RuntimeError(
                 "self.onx_op.outputs cannot be None, "
@@ -196,6 +196,10 @@ class OnnxOperator:
         def __repr__(self):
             return "OnnxOperatorVariable('%s')" % self.name
 
+        def __iter__(self):
+            yield self.name
+            yield None
+
     class UnscopedVariable(GraphStateVar):
         def __init__(self, name):
             self.name = name
@@ -216,6 +220,10 @@ class OnnxOperator:
         def __repr__(self):
             return "UnscopedVariable('%s')" % self.name
 
+        def __iter__(self):
+            yield self.name
+            yield None
+
     class ConstantVariable(GraphStateVar):
         def __init__(self, value):
             self.value = value
@@ -231,6 +239,10 @@ class OnnxOperator:
 
         def __str__(self):
             return "Cst({})".format(self.value)
+
+        def __iter__(self):
+            yield self.name
+            yield _guess_type(self.value)
 
     def find_schema(self, op_version):
         """
@@ -310,7 +322,6 @@ class OnnxOperator:
         self.domain = domain
         self.kwargs = kwargs
         self.onnx_prefix_name = None
-        self.infered_shapes = None
 
         # check inputs
         if len(inputs) == 0:
@@ -538,6 +549,8 @@ class OnnxOperator:
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+
+        At this stage, inputs types are not necessarily known.
         """
         if self.state is None:
             if self.is_deprecated:
@@ -567,7 +580,8 @@ class OnnxOperator:
                 inputs, self.output_names_, self.operator_name,
                 scope, container, None, op_version=self.op_version,
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
-                **kwargs)
+                expected_inputs=self.expected_inputs,
+                expected_outputs=self.expected_outputs, **kwargs)
             self.state.run(operator=operator)
         self._verify_add_to_()
 
@@ -589,26 +603,25 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
-    def get_type_inference(self, input_shapes=None):
+    def get_output_type_inference(self, input_shapes=None):
         """
         Returns the expected output variables in a list.
         """
-        if self.infered_shapes is not None:
-            return self.infered_shapes
+        if (self.state is not None and
+                self.state.computed_outputs_ is not None):
+            return self.state.computed_outputs_
 
-        if self.expected_inputs is None:
-            expected_inputs = self.state.computed_expected_inputs
-        else:
-            expected_inputs = self.expected_inputs
+        expected_inputs = (
+            self.state.computed_inputs_
+            if self.expected_inputs is None else self.expected_inputs)
         if expected_inputs is None:
             raise RuntimeError(
                 "Attribute 'expected_inputs' is empty for %r, "
                 "input_shapes=%r." % (self, input_shapes))
 
-        if self.expected_outputs is None:
-            expected_outputs = self.state.computed_expected_outputs
-        else:
-            expected_outputs = self.expected_outputs
+        expected_outputs = (
+            self.state.computed_outputs_
+            if self.expected_outputs is None else self.expected_outputs)
         if expected_outputs is None:
             raise RuntimeError(
                 "Attribute 'expected_outputs' is empty for %r, "
@@ -676,6 +689,7 @@ class OnnxOperator:
                     "Unable to guess output type for (%r, %r) - given=%r - "
                     "rev=%r." % (name, ct, given, rev)) from e
             res.append((name, dt))
+
         return res
 
     def _clean_attributes(self, *args, recursive=True):
@@ -728,7 +742,7 @@ class OnnxOperator:
                 "target_opset={} is lower than the version={} requested "
                 "for this node '{}'.".format(
                     target_opset, self.op_version, self.__class__.__name__))
-        if hasattr(self, "state"):
+        if self.state is not None:
             # The conversion already happened and needs to be cleaned.
             self._clean_attributes("output_names_", "state")
         if inputs is None:
@@ -969,12 +983,3 @@ class OnnxSubEstimator(OnnxOperator):
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
                 options=self.options, **kwargs)
             self.state.run(operator=operator)
-
-    @property
-    def outputs(self):
-        """
-        Returns the outputs of the node.
-        """
-        if self.state is None:
-            raise RuntimeError("Method add_to was not called.")
-        return self.state.outputs

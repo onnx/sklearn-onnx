@@ -4,14 +4,14 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, onnx_proto
-from onnxconverter_common.data_types import DataType, Int64Type, FloatType  # noqa
-from onnxconverter_common.data_types import StringType, TensorType  # noqa
 from onnxconverter_common.data_types import (  # noqa
+    DataType, Int64Type, FloatType,
+    StringType, TensorType,
     Int64TensorType, Int32TensorType, BooleanTensorType,
     FloatTensorType, StringTensorType, DoubleTensorType,
     DictionaryType, SequenceType)
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
+from ..proto import TensorProto, onnx_proto
 
 
 def _guess_type_proto(data_type, dims):

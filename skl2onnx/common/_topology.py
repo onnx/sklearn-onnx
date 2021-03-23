@@ -70,6 +70,12 @@ class Variable:
         :param type: A type object defined in .common.data_types.py;
                      e.g., FloatTensorType
         """
+        if not isinstance(raw_name, str) or '(' in raw_name:
+            raise TypeError(
+                "raw_name must be a string not %r." % type(raw_name))
+        if not isinstance(onnx_name, str) or '(' in onnx_name:
+            raise TypeError(
+                "raw_name must be a string not %r." % type(onnx_name))
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
         self.scope = scope
@@ -81,8 +87,8 @@ class Variable:
         self.is_leaf = None
         self.is_abandoned = False
         if self.type is not None and not isinstance(self.type, DataType):
-            raise TypeError("shape must be a DataType not {}.".format(
-                self.type))
+            raise TypeError(
+                "shape must be a DataType not {}.".format(self.type))
         if isinstance(self.type, TensorType):
             shape = self.type.shape
             if not isinstance(shape, (list, tuple)):
@@ -165,6 +171,18 @@ class Variable:
                                         type(obj), obj))
 
         return Variable(name, name, None, ty)
+
+    def __iter__(self):
+        "Enables expression such as `a,b = self`."
+        yield self.onnx_name
+        yield self.type
+
+    def __getitem__(self, index):
+        if index == 0:
+            return self.onnx_name
+        if index == 1:
+            return self.type
+        raise IndexError("Unreachable element at index %d." % index)
 
 
 class Operator(OperatorBase):

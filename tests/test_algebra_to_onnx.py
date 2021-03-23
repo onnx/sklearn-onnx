@@ -77,11 +77,11 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                 res = res_out[0]
                 self.assertEqual(res.shape, (1, 1))
                 inputs = None
-                expected = [[('C0', FloatTensorType(shape=[]))],
-                            [('Y0', FloatTensorType(shape=[]))],
-                            [('output0', FloatTensorType(shape=[]))]]
+                expected = [[('Ad_C01', FloatTensorType(shape=[]))],
+                            [('Li_Y01', FloatTensorType(shape=[]))],
+                            [('Y', FloatTensorType(shape=[]))]]
                 for i, node in enumerate(nodes):
-                    shape = node.get_type_inference(inputs)
+                    shape = node.get_output_type_inference(inputs)
                     self.assertEqual(str(expected[i]), str(shape))
                     inputs = shape
 
@@ -199,5 +199,4 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOnnxOperatorsToOnnx().test_sub_graph_str_cls()
     unittest.main()
