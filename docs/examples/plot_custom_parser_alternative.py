@@ -147,7 +147,8 @@ def validator_classifier_converter(scope, operator, container):
     # The model calls another one. The class `OnnxSubEstimator`
     # calls the converter for this operator.
     model = op.estimator_
-    onnx_op = OnnxSubEstimator(model, input0, op_version=opv)
+    onnx_op = OnnxSubEstimator(model, input0, op_version=opv,
+                               options={'zipmap': False})
 
     rmax = OnnxReduceMax(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
     great = OnnxGreater(rmax, np.array([op.threshold], dtype=np.float32),

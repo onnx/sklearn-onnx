@@ -241,7 +241,7 @@ class OnnxOperator:
             return "Cst({})".format(self.value)
 
         def __iter__(self):
-            yield self.name
+            yield "id%d" % id(self)
             yield _guess_type(self.value)
 
     def find_schema(self, op_version):
@@ -292,13 +292,17 @@ class OnnxOperator:
                 self.op_version < self.since_version):
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
-            self.expected_inputs = schema.expected_inputs
-            self.expected_outputs = schema.expected_outputs
+            self.expected_inputs = schema.expected_inputs.copy()
+            self.expected_outputs = schema.expected_outputs.copy()
             self.input_range = schema.input_range
             self.output_range = schema.output_range
         else:
-            self.expected_inputs = self.__class__.expected_inputs
-            self.expected_outputs = self.__class__.expected_outputs
+            self.expected_inputs = (
+                None if self.__class__.expected_inputs is None
+                else self.__class__.expected_inputs.copy())
+            self.expected_outputs = (
+                None if self.__class__.expected_outputs is None
+                else self.__class__.expected_outputs.copy())
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
             if self.__class__.__name__ not in {
@@ -396,6 +400,35 @@ class OnnxOperator:
                                         i, type(name)))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
+
+        if (self.output_names is not None and
+                len(self.output_names) > len(self.expected_outputs)):
+            for i in range(len(self.expected_outputs),
+                           len(self.output_names)):
+                self.expected_outputs.append((self.output_names[i], None))
+
+        if (self.expected_inputs is None or
+                len(self.inputs) > len(self.expected_inputs)):
+            if self.expected_inputs is None:
+                self.expected_inputs = []
+            for i in range(len(self.expected_inputs),
+                           len(self.inputs)):
+                inp = self.inputs[i]
+                if isinstance(inp, GraphStateVar):
+                    inp = tuple(inp)
+                elif isinstance(inp, str):
+                    inp = (inp, None)
+                elif hasattr(inp, 'add_to'):
+                    # OnnxOperator
+                    existing = set(_[0] for _ in self.expected_inputs)
+                    i = 10
+                    name = "input%d" % (10 + i)
+                    while name in existing:
+                        i += 1
+                        name = "input%d" % (10 + i)
+                    inp = (name, None)
+                self.expected_inputs.append(inp)
+
         self.output_names_ = None
 
     def __str__(self):
@@ -625,8 +658,8 @@ class OnnxOperator:
 
         res = []
         for name, ct in expected_outputs:
-            if isinstance(ct, str) and ct[0] == 'T':
-                if ('T' not in rev or
+            if isinstance(ct, str) and ct[0] in ('T', 'V', 'I'):
+                if (ct[0] not in rev or
                         all(map(lambda k: k not in given, rev[ct]))):
                     raise NotImplementedError(
                         "Unable to guess output type for (%r, %r) - "
@@ -673,8 +706,8 @@ class OnnxOperator:
         Removes attributes in this node and its parents.
         """
         for arg in args:
-            if arg == 'state':
-                self.state = None
+            if arg in ('state', 'output_names_'):
+                setattr(self, arg, None)
             elif hasattr(self, arg):
                 delattr(self, arg)
         if recursive:
@@ -912,7 +945,7 @@ class OnnxSubEstimator(OnnxOperator):
             else:
                 kwargs = self.kwargs
 
-            if hasattr(self, 'output_names_'):
+            if self.output_names_ is not None:
                 pass
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):

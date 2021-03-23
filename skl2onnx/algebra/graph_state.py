@@ -8,7 +8,7 @@ from scipy.sparse import coo_matrix
 from ..proto import onnx_proto, TensorProto
 from ..common.data_types import (
     guess_proto_type, _guess_numpy_type, _guess_type_proto_str,
-    _guess_type_proto, FloatType, Int64Type)
+    _guess_type_proto, FloatType, Int64Type, copy_type)
 from ..common._topology import Variable
 from ..common._registration import get_shape_calculator, get_converter
 
@@ -47,6 +47,7 @@ class GraphState:
         self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
         self.options = options
+
         for att in ['inputs', '_expected_inputs',
                     '_expected_outputs', 'computed_inputs_',
                     'computed_outputs_', '_outputs']:
@@ -112,6 +113,23 @@ class GraphState:
 
     def _get_var_name(self, var, in_out, operator=None, index=None):
         "input: True for output, False for input"
+        if hasattr(var, 'add_to'):
+            var.add_to(self.scope, self.container, operator=operator)
+            outputs = var.outputs
+            if isinstance(outputs, list):
+                vars = []
+                for var in outputs:
+                    if isinstance(var, (Variable, tuple)):
+                        vars.append(var)
+                    elif isinstance(var, str):
+                        vars.append((var, None))
+                if len(vars) == 0:
+                    raise RuntimeError(
+                        "Empty inputs outputs=%s var=%s in_out=%s "
+                        "operator=%r." % (outputs, var, in_out, operator))
+                return vars
+            raise RuntimeError("Unexpected output type {}".format(outputs))
+
         def __fct__(var, operator):
             if isinstance(var, Variable):
                 return [var]
@@ -122,22 +140,6 @@ class GraphState:
             if hasattr(var, 'ConstantValue'):
                 return [
                     self._add_constant(var.ConstantValue, scope=self.scope)]
-            if hasattr(var, 'add_to'):
-                var.add_to(self.scope, self.container, operator=operator)
-                outputs = var.outputs
-                if isinstance(outputs, list):
-                    vars = []
-                    for var in outputs:
-                        if isinstance(var, (Variable, tuple)):
-                            vars.append(var)
-                        elif isinstance(var, str):
-                            vars.append((var, None))
-                    if len(vars) == 0:
-                        raise RuntimeError(
-                            "Empty inputs outputs=%s var=%s in_out=%s "
-                            "operator=%r." % (outputs, var, in_out, operator))
-                    return vars
-                raise RuntimeError("Unexpected output type {}".format(outputs))
             if isinstance(var, str):
                 return [(var, None)]
             if isinstance(var, tuple) and len(var) == 2:
@@ -306,7 +308,7 @@ class GraphState:
         return new_inputs
 
     @staticmethod
-    def _update_contraints(vars1, expected1, vars2, expected2):
+    def _update_contraints(vars1, expected1, vars2, expected2, debug=None):
         memo = {}
         for va, ex in [(vars1, expected1), (vars2, expected2)]:
             if va is None or ex is None:
@@ -315,20 +317,21 @@ class GraphState:
                 if (isinstance(v, str) or (
                         hasattr(v, 'type') and v.type is None)):
                     continue
-                vt = (v.type.__class__
-                      if hasattr(v, 'type') else v[1].__class__)
-                if vt == str:
+                vt = (copy_type(v.type)
+                      if hasattr(v, 'type') else copy_type(v[1]))
+                if isinstance(vt, str):
                     continue
                 key = ct[1]
-                if isinstance(key, str) and key[0] == 'T':
-                    if vt != str and key not in memo:
+                if isinstance(key, str) and key[0] in ('T', 'I', 'V'):
+                    if not isinstance(vt, str) and key not in memo:
                         memo[key] = []
                     memo[key].append(vt)
 
         for k, v in memo.items():
-            if len(set(v)) != 1:
+            if len(set(_.__class__ for _ in v)) != 1:
                 raise RuntimeError(
-                    "Conflicted constraint %r, got types %r." % (k, v))
+                    "Conflicted constraint %r, got types %r operator=%s"
+                    "." % (k, v, debug))
         for i in range(0, len(vars1)):
             inp = vars1[i]
             if isinstance(inp, str):
@@ -336,11 +339,11 @@ class GraphState:
             if hasattr(inp, 'type') and inp.type is None:
                 ct = expected1[i][1]
                 if ct in memo:
-                    vars1[i].type = memo[ct][0]()
+                    vars1[i].type = copy_type(memo[ct][0])
             elif isinstance(inp, tuple):
                 ct = expected1[i][1]
                 if ct in memo:
-                    vars1[i] = (inp[0], memo[ct][0]())
+                    vars1[i] = (inp[0], copy_type(memo[ct][0]))
 
     def run(self):
         if self.computed_outputs_ is None:
@@ -429,4 +432,5 @@ class GraphState:
                         output_names, self._expected_outputs)]
                 self._update_contraints(
                     self.computed_outputs_, self._expected_outputs,
-                    self.computed_inputs_, self._expected_inputs)
+                    self.computed_inputs_, self._expected_inputs,
+                    debug=self.operator_name)

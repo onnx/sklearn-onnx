@@ -77,8 +77,8 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                 res = res_out[0]
                 self.assertEqual(res.shape, (1, 1))
                 inputs = None
-                expected = [[('Ad_C01', FloatTensorType(shape=[]))],
-                            [('Li_Y01', FloatTensorType(shape=[]))],
+                expected = [[('Ad_C0', FloatTensorType(shape=[]))],
+                            [('Li_Y0', FloatTensorType(shape=[]))],
                             [('Y', FloatTensorType(shape=[]))]]
                 for i, node in enumerate(nodes):
                     shape = node.get_output_type_inference(inputs)
@@ -88,8 +88,8 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
     def common_test_sub_graph(self, first_input, model, options=None,
                               cls_type=FloatTensorType):
         def generate_onnx_graph(opv):
-            node = OnnxAdd(first_input,
-                           np.array([0.1], dtype=np.float32),
+            dtype = np.float32 if cls_type == FloatTensorType else np.float64
+            node = OnnxAdd(first_input, np.array([0.1], dtype=dtype),
                            op_version=opv)
             lr = model()
             lr.fit(np.ones([10, 5]), np.arange(0, 10) % 3)
@@ -102,6 +102,8 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                                outputs=[('Y', cls_type())],
                                target_opset=opv)
             return onx
+
+        dtype = np.float32 if cls_type == FloatTensorType else np.float64
 
         for opv in ({'': 10}, 9, 10, 11, 12, TARGET_OPSET):
             if isinstance(opv, dict):
@@ -137,7 +139,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
-                X = (np.ones((1, 5)) * nbnode).astype(np.float32)
+                X = (np.ones((1, 5)) * nbnode).astype(dtype)
                 res_out = ort.run(None, {'X1': X})
                 assert len(res_out) == 1
                 res = res_out[0]

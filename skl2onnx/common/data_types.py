@@ -14,6 +14,15 @@ from onnxconverter_common.data_types import find_type_conversion, onnx_built_wit
 from ..proto import TensorProto, onnx_proto
 
 
+def copy_type(vtype, empty=True):
+    if isinstance(vtype, SequenceType):
+        return vtype.__class__(copy_type(vtype.element_type))
+    if isinstance(vtype, DictionaryType):
+        return vtype.__class__(copy_type(vtype.key_type),
+                               copy_type(vtype.value_type))
+    return vtype.__class__()
+
+
 def _guess_type_proto(data_type, dims):
     # This could be moved to onnxconverter_common.
     for d in dims:
