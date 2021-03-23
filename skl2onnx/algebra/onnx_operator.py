@@ -61,13 +61,13 @@ class OnnxOperatorItem:
         """
         self.onx_op.add_to(scope, container, operator=operator)
 
-    def get_output(self, i=0):
+    def get_output_name(self, i=0):
         """
         Returns the output.
         """
         if i != 0:
             raise IndexError("Can only return the first item.")
-        return self.onx_op.get_output(self.index)
+        return self.onx_op.get_output_name(self.index)
 
     @property
     def outputs(self):
@@ -396,6 +396,7 @@ class OnnxOperator:
                                         i, type(name)))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
+        self.output_names_ = None
 
     def __str__(self):
         """
@@ -438,50 +439,22 @@ class OnnxOperator:
         """
         return OnnxOperatorItem(self, index)
 
-    def get_output(self, i):
-        """
-        Returns the ith output.
-        """
-        if hasattr(self, 'output_names_'):
+    def get_output_name(self, i, scope=None):
+        "Returns name of output *i*."
+        if self.state is not None:
+            return self.state.computed_outputs_[i][0]
+        if self.output_names_ is not None:
             return self.output_names_[i]
-        if (self.output_names and i < len(self.output_names) and
-                self.output_names[i]):
-            return self.output_names[i]
-        if i < len(self.expected_outputs):
-            return self.expected_outputs[i][0]
-        if i < self.output_range[1]:
-            if i > 1000:
-                raise IndexError(
-                    "Too many outputs. You should redesign your operator.")
-            return "O%d" % i
-        raise IndexError("Output %d does not exist." % i)
-
-    def update_name(self, i, name):
-        """
-        Updates the name of a variable after it was scoped.
-        """
-        if (self.output_variables is not None and
-                i < len(self.output_variables)):
-            raise RuntimeError(
-                "Inconsistent, cannot changed variable name "
-                "after it was used: '{}' != '{}'".format(
-                    self.output_variables[i], name))
-        if (hasattr(self, 'output_names_') and
-                i < len(self.output_names_) and
-                self.output_names_[i] != name):
-            raise RuntimeError(
-                "Inconsistent, cannot changed variable name "
-                "after it was used: '{}' != '{}'".format(
-                    self.output_names_[i], name))
-        if self.output_names is None:
-            self.output_names = []
-        while len(self.output_names) <= i:
-            self.output_names.append(None)
-        self.output_names[i] = name
+        self._set_output_names_(getattr(self, 'scope', None) or scope, None)
+        return self.output_names_[i]
 
     def _set_output_names_(self, scope, operator):
-        if hasattr(self, 'output_names_'):
-            outputs = self.output_names_
+        "Called by add_to."
+        if operator is not None:
+            self.operator_ = operator
+        if self.output_names_ is not None:
+            raise RuntimeError(
+                "output_names_ is already set.")
         elif self.output_variables is not None:
             outputs = [o.onnx_name for o in self.output_variables]
             self.output_names_ = outputs
@@ -509,6 +482,8 @@ class OnnxOperator:
                 outputs.append(name)
             self.output_names_ = outputs
         else:
+            if scope is None:
+                raise RuntimeError("scope must not be None.")
             outputs = []
             for name in self.expected_outputs:
                 name = scope.get_unique_variable_name(
@@ -581,8 +556,9 @@ class OnnxOperator:
                 scope, container, None, op_version=self.op_version,
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 expected_inputs=self.expected_inputs,
-                expected_outputs=self.expected_outputs, **kwargs)
-            self.state.run(operator=operator)
+                expected_outputs=self.expected_outputs,
+                operator=operator, **kwargs)
+            self.state.run()
         self._verify_add_to_()
 
     def _verify_add_to_(self):
@@ -982,4 +958,4 @@ class OnnxSubEstimator(OnnxOperator):
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
                 options=self.options, **kwargs)
-            self.state.run(operator=operator)
+            self.state.run()

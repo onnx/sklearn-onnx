@@ -19,13 +19,14 @@ class GraphStateVar:
 
 class GraphState:
 
-    def __init__(self, inputs, outputs, operator_name, scope,
+    def __init__(self, inputs, output_names, operator_name, scope,
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
-                 expected_outputs=None, **attrs):
+                 expected_outputs=None, operator=None, **attrs):
         self.inputs = inputs
-        self._outputs = outputs
+        self._output_names = output_names
         self.scope = scope
+        self.operator = operator
         if hasattr(operator_name, 'fit'):
             from .. import get_model_alias
             self.operator_instance = operator_name
@@ -70,12 +71,12 @@ class GraphState:
             change = []
             for vi in v:
                 change.append((vi, None) if isinstance(vi, str) else vi)
-        if self._outputs is not None:
+        if self._output_names is not None:
             res = []
             for i in range(0, len(self._expected_outputs)):
-                if i < len(self._outputs):
+                if i < len(self._output_names):
                     res.append(
-                        (self._outputs[i], self._expected_outputs[i][1]))
+                        (self._output_names[i], self._expected_outputs[i][1]))
                 else:
                     res.append(self._expected_outputs[i])
             self._expected_outputs = res
@@ -109,42 +110,60 @@ class GraphState:
         self.run()
         return self.computed_outputs_
 
-    def _get_var_name(self, var, unused, operator=None):
-        if isinstance(var, Variable):
-            return [var]
-        if isinstance(var, (np.ndarray, np.bool, np.int64,
-                            np.float32, np.float64, np.bool,
-                            np.int8, np.uint8)):
-            return [self._add_constant(var)]
-        if hasattr(var, 'ConstantValue'):
-            return [self._add_constant(var.ConstantValue, scope=self.scope)]
-        if hasattr(var, 'add_to'):
-            var.add_to(self.scope, self.container, operator=operator)
-            outputs = var.outputs
-            if isinstance(outputs, list):
-                vars = []
-                for var in outputs:
-                    if isinstance(var, (Variable, tuple)):
-                        vars.append(var)
-                    elif isinstance(var, str):
-                        vars.append((var, None))
-                if len(vars) == 0:
-                    raise RuntimeError(
-                        "Empty inputs outputs=%s var=%s unused=%s "
-                        "operator=%r." % (outputs, var, unused, operator))
-                return vars
-            raise RuntimeError("Unexpected output type {}".format(outputs))
-        if isinstance(var, str):
-            return [(var, None)]
-        if isinstance(var, tuple) and len(var) == 2:
-            return [var]
-        try:
-            a, b = var
-            return [(a, b)]
-        except ValueError:
-            pass
-        raise RuntimeError("Unexpected type for parameter 'var': {0}."
-                           "".format(type(var)))
+    def _get_var_name(self, var, in_out, operator=None, index=None):
+        "input: True for output, False for input"
+        def __fct__(var, operator):
+            if isinstance(var, Variable):
+                return [var]
+            if isinstance(var, (np.ndarray, np.bool, np.int64,
+                                np.float32, np.float64, np.bool,
+                                np.int8, np.uint8)):
+                return [self._add_constant(var)]
+            if hasattr(var, 'ConstantValue'):
+                return [
+                    self._add_constant(var.ConstantValue, scope=self.scope)]
+            if hasattr(var, 'add_to'):
+                var.add_to(self.scope, self.container, operator=operator)
+                outputs = var.outputs
+                if isinstance(outputs, list):
+                    vars = []
+                    for var in outputs:
+                        if isinstance(var, (Variable, tuple)):
+                            vars.append(var)
+                        elif isinstance(var, str):
+                            vars.append((var, None))
+                    if len(vars) == 0:
+                        raise RuntimeError(
+                            "Empty inputs outputs=%s var=%s in_out=%s "
+                            "operator=%r." % (outputs, var, in_out, operator))
+                    return vars
+                raise RuntimeError("Unexpected output type {}".format(outputs))
+            if isinstance(var, str):
+                return [(var, None)]
+            if isinstance(var, tuple) and len(var) == 2:
+                return [var]
+            try:
+                a, b = var
+                return [(a, b)]
+            except ValueError:
+                pass
+            raise RuntimeError("Unexpected type for parameter 'var': {0}."
+                               "".format(type(var)))
+
+        v = __fct__(var, operator)
+        if v is None or not isinstance(v, list) or len(v) == 0:
+            raise TypeError(
+                "Unexpected type or empty value %r - %s." % (type(v), v))
+        if in_out and self._output_names is not None and index is not None:
+            if len(v) != 1:
+                raise RuntimeError(
+                    "Mismatch number of outputs between %s and %s." % (
+                        v, self._output_names[index]))
+            if v[0][0] != self._output_names[index]:
+                raise RuntimeError(
+                    "Mismatch output name %r between %s and %s." % (
+                        v[0][0], v, self._output_names[index]))
+        return v
 
     def _add_constant(self, cst, scope):
 
@@ -212,12 +231,16 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(cst)))
 
     @staticmethod
-    def _get_output_name(output, scope):
+    def _get_output_name(output_names, output, scope):
         if isinstance(output, Variable):
             return output
         if isinstance(output, str):
+            if output in output_names:
+                return (output, None)
             return (scope.get_unique_variable_name(output), None)
         if isinstance(output, tuple):
+            if output[0] in output_names:
+                return output
             return (scope.get_unique_variable_name(output[0]),
                     output[1])
         raise NotImplementedError(
@@ -319,36 +342,24 @@ class GraphState:
                 if ct in memo:
                     vars1[i] = (inp[0], memo[ct][0]())
 
-    def run(self, operator=None):
+    def run(self):
         if self.computed_outputs_ is None:
-            if operator is not None:
-                expected_outputs = operator.outputs
+            if self.operator is not None:
+                expected_outputs = self.operator.outputs
             else:
                 if self._expected_outputs is not None:
                     eoli = []
-                    for o in self._expected_outputs:
-                        v = self._get_var_name(o, True)
-                        if v is not None:
-                            if not isinstance(v, list):
-                                raise TypeError(
-                                    "Unexpected output type %r - %s." % (
-                                        type(v), v))
-                            eoli.extend(v)
+                    for i, o in enumerate(self._expected_outputs):
+                        v = self._get_var_name(o, True, index=i)
+                        eoli.extend(v)
                     expected_outputs = eoli
                 else:
                     expected_outputs = None
 
             inputs = []
             for i in self.inputs:
-                v = self._get_var_name(i, False)
-                if v is not None:
-                    if not isinstance(v, list):
-                        raise TypeError(
-                            "Unexpected input type %r - %s." % (type(v), v))
-                    if len(v) == 0:
-                        raise RuntimeError(
-                            "Empty input %r - %s." % (type(v), v))
-                    inputs.extend(v)
+                v = self._get_var_name(i, False, index=None)
+                inputs.extend(v)
 
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
@@ -405,8 +416,9 @@ class GraphState:
                     raise RuntimeError(
                         "Options must be empty for node %r but is it %r." % (
                             self.operator_name, self.options))
-                outputs = [self._get_output_name(o, self.scope)
-                           for o in expected_outputs]
+                outputs = [
+                    self._get_output_name(self._output_names, o, self.scope)
+                    for o in expected_outputs]
                 input_names = [i[0] for i in inputs]
                 output_names = [i[0] for i in outputs]
                 self.container.add_node(
