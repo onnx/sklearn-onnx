@@ -3,6 +3,7 @@ from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
@@ -16,7 +17,8 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshape,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
-    OnnxArrayFeatureExtractor, OnnxMul
+    OnnxArrayFeatureExtractor, OnnxMul,
+    OnnxPad
 )
 from onnx import (
     helper, TensorProto, load_model,
@@ -283,6 +285,17 @@ class TestOnnxOperators(unittest.TestCase):
         inits = [row for row in str(model_def).split('\n')
                  if row.startswith("  initializer {")]
         self.assertEqual(len(inits), 1)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_default(self):
+        pad = OnnxPad(mode='constant', value=1.5,
+                      pads=[0, 1, 0, 1], op_version=10)
+
+        X = helper.make_tensor_value_info(
+            'X', onnx.TensorProto.FLOAT, [None, 2])
+        model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
+        onnx.checker.check_model(model_def)
 
 
 if __name__ == "__main__":

@@ -278,7 +278,8 @@ class OnnxOperator:
         # check inputs
         if len(inputs) == 0:
             if self.input_range[0] == self.input_range[1]:
-                self.inputs = [_[0] for _ in self.expected_inputs]
+                self.inputs = [OnnxOperator.UnscopedVariable(_[0])
+                               for _ in self.expected_inputs]
             else:
                 # The number of inputs may vary.
                 self.inputs = None
