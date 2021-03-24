@@ -73,7 +73,7 @@ class Variable:
         """
         if not isinstance(raw_name, str) or '(' in raw_name:
             raise TypeError(
-                "raw_name must be a string not %r." % type(raw_name))
+                "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
             raise TypeError(
                 "raw_name must be a string not %r." % type(onnx_name))
