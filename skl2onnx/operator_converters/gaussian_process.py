@@ -112,6 +112,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             var_y = op._y_train_std.astype(dtype)
             if len(var_y.shape) == 1:
                 var_y = var_y.reshape(var_y.shape + (1,))
+            if isinstance(var_y, (np.float32, np.float64)):
+                var_y = np.array([var_y])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(
                 OnnxMul(y_mean_b, var_y, op_version=opv),
                 mean_y, op_version=opv)

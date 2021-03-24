@@ -49,7 +49,7 @@ class OnnxOperatorItem:
         """
         return self.onx_op.get_latest_tested_opset_version()
 
-    def add_to(self, scope, container, operator=None):
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -57,8 +57,10 @@ class OnnxOperatorItem:
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: must be True if called from method `to_onnx`
         """
-        self.onx_op.add_to(scope, container, operator=operator)
+        self.onx_op.add_to(scope, container, operator=operator,
+                           run_converters=run_converters)
 
     def get_output_name(self, i=0):
         """
@@ -498,7 +500,7 @@ class OnnxOperator:
                 inputs.append(input)
         return inputs
 
-    def add_to(self, scope, container, operator=None):
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -506,6 +508,8 @@ class OnnxOperator:
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: False by default, must be True if
+            called from method `to_onnx`
 
         At this stage, inputs types are not necessarily known.
         """
@@ -539,7 +543,7 @@ class OnnxOperator:
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 expected_inputs=self.expected_inputs,
                 expected_outputs=self.expected_outputs,
-                operator=operator, **kwargs)
+                operator=operator, run_converters=run_converters, **kwargs)
             self.state.run()
         self._verify_add_to_()
 
@@ -741,13 +745,13 @@ class OnnxOperator:
         for inp in inputs:
             container.add_input(Variable(inp[0], inp[0],
                                          scope=scope, type=inp[1]))
-        self.add_to(scope, container)
+        self.add_to(scope, container, run_converters=True)
         if other_outputs is not None:
             for out in other_outputs:
                 if not hasattr(out, 'add_to'):
                     raise RuntimeError(
                         "Extra outputs must have method 'add_to'.")
-                out.add_to(scope, container)
+                out.add_to(scope, container, run_converters=True)
 
         # infer shapes
         if outputs:
@@ -878,7 +882,7 @@ class OnnxSubEstimator(OnnxOperator):
             ", ".join("%r" % i for i in self.inputs),
             self.op_version, self.output_names)
 
-    def add_to(self, scope, container, operator=None, recursive=False):
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -886,6 +890,7 @@ class OnnxSubEstimator(OnnxOperator):
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: must be True if called from method `to_onnx`
         """
         if self.state is None:
             if self.kwargs.get('op_version', '') is None:
@@ -940,5 +945,5 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                options=self.options, **kwargs)
+                options=self.options, run_converters=run_converters, **kwargs)
             self.state.run()

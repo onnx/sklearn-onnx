@@ -218,7 +218,8 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
-        self.assertEqual(onx.outputs, ['Y'])
+        self.assertEqual(str(onx.outputs),
+                         "[('Y', DoubleTensorType(shape=[]))]")
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))

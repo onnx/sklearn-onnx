@@ -23,11 +23,11 @@ class GraphState:
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
                  expected_outputs=None, operator=None,
-                 run_converter=False, **attrs):
+                 run_converters=False, **attrs):
         self.inputs = inputs
         self._output_names = output_names
         self.scope = scope
-        self.run_converter = run_converter
+        self.run_converters = run_converters
         self.operator = operator
         if hasattr(operator_name, 'fit'):
             from .. import get_model_alias
@@ -121,7 +121,8 @@ class GraphState:
     def _get_var_name(self, var, in_out, operator=None, index=None):
         "input: True for output, False for input"
         if hasattr(var, 'add_to'):
-            var.add_to(self.scope, self.container, operator=operator)
+            var.add_to(self.scope, self.container, operator=operator,
+                       run_converters=self.run_converters)
             outputs = var.outputs
             if isinstance(outputs, list):
                 vars = []
@@ -444,12 +445,11 @@ class GraphState:
                 self.computed_outputs2_ = [
                     (v.raw_name, v.type) for v in self.computed_outputs_]
 
-                if self.run_converter:
-                    # The parser was run on sub-operators and neither the shape
-                    # calcutor nor the converter.
+                if self.run_converters:
+                    # The parser was run on sub-operators but not the
+                    # converter.
                     conv = get_converter(self.operator_name)
                     conv(self.scope, sub_op, self.container)
-                    # sub_op.is_evaluated = True
             else:
                 # only one node is added
                 if self.options is not None:

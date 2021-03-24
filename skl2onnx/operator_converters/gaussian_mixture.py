@@ -144,7 +144,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
     add = OnnxAdd(cst, log_prob, op_version=opv)
     mul = OnnxMul(add, np.array([-0.5], dtype=dtype),
                   op_version=opv)
-    if isinstance(log_det, float):
+    if isinstance(log_det, (np.float32, np.float64, float)):
         log_det = np.array([log_det], dtype=dtype)
 
     return OnnxAdd(mul, log_det.astype(dtype), op_version=opv)
