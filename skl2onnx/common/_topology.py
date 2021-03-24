@@ -6,6 +6,7 @@
 
 import re
 import warnings
+import pprint
 import numpy as np
 from onnx import onnx_pb as onnx_proto
 from onnxconverter_common.data_types import (  # noqa
@@ -224,6 +225,14 @@ class Operator(OperatorBase):
         self.target_opset = target_opset
         self.scope_inst = scope_inst
 
+    def __repr__(self):
+        return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
+                "outputs='{3}', raw_operator={4})".format(
+                    self.type, self.onnx_name,
+                    ','.join(v.onnx_name for v in self.inputs),
+                    ','.join(v.onnx_name for v in self.outputs),
+                    self.raw_operator))
+
     @property
     def full_name(self):
         """
@@ -328,6 +337,10 @@ class Scope:
 
         # Reserved variables.
         self.reserved = {}
+
+    def get(self, var_name, default_value):
+        "Returns variable with 'name' or default value is not found."
+        return self.variables.get(var_name, default_value)
 
     def temp(self):
         """
@@ -668,6 +681,7 @@ class Topology:
                     raise TypeError(
                         "operator.inputs must be a list not {}".format(
                             type(operator.inputs)))
+
                 if (all(variable.is_fed for variable in operator.inputs)
                         and not operator.is_evaluated):
                     # Check if over-writing problem occurs (i.e., multiple
@@ -676,18 +690,34 @@ class Topology:
                         # Throw an error if this variable has been treated as
                         # an output somewhere
                         if variable.is_fed:
+                            add = ["", "--DEBUG-INFO--"]
+                            add.append("self.variable_name_set=%s" % (
+                                pprint.pformat(self.variable_name_set)))
+                            add.append("self.operator_name_set=%s" % (
+                                pprint.pformat(self.operator_name_set)))
+                            for scope in self.scopes:
+                                add.append(pprint.pformat(
+                                    scope.variable_name_mapping))
+                                for var in scope.variables.values():
+                                    add.append("   is_fed=%s %s" % (
+                                        getattr(var, 'is_fed', '?'), var))
+                                for op in scope.operators.values():
+                                    add.append("   is_evaluated=%s %s" % (
+                                        getattr(op, 'is_evaluated', '?'), op))
                             raise RuntimeError(
                                 "A variable is already assigned ({}) "
                                 "for operator '{}' (name='{}'). This "
                                 "may still happen if a converter is a "
-                                "combination of sub-operators and one of "
+                                "combination of sub-estimators and one "
                                 "of them is producing this output. "
                                 "In that case, an identity node must be "
-                                "added.".format(
+                                "added.{}".format(
                                     variable, operator.type,
-                                    operator.onnx_name))
+                                    operator.onnx_name,
+                                    "\n".join(add)))
                         # Mark this variable as filled
                         variable.is_fed = True
+
                     # Make this operator as handled
                     operator.is_evaluated = True
                     is_evaluation_happened = True

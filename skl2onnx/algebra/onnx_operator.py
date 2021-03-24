@@ -5,7 +5,6 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from scipy.sparse import coo_matrix
-from onnxconverter_common.onnx_ops import apply_identity
 from ..proto import TensorProto
 from ..common.data_types import (
     _guess_type_proto_str, _guess_type_proto_str_inv)
@@ -111,61 +110,6 @@ class OnnxOperatorItem:
                 "type(self.onx_op.state)={}".format(
                     type(self), type(self.onx_op), type(self.onx_op.state)))
         return outputs[self.index:self.index + 1]
-
-
-class OnnxSubOperator:
-    """
-    Includes a sub operator in the ONNX graph.
-    """
-
-    def __init__(self, op, inputs, output_names=None, op_version=None,
-                 options=None):
-        self.op = op
-        self.output_names = output_names
-        if not isinstance(inputs, list):
-            inputs = [inputs]
-        self.inputs = inputs
-        self.op_version = op_version
-        self.options = options
-
-    def add_to(self, scope, container, operator=None):
-        """
-        Adds outputs to the container if not already added,
-        registered the outputs if the node is not final.
-
-        :param scope: scope
-        :param container: container
-        :param operator: overwrite inputs
-        """
-        if operator is not None:
-            raise RuntimeError(
-                "operator must be None, the operator to convert "
-                "is specified in member 'op'.")
-        try:
-            op_type = sklearn_operator_name_map[type(self.op)]
-        except KeyError:
-            raise RuntimeError(
-                "Unable to find a converter for model of type '{}'."
-                "".format(self.op.__class__.__name__))
-
-        this_operator = scope.declare_local_operator(op_type, self.op)
-        this_operator.inputs = self.inputs
-        if self.output_names is None:
-            output = scope.declare_local_variable('sub_%s' % op_type)
-            this_operator.outputs.append(output)
-            self.outputs = [output]
-        else:
-            self.outputs = []
-            for v in self.output_names:
-                if isinstance(v, Variable):
-                    output = scope.declare_local_variable(
-                        '%s_%s' % (v.onnx_name, op_type))
-                    apply_identity(
-                        scope, output.onnx_name, v.onnx_name, container)
-                elif isinstance(v, str):
-                    output = scope.declare_local_variable(v)
-            self.outputs.append(output)
-            this_operator.outputs.extend(self.outputs)
 
 
 class OnnxOperator:
@@ -278,6 +222,8 @@ class OnnxOperator:
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
+        if isinstance(output_names, str):
+            output_names = [output_names]
 
         if op_version is None:
             if domain == '':
@@ -340,7 +286,7 @@ class OnnxOperator:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
                 elif isinstance(inp, (OnnxOperator, Variable,
-                                      OnnxOperatorItem, OnnxSubOperator)):
+                                      OnnxOperatorItem, OnnxSubEstimator)):
                     self.inputs.append(inp)
                 elif isinstance(inp, tuple) and len(inp) == 2:
                     self.inputs.append(inp)
@@ -401,8 +347,11 @@ class OnnxOperator:
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
 
-        if (self.output_names is not None and
-                len(self.output_names) > len(self.expected_outputs)):
+        if (self.output_names is not None and (
+                self.expected_outputs is None or
+                len(self.output_names) > len(self.expected_outputs))):
+            if self.expected_outputs is None:
+                self.expected_outputs = []
             for i in range(len(self.expected_outputs),
                            len(self.output_names)):
                 self.expected_outputs.append((self.output_names[i], None))
@@ -986,6 +935,7 @@ class OnnxSubEstimator(OnnxOperator):
                             input[0], input[0], scope=scope, type=input[1]))
                 else:
                     inputs.append(input)
+
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,

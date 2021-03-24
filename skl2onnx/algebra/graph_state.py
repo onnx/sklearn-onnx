@@ -22,10 +22,12 @@ class GraphState:
     def __init__(self, inputs, output_names, operator_name, scope,
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
-                 expected_outputs=None, operator=None, **attrs):
+                 expected_outputs=None, operator=None,
+                 run_converter=False, **attrs):
         self.inputs = inputs
         self._output_names = output_names
         self.scope = scope
+        self.run_converter = run_converter
         self.operator = operator
         if hasattr(operator_name, 'fit'):
             from .. import get_model_alias
@@ -72,14 +74,19 @@ class GraphState:
             change = []
             for vi in v:
                 change.append((vi, None) if isinstance(vi, str) else vi)
+
         if self._output_names is not None:
             res = []
-            for i in range(0, len(self._expected_outputs)):
-                if i < len(self._output_names):
-                    res.append(
-                        (self._output_names[i], self._expected_outputs[i][1]))
-                else:
-                    res.append(self._expected_outputs[i])
+            if self._expected_outputs is not None:
+                for i in range(0, len(self._expected_outputs)):
+                    if i < len(self._output_names):
+                        res.append(
+                            (self._output_names[i],
+                             self._expected_outputs[i][1]))
+                    else:
+                        res.append(self._expected_outputs[i])
+            for i in range(len(res), len(self._output_names)):
+                res.append((self._output_names[i], None))
             self._expected_outputs = res
 
         if self._expected_outputs is not None:
@@ -161,6 +168,9 @@ class GraphState:
                 raise RuntimeError(
                     "Mismatch number of outputs between %s and %s." % (
                         v, self._output_names[index]))
+            v2 = self.scope.get(var[0], None)
+            if v2 is not None:
+                v = [v2]
             if v[0][0] != self._output_names[index]:
                 raise RuntimeError(
                     "Mismatch output name %r between %s and %s." % (
@@ -375,44 +385,71 @@ class GraphState:
                         "Attribute 'sub_op_' is not empty.")
 
                 # a model is converted into a subgraph
-                sub_op = self.scope.declare_local_operator(
-                    self.operator_name, self.operator_instance)
-                sub_op.inputs = self.computed_inputs_
+                sub_op_inputs = self.computed_inputs_
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn
                 self.scope.add_options(
-                    id(sub_op.raw_operator), self.options)
+                    id(self.operator_instance), self.options)
                 sub_outputs = _parse_sklearn(
-                    self.scope, self.operator_instance, sub_op.inputs)
+                    self.scope, self.operator_instance, sub_op_inputs)
+                set_input_names = set(v.onnx_name for v in sub_op_inputs)
+                sub_op = None
+                for op in self.scope.operators.values():
+                    for inp in op.inputs:
+                        if inp.onnx_name in set_input_names:
+                            sub_op = op
                 if (sub_outputs is None or
                         None in sub_outputs):
                     raise RuntimeError(
                         "Wrong result when parsing model {}.".format(
                             type(self.operator_instance)))
 
-                self.computed_outputs_ = []
+                # Checks operator outputs
                 for out in sub_outputs:
-                    self.computed_outputs_.append(
-                        out if isinstance(out, Variable)
-                        else Variable(
-                            v.raw_name,
-                            self.scope.get_unique_variable_name(v.raw_name),
-                            self.scope, v.type))
+                    if not isinstance(out, Variable):
+                        raise TypeError(
+                            "Output %s must be of type Variable." % out)
+                self.sub_op_ = sub_op
+                sub_op.outputs = sub_outputs
 
-                sub_op.outputs = self.computed_outputs_
                 shape_calc = get_shape_calculator(self.operator_name)
                 shape_calc(sub_op)
-                self.computed_inputs2_ = sub_op.inputs
-                self.computed_inputs2_ = [
-                    (v.raw_name, v.type) for v in self.computed_outputs_]
-                self.sub_op_ = sub_op
-                self.computed_outputs_ = sub_op.outputs
 
-                # The parser was run on sub-operators and neither the shape
-                # calcutor nor the converter.
-                conv = get_converter(self.operator_name)
-                conv(self.scope, sub_op, self.container)
+                # Add Identity nodes to be consistent with `is_fed`
+                # in Topology.
+                if expected_outputs is not None:
+                    outputs = [
+                        self._get_output_name(
+                            self._output_names, o, self.scope)
+                        for o in expected_outputs]
+                else:
+                    outputs = [
+                        self.scope.declare_local_variable(
+                            o.onnx_name, type=o.type)
+                        for o in sub_op.outputs]
+                if len(outputs) != len(sub_op.outputs):
+                    raise RuntimeError(
+                        "Mismatched number of outputs %s and %s." % (
+                            outputs, sub_op.outputs))
+
+                output_names = [i[0] for i in outputs]
+                for i, out in enumerate(sub_op.outputs):
+                    var = outputs[i]
+                    self.container.add_node(
+                        'Identity', [out.onnx_name], [var[0]],
+                        name=self.scope.get_unique_operator_name("SubOpId"))
+                self.computed_outputs_ = outputs
+                self.computed_inputs2_ = sub_op.inputs
+                self.computed_outputs2_ = [
+                    (v.raw_name, v.type) for v in self.computed_outputs_]
+
+                if self.run_converter:
+                    # The parser was run on sub-operators and neither the shape
+                    # calcutor nor the converter.
+                    conv = get_converter(self.operator_name)
+                    conv(self.scope, sub_op, self.container)
+                    # sub_op.is_evaluated = True
             else:
                 # only one node is added
                 if self.options is not None:
