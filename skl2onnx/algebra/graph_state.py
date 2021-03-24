@@ -160,7 +160,12 @@ class GraphState:
             raise RuntimeError("Unexpected type for parameter 'var': {0}."
                                "".format(type(var)))
 
-        v = __fct__(var, operator)
+        try:
+            v = __fct__(var, operator)
+        except TypeError as e:
+            raise RuntimeError(
+                "Unable to process one variable %s and operator=%s "
+                "(name=%r)." % (var, operator, self.operator_name)) from e
         if v is None or not isinstance(v, list) or len(v) == 0:
             raise TypeError(
                 "Unexpected type or empty value %r - %s." % (type(v), v))
@@ -205,8 +210,12 @@ class GraphState:
             cst, ty, astype = _ty_astype(cst)
             if astype is not None:
                 cst = cst.astype(astype)
+            if ty == onnx_proto.TensorProto.STRING:
+                value = [s.encode('utf-8') for s in cst.flatten()]
+            else:
+                value = cst.flatten()
             self.container.add_initializer(
-                name, ty, shape, cst.flatten())
+                name, ty, shape, value)
             return (name, _guess_numpy_type(cst.dtype, cst.shape))
 
         if isinstance(cst, coo_matrix):

@@ -9,7 +9,8 @@ from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, guess_numpy_type
+from skl2onnx.common.data_types import (
+    FloatTensorType, guess_numpy_type, DoubleTensorType)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshape,
@@ -218,8 +219,11 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
-        self.assertEqual(str(onx.outputs),
-                         "[('Y', DoubleTensorType(shape=[]))]")
+        self.assertIsInstance(onx.outputs, list)
+        self.assertEqual(len(onx.outputs), 1)
+        self.assertIsInstance(onx.outputs[0], tuple)
+        self.assertEqual(len(onx.outputs[0]), 2)
+        self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))

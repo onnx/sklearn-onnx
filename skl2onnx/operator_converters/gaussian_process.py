@@ -304,12 +304,14 @@ def convert_gaussian_process_classifier(scope, operator, container):
     integrals.set_onnx_name_prefix('integrals')
 
     # pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
+    coef_sum = (.5 * COEFS.sum()).astype(dtype)
+    if not isinstance(coef_sum, np.ndarray):
+        coef_sum = np.array([coef_sum])
     pi_star = OnnxAdd(
                 OnnxReduceSumApi11(
                     OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
                     op_version=opv, axes=[0]),
-                (.5 * COEFS.sum()).astype(dtype),
-                op_version=opv)
+                coef_sum, op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star')
 
     pi_star = OnnxReshape(pi_star, np.array([-1, 1], dtype=np.int64),
