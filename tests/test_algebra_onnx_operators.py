@@ -3,19 +3,22 @@ from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, guess_numpy_type
+from skl2onnx.common.data_types import (
+    FloatTensorType, guess_numpy_type, DoubleTensorType)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshapeApi13,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
-    OnnxArrayFeatureExtractor, OnnxMul
+    OnnxArrayFeatureExtractor, OnnxMul,
+    OnnxPad
 )
 from onnx import (
     helper, TensorProto, load_model,
@@ -218,7 +221,11 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
-        self.assertEqual(onx.outputs, ['Y'])
+        self.assertIsInstance(onx.outputs, list)
+        self.assertEqual(len(onx.outputs), 1)
+        self.assertIsInstance(onx.outputs[0], tuple)
+        self.assertEqual(len(onx.outputs[0]), 2)
+        self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))
@@ -278,6 +285,17 @@ class TestOnnxOperators(unittest.TestCase):
         inits = [row for row in str(model_def).split('\n')
                  if row.startswith("  initializer {")]
         self.assertEqual(len(inits), 1)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_default(self):
+        pad = OnnxPad(mode='constant', value=1.5,
+                      pads=[0, 1, 0, 1], op_version=10)
+
+        X = helper.make_tensor_value_info(
+            'X', onnx.TensorProto.FLOAT, [None, 2])
+        model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
+        onnx.checker.check_model(model_def)
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ def calculate_sklearn_concat(operator):
             operator.outputs[0].type.shape = [None, None]
             return
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     seen_types = []
     for i in operator.inputs:

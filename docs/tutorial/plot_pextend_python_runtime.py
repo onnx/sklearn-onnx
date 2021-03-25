@@ -165,8 +165,9 @@ class OnnxEig(OnnxOperator):
     """
 
     since_version = 1  # last changed in this version
-    expected_inputs = ['X']  # imput names
-    expected_outputs = ['EigenValues', 'EigenVectors']  # output names
+    expected_inputs = [('X', 'T')]  # input names and types
+    expected_outputs = [('EigenValues', 'T'),  # output names and types
+                        ('EigenVectors', 'T')]
     input_range = [1, 1]  # only one input is allowed
     output_range = [1, 2]  # 1 or 2 outputs are produced
     is_deprecated = False  # obviously not deprecated

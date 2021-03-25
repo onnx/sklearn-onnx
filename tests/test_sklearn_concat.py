@@ -101,11 +101,11 @@ class TestSklearnPipeline(unittest.TestCase):
         full_labels = data['survived']
 
         train_df, test_df, train_labels, test_labels = train_test_split(
-            full_df, full_labels, test_size=.2)
+            full_df, full_labels, test_size=.2, random_state=0)
 
         col_transformer = _column_tranformer_fitted_from_df(full_df)
 
-        regressor = DecisionTreeRegressor()
+        regressor = DecisionTreeRegressor(random_state=0)
         regressor.fit(
             col_transformer.transform(train_df),
             train_labels)

@@ -27,7 +27,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
         if variable.type.shape[1] is not None:
