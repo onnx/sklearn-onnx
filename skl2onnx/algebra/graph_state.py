@@ -450,7 +450,6 @@ class GraphState:
                         "Mismatched number of outputs %s and %s." % (
                             outputs, sub_op.outputs))
 
-                output_names = [i[0] for i in outputs]
                 for i, out in enumerate(sub_op.outputs):
                     var = outputs[i]
                     self.container.add_node(
