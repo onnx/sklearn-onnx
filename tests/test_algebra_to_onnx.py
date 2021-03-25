@@ -3,6 +3,7 @@ from distutils.version import StrictVersion
 import numpy as np
 import onnx
 from onnx.defs import onnx_opset_version
+import onnxruntime
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -156,6 +157,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
+        reason="not available")
     def test_sub_graph_tuple_double(self):
         self.common_test_sub_graph(
             ('X1', DoubleTensorType()), LinearRegression,
@@ -168,6 +172,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
+        reason="not available")
     def test_sub_graph_str_double(self):
         self.common_test_sub_graph('X1', LinearRegression,
                                    cls_type=DoubleTensorType)
@@ -183,6 +190,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                      reason="Double support for classifiers not merged yet.")
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
+        reason="not available")
     def test_sub_graph_tuple_cls_double(self):
         self.common_test_sub_graph(
             ('X1', DoubleTensorType()), LogisticRegression,
@@ -200,6 +210,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                      reason="Double support for classifiers not merged yet.")
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
+        reason="not available")
     def test_sub_graph_str_cls_double(self):
         self.common_test_sub_graph(
             'X1', LogisticRegression, options={'zipmap': False},
