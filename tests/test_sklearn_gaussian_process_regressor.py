@@ -599,7 +599,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
         X = 15 * np.random.rand(100, 2)
         y = np.sin(X[:, 0] - X[:, 1]).ravel()
-        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        y += 0.1 * (0.5 - np.random.rand(X.shape[0]))
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(
             kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
