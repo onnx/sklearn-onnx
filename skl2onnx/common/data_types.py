@@ -11,6 +11,27 @@ from onnxconverter_common.data_types import (  # noqa
     FloatTensorType, StringTensorType, DoubleTensorType,
     DictionaryType, SequenceType)
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
+
+
+try:
+    from onnxconverter_common.data_types import DoubleType
+except ImportError:
+
+    class DoubleType(DataType):
+        def __init__(self, doc_string=''):
+            super(DoubleType, self).__init__([1, 1], doc_string)
+
+        def to_onnx_type(self):
+            onnx_type = onnx_proto.TypeProto()
+            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.DOUBLE
+            s = onnx_type.tensor_type.shape.dim.add()
+            s.dim_value = 1
+            return onnx_type
+
+        def __repr__(self):
+            return "{}()".format(self.__class__.__name__)
+
+
 from ..proto import TensorProto, onnx_proto
 
 

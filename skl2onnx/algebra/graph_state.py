@@ -8,7 +8,7 @@ from scipy.sparse import coo_matrix
 from ..proto import onnx_proto, TensorProto
 from ..common.data_types import (
     guess_proto_type, _guess_numpy_type, _guess_type_proto_str,
-    _guess_type_proto, FloatType, Int64Type, copy_type)
+    _guess_type_proto, FloatType, DoubleType, Int64Type, copy_type)
 from ..common._topology import Variable
 from ..common._registration import get_shape_calculator, get_converter
 
@@ -246,6 +246,13 @@ class GraphState:
             ty = TensorProto.FLOAT
             self.container.add_initializer(name, ty, None, float(cst))
             return (name, FloatType())
+
+        if isinstance(cst, np.float64):
+            name = self.scope.get_unique_variable_name(
+                self.onnx_prefix + 'cst')
+            ty = TensorProto.DOUBLE
+            self.container.add_initializer(name, ty, None, float(cst))
+            return (name, DoubleType())
 
         raise NotImplementedError(
             "Unable to add a constant of type {}. "
