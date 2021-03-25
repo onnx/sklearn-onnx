@@ -568,7 +568,7 @@ class OnnxOperator:
 
     def get_output_type_inference(self, input_shapes=None):
         """
-        Returns the expected output variables in a list.
+        Returns the expected output types in a list.
         """
         if (self.state is not None and
                 self.state.computed_outputs_ is not None):

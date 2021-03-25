@@ -103,6 +103,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
         if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
+            if isinstance(y_mean_b, (np.float32, np.float64)):
+                y_mean_b = np.array([y_mean_b])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
