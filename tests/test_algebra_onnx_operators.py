@@ -347,6 +347,55 @@ class TestOnnxOperators(unittest.TestCase):
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=6)
 
+    def test_onnxt_runtime_pad(self):
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[0.0, 0.0, 1.0, 1.2],
+                        [0.0, 0.0, 2.3, 3.4],
+                        [0.0, 0.0, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', constant_value, output_names=['Y'],
+            op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        assert_almost_equal(exp, got[0])
+
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[0, 1.2, 1.0, 1.2],
+                        [0, 3.4, 2.3, 3.4],
+                        [0, 5.7, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', output_names=['Y'],
+            mode='reflect', op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        assert_almost_equal(exp, got[0])
+
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[1.0, 1.0, 1.0, 1.2],
+                        [2.3, 2.3, 2.3, 3.4],
+                        [4.5, 4.5, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', output_names=['Y'],
+            mode='edge', op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        assert_almost_equal(exp, got[0])
+
 
 if __name__ == "__main__":
     unittest.main()

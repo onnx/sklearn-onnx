@@ -9,7 +9,7 @@ from onnxconverter_common.data_types import (  # noqa
     StringType, TensorType,  # noqa
     Int64TensorType, Int32TensorType, BooleanTensorType,  # noqa
     FloatTensorType, StringTensorType, DoubleTensorType,  # noqa
-    DictionaryType, SequenceType, UInt8TensorType)  # noqa
+    DictionaryType, SequenceType)  # noqa
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 
 
@@ -30,6 +30,18 @@ except ImportError:
 
         def __repr__(self):
             return "{}()".format(self.__class__.__name__)
+
+
+try:
+    from onnxconverter_common.data_types import UInt8TensorType
+except ImportError:
+
+    class UInt8TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(UInt8TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.UINT8
 
 
 try:

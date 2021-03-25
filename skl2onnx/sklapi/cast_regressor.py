@@ -11,7 +11,7 @@ except ImportError:
     _deprecate_positional_args = lambda x: x  # noqa
 
 
-class CastRegressor(RegressorMixin, BaseEstimator):
+class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
 
     """
     Cast predictions into a specific types.

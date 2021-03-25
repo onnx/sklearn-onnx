@@ -22,10 +22,12 @@ class GraphState:
     def __init__(self, inputs, output_names, operator_name, scope,
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
-                 expected_outputs=None, output_range=None,
-                 operator=None, run_converters=False, **attrs):
+                 expected_outputs=None, input_range=None,
+                 output_range=None, operator=None,
+                 run_converters=False, **attrs):
         self.inputs = inputs
         self._output_names = output_names
+        self._input_range = input_range.copy() if input_range else [1, 1e9]
         self._output_range = output_range.copy() if output_range else [1, 1e9]
         self.scope = scope
         self.run_converters = run_converters
@@ -296,7 +298,7 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(output), output))
 
     @staticmethod
-    def _update_inputs(inputs, names, scope, expected_inputs):
+    def _update_inputs(inputs, names, scope, expected_inputs, input_range):
         new_inputs = []
         for inp in inputs:
             if isinstance(inp, (Variable, tuple, GraphStateVar)):
@@ -326,7 +328,8 @@ class GraphState:
             if names is not None:
                 try:
                     inp.onnx_name = (
-                        names[i] if isinstance(names[i], str) else names[i][0])
+                        names[i] if isinstance(names[i], str)
+                        else names[i][0])
                 except IndexError as e:
                     raise IndexError(
                         "Wrong index %d, list=%s." % (i, names)) from e
@@ -345,6 +348,9 @@ class GraphState:
                     ct = expected_inputs[i][1]
                     if ct in memo:
                         for j in memo[ct]:
+                            if (j >= len(new_inputs) and
+                                    j >= input_range[0]):
+                                continue
                             if new_inputs[j].type is not None:
                                 new_inputs[i].type = (
                                     new_inputs[j].type.__class__())
@@ -413,7 +419,8 @@ class GraphState:
 
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
-                expected_inputs=self._expected_inputs)
+                expected_inputs=self._expected_inputs,
+                input_range=self._input_range)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
