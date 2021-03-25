@@ -348,6 +348,8 @@ class TestOnnxOperators(unittest.TestCase):
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+                     reason="only available for opset >= 11")
     def test_onnxt_runtime_pad(self):
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
                         dtype=np.float32)
