@@ -15,7 +15,7 @@ def calculate_sklearn_zipmap(operator):
 
 
 def calculate_sklearn_zipmap_columns(operator):
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type = operator.inputs[0].type.__class__(
         operator.inputs[0].type.shape)
     for i in range(1, len(operator.outputs)):

@@ -38,7 +38,7 @@ from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 from skl2onnx import update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
-from skl2onnx.algebra.onnx_operator import OnnxSubOperator
+from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx import to_onnx
 
 
@@ -146,7 +146,7 @@ def decorrelate_transformer_converter(scope, operator, container):
 
     # We tell in ONNX language how to compute the unique output.
     # op_version=opv tells which opset is requested
-    subop = OnnxSubOperator(op.pca_, X, op_version=opv)
+    subop = OnnxSubEstimator(op.pca_, X, op_version=opv)
     Y = OnnxIdentity(subop, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 

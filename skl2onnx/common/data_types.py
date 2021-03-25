@@ -4,10 +4,9 @@
 # license information.
 # --------------------------------------------------------------------------
 import numpy as np
-from ..proto import TensorProto, onnx_proto
-from onnxconverter_common.data_types import DataType, Int64Type, FloatType  # noqa
-from onnxconverter_common.data_types import StringType, TensorType  # noqa
 from onnxconverter_common.data_types import (  # noqa
+    DataType, Int64Type, FloatType,
+    StringType, TensorType,
     Int64TensorType, Int32TensorType, BooleanTensorType,
     FloatTensorType, StringTensorType, DoubleTensorType,
     DictionaryType, SequenceType)
@@ -20,6 +19,37 @@ except ImportError:
     Complex128TensorType = None
 
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
+
+
+try:
+    from onnxconverter_common.data_types import DoubleType
+except ImportError:
+
+    class DoubleType(DataType):
+        def __init__(self, doc_string=''):
+            super(DoubleType, self).__init__([1, 1], doc_string)
+
+        def to_onnx_type(self):
+            onnx_type = onnx_proto.TypeProto()
+            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.DOUBLE
+            s = onnx_type.tensor_type.shape.dim.add()
+            s.dim_value = 1
+            return onnx_type
+
+        def __repr__(self):
+            return "{}()".format(self.__class__.__name__)
+
+
+from ..proto import TensorProto, onnx_proto
+
+
+def copy_type(vtype, empty=True):
+    if isinstance(vtype, SequenceType):
+        return vtype.__class__(copy_type(vtype.element_type))
+    if isinstance(vtype, DictionaryType):
+        return vtype.__class__(copy_type(vtype.key_type),
+                               copy_type(vtype.value_type))
+    return vtype.__class__()
 
 
 def _guess_type_proto(data_type, dims):
@@ -61,6 +91,26 @@ def _guess_type_proto_str(data_type, dims):
         return Int32TensorType(dims)
     if data_type == "tensor(bool)":
         return BooleanTensorType(dims)
+    raise NotImplementedError(
+        "Unsupported data_type '{}'. You may raise an issue "
+        "at https://github.com/onnx/sklearn-onnx/issues."
+        "".format(data_type))
+
+
+def _guess_type_proto_str_inv(data_type):
+    # This could be moved to onnxconverter_common.
+    if isinstance(data_type, FloatTensorType):
+        return "tensor(float)"
+    if isinstance(data_type, DoubleTensorType):
+        return "tensor(double)"
+    if isinstance(data_type, StringTensorType):
+        return "tensor(string)"
+    if isinstance(data_type, Int64TensorType):
+        return "tensor(int64)"
+    if isinstance(data_type, Int32TensorType):
+        return "tensor(int32)"
+    if isinstance(data_type, BooleanTensorType):
+        return "tensor(bool)"
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
