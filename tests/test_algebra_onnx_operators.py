@@ -326,7 +326,7 @@ class TestOnnxOperators(unittest.TestCase):
                                 target_opset=TARGET_OPSET)
         oinf = InferenceSession(model_def.SerializeToString())
         got = oinf.run(None, {'X': x})
-        assert_almost_equal(y, got[0], decimal=6)
+        assert_almost_equal(y, got[0], decimal=5)
 
         # input size: (2, 3, 4, 5)
         x = np.random.randn(2, 3, 4, 5).astype(np.float32)
@@ -346,7 +346,7 @@ class TestOnnxOperators(unittest.TestCase):
                                 target_opset=TARGET_OPSET)
         oinf = InferenceSession(model_def.SerializeToString())
         got = oinf.run(None, {'X': x})
-        assert_almost_equal(y, got[0], decimal=6)
+        assert_almost_equal(y, got[0], decimal=5)
 
     def test_onnxt_runtime_pad(self):
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
