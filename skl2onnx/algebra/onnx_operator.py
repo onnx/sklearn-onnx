@@ -544,6 +544,7 @@ class OnnxOperator:
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 expected_inputs=self.expected_inputs,
                 expected_outputs=self.expected_outputs,
+                output_range=self.output_range,
                 operator=operator, run_converters=run_converters, **kwargs)
             self.state.run()
         self._verify_add_to_()

@@ -22,10 +22,11 @@ class GraphState:
     def __init__(self, inputs, output_names, operator_name, scope,
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
-                 expected_outputs=None, operator=None,
-                 run_converters=False, **attrs):
+                 expected_outputs=None, output_range=None,
+                 operator=None, run_converters=False, **attrs):
         self.inputs = inputs
         self._output_names = output_names
+        self._output_range = output_range.copy() if output_range else [1, 1e9]
         self.scope = scope
         self.run_converters = run_converters
         self.operator = operator
@@ -177,10 +178,27 @@ class GraphState:
             v2 = self.scope.get(var[0], None)
             if v2 is not None:
                 v = [v2]
-            if v[0][0] != self._output_names[index]:
+            try:
+                vn = v[0][0]
+            except IndexError as e:
+                raise ValueError(
+                    "Unexpected output %s in operator name %r."
+                    "" % (vn, self.operator_name)) from e
+            if (index >= len(self._output_names) and
+                    index >= self._output_range[0]):
+                return None
+            try:
+                vin = self._output_names[index]
+            except IndexError as e:
+                raise ValueError(
+                    "Unexpected index %s in operator name %r with ."
+                    "output names %s." % (
+                        index, self.operator_name,
+                        self._output_names)) from e
+            if vn != vin:
                 raise RuntimeError(
-                    "Mismatch output name %r between %s and %s." % (
-                        v[0][0], v, self._output_names[index]))
+                    "Mismatched output name %r between %s and %s." % (
+                        vn, v, vin))
         return v
 
     def _add_constant(self, cst, scope):
@@ -381,6 +399,8 @@ class GraphState:
                     eoli = []
                     for i, o in enumerate(self._expected_outputs):
                         v = self._get_var_name(o, True, index=i)
+                        if v is None:
+                            continue
                         eoli.extend(v)
                     expected_outputs = eoli
                 else:
