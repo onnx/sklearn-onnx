@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
+import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
@@ -544,6 +545,8 @@ class OnnxOperator:
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
                 expected_inputs=self.expected_inputs,
                 expected_outputs=self.expected_outputs,
+                input_range=self.input_range,
+                output_range=self.output_range,
                 operator=operator, run_converters=run_converters, **kwargs)
             self.state.run()
         self._verify_add_to_()
@@ -948,3 +951,17 @@ class OnnxSubEstimator(OnnxOperator):
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
                 options=self.options, run_converters=run_converters, **kwargs)
             self.state.run()
+
+
+class OnnxSubOperator(OnnxSubEstimator):
+    """
+    This class is deprecated and will be removed in version 1.9.
+    It should be replaced by :class:`OnnxSubEstimator
+    <skl2onnx.algebra.onnx_operator.OnnxSubEstimator>`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        OnnxSubEstimator.__init__(self, *args, **kwargs)
+        warnings.warn(("Class OnnxSubOperator will be removed in 1.9. "
+                       "It should be replaced by OnnxSubEstimator."),
+                      DeprecationWarning)

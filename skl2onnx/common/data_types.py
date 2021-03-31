@@ -5,11 +5,11 @@
 # --------------------------------------------------------------------------
 import numpy as np
 from onnxconverter_common.data_types import (  # noqa
-    DataType, Int64Type, FloatType,
-    StringType, TensorType,
-    Int64TensorType, Int32TensorType, BooleanTensorType,
-    FloatTensorType, StringTensorType, DoubleTensorType,
-    DictionaryType, SequenceType)
+    DataType, Int64Type, FloatType,  # noqa
+    StringType, TensorType,  # noqa
+    Int64TensorType, Int32TensorType, BooleanTensorType,  # noqa
+    FloatTensorType, StringTensorType, DoubleTensorType,  # noqa
+    DictionaryType, SequenceType)  # noqa
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 
 
@@ -24,6 +24,37 @@ except ImportError:
         def to_onnx_type(self):
             onnx_type = onnx_proto.TypeProto()
             onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.DOUBLE
+            s = onnx_type.tensor_type.shape.dim.add()
+            s.dim_value = 1
+            return onnx_type
+
+        def __repr__(self):
+            return "{}()".format(self.__class__.__name__)
+
+
+try:
+    from onnxconverter_common.data_types import UInt8TensorType
+except ImportError:
+
+    class UInt8TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(UInt8TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.UINT8
+
+
+try:
+    from onnxconverter_common.data_types import UInt8Type
+except ImportError:
+
+    class UInt8Type(DataType):
+        def __init__(self, doc_string=''):
+            super(UInt8Type, self).__init__([1, 1], doc_string)
+
+        def to_onnx_type(self):
+            onnx_type = onnx_proto.TypeProto()
+            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.UINT8
             s = onnx_type.tensor_type.shape.dim.add()
             s.dim_value = 1
             return onnx_type
@@ -118,11 +149,13 @@ def _guess_numpy_type(data_type, dims):
     if data_type in (np.str, str, object) or str(data_type) in ('<U1', ) or (
             hasattr(data_type, 'type') and data_type.type is np.str_): # noqa
         return StringTensorType(dims)
-    if data_type in (np.int64, np.uint64) or str(data_type) == '<U6':
+    if data_type in (np.int64, ) or str(data_type) == '<U6':
         return Int64TensorType(dims)
-    if data_type in (np.int32, np.uint32) or str(
+    if data_type in (np.int32, ) or str(
         data_type) in ('<U4', ): # noqa
         return Int32TensorType(dims)
+    if data_type == np.uint8:
+        return UInt8TensorType(dims)
     if data_type == np.bool:
         return BooleanTensorType(dims)
     raise NotImplementedError(
@@ -194,6 +227,8 @@ def guess_proto_type(data_type):
         return onnx_proto.TensorProto.STRING
     if isinstance(data_type, BooleanTensorType):
         return onnx_proto.TensorProto.BOOL
+    if isinstance(data_type, UInt8TensorType):
+        return onnx_proto.TensorProto.UINT8
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
 

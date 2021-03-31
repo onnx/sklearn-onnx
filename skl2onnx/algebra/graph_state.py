@@ -22,10 +22,13 @@ class GraphState:
     def __init__(self, inputs, output_names, operator_name, scope,
                  container, converter, onnx_prefix_name=None,
                  options=None, expected_inputs=None,
-                 expected_outputs=None, operator=None,
+                 expected_outputs=None, input_range=None,
+                 output_range=None, operator=None,
                  run_converters=False, **attrs):
         self.inputs = inputs
         self._output_names = output_names
+        self._input_range = input_range.copy() if input_range else [1, 1e9]
+        self._output_range = output_range.copy() if output_range else [1, 1e9]
         self.scope = scope
         self.run_converters = run_converters
         self.operator = operator
@@ -177,10 +180,27 @@ class GraphState:
             v2 = self.scope.get(var[0], None)
             if v2 is not None:
                 v = [v2]
-            if v[0][0] != self._output_names[index]:
+            try:
+                vn = v[0][0]
+            except IndexError as e:
+                raise ValueError(
+                    "Unexpected output %s in operator name %r."
+                    "" % (vn, self.operator_name)) from e
+            if (index >= len(self._output_names) and
+                    index >= self._output_range[0]):
+                return None
+            try:
+                vin = self._output_names[index]
+            except IndexError as e:
+                raise ValueError(
+                    "Unexpected index %s in operator name %r with ."
+                    "output names %s." % (
+                        index, self.operator_name,
+                        self._output_names)) from e
+            if vn != vin:
                 raise RuntimeError(
-                    "Mismatch output name %r between %s and %s." % (
-                        v[0][0], v, self._output_names[index]))
+                    "Mismatched output name %r between %s and %s." % (
+                        vn, v, vin))
         return v
 
     def _add_constant(self, cst, scope):
@@ -278,7 +298,7 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(output), output))
 
     @staticmethod
-    def _update_inputs(inputs, names, scope, expected_inputs):
+    def _update_inputs(inputs, names, scope, expected_inputs, input_range):
         new_inputs = []
         for inp in inputs:
             if isinstance(inp, (Variable, tuple, GraphStateVar)):
@@ -308,7 +328,8 @@ class GraphState:
             if names is not None:
                 try:
                     inp.onnx_name = (
-                        names[i] if isinstance(names[i], str) else names[i][0])
+                        names[i] if isinstance(names[i], str)
+                        else names[i][0])
                 except IndexError as e:
                     raise IndexError(
                         "Wrong index %d, list=%s." % (i, names)) from e
@@ -327,6 +348,9 @@ class GraphState:
                     ct = expected_inputs[i][1]
                     if ct in memo:
                         for j in memo[ct]:
+                            if (j >= len(new_inputs) and
+                                    j >= input_range[0]):
+                                continue
                             if new_inputs[j].type is not None:
                                 new_inputs[i].type = (
                                     new_inputs[j].type.__class__())
@@ -381,6 +405,8 @@ class GraphState:
                     eoli = []
                     for i, o in enumerate(self._expected_outputs):
                         v = self._get_var_name(o, True, index=i)
+                        if v is None:
+                            continue
                         eoli.extend(v)
                     expected_outputs = eoli
                 else:
@@ -393,7 +419,8 @@ class GraphState:
 
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
-                expected_inputs=self._expected_inputs)
+                expected_inputs=self._expected_inputs,
+                input_range=self._input_range)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -450,7 +477,6 @@ class GraphState:
                         "Mismatched number of outputs %s and %s." % (
                             outputs, sub_op.outputs))
 
-                output_names = [i[0] for i in outputs]
                 for i, out in enumerate(sub_op.outputs):
                     var = outputs[i]
                     self.container.add_node(
