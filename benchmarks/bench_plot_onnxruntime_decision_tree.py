@@ -1,9 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on DecisionTree.
 """
 # Authors: Xavier Dupré (benchmark)
-# License: MIT
 import matplotlib
 
 from io import BytesIO
