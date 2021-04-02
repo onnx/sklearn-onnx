@@ -1,8 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on LinearRegression.
 """
-# License: MIT
 import matplotlib
 
 import warnings

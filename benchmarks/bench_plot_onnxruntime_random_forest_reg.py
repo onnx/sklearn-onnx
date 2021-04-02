@@ -1,8 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on RandomForestRegressor.
 """
-# License: MIT
 import sys
 import warnings
 from io import BytesIO
@@ -44,7 +45,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
 
     if False:
         import treelite.sklearn
-        import treelite_runtime 
+        import treelite_runtime
         try:
             lite = treelite.sklearn.import_model(rf)
             name = "lite{}.dll".format(id(rf))

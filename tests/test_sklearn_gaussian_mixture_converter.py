@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 import unittest
 import numpy as np
 from sklearn.datasets import load_iris
