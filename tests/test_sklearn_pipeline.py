@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 import unittest
 import urllib.error as url_error
 from distutils.version import StrictVersion

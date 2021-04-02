@@ -1,8 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on LogisticRegression.
 """
-# License: MIT
+# Authors: Xavier Dupré (benchmark)
 import matplotlib
 
 from io import BytesIO

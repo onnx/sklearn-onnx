@@ -1,9 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on RandomForest.
 """
 # Authors: Xavier Dupré (benchmark)
-# License: MIT
 from io import BytesIO
 from time import perf_counter as time
 from itertools import combinations, chain
