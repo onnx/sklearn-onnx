@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 ===========
 API Summary
@@ -19,7 +21,7 @@ Converters
 ==========
 
 Both functions convert a *scikit-learn* model into ONNX.
-The first one lets the user manually 
+The first one lets the user manually
 define the input's name and types. The second one
 infers this information from the training data.
 These two functions are the main entry points to converter.

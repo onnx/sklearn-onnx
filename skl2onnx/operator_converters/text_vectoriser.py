@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import warnings
 import numpy as np
@@ -134,12 +131,12 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
     Regular expression ``[^\\\\\\\\n]`` is used to split
     a sentance into character (and not works) if ``analyser=='char'``.
     The mode ``analyser=='char_wb'`` is not implemented.
-    
+
     .. versionchanged:: 1.6
         Parameters have been renamed: *sep* into *separators*,
         *regex* into *tokenexp*.
     ````
-    
+
     """ # noqa
     op = operator.raw_operator
 

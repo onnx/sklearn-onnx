@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 ============
 Introduction
@@ -23,7 +25,7 @@ At a high level, you can:
    for more details.
 3. Load and run the model using *ONNX Runtime*.
 
-In this tutorial, we will briefly create a 
+In this tutorial, we will briefly create a
 pipeline with *scikit-learn*, convert it into
 ONNX format and run the first predictions.
 
@@ -67,7 +69,7 @@ to convert other model formats into ONNX. Here we will use
 Step 3: Load and run the model using ONNX Runtime
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-We will use *ONNX Runtime* to compute the predictions 
+We will use *ONNX Runtime* to compute the predictions
 for this machine learning model.
 
 ::
@@ -76,7 +78,7 @@ for this machine learning model.
     sess = rt.InferenceSession("logreg_iris.onnx")
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    
+
     pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
 
 .. index:: initial types
@@ -102,7 +104,7 @@ In many cases, the training datasets is a numerical matrix
 ``initial_type=[('X', FloatTensorType([None, X_train.shape[1]]))]``.
 *X* is the name of this unique input, the second term indicates the
 type and shape. The shape is ``[None, X_train.shape[1]]``,
-the first dimension is the number of rows followed by the 
+the first dimension is the number of rows followed by the
 number of features. The number of rows is undefined as the
 the number of requested predictions is unknown at the time
 the model is converted. The number of features is usually known.
@@ -119,10 +121,10 @@ a matrix, then initial types would be:
 Function :func:`to_onnx <skl2onnx.to_onnx>` was implemented
 after discussions with the core developers of *scikit-learn*.
 It also contains a mechanism to infer the proper type based on
-one row of the training datasets. Then, the following code 
+one row of the training datasets. Then, the following code
 ``convert_sklearn(clr, initial_types=[('X', FloatTensorType([None, 4]))])``
 is usually rewritten into ``to_onnx(clr, X_train[:1])`` where
-*X_train* is the training dataset, it can be a matrix or a 
+*X_train* is the training dataset, it can be a matrix or a
 dataframe. The input name is ``'X'`` by default unless *X_train*
 is a dataframe. In that case, the column names are used
 as input names.
