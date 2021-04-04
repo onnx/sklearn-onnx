@@ -99,6 +99,11 @@ def _guess_type_proto(data_type, dims):
         return Int32TensorType(dims)
     if data_type == onnx_proto.TensorProto.BOOL:
         return BooleanTensorType(dims)
+    if Complex64TensorType is not None:
+        if data_type == onnx_proto.TensorProto.COMPLEX64:
+            return Complex64TensorType(dims)
+        if data_type == onnx_proto.TensorProto.COMPLEX128:
+            return Complex128TensorType(dims)
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
@@ -119,6 +124,11 @@ def _guess_type_proto_str(data_type, dims):
         return Int32TensorType(dims)
     if data_type == "tensor(bool)":
         return BooleanTensorType(dims)
+    if Complex64TensorType is not None:
+        if data_type == "tensor(complex64)":
+            return Complex64TensorType(dims)
+        if data_type == "tensor(complex128)":
+            return Complex128TensorType(dims)
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
@@ -166,7 +176,7 @@ def _guess_numpy_type(data_type, dims):
 
     if Complex64TensorType is not None:
         if data_type == np.complex64:
-            return Complex128TensorType(dims)
+            return Complex64TensorType(dims)
         if data_type == np.complex128:
             return Complex128TensorType(dims)
 
@@ -219,6 +229,11 @@ def guess_numpy_type(data_type):
         return np.str
     if isinstance(data_type, BooleanTensorType):
         return np.bool
+    if Complex64TensorType is not None:
+        if isinstance(data_type, Complex64TensorType):
+            return np.complex64
+        if isinstance(data_type, Complex128TensorType):
+            return np.complex128
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
 
@@ -241,6 +256,11 @@ def guess_proto_type(data_type):
         return onnx_proto.TensorProto.BOOL
     if isinstance(data_type, UInt8TensorType):
         return onnx_proto.TensorProto.UINT8
+    if Complex64TensorType is not None:
+        if isinstance(data_type, Complex64TensorType):
+            return onnx_proto.TensorProto.COMPLEX64
+        if isinstance(data_type, Complex128TensorType):
+            return onnx_proto.TensorProto.COMPLEX128
     raise NotImplementedError(
         "Unsupported data_type '{}'.".format(data_type))
 
