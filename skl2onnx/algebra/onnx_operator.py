@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
