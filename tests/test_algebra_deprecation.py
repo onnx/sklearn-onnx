@@ -93,7 +93,8 @@ class TestOnnxDeprecation(unittest.TestCase):
                           target_opset=TARGET_OPSET)
         mes = None
         for w in ws:
-            if w.category == DeprecationWarning:
+            if (w.category == DeprecationWarning and
+                    'numpy' not in str(w.message).lower()):
                 mes = w.message
         self.assertTrue(mes is not None)
         self.assertIn('will be removed', str(mes))
