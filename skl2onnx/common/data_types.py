@@ -30,6 +30,78 @@ except ImportError:
 
 
 try:
+    from onnxconverter_common.data_types import Float16TensorType
+except ImportError:
+
+    class Float16TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(Float16TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.FLOAT16
+
+
+try:
+    from onnxconverter_common.data_types import Int8TensorType
+except ImportError:
+
+    class Int8TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(Int8TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.INT8
+
+
+try:
+    from onnxconverter_common.data_types import Int16TensorType
+except ImportError:
+
+    class Int16TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(Int16TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.INT16
+
+
+try:
+    from onnxconverter_common.data_types import UInt16TensorType
+except ImportError:
+
+    class UInt16TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(UInt16TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.UINT16
+
+
+try:
+    from onnxconverter_common.data_types import UInt32TensorType
+except ImportError:
+
+    class UInt32TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(UInt32TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.UINT32
+
+
+try:
+    from onnxconverter_common.data_types import UInt64TensorType
+except ImportError:
+
+    class UInt64TensorType(TensorType):
+        def __init__(self, shape=None, doc_string=''):
+            super(UInt64TensorType, self).__init__(shape, doc_string)
+
+        def _get_element_onnx_type(self):
+            return onnx_proto.TensorProto.UINT64
+
+
+try:
     from onnxconverter_common.data_types import UInt8TensorType
 except ImportError:
 
@@ -52,6 +124,25 @@ except ImportError:
         def to_onnx_type(self):
             onnx_type = onnx_proto.TypeProto()
             onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.UINT8
+            s = onnx_type.tensor_type.shape.dim.add()
+            s.dim_value = 1
+            return onnx_type
+
+        def __repr__(self):
+            return "{}()".format(self.__class__.__name__)
+
+
+try:
+    from onnxconverter_common.data_types import Int8Type
+except ImportError:
+
+    class Int8Type(DataType):
+        def __init__(self, doc_string=''):
+            super(Int8Type, self).__init__([1, 1], doc_string)
+
+        def to_onnx_type(self):
+            onnx_type = onnx_proto.TypeProto()
+            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.INT8
             s = onnx_type.tensor_type.shape.dim.add()
             s.dim_value = 1
             return onnx_type
@@ -153,8 +244,22 @@ def _guess_numpy_type(data_type, dims):
         return Int32TensorType(dims)
     if data_type == np.uint8:
         return UInt8TensorType(dims)
-    if data_type == np.bool:
+    if data_type in (np.bool, np.bool_, bool):
         return BooleanTensorType(dims)
+    if data_type in (np.str, np.str_, str):
+        return StringTensorType(dims)
+    if data_type == np.int8:
+        return Int8TensorType(dims)
+    if data_type == np.int16:
+        return Int16TensorType(dims)
+    if data_type == np.uint64:
+        return UInt64TensorType(dims)
+    if data_type == np.uint32:
+        return UInt32TensorType(dims)
+    if data_type == np.uint16:
+        return UInt16TensorType(dims)
+    if data_type == np.float16:
+        return Float16TensorType(dims)
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
