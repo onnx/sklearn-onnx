@@ -1,19 +1,16 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
-__version__ = "1.8.dev0"
+__version__ = "1.8.0"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
 __domain__ = "ai.onnx"
 __model_version__ = 0
-__max_supported_opset__ = 12
+__max_supported_opset__ = 13
 
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin # noqa

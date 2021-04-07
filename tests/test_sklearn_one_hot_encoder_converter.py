@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """Tests scikit-learn's OneHotEncoder converter."""
 import unittest
 from distutils.version import StrictVersion

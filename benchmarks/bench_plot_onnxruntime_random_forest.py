@@ -1,21 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on RandomForest.
 """
 # Authors: Xavier Dupré (benchmark)
-# License: MIT
-import matplotlib
-
 from io import BytesIO
 from time import perf_counter as time
 from itertools import combinations, chain
 from itertools import combinations_with_replacement as combinations_w_r
-
 import numpy as np
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas
+from sklearn import config_context
 from sklearn.ensemble import RandomForestClassifier
 try:
     # scikit-learn >= 0.22
@@ -116,15 +116,16 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
                             Xs.append(x)
 
                         # measures the baseline
-                        st = time()
-                        repeated = 0
-                        for X in Xs:
-                            p1 = fct1(X)
-                            repeated += 1
-                            if time() - st >= 1:
-                                break  # stops if longer than a second
-                        end = time()
-                        obs["time_skl"] = (end - st) / repeated
+                        with config_context(assume_finite=True):
+                            st = time()
+                            repeated = 0
+                            for X in Xs:
+                                p1 = fct1(X)
+                                repeated += 1
+                                if time() - st >= 1:
+                                    break  # stops if longer than a second
+                            end = time()
+                            obs["time_skl"] = (end - st) / repeated
 
                         # measures the new implementation
                         st = time()
@@ -231,7 +232,7 @@ if __name__ == '__main__':
         {"name": "onnxruntime", "version": onnxruntime.__version__},
         {"name": "skl2onnx", "version": skl2onnx.__version__},
     ])
-    df.to_csv("bench_plot_onnxruntime_decision_tree.time.csv", index=False)
+    df.to_csv("bench_plot_onnxruntime_random_forest.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)
     plt.savefig("bench_plot_onnxruntime_random_forest.png")
