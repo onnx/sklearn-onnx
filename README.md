@@ -1,10 +1,12 @@
+<!--- SPDX-License-Identifier: Apache-2.0 -->
+
 <p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
 | Linux | Windows |
 |-------|---------|
 | [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master) | [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master)|
 
-## Introduction 
+## Introduction
 *sklearn-onnx* converts [scikit-learn](https://scikit-learn.org/stable/) models to [ONNX](https://github.com/onnx/onnx). Once in the ONNX format, you can use tools like [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high performance scoring.
 
 ## Documentation
@@ -26,7 +28,7 @@ pip install git+https://github.com/onnx/sklearn-onnx.git
 If you install *sklearn-onnx* from its source code, you must set the environment variable `ONNX_ML=1` before installing the onnx package.
 
 ## Contribute
-We welcome contributions in the form of feedback, ideas, or code. 
+We welcome contributions in the form of feedback, ideas, or code.
 
 ## License
-[MIT License](LICENSE)
+[Apache License v2.0](LICENSE)

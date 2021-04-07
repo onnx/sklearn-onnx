@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import warnings
 
@@ -441,7 +438,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
-    if options is not None and 'zipmap' in options:
+    elif options is not None and 'zipmap' in options:
         from ._parse import (
             _parse_sklearn_classifier, update_registered_parser)
         update_registered_parser(model, _parse_sklearn_classifier)

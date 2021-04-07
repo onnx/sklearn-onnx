@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import re
 import warnings
@@ -40,7 +37,8 @@ type_fct = type
 
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-except ImportError:
+    assert OPSET_TO_IR_VERSION[13]
+except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 import unittest
 import numpy as np
 from skl2onnx.algebra.type_helper import _guess_type
