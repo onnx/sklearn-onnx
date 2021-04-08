@@ -81,14 +81,16 @@ def convert_sklearn_svm_regressor(
         if type(operator.inputs[0].type) in (
                 BooleanTensorType, Int64TensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
-
             apply_cast(scope, operator.input_full_names, cast_input_name,
                        container, to=proto_dtype)
             input_name = cast_input_name
 
+        svm_out = scope.get_unique_variable_name('SVM03')
         container.add_node(
-            op_type, input_name, operator.output_full_names,
+            op_type, input_name, svm_out,
             op_domain=op_domain, op_version=op_version, **svm_attrs)
+        apply_cast(scope, svm_out, operator.output_full_names,
+                   container, to=proto_dtype)
     elif (operator.type in ['SklearnOneClassSVM'] or
           isinstance(op, OneClassSVM)):
         svm_attrs['post_transform'] = 'NONE'
@@ -98,15 +100,17 @@ def convert_sklearn_svm_regressor(
         if type(operator.inputs[0].type) in (
                 BooleanTensorType, Int64TensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
-
             apply_cast(scope, operator.input_full_names, cast_input_name,
                        container, to=proto_dtype)
             input_name = cast_input_name
 
-        svm_out = operator.output_full_names[1]
+        svm_out0 = scope.get_unique_variable_name('SVMO1')
         container.add_node(
-            op_type, input_name, svm_out,
+            op_type, input_name, svm_out0,
             op_domain=op_domain, op_version=op_version, **svm_attrs)
+
+        svm_out = operator.output_full_names[1]
+        apply_cast(scope, svm_out0, svm_out, container, to=proto_dtype)
 
         pred = scope.get_unique_variable_name('float_prediction')
         container.add_node('Sign', svm_out, pred, op_version=9)
@@ -135,6 +139,10 @@ def convert_sklearn_svm_classifier(
     sklearn/utils/multiclass.py#L402>`_. *onnxruntime* returns
     the raw score from *svm* algorithm as a *matrix[N, (C(C-1)/2]*.
     """
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+
     svm_attrs = {'name': scope.get_unique_operator_name('SVMc')}
     op = operator.raw_operator
     if isinstance(op.dual_coef_, np.ndarray):
@@ -208,10 +216,13 @@ def convert_sklearn_svm_classifier(
         else:
             raise RuntimeError("Invalid class label type '%s'." % op.classes_)
 
+        svm_out = scope.get_unique_variable_name('SVM02')
         container.add_node(
             op_type, operator.inputs[0].full_name,
-            [label_name, probability_tensor_name],
+            [label_name, svm_out],
             op_domain=op_domain, op_version=op_version, **svm_attrs)
+        apply_cast(scope, svm_out, probability_tensor_name,
+                   container, to=proto_dtype)
     else:
         raise ValueError("Unknown support vector machine model type found "
                          "'{0}'.".format(operator.type))
@@ -245,10 +256,6 @@ def convert_sklearn_svm_classifier(
             raise RuntimeError(
                 "Classes different from first n integers are not supported "
                 "in SVC converter.")
-
-        proto_dtype = guess_proto_type(operator.inputs[0].type)
-        if proto_dtype != onnx_proto.TensorProto.DOUBLE:
-            proto_dtype = onnx_proto.TensorProto.FLOAT
 
         cst3 = scope.get_unique_variable_name('cst3')
         container.add_initializer(cst3, proto_dtype, [], [3])
@@ -312,7 +319,8 @@ def convert_sklearn_svm_classifier(
                     'Neg', ext, neg, op_domain='', name=name,
                     op_version=6)
                 neg1 = scope.get_unique_variable_name('Vnegv1_%d' % k)
-                apply_add(scope, [neg, cst1], neg1, container, broadcast=1)
+                apply_add(scope, [neg, cst1], neg1, container, broadcast=1,
+                          operator_name='AddCl_%d_%d' % (i, j))
                 vote_add[vote_name[i]].append(neg1)
 
                 # next
@@ -336,7 +344,8 @@ def convert_sklearn_svm_classifier(
         apply_abs(scope, conc, conc_abs, container)
 
         conc_abs1 = scope.get_unique_variable_name('Cconc_abs1')
-        apply_add(scope, [conc_abs, cst1], conc_abs1, container, broadcast=1)
+        apply_add(scope, [conc_abs, cst1], conc_abs1, container, broadcast=1,
+                  operator_name='AddF0')
         conc_abs3 = scope.get_unique_variable_name('Cconc_abs3')
         apply_mul(scope, [conc_abs1, cst3], conc_abs3, container, broadcast=1)
 
@@ -346,7 +355,8 @@ def convert_sklearn_svm_classifier(
 
         output_name = operator.outputs[1].full_name
         apply_add(
-            scope, [conc_vote, final], output_name, container, broadcast=0)
+            scope, [conc_vote, final], output_name, container, broadcast=0,
+            operator_name='AddF1')
 
 
 register_converter('SklearnOneClassSVM', convert_sklearn_svm_regressor)

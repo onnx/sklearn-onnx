@@ -5,6 +5,7 @@ from onnx.helper import make_tensor
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_mul
 from ..common.utils_classifier import _finalize_converter_classes
+from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import onnx_proto
 
@@ -26,6 +27,9 @@ def convert_voting_classifier(scope, operator, container):
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
     n_classes = len(op.classes_)
 
@@ -60,13 +64,13 @@ def convert_voting_classifier(scope, operator, container):
                 container.add_node(
                     'ConstantOfShape', shape_name, zero_name,
                     name=scope.get_unique_operator_name('CoSA'),
-                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                    value=make_tensor("value", proto_dtype,
                                       (1, ), [0.]), op_version=9)
                 one_name = scope.get_unique_variable_name('one')
                 container.add_node(
                     'ConstantOfShape', shape_name, one_name,
                     name=scope.get_unique_operator_name('CoSB'),
-                    value=make_tensor("value", onnx_proto.TensorProto.FLOAT,
+                    value=make_tensor("value", proto_dtype,
                                       (1, ), [1.]), op_version=9)
 
             argmax_output_name = scope.get_unique_variable_name(
@@ -96,7 +100,7 @@ def convert_voting_classifier(scope, operator, container):
 
         weights_name = scope.get_unique_variable_name('w%d' % i)
         container.add_initializer(
-            weights_name, onnx_proto.TensorProto.FLOAT, [1], [val])
+            weights_name, proto_dtype, [1], [val])
         wprob_name = scope.get_unique_variable_name('wprob_name')
         apply_mul(scope, [prob_name, weights_name],
                   wprob_name, container, broadcast=1)
@@ -118,7 +122,7 @@ def convert_voting_classifier(scope, operator, container):
                        name=scope.get_unique_operator_name('ArgMax'), axis=1)
     _finalize_converter_classes(scope, label_name,
                                 operator.outputs[0].full_name, container,
-                                op.classes_)
+                                op.classes_, proto_dtype)
 
 
 register_converter('SklearnVotingClassifier',

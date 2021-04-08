@@ -5,7 +5,8 @@ import numpy as np
 from ..proto import onnx_proto
 from ..common.data_types import guess_numpy_type, guess_proto_type
 from ..common._registration import register_converter
-from ..common._apply_operation import apply_mul, apply_identity
+from ..common._apply_operation import (
+    apply_mul, apply_identity, apply_normalizer)
 
 
 def convert_sklearn_tfidf_transformer(scope, operator, container):
@@ -58,19 +59,9 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         data = [idfed]
 
     if op.norm is not None:
-        op_type = 'Normalizer'
-        norm_map = {'max': 'MAX', 'l1': 'L1', 'l2': 'L2'}
-        attrs = {'name': scope.get_unique_operator_name(op_type)}
-        if op.norm in norm_map:
-            attrs['norm'] = norm_map[op.norm]
-        else:
-            raise RuntimeError("Invalid norm '%s'. "
-                               "You may raise an issue at "
-                               "https://github.com/onnx/sklearn-onnx/"
-                               "issues." % op.norm)
-
-        container.add_node(op_type, data, operator.output_full_names,
-                           op_domain='ai.onnx.ml', **attrs)
+        apply_normalizer(
+            scope, data, operator.output_full_names, container,
+            norm=op.norm.upper(), use_float=float_type == np.float32)
         data = None
 
     if data == operator.input_full_names:
