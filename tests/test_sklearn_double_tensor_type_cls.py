@@ -262,6 +262,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="ArgMax, Sigmoid are missing")
+    @unittest.skipIf(
+        StackingClassifier is None, reason="scikit-learn too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_stacking_64(self):
         self._common_classifier(
