@@ -281,8 +281,7 @@ def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
             x, axes=axes, keepdims=keepdims,
             op_version=op_version, output_names=output_names)
     x2 = OnnxMul(x, x, op_version=op_version)  # noqa
-    red = OnnxReduceSum(  # noqa
-        x2, np.array([1], dtype=np.int64),
-        keepdims=1, op_version=op_version)
+    red = OnnxReduceSumApi11(
+        x2, axes=[1], keepdims=1, op_version=op_version)
     return OnnxSqrt(  # noqa
         red, op_version=op_version, output_names=output_names)
