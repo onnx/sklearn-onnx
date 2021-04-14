@@ -672,6 +672,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         X = 15 * state.rand(100, 2)
         y = np.sin(X[:, 0] - X[:, 1]).ravel()
         y += 0.5 * (0.5 - state.rand(X.shape[0]))
+        y /= 10
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(
             kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
