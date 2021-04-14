@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import warnings
 
@@ -111,10 +108,12 @@ from sklearn.naive_bayes import (
 )
 try:
     from sklearn.naive_bayes import CategoricalNB
-    from sklearn.naive_bayes import ComplementNB
 except ImportError:
     # scikit-learn versions <= 0.21
     CategoricalNB = None
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
     # scikit-learn versions <= 0.19
     ComplementNB = None
 

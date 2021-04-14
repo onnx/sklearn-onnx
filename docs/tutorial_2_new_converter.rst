@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 A custom converter for a custom model
 =====================================
 
@@ -24,7 +26,7 @@ it displays an error message telling it misses a converter.
     try:
         to_onnx(MyLogisticRegression(), X)
     except Exception as e:
-        print(e)    
+        print(e)
 
 Following section shows how to create a custom converter.
 

@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 
@@ -10,6 +7,7 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_cast, apply_concat, apply_reshape)
 from ..common._registration import register_converter
+from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -28,7 +26,13 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
         output_proba = scope.declare_local_variable(
             'probability_tensor', inputs.type.__class__())
         this_operator.outputs.append(output_proba)
-    return output_proba.full_name
+
+    proto_type = guess_proto_type(inputs.type)
+    new_name = scope.get_unique_variable_name(
+        output_proba.full_name + '_castio')
+    apply_cast(scope, output_proba.full_name, new_name,
+               container, to=proto_type)
+    return new_name
 
 
 def _transform_regressor(scope, operator, container, model):

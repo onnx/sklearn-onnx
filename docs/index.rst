@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 sklearn-onnx: Convert your scikit-learn model into ONNX
 =======================================================
@@ -11,15 +13,15 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
             :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
       - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master
             :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
-	    
-	    
+
+
 *sklearn-onnx* enables you to convert models from
 `sklearn-learn <https://scikit-learn.org/stable/>`_
 toolkits into `ONNX <https://onnx.ai>`_.
 
 .. toctree::
     :maxdepth: 1
-    
+
     introduction
     index_tutorial
     api_summary
@@ -101,12 +103,12 @@ Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
 
 **Credits**
 
-The package was started by the following engineers and data scientists at 
-Microsoft starting from winter 2017: Zeeshan Ahmed, Wei-Sheng Chin, Aidan Crook, 
-Xavier Dupré, Costin Eseanu, Tom Finley, Lixin Gong, Scott Inglis, 
-Pei Jiang, Ivan Matantsev, Prabhat Roy, M. Zeeshan Siddiqui, 
+The package was started by the following engineers and data scientists at
+Microsoft starting from winter 2017: Zeeshan Ahmed, Wei-Sheng Chin, Aidan Crook,
+Xavier Dupré, Costin Eseanu, Tom Finley, Lixin Gong, Scott Inglis,
+Pei Jiang, Ivan Matantsev, Prabhat Roy, M. Zeeshan Siddiqui,
 Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 
 **License**
 
-It is licensed with `MIT License <../LICENSE>`_.
+It is licensed with `Apache License v2.0 <../LICENSE>`_.

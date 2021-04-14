@@ -1,8 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
 # coding: utf-8
 """
 Benchmark of onnxruntime on RandomForestRegressor.
 """
-# License: MIT
 import sys
 import warnings
 from io import BytesIO
@@ -31,7 +32,7 @@ from onnxruntime import InferenceSession
 
 def fcts_model(X, y, max_depth, n_estimators):
     "RandomForestClassifier."
-    rf = HistGradientBoostingRegressor(    
+    rf = HistGradientBoostingRegressor(
         max_depth=max_depth, max_iter=n_estimators)
     rf.fit(X, y)
 

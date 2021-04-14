@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import unittest
 import inspect
@@ -584,7 +581,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         dump_data_and_model(
             X_test.astype(np.float64), gp, model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec3",
+            basename="SklearnGaussianProcessExpSineSquaredStdT-Out0-Dec2",
             disable_optimisation=True)
         self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[

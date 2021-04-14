@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 from ._apply_operation import apply_cast, apply_reshape
@@ -47,7 +44,7 @@ def get_label_classes(scope, op, node_names=False):
 
 
 def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
-                                container, classes):
+                                container, classes, proto_dtype):
     """
     See :func:`convert_voting_classifier`.
     """
@@ -77,7 +74,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
                                                 'reshaped_result')
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
-                   to=onnx_proto.TensorProto.FLOAT)
+                   to=proto_dtype)
         apply_reshape(scope, cast2_result_name, reshaped_result_name,
                       container, desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, output_full_name, container,
