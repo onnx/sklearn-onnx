@@ -14,7 +14,7 @@ from ..algebra.onnx_ops import (
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
     OnnxIdentity, OnnxReduceSumSquare,
-    OnnxSqrt, OnnxEinsum, OnnxReduceL2
+    OnnxReduceL2_typed
 )
 from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
@@ -167,10 +167,10 @@ def _convert_pairwise_kernel(X, Y, metric=None,
                              optim=None, **kwargs):
     """
     Implements the kernel PairwiseKernel.
-    
+
     * cosine: :math:`k(x_i,x_j)=\\frac{<x_i, x_j>}
         {\\parallel x_i \\parallel \\parallel x_j \\parallel}`
-    
+
     See `KERNEL_PARAMS
     <https://github.com/scikit-learn/scikit-learn/blob/
     95119c13af77c76e150b753485c662b7c52a41a2/sklearn/
@@ -178,17 +178,18 @@ def _convert_pairwise_kernel(X, Y, metric=None,
     """
     if metric == 'cosine':
         if isinstance(Y, np.ndarray):
-            ny = np.sqrt(np.einsum('ij,ij->i', Y, Y))
+            ny = np.sqrt(np.sum(Y ** 2, axis=1, keepdims=True))
             norm_y = Y / ny
             norm_try = norm_y.T.astype(dtype)
         else:
-            norm_y = OnnxReduceL2(Y, axes=[1], op_version=op_version)
+            ny = OnnxReduceL2_typed(dtype, Y, axes=[1], op_version=op_version)
+            norm_y = OnnxDiv(Y, ny, op_version=op_version)
             norm_try = OnnxTranspose(norm_y, perm=[1, 0],
                                      op_version=op_version)
 
-        norm_x = OnnxReduceL2(X, axes=[1], op_version=op_version)
-        K = OnnxEinsum(norm_x, norm_try, equation='ij,ij->i',
-                       op_version=op_version)
+        nx = OnnxReduceL2_typed(dtype, X, axes=[1], op_version=op_version)
+        norm_x = OnnxDiv(X, nx, op_version=op_version)
+        K = OnnxMatMul(norm_x, norm_try, op_version=op_version)
         return OnnxIdentity(K, op_version=op_version, **kwargs)
     raise NotImplementedError("Metric %r is not implemented." % metric)
 

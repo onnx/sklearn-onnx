@@ -27,6 +27,10 @@ try:
     from onnxruntime import GraphOptimizationLevel
 except ImportError:
     GraphOptimizationLevel = None
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import NotImplemented
+except ImportError:
+    NotImplemented = RuntimeError
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
 
@@ -155,8 +159,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
-    def test_kernel_cosine(self):
+    def test_kernel_cosine_float(self):
         ker = PairwiseKernel(metric='cosine')
+
+        # X, X
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
@@ -164,14 +170,50 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             target_opset=TARGET_OPSET)
 
         x = np.random.randn(4, 3)
-
-        from mlprodict.onnxrt import OnnxInference
-        oinf = OnnxInference(model_onnx)
-        oinf.run({'X': x.astype(np.float32)}, verbose=1, fLOG=print)
-    
         x[0, 0] = x[1, 1] = x[2, 2] = 10.
+        x[3, 2] = 5.
+
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x)
+        assert_almost_equal(m1, m2, decimal=5)
+
+        # X, x
+        onx = convert_kernel(ker, 'X', x_train=x,
+                             output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x)
+        assert_almost_equal(m1, m2, decimal=5)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_kernel_cosine_double(self):
+        ker = PairwiseKernel(metric='cosine')
+        onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float64,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', DoubleTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+
+        x = np.random.randn(4, 3)
+        x[0, 0] = x[1, 1] = x[2, 2] = 10.
+        x[3, 2] = 5.
+
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString())
+        except NotImplemented:
+            # Failed to find kernel for FusedMatMul(1).
+            return
+        res = sess.run(None, {'X': x.astype(np.float64)})[0]
         m1 = res
         m2 = ker(x)
         assert_almost_equal(m1, m2, decimal=5)
@@ -525,6 +567,52 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         dump_data_and_model(X.astype(np.float64), gp, model_onnx,
                             verbose=False,
                             basename="SklearnGaussianProcessRBFTDouble")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="shape_inference fails")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_cosine_fitted_true_float(self):
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
+                                      normalize_y=False,
+                                      kernel=PairwiseKernel(metric='cosine'))
+        gp, X = fit_regression_model(
+            gp, n_features=2, n_samples=20, factor=0.01)
+
+        # return_cov=False, return_std=False
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X.astype(np.float32), gp, model_onnx,
+                            verbose=False,
+                            basename="SklearnGaussianProcessCosineFloat-Dec2")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        reason="shape_inference fails")
+    @unittest.skipIf(
+        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    def test_gpr_cosine_fitted_true_double(self):
+        gp = GaussianProcessRegressor(alpha=1e-5,
+                                      n_restarts_optimizer=25,
+                                      normalize_y=False,
+                                      kernel=PairwiseKernel(metric='cosine'))
+        gp, X = fit_regression_model(
+            gp, n_features=2, n_samples=20, factor=0.01)
+
+        # return_cov=False, return_std=False
+        model_onnx = to_onnx(
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X.astype(np.float64), gp, model_onnx,
+                            verbose=False,
+                            basename="SklearnGaussianProcessCosineDouble")
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -920,5 +1008,4 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnGaussianProcessRegressor().test_kernel_cosine()
     unittest.main()

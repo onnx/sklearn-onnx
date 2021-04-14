@@ -269,3 +269,20 @@ def OnnxUnsqueezeApi11(*x, axes=None, op_version=None,
             output_names=output_names)
     return OnnxUnsqueeze_1(*x, axes=axes, # noqa
                            op_version=op_version, output_names=output_names)
+
+
+def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
+                       output_names=None):
+    """
+    Adds operator ReduceL2 for float or double.
+    """
+    if dtype == np.float32:
+        return OnnxReduceL2(  # noqa
+            x, axes=axes, keepdims=keepdims,
+            op_version=op_version, output_names=output_names)
+    x2 = OnnxMul(x, x, op_version=op_version)  # noqa
+    red = OnnxReduceSum(  # noqa
+        x2, np.array([1], dtype=np.int64),
+        keepdims=1, op_version=op_version)
+    return OnnxSqrt(  # noqa
+        red, op_version=op_version, output_names=output_names)
