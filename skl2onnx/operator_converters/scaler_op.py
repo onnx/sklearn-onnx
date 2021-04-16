@@ -27,7 +27,7 @@ def convert_sklearn_scaler(scope, operator, container):
     attrs = {'name': scope.get_unique_operator_name(op_type)}
 
     if isinstance(op, StandardScaler):
-        C = operator.inputs[0].type.shape[1]
+        C = operator.inputs[0].get_first_dimension()
         attrs['offset'] = op.mean_ if op.with_mean else [0.0] * C
         attrs['scale'] = 1.0 / op.scale_ if op.with_std else [1.0] * C
         inv_scale = op.scale_ if op.with_std else None
