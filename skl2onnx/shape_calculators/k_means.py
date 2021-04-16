@@ -19,9 +19,6 @@ def calculate_sklearn_kmeans_output_shapes(operator):
         raise RuntimeError("Two outputs are expected for KMeans.")
 
     variable = operator.inputs[0]
-    if len(variable.type.shape) != 2:
-        raise RuntimeError('Only 2-D tensor(s) can be input(s).')
-
     N = variable.get_first_dimension()
     op = operator.raw_operator
     operator.outputs[0].type.shape = [N]
