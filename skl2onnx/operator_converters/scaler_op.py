@@ -27,12 +27,14 @@ def convert_sklearn_scaler(scope, operator, container):
     attrs = {'name': scope.get_unique_operator_name(op_type)}
 
     if isinstance(op, StandardScaler):
-        C = operator.inputs[0].get_first_dimension()
+        C = (operator.inputs[0].type.shape[1]
+             if len(operator.inputs[0].type.shape) == 2 else 1)
         attrs['offset'] = op.mean_ if op.with_mean else [0.0] * C
         attrs['scale'] = 1.0 / op.scale_ if op.with_std else [1.0] * C
         inv_scale = op.scale_ if op.with_std else None
     elif isinstance(op, RobustScaler):
-        C = operator.inputs[0].type.shape[1]
+        C = (operator.inputs[0].type.shape[1]
+             if len(operator.inputs[0].type.shape) == 2 else 1)
         attrs['offset'] = op.center_ if op.with_centering else [0.0] * C
         attrs['scale'] = 1.0 / op.scale_ if op.with_scaling else [1.0] * C
         inv_scale = op.scale_ if op.with_scaling else None
@@ -42,7 +44,8 @@ def convert_sklearn_scaler(scope, operator, container):
         attrs['offset'] = -op.min_/(op.scale_ + 1e-8)
         inv_scale = None
     elif isinstance(op, MaxAbsScaler):
-        C = operator.inputs[0].type.shape[1]
+        C = (operator.inputs[0].type.shape[1]
+             if len(operator.inputs[0].type.shape) == 2 else 1)
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = [0.] * C
         inv_scale = op.scale_
