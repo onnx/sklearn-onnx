@@ -86,6 +86,7 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
+      pip install flatbuffers
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
