@@ -32,7 +32,7 @@ def calculate_sklearn_svm_output_shapes(operator):
     """
     op = operator.raw_operator
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     if operator.type in ['SklearnOneClassSVM']:
         operator.outputs[0].type = Int64TensorType([N, 1])
         operator.outputs[1].type.shape = [N, 1]

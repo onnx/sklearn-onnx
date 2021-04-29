@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
-from skl2onnx.algebra.onnx_operator import OnnxSubOperator
+from skl2onnx.algebra.onnx_operator import OnnxSubEstimator as SubOp
 from skl2onnx import update_registered_converter
 from onnxruntime import __version__ as ortv
 from test_utils import TARGET_OPSET
@@ -61,7 +61,7 @@ def decorrelate_transformer_convertor(scope, operator, container):
     opv = container.target_opset
     out = operator.outputs
     X = operator.inputs[0]
-    subop = OnnxSubOperator(op.pca_, X, op_version=opv)
+    subop = SubOp(op.pca_, X, op_version=opv)
     Y = OnnxIdentity(subop, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 
@@ -71,8 +71,7 @@ def decorrelate_transformer_convertor2(scope, operator, container):
     opv = container.target_opset
     out = operator.outputs
     X = operator.inputs[0]
-    Y = OnnxSubOperator(op.pca_, X, op_version=opv,
-                        output_names=out[:1])
+    Y = SubOp(op.pca_, X, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 
 
@@ -93,9 +92,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
             decorrelate_transformer_convertor)
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
-
+        self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(onx.SerializeToString())
-
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -115,9 +113,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
             decorrelate_transformer_convertor)
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
-
+        self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(onx.SerializeToString())
-
         exp = dec.transform(X.astype(np.float64))
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -137,9 +134,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
             decorrelate_transformer_convertor2)
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
-
+        self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(onx.SerializeToString())
-
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -159,9 +155,8 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
             decorrelate_transformer_convertor2)
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
-
+        self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(onx.SerializeToString())
-
         exp = dec.transform(X.astype(np.float64))
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)

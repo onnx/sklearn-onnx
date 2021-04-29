@@ -73,8 +73,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
             if key in {'output_names', 'op_version', 'domain', 'ir_version'}:
                 continue
             if key not in attr_names:
-                raise TypeError("Argument '%s' not valid for '%s'"
-                                % (key, op_name))
+                raise TypeError("Argument '%s' not valid for '%s' opset=%s."
+                                % (key, op_name, op_version))
 
         if op_version is not None:
             kwargs['op_version'] = op_version
