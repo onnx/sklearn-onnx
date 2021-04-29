@@ -78,6 +78,7 @@ jobs:
   - script: |
       call activate py$(python.version)
       pip install $(onnx.version)
+      pip install flatbuffers
       pip install $(onnxrt.version)
     displayName: 'install onnx, onnxruntime'
 
