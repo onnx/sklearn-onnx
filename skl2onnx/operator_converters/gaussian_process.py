@@ -100,6 +100,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
         if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
+            if isinstance(y_mean_b, (np.float32, np.float64)):
+                y_mean_b = np.array([y_mean_b])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
@@ -109,6 +113,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             var_y = op._y_train_std.astype(dtype)
             if len(var_y.shape) == 1:
                 var_y = var_y.reshape(var_y.shape + (1,))
+            if isinstance(var_y, (np.float32, np.float64)):
+                var_y = np.array([var_y])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(
                 OnnxMul(y_mean_b, var_y, op_version=opv),
                 mean_y, op_version=opv)
@@ -297,12 +305,14 @@ def convert_gaussian_process_classifier(scope, operator, container):
     integrals.set_onnx_name_prefix('integrals')
 
     # pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
+    coef_sum = (.5 * COEFS.sum()).astype(dtype)
+    if not isinstance(coef_sum, np.ndarray):
+        coef_sum = np.array([coef_sum])
     pi_star = OnnxAdd(
                 OnnxReduceSumApi11(
                     OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
                     op_version=opv, axes=[0]),
-                (.5 * COEFS.sum()).astype(dtype),
-                op_version=opv)
+                coef_sum, op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star')
 
     pi_star = OnnxReshape(pi_star, np.array([-1, 1], dtype=np.int64),

@@ -9,7 +9,9 @@ from ..common.data_types import (
     _guess_type_proto,
     BooleanTensorType,
     DataType,
+    DoubleType,
     DoubleTensorType,
+    FloatType,
     FloatTensorType,
     Int64Type,
     Int64TensorType, Int32TensorType,
@@ -51,6 +53,10 @@ def _guess_type(given_type):
         return _guess_type_proto(ttype.elem_type, dims)
     if isinstance(given_type, np.int64):
         return Int64Type()
+    if isinstance(given_type, np.float32):
+        return FloatType()
+    if isinstance(given_type, np.float64):
+        return DoubleType()
     if given_type.__class__.__name__.endswith("Categorical"):
         # pandas Categorical without important pandas
         return Int64TensorType()

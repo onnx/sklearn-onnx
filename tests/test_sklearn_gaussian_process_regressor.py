@@ -555,6 +555,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
+    @unittest.skipIf(
+        TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_true(self):
         state = np.random.RandomState(0)
         X = 15 * state.rand(100, 2)
@@ -594,7 +596,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
         X = 15 * np.random.rand(100, 2)
         y = np.sin(X[:, 0] - X[:, 1]).ravel()
-        y += 0.5 * (0.5 - np.random.rand(X.shape[0]))
+        y += 0.1 * (0.5 - np.random.rand(X.shape[0]))
         X_train, X_test, y_train, _ = train_test_split(X, y)
         gp = GaussianProcessRegressor(
             kernel=ExpSineSquared(periodicity_bounds=(1e-10, 1e10)),
@@ -660,6 +662,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
+    @unittest.skipIf(
+        TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
     def test_gpr_rbf_fitted_return_std_dot_product_true(self):
         X = 15 * np.random.rand(100, 2)
         y = np.sin(X[:, 0] - X[:, 1]).ravel()
@@ -696,6 +700,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
+    @unittest.skipIf(
+        TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
     def test_gpr_rbf_fitted_return_std_rational_quadratic_true(self):
 
         X, y = make_regression(n_features=2, n_informative=2, random_state=2)

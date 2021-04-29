@@ -16,7 +16,7 @@ def calculate_sklearn_polynomial_features(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     model = operator.raw_operator
     operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
     operator.outputs[0].type.shape = [N, model.n_output_features_]
