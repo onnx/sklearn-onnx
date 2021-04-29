@@ -23,6 +23,16 @@ jobs:
         sklearn.version: '==0.24.1'
         onnxcc.version: '==1.8.1'  # git
         run.example: '1'
+      Py38-Onnx181-Rt170-Skl0242:
+        do.bench: '0'
+        python.version: '3.8'
+        numpy.version: '>=1.18.1'
+        onnx.version: '==1.8.1'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.7.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.24.2'
+        onnxcc.version: '==1.7.0'  # git
+        run.example: '1'
       Py38-Onnx181-Rt170-Skl0241:
         do.bench: '0'
         python.version: '3.8'
@@ -312,15 +322,19 @@ jobs:
     displayName: 'coverage'
 
   - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
       python setup.py install
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
       pip install --no-deps git+https://github.com/onnx/onnxmltools.git
+    displayName: 'install for documentation'
+    condition: eq(variables['run.example'], '1')
+
+  - script: |
+      if [ '$(onnx.target_opset)' != '' ]
+      then
+        export TEST_TARGET_OPSET="$(onnx.target_opset)"
+      fi
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
