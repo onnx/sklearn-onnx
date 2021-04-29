@@ -272,3 +272,4 @@ register_converter('SklearnGaussianMixture', convert_sklearn_gaussian_mixture,
 register_converter('SklearnBayesianGaussianMixture',
                    convert_sklearn_gaussian_mixture,
                    options={'score_samples': [True, False]})
+
