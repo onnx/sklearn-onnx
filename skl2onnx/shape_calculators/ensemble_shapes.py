@@ -31,7 +31,7 @@ def calculate_tree_regressor_output_shapes(operator):
         BooleanTensorType, DoubleTensorType,
         FloatTensorType, Int64TensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type.shape = [N, 1]
     if len(operator.outputs) == 2:
         if hasattr(operator.raw_operator, 'estimators_'):
@@ -44,7 +44,7 @@ def calculate_tree_regressor_output_shapes(operator):
 def calculate_tree_classifier_output_shapes(operator):
     _calculate_linear_classifier_output_shapes(operator, True)
     if len(operator.outputs) == 3:
-        N = operator.inputs[0].type.shape[0]
+        N = operator.inputs[0].get_first_dimension()
         if hasattr(operator.raw_operator, 'estimators_'):
             operator.outputs[2].type.shape = [
                 N, len(operator.raw_operator.estimators_)]

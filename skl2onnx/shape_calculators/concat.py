@@ -4,7 +4,7 @@
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
     FloatType, Int64Type, StringType, TensorType,
-    BooleanTensorType, FloatTensorType,
+    DoubleType, BooleanTensorType, FloatTensorType,
     Int64TensorType, StringTensorType,
     DoubleTensorType)
 from ..common.utils import check_input_and_output_numbers
@@ -17,20 +17,21 @@ def calculate_sklearn_concat(operator):
             operator.outputs[0].type.shape = [None, None]
             return
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     seen_types = []
     for i in operator.inputs:
-        if isinstance(i.type, TensorType):
-            if i.type.shape[1] is None:
+        if C is not None:
+            if isinstance(i.type, TensorType):
+                if i.type.shape[1] is None:
+                    C = None
+                else:
+                    C += i.type.shape[1]
+            elif isinstance(i.type, (
+                    Int64Type, FloatType, StringType, DoubleType)):
+                C += 1
+            else:
                 C = None
-                break
-            C += i.type.shape[1]
-        elif isinstance(i.type, (Int64Type, FloatType, StringType)):
-            C += 1
-        else:
-            C = None
-            break
         if len(seen_types) == 0:
             seen_types.append(i.type)
 
@@ -60,14 +61,16 @@ def calculate_sklearn_concat(operator):
         if final_type is None:
             final_type = seen
         elif seen != final_type:
-            if more_generic(final_type, seen):
+            merged_type = more_generic(final_type, seen)
+            if merged_type:
                 final_type = seen
 
     if final_type is None:
         raise NotImplementedError(
-            "Columns must be tensors."
-            "Inputs:\n{}\nOutputs:\n{}".format(
-                operator.inputs, operator.outputs))
+            "Columns must be tensors.\n"
+            "- Inputs: {}\n- Outputs: {}\n- types: {}"
+            "".format(
+                operator.inputs, operator.outputs, seen_types))
     if final_type != operator.outputs[0].type:
         operator.outputs[0].type = type(final_type)([N, C])
     else:

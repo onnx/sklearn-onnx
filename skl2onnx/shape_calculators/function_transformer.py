@@ -15,7 +15,7 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
                            "transform function is None (= identity). "
                            "You may raise an issue at "
                            "https://github.com/onnx/sklearn-onnx/issues.")
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
         if variable.type.shape[1] is not None:

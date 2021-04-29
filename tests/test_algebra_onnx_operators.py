@@ -1,23 +1,27 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+import warnings
 from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, guess_numpy_type
+from skl2onnx.common.data_types import (
+    FloatTensorType, guess_numpy_type, DoubleTensorType)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshapeApi13,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
-    OnnxArrayFeatureExtractor, OnnxMul
+    OnnxArrayFeatureExtractor, OnnxMul,
+    OnnxPad, OnnxBatchNormalization
 )
 from onnx import (
     helper, TensorProto, load_model,
@@ -220,7 +224,11 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
-        self.assertEqual(onx.outputs, ['Y'])
+        self.assertIsInstance(onx.outputs, list)
+        self.assertEqual(len(onx.outputs), 1)
+        self.assertIsInstance(onx.outputs[0], tuple)
+        self.assertEqual(len(onx.outputs[0]), 2)
+        self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))
@@ -280,6 +288,121 @@ class TestOnnxOperators(unittest.TestCase):
         inits = [row for row in str(model_def).split('\n')
                  if row.startswith("  initializer {")]
         self.assertEqual(len(inits), 1)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_default(self):
+        pad = OnnxPad(mode='constant', value=1.5,
+                      pads=[0, 1, 0, 1], op_version=10)
+
+        X = helper.make_tensor_value_info(
+            'X', onnx.TensorProto.FLOAT, [None, 2])
+        model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
+        onnx.checker.check_model(model_def)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
+                     reason="only available for opset >= 10")
+    def test_batch_normalization(self):
+
+        def _batchnorm_test_mode(x, s, bias, mean, var, epsilon=1e-5):
+            dims_x = len(x.shape)
+            dim_ones = (1,) * (dims_x - 2)
+            s = s.reshape(-1, *dim_ones)
+            bias = bias.reshape(-1, *dim_ones)
+            mean = mean.reshape(-1, *dim_ones)
+            var = var.reshape(-1, *dim_ones)
+            return s * (x - mean) / np.sqrt(var + epsilon) + bias
+
+        # input size: (1, 2, 1, 3)
+        x = np.array([[[[-1, 0, 1]], [[2, 3, 4]]]]).astype(np.float32)
+        s = np.array([1.0, 1.5]).astype(np.float32)
+        bias = np.array([0, 1]).astype(np.float32)
+        mean = np.array([0, 3]).astype(np.float32)
+        var = np.array([1, 1.5]).astype(np.float32)
+        y = _batchnorm_test_mode(x, s, bias, mean, var).astype(np.float32)
+
+        onx = OnnxBatchNormalization(
+            'X', s, bias, mean, var, output_names=['Y'],
+            op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'X': x.astype(np.float32)},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'X': x})
+        assert_almost_equal(y, got[0], decimal=5)
+
+        # input size: (2, 3, 4, 5)
+        x = np.random.randn(2, 3, 4, 5).astype(np.float32)
+        s = np.random.randn(3).astype(np.float32)
+        bias = np.random.randn(3).astype(np.float32)
+        mean = np.random.randn(3).astype(np.float32)
+        var = np.random.rand(3).astype(np.float32)
+        epsilon = 1e-2
+        y = _batchnorm_test_mode(
+            x, s, bias, mean, var, epsilon).astype(np.float32)
+
+        onx = OnnxBatchNormalization(
+            'X', s, bias, mean, var,
+            output_names=['Y'], epsilon=epsilon,
+            op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'X': x.astype(np.float32)},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'X': x})
+        assert_almost_equal(y, got[0], decimal=5)
+
+    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+                     reason="only available for opset >= 11")
+    def test_onnxt_runtime_pad(self):
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[0.0, 0.0, 1.0, 1.2],
+                        [0.0, 0.0, 2.3, 3.4],
+                        [0.0, 0.0, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', constant_value, output_names=['Y'],
+            op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        assert_almost_equal(exp, got[0])
+
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[0, 1.2, 1.0, 1.2],
+                        [0, 3.4, 2.3, 3.4],
+                        [0, 5.7, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', output_names=['Y'],
+            mode='reflect', op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        try:
+            assert_almost_equal(exp, got[0])
+        except AssertionError as e:
+            warnings.warn(e)
+
+        data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
+                        dtype=np.float32)
+        pads = np.array([0, 2, 0, 0], dtype=np.int64)
+        constant_value = np.array([0.0], dtype=np.float32)
+        exp = np.array([[1.0, 1.0, 1.0, 1.2],
+                        [2.3, 2.3, 2.3, 3.4],
+                        [4.5, 4.5, 4.5, 5.7]], dtype=np.float32)
+        onx = OnnxPad(
+            'data', 'pads', output_names=['Y'],
+            mode='edge', op_version=TARGET_OPSET)
+        model_def = onx.to_onnx({'data': data, 'pads': pads},
+                                target_opset=TARGET_OPSET)
+        oinf = InferenceSession(model_def.SerializeToString())
+        got = oinf.run(None, {'data': data, 'pads': pads})
+        assert_almost_equal(exp, got[0])
 
 
 if __name__ == "__main__":
