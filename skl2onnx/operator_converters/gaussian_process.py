@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
+from scipy.linalg import solve_triangular
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 try:
     from sklearn.gaussian_process._gpc import LAMBDAS, COEFS
@@ -130,14 +131,13 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             raise NotImplementedError()
         if options['return_std']:
-            if op._K_inv is None:
-                raise RuntimeError(
-                    "The method *predict* must be called once with parameter "
-                    "return_std=True to compute internal variables. "
-                    "They cannot be computed here as the same operation "
-                    "(matrix inversion) produces too many discrepencies "
-                    "if done with single floats than double floats.")
-            _K_inv = op._K_inv
+            if hasattr(op, '_K_inv') and op._K_inv is not None:
+                # scikit-learn < 0.24.2
+                _K_inv = op._K_inv
+            else:
+                # scikit-learn >= 0.24.2
+                L_inv = solve_triangular(op.L_.T, np.eye(op.L_.shape[0]))
+                _K_inv = L_inv.dot(L_inv.T)
 
             # y_var = self.kernel_.diag(X)
             y_var = convert_kernel_diag(kernel, X, dtype=dtype,
