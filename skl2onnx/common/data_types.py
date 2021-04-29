@@ -147,7 +147,9 @@ def guess_proto_type(data_type):
 
 def guess_tensor_type(data_type):
     """
-    Guess the corresponding variable type based on input type.
+    Guess the corresponding variable output type based
+    on input type. It returns type if *data_type* is a real.
+    It returns *FloatTensorType* if *data_type* is an integer.
     """
     if isinstance(data_type, DoubleTensorType):
         return DoubleTensorType()
