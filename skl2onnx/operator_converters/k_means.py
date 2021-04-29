@@ -4,8 +4,9 @@ import numpy as np
 from sklearn.utils.extmath import row_norms
 from ..common.data_types import Int64TensorType, guess_numpy_type
 from ..common._registration import register_converter
-from ..algebra.onnx_ops import OnnxReduceSumSquare, OnnxGemm
-from ..algebra.onnx_ops import OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul
+from ..algebra.onnx_ops import (
+    OnnxReduceSumSquare, OnnxGemm, OnnxMatMul,
+    OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul)
 from ..proto import onnx_proto
 
 
@@ -64,6 +65,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
+    options = container.get_options(op, dict(gemm=True))
     opv = container.target_opset
     C = op.cluster_centers_
     input_name = X
@@ -86,9 +88,14 @@ def convert_sklearn_kmeans(scope, operator, container):
         zeros = OnnxMul(rs, np.array([0], dtype=dtype),
                         op_version=opv)
 
-    z = OnnxAdd(rs, OnnxGemm(input_name, C, zeros, alpha=-2.,
-                             transB=1, op_version=opv),
-                op_version=opv)
+    if options['gemm']:
+        gemm_out = OnnxGemm(input_name, C, zeros, alpha=-2.,
+                            transB=1, op_version=opv)
+    else:
+        gemm_out = OnnxMatMul(
+            input_name, (C.T * (-2)).astype(dtype), op_version=opv)
+
+    z = OnnxAdd(rs, gemm_out, op_version=opv)
     y2 = OnnxAdd(C2, z, op_version=opv)
     ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1],
                     op_version=opv)
@@ -97,5 +104,7 @@ def convert_sklearn_kmeans(scope, operator, container):
     y2s.add_to(scope, container)
 
 
-register_converter('SklearnKMeans', convert_sklearn_kmeans)
-register_converter('SklearnMiniBatchKMeans', convert_sklearn_kmeans)
+register_converter('SklearnKMeans', convert_sklearn_kmeans,
+                   options={'gemm': [True, False]})
+register_converter('SklearnMiniBatchKMeans', convert_sklearn_kmeans,
+                   options={'gemm': [True, False]})

@@ -68,6 +68,17 @@ def convert_sklearn_scaler(scope, operator, container):
         if isinstance(v, np.ndarray) and v.dtype != dtype:
             attrs[k] = v.astype(dtype)
 
+    if dtype == np.float64:
+        opv = container.target_opset
+        sub = OnnxSub(
+            feature_name, attrs['offset'].astype(dtype),
+            op_version=opv)
+        div = OnnxDiv(sub, inv_scale.astype(dtype),
+                      op_version=opv,
+                      output_names=[operator.outputs[0].full_name])
+        div.add_to(scope, container)
+        return
+
     if inv_scale is not None:
         options = container.get_options(op, dict(div='std'))
         div = options['div']
