@@ -246,26 +246,6 @@ def _guess_type_proto_str_inv(data_type):
         "".format(data_type))
 
 
-def _guess_type_proto_str_inv(data_type):
-    # This could be moved to onnxconverter_common.
-    if isinstance(data_type, FloatTensorType):
-        return "tensor(float)"
-    if isinstance(data_type, DoubleTensorType):
-        return "tensor(double)"
-    if isinstance(data_type, StringTensorType):
-        return "tensor(string)"
-    if isinstance(data_type, Int64TensorType):
-        return "tensor(int64)"
-    if isinstance(data_type, Int32TensorType):
-        return "tensor(int32)"
-    if isinstance(data_type, BooleanTensorType):
-        return "tensor(bool)"
-    raise NotImplementedError(
-        "Unsupported data_type '{}'. You may raise an issue "
-        "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
-
-
 def _guess_numpy_type(data_type, dims):
     # This could be moved to onnxconverter_common.
     if data_type == np.float32:
