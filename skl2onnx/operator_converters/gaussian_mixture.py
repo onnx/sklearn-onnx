@@ -156,6 +156,10 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     dtype = guess_numpy_type(X.type)
     if dtype != np.float64:
         dtype = np.float32
+    elif operator.target_opset < 11:
+        raise RuntimeError(
+            "Some needed operators are not available below opset 11"
+            " to convert model %r" % type(operator.raw_operator))
     out = operator.outputs
     op = operator.raw_operator
     n_components = op.means_.shape[0]
