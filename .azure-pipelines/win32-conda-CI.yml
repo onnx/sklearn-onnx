@@ -173,14 +173,6 @@ jobs:
       python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
-  - script: |
-      call activate skl2onnxEnvironment
-      if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
-      pip install lightgbm xgboost hummingbird-ml hummingbird
-      pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
-      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
-    displayName: 'install onnxmltools'
-
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'

@@ -305,15 +305,19 @@ jobs:
     displayName: 'coverage'
 
   - script: |
-      if [ '$(onnx.target_opset)' != '' ]
-      then
-        export TEST_TARGET_OPSET="$(onnx.target_opset)"
-      fi
       pip install -r docs/requirements.txt
       pip uninstall -y skl2onnx
       python setup.py install
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
       pip install --no-deps git+https://github.com/onnx/onnxmltools.git
+    displayName: 'install for documentation'
+    condition: eq(variables['run.example'], '1')
+
+  - script: |
+      if [ '$(onnx.target_opset)' != '' ]
+      then
+        export TEST_TARGET_OPSET="$(onnx.target_opset)"
+      fi
       pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')

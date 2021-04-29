@@ -131,7 +131,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             raise NotImplementedError()
         if options['return_std']:
-            if hasattr(op, '_K_inv'):
+            if hasattr(op, '_K_inv') and op._K_inv is not None:
                 # scikit-learn < 0.24.2
                 _K_inv = op._K_inv
             else:
