@@ -26,6 +26,15 @@ try:
 except ImportError:
     # ColumnTransformer was introduced in 0.20.
     ColumnTransformer = None
+try:
+    from sklearn.preprocessing import Imputer
+except ImportError:
+    Imputer = None
+try:
+    from sklearn.impute import SimpleImputer
+except ImportError:
+    # changed in 0.20
+    SimpleImputer = None
 
 from ._supported_operators import (
     _get_sklearn_operator_name, cluster_list, outlier_list)
@@ -160,6 +169,13 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
             scores_var = scope.declare_local_variable(
                 'score_samples', guess_tensor_type(inputs[0].type))
             this_operator.outputs.append(scores_var)
+    elif type(model) in {SimpleImputer, Imputer}:
+        if isinstance(inputs[0].type, Int64TensorType):
+            otype = Int64TensorType()
+        else:
+            otype = guess_tensor_type(inputs[0].type)
+        variable = scope.declare_local_variable('variable', otype)
+        this_operator.outputs.append(variable)
     else:
         # We assume that all scikit-learn operator produce a single output.
         variable = scope.declare_local_variable(

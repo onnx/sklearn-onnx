@@ -55,7 +55,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture(), load_iris())
-        for tg in range(min(9, TARGET_OPSET), TARGET_OPSET):
+        for tg in range(min(9, TARGET_OPSET), TARGET_OPSET + 1):
             with self.subTest(target_opset=tg):
                 model_onnx = convert_sklearn(
                     model, "gaussian_mixture",
