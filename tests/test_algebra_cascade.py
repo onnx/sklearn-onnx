@@ -53,47 +53,49 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             elif opv is not None and opv > get_latest_tested_opset_version():
                 continue
             for i, nbnode in enumerate((1, 2, 3, 100)):
-                onx = generate_onnx_graph(5, nbnode, opv=opv)
-                if opv == {'': 10}:
-                    for im in onx.opset_import:
-                        if im.version > 10:
-                            raise AssertionError(
-                                "Wrong final opset\nopv={}\n{}".format(
-                                    opv, onx))
-                else:
-                    for im in onx.opset_import:
-                        if im.version > opv:
-                            raise AssertionError(
-                                "Wrong final opset\nopv={}\n{}".format(
-                                    opv, onx))
-                as_string = onx.SerializeToString()
-                try:
-                    ort = InferenceSession(as_string)
-                except (InvalidGraph, InvalidArgument) as e:
-                    if (isinstance(opv, dict) and
-                            opv[''] >= onnx_opset_version()):
-                        continue
-                    if (isinstance(opv, int) and
-                            opv >= onnx_opset_version()):
-                        continue
-                    raise AssertionError(
-                        "Unable to load opv={}\n---\n{}\n---".format(
-                            opv, onx)) from e
-                X = (np.ones((1, 5)) * nbnode).astype(np.float32)
-                res_out = ort.run(None, {'X1': X})
-                assert len(res_out) == 1
-                res = res_out[0]
-                assert_almost_equal(exp[i], res)
+                with self.subTest(n_nodes=nbnode):
+                    onx = generate_onnx_graph(5, nbnode, opv=opv)
+                    if opv == {'': 10}:
+                        for im in onx.opset_import:
+                            if im.version > 10:
+                                raise AssertionError(
+                                    "Wrong final opset\nopv={}\n{}".format(
+                                        opv, onx))
+                    else:
+                        for im in onx.opset_import:
+                            if im.version > opv:
+                                raise AssertionError(
+                                    "Wrong final opset\nopv={}\n{}".format(
+                                        opv, onx))
+                    as_string = onx.SerializeToString()
+                    try:
+                        ort = InferenceSession(as_string)
+                    except (InvalidGraph, InvalidArgument) as e:
+                        if (isinstance(opv, dict) and
+                                opv[''] >= onnx_opset_version()):
+                            continue
+                        if (isinstance(opv, int) and
+                                opv >= onnx_opset_version()):
+                            continue
+                        raise AssertionError(
+                            "Unable to load opv={}\n---\n{}\n---".format(
+                                opv, onx)) from e
+                    X = (np.ones((1, 5)) * nbnode).astype(np.float32)
+                    res_out = ort.run(None, {'X1': X})
+                    assert len(res_out) == 1
+                    res = res_out[0]
+                    assert_almost_equal(exp[i], res)
 
-        dim = 10
-        onx = generate_onnx_graph(dim, 300, opv=11)
-        as_string = onx.SerializeToString()
-        ort = InferenceSession(as_string)
-        X = (np.ones((1, dim)) * nbnode).astype(np.float32)
-        res_out = ort.run(None, {'X1': X})
-        assert len(res_out) == 1
-        res = res_out[0]
-        assert res.shape[1] == dim
+        with self.subTest(n_nodes=300):
+            dim = 10
+            onx = generate_onnx_graph(dim, 300, opv=11)
+            as_string = onx.SerializeToString()
+            ort = InferenceSession(as_string)
+            X = (np.ones((1, dim)) * nbnode).astype(np.float32)
+            res_out = ort.run(None, {'X1': X})
+            assert len(res_out) == 1
+            res = res_out[0]
+            assert res.shape[1] == dim
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")

@@ -27,18 +27,16 @@ def calculate_sklearn_scaler_output_shapes(operator):
     # Inputs: multiple float- and integer-tensors
     # Output: one float tensor
     for variable in operator.inputs:
-        if len(variable.type.shape) != 2:
-            raise RuntimeError('Only 2-D tensor(s) can be input(s) not '
-                               '{}.'.format(variable.type))
-        if (len(set(variable.type.shape[0] for variable in operator.inputs))
+        if (len(set(variable.get_first_dimension()
+                    for variable in operator.inputs))
                 > 1):
             raise RuntimeError('Batch size must be identical across inputs.')
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
-        if isinstance(variable.type.shape[1], numbers.Integral):
-            C += variable.type.shape[1]
+        if isinstance(variable.get_first_dimension(), numbers.Integral):
+            C += variable.get_first_dimension()
         else:
             C = None
             break
