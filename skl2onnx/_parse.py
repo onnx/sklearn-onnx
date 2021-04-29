@@ -42,7 +42,7 @@ from ._supported_operators import (
     sklearn_classifier_list, sklearn_operator_name_map)
 from .common._container import SklearnModelContainerNode
 from .common._registration import _converter_pool, _shape_calculator_pool
-from .common._topology import Topology
+from .common._topology import Topology, Variable
 from .common.data_types import (
     DictionaryType, Int64TensorType, SequenceType,
     StringTensorType, TensorType, guess_tensor_type)
@@ -465,6 +465,11 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None,
         (if type is not None) and the name of every output.
     :return: The output variables produced by the input model
     """
+    for i, inp in enumerate(inputs):
+        if not isinstance(inp, Variable):
+            raise TypeError(
+                "Unexpected input type %r for input %r: %r." % (
+                    type(inp), i, inp))
     if final_types is not None:
         outputs = []
         for name, ty in final_types:

@@ -107,7 +107,7 @@ class OnnxOperatorMixin:
             names = []
             while True:
                 try:
-                    name = op.get_output(len(names))
+                    name = op.get_output_name(len(names), scope=scope)
                     if name is None:
                         break
                     names.append(name)

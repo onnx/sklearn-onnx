@@ -21,7 +21,7 @@ def calculate_pls_regression_output_shapes(operator):
     cls_type = operator.inputs[0].type.__class__
     if cls_type != DoubleTensorType:
         cls_type = FloatTensorType
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type = cls_type([N, op.coef_.shape[1]])
 
 
