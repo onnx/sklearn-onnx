@@ -40,8 +40,8 @@ class TestSklearnImputerConverter(unittest.TestCase):
         StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
         reason="onnxruntime too old")
     def test_model_imputer_int(self):
-        model = Imputer(missing_values="NaN", strategy="mean", axis=0)
-        data = [[1, 2], [np.nan, 3], [7, 6]]
+        model = Imputer(missing_values=-5, strategy="mean", axis=0)
+        data = [[1, 2], [-5, 3], [7, 6]]
         model.fit(data)
         # The conversion works but internally scikit-learn converts
         # everything into float before looking into missing values.
@@ -57,8 +57,8 @@ class TestSklearnImputerConverter(unittest.TestCase):
         StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
         reason="onnxruntime too old")
     def test_imputer_int_inputs(self):
-        model = Imputer(missing_values="NaN", strategy="most_frequent", axis=0)
-        data = [[1, 2], [np.nan, 3], [7, 6]]
+        model = Imputer(missing_values=-5, strategy="most_frequent", axis=0)
+        data = [[1, 2], [-5, 3], [7, 6]]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scikit-learn imputer",
                                      [("input", Int64TensorType([None, 2]))])
