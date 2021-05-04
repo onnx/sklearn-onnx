@@ -36,40 +36,6 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     @unittest.skipIf(Imputer is None,
                      reason="Imputer removed in 0.21")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
-        reason="onnxruntime too old")
-    def test_model_imputer_int(self):
-        model = Imputer(missing_values=-5, strategy="mean", axis=0)
-        data = [[1, 2], [-5, 3], [7, 6]]
-        model.fit(data)
-        # The conversion works but internally scikit-learn converts
-        # everything into float before looking into missing values.
-        # There is no nan integer. The runtime is not tested
-        # in this case.
-        model_onnx = convert_sklearn(model, "scikit-learn imputer",
-                                     [("input", Int64TensorType([None, 2]))])
-        self.assertTrue(model_onnx is not None)
-
-    @unittest.skipIf(Imputer is None,
-                     reason="Imputer removed in 0.21")
-    @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
-        reason="onnxruntime too old")
-    def test_imputer_int_inputs(self):
-        model = Imputer(missing_values=-5, strategy="most_frequent", axis=0)
-        data = [[1, 2], [-5, 3], [7, 6]]
-        model.fit(data)
-        model_onnx = convert_sklearn(model, "scikit-learn imputer",
-                                     [("input", Int64TensorType([None, 2]))])
-
-        # Last node should be Imputer
-        outputs = model_onnx.graph.output
-        self.assertEqual(len(outputs), 1)
-        self._check_outputs_ints(model, model_onnx, data)
-
-    @unittest.skipIf(Imputer is None,
-                     reason="Imputer removed in 0.21")
     def test_imputer_float_inputs(self):
         model = Imputer(missing_values="NaN", strategy="mean", axis=0)
         data = [[1, 2], [np.nan, 3], [7, 6]]
