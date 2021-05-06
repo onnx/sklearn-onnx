@@ -135,6 +135,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
                 self._test_score(model, X, tg)
 
     @unittest.skipIf(
+        TARGET_OPSET < OPSET_VERSION,
+        reason="onnx misses Gemm for double")
+    @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -199,6 +202,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
         reason="onnxruntime misses Gemm for double")
+    @unittest.skipIf(
+        TARGET_OPSET < OPSET_VERSION,
+        reason="onnx misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_gaussian_mixture_full(self):
         data = load_iris()
