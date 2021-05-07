@@ -221,7 +221,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_int(self):
         model, X = fit_classification_model(
-            linear_model.LogisticRegressionCV(max_iter=100), 4, is_int=True)
+            linear_model.LogisticRegressionCV(max_iter=100), 7, is_int=True)
         model_onnx = convert_sklearn(
             model, "logistic regression cv",
             [("input", Int64TensorType([None, X.shape[1]]))])
