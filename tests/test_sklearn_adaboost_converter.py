@@ -117,6 +117,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     def test_ada_boost_classifier_samme(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME", random_state=42,
+            n_features=7,
             base_estimator=DecisionTreeClassifier(
                 max_depth=6, random_state=42)), 2)
         model_onnx = convert_sklearn(
