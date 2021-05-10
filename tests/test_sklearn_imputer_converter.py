@@ -4,10 +4,8 @@
 Tests scikit-imputer converter.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
-import onnxruntime
 from onnxruntime import InferenceSession
 try:
     from sklearn.preprocessing import Imputer
