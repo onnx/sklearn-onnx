@@ -10,6 +10,8 @@ import pickle
 from distutils.version import StrictVersion  # noqa
 import numpy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
+import onnx
+import onnxruntime
 
 
 class ExpectedAssertionError(Exception):
@@ -23,7 +25,10 @@ class OnnxRuntimeAssertionError(AssertionError):
     """
     Expected failure.
     """
-    pass
+    def __init__(self, msg):
+        new_msg = "{}\nonnx=={} onnxruntime=={}".format(
+            msg, onnx.__version__, onnxruntime.__version__)
+        AssertionError.__init__(self, msg)
 
 
 class OnnxRuntimeMissingNewOnnxOperatorException(OnnxRuntimeAssertionError):
