@@ -110,6 +110,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
     @unittest.skipIf(
         TARGET_OPSET < OPSET_VERSION,
         reason="onnxruntime misses Gemm for double")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
+        reason="onnxruntime misses Gemm for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
