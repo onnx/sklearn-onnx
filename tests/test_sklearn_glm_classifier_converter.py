@@ -222,7 +222,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
     def test_model_logistic_regression_cv_int(self):
         try:
             model, X = fit_classification_model(
-                linear_model.LogisticRegressionCV(max_iter=100), 7, is_int=True)
+                linear_model.LogisticRegressionCV(max_iter=100),
+                7, is_int=True)
         except AttributeError:
             # AttributeError: 'str' object has no attribute 'decode'
             # Bug fixed in scikit-learn 0.24 due to a warning using encoding.
