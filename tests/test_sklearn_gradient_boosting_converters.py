@@ -306,7 +306,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingRegressionInt-Dec4",
+            basename="SklearnGradientBoostingRegressionInt-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )

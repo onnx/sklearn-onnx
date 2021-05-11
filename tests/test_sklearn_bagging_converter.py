@@ -2,6 +2,8 @@
 
 
 import unittest
+from distutils.version import StrictVersion
+import onnxruntime
 from sklearn.ensemble import (
     BaggingClassifier,
     BaggingRegressor,
@@ -184,6 +186,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'])
 
+    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
+                     <= StrictVersion("0.4.0"),
+                     reason="Not implemented.")
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
