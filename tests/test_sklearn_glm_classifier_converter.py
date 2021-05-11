@@ -220,8 +220,14 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_int(self):
-        model, X = fit_classification_model(
-            linear_model.LogisticRegressionCV(max_iter=100), 4, is_int=True)
+        try:
+            model, X = fit_classification_model(
+                linear_model.LogisticRegressionCV(max_iter=100),
+                7, is_int=True)
+        except AttributeError:
+            # AttributeError: 'str' object has no attribute 'decode'
+            # Bug fixed in scikit-learn 0.24 due to a warning using encoding.
+            return
         model_onnx = convert_sklearn(
             model, "logistic regression cv",
             [("input", Int64TensorType([None, X.shape[1]]))])
