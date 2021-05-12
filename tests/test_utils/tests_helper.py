@@ -52,7 +52,7 @@ def fit_classification_model(model, n_classes, is_int=False,
                              random_state=42, is_bool=False,
                              n_features=20):
     X, y = make_classification(
-        n_classes=n_classes, n_features=n_features, n_samples=500,
+        n_classes=n_classes, n_features=n_features, n_samples=250,
         random_state=random_state, n_informative=min(7, n_features),
         n_redundant=min(2, n_features - min(7, n_features)))
     if label_string:
@@ -69,7 +69,7 @@ def fit_classification_model(model, n_classes, is_int=False,
 
 
 def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
-                                        n_samples=400, n_features=20,
+                                        n_samples=200, n_features=20,
                                         is_int=False):
     X, y = make_multilabel_classification(
         n_classes=n_classes, n_labels=n_labels, n_features=n_features,
@@ -82,7 +82,7 @@ def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
 
 
 def fit_regression_model(model, is_int=False, n_targets=1, is_bool=False,
-                         factor=1., n_features=10, n_samples=500,
+                         factor=1., n_features=10, n_samples=250,
                          n_informative=10):
     X, y = make_regression(n_features=n_features, n_samples=n_samples,
                            n_targets=n_targets, random_state=42,

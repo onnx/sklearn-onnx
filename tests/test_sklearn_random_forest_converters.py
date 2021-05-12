@@ -447,7 +447,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_random_forest_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
-            RandomForestClassifier(random_state=42))
+            RandomForestClassifier(random_state=42, n_estimators=5))
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
             model,
@@ -471,7 +471,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_random_forest_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
-            RandomForestClassifier(random_state=42), n_samples=4)
+            RandomForestClassifier(random_state=42, n_estimators=5),
+            n_samples=4)
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
             model,
@@ -495,7 +496,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_extra_trees_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
-            ExtraTreesClassifier(random_state=42))
+            ExtraTreesClassifier(random_state=42, n_estimators=5))
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
             model,
@@ -519,7 +520,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     def test_model_extra_trees_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
-            ExtraTreesClassifier(random_state=42), n_samples=10)
+            ExtraTreesClassifier(random_state=42, n_estimators=5),
+            n_samples=10)
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
             model,
