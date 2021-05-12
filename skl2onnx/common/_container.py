@@ -500,8 +500,10 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             outputs = [outputs]
         common = set(inputs) & set(outputs)
         if common:
-            raise RuntimeError("inputs and outputs cannot have "
-                               "variables in common {}".format(common))
+            raise RuntimeError(
+                "inputs and outputs cannot have "
+                "variables in common {} in node '{}' "
+                "with name '{}'.".format(common, op_type, name))
         if not isinstance(inputs, list) or not all(
                 isinstance(s, (six.string_types, six.text_type))
                 for s in inputs):

@@ -28,7 +28,7 @@ def calculate_sklearn_truncated_svd_output_shapes(operator):
     cls_type = operator.inputs[0].type.__class__
     if cls_type != DoubleTensorType:
         cls_type = FloatTensorType
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     K = (operator.raw_operator.n_components
          if operator.type == 'SklearnTruncatedSVD'
          else operator.raw_operator.n_components_)

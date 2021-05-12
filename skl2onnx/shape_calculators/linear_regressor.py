@@ -31,7 +31,7 @@ def calculate_bayesian_ridge_output_shapes(operator):
     else:
         cls_type = FloatTensorType
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     if (hasattr(operator.raw_operator, 'coef_') and
             len(operator.raw_operator.coef_.shape) > 1):
         operator.outputs[0].type = cls_type([

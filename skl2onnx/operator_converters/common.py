@@ -1,36 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from ..common.data_types import (Int64TensorType, Int64Type, FloatTensorType,
-                                 FloatType, StringType)
+from ..common._apply_operation import apply_cast
+from ..common.data_types import (
+    Int64TensorType, FloatTensorType, DoubleTensorType, guess_proto_type)
 
 
-def convert_integer_to_float(scope, variable, container):
-    op_type = 'Scaler'
-    scaled_name = scope.get_unique_variable_name(variable.full_name
-                                                 + '_scaled')
-    scaler_attrs = {
-        'name': scope.get_unique_operator_name(op_type),
-        'scale': [1.],
-        'offset': [0.]
-    }
-    container.add_node('Scaler', variable.full_name, scaled_name,
-                       op_domain='ai.onnx.ml', **scaler_attrs)
-    return scaled_name
-
-
-def concatenate_variables(scope, variables, container):
+def concatenate_variables(scope, variables, container, main_type=None):
     """
     This function allocate operators to from a float tensor by concatenating
     all input variables. Notice that if all integer inputs would be converted
     to floats before concatenation.
     """
+    if main_type is None:
+        main_type = variables[0].type.__class__
 
     # Check if it's possible to concatenate those inputs.
     type_set = set(type(variable.type) for variable in variables)
-    number_type_set = {FloatType, FloatTensorType, Int64Type, Int64TensorType}
-    if (StringType in type_set and
-            any(number_type in type_set for number_type in number_type_set)):
+    number_type_set = {FloatTensorType, Int64TensorType, DoubleTensorType}
+    if any(itype not in number_type_set for itype in type_set):
         raise RuntimeError('Numerical tensor(s) and string tensor(s) '
                            'cannot be concatenated.')
     # input variables' names we want to concatenate
@@ -40,9 +28,12 @@ def concatenate_variables(scope, variables, container):
 
     # Collect input variable names and do cast if needed
     for variable in variables:
-        if isinstance(variable.type, (Int64TensorType, Int64Type)):
-            input_names.append(convert_integer_to_float(scope, variable,
-                                                        container))
+        if not isinstance(variable.type, main_type):
+            proto_type = guess_proto_type(main_type())
+            new_name = scope.get_unique_variable_name('cast')
+            apply_cast(scope, variable.full_name, new_name,
+                       container, to=proto_type)
+            input_names.append(new_name)
         else:
             input_names.append(variable.full_name)
         # We assume input variables' shape are [1, C_1], ..., [1, C_n],
@@ -52,17 +43,16 @@ def concatenate_variables(scope, variables, container):
     if len(input_names) == 1:
         # No need to concatenate tensors if there is only one input
         return input_names[0]
-    else:
-        # To combine all inputs, we need a FeatureVectorizer
-        op_type = 'FeatureVectorizer'
-        attrs = {
-            'name': scope.get_unique_operator_name(op_type),
-            'inputdimensions': input_dims
-        }
-        # Create a variable name to capture feature vectorizer's output
-        concatenated_name = scope.get_unique_variable_name('concatenated')
-        # Set up our FeatureVectorizer
-        container.add_node(op_type, input_names, concatenated_name,
-                           op_domain='ai.onnx.ml', **attrs)
 
-        return concatenated_name
+    # To combine all inputs, we need a FeatureVectorizer
+    op_type = 'FeatureVectorizer'
+    attrs = {
+        'name': scope.get_unique_operator_name(op_type),
+        'inputdimensions': input_dims}
+    # Create a variable name to capture feature vectorizer's output
+    concatenated_name = scope.get_unique_variable_name('concatenated')
+    # Set up our FeatureVectorizer
+    container.add_node(op_type, input_names, concatenated_name,
+                       op_domain='ai.onnx.ml', **attrs)
+
+    return concatenated_name
