@@ -52,6 +52,8 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="Missing Gemm (11)")
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture(), load_iris())
