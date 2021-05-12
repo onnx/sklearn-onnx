@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
@@ -22,10 +19,7 @@ def calculate_sklearn_kmeans_output_shapes(operator):
         raise RuntimeError("Two outputs are expected for KMeans.")
 
     variable = operator.inputs[0]
-    if len(variable.type.shape) != 2:
-        raise RuntimeError('Only 2-D tensor(s) can be input(s).')
-
-    N = variable.type.shape[0]
+    N = variable.get_first_dimension()
     op = operator.raw_operator
     operator.outputs[0].type.shape = [N]
     operator.outputs[1].type.shape = [N, op.n_clusters]

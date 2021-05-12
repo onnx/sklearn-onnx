@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 ==================
 Convert a pipeline
@@ -32,7 +34,7 @@ useful to build complex pipelines such as the following one:
 
     numeric_features = [0, 1, 2] # ["vA", "vB", "vC"]
     categorical_features = [3, 4] # ["vcat", "vcat2"]
-    
+
     classifier = LogisticRegression(C=0.01, class_weight=dict(zip([False, True], [0.2, 0.8])),
                                     n_jobs=1, max_iter=10, solver='lbfgs', tol=1e-3)
 
@@ -67,13 +69,13 @@ Which we can represents as:
         features -> categorical_features;
         numeric_features -> SimpleImputer -> StandardScaler -> LogisticRegression;
         categorical_features -> OneHotEncoder -> TruncatedSVD -> LogisticRegression;
-    
+
         group {
             numeric_features; SimpleImputer; StandardScaler;
         }
         group {
             categorical_features; OneHotEncoder; TruncatedSVD;
-        }    
+        }
     }
 
 Once fitted, the model is converted into *ONNX*:
@@ -92,7 +94,7 @@ Once fitted, the model is converted into *ONNX*:
     means the model was not trained. The converter tries to access an attribute
     created by method `fit`.
 
-It can be represented as a 
+It can be represented as a
 `DOT <https://en.wikipedia.org/wiki/DOT_(graph_description_language)>`_ graph:
 
 ::
@@ -152,7 +154,7 @@ order:
   `operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
   `ML operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
   custom *ONNX* operators.
-  
+
 As *sklearn-onnx* may convert pipelines with model coming from other libraries,
 the library must handle parsers, shape calculators or converters coming
 from other packages. This can be done is two ways. The first one
@@ -262,22 +264,22 @@ a pipeline and each of its components independently.
 
     # Loop on every operator.
     for op in operators:
-    
+
         # The ONNX for this operator.
         onnx_step = op['onnx_step']
-        
+
         # Use onnxruntime to compute ONNX outputs
         sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
-    
+
         # Let's use the initial data as the ONNX model
         # contains all nodes from the first inputs to this node.
         onnx_outputs = sess.run(None, {'input': data})
         onnx_output = onnx_outputs[0]
         skl_outputs = op['model']._debug.outputs['transform']
-        
+
         # Compares the outputs between scikit-learn and onnxruntime.
         assert_almost_equal(onnx_output, skl_outputs)
-        
+
         # A function which is able to deal with different types.
         compare_objects(onnx_output, skl_outputs)
 
@@ -285,7 +287,7 @@ Investigate missing converters
 ==============================
 
 Many converters can be missing before converting a pipeline.
-Exception :class:`MissingShapeCalculator 
+Exception :class:`MissingShapeCalculator
 <skl2onnx.common.exceptions.MissingShapeCalculator>` is
 raised when the first missing one is found.
 The previous snippet of code can be modified to find all of
@@ -320,36 +322,36 @@ them.
     # methods transform or predict are used, inputs and outputs
     # are stored in every operator.
     _alter_model_for_debugging(model, recursive=True)
-    
+
     # Let's use the pipeline and keep intermediate
     # inputs and outputs.
     model.transform(data)
-    
+
     # Let's get the list of all operators to convert
     # and independently process them.
     all_models = list(enumerate_pipeline_models(model))
-    
+
     # Loop on every operator.
     for ind, op, last in all_models:
         if ind == (0,):
             # whole pipeline
             continue
-        
+
         # The dump input data for this operator.
         data_in = op._debug.inputs['transform']
-        
-        # Let's infer some initial shape.        
+
+        # Let's infer some initial shape.
         t = guess_data_type(data_in)
-        
+
         # Let's convert.
         try:
-            onnx_step = convert_sklearn(op, initial_types=t)            
+            onnx_step = convert_sklearn(op, initial_types=t)
         except MissingShapeCalculator as e:
             if "MyScaler" in str(e):
                 print(e)
                 continue
             raise
-        
+
         # If it does not fail, let's compare the ONNX outputs with
         # the original operator.
         sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())

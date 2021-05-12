@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import warnings
 
@@ -111,10 +108,12 @@ from sklearn.naive_bayes import (
 )
 try:
     from sklearn.naive_bayes import CategoricalNB
-    from sklearn.naive_bayes import ComplementNB
 except ImportError:
     # scikit-learn versions <= 0.21
     CategoricalNB = None
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
     # scikit-learn versions <= 0.19
     ComplementNB = None
 
@@ -439,7 +438,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
-    if options is not None and 'zipmap' in options:
+    elif options is not None and 'zipmap' in options:
         from ._parse import (
             _parse_sklearn_classifier, update_registered_parser)
         update_registered_parser(model, _parse_sklearn_classifier)

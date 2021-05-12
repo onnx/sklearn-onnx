@@ -1,11 +1,9 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 from ..common._registration import register_converter
+from ..common.data_types import Int64TensorType
 from .common import concatenate_variables
 
 
@@ -20,11 +18,28 @@ def convert_sklearn_imputer(scope, operator, container):
     if not hasattr(op, 'statistics_'):
         raise RuntimeError("Member statistics_ is not present, was the "
                            "model fitted?")
-    attrs['imputed_value_floats'] = op.statistics_.astype(np.float32)
+
+    if isinstance(operator.inputs[0].type, Int64TensorType):
+        attrs['imputed_value_int64s'] = op.statistics_.astype(np.int64)
+        use_int = True
+        delta = np.max(np.abs(attrs['imputed_value_int64s'] - op.statistics_))
+        if delta != 0:
+            raise RuntimeError(
+                "SimpleImputer takes integer as input but nan values are "
+                "replaced by float {} != {}.".format(
+                    attrs['imputed_value_int64s'], op.statistics_))
+    else:
+        attrs['imputed_value_floats'] = op.statistics_.astype(np.float32)
+        use_int = False
+
     if isinstance(op.missing_values, str) and op.missing_values == 'NaN':
         attrs['replaced_value_float'] = np.NaN
     elif isinstance(op.missing_values, float):
-        attrs['replaced_value_float'] = float(op.missing_values)
+        if use_int:
+            ar = np.array([op.missing_values]).astype(np.int64)
+            attrs['replaced_value_int64'] = ar[0]
+        else:
+            attrs['replaced_value_float'] = float(op.missing_values)
     else:
         raise RuntimeError("Unsupported proposed value '{0}'. "
                            "You may raise an issue at "

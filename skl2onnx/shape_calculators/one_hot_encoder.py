@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 from ..common._registration import register_shape_calculator
@@ -17,7 +14,7 @@ def calculate_sklearn_one_hot_encoder_output_shapes(operator):
             categories = (categories[np.arange(len(categories)) !=
                           op.drop_idx_[index]])
         categories_len += len(categories)
-    instances = operator.inputs[0].type.shape[0]
+    instances = operator.inputs[0].get_first_dimension()
     if np.issubdtype(op.dtype, np.signedinteger):
         operator.outputs[0].type = Int64TensorType([instances, categories_len])
     else:

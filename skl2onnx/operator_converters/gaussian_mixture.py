@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 from scipy.special import digamma
@@ -144,7 +141,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
     add = OnnxAdd(cst, log_prob, op_version=opv)
     mul = OnnxMul(add, np.array([-0.5], dtype=dtype),
                   op_version=opv)
-    if isinstance(log_det, float):
+    if isinstance(log_det, (np.float32, np.float64, float)):
         log_det = np.array([log_det], dtype=dtype)
 
     return OnnxAdd(mul, log_det.astype(dtype), op_version=opv)
@@ -159,6 +156,10 @@ def convert_sklearn_gaussian_mixture(scope, operator, container):
     dtype = guess_numpy_type(X.type)
     if dtype != np.float64:
         dtype = np.float32
+    elif operator.target_opset < 11:
+        raise RuntimeError(
+            "Some needed operators are not available below opset 11"
+            " to convert model %r" % type(operator.raw_operator))
     out = operator.outputs
     op = operator.raw_operator
     n_components = op.means_.shape[0]

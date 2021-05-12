@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
@@ -25,7 +22,7 @@ def calculate_gaussian_mixture_output_shapes(operator):
         raise RuntimeError('Input must be a [N, C]-tensor')
 
     op = operator.raw_operator
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type = Int64TensorType([N, 1])
     operator.outputs[1].type.shape = [N, op.n_components]
     if len(operator.outputs) > 2:

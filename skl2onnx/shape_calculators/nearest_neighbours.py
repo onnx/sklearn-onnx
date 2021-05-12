@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import copy
 import numpy as np
@@ -22,7 +19,7 @@ def calculate_sklearn_neighbours_transformer(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     n_samples_fit = operator.raw_operator.n_samples_fit_
     output_type = (
         DoubleTensorType
@@ -39,7 +36,7 @@ def calculate_sklearn_nearest_neighbours(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     neighbours = operator.raw_operator.n_neighbors
     operator.outputs[0].type = Int64TensorType([N, neighbours])
     operator.outputs[1].type.shape = [N, neighbours]
@@ -52,7 +49,7 @@ def calculate_sklearn_nearest_neighbours_regressor(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     if (hasattr(operator.raw_operator, '_y') and
             len(np.squeeze(operator.raw_operator._y).shape) == 1):
         C = 1
@@ -68,7 +65,7 @@ def calculate_sklearn_nca(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     output_type = (
         DoubleTensorType
         if isinstance(operator.inputs[0].type, DoubleTensorType)

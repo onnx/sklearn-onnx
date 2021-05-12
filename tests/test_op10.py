@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 import unittest
 from sklearn import linear_model
 from sklearn.cluster import KMeans

@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 from sklearn.base import BaseEstimator
 from onnx import shape_inference
 from ..common._registration import get_converter, get_shape_calculator
@@ -110,7 +107,7 @@ class OnnxOperatorMixin:
             names = []
             while True:
                 try:
-                    name = op.get_output(len(names))
+                    name = op.get_output_name(len(names), scope=scope)
                     if name is None:
                         break
                     names.append(name)

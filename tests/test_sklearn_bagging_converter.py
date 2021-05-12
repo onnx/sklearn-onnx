@@ -1,10 +1,9 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import unittest
+from distutils.version import StrictVersion
+import onnxruntime
 from sklearn.ensemble import (
     BaggingClassifier,
     BaggingRegressor,
@@ -187,6 +186,9 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'])
 
+    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
+                     <= StrictVersion("0.4.0"),
+                     reason="Not implemented.")
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
@@ -208,8 +210,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     def test_bagging_classifier_sgd_multiclass_decision_function(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                GradientBoostingClassifier(random_state=42, n_estimators=10),
-                random_state=42), 4, n_features=40)
+                GradientBoostingClassifier(random_state=42, n_estimators=4),
+                random_state=42), 4, n_features=10)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model, "bagging classifier",

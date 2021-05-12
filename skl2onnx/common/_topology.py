@@ -1,11 +1,9 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import re
 import warnings
+import pprint
 import numpy as np
 from onnx import onnx_pb as onnx_proto
 from onnxconverter_common.data_types import (  # noqa
@@ -40,7 +38,8 @@ type_fct = type
 
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-except ImportError:
+    assert OPSET_TO_IR_VERSION[13]
+except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
@@ -69,6 +68,12 @@ class Variable:
         :param type: A type object defined in .common.data_types.py;
                      e.g., FloatTensorType
         """
+        if not isinstance(raw_name, str) or '(' in raw_name:
+            raise TypeError(
+                "raw_name must be a string not '%s'." % raw_name.__class__)
+        if not isinstance(onnx_name, str) or '(' in onnx_name:
+            raise TypeError(
+                "raw_name must be a string not %r." % type(onnx_name))
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
         self.scope = scope
@@ -80,8 +85,8 @@ class Variable:
         self.is_leaf = None
         self.is_abandoned = False
         if self.type is not None and not isinstance(self.type, DataType):
-            raise TypeError("shape must be a DataType not {}.".format(
-                self.type))
+            raise TypeError(
+                "shape must be a DataType not {}.".format(self.type))
         if isinstance(self.type, TensorType):
             shape = self.type.shape
             if not isinstance(shape, (list, tuple)):
@@ -96,6 +101,16 @@ class Variable:
                 if not isinstance(dim, (int, np.int32, np.int64)):
                     raise TypeError("shape must contains integers not "
                                     "'{}'.".format(dim))
+
+    def get_first_dimension(self):
+        """
+        Returns the first dimension (batch dimension) or
+        None if not specified (shape is empty).
+        """
+        if (self.type is None or self.type.shape is None or
+                len(self.type.shape) == 0):
+            return None
+        return self.type.shape[0]
 
     @property
     def full_name(self):
@@ -155,6 +170,18 @@ class Variable:
 
         return Variable(name, name, None, ty)
 
+    def __iter__(self):
+        "Enables expression such as `a,b = self`."
+        yield self.onnx_name
+        yield self.type
+
+    def __getitem__(self, index):
+        if index == 0:
+            return self.onnx_name
+        if index == 1:
+            return self.type
+        raise IndexError("Unreachable element at index %d." % index)
+
 
 class Operator(OperatorBase):
     """
@@ -194,6 +221,14 @@ class Operator(OperatorBase):
         self.is_abandoned = False
         self.target_opset = target_opset
         self.scope_inst = scope_inst
+
+    def __repr__(self):
+        return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
+                "outputs='{3}', raw_operator={4})".format(
+                    self.type, self.onnx_name,
+                    ','.join(v.onnx_name for v in self.inputs),
+                    ','.join(v.onnx_name for v in self.outputs),
+                    self.raw_operator))
 
     @property
     def full_name(self):
@@ -299,6 +334,10 @@ class Scope:
 
         # Reserved variables.
         self.reserved = {}
+
+    def get(self, var_name, default_value):
+        "Returns variable with 'name' or default value is not found."
+        return self.variables.get(var_name, default_value)
 
     def temp(self):
         """
@@ -433,6 +472,26 @@ class Scope:
         raise NotImplementedError(
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__))
+
+    def add_options(self, model_id, options):
+        """
+        Adds an option, for example,
+        ``add_options(id(clr), {'raw_scores': True})``
+        tells the converter associated to ``clr`` to
+        use raw score instead of probabilities.
+
+        :param model_id: class or ``id(instance)``
+        :param options: dictionary with the new values
+        """
+        if options is None:
+            return
+        if self.options is None:
+            self.options = {}
+        if model_id not in self.options:
+            self.options[model_id] = None
+        if self.options[model_id] is None:
+            self.options[model_id] = {}
+        self.options[model_id].update(options)
 
     def get_options(self, model, default_values=None, fail=True):
         """
@@ -619,6 +678,7 @@ class Topology:
                     raise TypeError(
                         "operator.inputs must be a list not {}".format(
                             type(operator.inputs)))
+
                 if (all(variable.is_fed for variable in operator.inputs)
                         and not operator.is_evaluated):
                     # Check if over-writing problem occurs (i.e., multiple
@@ -627,18 +687,34 @@ class Topology:
                         # Throw an error if this variable has been treated as
                         # an output somewhere
                         if variable.is_fed:
+                            add = ["", "--DEBUG-INFO--"]
+                            add.append("self.variable_name_set=%s" % (
+                                pprint.pformat(self.variable_name_set)))
+                            add.append("self.operator_name_set=%s" % (
+                                pprint.pformat(self.operator_name_set)))
+                            for scope in self.scopes:
+                                add.append(pprint.pformat(
+                                    scope.variable_name_mapping))
+                                for var in scope.variables.values():
+                                    add.append("   is_fed=%s %s" % (
+                                        getattr(var, 'is_fed', '?'), var))
+                                for op in scope.operators.values():
+                                    add.append("   is_evaluated=%s %s" % (
+                                        getattr(op, 'is_evaluated', '?'), op))
                             raise RuntimeError(
                                 "A variable is already assigned ({}) "
                                 "for operator '{}' (name='{}'). This "
                                 "may still happen if a converter is a "
-                                "combination of sub-operators and one of "
+                                "combination of sub-estimators and one "
                                 "of them is producing this output. "
                                 "In that case, an identity node must be "
-                                "added.".format(
+                                "added.{}".format(
                                     variable, operator.type,
-                                    operator.onnx_name))
+                                    operator.onnx_name,
+                                    "\n".join(add)))
                         # Mark this variable as filled
                         variable.is_fed = True
+
                     # Make this operator as handled
                     operator.is_evaluated = True
                     is_evaluation_happened = True

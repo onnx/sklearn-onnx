@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 from .onnx_operator import OnnxOperator
 
 
@@ -13,8 +10,8 @@ class OnnxCDist(OnnxOperator):
     """
 
     since_version = 1
-    expected_inputs = ['X', 'Y']
-    expected_outputs = ['dist']
+    expected_inputs = [('X', 'T'), ('Y', 'T')]
+    expected_outputs = [('dist', 'T')]
     input_range = [2, 2]
     output_range = [1, 1]
     is_deprecated = False
@@ -43,8 +40,8 @@ class OnnxSolve(OnnxOperator):
     """
 
     since_version = 1
-    expected_inputs = ['A', 'Y']
-    expected_outputs = ['X']
+    expected_inputs = [('A', 'T'), ('Y', 'T')]
+    expected_outputs = [('X', 'T')]
     input_range = [2, 2]
     output_range = [1, 1]
     is_deprecated = False

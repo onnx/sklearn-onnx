@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from distutils.version import StrictVersion
 from logging import getLogger
@@ -309,7 +306,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingRegressionInt-Dec4",
+            basename="SklearnGradientBoostingRegressionInt-Dec3",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')"
         )

@@ -1,22 +1,22 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
+import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
-from onnxconverter_common.onnx_ops import apply_identity
 from ..proto import TensorProto
+from ..common.data_types import (
+    _guess_type_proto_str, _guess_type_proto_str_inv)
 from ..common._topology import (
     Variable, Scope, _update_domain_version,
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
 from ..proto.onnx_helper_modified import make_graph, make_model
 from ..helpers.onnx_helper import infer_outputs
-from .graph_state import GraphState
+from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
 
 
@@ -27,11 +27,12 @@ class OnnxOperatorItem:
     :param onx_op: OnnxOperator
     :param index: integer
     """
-    def __init__(self, onx_op, index):
+    def __init__(self, onx_op, index, op_version=None):
         if not isinstance(index, int):
             raise TypeError("index must be an integer.")
         self.onx_op = onx_op
         self.index = index
+        self.op_version = op_version
 
     def __str__(self):
         """
@@ -46,7 +47,7 @@ class OnnxOperatorItem:
         """
         return self.onx_op.get_latest_tested_opset_version()
 
-    def add_to(self, scope, container, operator=None):
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -54,16 +55,18 @@ class OnnxOperatorItem:
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: must be True if called from method `to_onnx`
         """
-        self.onx_op.add_to(scope, container, operator=operator)
+        self.onx_op.add_to(scope, container, operator=operator,
+                           run_converters=run_converters)
 
-    def get_output(self, i=0):
+    def get_output_name(self, i=0):
         """
         Returns the output.
         """
         if i != 0:
             raise IndexError("Can only return the first item.")
-        return self.onx_op.get_output(self.index)
+        return self.onx_op.get_output_name(self.index)
 
     @property
     def outputs(self):
@@ -87,60 +90,26 @@ class OnnxOperatorItem:
                     type(self), type(self.onx_op), type(self.onx_op.state)))
         return outputs[self.index:self.index + 1]
 
-
-class OnnxSubOperator:
-    """
-    Includes a sub operator in the ONNX graph.
-    """
-
-    def __init__(self, op, inputs, output_names=None, op_version=None,
-                 options=None):
-        self.op = op
-        self.output_names = output_names
-        if not isinstance(inputs, list):
-            inputs = [inputs]
-        self.inputs = inputs
-        self.op_version = op_version
-        self.options = options
-
-    def add_to(self, scope, container, operator=None):
+    def get_output_type_inference(self, input_shapes=None):
         """
-        Adds outputs to the container if not already added,
-        registered the outputs if the node is not final.
-
-        :param scope: scope
-        :param container: container
-        :param operator: overwrite inputs
+        Returns the inferred shape.
         """
-        if operator is not None:
+        if self.onx_op is None:
             raise RuntimeError(
-                "operator must be None, the operator to convert "
-                "is specified in member 'op'.")
-        try:
-            op_type = sklearn_operator_name_map[type(self.op)]
-        except KeyError:
+                "self.onx_op cannot be None, type(self)={}".format(
+                    type(self)))
+        if self.index is None:
             raise RuntimeError(
-                "Unable to find a converter for model of type '{}'."
-                "".format(self.op.__class__.__name__))
-
-        this_operator = scope.declare_local_operator(op_type, self.op)
-        this_operator.inputs = self.inputs
-        if self.output_names is None:
-            output = scope.declare_local_variable('sub_%s' % op_type)
-            this_operator.outputs.append(output)
-            self.outputs = [output]
-        else:
-            self.outputs = []
-            for v in self.output_names:
-                if isinstance(v, Variable):
-                    output = scope.declare_local_variable(
-                        '%s_%s' % (v.onnx_name, op_type))
-                    apply_identity(
-                        scope, output.onnx_name, v.onnx_name, container)
-                elif isinstance(v, str):
-                    output = scope.declare_local_variable(v)
-            self.outputs.append(output)
-            this_operator.outputs.extend(self.outputs)
+                "self.index cannot be None, type(self)={}".format(
+                    type(self)))
+        outputs = self.onx_op.get_output_type_inference(input_shapes)
+        if outputs is None:
+            raise RuntimeError(
+                "self.onx_op.outputs cannot be None, "
+                "type(self)={}, type(self.onx_op)={}, "
+                "type(self.onx_op.state)={}".format(
+                    type(self), type(self.onx_op), type(self.onx_op.state)))
+        return outputs[self.index:self.index + 1]
 
 
 class OnnxOperator:
@@ -158,18 +127,30 @@ class OnnxOperator:
     :param domain: to overwrite the default domain
     :param kwargs: additional parameters of the operator
     """
-    class OnnxOperatorVariable:
+    class OnnxOperatorVariable(GraphStateVar):
 
         def __init__(self, index, name=None):
             self.index = index
             self.name = name
 
+        def as_variable(self, scope):
+            name = "ov%s" % self.name
+            return Variable(name, name, scope=scope, type=None)
+
         def __repr__(self):
             return "OnnxOperatorVariable('%s')" % self.name
 
-    class UnscopedVariable:
+        def __iter__(self):
+            yield self.name
+            yield None
+
+    class UnscopedVariable(GraphStateVar):
         def __init__(self, name):
             self.name = name
+
+        def as_variable(self, scope):
+            name = self.name
+            return Variable(name, name, scope=scope, type=None)
 
         def __eq__(self, name):
             if isinstance(name, str):
@@ -183,19 +164,29 @@ class OnnxOperator:
         def __repr__(self):
             return "UnscopedVariable('%s')" % self.name
 
-    class ConstantVariable:
+        def __iter__(self):
+            yield self.name
+            yield None
+
+    class ConstantVariable(GraphStateVar):
         def __init__(self, value):
             self.value = value
+
+        def as_variable(self, scope):
+            name = "id%d" % id(self)
+            return Variable(name, name, scope=scope,
+                            type=_guess_type(self.value))
 
         @property
         def ConstantValue(self):
             return self.value
 
         def __str__(self):
-            """
-            usual
-            """
             return "Cst({})".format(self.value)
+
+        def __iter__(self):
+            yield "id%d" % id(self)
+            yield _guess_type(self.value)
 
     def find_schema(self, op_version):
         """
@@ -231,6 +222,8 @@ class OnnxOperator:
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
+        if isinstance(output_names, str):
+            output_names = [output_names]
 
         if op_version is None:
             if domain == '':
@@ -245,13 +238,17 @@ class OnnxOperator:
                 self.op_version < self.since_version):
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
-            self.expected_inputs = schema.expected_inputs
-            self.expected_outputs = schema.expected_outputs
+            self.expected_inputs = schema.expected_inputs.copy()
+            self.expected_outputs = schema.expected_outputs.copy()
             self.input_range = schema.input_range
             self.output_range = schema.output_range
         else:
-            self.expected_inputs = self.__class__.expected_inputs
-            self.expected_outputs = self.__class__.expected_outputs
+            self.expected_inputs = (
+                None if self.__class__.expected_inputs is None
+                else self.__class__.expected_inputs.copy())
+            self.expected_outputs = (
+                None if self.__class__.expected_outputs is None
+                else self.__class__.expected_outputs.copy())
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
             if self.__class__.__name__ not in {
@@ -279,7 +276,8 @@ class OnnxOperator:
         # check inputs
         if len(inputs) == 0:
             if self.input_range[0] == self.input_range[1]:
-                self.inputs = [_[0] for _ in self.expected_inputs]
+                self.inputs = [OnnxOperator.UnscopedVariable(_[0])
+                               for _ in self.expected_inputs]
             else:
                 # The number of inputs may vary.
                 self.inputs = None
@@ -289,7 +287,9 @@ class OnnxOperator:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
                 elif isinstance(inp, (OnnxOperator, Variable,
-                                      OnnxOperatorItem, OnnxSubOperator)):
+                                      OnnxOperatorItem, OnnxSubEstimator)):
+                    self.inputs.append(inp)
+                elif isinstance(inp, tuple) and len(inp) == 2:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
                     self.inputs.append(
@@ -302,7 +302,7 @@ class OnnxOperator:
                 elif isinstance(inp, (np.int64, np.float32,
                                       np.float64, np.bool,
                                       np.int8, np.uint8)):
-                    self.inputs.append(inp)
+                    self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (float, )):
                     self.inputs.append(np.float64(inp))
                 elif isinstance(inp, (int, )):
@@ -348,6 +348,39 @@ class OnnxOperator:
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
 
+        if (self.output_names is not None and (
+                self.expected_outputs is None or
+                len(self.output_names) > len(self.expected_outputs))):
+            if self.expected_outputs is None:
+                self.expected_outputs = []
+            for i in range(len(self.expected_outputs),
+                           len(self.output_names)):
+                self.expected_outputs.append((self.output_names[i], None))
+
+        if (self.expected_inputs is None or
+                len(self.inputs) > len(self.expected_inputs)):
+            if self.expected_inputs is None:
+                self.expected_inputs = []
+            for i in range(len(self.expected_inputs),
+                           len(self.inputs)):
+                inp = self.inputs[i]
+                if isinstance(inp, GraphStateVar):
+                    inp = tuple(inp)
+                elif isinstance(inp, str):
+                    inp = (inp, None)
+                elif hasattr(inp, 'add_to'):
+                    # OnnxOperator
+                    existing = set(_[0] for _ in self.expected_inputs)
+                    i = 10
+                    name = "input%d" % (10 + i)
+                    while name in existing:
+                        i += 1
+                        name = "input%d" % (10 + i)
+                    inp = (name, None)
+                self.expected_inputs.append(inp)
+
+        self.output_names_ = None
+
     def __str__(self):
         """
         usual
@@ -389,50 +422,22 @@ class OnnxOperator:
         """
         return OnnxOperatorItem(self, index)
 
-    def get_output(self, i):
-        """
-        Returns the ith output.
-        """
-        if hasattr(self, 'output_names_'):
+    def get_output_name(self, i, scope=None):
+        "Returns name of output *i*."
+        if self.state is not None:
+            return self.state.computed_outputs_[i][0]
+        if self.output_names_ is not None:
             return self.output_names_[i]
-        if (self.output_names and i < len(self.output_names) and
-                self.output_names[i]):
-            return self.output_names[i]
-        if i < len(self.expected_outputs):
-            return self.expected_outputs[i][0]
-        if i < self.output_range[1]:
-            if i > 1000:
-                raise IndexError(
-                    "Too many outputs. You should redesign your operator.")
-            return "O%d" % i
-        raise IndexError("Output %d does not exist." % i)
-
-    def update_name(self, i, name):
-        """
-        Updates the name of a variable after it was scoped.
-        """
-        if (self.output_variables is not None and
-                i < len(self.output_variables)):
-            raise RuntimeError(
-                "Inconsistent, cannot changed variable name "
-                "after it was used: '{}' != '{}'".format(
-                    self.output_variables[i], name))
-        if (hasattr(self, 'output_names_') and
-                i < len(self.output_names_) and
-                self.output_names_[i] != name):
-            raise RuntimeError(
-                "Inconsistent, cannot changed variable name "
-                "after it was used: '{}' != '{}'".format(
-                    self.output_names_[i], name))
-        if self.output_names is None:
-            self.output_names = []
-        while len(self.output_names) <= i:
-            self.output_names.append(None)
-        self.output_names[i] = name
+        self._set_output_names_(getattr(self, 'scope', None) or scope, None)
+        return self.output_names_[i]
 
     def _set_output_names_(self, scope, operator):
-        if hasattr(self, 'output_names_'):
-            outputs = self.output_names_
+        "Called by add_to."
+        if operator is not None:
+            self.operator_ = operator
+        if self.output_names_ is not None:
+            raise RuntimeError(
+                "output_names_ is already set.")
         elif self.output_variables is not None:
             outputs = [o.onnx_name for o in self.output_variables]
             self.output_names_ = outputs
@@ -460,6 +465,8 @@ class OnnxOperator:
                 outputs.append(name)
             self.output_names_ = outputs
         else:
+            if scope is None:
+                raise RuntimeError("scope must not be None.")
             outputs = []
             for name in self.expected_outputs:
                 name = scope.get_unique_variable_name(
@@ -492,7 +499,7 @@ class OnnxOperator:
                 inputs.append(input)
         return inputs
 
-    def add_to(self, scope, container, operator=None):
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -500,6 +507,10 @@ class OnnxOperator:
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: False by default, must be True if
+            called from method `to_onnx`
+
+        At this stage, inputs types are not necessarily known.
         """
         if self.state is None:
             if self.is_deprecated:
@@ -529,8 +540,12 @@ class OnnxOperator:
                 inputs, self.output_names_, self.operator_name,
                 scope, container, None, op_version=self.op_version,
                 op_domain=domain, onnx_prefix_name=self.onnx_prefix,
-                **kwargs)
-            self.state.run(operator=operator)
+                expected_inputs=self.expected_inputs,
+                expected_outputs=self.expected_outputs,
+                input_range=self.input_range,
+                output_range=self.output_range,
+                operator=operator, run_converters=run_converters, **kwargs)
+            self.state.run()
         self._verify_add_to_()
 
     def _verify_add_to_(self):
@@ -551,13 +566,102 @@ class OnnxOperator:
             raise RuntimeError("Method add_to was not called.")
         return self.state.outputs
 
+    def get_output_type_inference(self, input_shapes=None):
+        """
+        Returns the expected output types in a list.
+        """
+        if (self.state is not None and
+                self.state.computed_outputs_ is not None):
+            return self.state.computed_outputs_
+
+        expected_inputs = (
+            self.state.computed_inputs_
+            if self.expected_inputs is None else self.expected_inputs)
+        if expected_inputs is None:
+            raise RuntimeError(
+                "Attribute 'expected_inputs' is empty for %r, "
+                "input_shapes=%r." % (self, input_shapes))
+
+        expected_outputs = (
+            self.state.computed_outputs_
+            if self.expected_outputs is None else self.expected_outputs)
+        if expected_outputs is None:
+            raise RuntimeError(
+                "Attribute 'expected_outputs' is empty for %r, "
+                "input_shapes=%r." % (self, input_shapes))
+
+        # Shape inference only work on a full graph.
+        if input_shapes is None:
+            input_shapes = self.inputs
+
+        given = {}
+        for i, inp in enumerate(input_shapes):
+            if isinstance(inp, tuple):
+                given[i] = inp[1]
+            elif isinstance(inp, GraphStateVar):
+                dt = inp.as_variable(scope=None)
+                if dt.type is None:
+                    continue
+                given[i] = dt.type
+        rev = {}
+        for i, (name, v) in enumerate(expected_inputs):
+            if v in rev:
+                rev[v].append(i)
+            else:
+                rev[v] = [i]
+
+        res = []
+        for name, ct in expected_outputs:
+            if isinstance(ct, str) and ct[0] in ('T', 'V', 'I'):
+                if (ct[0] not in rev or
+                        all(map(lambda k: k not in given, rev[ct]))):
+                    raise NotImplementedError(
+                        "Unable to guess output type for (%r, %r) - "
+                        "given=%r - rev=%r input_shapes=%r expected_inputs"
+                        "=%r." % (
+                            name, ct, given, rev, input_shapes,
+                            self.expected_inputs))
+                found = False
+                for ind in rev[ct]:
+                    if ind in given:
+                        res.append((name, given[ind]))
+                        found = True
+                        break
+                if not found:
+                    raise NotImplementedError(
+                        "Unable to guess output type for (%r, %r) - "
+                        "given=%r - rev=%r input_shapes=%r expected_inputs"
+                        "=%r." % (
+                            name, ct, given, rev, input_shapes,
+                            self.expected_inputs))
+                continue
+            if isinstance(ct, str):
+                try:
+                    dt = _guess_type_proto_str(ct, None)
+                except NotImplementedError as e:
+                    raise NotImplementedError(
+                        "Unable to guess output type for (%r, %r) - "
+                        "given=%r - rev=%r." % (name, ct, given, rev)) from e
+                res.append((name, dt))
+                continue
+            try:
+                dt = _guess_type_proto_str(
+                    _guess_type_proto_str_inv(ct), None)
+            except NotImplementedError as e:
+                raise NotImplementedError(
+                    "Unable to guess output type for (%r, %r) - given=%r - "
+                    "rev=%r." % (name, ct, given, rev)) from e
+            res.append((name, dt))
+
+        return res
+
     def _clean_attributes(self, *args, recursive=True):
         """
         Removes attributes in this node and its parents.
         """
         for arg in args:
-            if arg == 'state':
-                self.state = None
+            if arg in ('state', 'output_names_'):
+                setattr(self, arg, None)
             elif hasattr(self, arg):
                 delattr(self, arg)
         if recursive:
@@ -601,7 +705,7 @@ class OnnxOperator:
                 "target_opset={} is lower than the version={} requested "
                 "for this node '{}'.".format(
                     target_opset, self.op_version, self.__class__.__name__))
-        if hasattr(self, "state"):
+        if self.state is not None:
             # The conversion already happened and needs to be cleaned.
             self._clean_attributes("output_names_", "state")
         if inputs is None:
@@ -626,22 +730,29 @@ class OnnxOperator:
                                    "is unknown. You should specify "
                                    "input types.".format(
                                        name, self.__class__.__name__))
+
+        registered_models = dict(
+            conv=_converter_pool, shape=_shape_calculator_pool,
+            aliases=sklearn_operator_name_map)
+
         target_opset = self.get_latest_tested_opset_version(target_opset)
-        container = ModelComponentContainer(target_opset)
+        container = ModelComponentContainer(
+            target_opset, registered_models=registered_models)
 
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,
-                      variable_name_set=set(_[0] for _ in inputs))
+                      variable_name_set=set(_[0] for _ in inputs),
+                      registered_models=registered_models)
         for inp in inputs:
             container.add_input(Variable(inp[0], inp[0],
                                          scope=scope, type=inp[1]))
-        self.add_to(scope, container)
+        self.add_to(scope, container, run_converters=True)
         if other_outputs is not None:
             for out in other_outputs:
                 if not hasattr(out, 'add_to'):
                     raise RuntimeError(
                         "Extra outputs must have method 'add_to'.")
-                out.add_to(scope, container)
+                out.add_to(scope, container, run_converters=True)
 
         # infer shapes
         if outputs:
@@ -758,14 +869,21 @@ class OnnxSubEstimator(OnnxOperator):
     output_range = [1, 1e9]
 
     def __init__(self, skl_op, *inputs, op_version=None,
-                 output_names=None,
-                 domain=None, **kwargs):
+                 output_names=None, domain=None, options=None,
+                 **kwargs):
         OnnxOperator.__init__(
             self, *inputs, op_version=op_version,
             output_names=output_names, domain=domain, **kwargs)
         self.operator_instance = skl_op
+        self.options = options
 
-    def add_to(self, scope, container, operator=None):
+    def __repr__(self):
+        return "%s(%r, %s, op_version=%r, output_names=%r)" % (
+            self.__class__.__name__, self.operator_instance,
+            ", ".join("%r" % i for i in self.inputs),
+            self.op_version, self.output_names)
+
+    def add_to(self, scope, container, operator=None, run_converters=False):
         """
         Adds outputs to the container if not already added,
         registered the outputs if the node is not final.
@@ -773,6 +891,7 @@ class OnnxSubEstimator(OnnxOperator):
         :param scope: scope
         :param container: container
         :param operator: overwrite inputs
+        :param run_converters: must be True if called from method `to_onnx`
         """
         if self.state is None:
             if self.kwargs.get('op_version', '') is None:
@@ -781,7 +900,7 @@ class OnnxSubEstimator(OnnxOperator):
             else:
                 kwargs = self.kwargs
 
-            if hasattr(self, 'output_names_'):
+            if self.output_names_ is not None:
                 pass
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
@@ -816,20 +935,30 @@ class OnnxSubEstimator(OnnxOperator):
                                              operator.inputs))
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
+                elif isinstance(input, tuple) and len(input) == 2:
+                    inputs.append(
+                        Variable(
+                            input[0], input[0], scope=scope, type=input[1]))
                 else:
                     inputs.append(input)
+
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                **kwargs)
-            self.state.run(operator=operator)
+                options=self.options, run_converters=run_converters, **kwargs)
+            self.state.run()
 
-    @property
-    def outputs(self):
-        """
-        Returns the outputs of the node.
-        """
-        if self.state is None:
-            raise RuntimeError("Method add_to was not called.")
-        return self.state.outputs
+
+class OnnxSubOperator(OnnxSubEstimator):
+    """
+    This class is deprecated and will be removed in version 1.9.
+    It should be replaced by :class:`OnnxSubEstimator
+    <skl2onnx.algebra.onnx_operator.OnnxSubEstimator>`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        OnnxSubEstimator.__init__(self, *args, **kwargs)
+        warnings.warn(("Class OnnxSubOperator will be removed in 1.9. "
+                       "It should be replaced by OnnxSubEstimator."),
+                      DeprecationWarning)

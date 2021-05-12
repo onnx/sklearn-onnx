@@ -1,6 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Tests examples from scikit-learn documentation.
 """
+import sys
 import unittest
 import urllib.error
 from distutils.version import StrictVersion
@@ -63,6 +66,9 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
 class TestSklearnDocumentation(unittest.TestCase):
     "Test example from the documentation of scikit-learn."
 
+    @unittest.skipIf(
+        sys.platform == "win32",
+        reason="Too long on Windows")
     @unittest.skipIf(
         StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
         reason="Encoding issue fixed in a later version")

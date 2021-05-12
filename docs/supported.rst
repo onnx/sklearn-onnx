@@ -1,10 +1,12 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 =============================
 Supported scikit-learn Models
 =============================
 
 *skl2onnx* currently can convert the following list
-of models for *skl2onnx* :skl2onnxversion:`v`. They 
+of models for *skl2onnx* :skl2onnxversion:`v`. They
 were tested using *onnxruntime* :skl2onnxversion:`rt`.
 All the following classes overloads the following methods
 such as :class:`OnnxSklearnPipeline` does. They wrap existing

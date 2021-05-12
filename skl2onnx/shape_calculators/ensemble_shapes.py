@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.utils import (
@@ -34,7 +31,7 @@ def calculate_tree_regressor_output_shapes(operator):
         BooleanTensorType, DoubleTensorType,
         FloatTensorType, Int64TensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type.shape = [N, 1]
 
     # decision_path, decision_leaf
@@ -50,7 +47,7 @@ def calculate_tree_regressor_output_shapes(operator):
 
 def calculate_tree_classifier_output_shapes(operator):
     _calculate_linear_classifier_output_shapes(operator, True, True)
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
 
     # decision_path, decision_leaf
     for n in range(2, len(operator.outputs)):

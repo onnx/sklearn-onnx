@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import unittest
 from distutils.version import StrictVersion
@@ -121,7 +118,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME", random_state=42,
             base_estimator=DecisionTreeClassifier(
-                max_depth=6, random_state=42)), 2)
+                max_depth=6, random_state=42)), 2, n_features=7)
         model_onnx = convert_sklearn(
             model,
             "AdaBoostClSamme",

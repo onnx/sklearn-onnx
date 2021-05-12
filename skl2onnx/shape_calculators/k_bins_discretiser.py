@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
@@ -18,7 +15,7 @@ def calculate_sklearn_k_bins_discretiser(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    M = operator.inputs[0].type.shape[0]
+    M = operator.inputs[0].get_first_dimension()
     model = operator.raw_operator
     N = len(model.n_bins_) if model.encode == 'ordinal' else sum(model.n_bins_)
     operator.outputs[0].type.shape = [M, N]

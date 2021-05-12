@@ -1,9 +1,7 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
+from scipy.linalg import solve_triangular
 from sklearn.gaussian_process.kernels import ConstantKernel as C, RBF
 try:
     from sklearn.gaussian_process._gpc import LAMBDAS, COEFS
@@ -103,6 +101,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
         if not hasattr(op, '_y_train_std') or op._y_train_std == 1:
+            if isinstance(y_mean_b, (np.float32, np.float64)):
+                y_mean_b = np.array([y_mean_b])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
@@ -112,6 +114,10 @@ def convert_gaussian_process_regressor(scope, operator, container):
             var_y = op._y_train_std.astype(dtype)
             if len(var_y.shape) == 1:
                 var_y = var_y.reshape(var_y.shape + (1,))
+            if isinstance(var_y, (np.float32, np.float64)):
+                var_y = np.array([var_y])
+            if isinstance(mean_y, (np.float32, np.float64)):
+                mean_y = np.array([mean_y])
             y_mean = OnnxAdd(
                 OnnxMul(y_mean_b, var_y, op_version=opv),
                 mean_y, op_version=opv)
@@ -125,14 +131,13 @@ def convert_gaussian_process_regressor(scope, operator, container):
         if options['return_cov']:
             raise NotImplementedError()
         if options['return_std']:
-            if op._K_inv is None:
-                raise RuntimeError(
-                    "The method *predict* must be called once with parameter "
-                    "return_std=True to compute internal variables. "
-                    "They cannot be computed here as the same operation "
-                    "(matrix inversion) produces too many discrepencies "
-                    "if done with single floats than double floats.")
-            _K_inv = op._K_inv
+            if hasattr(op, '_K_inv') and op._K_inv is not None:
+                # scikit-learn < 0.24.2
+                _K_inv = op._K_inv
+            else:
+                # scikit-learn >= 0.24.2
+                L_inv = solve_triangular(op.L_.T, np.eye(op.L_.shape[0]))
+                _K_inv = L_inv.dot(L_inv.T)
 
             # y_var = self.kernel_.diag(X)
             y_var = convert_kernel_diag(kernel, X, dtype=dtype,
@@ -300,12 +305,14 @@ def convert_gaussian_process_classifier(scope, operator, container):
     integrals.set_onnx_name_prefix('integrals')
 
     # pi_star = (COEFS * integrals).sum(axis=0) + .5 * COEFS.sum()
+    coef_sum = (.5 * COEFS.sum()).astype(dtype)
+    if not isinstance(coef_sum, np.ndarray):
+        coef_sum = np.array([coef_sum])
     pi_star = OnnxAdd(
                 OnnxReduceSumApi11(
                     OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
                     op_version=opv, axes=[0]),
-                (.5 * COEFS.sum()).astype(dtype),
-                op_version=opv)
+                coef_sum, op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star')
 
     pi_star = OnnxReshape(pi_star, np.array([-1, 1], dtype=np.int64),

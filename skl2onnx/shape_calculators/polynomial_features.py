@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import copy
 from ..common.data_types import (
@@ -19,7 +16,7 @@ def calculate_sklearn_polynomial_features(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     model = operator.raw_operator
     operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
     operator.outputs[0].type.shape = [N, model.n_output_features_]

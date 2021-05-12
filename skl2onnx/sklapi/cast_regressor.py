@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 from sklearn.base import RegressorMixin, BaseEstimator
 try:
@@ -11,7 +8,7 @@ except ImportError:
     _deprecate_positional_args = lambda x: x  # noqa
 
 
-class CastRegressor(RegressorMixin, BaseEstimator):
+class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
 
     """
     Cast predictions into a specific types.

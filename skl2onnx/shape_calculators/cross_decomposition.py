@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
@@ -24,7 +21,7 @@ def calculate_pls_regression_output_shapes(operator):
     cls_type = operator.inputs[0].type.__class__
     if cls_type != DoubleTensorType:
         cls_type = FloatTensorType
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type = cls_type([N, op.coef_.shape[1]])
 
 

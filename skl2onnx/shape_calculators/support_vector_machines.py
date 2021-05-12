@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numbers
 import numpy as np
@@ -35,7 +32,7 @@ def calculate_sklearn_svm_output_shapes(operator):
     """
     op = operator.raw_operator
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     if operator.type in ['SklearnOneClassSVM']:
         operator.outputs[0].type = Int64TensorType([N, 1])
         operator.outputs[1].type.shape = [N, 1]

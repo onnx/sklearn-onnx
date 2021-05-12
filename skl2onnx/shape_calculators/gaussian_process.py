@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.shape_calculator import calculate_linear_classifier_output_shapes
@@ -23,7 +20,7 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
 
     variable = operator.inputs[0]
 
-    N = variable.type.shape[0] if len(variable.type.shape) > 0 else 1
+    N = variable.get_first_dimension()
     op = operator.raw_operator
 
     # Output 1 is mean

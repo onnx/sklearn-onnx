@@ -1,21 +1,19 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import numpy as np
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_identity, apply_mul, apply_reciprocal, apply_reshape, apply_sub)
 from ..common.data_types import (
-    BooleanTensorType, Int64TensorType, guess_numpy_type)
+    BooleanTensorType, Int64TensorType, guess_numpy_type,
+    guess_proto_type)
 from ..common._registration import register_converter
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
 
-def _decision_function(scope, operator, container, model):
+def _decision_function(scope, operator, container, model, proto_type):
     """Predict for linear model.
     score = X * coefficient + intercept
     """
@@ -26,9 +24,9 @@ def _decision_function(scope, operator, container, model):
     score_name = scope.get_unique_variable_name('score')
     coef = model.coef_.T
 
-    container.add_initializer(coef_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(coef_name, proto_type,
                               coef.shape, coef.ravel())
-    container.add_initializer(intercept_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(intercept_name, proto_type,
                               model.intercept_.shape, model.intercept_)
 
     input_name = operator.inputs[0].full_name
@@ -36,7 +34,7 @@ def _decision_function(scope, operator, container, model):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
+                   container, to=proto_type)
         input_name = cast_input_name
 
     container.add_node(
@@ -48,7 +46,8 @@ def _decision_function(scope, operator, container, model):
     return score_name
 
 
-def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
+def _handle_zeros(scope, container, proba, reduced_proba, num_classes,
+                  proto_type):
     """Handle cases where reduced_proba values are zeros to avoid NaNs in
     class probability scores because of divide by 0 when we calculate
     proba / reduced_proba in _normalise_proba().
@@ -67,7 +66,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
     reduced_proba_updated_name = scope.get_unique_variable_name(
         'reduced_proba_updated')
 
-    container.add_initializer(num_classes_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(num_classes_name, proto_type,
                               [], [num_classes])
 
     apply_cast(scope, reduced_proba, bool_reduced_proba_name, container,
@@ -76,7 +75,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
                        bool_not_reduced_proba_name,
                        name=scope.get_unique_operator_name('Not'))
     apply_cast(scope, bool_not_reduced_proba_name, not_reduced_proba_name,
-               container, to=onnx_proto.TensorProto.FLOAT)
+               container, to=proto_type)
     apply_add(scope, [proba, not_reduced_proba_name],
               proba_updated_name, container, broadcast=1)
     apply_mul(scope, [not_reduced_proba_name, num_classes_name],
@@ -87,7 +86,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes):
 
 
 def _normalise_proba(scope, operator, container, proba, num_classes,
-                     unity_name):
+                     unity_name, proto_type):
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
 
@@ -109,13 +108,15 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
                 'ReduceSum', [proba, axis_name], reduced_proba_name,
                 name=scope.get_unique_operator_name('ReduceSum'))
         proba_updated, reduced_proba_updated = _handle_zeros(
-            scope, container, proba, reduced_proba_name, num_classes)
+            scope, container, proba, reduced_proba_name, num_classes,
+            proto_type)
         apply_div(scope, [proba_updated, reduced_proba_updated],
                   operator.outputs[1].full_name, container, broadcast=1)
     return operator.outputs[1].full_name
 
 
-def _predict_proba_log(scope, operator, container, scores, num_classes):
+def _predict_proba_log(scope, operator, container, scores, num_classes,
+                       proto_type):
     """Probability estimation for SGDClassifier with loss=log and
     Logistic Regression.
     Positive class probabilities are computed as
@@ -129,9 +130,9 @@ def _predict_proba_log(scope, operator, container, scores, num_classes):
     add_result_name = scope.get_unique_variable_name('add_result')
     proba_name = scope.get_unique_variable_name('proba')
 
-    container.add_initializer(negate_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(negate_name, proto_type,
                               [], [-1])
-    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(unity_name, proto_type,
                               [], [1])
 
     apply_mul(scope, [scores, negate_name],
@@ -141,11 +142,11 @@ def _predict_proba_log(scope, operator, container, scores, num_classes):
               add_result_name, container, broadcast=1)
     apply_reciprocal(scope, add_result_name, proba_name, container)
     return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes, unity_name)
+                            num_classes, unity_name, proto_type)
 
 
 def _predict_proba_modified_huber(scope, operator, container,
-                                  scores, num_classes):
+                                  scores, num_classes, proto_type):
     """Probability estimation for SGDClassifier with
     loss=modified_huber.
     Multiclass probability estimates are derived from binary
@@ -162,9 +163,9 @@ def _predict_proba_modified_huber(scope, operator, container,
     proba_name = scope.get_unique_variable_name('proba')
     clipped_scores_name = scope.get_unique_variable_name('clipped_scores')
 
-    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(unity_name, proto_type,
                               [], [1])
-    container.add_initializer(constant_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(constant_name, proto_type,
                               [], [2])
 
     apply_clip(scope, scores, clipped_scores_name, container,
@@ -175,7 +176,7 @@ def _predict_proba_modified_huber(scope, operator, container,
     apply_div(scope, [add_result_name, constant_name],
               proba_name, container, broadcast=1)
     return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes, unity_name)
+                            num_classes, unity_name, proto_type)
 
 
 def convert_sklearn_sgd_classifier(scope, operator, container):
@@ -183,6 +184,9 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
     sgd_op = operator.raw_operator
     classes = get_label_classes(scope, sgd_op)
     class_type = onnx_proto.TensorProto.STRING
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    if proto_type != onnx_proto.TensorProto.DOUBLE:
+        proto_type = onnx_proto.TensorProto.FLOAT
 
     if np.issubdtype(classes.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
@@ -200,15 +204,16 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
     container.add_initializer(classes_name, class_type,
                               classes.shape, classes)
 
-    scores = _decision_function(scope, operator, container, sgd_op)
+    scores = _decision_function(scope, operator, container, sgd_op, proto_type)
     options = container.get_options(sgd_op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
     if sgd_op.loss == 'log' and not use_raw_scores:
         proba = _predict_proba_log(scope, operator, container, scores,
-                                   len(classes))
+                                   len(classes), proto_type)
     elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
         proba = _predict_proba_modified_huber(
-            scope, operator, container, scores, len(classes))
+            scope, operator, container, scores, len(classes),
+            proto_type)
     else:
         if len(classes) == 2:
             negate_name = scope.get_unique_variable_name('negate')
@@ -216,7 +221,7 @@ def convert_sklearn_sgd_classifier(scope, operator, container):
                 'negated_scores')
 
             container.add_initializer(
-                negate_name, onnx_proto.TensorProto.FLOAT, [], [-1])
+                negate_name, proto_type, [], [-1])
 
             apply_mul(scope, [scores, negate_name],
                       negated_scores_name, container, broadcast=1)

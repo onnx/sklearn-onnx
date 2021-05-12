@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 from sklearn.base import is_regressor
 from ..proto import onnx_proto
 from ..common._apply_operation import (
@@ -12,6 +9,7 @@ from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import (
     apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
 from ..common.utils_classifier import _finalize_converter_classes
+from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -23,6 +21,9 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
     options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
@@ -74,7 +75,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
         # Raw score would mean: scores = conc_name.
         thresh_name = scope.get_unique_variable_name('thresh')
         container.add_initializer(
-            thresh_name, onnx_proto.TensorProto.FLOAT,
+            thresh_name, proto_dtype,
             [1, len(op.classes_)], [.5] * len(op.classes_))
         scores = scope.get_unique_variable_name('threshed')
         apply_sub(scope, [conc_name, thresh_name], scores, container)
@@ -89,7 +90,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                    container, to=onnx_proto.TensorProto.INT64)
 
         label_name = scope.get_unique_variable_name('label')
-        if container.target_opset < 11:
+        if container.target_opset <= 11:
             abs_name = scope.get_unique_variable_name('abs')
             add_name = scope.get_unique_variable_name('add')
             cst_2 = scope.get_unique_variable_name('cst2')
@@ -122,14 +123,12 @@ def convert_one_vs_rest_classifier(scope, operator, container):
                 'unit_float_tensor')
             if use_raw_scores:
                 container.add_initializer(
-                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
-                    [], [-1.0])
+                    unit_float_tensor_name, proto_dtype, [], [-1.0])
                 apply_mul(scope, [unit_float_tensor_name, conc_name],
                           zeroth_col_name, container, broadcast=1)
             else:
                 container.add_initializer(
-                    unit_float_tensor_name, onnx_proto.TensorProto.FLOAT,
-                    [], [1.0])
+                    unit_float_tensor_name, proto_dtype, [], [1.0])
                 apply_sub(scope, [unit_float_tensor_name, conc_name],
                           zeroth_col_name, container, broadcast=1)
             apply_concat(scope, [zeroth_col_name, conc_name],
@@ -153,7 +152,7 @@ def convert_one_vs_rest_classifier(scope, operator, container):
 
         _finalize_converter_classes(scope, label_name,
                                     operator.outputs[0].full_name, container,
-                                    op.classes_)
+                                    op.classes_, proto_dtype)
 
 
 register_converter('SklearnOneVsRestClassifier',

@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
@@ -27,7 +24,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType])
 
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
         if variable.type.shape[1] is not None:

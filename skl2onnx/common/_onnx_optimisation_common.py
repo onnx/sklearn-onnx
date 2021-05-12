@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Common functions to reduce the number of
 nodes of an :epkg:`ONNX` graphs.

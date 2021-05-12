@@ -1,3 +1,5 @@
+..  SPDX-License-Identifier: Apache-2.0
+
 
 .. _l-conv-options:
 
@@ -27,7 +29,7 @@ Function :func:`onnx_cdist <skl2onnx.algebra.complex_functions.onnx_cdist>`
 produces this part of the graph but there exist two options.
 The first one is using *Scan* operator, the second one is
 using a dedicated operator called *CDist* which is not part
-of the regular ONNX operator until issue 
+of the regular ONNX operator until issue
 `2442 <https://github.com/onnx/onnx/issues/2442>`_
 is addressed. By default, *Scan* is used, *CDist* can be used
 by giving:

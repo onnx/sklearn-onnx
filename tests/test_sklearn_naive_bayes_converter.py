@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 from distutils.version import StrictVersion
 import unittest
 import numpy as np
@@ -9,10 +11,12 @@ from sklearn.naive_bayes import (
 )
 try:
     from sklearn.naive_bayes import CategoricalNB
-    from sklearn.naive_bayes import ComplementNB
 except ImportError:
     # scikit-learn versions <= 0.21
     CategoricalNB = None
+try:
+    from sklearn.naive_bayes import ComplementNB
+except ImportError:
     # scikit-learn versions <= 0.19
     ComplementNB = None
 from skl2onnx import convert_sklearn

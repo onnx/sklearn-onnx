@@ -1,8 +1,5 @@
-# -------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# --------------------------------------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+
 
 import copy
 from ..common._registration import register_shape_calculator
@@ -18,7 +15,7 @@ def calculate_sklearn_function_transformer_output_shapes(operator):
                            "transform function is None (= identity). "
                            "You may raise an issue at "
                            "https://github.com/onnx/sklearn-onnx/issues.")
-    N = operator.inputs[0].type.shape[0]
+    N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
         if variable.type.shape[1] is not None:
