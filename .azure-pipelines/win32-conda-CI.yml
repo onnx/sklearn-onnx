@@ -92,6 +92,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      python -m pip install flatbuffers
       python -m pip install $(onnxrt.version)
     displayName: 'Install onnxruntime'
 
