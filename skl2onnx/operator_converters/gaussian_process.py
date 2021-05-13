@@ -12,7 +12,7 @@ from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSumApi11,
-    OnnxMul, OnnxMax, OnnxReshape, OnnxDiv, OnnxNot,
+    OnnxMul, OnnxMax, OnnxReshapeApi13, OnnxDiv, OnnxNot,
     OnnxReciprocal, OnnxCast, OnnxLess,
     OnnxPow, OnnxNeg, OnnxConcat, OnnxArrayFeatureExtractor,
     OnnxTranspose,
@@ -123,7 +123,7 @@ def convert_gaussian_process_regressor(scope, operator, container):
                 mean_y, op_version=opv)
 
         y_mean.set_onnx_name_prefix('gpr')
-        y_mean_reshaped = OnnxReshape(
+        y_mean_reshaped = OnnxReshapeApi13(
             y_mean, np.array([-1, 1], dtype=np.int64),
             op_version=opv, output_names=out[:1])
         outputs = [y_mean_reshaped]
@@ -262,8 +262,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
 
     # gamma = LAMBDAS * f_star
     gamma = OnnxMul(LAMBDAS.astype(dtype),
-                    OnnxReshape(f_star, np.array([1, -1], dtype=np.int64),
-                                op_version=opv),
+                    OnnxReshapeApi13(
+                        f_star, np.array([1, -1], dtype=np.int64),
+                        op_version=opv),
                     op_version=opv)
     gamma.set_onnx_name_prefix('gamma')
 
@@ -315,8 +316,9 @@ def convert_gaussian_process_classifier(scope, operator, container):
                 coef_sum, op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star')
 
-    pi_star = OnnxReshape(pi_star, np.array([-1, 1], dtype=np.int64),
-                          op_version=opv)
+    pi_star = OnnxReshapeApi13(
+        pi_star, np.array([-1, 1], dtype=np.int64),
+        op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star2')
     final = OnnxConcat(
                 OnnxAdd(OnnxNeg(pi_star, op_version=opv),
