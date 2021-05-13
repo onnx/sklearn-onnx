@@ -1,5 +1,4 @@
 flatbuffers
-nose
 numpy
 protobuf
 codecov

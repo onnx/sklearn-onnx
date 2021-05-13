@@ -226,8 +226,11 @@ jobs:
 
   - script: |
       pip install -r requirements.txt
-      pip install -r requirements-dev.txt
     displayName: 'install requirements'
+
+  - script: |
+      pip install -r requirements-dev.txt
+    displayName: 'install requirements-dev'
 
   - script: |
       pip install -e .
