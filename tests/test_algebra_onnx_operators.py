@@ -17,7 +17,7 @@ from skl2onnx.common.data_types import (
     FloatTensorType, guess_numpy_type, DoubleTensorType)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
-    OnnxSub, OnnxDiv, OnnxReshape,
+    OnnxSub, OnnxDiv, OnnxReshapeApi13,
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
@@ -273,9 +273,9 @@ class TestOnnxOperators(unittest.TestCase):
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")
     def test_container_init(self):
-        onx = OnnxReshape(
-                OnnxReshape('X', np.array([1, -1], dtype=np.int64),
-                            op_version=TARGET_OPSET),
+        onx = OnnxReshapeApi13(
+                OnnxReshapeApi13('X', np.array([1, -1], dtype=np.int64),
+                                 op_version=TARGET_OPSET),
                 np.array([1, -1], dtype=np.int64),
                 output_names=['Y'], op_version=TARGET_OPSET)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
