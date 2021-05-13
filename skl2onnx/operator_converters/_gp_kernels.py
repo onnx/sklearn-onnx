@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
     RBF, DotProduct, ExpSineSquared,
-    RationalQuadratic
+    RationalQuadratic, PairwiseKernel
 )
 from ..algebra.complex_functions import onnx_squareform_pdist, onnx_cdist
 from ..algebra.onnx_ops import (
@@ -13,7 +13,8 @@ from ..algebra.onnx_ops import (
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
-    OnnxIdentity, OnnxReduceSumSquare
+    OnnxIdentity, OnnxReduceSumSquare,
+    OnnxReduceL2_typed
 )
 from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
@@ -90,6 +91,9 @@ def py_make_float_array(cst, dtype, as_tensor=False):
 def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
                               pi=math.pi, dtype=None, optim=None,
                               op_version=None, **kwargs):
+    """
+    Implements the kernel ExpSineSquared.
+    """
     if optim is None:
         dists = onnx_cdist(
             X, Y, metric="euclidean", dtype=dtype, op_version=op_version)
@@ -118,7 +122,7 @@ def _convert_exp_sine_squared(X, Y, length_scale=1.2, periodicity=1.1,
 def _convert_dot_product(X, Y, sigma_0=2.0, dtype=None, op_version=None,
                          **kwargs):
     """
-    Implements the kernel
+    Implements the kernel DotProduct.
     :math:`k(x_i,x_j)=\\sigma_0^2+x_i\\cdot x_j`.
     """
     # It only works in two dimensions.
@@ -136,7 +140,7 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
                                 dtype=None, optim=None, op_version=None,
                                 **kwargs):
     """
-    Implements the kernel
+    Implements the kernel RationalQuadratic.
     :math:`k(x_i,x_j)=(1 + d(x_i, x_j)^2 / (2*\\alpha * l^2))^{-\\alpha}`.
     """
     if optim is None:
@@ -154,6 +158,40 @@ def _convert_rational_quadratic(X, Y, length_scale=1.0, alpha=2.0,
     t_alpha = py_make_float_array(-alpha, dtype=dtype)
     K = OnnxPow(base, t_alpha, op_version=op_version)
     return OnnxIdentity(K, op_version=op_version, **kwargs)
+
+
+def _convert_pairwise_kernel(X, Y, metric=None,
+                             dtype=None, op_version=None,
+                             gamma=None, gamma_bounds=None,
+                             degree=None, coef0=None,
+                             optim=None, **kwargs):
+    """
+    Implements the kernel PairwiseKernel.
+
+    * cosine: :math:`k(x_i,x_j)=\\frac{<x_i, x_j>}
+        {\\parallel x_i \\parallel \\parallel x_j \\parallel}`
+
+    See `KERNEL_PARAMS
+    <https://github.com/scikit-learn/scikit-learn/blob/
+    95119c13af77c76e150b753485c662b7c52a41a2/sklearn/
+    metrics/pairwise.py#L1862>`_.
+    """
+    if metric == 'cosine':
+        if isinstance(Y, np.ndarray):
+            ny = np.sqrt(np.sum(Y ** 2, axis=1, keepdims=True))
+            norm_y = Y / ny
+            norm_try = norm_y.T.astype(dtype)
+        else:
+            ny = OnnxReduceL2_typed(dtype, Y, axes=[1], op_version=op_version)
+            norm_y = OnnxDiv(Y, ny, op_version=op_version)
+            norm_try = OnnxTranspose(norm_y, perm=[1, 0],
+                                     op_version=op_version)
+
+        nx = OnnxReduceL2_typed(dtype, X, axes=[1], op_version=op_version)
+        norm_x = OnnxDiv(X, nx, op_version=op_version)
+        K = OnnxMatMul(norm_x, norm_try, op_version=op_version)
+        return OnnxIdentity(K, op_version=op_version, **kwargs)
+    raise NotImplementedError("Metric %r is not implemented." % metric)
 
 
 def convert_kernel(kernel, X, output_names=None,
@@ -289,6 +327,18 @@ def convert_kernel(kernel, X, output_names=None,
                 X, x_train, length_scale=kernel.length_scale,
                 dtype=dtype, alpha=kernel.alpha,
                 output_names=output_names,
+                optim=optim, op_version=op_version)
+
+    if isinstance(kernel, PairwiseKernel):
+        if x_train is None:
+            return _convert_pairwise_kernel(
+                X, X, metric=kernel.metric,
+                dtype=dtype, output_names=output_names,
+                optim=optim, op_version=op_version)
+        else:
+            return _convert_pairwise_kernel(
+                X, x_train, metric=kernel.metric,
+                dtype=dtype, output_names=output_names,
                 optim=optim, op_version=op_version)
 
     raise RuntimeError("Unable to convert __call__ method for "

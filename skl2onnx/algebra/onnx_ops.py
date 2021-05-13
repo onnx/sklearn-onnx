@@ -271,6 +271,22 @@ def OnnxUnsqueezeApi11(*x, axes=None, op_version=None,
                            op_version=op_version, output_names=output_names)
 
 
+def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
+                       output_names=None):
+    """
+    Adds operator ReduceL2 for float or double.
+    """
+    if dtype == np.float32:
+        return OnnxReduceL2(  # noqa
+            x, axes=axes, keepdims=keepdims,
+            op_version=op_version, output_names=output_names)
+    x2 = OnnxMul(x, x, op_version=op_version)  # noqa
+    red = OnnxReduceSumApi11(
+        x2, axes=[1], keepdims=1, op_version=op_version)
+    return OnnxSqrt(  # noqa
+        red, op_version=op_version, output_names=output_names)
+
+
 def OnnxReshapeApi13(*x, allowzero=0, op_version=None,
                      output_names=None):
     """
