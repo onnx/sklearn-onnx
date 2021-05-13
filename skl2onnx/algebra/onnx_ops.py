@@ -285,3 +285,23 @@ def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
         x2, axes=[1], keepdims=1, op_version=op_version)
     return OnnxSqrt(  # noqa
         red, op_version=op_version, output_names=output_names)
+
+
+def OnnxReshapeApi13(*x, allowzero=0, op_version=None,
+                     output_names=None):
+    """
+    Adds operator Reshape with opset>=14 following API from opset 13.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 14:
+        return OnnxReshape(  # noqa
+            *x, allowzero=allowzero,
+            op_version=op_version, output_names=output_names)
+    if op_version >= 13:
+        return OnnxReshape_13(  # noqa
+            *x, op_version=op_version,
+            output_names=output_names)
+    return OnnxReshape_5(  # noqa
+        *x, op_version=op_version,
+        output_names=output_names)
