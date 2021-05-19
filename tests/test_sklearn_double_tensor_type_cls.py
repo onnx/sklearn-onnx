@@ -49,7 +49,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     def _common_classifier(
             self, model_cls_set, name_root=None, debug=False,
             raw_scores=True, pos_features=False, is_int=False,
-            comparable_outputs=None):
+            comparable_outputs=None, n_features=4,
+            n_repeated=None, n_redundant=None):
         for model_cls in model_cls_set:
             if name_root is None:
                 name = model_cls.__name__
@@ -57,8 +58,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                 name = name_root
             for n_cl in [2, 3]:
                 model, X = fit_classification_model(
-                    model_cls(), n_cl, n_features=4,
-                    pos_features=pos_features, is_int=is_int)
+                    model_cls(), n_cl, n_features=n_features,
+                    pos_features=pos_features, is_int=is_int,
+                    n_repeated=n_repeated, n_redundant=n_redundant)
                 pmethod = ('decision_function_binary' if n_cl == 2 else
                            'decision_function')
                 bs = [True, False] if raw_scores else [False]
@@ -306,7 +308,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     def test_bagging_64(self):
         self._common_classifier(
             [lambda: BaggingClassifier(LogisticRegression())],
-            "BaggingClassifier")
+            "BaggingClassifier", n_features=3,
+            n_repeated=0, n_redundant=0)
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
