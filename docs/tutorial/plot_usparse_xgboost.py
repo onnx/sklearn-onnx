@@ -36,8 +36,11 @@ from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.ensemble import (
-    RandomForestClassifier, HistGradientBoostingClassifier)
+from sklearn.ensemble import RandomForestClassifier
+try:
+    from sklearn.ensemble import HistGradientBoostingClassifier
+except ImportError:
+    HistGradientBoostingClassifier = None
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
@@ -100,6 +103,7 @@ def make_pipelines(df_train, y_train, models=None,
         models = [
             RandomForestClassifier, HistGradientBoostingClassifier,
             XGBClassifier, LGBMClassifier]
+    models = [_ for _ in models if _ is not None]
 
     pipes = []
     for model in tqdm(models):

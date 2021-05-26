@@ -37,6 +37,7 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             basename="SklearnCastTransformer{}".format(
                 input_type.__class__.__name__))
 
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not supported")
     def test_replace_transformer(self):
         self.common_test_replace_transformer(
             numpy.float32, FloatTensorType)
