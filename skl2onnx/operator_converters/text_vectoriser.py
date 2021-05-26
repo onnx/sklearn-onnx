@@ -3,7 +3,8 @@
 
 import warnings
 import numpy as np
-from ..common._apply_operation import apply_cast, apply_reshape
+from ..common._apply_operation import (
+    apply_cast, apply_reshape, apply_identity)
 from ..common._registration import register_converter
 from ..common.data_types import guess_proto_type
 from ..proto import onnx_proto
@@ -168,8 +169,9 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     options = container.get_options(
             op, dict(separators="DEFAULT",
-                     tokenexp=None))
-    if set(options) != {'separators', 'tokenexp'}:
+                     tokenexp=None,
+                     nan=False))
+    if set(options) != {'separators', 'tokenexp', 'nan'}:
         raise RuntimeError("Unknown option {} for {}".format(
                                 set(options) - {'separators'}, type(op)))
 
@@ -334,8 +336,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         'ngram_counts': ngcounts,
         'weights': list(map(np.float32, weights)),
     })
-    output = (scope.get_unique_variable_name('output')
-              if op.binary else operator.output_full_names)
+    output = scope.get_unique_variable_name('output')
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
@@ -361,12 +362,37 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
 
     if op.binary:
         cast_result_name = scope.get_unique_variable_name('cast_result')
+        output_name = scope.get_unique_variable_name('output_name')
 
         apply_cast(scope, output, cast_result_name, container,
                    to=onnx_proto.TensorProto.BOOL)
-        apply_cast(scope, cast_result_name, operator.output_full_names,
+        apply_cast(scope, cast_result_name, output_name,
                    container, to=onnx_proto.TensorProto.FLOAT)
+        output = output_name
+
+    options = container.get_options(op, dict(nan=False))
+    replace_by_nan = options.get('nan', False)
+    if replace_by_nan:
+        # This part replaces all null values by nan.
+        cst_nan_name = scope.get_unique_variable_name('nan_name')
+        container.add_initializer(cst_nan_name, proto_dtype, [1], [np.nan])
+        cst_zero_name = scope.get_unique_variable_name('zero_name')
+        container.add_initializer(cst_zero_name, proto_dtype, [1], [0])
+
+        mask_name = scope.get_unique_variable_name('mask_name')
+        container.add_node('Equal', [output, cst_zero_name],
+                           mask_name,
+                           name=scope.get_unique_operator_name('Equal'))
+
+        where_name = scope.get_unique_variable_name('where_name')
+        container.add_node('Where', [mask_name, cst_nan_name, output],
+                           where_name,
+                           name=scope.get_unique_operator_name('Where'))
+        output = where_name
+
+    apply_identity(scope, output, operator.output_full_names, container)
 
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
-                   options={'tokenexp': None, 'separators': None})
+                   options={'tokenexp': None, 'separators': None,
+                            'nan': [True, False]})
