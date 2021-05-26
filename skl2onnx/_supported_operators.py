@@ -202,7 +202,7 @@ except ImportError:
 from sklearn.random_projection import GaussianRandomProjection
 
 # Custom extension
-from .sklapi import CastRegressor, CastTransformer
+from .sklapi import CastRegressor, CastTransformer, ReplaceTransformer
 
 from .common._registration import register_converter, register_shape_calculator
 
@@ -327,6 +327,7 @@ def build_sklearn_operator_name_map():
                 RandomForestClassifier,
                 RandomForestRegressor,
                 RANSACRegressor,
+                ReplaceTransformer,
                 RFE,
                 RFECV,
                 RobustScaler,
