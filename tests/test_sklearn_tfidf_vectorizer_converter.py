@@ -551,11 +551,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert_almost_equal(exp, res)
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+        StrictVersion(onnx.__version__) <= StrictVersion("1.5.0"),
+        reason="Requires opset 10.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
-        reason="Requires opset 9.")
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
+        reason="Requires opset 10.")
     def test_model_tfidf_vectorizer_nan(self):
         corpus = numpy.array([
             "This is the first document.",
