@@ -30,7 +30,7 @@ class CastTransformer(TransformerMixin, BaseEstimator):
             if hasattr(a, 'values') and hasattr(a, 'iloc'):
                 # dataframe
                 a = a.values
-            else:
+            elif not hasattr(a, 'astype'):
                 raise TypeError(
                     "{} must be a numpy array or a dataframe.".format(
                         name))
