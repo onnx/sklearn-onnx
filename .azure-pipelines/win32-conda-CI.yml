@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
-- master
+- master 
 
 jobs:
 
@@ -13,13 +13,13 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Py39-Onnx190-Rt170-Skl0241:
+      Py39-Onnx190-Rt180-Skl0241:
         python.version: '3.9'
         onnx.version: 'onnx==1.9.0'  # '-i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.7.0'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly==1.8.0.dev202105266'
         onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.1'
       Py38-Onnx181-Rt170-Skl0242:
@@ -28,7 +28,7 @@ jobs:
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.7.0'  # -i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly==1.8.0.dev202105266'
         onnxcc.version: 'onnxconverter-common==1.7.0'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.2'
       Py38-Onnx181-Rt170-Skl0241:
