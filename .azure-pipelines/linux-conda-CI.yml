@@ -231,6 +231,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
+      python -m pip install flatbuffers
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
