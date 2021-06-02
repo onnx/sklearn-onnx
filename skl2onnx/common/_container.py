@@ -491,7 +491,12 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             inputs = [inputs]
         if isinstance(outputs, (six.string_types, six.text_type)):
             outputs = [outputs]
-        common = set(inputs) & set(outputs)
+        try:
+            common = set(inputs) & set(outputs)
+        except TypeError as e:
+            raise TypeError(
+                "inputs or outputs are wrong, inputs=%r, outputs=%r, node=%r."
+                "" % (inputs, outputs, op_type)) from e
         if common:
             raise RuntimeError(
                 "inputs and outputs cannot have "
