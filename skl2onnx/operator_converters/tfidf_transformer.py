@@ -21,7 +21,7 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
     data = operator.input_full_names
-    final = operator.output_full_names
+    output_name = scope.get_unique_variable_name('tfidftr_output')
 
     if op.sublinear_tf:
         # code scikit-learn
@@ -53,21 +53,40 @@ def convert_sklearn_tfidf_transformer(scope, operator, container):
         shape = [len(cst)]
         idfcst = scope.get_unique_variable_name('idfcst')
         container.add_initializer(idfcst, proto_dtype, shape, cst)
-        idfed = (final if op.norm is None
-                 else scope.get_unique_variable_name('idfed'))
-        apply_mul(scope, data + [idfcst], idfed, container, broadcast=1)
-        data = [idfed]
+        apply_mul(scope, data + [idfcst], output_name, container, broadcast=1)
+    else:
+        output_name = data[0]
 
     if op.norm is not None:
+        norm_name = scope.get_unique_variable_name('tfidftr_norm')
         apply_normalizer(
-            scope, data, operator.output_full_names, container,
+            scope, output_name, norm_name, container,
             norm=op.norm.upper(), use_float=float_type == np.float32)
-        data = None
+        output_name = norm_name
 
-    if data == operator.input_full_names:
-        # Nothing happened --> identity
-        apply_identity(scope, data, final, container)
+    options = container.get_options(op, dict(nan=False))
+    replace_by_nan = options.get('nan', False)
+    if replace_by_nan:
+        # This part replaces all null values by nan.
+        cst_nan_name = scope.get_unique_variable_name('nan_name')
+        container.add_initializer(cst_nan_name, proto_dtype, [1], [np.nan])
+        cst_zero_name = scope.get_unique_variable_name('zero_name')
+        container.add_initializer(cst_zero_name, proto_dtype, [1], [0])
+
+        mask_name = scope.get_unique_variable_name('mask_name')
+        container.add_node('Equal', [output_name, cst_zero_name],
+                           mask_name,
+                           name=scope.get_unique_operator_name('Equal'))
+
+        where_name = scope.get_unique_variable_name('where_name')
+        container.add_node('Where', [mask_name, cst_nan_name, output_name],
+                           where_name,
+                           name=scope.get_unique_operator_name('Where'))
+        output_name = where_name
+
+    apply_identity(scope, output_name, operator.output_full_names, container)
 
 
 register_converter('SklearnTfidfTransformer',
-                   convert_sklearn_tfidf_transformer)
+                   convert_sklearn_tfidf_transformer,
+                   options={'nan': [True, False]})

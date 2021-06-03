@@ -5,6 +5,7 @@ Tests scikit-learn's tfidf converter.
 """
 import unittest
 from distutils.version import StrictVersion
+import copy
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -548,6 +549,33 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': embeddings})[0]
         assert_almost_equal(exp, res)
+
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.5.0"),
+        reason="Requires opset 10.")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
+        reason="Requires opset 10.")
+    def test_model_tfidf_vectorizer_nan(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        options = copy.deepcopy(self.get_options())
+        options[TfidfVectorizer]['nan'] = True
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType())],
+                                     options=options,
+                                     target_opset=TARGET_OPSET)
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': corpus.ravel()})[0]
+        assert res.shape == (4, 9)
+        assert numpy.isnan(res[0, 0])
 
 
 if __name__ == "__main__":
