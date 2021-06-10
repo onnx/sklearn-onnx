@@ -255,6 +255,8 @@ jobs:
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
       cd tests
+      python -c "from onnxruntime import __version__;print('onnxruntime', __version__)"
+      python -c "from onnx import __version__;print('onnx', __version__)"
       python -c "from skl2onnx import __max_supported_opset__;print('__max_supported_opset__', __max_supported_opset__)"
       python -c "import test_utils;print('max_onnxruntime_opset', test_utils.max_onnxruntime_opset())"
       python -c "import test_utils;print('TARGET OPSET, IR', test_utils.TARGET_OPSET, test_utils.TARGET_IR)"
