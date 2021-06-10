@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from distutils.version import StrictVersion
 import numpy as np
 import onnx
+from onnxruntime import __version__ as ort_version
 from skl2onnx import __max_supported_opset__ as max_opset
 from skl2onnx.common._topology import OPSET_TO_IR_VERSION
 from .tests_helper import dump_data_and_model  # noqa
@@ -10,8 +12,7 @@ from .tests_helper import (  # noqa
     dump_one_class_classification,
     dump_binary_classification,
     dump_multilabel_classification,
-    dump_multiple_classification,
-)
+    dump_multiple_classification)
 from .tests_helper import (  # noqa
     dump_multiple_regression,
     dump_single_regression,
@@ -19,8 +20,7 @@ from .tests_helper import (  # noqa
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
-    binary_array_to_string
-)
+    binary_array_to_string)
 
 
 def create_tensor(N, C, H=None, W=None):
@@ -46,11 +46,34 @@ def _get_ir_version(opv):
     return 3
 
 
+def max_onnxruntime_opset():
+    """
+    See `Versioning.md
+    <https://github.com/microsoft/onnxruntime/blob/
+    master/docs/Versioning.md>`_.
+    """
+    vi = StrictVersion(ort_version)
+    if vi >= StrictVersion("1.9.0"):
+        return 14
+    if vi >= StrictVersion("1.6.0"):
+        return 13
+    if vi >= StrictVersion("1.3.0"):
+        return 12
+    if vi >= StrictVersion("1.0.0"):
+        return 11
+    if vi >= StrictVersion("0.4.0"):
+        return 10
+    if vi >= StrictVersion("0.3.0"):
+        return 9
+    return 8
+
+
 TARGET_OPSET = int(
     os.environ.get(
         'TEST_TARGET_OPSET',
-        min(max_opset,
-            onnx.defs.onnx_opset_version())))
+        min(max_onnxruntime_opset(),
+            min(max_opset,
+                onnx.defs.onnx_opset_version()))))
 
 TARGET_IR = int(
     os.environ.get(
