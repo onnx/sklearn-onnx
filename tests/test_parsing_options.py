@@ -36,12 +36,14 @@ class TestParsingOptions(unittest.TestCase):
         assert sess.get_outputs()[0].name == 'output'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output4', None)])
+            final_types=[('output4', None)],
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output4'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output4', DoubleTensorType())])
+            final_types=[('output4', DoubleTensorType())],
+            target_opset=TARGET_OPSET)
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
         except RuntimeError as e:

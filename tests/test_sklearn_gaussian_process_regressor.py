@@ -883,7 +883,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             assert "Max relative difference:" in str(e)
 
         model_onnx = to_onnx(
-            gp, initial_types=[('X', DoubleTensorType([None, None]))])
+            gp, initial_types=[('X', DoubleTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
