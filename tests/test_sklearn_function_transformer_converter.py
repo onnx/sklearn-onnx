@@ -22,7 +22,7 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnFunctionTransformerConverter(unittest.TestCase):
@@ -67,7 +67,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
 
         inputs = convert_dataframe_schema(data)
         model_onnx = convert_sklearn(pipe, "scikit-learn function_transformer",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data[:5],
@@ -116,7 +116,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
 
         inputs = convert_dataframe_schema(data)
         model_onnx = convert_sklearn(pipe, "scikit-learn function_transformer",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data[:5],
@@ -165,7 +165,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
 
         inputs = convert_dataframe_schema(data)
         model_onnx = convert_sklearn(pipe, "scikit-learn function_transformer",
-                                     inputs)
+                                     inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data[:5], pipe, model_onnx,

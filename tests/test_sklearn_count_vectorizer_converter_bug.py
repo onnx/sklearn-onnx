@@ -40,7 +40,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         vect.tokenizer = None
         model_onnx = convert_sklearn(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1]))],
-                                     options=extra)
+                                     options=extra,
+                                     target_opset=TARGET_OPSET)
         vect.tokenizer = prev
 
         self.assertTrue(model_onnx is not None)
@@ -66,7 +67,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         vect.fit(corpus.ravel())
 
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1]))])
+                                     [('input', StringTensorType([1]))],
+                                     target_opset=TARGET_OPSET)
 
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

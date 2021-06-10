@@ -45,7 +45,8 @@ class TestStackingConverter(unittest.TestCase):
         model, X = fit_regression_model(model_to_test_reg())
         model_onnx = convert_sklearn(
             model, "stacking regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

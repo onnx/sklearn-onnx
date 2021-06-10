@@ -14,7 +14,7 @@ import onnxruntime as ort
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
@@ -45,6 +45,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
             text_clf,
             name="DocClassifierCV-Tfidf",
             initial_types=[("input", StringTensorType([5]))],
+            target_opset=TARGET_OPSET
         )
         dump_data_and_model(
             twenty_train.data[5:10],
