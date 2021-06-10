@@ -589,8 +589,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "extra trees regression",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -650,7 +649,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_path': True}})
+            options={id(model): {'decision_path': True}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -671,7 +671,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_path': True}})
+            options={id(model): {'decision_path': True}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
