@@ -130,15 +130,6 @@ jobs:
         onnxrt.version: 'onnxruntime==0.5.0'
         onnxcc.version: 'onnxconverter-common==1.6.1'
         sklearn.version: '==0.21.3'
-      Py36-Onnx141-Rt040-Skl0213:
-        python.version: '3.6'
-        onnx.version: 'onnx==1.4.1'
-        onnx.target_opset: ''
-        numpy.version: 'numpy>=1.17.0'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==0.4.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
-        sklearn.version: '==0.21.3'
     maxParallel: 3
 
   steps:
