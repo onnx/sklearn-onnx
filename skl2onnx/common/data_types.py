@@ -14,6 +14,7 @@ except ImportError:
     Complex64TensorType = None
     Complex128TensorType = None
 from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
+from ..proto import TensorProto, onnx_proto
 
 
 try:
@@ -157,9 +158,6 @@ except ImportError:
             return "{}()".format(self.__class__.__name__)
 
 
-from ..proto import TensorProto, onnx_proto
-
-
 def copy_type(vtype, empty=True):
     if isinstance(vtype, SequenceType):
         return vtype.__class__(copy_type(vtype.element_type))
@@ -188,6 +186,10 @@ def _guess_type_proto(data_type, dims):
         return Int32TensorType(dims)
     if data_type == onnx_proto.TensorProto.BOOL:
         return BooleanTensorType(dims)
+    if data_type == onnx_proto.TensorProto.INT8:
+        return Int8TensorType(dims)
+    if data_type == onnx_proto.TensorProto.UINT8:
+        return UInt8TensorType(dims)
     if Complex64TensorType is not None:
         if data_type == onnx_proto.TensorProto.COMPLEX64:
             return Complex64TensorType(dims)
@@ -213,6 +215,10 @@ def _guess_type_proto_str(data_type, dims):
         return Int32TensorType(dims)
     if data_type == "tensor(bool)":
         return BooleanTensorType(dims)
+    if data_type == "tensor(int8)":
+        return Int8TensorType(dims)
+    if data_type == "tensor(uint8)":
+        return UInt8TensorType(dims)
     if Complex64TensorType is not None:
         if data_type == "tensor(complex64)":
             return Complex64TensorType(dims)
@@ -331,6 +337,8 @@ def guess_numpy_type(data_type):
     if isinstance(data_type, BooleanTensorType):
         return np.bool
     if Complex64TensorType is not None:
+        if data_type in (np.complex64, np.complex128):
+            return data_type
         if isinstance(data_type, Complex64TensorType):
             return np.complex64
         if isinstance(data_type, Complex128TensorType):
@@ -355,6 +363,8 @@ def guess_proto_type(data_type):
         return onnx_proto.TensorProto.STRING
     if isinstance(data_type, BooleanTensorType):
         return onnx_proto.TensorProto.BOOL
+    if isinstance(data_type, Int8TensorType):
+        return onnx_proto.TensorProto.INT8
     if isinstance(data_type, UInt8TensorType):
         return onnx_proto.TensorProto.UINT8
     if Complex64TensorType is not None:
@@ -381,7 +391,8 @@ def guess_tensor_type(data_type):
             return data_type.__class__()
     if not isinstance(data_type, (
             Int64TensorType, Int32TensorType, BooleanTensorType,
-            FloatTensorType, StringTensorType, DoubleTensorType)):
+            FloatTensorType, StringTensorType, DoubleTensorType,
+            Int8TensorType, UInt8TensorType)):
         raise TypeError(
             "data_type is not a tensor type but '{}'.".format(
                 type(data_type)))
