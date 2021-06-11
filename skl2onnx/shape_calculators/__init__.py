@@ -30,6 +30,7 @@ from . import one_vs_rest_classifier
 from . import polynomial_features
 from . import power_transformer
 from . import random_projection
+from . import replace_op
 from . import scaler
 from . import svd
 from . import support_vector_machines
@@ -67,6 +68,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     random_projection,
+    replace_op,
     scaler,
     svd,
     support_vector_machines,

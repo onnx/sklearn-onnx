@@ -92,6 +92,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -111,6 +112,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPRegressor",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -156,6 +158,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -175,6 +178,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPRegressor",
             [("input", Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -218,6 +222,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -239,6 +244,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPRegressor",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -282,6 +288,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -301,6 +308,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPRegressor",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -320,6 +328,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model,
             "scikit-learn MLPRegressor",
             [("input", BooleanTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -345,7 +354,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, 'mlp',
             [('input', FloatTensorType([None, X_test.shape[1]]))],
-            options=options)
+            options=options, target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, input_feed={'input': X_test})
         assert_almost_equal(res[1], model.predict_proba(X_test), decimal=5)

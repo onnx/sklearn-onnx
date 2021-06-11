@@ -305,7 +305,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_bagging_64(self):
         self._common_classifier(
-            [lambda: BaggingClassifier(LogisticRegression())],
+            [lambda: BaggingClassifier(
+                LogisticRegression(random_state=42), random_state=42)],
             "BaggingClassifier")
 
     @unittest.skipIf(

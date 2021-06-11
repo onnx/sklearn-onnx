@@ -10,7 +10,7 @@
 *sklearn-onnx* converts [scikit-learn](https://scikit-learn.org/stable/) models to [ONNX](https://github.com/onnx/onnx). Once in the ONNX format, you can use tools like [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high performance scoring.
 
 ## Documentation
-Full documentation including tutorials is available at [http://onnx.ai/sklearn-onnx/](http://onnx.ai/sklearn-onnx/).
+Full documentation including tutorials is available at [https://onnx.ai/sklearn-onnx/](https://onnx.ai/sklearn-onnx/).
 
 You may also find answers in [existing issues](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
 or submit a new one.

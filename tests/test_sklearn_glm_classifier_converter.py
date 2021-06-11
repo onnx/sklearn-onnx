@@ -39,7 +39,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegression(max_iter=100), 2)
         model_onnx = convert_sklearn(
             model, "logistic regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -68,7 +69,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             label_string=True)
         model_onnx = convert_sklearn(
             model, "logistic regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -94,7 +96,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegression(max_iter=100), 3, is_int=True)
         model_onnx = convert_sklearn(
             model, "logistic regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -113,7 +116,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegression(max_iter=100), 3, is_bool=True)
         model_onnx = convert_sklearn(
             model, "logistic regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -136,7 +140,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model = LinearDiscriminantAnalysis().fit(X, y)
         model_onnx = convert_sklearn(
             model, "linear model",
-            [("input", FloatTensorType([None, X_test.shape[1]]))])
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X_test,
@@ -160,7 +165,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "linear model",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options={id(model): {'raw_scores': True}})
+            options={id(model): {'raw_scores': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X_test, model, model_onnx,
@@ -183,7 +189,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "linear model",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options={id(model): {'raw_scores': True}})
+            options={id(model): {'raw_scores': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X_test, model, model_onnx,
@@ -203,7 +210,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegressionCV(max_iter=100), 2)
         model_onnx = convert_sklearn(
             model, "logistic regression cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -230,7 +238,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             return
         model_onnx = convert_sklearn(
             model, "logistic regression cv",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -251,7 +260,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             linear_model.LogisticRegressionCV(max_iter=100), 3, is_bool=True)
         model_onnx = convert_sklearn(
             model, "logistic regression cv",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

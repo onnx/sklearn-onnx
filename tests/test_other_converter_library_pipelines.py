@@ -16,7 +16,7 @@ from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes, )
 from skl2onnx.operator_converters.linear_classifier import (
     convert_sklearn_linear_classifier, )
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class MyCustomClassifier(BaseEstimator, ClassifierMixin):
@@ -69,7 +69,8 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
 
         try:
             model_onnx = convert_sklearn(
-                pipe, "pipeline", [("input", FloatTensorType([None, 2]))])
+                pipe, "pipeline", [("input", FloatTensorType([None, 2]))],
+                target_opset=TARGET_OPSET)
         except RuntimeError as e:
             if "No proper shape calculator found for" not in str(
                     e
@@ -82,12 +83,10 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
                 "pipeline",
                 [("input", FloatTensorType([None, 2]))],
                 custom_conversion_functions={
-                    "MyCustomClassifier": my_custom_converter
-                },
+                    "MyCustomClassifier": my_custom_converter},
                 custom_shape_calculators={
-                    "MyCustomClassifier": my_custom_shape_extractor
-                },
-            )
+                    "MyCustomClassifier": my_custom_shape_extractor},
+                target_opset=TARGET_OPSET)
         except TypeError as e:
             if "Keys in custom_conversion_functions must be types" not in str(
                     e):
@@ -98,36 +97,27 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             "pipeline",
             [("input", FloatTensorType([None, 2]))],
             custom_conversion_functions={
-                MyCustomClassifier: my_custom_converter
-            },
+                MyCustomClassifier: my_custom_converter},
             custom_shape_calculators={
-                MyCustomClassifier: my_custom_shape_extractor
-            },
-        )
+                MyCustomClassifier: my_custom_shape_extractor},
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(numpy.float32),
-            pipe,
-            model_onnx,
-            basename="SklearnPipelineScalerCustomClassifier",
-        )
+            pipe, model_onnx,
+            basename="SklearnPipelineScalerCustomClassifier")
 
         update_registered_converter(
-            MyCustomClassifier,
-            "MyCustomClassifier",
-            my_custom_shape_extractor,
-            my_custom_converter,
-        )
+            MyCustomClassifier, "MyCustomClassifier",
+            my_custom_shape_extractor, my_custom_converter)
 
         model_onnx = convert_sklearn(pipe, "pipeline",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(numpy.float32),
-            pipe,
-            model_onnx,
-            basename="SklearnPipelineScalerCustomClassifier2",
-        )
+            X.astype(numpy.float32), pipe, model_onnx,
+            basename="SklearnPipelineScalerCustomClassifier2")
 
 
 if __name__ == "__main__":

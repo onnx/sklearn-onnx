@@ -25,21 +25,25 @@ class TestParsingOptions(unittest.TestCase):
         X, y = make_regression(n_features=4, random_state=42)
         model.fit(X)
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
-        model_onnx = convert_sklearn(model, initial_types=initial_types)
+        model_onnx = convert_sklearn(model, initial_types=initial_types,
+                                     target_opset=TARGET_OPSET)
         assert model_onnx is not None
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output', None)])
+            final_types=[('output', None)],
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output4', None)])
+            final_types=[('output4', None)],
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output4'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            final_types=[('output4', DoubleTensorType())])
+            final_types=[('output4', DoubleTensorType())],
+            target_opset=TARGET_OPSET)
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
         except RuntimeError as e:
@@ -57,7 +61,8 @@ class TestParsingOptions(unittest.TestCase):
         model.fit(X, y)
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(model, initial_types=initial_types,
-                                     final_types=[('output4', None)])
+                                     final_types=[('output4', None)],
+                                     target_opset=TARGET_OPSET)
         assert model_onnx is not None
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output4'
@@ -71,7 +76,8 @@ class TestParsingOptions(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         with self.assertRaises(RuntimeError):
             convert_sklearn(model, initial_types=initial_types,
-                            final_types=[('output4', None)])
+                            final_types=[('output4', None)],
+                            target_opset=TARGET_OPSET)
         with self.assertRaises(RuntimeError):
             convert_sklearn(model, initial_types=initial_types,
                             final_types=[('dup1', None), ('dup1', None)],
