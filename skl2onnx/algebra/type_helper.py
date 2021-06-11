@@ -15,8 +15,10 @@ from ..common.data_types import (
     FloatTensorType,
     Int64Type,
     Int64TensorType, Int32TensorType,
-    StringTensorType
-)
+    StringTensorType)
+from ..common.data_types import (
+    Int8TensorType, UInt8TensorType,
+    UInt8Type, Int8Type)
 
 
 def _guess_type(given_type):
@@ -37,7 +39,8 @@ def _guess_type(given_type):
         return _guess_numpy_type(given_type.dtype, shape)
     if isinstance(given_type, (FloatTensorType, Int64TensorType,
                                Int32TensorType, StringTensorType,
-                               BooleanTensorType, DoubleTensorType)):
+                               BooleanTensorType, DoubleTensorType,
+                               Int8TensorType, UInt8TensorType)):
         return given_type
     if isinstance(given_type, Variable):
         return given_type.type
@@ -57,6 +60,10 @@ def _guess_type(given_type):
         return FloatType()
     if isinstance(given_type, np.float64):
         return DoubleType()
+    if isinstance(given_type, np.int8):
+        return Int8Type()
+    if isinstance(given_type, np.uint8):
+        return UInt8Type()
     if given_type.__class__.__name__.endswith("Categorical"):
         # pandas Categorical without important pandas
         return Int64TensorType()
