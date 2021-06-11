@@ -69,6 +69,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             "pipelinewithinpipeline",
             [("input", FloatTensorType(data.shape))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -124,6 +125,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             "pipelinewithinpipeline",
             [("input", FloatTensorType(data.shape))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -302,6 +304,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             "pipelinewithinpipeline",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

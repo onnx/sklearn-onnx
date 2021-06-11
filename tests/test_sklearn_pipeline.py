@@ -33,7 +33,8 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, fit_classification_model
+from test_utils import (
+    dump_data_and_model, fit_classification_model, TARGET_OPSET)
 from onnxruntime import __version__ as ort_version, InferenceSession
 
 
@@ -72,7 +73,8 @@ class TestSklearnPipeline(unittest.TestCase):
         model = Pipeline([("scaler1", scaler), ("scaler2", scaler)])
 
         model_onnx = convert_sklearn(model, "pipeline",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(data,
                             model,
@@ -95,7 +97,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 ("input1", FloatTensorType([None, 1])),
                 ("input2", FloatTensorType([None, 1])),
             ],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
         self.assertTrue(model_onnx is not None)
         data = {
@@ -138,7 +140,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 ("input1", FloatTensorType([None, 1])),
                 ("input2", FloatTensorType([None, 1])),
             ],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
         self.assertTrue(model_onnx is not None)
         data = {
@@ -168,7 +170,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 ("input1", Int64TensorType([None, 1])),
                 ("input2", FloatTensorType([None, 1])),
             ],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(len(model_onnx.graph.node[-1].output) == 1)
         self.assertTrue(model_onnx is not None)
         data = numpy.array(data)
@@ -245,7 +247,8 @@ class TestSklearnPipeline(unittest.TestCase):
         ]
 
         X_train = X_train[:11]
-        model_onnx = convert_sklearn(model, initial_types=initial_type)
+        model_onnx = convert_sklearn(model, initial_types=initial_type,
+                                     target_opset=TARGET_OPSET)
 
         dump_data_and_model(
             X_train,
@@ -366,7 +369,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
         clf.fit(X_train, y_train)
         inputs = convert_dataframe_schema(X_train, to_drop)
-        model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs)
+        model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs,
+                                     target_opset=TARGET_OPSET)
 
         data = X_test[:5]
         pred = clf.transform(data)
@@ -399,7 +403,8 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer weights",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -425,7 +430,8 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer drop",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -452,7 +458,8 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -478,7 +485,8 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             "column transformer passthrough",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -535,7 +543,8 @@ class TestSklearnPipeline(unittest.TestCase):
         ]
 
         pipe.fit(X_train)
-        model_onnx = convert_sklearn(pipe, initial_types=init_types)
+        model_onnx = convert_sklearn(
+            pipe, initial_types=init_types, target_opset=TARGET_OPSET)
         oinf = InferenceSession(model_onnx.SerializeToString())
 
         pred = pipe.transform(X_train)

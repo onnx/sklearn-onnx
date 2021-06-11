@@ -98,7 +98,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
         assert z is not None
 
         matf = mat.astype(np.float32)
-        model_onnx = to_onnx(pipe, matf)
+        model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
         # Next instructions fails...
         # Field 'shape' of type is required but missing.
         # onnx.checker.check_model(model_onnx)
@@ -136,7 +136,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         matf = mat.astype(np.float32)
 
-        model_onnx = to_onnx(pipe, matf)
+        model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
 
         # Next instructions fails...
         # Field 'shape' of type is required but missing.

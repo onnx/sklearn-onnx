@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelBinarizer
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import Int64TensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnLabelBinariser(unittest.TestCase):
@@ -22,6 +22,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             "scikit-learn label binariser",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -41,6 +42,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             "scikit-learn label binariser",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -60,6 +62,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             "scikit-learn label binariser",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -79,6 +82,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             "scikit-learn label binariser",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -98,6 +102,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model,
             "scikit-learn label binariser",
             [("input", Int64TensorType([None]))],
+            target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -115,7 +120,8 @@ class TestSklearnLabelBinariser(unittest.TestCase):
         model = LabelBinarizer().fit(X1)
         onnx_fs = convert_sklearn(
             model, 'lb',
-            [('float_input', Int64TensorType([None, X1.shape[1]]))])
+            [('float_input', Int64TensorType([None, X1.shape[1]]))],
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(onnx_fs.SerializeToString())
 
         res = sess.run(None, input_feed={'float_input': X1})

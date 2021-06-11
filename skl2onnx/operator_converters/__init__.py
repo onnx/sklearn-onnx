@@ -43,6 +43,7 @@ from . import power_transformer
 from . import random_forest
 from . import random_projection
 from . import ransac_regressor
+from . import replace_op
 from . import scaler_op
 from . import sgd_classifier
 from . import stacking
@@ -95,6 +96,7 @@ __all__ = [
     random_forest,
     random_projection,
     ransac_regressor,
+    replace_op,
     scaler_op,
     sgd_classifier,
     stacking,
