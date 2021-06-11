@@ -18,7 +18,8 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from onnxruntime import __version__ as ort_version, InferenceSession
-from test_utils import dump_data_and_model, fit_regression_model
+from test_utils import (
+    dump_data_and_model, fit_regression_model, TARGET_OPSET)
 
 
 class TestGLMRegressorConverter(unittest.TestCase):
@@ -26,7 +27,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LinearRegression())
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -46,7 +48,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -64,7 +67,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_linear_regression64(self):
         model, X = fit_regression_model(linear_model.LinearRegression())
         model_onnx = convert_sklearn(model, "linear regression",
-                                     [("input", DoubleTensorType(X.shape))])
+                                     [("input", DoubleTensorType(X.shape))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         self.assertIn("elem_type: 11", str(model_onnx))
         dump_data_and_model(
@@ -84,7 +88,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LinearRegression(),
                                         n_targets=2)
         model_onnx = convert_sklearn(model, "linear regression",
-                                     [("input", DoubleTensorType(X.shape))])
+                                     [("input", DoubleTensorType(X.shape))],
+                                     target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         self.assertIn("elem_type: 11", str(model_onnx))
         dump_data_and_model(
@@ -102,7 +107,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.LinearRegression(), is_int=True)
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -119,7 +125,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.LinearRegression(fit_intercept=False))
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -136,7 +143,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.LinearRegression(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -152,7 +160,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(LinearSVR())
         model_onnx = convert_sklearn(
             model, "linear SVR",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -168,7 +177,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(LinearSVR(), is_int=True)
         model_onnx = convert_sklearn(
             model, "linear SVR",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -184,7 +194,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(LinearSVR(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "linear SVR",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -200,7 +211,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.Ridge())
         model_onnx = convert_sklearn(
             model, "ridge regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -216,7 +228,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.Ridge(), is_int=True)
         model_onnx = convert_sklearn(
             model, "ridge regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -232,7 +245,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.Ridge(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "ridge regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -250,6 +264,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             "scikit-learn SGD regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -267,7 +282,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.SGDRegressor(), is_int=True)
         model_onnx = convert_sklearn(
             model, "SGD regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -284,7 +300,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.SGDRegressor(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "SGD regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -302,7 +319,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             "scikit-learn elastic-net regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -320,7 +337,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model,
             "scikit-learn elastic-net regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -336,7 +353,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.ElasticNet(), is_int=True)
         model_onnx = convert_sklearn(
             model, "elastic net regression",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -353,7 +371,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.ElasticNet(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "elastic net regression",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -369,7 +388,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.Lars())
         model_onnx = convert_sklearn(
             model, "lars",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -385,7 +405,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LarsCV())
         model_onnx = convert_sklearn(
             model, "lars",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -401,7 +422,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LassoLars(alpha=0.01))
         model_onnx = convert_sklearn(
             model, "lasso lars",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -417,7 +439,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LassoLarsCV())
         model_onnx = convert_sklearn(
             model, "lasso lars cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -433,7 +456,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LassoLarsIC())
         model_onnx = convert_sklearn(
             model, "lasso lars cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -449,7 +473,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LassoCV())
         model_onnx = convert_sklearn(
             model, "lasso cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -465,7 +490,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.LassoLars(), is_int=True)
         model_onnx = convert_sklearn(
             model, "lasso lars",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -482,7 +508,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.LassoLars(), is_bool=True)
         model_onnx = convert_sklearn(
             model, "lasso lars",
-            [("input", BooleanTensorType([None, X.shape[1]]))])
+            [("input", BooleanTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -499,7 +526,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "linear regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -517,7 +545,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.ARDRegression(), factor=0.001)
         model_onnx = convert_sklearn(
             model, "ard regression",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -533,7 +562,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.TheilSenRegressor())
         model_onnx = convert_sklearn(
             model, "thiel-sen regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -549,7 +579,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.BayesianRidge())
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -567,7 +598,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={linear_model.BayesianRidge: {'return_std': True}})
+            options={linear_model.BayesianRidge: {'return_std': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -585,7 +617,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", DoubleTensorType([None, X.shape[1]]))],
-            options={linear_model.BayesianRidge: {'return_std': True}})
+            options={linear_model.BayesianRidge: {'return_std': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
         X = X.astype(numpy.float64)
@@ -602,7 +635,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={linear_model.BayesianRidge: {'return_std': True}})
+            options={linear_model.BayesianRidge: {'return_std': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -620,7 +654,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", DoubleTensorType([None, X.shape[1]]))],
-            options={linear_model.BayesianRidge: {'return_std': True}})
+            options={linear_model.BayesianRidge: {'return_std': True}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
         X = X.astype(numpy.float64)
@@ -634,7 +669,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         model, X = fit_regression_model(linear_model.HuberRegressor())
         model_onnx = convert_sklearn(
             model, "huber regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -651,7 +687,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "multi-task lasso",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -669,7 +706,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "mutli-task lasso cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -687,7 +725,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "multi-task elasticnet",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -705,7 +744,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.OrthogonalMatchingPursuit())
         model_onnx = convert_sklearn(
             model, "orthogonal matching pursuit",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -723,7 +763,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.PassiveAggressiveRegressor())
         model_onnx = convert_sklearn(
             model, "passive aggressive regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -741,7 +782,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.RANSACRegressor())
         model_onnx = convert_sklearn(
             model, "ransac regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -760,7 +802,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                 base_estimator=MLPRegressor(solver='sgd', max_iter=20)))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -779,7 +822,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                 base_estimator=GradientBoostingRegressor()))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -797,7 +841,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                                         n_targets=2)
         model_onnx = convert_sklearn(
             model, "multi-task elasticnet cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -815,7 +860,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             linear_model.OrthogonalMatchingPursuitCV())
         model_onnx = convert_sklearn(
             model, "orthogonal matching pursuit cv",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,

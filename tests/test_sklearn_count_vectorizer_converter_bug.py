@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 import onnx
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnCountVectorizerBug(unittest.TestCase):
@@ -40,7 +40,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         vect.tokenizer = None
         model_onnx = convert_sklearn(vect, 'CountVectorizer',
                                      [('input', StringTensorType([1]))],
-                                     options=extra)
+                                     options=extra,
+                                     target_opset=TARGET_OPSET)
         vect.tokenizer = prev
 
         self.assertTrue(model_onnx is not None)
@@ -66,7 +67,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         vect.fit(corpus.ravel())
 
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1]))])
+                                     [('input', StringTensorType([1]))],
+                                     target_opset=TARGET_OPSET)
 
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(

@@ -100,7 +100,7 @@ class TestConvert(unittest.TestCase):
                                      target_opset=tops)
                 dom = get_domain_opset(model_onnx)
                 self.assertEqual(len(dom), 2)
-                self.assertIn(dom[''], (i, i-1, i-2))
+                self.assertIn(dom[''], list(range(9, TARGET_OPSET+1)))
                 self.assertEqual(dom['ai.onnx.ml'], 1)
 
     def test_label_encoder(self):

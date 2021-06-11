@@ -9,7 +9,7 @@ import numpy
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfTransformerConverter(unittest.TestCase):
@@ -46,6 +46,7 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
                             "TfidfTransformer",
                             [("input",
                               FloatTensorType([None, data.shape[1]]))],
+                            target_opset=TARGET_OPSET
                         )
                         self.assertTrue(model_onnx is not None)
                         suffix = norm.upper() if norm else ""

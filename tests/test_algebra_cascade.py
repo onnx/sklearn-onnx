@@ -20,7 +20,7 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxScaler
 from skl2onnx import to_onnx, convert_sklearn
 from skl2onnx.proto import get_latest_tested_opset_version
-from test_utils import fit_regression_model
+from test_utils import fit_regression_model, TARGET_OPSET
 
 
 class TestOnnxOperatorsCascade(unittest.TestCase):
@@ -207,8 +207,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         model, X_test = fit_regression_model(
             MLPRegressor(random_state=42))
         exp = model.predict(X_test)
-        for opv in (1, 2, 7, 8, 9, 10, 11, 12, onnx_opset_version()):
-            if opv is not None and opv > get_latest_tested_opset_version():
+        for opv in (1, 2, 7, 8, 9, 10, 11, 12, 13, onnx_opset_version()):
+            if opv is not None and opv > TARGET_OPSET:
                 continue
             try:
                 onx = convert_sklearn(
