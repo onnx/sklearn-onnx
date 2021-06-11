@@ -1161,6 +1161,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         container.validate_options(operator)
         conv(scope, operator, container)
 
+    container.ensure_topological_order()
+
     # Create a graph from its main components
     if container.target_opset_onnx < 9:
         # When calling ModelComponentContainer's add_initializer(...),

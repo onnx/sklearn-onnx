@@ -677,3 +677,73 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         """
         opts = self._get_allowed_options(model)
         return option_name in opts
+
+    def ensure_topological_order(self):
+        """
+        Ensures and modifies the order of nodes to have
+        a topological order (every node in the list
+        can only be an input for a node later in this list).
+        The function raises an exception if a cycle is detected.
+        """
+        order = {}
+        for inp in self.inputs:
+            name = inp.name
+            order[name] = 0
+        for inp in self.initializers:
+            name = inp.name
+            order[name] = 0
+        n_iter = 0
+        while n_iter < len(self.nodes) * 2:
+            n_iter += 1
+            missing_names = set()
+            missing_ops = []
+            for node in self.nodes:
+                maxi = 0
+                for name in node.input:
+                    if name in order:
+                        maxi = max(maxi, order[name])
+                    else:
+                        maxi = None
+                        missing_names.add(name)
+                        continue
+                if maxi is None:
+                    missing_ops.append(node)
+                    continue
+                key = id(node)
+                if key in order:
+                    continue
+                maxi += 1
+                order[key] = maxi
+                maxi += 1
+                for name in node.output:
+                    if name in order:
+                        raise RuntimeError(
+                            "Unable to sort a node (cycle). An output was "
+                            "already ordered %r (iteration=%r)." % (
+                                name, n_iter))
+                    order[name] = maxi
+            if len(missing_names) == 0:
+                continue
+
+        if len(missing_ops) > 0:
+            def nstr(name):
+                if name in order:
+                    return "%s(%d)" % (name, order[name])
+                return name
+            rows = ["%s (%s) -> (%s)" % (
+                        n.name or n.op_type,
+                        ', '.join(map(nstr, n.input)),
+                        ', '.join(n.output))
+                    for n in missing_ops]
+            rows.insert(0, "")
+            raise RuntimeError(
+                "After %d iterations for %d nodes, still unable "
+                "to sort names %r and operators %s" % (
+                    n_iter, len(self.nodes), missing_names,
+                    "\n".join(rows)))
+
+        # Update order
+        topo = [(order[id(node)], str(id(node))) for node in self.nodes]
+        topo.sort()
+        map_nodes = {str(id(node)): node for node in self.nodes}
+        self.nodes = [map_nodes[_[1]] for _ in topo]
