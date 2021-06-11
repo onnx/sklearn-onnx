@@ -738,7 +738,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             rows.insert(0, "")
             raise RuntimeError(
                 "After %d iterations for %d nodes, still unable "
-                "to sort names %r and operators %s" % (
+                "to sort names %r. The graph may be disconnected. "
+                "List of operators: %s" % (
                     n_iter, len(self.nodes), missing_names,
                     "\n".join(rows)))
 
