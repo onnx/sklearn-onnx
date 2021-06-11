@@ -742,7 +742,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True}})
+            options={id(model): {'decision_leaf': True}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -763,7 +764,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True,
-                                 'decision_path': True}})
+                                 'decision_path': True}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -786,7 +788,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True, 'zipmap': False}})
+            options={id(model): {'decision_leaf': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
@@ -808,7 +811,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True,
                                  'decision_path': True,
-                                 'zipmap': False}})
+                                 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
