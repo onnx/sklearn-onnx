@@ -12,9 +12,7 @@ from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, DoubleTensorType
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import (
-    dump_data_and_model,
-)
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnPLSRegressionConverters(unittest.TestCase):
@@ -31,7 +29,8 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         pls2.fit(X, Y)
         model_onnx = convert_sklearn(
             pls2, "scikit-learn pls",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
@@ -52,7 +51,8 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         pls2.fit(X, Y)
         model_onnx = convert_sklearn(
             pls2, "scikit-learn pls64",
-            [("input", DoubleTensorType([None, X.shape[1]]))])
+            [("input", DoubleTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
@@ -73,7 +73,8 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         pls2.fit(X, Y)
         model_onnx = convert_sklearn(
             pls2, "scikit-learn plsint64",
-            [("input", Int64TensorType([None, X.shape[1]]))])
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],

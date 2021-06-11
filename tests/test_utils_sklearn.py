@@ -36,7 +36,8 @@ from skl2onnx.common.data_types import (
     FloatTensorType, StringTensorType)
 from skl2onnx.common.utils_sklearn import (
     _process_options, _process_pipeline_options)
-from test_utils import dump_data_and_model, fit_regression_model
+from test_utils import (
+    dump_data_and_model, fit_regression_model, TARGET_OPSET)
 
 
 class TestUtilsSklearn(unittest.TestCase):
@@ -101,7 +102,8 @@ class TestUtilsSklearn(unittest.TestCase):
 
         model_def = to_onnx(
             pipe, data,
-            options={'clr__raw_scores': True, 'clr__zipmap': False})
+            options={'clr__raw_scores': True, 'clr__zipmap': False},
+            target_opset=TARGET_OPSET)
         sonx = str(model_def)
         assert "SOFTMAX" not in sonx
 
@@ -163,12 +165,13 @@ class TestUtilsSklearn(unittest.TestCase):
             'precprocessor__cat__onehot__categories___0',
             'precprocessor__cat__onehot__categories___1',
             'precprocessor__cat__tsvd', 'classifier']
-        assert simple2 == exp
+        self.assertEqual(simple2, exp)
 
         initial_type = [
             ("numfeat", FloatTensorType([None, 3])),
             ("strfeat", StringTensorType([None, 2]))]
-        model_onnx = convert_sklearn(model, initial_types=initial_type)
+        model_onnx = convert_sklearn(model, initial_types=initial_type,
+                                     target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_train, model, model_onnx,
             basename="SklearnPipelineColumnTransformerPipelinerOptions1",
@@ -183,7 +186,8 @@ class TestUtilsSklearn(unittest.TestCase):
 
         model_onnx = convert_sklearn(
             model, initial_types=initial_type,
-            options={'classifier': {'zipmap': False}})
+            options={'classifier': {'zipmap': False}},
+            target_opset=TARGET_OPSET)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,
@@ -199,7 +203,7 @@ class TestUtilsSklearn(unittest.TestCase):
 
         model_onnx = convert_sklearn(
             model, initial_types=initial_type,
-            options=options)
+            options=options, target_opset=TARGET_OPSET)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,
@@ -214,7 +218,8 @@ class TestUtilsSklearn(unittest.TestCase):
 
         model_onnx = convert_sklearn(
             model, initial_types=initial_type,
-            options={id(model): {'zipmap': False}})
+            options={id(model): {'zipmap': False}},
+            target_opset=TARGET_OPSET)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,

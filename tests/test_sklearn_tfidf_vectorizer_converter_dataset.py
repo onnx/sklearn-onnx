@@ -12,7 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
@@ -28,7 +28,8 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
 
         model = TfidfVectorizer().fit(X_train)
         onnx_model = convert_sklearn(
-            model, 'cv', [('input', StringTensorType(X_test.shape))])
+            model, 'cv', [('input', StringTensorType(X_test.shape))],
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, onnx_model,
             basename="SklearnTfidfVectorizer20newsgroups",
@@ -46,7 +47,8 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
 
         model = TfidfVectorizer(lowercase=False).fit(X_train)
         onnx_model = convert_sklearn(
-            model, 'cv', [('input', StringTensorType(X_test.shape))])
+            model, 'cv', [('input', StringTensorType(X_test.shape))],
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, onnx_model,
             basename="SklearnTfidfVectorizer20newsgroupsNOLower",

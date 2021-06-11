@@ -432,6 +432,9 @@ def convert_model(model, name, input_types, target_opset=None):
     :return: *onnx* model
     """
     from skl2onnx import convert_sklearn
+    if target_opset is None:
+        from . import TARGET_OPSET
+        target_opset = TARGET_OPSET
 
     model, prefix = (
         convert_sklearn(model, name, input_types, target_opset=target_opset),
