@@ -705,7 +705,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                     else:
                         maxi = None
                         missing_names.add(name)
-                        continue
+                        break
                 if maxi is None:
                     missing_ops.append(node)
                     continue
