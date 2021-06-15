@@ -19,14 +19,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
     KNeighborsRegressor, RadiusNeighborsRegressor,
     KNeighborsClassifier, RadiusNeighborsClassifier,
-    NearestNeighbors,
-)
+    NearestNeighbors)
 try:
     from sklearn.impute import KNNImputer
     from sklearn.neighbors import (
         KNeighborsTransformer,
-        NeighborhoodComponentsAnalysis,
-    )
+        NeighborhoodComponentsAnalysis)
 except ImportError:
     # New in 0.22
     KNNImputer = None
@@ -133,6 +131,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                      target_opset=TARGET_OPSET,
                                      options={id(model): {'optim': 'cdist'}})
         sess = InferenceSession(model_onnx.SerializeToString())
+        X = X[:5]
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
         if any(numpy.isnan(got.ravel())):
