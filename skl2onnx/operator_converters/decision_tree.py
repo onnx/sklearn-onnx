@@ -167,6 +167,65 @@ def predict(model, scope, operator, container,
     return transposed_result_name
 
 
+def _append_decision_output(
+        input_name, attrs, fct_label, n_out, scope, operator, container,
+        op_type='TreeEnsembleClassifier',
+        op_domain='ai.onnx.ml', op_version=1,
+        cast_encode=False, regression=False, dtype=np.float32,
+        overwrite_tree=None):
+
+    attrs = attrs.copy()
+    attrs['name'] = scope.get_unique_operator_name(op_type)
+    attrs['n_targets'] = 1
+    attrs['post_transform'] = 'NONE'
+    if regression:
+        attrs['target_weights'] = np.array(
+            [float(_) for _ in attrs['target_nodeids']], dtype=dtype)
+    else:
+        attrs['target_ids'] = [0 for _ in attrs['class_ids']]
+        attrs['target_weights'] = [float(_) for _ in attrs['class_nodeids']]
+        attrs['target_nodeids'] = attrs['class_nodeids']
+        attrs['target_treeids'] = attrs['class_treeids']
+
+    rem = [k for k in attrs if k.startswith('class')]
+    for k in rem:
+        del attrs[k]
+    dpath = scope.get_unique_variable_name("dpath")
+    container.add_node(
+        op_type.replace("Classifier", "Regressor"), input_name, dpath,
+        op_domain=op_domain, op_version=op_version, **attrs)
+
+    if n_out is None:
+        final_name = scope.get_unique_variable_name("dpatho")
+    else:
+        final_name = operator.outputs[n_out].full_name
+
+    if cast_encode:
+        apply_cast(
+            scope, dpath, final_name,
+            container, to=onnx_proto.TensorProto.INT64,
+            operator_name=scope.get_unique_operator_name('TreePathType'))
+    else:
+        op = operator.raw_operator
+        labels = fct_label(
+            overwrite_tree if overwrite_tree is not None else op.tree_)
+        ordered = list(sorted(labels.items()))
+        keys = [float(_[0]) for _ in ordered]
+        values = [_[1] for _ in ordered]
+        name = scope.get_unique_variable_name("spath")
+        container.add_node(
+            'LabelEncoder', dpath, name,
+            op_domain=op_domain, op_version=2,
+            default_string='0', keys_floats=keys, values_strings=values,
+            name=scope.get_unique_operator_name('TreePath'))
+        apply_reshape(
+            scope, name, final_name,
+            container, desired_shape=(-1, 1),
+            operator_name=scope.get_unique_operator_name('TreePathShape'))
+
+    return final_name
+
+
 def convert_sklearn_decision_tree_classifier(
         scope, operator, container, op_type='TreeEnsembleClassifier',
         op_domain='ai.onnx.ml', op_version=1):
@@ -178,7 +237,8 @@ def convert_sklearn_decision_tree_classifier(
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
-    options = scope.get_options(op, dict(decision_path=False))
+    options = scope.get_options(
+            op, dict(decision_path=False, decision_leaf=False))
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)
@@ -218,40 +278,24 @@ def convert_sklearn_decision_tree_classifier(
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain=op_domain, op_version=op_version, **attrs)
 
-        if not options['decision_path']:
-            return
-
-        # decision_path
-        attrs = attrs.copy()
-        attrs['name'] = scope.get_unique_operator_name(op_type)
-        attrs['n_targets'] = 1
-        attrs['post_transform'] = 'NONE'
-        attrs['target_ids'] = [0 for _ in attrs['class_ids']]
-        attrs['target_weights'] = [float(_) for _ in attrs['class_nodeids']]
-        attrs['target_nodeids'] = attrs['class_nodeids']
-        attrs['target_treeids'] = attrs['class_treeids']
-        rem = [k for k in attrs if k.startswith('class')]
-        for k in rem:
-            del attrs[k]
-        dpath = scope.get_unique_variable_name("dpath")
-        container.add_node(
-            op_type.replace("Classifier", "Regressor"), input_name, dpath,
-            op_domain=op_domain, op_version=op_version, **attrs)
-
-        labels = _build_labels(op.tree_)
-        ordered = list(sorted(labels.items()))
-        keys = [float(_[0]) for _ in ordered]
-        values = [_[1] for _ in ordered]
-        name = scope.get_unique_variable_name("spath")
-        container.add_node(
-            'LabelEncoder', dpath, name,
-            op_domain=op_domain, op_version=2,
-            default_string='0', keys_floats=keys, values_strings=values,
-            name=scope.get_unique_operator_name('TreePath'))
-        apply_reshape(
-            scope, name, operator.outputs[2].full_name,
-            container, desired_shape=(-1, 1),
-            operator_name=scope.get_unique_operator_name('TreePathShape'))
+        n_out = 2
+        if options['decision_path']:
+            # decision_path
+            _append_decision_output(
+                input_name, attrs, _build_labels_path, n_out,
+                scope, operator, container,
+                op_type=op_type, op_domain=op_domain,
+                op_version=op_version, dtype=dtype)
+            n_out += 1
+        if options['decision_leaf']:
+            # decision_path
+            _append_decision_output(
+                input_name, attrs, _build_labels_leaf, n_out,
+                scope, operator, container,
+                op_type=op_type, op_domain=op_domain,
+                op_version=op_version, cast_encode=True,
+                dtype=dtype)
+            n_out += 1
     else:
         transposed_result_name = predict(
             op, scope, operator, container, op_type, op_domain, op_version)
@@ -296,7 +340,12 @@ def convert_sklearn_decision_tree_classifier(
 
         if options['decision_path']:
             raise RuntimeError(
-                "Decision output for multi-outputs is not implemented yet.")
+                "Option decision_path for multi-outputs "
+                "is not implemented yet.")
+        if options['decision_leaf']:
+            raise RuntimeError(
+                "Option decision_leaf for multi-outputs "
+                "is not implemented yet.")
 
 
 def convert_sklearn_decision_tree_regressor(
@@ -332,57 +381,48 @@ def convert_sklearn_decision_tree_regressor(
         op_type, input_name, operator.outputs[0].full_name,
         op_domain=op_domain, op_version=op_version, **attrs)
 
-    options = scope.get_options(op, dict(decision_path=False))
-    if not options['decision_path']:
-        return
+    options = scope.get_options(
+        op, dict(decision_path=False, decision_leaf=False))
 
     # decision_path
-    attrs = attrs.copy()
-    attrs['name'] = scope.get_unique_operator_name(op_type)
-    attrs['n_targets'] = 1
-    attrs['post_transform'] = 'NONE'
-    attrs['target_ids'] = [0 for _ in attrs['target_ids']]
-    attrs['target_weights'] = np.array(
-        [float(_) for _ in attrs['target_nodeids']], dtype=dtype)
-    dpath = scope.get_unique_variable_name("dpath")
-    container.add_node(
-        op_type, input_name, dpath,
-        op_domain=op_domain, op_version=op_version, **attrs)
-
-    labels = _build_labels(op.tree_)
-    ordered = list(sorted(labels.items()))
-    keys = [float(_[0]) for _ in ordered]
-    values = [_[1] for _ in ordered]
-    name = scope.get_unique_variable_name("spath")
-    container.add_node(
-        'LabelEncoder', dpath, name,
-        op_domain=op_domain, op_version=2,
-        default_string='0', keys_floats=keys, values_strings=values,
-        name=scope.get_unique_operator_name('TreePath'))
-    apply_reshape(
-        scope, name, operator.outputs[1].full_name,
-        container, desired_shape=(-1, 1),
-        operator_name=scope.get_unique_operator_name('TreePathShape'))
+    n_out = 1
+    if options['decision_path']:
+        # decision_path
+        _append_decision_output(
+            input_name, attrs, _build_labels_path, n_out,
+            scope, operator, container,
+            op_type=op_type, op_domain=op_domain,
+            op_version=op_version, regression=True)
+        n_out += 1
+    if options['decision_leaf']:
+        # decision_path
+        _append_decision_output(
+            input_name, attrs, _build_labels_leaf, n_out,
+            scope, operator, container,
+            op_type=op_type, op_domain=op_domain,
+            op_version=op_version, regression=True, cast_encode=True)
+        n_out += 1
 
 
-def _build_labels(tree):
-    def _recursive_build_labels(index, current):
-        current[index] = True
-        if tree.children_left[index] == -1:
-            yield (index, current.copy())
-        else:
-            for it in _recursive_build_labels(
-                    tree.children_left[index], current):
-                yield it
-            for it in _recursive_build_labels(
-                    tree.children_right[index], current):
-                yield it
-        current[index] = False
+def _recursive_build_labels(tree, index, current):
+    current[index] = True
+    if tree.children_left[index] == -1:
+        yield (index, current.copy())
+    else:
+        for it in _recursive_build_labels(
+                tree, tree.children_left[index], current):
+            yield it
+        for it in _recursive_build_labels(
+                tree, tree.children_right[index], current):
+            yield it
+    current[index] = False
 
+
+def _build_labels_path(tree):
     paths = {}
     current = {}
 
-    for leave_index, path in _recursive_build_labels(0, current):
+    for leave_index, path in _recursive_build_labels(tree, 0, current):
         spath = ["0" for _ in range(tree.node_count)]
         for nodeid, b in path.items():
             if b:
@@ -391,19 +431,32 @@ def _build_labels(tree):
     return paths
 
 
+def _build_labels_leaf(tree):
+    paths = {}
+    current = {}
+
+    for leave_index, path in _recursive_build_labels(tree, 0, current):
+        paths[leave_index] = leave_index
+    return paths
+
+
 register_converter('SklearnDecisionTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
-                            'decision_path': [True, False]})
+                            'decision_path': [True, False],
+                            'decision_leaf': [True, False]})
 register_converter('SklearnDecisionTreeRegressor',
                    convert_sklearn_decision_tree_regressor,
-                   options={'decision_path': [True, False]})
+                   options={'decision_path': [True, False],
+                            'decision_leaf': [True, False]})
 register_converter('SklearnExtraTreeClassifier',
                    convert_sklearn_decision_tree_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
-                            'decision_path': [True, False]})
+                            'decision_path': [True, False],
+                            'decision_leaf': [True, False]})
 register_converter('SklearnExtraTreeRegressor',
                    convert_sklearn_decision_tree_regressor,
-                   options={'decision_path': [True, False]})
+                   options={'decision_path': [True, False],
+                            'decision_leaf': [True, False]})

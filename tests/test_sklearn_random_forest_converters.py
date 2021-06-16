@@ -37,6 +37,7 @@ from test_utils import (
     fit_classification_model,
     fit_multilabel_classification_model,
     fit_regression_model,
+    path_to_leaf,
     TARGET_OPSET,
 )
 try:
@@ -729,6 +730,99 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         exp = binary_array_to_string(dec[0].todense())
         got = numpy.array([''.join(row) for row in res[2]])
         assert exp == got.ravel().tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_rf_regressor_decision_leaf(self):
+        model = RandomForestRegressor(n_estimators=2, max_depth=3)
+        X, y = make_regression(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True}},
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel(), decimal=4)
+        dec = model.decision_path(X)
+        exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
+        assert exp.tolist() == res[1].tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_rf_regressor_decision_path_leaf(self):
+        model = RandomForestRegressor(n_estimators=3, max_depth=3)
+        X, y = make_regression(10, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True,
+                                 'decision_path': True}},
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel(), decimal=4)
+        dec = model.decision_path(X)
+        exp_leaf = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
+        exp_path = binary_array_to_string(dec[0].todense())
+        got_path = numpy.array([''.join(row) for row in res[1]])
+        assert exp_path == got_path.ravel().tolist()
+        assert exp_leaf.tolist() == res[2].tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_rf_classifier_decision_leaf(self):
+        model = RandomForestClassifier(n_estimators=2, max_depth=3)
+        X, y = make_classification(3, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
+        assert exp.tolist() == res[2].tolist()
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    def test_rf_classifier_decision_path_leaf(self):
+        model = RandomForestClassifier(n_estimators=3, max_depth=3)
+        X, y = make_classification(3, n_features=4, random_state=42)
+        X = X[:, :2]
+        model.fit(X, y)
+        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types,
+            options={id(model): {'decision_leaf': True,
+                                 'decision_path': True,
+                                 'zipmap': False}},
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X.astype(numpy.float32)})
+        pred = model.predict(X)
+        assert_almost_equal(pred, res[0].ravel())
+        dec = model.decision_path(X)
+        exp_leaf = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
+        exp_path = binary_array_to_string(dec[0].todense())
+        got_path = numpy.array([''.join(row) for row in res[2]])
+        assert exp_path == got_path.ravel().tolist()
+        assert exp_leaf.tolist() == res[3].tolist()
 
 
 if __name__ == "__main__":
