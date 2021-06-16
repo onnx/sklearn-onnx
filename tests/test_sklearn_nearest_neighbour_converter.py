@@ -17,6 +17,7 @@ from pandas import DataFrame
 try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
+    # older versions of scikit-learn
     from sklearn.utils.testing import ignore_warnings
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
