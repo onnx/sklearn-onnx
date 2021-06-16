@@ -14,6 +14,7 @@ import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
 from pandas import DataFrame
+from sklearn.utils._testing import ignore_warnings
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
@@ -108,6 +109,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -124,6 +126,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor-Dec4")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -159,6 +162,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
         model_onnx = convert_sklearn(
@@ -181,6 +185,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor64")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
         model_onnx = convert_sklearn(
@@ -201,6 +206,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_yint(self):
         model, X = self._fit_model(
             KNeighborsRegressor(n_neighbors=2), label_int=True)
@@ -214,6 +220,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressorYInt")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_yint_radius(self):
         model, X = self._fit_model(
             RadiusNeighborsRegressor(), label_int=True)
@@ -229,6 +236,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
@@ -242,6 +250,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor2")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1_radius(self):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(algorithm="brute"),
@@ -296,6 +305,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1_opset(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
                                    n_targets=2)
@@ -316,6 +326,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_2(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2),
                                    n_targets=2)
@@ -333,6 +344,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 9,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_weights_distance_11(self):
         model, X = self._fit_model(
             KNeighborsRegressor(
@@ -364,6 +376,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     basename="SklearnKNeighborsRegressorWDist%d-Dec3" % op)
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_weights_distance_11_radius(self):
         model, X = self._fit_model_simple(
             RadiusNeighborsRegressor(
@@ -385,6 +398,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_metric_cityblock(self):
         model, X = self._fit_model(KNeighborsRegressor(metric="cityblock"))
         model_onnx = convert_sklearn(model, "KNN regressor",
@@ -403,6 +417,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < TARGET_OPSET,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_binary_class(self):
         model, X = self._fit_model_binary_classification(
             KNeighborsClassifier())
@@ -421,6 +436,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(TARGET_OPSET < 12,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_binary_class_radius(self):
         model, X = self._fit_model_binary_classification(
             RadiusNeighborsClassifier())
@@ -439,6 +455,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multi_class(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier())
@@ -457,6 +474,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(TARGET_OPSET < 12,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multi_class_radius(self):
         model, X = self._fit_model_multiclass_classification(
             RadiusNeighborsClassifier())
@@ -476,6 +494,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multi_class_string(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(), use_string=True)
@@ -494,6 +513,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_weights_distance(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(weights='distance'))
@@ -508,6 +528,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_metric_cityblock(self):
         model, X = self._fit_model_multiclass_classification(
             KNeighborsClassifier(metric='cityblock'))
@@ -522,6 +543,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             KNeighborsClassifier(), n_classes=7, n_labels=3,
@@ -548,6 +570,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_int(self):
         model, X = self._fit_model(KNeighborsRegressor())
         X = X.astype(numpy.int64)
@@ -567,6 +590,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_equal(self):
         X, y = datasets.make_regression(
             n_samples=1000, n_features=100, random_state=42)
@@ -600,6 +624,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_multi_class_nocl(self):
         model, X = fit_classification_model(
             KNeighborsClassifier(),
@@ -624,6 +649,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_2_pipee(self):
         pipe = make_pipeline(StandardScaler(),
                              KNeighborsClassifier())
@@ -641,6 +667,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_test_knn_transform(self):
         iris = datasets.load_iris()
         X, _ = iris.data, iris.target
@@ -665,6 +692,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_default(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(random_state=42), 3)
@@ -683,6 +711,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_identity(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(
@@ -702,6 +731,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_double(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(
@@ -722,6 +752,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_int(self):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(
@@ -741,6 +772,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNeighborsTransformer is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_k_neighbours_transformer_distance(self):
         model, X_test = fit_classification_model(
             KNeighborsTransformer(
@@ -760,6 +792,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNeighborsTransformer is None,
                      reason="new in 0.22")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_k_neighbours_transformer_connectivity(self):
         model, X_test = fit_classification_model(
             KNeighborsTransformer(
@@ -782,6 +815,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf((StrictVersion(onnx.__version__) <
                       StrictVersion("1.4.1")),
                      reason="ConstantOfShape op not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer(self):
         x_train = numpy.array(
             [[1, 2, numpy.nan, 12], [3, numpy.nan, 3, 13],
@@ -807,6 +841,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf((StrictVersion(onnx.__version__) <
                       StrictVersion("1.4.1")),
                      reason="ConstantOfShape op not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_cdist(self):
         x_train = numpy.array(
             [[1, 2, numpy.nan, 12], [3, numpy.nan, 3, 13],
@@ -845,6 +880,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_iris_regressor_multi_reg(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
@@ -862,6 +898,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressorMReg")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_iris_regressor_multi_reg_radius(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
@@ -889,6 +926,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_iris_classifier_multi_reg2_weight(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
@@ -907,6 +945,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierMReg2-Out0")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_iris_classifier_multi_reg2_weight_radius(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
@@ -931,6 +970,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
+    @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_iris_classifier_multi_reg3_weight(self):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
