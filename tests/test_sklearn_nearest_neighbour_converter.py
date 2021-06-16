@@ -14,7 +14,10 @@ import onnx
 import onnxruntime
 from onnxruntime import InferenceSession
 from pandas import DataFrame
-from sklearn.utils._testing import ignore_warnings
+try:
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    from sklearn.utils.testing import ignore_warnings
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
