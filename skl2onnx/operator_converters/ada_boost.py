@@ -79,7 +79,7 @@ def _samme_r_proba(scope, container, proba_name, n_classes, dtype, pdtype):
     apply_clip(
         scope, proba_name, clipped_proba_name, container,
         operator_name=scope.get_unique_operator_name('Clip'),
-        min=cst_min)
+        min=float(cst_min))
     container.add_node(
         'Log', clipped_proba_name, log_proba_name,
         name=scope.get_unique_operator_name('Log'))
