@@ -45,7 +45,7 @@ from sklearn.datasets import make_blobs
 
 X, y = make_blobs(n_samples=100, n_features=2)
 
-model = IsolationForest(3)
+model = IsolationForest(n_estimators=3)
 model.fit(X)
 labels = model.predict(X)
 
