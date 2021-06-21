@@ -147,7 +147,7 @@ class Variable:
             return r
 
         def get_shape(tt):
-            return [get_dim(tt.shape.dim[i])        
+            return [get_dim(tt.shape.dim[i])
                     for i in range(len(tt.shape.dim))]
 
         if hasattr(obj, 'extend'):
