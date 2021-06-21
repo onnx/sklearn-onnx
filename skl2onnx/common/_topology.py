@@ -75,7 +75,7 @@ class Variable:
             raise TypeError(
                 "raw_name must be a string not %r." % type(onnx_name))
 
-       if type is not None:
+        if type is not None:
             shape = type.shape
             if shape is not None:
                 not_none = [v for v in shape if v is not None]
@@ -139,7 +139,7 @@ class Variable:
         """
         Creates a data type from a protobuf object.
         """
-       def get_dim(d):
+        def get_dim(d):
             r = d.dim_value
             if r == 0:
                 # dim_value is 0 when it is 0 or undefined
