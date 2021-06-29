@@ -34,7 +34,7 @@ class identity(IdentityTransformer):
 
 def dummy_shape_calculator(operator):
     op_input = operator.inputs[0]
-    operator.outputs[0].type = FloatTensorType(op_input.type.shape)
+    operator.outputs[0].type.shape = op_input.type.shape
 
 
 def dummy_converter(scope, operator, container):
@@ -42,7 +42,7 @@ def dummy_converter(scope, operator, container):
     out = operator.outputs
 
     id1 = OnnxIdentity(X, op_version=TARGET_OPSET)
-    id2 = OnnxIdentity(id1, output_names=out[1:],
+    id2 = OnnxIdentity(id1, output_names=out[:1],
                        op_version=TARGET_OPSET)
     id2.add_to(scope, container)
 
@@ -71,7 +71,7 @@ class TestTopologyPrune(unittest.TestCase):
 
         idnode = [node for node in model_onnx.graph.node
                   if node.op_type == "Identity"]
-        assert len(idnode) == 0
+        self.assertEqual(len(idnode), 1)
 
 
 if __name__ == "__main__":

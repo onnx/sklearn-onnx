@@ -74,6 +74,17 @@ class Variable:
         if not isinstance(onnx_name, str) or '(' in onnx_name:
             raise TypeError(
                 "raw_name must be a string not %r." % type(onnx_name))
+
+        if type is not None:
+            shape = type.shape
+            if shape is not None:
+                not_none = [v for v in shape if v is not None]
+                if len(not_none) and min(not_none) == 0:
+                    raise RuntimeError(
+                        "A variable cannot be empty, raw_name=%r, "
+                        "onnx_name=%r, type=%r." % (
+                            raw_name, onnx_name, type))
+
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
         self.scope = scope
@@ -128,8 +139,15 @@ class Variable:
         """
         Creates a data type from a protobuf object.
         """
+        def get_dim(d):
+            r = d.dim_value
+            if r == 0:
+                # dim_value is 0 when it is 0 or undefined
+                return 0 if "0" in str(d) else None
+            return r
+
         def get_shape(tt):
-            return [tt.shape.dim[i].dim_value
+            return [get_dim(tt.shape.dim[i])
                     for i in range(len(tt.shape.dim))]
 
         if hasattr(obj, 'extend'):
@@ -1160,6 +1178,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                               type(getattr(operator, 'raw_model', None))))
         container.validate_options(operator)
         conv(scope, operator, container)
+
+    container.ensure_topological_order()
 
     # Create a graph from its main components
     if container.target_opset_onnx < 9:
