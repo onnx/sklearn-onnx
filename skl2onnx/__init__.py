@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
 """
 Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
-__version__ = "1.9.dev"
+__version__ = "1.9"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
