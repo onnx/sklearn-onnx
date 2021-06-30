@@ -386,6 +386,9 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         else:
             if any(d is None for d in shape):
                 raise ValueError('Shape of initializer cannot contain None.')
+            if (hasattr(content, 'dtype') and
+                    content.dtype in (bool, np.bool_)):
+                content = content.astype(np.int32)
             try:
                 tensor = make_tensor(name, onnx_type, shape, content)
             except TypeError as e:

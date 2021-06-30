@@ -25,7 +25,7 @@ Or you can install from the source with the latest changes.
 pip install git+https://github.com/onnx/sklearn-onnx.git
 ```
 
-If you install *sklearn-onnx* from its source code, you must set the environment variable `ONNX_ML=1` before installing the onnx package.
+If you install *onnx* from its source code, you must set the environment variable `ONNX_ML=1` before installing the onnx package.
 
 ## Contribute
 We welcome contributions in the form of feedback, ideas, or code.
