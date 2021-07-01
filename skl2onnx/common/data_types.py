@@ -324,6 +324,10 @@ def guess_numpy_type(data_type):
     if data_type in (np.float64, np.float32, np.int8, np.uint8,
                      np.str_, np.bool_, np.int32, np.int64):
         return data_type
+    if data_type == str:
+        return np.str_
+    if data_type == bool:
+        return np.bool_
     if isinstance(data_type, FloatTensorType):
         return np.float32
     if isinstance(data_type, DoubleTensorType):
