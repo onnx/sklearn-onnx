@@ -32,32 +32,33 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
-import skl2onnx
-import onnx
-import sklearn
-import matplotlib.pyplot as plt
 import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-import numpy
-import onnxruntime as rt
-from skl2onnx import convert_sklearn
 import pprint
-from skl2onnx.common.data_types import FloatTensorType, StringTensorType
-from skl2onnx.common.data_types import Int64TensorType
 import pandas as pd
 import numpy as np
+from numpy.testing import assert_almost_equal
+import onnx
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+import onnxruntime as rt
+import matplotlib.pyplot as plt
+import sklearn
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+import skl2onnx
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
+from skl2onnx.common.data_types import Int64TensorType
 
 titanic_url = ('https://raw.githubusercontent.com/amueller/'
                'scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv')
 data = pd.read_csv(titanic_url)
 X = data.drop('survived', axis=1)
 y = data['survived']
+print(data.dtypes)
 
 # SimpleImputer on string is not available for
 # string in ONNX-ML specifications.
@@ -118,9 +119,9 @@ def convert_dataframe_schema(df, drop=None):
     return inputs
 
 
-inputs = convert_dataframe_schema(X_train)
+initial_inputs = convert_dataframe_schema(X_train)
 
-pprint.pprint(inputs)
+pprint.pprint(initial_inputs)
 
 #############################
 # Merging single column into vectors is not
@@ -132,7 +133,7 @@ pprint.pprint(inputs)
 # ++++++++++++++++++++++++++++++
 
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
                                  target_opset=12)
 except Exception as e:
     print(e)
@@ -144,9 +145,9 @@ except Exception as e:
 
 to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
            'name', 'body', 'home.dest', 'boat'}
-inputs = convert_dataframe_schema(X_train, to_drop)
+initial_inputs = convert_dataframe_schema(X_train, to_drop)
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
                                  target_opset=12)
 except Exception as e:
     print(e)
@@ -156,11 +157,9 @@ except Exception as e:
 # *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 # must be applied on columns of the same type.
 
-X_train['pclass'] = X_train['pclass'].astype(str)
-X_test['pclass'] = X_test['pclass'].astype(str)
-inputs = convert_dataframe_schema(X_train, to_drop)
+initial_inputs = convert_dataframe_schema(X_train, to_drop)
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
+model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
                              target_opset=12)
 
 
@@ -177,7 +176,7 @@ with open("pipeline_titanic.onnx", "wb") as f:
 # Let's start with *scikit-learn*.
 
 print("predict", clf.predict(X_test[:5]))
-print("predict_proba", clf.predict_proba(X_test[:1]))
+print("predict_proba", clf.predict_proba(X_test[:2]))
 
 ##########################
 # Predictions with onnxruntime.
@@ -203,7 +202,27 @@ for k in inputs:
 sess = rt.InferenceSession("pipeline_titanic.onnx")
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
-print("predict_proba", pred_onx[1][:1])
+print("predict_proba", pred_onx[1][:2])
+
+##################################
+# The output of onnxruntime is a list of dictionaries.
+# Let's swith to an array but that requires to convert again with
+# an additional option zipmap.
+
+model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
+                             target_opset=12,
+                             options={id(clf): {'zipmap': False}})
+with open("pipeline_titanic_nozipmap.onnx", "wb") as f:
+    f.write(model_onnx.SerializeToString())
+
+sess = rt.InferenceSession("pipeline_titanic_nozipmap.onnx")
+pred_onx = sess.run(None, inputs)
+print("predict", pred_onx[0][:5])
+print("predict_proba", pred_onx[1][:2])
+
+#############################################
+# Let's check they are the same.
+assert_almost_equal(clf.predict_proba(X_test), pred_onx[1])
 
 ##################################
 # .. _l-plot-complex-pipeline-graph:
@@ -231,7 +250,7 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-print("numpy:", numpy.__version__)
+print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
