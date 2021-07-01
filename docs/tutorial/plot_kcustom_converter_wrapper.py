@@ -148,8 +148,7 @@ def decorrelate_transformer_converter(scope, operator, container):
 
     # We tell in ONNX language how to compute the unique output.
     # op_version=opv tells which opset is requested
-    subop = OnnxSubEstimator(op.pca_, X, op_version=opv)
-    Y = OnnxIdentity(subop, op_version=opv, output_names=out[:1])
+    Y = OnnxSubEstimator(op.pca_, X, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 
 
