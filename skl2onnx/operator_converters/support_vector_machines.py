@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-import six
 from scipy.sparse import isspmatrix
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
 from ..common._apply_operation import (
@@ -209,8 +208,7 @@ def convert_sklearn_svm_classifier(
                 for i in op.classes_):
             labels = [int(i) for i in op.classes_]
             svm_attrs['classlabels_ints'] = labels
-        elif all(isinstance(i, (six.text_type, six.string_types))
-                 for i in op.classes_):
+        elif all(isinstance(i, str) for i in op.classes_):
             labels = [str(i) for i in op.classes_]
             svm_attrs['classlabels_strings'] = labels
         else:

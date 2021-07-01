@@ -300,7 +300,7 @@ class OnnxOperator:
                                       OnnxOperator.ConstantVariable)):
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.int64, np.float32,
-                                      np.float64, np.bool,
+                                      np.float64, np.bool_,
                                       np.int8, np.uint8)):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, (float, )):

@@ -409,7 +409,7 @@ class TestSklearnPipeline(unittest.TestCase):
         run = sess.run(None, inputs)
         got = run[-1]
         assert_almost_equal(pred, got, decimal=5)
-        
+
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19",

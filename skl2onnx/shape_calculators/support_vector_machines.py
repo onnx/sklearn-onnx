@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-import six
 from sklearn.svm import SVC, NuSVC
 from ..common._registration import register_shape_calculator
 from ..common.data_types import Int64TensorType
@@ -41,8 +40,7 @@ def calculate_sklearn_svm_output_shapes(operator):
         check_input_and_output_numbers(operator, input_count_range=[1, None],
                                        output_count_range=[1, 2])
 
-        if all(isinstance(i, (six.string_types, six.text_type))
-               for i in op.classes_):
+        if all(isinstance(i, str) for i in op.classes_):
             operator.outputs[0].type = StringTensorType([N])
             operator.outputs[1].type.shape = [N, number_of_classes]
         elif all(isinstance(i, (numbers.Real, bool, np.bool_))
