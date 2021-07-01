@@ -89,7 +89,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                     raise TypeError(
                         "Input %r is a tuple or class %r, it must have two "
                         "elements (name, type) not %r." % (i, class_name, a))
-                if  (not isinstance(a[0], str) or
+                if (not isinstance(a[0], str) or
                         not isinstance(a[1], DataType)):
                     raise TypeError(
                         "Input %r is a tuple or class %r, it must be a tuple "
