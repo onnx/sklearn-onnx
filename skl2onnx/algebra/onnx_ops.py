@@ -78,6 +78,14 @@ def ClassFactory(class_name, op_name, inputs, outputs,
 
         if op_version is not None:
             kwargs['op_version'] = op_version
+        # This class can only be created by a user. Let's check
+        # types are either a variable, an operator or an array.
+        for i, a in enumerate(args):
+            if not isinstance(a, (Variable, OnnxOperator, np.ndarray)):
+                raise TypeError(
+                    "Unexpected type %r for input %r of operator %r. "
+                    "It must be an instance of Variable, OnnxOperator, "
+                    "numpy.ndarray)." % (type(a), i, class_name))
         OnnxOperator.__init__(self, *args, **kwargs)
 
     newclass = type(class_name, (OnnxOperator,),

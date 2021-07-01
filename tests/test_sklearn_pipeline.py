@@ -305,7 +305,6 @@ class TestSklearnPipeline(unittest.TestCase):
             return
         X = data.drop("survived", axis=1)
         y = data["survived"]
-        print(X.dtypes)
 
         # SimpleImputer on string is not available for string
         # in ONNX-ML specifications.
