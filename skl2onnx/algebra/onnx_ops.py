@@ -15,7 +15,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                  domain, attr_names, doc,
                  deprecated, since_version,
                  past_version):
-    from .onnx_operator import OnnxOperator
+    from .onnx_operator import OnnxOperator, OnnxOperatorItem
 
     def __init__(self, *args, **kwargs):
 
@@ -82,11 +82,12 @@ def ClassFactory(class_name, op_name, inputs, outputs,
         # This class can only be created by a user. Let's check
         # types are either a variable, an operator or an array.
         for i, a in enumerate(args):
-            if not isinstance(a, (Variable, OnnxOperator, np.ndarray, str)):
+            if not isinstance(a, (
+                    Variable, OnnxOperator, np.ndarray, str, OnnxOperatorItem)):
                 raise TypeError(
                     "Unexpected type %r for input %r of operator %r. "
                     "It must be an instance of Variable (or a string), "
-                    "OnnxOperator, numpy.ndarray)." % (
+                    "OnnxOperator, OnnxOperatorItem, numpy.ndarray)." % (
                         type(a), i, class_name))
         OnnxOperator.__init__(self, *args, **kwargs)
 
