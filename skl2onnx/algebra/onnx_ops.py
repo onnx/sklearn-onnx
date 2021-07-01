@@ -6,6 +6,7 @@ Place holder for all ONNX operators.
 import sys
 import numpy as np
 import onnx
+from ..common.data_types import DataType
 from ..common._topology import Variable
 from .automation import get_rst_doc
 
@@ -82,8 +83,20 @@ def ClassFactory(class_name, op_name, inputs, outputs,
         # This class can only be created by a user. Let's check
         # types are either a variable, an operator or an array.
         for i, a in enumerate(args):
+            if isinstance(a, tuple):
+                if len(a) != 2:
+                    raise TypeError(
+                        "Input %r is a tuple or class %r, it must have two "
+                        "elements (name, type) not %r." % (i, class_name, a))
+                if  (not isinstance(a[0], str) or
+                        not isinstance(a[1], DataType)):
+                    raise TypeError(
+                        "Input %r is a tuple or class %r, it must be a tuple "
+                        "(name, type) not %r." % (i, class_name, a))
+                continue
             if not isinstance(a, (
-                    Variable, OnnxOperator, np.ndarray, str, OnnxOperatorItem)):
+                    Variable, OnnxOperator, np.ndarray, str,
+                    OnnxOperatorItem)):
                 raise TypeError(
                     "Unexpected type %r for input %r of operator %r. "
                     "It must be an instance of Variable (or a string), "
