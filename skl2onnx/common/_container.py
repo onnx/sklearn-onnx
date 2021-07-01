@@ -168,7 +168,7 @@ class SklearnModelContainerNode(RawModelContainerNode):
 
     def __init__(self, sklearn_model, white_op=None, black_op=None):
         super(SklearnModelContainerNode, self).__init__(
-              sklearn_model, white_op=white_op, black_op=black_op)
+            sklearn_model, white_op=white_op, black_op=black_op)
         # Scikit-learn models have no input and output specified,
         # so we create them and store them in this container.
         self._inputs = []
@@ -741,10 +741,10 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                     return "%s(%d)" % (name, order[name])
                 return name
             rows = ["%s (%s) -> (%s)" % (
-                        n.name or n.op_type,
-                        ', '.join(map(nstr, n.input)),
-                        ', '.join(n.output))
-                    for n in missing_ops]
+                n.name or n.op_type,
+                ', '.join(map(nstr, n.input)),
+                ', '.join(n.output))
+                for n in missing_ops]
             rows.insert(0, "")
             raise RuntimeError(
                 "After %d iterations for %d nodes, still unable "

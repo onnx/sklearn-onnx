@@ -6,12 +6,15 @@ from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
 from ..algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxCast
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type, guess_proto_type
 from ..proto import onnx_proto
 from .common import concatenate_variables
 
 
-def convert_sklearn_scaler(scope, operator, container):
+def convert_sklearn_scaler(scope: Scope, operator: Operator,
+                           container: ModelComponentContainer):
     # If there are multiple input variables, we need to combine them as a
     # whole tensor. Integer(s) would be converted to float(s).
     # Options div use true division instead of Scaler operator

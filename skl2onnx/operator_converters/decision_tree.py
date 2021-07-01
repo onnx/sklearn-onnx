@@ -238,7 +238,7 @@ def convert_sklearn_decision_tree_classifier(
         dtype = np.float32
     op = operator.raw_operator
     options = scope.get_options(
-            op, dict(decision_path=False, decision_leaf=False))
+        op, dict(decision_path=False, decision_leaf=False))
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)

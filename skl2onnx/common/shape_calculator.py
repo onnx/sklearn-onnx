@@ -57,8 +57,8 @@ def _calculate_linear_classifier_output_shapes(
            for i in class_labels):
         shape = ([N, len(op.classes_)]
                  if (getattr(op, 'multilabel_', False) or (
-                        isinstance(op.classes_, list) and
-                        isinstance(op.classes_[0], np.ndarray))) else [N])
+                     isinstance(op.classes_, list) and
+                     isinstance(op.classes_[0], np.ndarray))) else [N])
         operator.outputs[0].type = StringTensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]
@@ -74,8 +74,8 @@ def _calculate_linear_classifier_output_shapes(
              for i in class_labels):
         shape = ([N, len(op.classes_)]
                  if (getattr(op, 'multilabel_', False) or (
-                        isinstance(op.classes_, list) and
-                        isinstance(op.classes_[0], np.ndarray))) else [N])
+                     isinstance(op.classes_, list) and
+                     isinstance(op.classes_[0], np.ndarray))) else [N])
         operator.outputs[0].type = Int64TensorType(shape=shape)
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]

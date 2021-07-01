@@ -2,7 +2,7 @@
 
 import os
 import numpy
-from pandas import DataFrame, read_csv
+from pandas import read_csv
 import matplotlib.pyplot as plt
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -27,7 +27,7 @@ def linear_models():
     dfr = read_csv(filename1)
     dfr["speedup"] = dfr["time_skl"] / dfr["time_ort"]
     dfc = read_csv(filename2)
-    dfc = dfc[(dfc.method == "predict_proba") & (dfc.fit_intercept == True)]
+    dfc = dfc[(dfc.method == "predict_proba") & dfc.fit_intercept]
     dfc["speedup"] = dfc["time_skl"] / dfc["time_ort"]
 
     nfeats = [10, 50]
@@ -107,7 +107,8 @@ def svm_models():
 
 
 def rf_models():
-    filename = os.path.join(HERE, 'bench_plot_onnxruntime_random_forest_reg.csv')
+    filename = os.path.join(
+        HERE, 'bench_plot_onnxruntime_random_forest_reg.csv')
     if not os.path.exists(filename):
         return
     dfr = read_csv(filename)
@@ -123,8 +124,9 @@ def rf_models():
         for nf in [30, 100]:
             for est in [100, 200]:
                 for n_jobs in [4]:
-                    sub = dfr[(dfr.max_depth == max_depth) & (dfr.nfeat == nf) &
-                              (dfr.n_estimators == est) & (dfr.n_jobs == n_jobs)]
+                    sub = dfr[
+                        (dfr.max_depth == max_depth) & (dfr.nfeat == nf) &
+                        (dfr.n_estimators == est) & (dfr.n_jobs == n_jobs)]
                     ax = axs[pos]
                     labels = sub.n_obs
                     means = sub.speedup
@@ -139,8 +141,9 @@ def rf_models():
 
                     if pos == 0:
                         ax.set_ylabel('Speedup')
-                    ax.set_title('%s\ndepth %d - %d features\n %d estimators %d jobs' % (
-                        name, max_depth, nf, est, n_jobs))
+                    ax.set_title(
+                        '%s\ndepth %d - %d features\n %d estimators %d jobs'
+                        '' % (name, max_depth, nf, est, n_jobs))
                     ax.set_xlabel('batch size')
                     ax.set_xticks(x)
                     ax.set_xticklabels(labels)

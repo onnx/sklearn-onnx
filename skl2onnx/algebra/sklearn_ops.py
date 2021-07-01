@@ -99,6 +99,7 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
     sklearn.pipeline.Pipeline.html>`_ and
     :class:`OnnxSubGraphOperatorMixin`.
     """
+
     def __init__(self, steps, memory=None, verbose=False, op_version=None):
         Pipeline.__init__(self, steps=steps, memory=memory, verbose=verbose)
         OnnxSubGraphOperatorMixin.__init__(self)

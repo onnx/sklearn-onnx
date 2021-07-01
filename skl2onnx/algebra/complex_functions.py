@@ -172,7 +172,7 @@ def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None,
     diff, id_next = _onnx_cdist_begin(op_version)
     diff_pow = OnnxAbs(diff, op_version=op_version)
     norm = OnnxReduceSumApi11(diff_pow, axes=[1], output_names=[
-                         'norm'], keepdims=0, op_version=op_version)
+        'norm'], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)

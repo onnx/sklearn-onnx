@@ -6,6 +6,8 @@ import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_reshape, apply_identity)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_proto_type
 from ..proto import onnx_proto
 
@@ -78,7 +80,8 @@ def _intelligent_split(text, op, tokenizer, existing):
     return spl
 
 
-def convert_sklearn_text_vectorizer(scope, operator, container):
+def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
+                                    container: ModelComponentContainer):
     """
     Converters for class
     `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/
@@ -138,7 +141,7 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
         *regex* into *tokenexp*.
     ````
 
-    """ # noqa
+    """  # noqa
     op = operator.raw_operator
 
     if (container.target_opset is not None and
@@ -168,12 +171,12 @@ def convert_sklearn_text_vectorizer(scope, operator, container):
             "https://github.com/onnx/sklearn-onnx/issues.")
 
     options = container.get_options(
-            op, dict(separators="DEFAULT",
-                     tokenexp=None,
-                     nan=False))
+        op, dict(separators="DEFAULT",
+                 tokenexp=None,
+                 nan=False))
     if set(options) != {'separators', 'tokenexp', 'nan'}:
         raise RuntimeError("Unknown option {} for {}".format(
-                                set(options) - {'separators'}, type(op)))
+            set(options) - {'separators'}, type(op)))
 
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'

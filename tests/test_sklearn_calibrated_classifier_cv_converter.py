@@ -227,8 +227,8 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             base_estimator=SVC(),
             method='sigmoid').fit(X, y)
         model_onnx = convert_sklearn(
-                model, "unused",
-                [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused",
+            [("input", FloatTensorType([None, X.shape[1]]))])
         assert model_onnx is not None
 
 

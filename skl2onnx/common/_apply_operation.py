@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from onnxconverter_common.onnx_ops import * # noqa
+from onnxconverter_common.onnx_ops import *  # noqa
 from ..proto import onnx_proto
 
 

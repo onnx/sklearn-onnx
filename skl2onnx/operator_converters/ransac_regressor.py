@@ -4,9 +4,12 @@
 from .._supported_operators import sklearn_operator_name_map
 from ..common._apply_operation import apply_identity
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_ransac_regressor(scope, operator, container):
+def convert_sklearn_ransac_regressor(scope: Scope, operator: Operator,
+                                     container: ModelComponentContainer):
     """
     Converter for RANSACRegressor.
     """

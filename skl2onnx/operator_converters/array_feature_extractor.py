@@ -3,9 +3,12 @@
 
 from ..proto import onnx_proto
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_array_feature_extractor(scope, operator, container):
+def convert_sklearn_array_feature_extractor(
+        scope: Scope, operator: Operator, container: ModelComponentContainer):
     """
     Extracts a subset of columns. This is used by *ColumnTransformer*.
     """
@@ -25,11 +28,11 @@ def convert_sklearn_array_feature_extractor(scope, operator, container):
                               operator.column_indices)
 
     container.add_node(
-                'ArrayFeatureExtractor',
-                [operator.inputs[0].full_name, column_indices_name],
-                operator.outputs[0].full_name,
-                name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
-                op_domain='ai.onnx.ml')
+        'ArrayFeatureExtractor',
+        [operator.inputs[0].full_name, column_indices_name],
+        operator.outputs[0].full_name,
+        name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
+        op_domain='ai.onnx.ml')
 
 
 register_converter('SklearnArrayFeatureExtractor',

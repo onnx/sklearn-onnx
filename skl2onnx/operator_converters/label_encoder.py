@@ -3,9 +3,12 @@
 
 import numpy as np
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_label_encoder(scope, operator, container):
+def convert_sklearn_label_encoder(scope: Scope, operator: Operator,
+                                  container: ModelComponentContainer):
     op = operator.raw_operator
     op_type = 'LabelEncoder'
     attrs = {'name': scope.get_unique_operator_name(op_type)}

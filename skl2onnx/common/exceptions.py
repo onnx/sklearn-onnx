@@ -25,6 +25,7 @@ class MissingShapeCalculator(RuntimeError):
     Raised when there is no registered shape calculator
     for a machine learning operator.
     """
+
     def __init__(self, msg):
         super().__init__(msg + _missing_converter)
 
@@ -36,5 +37,6 @@ class MissingConverter(RuntimeError):
     part of scikit-learn, you may raise an issue at
     https://github.com/onnx/sklearn-onnx/issues.
     """
+
     def __init__(self, msg):
         super().__init__(msg + _missing_converter)

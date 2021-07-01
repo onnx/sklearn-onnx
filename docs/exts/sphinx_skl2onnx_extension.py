@@ -17,7 +17,8 @@ from skl2onnx.algebra.sklearn_ops import dynamic_class_creation_sklearn
 import onnxruntime
 
 
-def skl2onnx_version_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+def skl2onnx_version_role(role, rawtext, text, lineno, inliner,
+                          options=None, content=None):
     """
     Defines custom role *skl2onnx-version* which returns
     *skl2onnx* version.
@@ -31,7 +32,9 @@ def skl2onnx_version_role(role, rawtext, text, lineno, inliner, options=None, co
     elif text == 'rt':
         version = 'v' + onnxruntime.__version__
     else:
-        raise RuntimeError("skl2onnx_version_role cannot interpret content '{0}'.".format(text))
+        raise RuntimeError(
+            "skl2onnx_version_role cannot interpret content '{0}'."
+            "".format(text))
     node = nodes.literal(version)
     return [node], []
 
@@ -112,7 +115,8 @@ class SupportedOnnxOpsDirective(Directive):
             rows.append(cl.__name__)
             rows.append('=' * len(cl.__name__))
             rows.append('')
-            rows.append(".. autoclass:: skl2onnx.algebra.onnx_ops.{}".format(name))
+            rows.append(
+                ".. autoclass:: skl2onnx.algebra.onnx_ops.{}".format(name))
             st = StringList(rows)
             node = nodes.container()
             nested_parse_with_titles(self.state, st, node)
@@ -174,7 +178,8 @@ class SupportedSklearnOpsDirective(Directive):
             rows.append(cl.__name__)
             rows.append('=' * len(cl.__name__))
             rows.append('')
-            rows.append(".. autoclass:: skl2onnx.algebra.sklearn_ops.{}".format(name))
+            rows.append(
+                ".. autoclass:: skl2onnx.algebra.sklearn_ops.{}".format(name))
             st = StringList(rows)
             node = nodes.container()
             nested_parse_with_titles(self.state, st, node)
@@ -208,7 +213,7 @@ def missing_ops():
                                'FeatureUnion', 'BaseEstimator'}:
                 continue
             if (sub in {'calibration', 'dummy', 'manifold'} and
-                'Calibrated' not in cl.__name__):
+                    'Calibrated' not in cl.__name__):
                 continue
             if issub:
                 found.append((cl.__name__, sub, cl))
@@ -232,7 +237,8 @@ class AllSklearnOpsDirective(Directive):
         found = missing_ops()
         nbconverters = 0
         supported = set(build_sklearn_operator_name_map())
-        rows = [".. list-table::", "    :header-rows: 1", "    :widths: 10 7 4",
+        rows = [".. list-table::", "    :header-rows: 1",
+                "    :widths: 10 7 4",
                 "", "    * - Name", "      - Package", "      - Supported"]
         for name, sub, cl in found:
             rows.append("    * - " + name)
@@ -245,7 +251,8 @@ class AllSklearnOpsDirective(Directive):
 
         rows.append("")
         rows.append("scikit-learn's version is **{0}**.".format(skver))
-        rows.append("{0}/{1} models are covered.".format(nbconverters, len(found)))
+        rows.append(
+            "{0}/{1} models are covered.".format(nbconverters, len(found)))
 
         node = nodes.container()
         st = StringList(rows)
@@ -264,4 +271,3 @@ def setup(app):
     app.add_directive('supported-sklearn-ops', SupportedSklearnOpsDirective)
     app.add_directive('covered-sklearn-ops', AllSklearnOpsDirective)
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
-

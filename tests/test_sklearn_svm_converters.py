@@ -188,8 +188,8 @@ class TestSklearnSVM(unittest.TestCase):
             SVC(kernel="linear", probability=False,
                 decision_function_shape='ovr'))
         model_onnx = convert_sklearn(
-                model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))],
-                target_opset=TARGET_OPSET)
+            model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnMclSVCOVR-Dec4",

@@ -296,10 +296,10 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         extra = {TfidfVectorizer: {'separators': [
-                                        ' ', '[.]', '\\?', ',', ';',
-                                        ':', '\\!', '\\(', '\\)'
-                                    ],
-                                   'tokenexp': None}}
+            ' ', '[.]', '\\?', ',', ';',
+            ':', '\\!', '\\(', '\\)'
+        ],
+            'tokenexp': None}}
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1]))],
                                      options=extra,
@@ -339,10 +339,10 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             pass
 
         extra = {id(vect): {"separators": [
-                                ' ', '[.]', '\\?', ',', ';', ':',
-                                '\\!', '\\(', '\\)'
-                            ],
-                            "tokenexp": None}}
+            ' ', '[.]', '\\?', ',', ';', ':',
+            '\\!', '\\(', '\\)'
+        ],
+            "tokenexp": None}}
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
                                      [('input', StringTensorType([1]))],
                                      options=extra,

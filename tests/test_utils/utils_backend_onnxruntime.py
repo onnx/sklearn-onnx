@@ -259,7 +259,7 @@ def compare_runtime(test,
                 try:
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
-                        lambda_onnx = lambda: sess.run(None, {name: input})  # noqa
+                        def lambda_onnx(): return sess.run(None, {name: input})  # noqa
                     if verbose:
                         import pprint
                         pprint.pprint(one)
@@ -291,7 +291,7 @@ def compare_runtime(test,
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
-                        lambda_onnx = lambda: sess.run(None, iii)  # noqa
+                        def lambda_onnx(): return sess.run(None, iii)  # noqa
                     if verbose:
                         import pprint
                         pprint.pprint(one)
@@ -337,7 +337,7 @@ def compare_runtime(test,
             run_options = None
         try:
             output = sess.run(None, inputs, run_options)
-            lambda_onnx = lambda: sess.run(None, inputs)  # noqa
+            def lambda_onnx(): return sess.run(None, inputs)  # noqa
             if verbose:
                 import pprint
                 pprint.pprint(output)

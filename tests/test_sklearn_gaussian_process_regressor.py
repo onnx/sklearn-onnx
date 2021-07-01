@@ -534,7 +534,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
-                            GaussianProcessRegressor])
+            GaussianProcessRegressor])
 
         # return_cov=True
         options = {GaussianProcessRegressor: {"return_cov": True}}
@@ -546,7 +546,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
-                             GaussianProcessRegressor])
+            GaussianProcessRegressor])
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.6.0"),
@@ -659,8 +659,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float32),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           decimal=4, disable_optimisation=True)
+            GaussianProcessRegressor],
+            decimal=4, disable_optimisation=True)
         dump_data_and_model(Xtest_.astype(np.float32), gp, model_onnx,
                             verbose=False,
                             basename="SklearnGaussianProcessRBFStd-Out0",
@@ -702,8 +702,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             disable_optimisation=True)
         self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           decimal=4, disable_optimisation=True)
+            GaussianProcessRegressor],
+            decimal=4, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -736,8 +736,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             basename="SklearnGaussianProcessExpSineSquaredStdF-Out0-Dec3")
         self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           decimal=3)
+            GaussianProcessRegressor],
+            decimal=3)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -771,8 +771,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             disable_optimisation=True)
         self.check_outputs(gp, model_onnx, Xtest_.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           decimal=3, disable_optimisation=True)
+            GaussianProcessRegressor],
+            decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -809,8 +809,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             disable_optimisation=True)
         self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           decimal=3, disable_optimisation=True)
+            GaussianProcessRegressor],
+            decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
@@ -844,8 +844,8 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             disable_optimisation=True)
         self.check_outputs(gp, model_onnx, X_test.astype(np.float64),
                            predict_attributes=options[
-                             GaussianProcessRegressor],
-                           disable_optimisation=True)
+            GaussianProcessRegressor],
+            disable_optimisation=True)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion(THRESHOLD),

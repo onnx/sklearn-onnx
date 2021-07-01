@@ -12,10 +12,13 @@ from ..common.data_types import (
     BooleanTensorType, Int64TensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
-def convert_sklearn_linear_regressor(scope, operator, container):
+def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
+                                     container: ModelComponentContainer):
     op = operator.raw_operator
 
     if type(operator.inputs[0].type) in (DoubleTensorType, ):
@@ -67,7 +70,8 @@ def convert_sklearn_linear_regressor(scope, operator, container):
                        **attrs)
 
 
-def convert_sklearn_bayesian_ridge(scope, operator, container):
+def convert_sklearn_bayesian_ridge(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     convert_sklearn_linear_regressor(scope, operator, container)
 
     op = operator.raw_operator

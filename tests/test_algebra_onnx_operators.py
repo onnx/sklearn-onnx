@@ -274,10 +274,10 @@ class TestOnnxOperators(unittest.TestCase):
                      reason="only available for opset >= 10")
     def test_container_init(self):
         onx = OnnxReshapeApi13(
-                OnnxReshapeApi13('X', np.array([1, -1], dtype=np.int64),
-                                 op_version=TARGET_OPSET),
-                np.array([1, -1], dtype=np.int64),
-                output_names=['Y'], op_version=TARGET_OPSET)
+            OnnxReshapeApi13('X', np.array([1, -1], dtype=np.int64),
+                             op_version=TARGET_OPSET),
+            np.array([1, -1], dtype=np.int64),
+            output_names=['Y'], op_version=TARGET_OPSET)
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([None, 2]))],

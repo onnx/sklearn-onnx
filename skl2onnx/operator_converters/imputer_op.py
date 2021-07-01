@@ -4,10 +4,13 @@
 import numpy as np
 from ..common._registration import register_converter
 from ..common.data_types import Int64TensorType
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from .common import concatenate_variables
 
 
-def convert_sklearn_imputer(scope, operator, container):
+def convert_sklearn_imputer(scope: Scope, operator: Operator,
+                            container: ModelComponentContainer):
     op_type = 'Imputer'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     op = operator.raw_operator

@@ -6,9 +6,12 @@ from onnx import TensorProto
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_concat, apply_cast
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_polynomial_features(scope, operator, container):
+def convert_sklearn_polynomial_features(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     op = operator.raw_operator
     transformed_columns = [None] * (op.n_output_features_)
 
@@ -55,7 +58,7 @@ def convert_sklearn_polynomial_features(scope, operator, container):
         container.add_node('Shape', last_feat, shape_name)
         container.add_node('ConstantOfShape', shape_name, unit_name,
                            value=make_tensor(
-                                'ONE', TensorProto.FLOAT, [1], [1.]),
+                               'ONE', TensorProto.FLOAT, [1], [1.]),
                            op_version=9)
 
     if (operator.inputs[0].type._get_element_onnx_type()

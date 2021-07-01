@@ -5,11 +5,14 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_cast, apply_div, apply_sqrt, apply_sub)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import (
     Int64TensorType, DoubleTensorType, FloatTensorType, guess_proto_type)
 
 
-def convert_truncated_svd(scope, operator, container):
+def convert_truncated_svd(scope: Scope, operator: Operator,
+                          container: ModelComponentContainer):
     # Create alias for the scikit-learn truncated SVD model we
     # are going to convert
     svd = operator.raw_operator

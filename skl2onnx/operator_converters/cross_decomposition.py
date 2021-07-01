@@ -3,13 +3,16 @@
 import numpy as np
 from ..proto import onnx_proto
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import (
     Int64TensorType, guess_numpy_type, guess_proto_type)
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxCast, OnnxDiv, OnnxMatMul, OnnxSub)
 
 
-def convert_pls_regression(scope, operator, container):
+def convert_pls_regression(scope: Scope, operator: Operator,
+                           container: ModelComponentContainer):
     X = operator.inputs[0]
     op = operator.raw_operator
     opv = container.target_opset
@@ -24,10 +27,10 @@ def convert_pls_regression(scope, operator, container):
         X = OnnxCast(X, to=proto_dtype, op_version=opv)
 
     norm_x = OnnxDiv(
-                OnnxSub(X, op.x_mean_.astype(dtype),
-                        op_version=opv),
-                op.x_std_.astype(dtype),
-                op_version=opv)
+        OnnxSub(X, op.x_mean_.astype(dtype),
+                op_version=opv),
+        op.x_std_.astype(dtype),
+        op_version=opv)
     dot = OnnxMatMul(norm_x, op.coef_.astype(dtype),
                      op_version=opv)
     pred = OnnxAdd(dot, op.y_mean_.astype(dtype),

@@ -9,6 +9,8 @@ from ..common.data_types import (
     BooleanTensorType, Int64TensorType, guess_numpy_type,
     guess_proto_type)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 
@@ -179,7 +181,8 @@ def _predict_proba_modified_huber(scope, operator, container,
                             num_classes, unity_name, proto_type)
 
 
-def convert_sklearn_sgd_classifier(scope, operator, container):
+def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     """Converter for SGDClassifier."""
     sgd_op = operator.raw_operator
     classes = get_label_classes(scope, sgd_op)

@@ -3,10 +3,13 @@
 
 from ..common._apply_operation import apply_cast
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from .._supported_operators import sklearn_operator_name_map
 
 
-def convert_sklearn_cast(scope, operator, container):
+def convert_sklearn_cast(scope: Scope, operator: Operator,
+                         container: ModelComponentContainer):
     inp = operator.inputs[0]
     exptype = operator.outputs[0]
     res = exptype.type.to_onnx_type()
@@ -15,7 +18,8 @@ def convert_sklearn_cast(scope, operator, container):
                container, to=et)
 
 
-def convert_sklearn_cast_regressor(scope, operator, container):
+def convert_sklearn_cast_regressor(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
 
     op = operator.raw_operator
     estimator = op.estimator

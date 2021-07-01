@@ -5,6 +5,8 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_concat, apply_identity, apply_mul, apply_reshape)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import (
     apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
@@ -13,7 +15,8 @@ from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
 
 
-def convert_one_vs_rest_classifier(scope, operator, container):
+def convert_one_vs_rest_classifier(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     """
     Converts a *OneVsRestClassifier* into *ONNX* format.
     """

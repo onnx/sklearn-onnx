@@ -8,10 +8,13 @@ from ..common.data_types import (
     FloatTensorType, DoubleTensorType
 )
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
-def convert_sklearn_one_hot_encoder(scope, operator, container):
+def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
+                                    container: ModelComponentContainer):
     """
     Converts *OneHotEncoder* into ONNX.
     It supports multiple inputs of types

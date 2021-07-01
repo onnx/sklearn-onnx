@@ -14,6 +14,8 @@ from ..common._apply_operation import (
     apply_cast, apply_add, apply_sigmoid, apply_softmax,
     apply_normalizer)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import (
     BooleanTensorType, DoubleTensorType, guess_proto_type)
 from ..common.utils_classifier import (
@@ -30,7 +32,8 @@ def apply_logistic(scope, input_name, output_name, container,
         use_float=proto_dtype == onnx_proto.TensorProto.FLOAT)
 
 
-def convert_sklearn_linear_classifier(scope, operator, container):
+def convert_sklearn_linear_classifier(scope: Scope, operator: Operator,
+                                      container: ModelComponentContainer):
     op = operator.raw_operator
     coefficients = op.coef_.flatten().astype(float).tolist()
     classes = get_label_classes(scope, op)

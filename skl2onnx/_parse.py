@@ -72,11 +72,11 @@ def _fetch_input_slice(scope, inputs, column_indices):
         # No need to extract.
         return inputs
     array_feature_extractor_operator = scope.declare_local_operator(
-                                            'SklearnArrayFeatureExtractor')
+        'SklearnArrayFeatureExtractor')
     array_feature_extractor_operator.inputs = inputs
     array_feature_extractor_operator.column_indices = column_indices
     output_variable_name = scope.declare_local_variable(
-                            'extracted_feature_columns', inputs[0].type)
+        'extracted_feature_columns', inputs[0].type)
     array_feature_extractor_operator.outputs.append(output_variable_name)
     return array_feature_extractor_operator.outputs
 
@@ -346,15 +346,15 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 
 def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     return (_parse_sklearn_classifier(
-                scope, model, inputs, custom_parsers=None)
-            if is_classifier(model) else
-            _parse_sklearn_simple_model(scope, model, inputs,
-                                        custom_parsers=custom_parsers))
+        scope, model, inputs, custom_parsers=None)
+        if is_classifier(model) else
+        _parse_sklearn_simple_model(scope, model, inputs,
+                                    custom_parsers=custom_parsers))
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     probability_tensor = _parse_sklearn_simple_model(
-            scope, model, inputs, custom_parsers=custom_parsers)
+        scope, model, inputs, custom_parsers=custom_parsers)
     if model.__class__ in [NuSVC, SVC] and not model.probability:
         return probability_tensor
     options = scope.get_options(model, dict(zipmap=True))
@@ -413,7 +413,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(
-            model, dict(return_cov=False, return_std=False))
+        model, dict(return_cov=False, return_std=False))
     if options['return_std'] and options['return_cov']:
         raise RuntimeError(
             "Not returning standard deviation of predictions when "
@@ -618,13 +618,13 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # Declare a computational graph. It will become a representation of
     # the input scikit-learn model after parsing.
     topology = Topology(
-            raw_model_container, initial_types=initial_types,
-            target_opset=target_opset,
-            custom_conversion_functions=custom_conversion_functions,
-            custom_shape_calculators=custom_shape_calculators,
-            registered_models=dict(
-                conv=_converter_pool, shape=_shape_calculator_pool,
-                aliases=sklearn_operator_name_map))
+        raw_model_container, initial_types=initial_types,
+        target_opset=target_opset,
+        custom_conversion_functions=custom_conversion_functions,
+        custom_shape_calculators=custom_shape_calculators,
+        registered_models=dict(
+            conv=_converter_pool, shape=_shape_calculator_pool,
+            aliases=sklearn_operator_name_map))
 
     # Declare an object to provide variables' and operators' naming mechanism.
     # In contrast to CoreML, one global scope

@@ -4,9 +4,12 @@
 import numbers
 import six
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_dict_vectorizer(scope, operator, container):
+def convert_sklearn_dict_vectorizer(scope: Scope, operator: Operator,
+                                    container: ModelComponentContainer):
     """
     When a *DictVectorizer* converts numbers into strings,
     scikit-learn adds a separator to disambiguate strings

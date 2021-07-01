@@ -3,10 +3,13 @@
 import numpy as np
 from ..common._registration import register_converter
 from ..common.data_types import guess_numpy_type
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import OnnxMatMul
 
 
-def convert_random_projection(scope, operator, container):
+def convert_random_projection(scope: Scope, operator: Operator,
+                              container: ModelComponentContainer):
     """Converter for PowerTransformer"""
     op_in = operator.inputs[0]
     op_out = operator.outputs[0].full_name

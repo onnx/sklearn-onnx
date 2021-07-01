@@ -9,9 +9,12 @@ from ..common._apply_operation import (
     apply_mul, apply_add
 )
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_k_bins_discretiser(scope, operator, container):
+def convert_sklearn_k_bins_discretiser(scope: Scope, operator: Operator,
+                                       container: ModelComponentContainer):
     op = operator.raw_operator
 
     if op.encode == 'onehot':

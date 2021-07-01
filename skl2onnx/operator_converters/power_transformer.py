@@ -6,6 +6,8 @@ from onnxconverter_common import apply_identity
 from onnx import TensorProto
 
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxPow, OnnxDiv, OnnxMul,
@@ -13,7 +15,8 @@ from ..algebra.onnx_ops import (
     OnnxImputer)
 
 
-def convert_powertransformer(scope, operator, container):
+def convert_powertransformer(scope: Scope, operator: Operator,
+                             container: ModelComponentContainer):
     """Converter for PowerTransformer"""
     op_in = operator.inputs[0]
     op_out = operator.outputs[0].full_name

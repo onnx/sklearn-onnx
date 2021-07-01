@@ -4,10 +4,13 @@
 from sklearn.base import is_classifier
 from ..common._apply_operation import apply_identity
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from .._supported_operators import sklearn_operator_name_map
 
 
-def convert_sklearn_grid_search_cv(scope, operator, container):
+def convert_sklearn_grid_search_cv(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     """
     Converter for scikit-learn's GridSearchCV.
     """

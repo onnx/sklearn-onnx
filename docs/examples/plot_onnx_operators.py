@@ -39,6 +39,8 @@ It relies on *protobuf* whose definition can be found
 on github `onnx.proto
 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`_.
 """
+import onnxruntime
+import numpy
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -180,10 +182,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

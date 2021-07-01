@@ -7,6 +7,8 @@ from ..common._apply_operation import (
     apply_cast, apply_concat,
     apply_div, apply_reshape)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
@@ -107,7 +109,8 @@ def _calculate_proba(scope, operator, container, model):
     return final_proba_name
 
 
-def convert_sklearn_bagging_classifier(scope, operator, container):
+def convert_sklearn_bagging_classifier(scope: Scope, operator: Operator,
+                                       container: ModelComponentContainer):
     """
     Converter for BaggingClassifier.
     """
@@ -161,7 +164,8 @@ def convert_sklearn_bagging_classifier(scope, operator, container):
                       desired_shape=output_shape)
 
 
-def convert_sklearn_bagging_regressor(scope, operator, container):
+def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
+                                      container: ModelComponentContainer):
     """
     Converter for BaggingRegressor.
     """

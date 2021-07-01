@@ -3,6 +3,8 @@
 
 from onnx.helper import make_tensor
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common._apply_operation import apply_mul
 from ..common.utils_classifier import _finalize_converter_classes
 from ..common.data_types import guess_proto_type
@@ -10,7 +12,8 @@ from .._supported_operators import sklearn_operator_name_map
 from ..proto import onnx_proto
 
 
-def convert_voting_classifier(scope, operator, container):
+def convert_voting_classifier(scope: Scope, operator: Operator,
+                              container: ModelComponentContainer):
     """
     Converts a *VotingClassifier* into *ONNX* format.
 

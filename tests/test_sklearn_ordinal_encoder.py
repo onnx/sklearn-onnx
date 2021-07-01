@@ -60,8 +60,8 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         reason="OrdinalEncoder was not available before 0.20",
     )
     @unittest.skipIf(
-         StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-         reason="Requires opset 9.")
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
     def test_ordinal_encoder_mixed_string_int_drop(self):
         data = [
             ["c0.4", "c0.2", 3],
