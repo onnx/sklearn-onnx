@@ -5,6 +5,7 @@ Place holder for all ONNX operators.
 """
 import sys
 import numpy as np
+from scipy.sparse.coo import coo_matrix
 import onnx
 from ..common.data_types import DataType
 from ..common._topology import Variable
@@ -96,11 +97,12 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                 continue
             if not isinstance(a, (
                     Variable, OnnxOperator, np.ndarray, str,
-                    OnnxOperatorItem)):
+                    OnnxOperatorItem, coo_matrix)):
                 raise TypeError(
                     "Unexpected type %r for input %r of operator %r. "
                     "It must be an instance of Variable (or a string), "
-                    "OnnxOperator, OnnxOperatorItem, numpy.ndarray)." % (
+                    "OnnxOperator, OnnxOperatorItem, numpy.ndarray, "
+                    "coo_matrix)." % (
                         type(a), i, class_name))
         OnnxOperator.__init__(self, *args, **kwargs)
 
