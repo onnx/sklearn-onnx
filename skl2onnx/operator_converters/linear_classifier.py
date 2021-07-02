@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-import six
 from sklearn.linear_model import (
     LogisticRegression,
     RidgeClassifier,
@@ -78,7 +77,7 @@ def convert_sklearn_linear_classifier(scope, operator, container):
         classifier_attrs['post_transform'] = (
             'LOGISTIC' if multi_class > 2 else 'SOFTMAX')
 
-    if all(isinstance(i, (six.string_types, six.text_type)) for i in classes):
+    if all(isinstance(i, str) for i in classes):
         class_labels = [str(i) for i in classes]
         classifier_attrs['classlabels_strings'] = class_labels
     elif all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):

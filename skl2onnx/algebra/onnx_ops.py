@@ -5,7 +5,10 @@ Place holder for all ONNX operators.
 """
 import sys
 import numpy as np
+from scipy.sparse.coo import coo_matrix
 import onnx
+from ..common.data_types import DataType
+from ..common._topology import Variable
 from .automation import get_rst_doc
 
 
@@ -14,7 +17,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                  domain, attr_names, doc,
                  deprecated, since_version,
                  past_version):
-    from .onnx_operator import OnnxOperator
+    from .onnx_operator import OnnxOperator, OnnxOperatorItem
 
     def __init__(self, *args, **kwargs):
 
@@ -78,6 +81,29 @@ def ClassFactory(class_name, op_name, inputs, outputs,
 
         if op_version is not None:
             kwargs['op_version'] = op_version
+        # This class can only be created by a user. Let's check
+        # types are either a variable, an operator or an array.
+        for i, a in enumerate(args):
+            if isinstance(a, tuple):
+                if len(a) != 2:
+                    raise TypeError(
+                        "Input %r is a tuple or class %r, it must have two "
+                        "elements (name, type) not %r." % (i, class_name, a))
+                if (not isinstance(a[0], str) or
+                        not isinstance(a[1], DataType)):
+                    raise TypeError(
+                        "Input %r is a tuple or class %r, it must be a tuple "
+                        "(name, type) not %r." % (i, class_name, a))
+                continue
+            if not isinstance(a, (
+                    Variable, OnnxOperator, np.ndarray, str,
+                    OnnxOperatorItem, coo_matrix)):
+                raise TypeError(
+                    "Unexpected type %r for input %r of operator %r. "
+                    "It must be an instance of Variable (or a string), "
+                    "OnnxOperator, OnnxOperatorItem, numpy.ndarray, "
+                    "coo_matrix)." % (
+                        type(a), i, class_name))
         OnnxOperator.__init__(self, *args, **kwargs)
 
     newclass = type(class_name, (OnnxOperator,),
