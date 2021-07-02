@@ -19,6 +19,9 @@ Predict with onnxruntime
 Simple function to check the converted model
 works fine.
 """
+import onnxruntime
+import onnx
+import numpy
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
@@ -201,10 +204,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

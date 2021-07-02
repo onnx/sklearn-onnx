@@ -5,9 +5,12 @@ import numpy as np
 from ..proto import onnx_proto
 from ..common._apply_operation import apply_cast, apply_reshape
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_label_binariser(scope, operator, container):
+def convert_sklearn_label_binariser(scope: Scope, operator: Operator,
+                                    container: ModelComponentContainer):
     """Converts Scikit Label Binariser model to onnx format."""
     binariser_op = operator.raw_operator
     classes = binariser_op.classes_

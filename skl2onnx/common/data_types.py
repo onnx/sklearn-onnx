@@ -262,7 +262,7 @@ def _guess_numpy_type(data_type, dims):
     if data_type in (np.int64, ) or str(data_type) == '<U6':
         return Int64TensorType(dims)
     if data_type in (np.int32, ) or str(
-        data_type) in ('<U4', ): # noqa
+        data_type) in ('<U4', ):  # noqa
         return Int32TensorType(dims)
     if data_type == np.uint8:
         return UInt8TensorType(dims)

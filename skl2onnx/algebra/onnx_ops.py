@@ -253,9 +253,9 @@ def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
             *x, split=split, axis=axis, op_version=op_version,
             output_names=output_names)
     if split is None:
-        return OnnxSplit_2( # noqa
+        return OnnxSplit_2(  # noqa
             *x, axis=axis, op_version=op_version, output_names=output_names)
-    return OnnxSplit_2(*x, split=split, axis=axis, # noqa
+    return OnnxSplit_2(*x, split=split, axis=axis,  # noqa
                        op_version=op_version, output_names=output_names)
 
 
@@ -274,7 +274,7 @@ def OnnxSqueezeApi11(*x, axes=None, op_version=None,
         return OnnxSqueeze_11(  # noqa
             *x, axes=axes, op_version=op_version,
             output_names=output_names)
-    return OnnxSqueeze_1(*x, axes=axes, # noqa
+    return OnnxSqueeze_1(*x, axes=axes,  # noqa
                          op_version=op_version, output_names=output_names)
 
 
@@ -293,7 +293,7 @@ def OnnxUnsqueezeApi11(*x, axes=None, op_version=None,
         return OnnxUnsqueeze_11(  # noqa
             *x, axes=axes, op_version=op_version,
             output_names=output_names)
-    return OnnxUnsqueeze_1(*x, axes=axes, # noqa
+    return OnnxUnsqueeze_1(*x, axes=axes,  # noqa
                            op_version=op_version, output_names=output_names)
 
 

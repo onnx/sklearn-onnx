@@ -5,10 +5,13 @@ import numpy as np
 from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
 from ..common.data_types import Int64TensorType, StringTensorType
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
-def convert_sklearn_ordinal_encoder(scope, operator, container):
+def convert_sklearn_ordinal_encoder(scope: Scope, operator: Operator,
+                                    container: ModelComponentContainer):
     ordinal_op = operator.raw_operator
     result = []
     concatenated_input_name = operator.inputs[0].full_name
@@ -77,7 +80,7 @@ def convert_sklearn_ordinal_encoder(scope, operator, container):
                  container, axis=1)
     cast_type = (onnx_proto.TensorProto.FLOAT if np.issubdtype(
         ordinal_op.dtype, np.floating)
-                 else onnx_proto.TensorProto.INT64)
+        else onnx_proto.TensorProto.INT64)
     apply_cast(scope, concat_result_name, operator.output_full_names,
                container, to=cast_type)
 

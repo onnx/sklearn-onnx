@@ -5,13 +5,8 @@
 Benchmark of onnxruntime on DecisionTree.
 """
 # Authors: Xavier Dupré (benchmark)
-import matplotlib
-
 from io import BytesIO
 from time import perf_counter as time
-from itertools import combinations, chain
-from itertools import combinations_with_replacement as combinations_w_r
-
 import numpy as np
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
@@ -96,7 +91,8 @@ def bench(n_obs, n_features, max_depths, methods,
 
                     fct1, fct2 = fcts[method]
 
-                    if not allow_configuration(n=n, nfeat=nfeat, max_depth=max_depth):
+                    if not allow_configuration(
+                            n=n, nfeat=nfeat, max_depth=max_depth):
                         continue
 
                     obs = dict(n_obs=n, nfeat=nfeat,
@@ -162,8 +158,10 @@ def plot_results(df, verbose=False):
                 if row == ax.shape[0] - 1:
                     a.set_xlabel("N features", fontsize='x-small')
                 if pos == 0:
-                    a.set_ylabel("Time (s) n_obs={}\nmax_depth={}".format(n_obs, max_depth),
-                                 fontsize='x-small')
+                    a.set_ylabel(
+                        "Time (s) n_obs={}\nmax_depth={}".format(
+                            n_obs, max_depth),
+                        fontsize='x-small')
 
                 color = 'b'
                 subset = df[(df.method == method) & (df.n_obs == n_obs) &

@@ -7,6 +7,8 @@ from ..common._apply_operation import (
     apply_add, apply_cast, apply_concat, apply_identity,
     apply_reshape, apply_sub)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
@@ -81,7 +83,8 @@ def _predict(scope, input_name, container, model, proto_dtype):
     return activations[-1]
 
 
-def convert_sklearn_mlp_classifier(scope, operator, container):
+def convert_sklearn_mlp_classifier(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     """
     Converter for MLPClassifier.
     This function calls _predict() which returns the probability scores
@@ -164,7 +167,8 @@ def convert_sklearn_mlp_classifier(scope, operator, container):
                           desired_shape=(-1,))
 
 
-def convert_sklearn_mlp_regressor(scope, operator, container):
+def convert_sklearn_mlp_regressor(scope: Scope, operator: Operator,
+                                  container: ModelComponentContainer):
     """
     Converter for MLPRegressor.
     This function calls _predict() which returns the scores.

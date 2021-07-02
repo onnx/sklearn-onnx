@@ -8,8 +8,8 @@ from .common.utils_sklearn import _process_options
 from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
-from . import shape_calculators # noqa
-from . import operator_converters # noqa
+from . import shape_calculators  # noqa
+from . import operator_converters  # noqa
 
 
 def convert_sklearn(model, name=None, initial_types=None, doc_string='',
@@ -123,7 +123,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         the latest tested opset returned by
         :py:func:`skl2onnx.get_latest_tested_opset_version` and
         not the version of the *onnx* package.
-    """ # noqa
+    """  # noqa
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
             initial_types = model.infer_initial_types()

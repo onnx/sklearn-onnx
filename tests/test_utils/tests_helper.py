@@ -242,7 +242,7 @@ def dump_data_and_model(
         prediction = []
         for method in methods:
             if callable(method):
-                call = lambda X, model=model: method(model, X)  # noqa
+                def call(X, model=model): return method(model, X)  # noqa
             else:
                 try:
                     call = getattr(model, method)
@@ -256,7 +256,7 @@ def dump_data_and_model(
             if callable(call):
                 prediction.append(call(data))
                 # we only take the last one for benchmark
-                lambda_original = lambda: call(dataone)  # noqa
+                def lambda_original(): return call(dataone)  # noqa
             else:
                 raise RuntimeError(
                     "Method '{0}' is not callable.".format(method))
@@ -265,7 +265,7 @@ def dump_data_and_model(
             if _has_predict_proba(model):
                 # Classifier
                 prediction = [model.predict(data), model.predict_proba(data)]
-                lambda_original = lambda: model.predict_proba(dataone)  # noqa
+                def lambda_original(): return model.predict_proba(dataone)  # noqa
             elif _has_decision_function(model):
                 # Classifier without probabilities
                 prediction = [
@@ -278,7 +278,7 @@ def dump_data_and_model(
                 # clustering
                 try:
                     prediction = [model.predict(data), model.transform(data)]
-                    lambda_original = lambda: model.transform(dataone)  # noqa
+                    def lambda_original(): return model.transform(dataone)  # noqa
                 except ValueError as e:
                     if "Buffer dtype mismatch" in str(e):
                         # scikit-learn does not cast anymore
@@ -286,23 +286,23 @@ def dump_data_and_model(
                         prediction = [model.predict(data64),
                                       model.transform(data64)]
                         dataone64 = dataone.astype(numpy.float64)
-                        lambda_original = lambda: model.transform(dataone64)  # noqa
+                        def lambda_original(): return model.transform(dataone64)  # noqa
                     else:
                         raise e
             else:
                 # Regressor or VotingClassifier
                 prediction = [model.predict(data)]
-                lambda_original = lambda: model.predict(dataone)  # noqa
+                def lambda_original(): return model.predict(dataone)  # noqa
 
         elif hasattr(model, "transform"):
             options = extract_options(basename)
             SklCol = options.get("SklCol", False)
             if SklCol:
                 prediction = model.transform(data.ravel())
-                lambda_original = lambda: model.transform(dataone.ravel())  # noqa
+                def lambda_original(): return model.transform(dataone.ravel())  # noqa
             else:
                 prediction = model.transform(data)
-                lambda_original = lambda: model.transform(dataone)  # noqa
+                def lambda_original(): return model.transform(dataone)  # noqa
         else:
             raise TypeError(
                 "Model has no predict or transform method: {0}".format(

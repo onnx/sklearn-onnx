@@ -2,10 +2,13 @@
 
 
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_proto_type
 
 
-def convert_sklearn_replace_transformer(scope, operator, container):
+def convert_sklearn_replace_transformer(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     op = operator.raw_operator
     input_name = operator.inputs[0].full_name
     output_name = operator.outputs[0].full_name

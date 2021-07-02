@@ -10,6 +10,8 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.mixture.gaussian_mixture import _compute_log_det_cholesky
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
@@ -147,7 +149,8 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
     return OnnxAdd(mul, log_det.astype(dtype), op_version=opv)
 
 
-def convert_sklearn_gaussian_mixture(scope, operator, container):
+def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
+                                     container: ModelComponentContainer):
     """
     Converter for *GaussianMixture*,
     *BayesianGaussianMixture*.

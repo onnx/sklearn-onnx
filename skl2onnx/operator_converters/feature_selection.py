@@ -3,9 +3,12 @@
 
 from ..proto import onnx_proto
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_feature_selection(scope, operator, container):
+def convert_sklearn_feature_selection(scope: Scope, operator: Operator,
+                                      container: ModelComponentContainer):
     op = operator.raw_operator
     # Get indices of the features selected
     index = op.get_support(indices=True)

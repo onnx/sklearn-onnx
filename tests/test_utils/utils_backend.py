@@ -25,6 +25,7 @@ class OnnxRuntimeAssertionError(AssertionError):
     """
     Expected failure.
     """
+
     def __init__(self, msg):
         new_msg = "{}\nonnx=={} onnxruntime=={}".format(
             msg, onnx.__version__, onnxruntime.__version__)

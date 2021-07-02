@@ -22,6 +22,9 @@ GaussianMixture
 The first converter to change its behaviour depending on a black list
 of operators is for model *GaussianMixture*.
 """
+import onnxruntime
+import onnx
+import numpy
 import os
 from timeit import timeit
 import numpy as np
@@ -141,10 +144,10 @@ except RuntimeError as e:
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

@@ -6,6 +6,8 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
@@ -299,7 +301,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         T = (_transform_sigmoid(scope, container, model, df_col_name, k)
              if model.method == 'sigmoid' else
              _transform_isotonic(
-                scope, container, model, df_col_name, k, dtype))
+            scope, container, model, df_col_name, k, dtype))
 
         prob_name[k] = T
         if n_classes == 2:
@@ -348,7 +350,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     return class_prob_tensor_name
 
 
-def convert_sklearn_calibrated_classifier_cv(scope, operator, container):
+def convert_sklearn_calibrated_classifier_cv(
+        scope: Scope, operator: Operator, container: ModelComponentContainer):
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only

@@ -3,9 +3,12 @@
 
 from ..common._apply_operation import apply_concat, apply_cast
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_concat(scope, operator, container):
+def convert_sklearn_concat(scope: Scope, operator: Operator,
+                           container: ModelComponentContainer):
     exptype = operator.outputs[0]
     new_inputs = []
     for inp in operator.inputs:

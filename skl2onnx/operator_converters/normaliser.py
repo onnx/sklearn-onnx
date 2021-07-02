@@ -2,12 +2,15 @@
 
 
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common._apply_operation import apply_normalizer
 from ..common.data_types import DoubleTensorType
 from .common import concatenate_variables
 
 
-def convert_sklearn_normalizer(scope, operator, container):
+def convert_sklearn_normalizer(scope: Scope, operator: Operator,
+                               container: ModelComponentContainer):
     if len(operator.inputs) > 1:
         # If there are multiple input tensors,
         # we combine them using a FeatureVectorizer

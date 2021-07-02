@@ -6,10 +6,13 @@ from ..common._apply_operation import apply_identity
 from ..common.data_types import (
     FloatTensorType, DoubleTensorType, guess_proto_type)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from .._supported_operators import sklearn_operator_name_map
 
 
-def convert_sklearn_tfidf_vectoriser(scope, operator, container):
+def convert_sklearn_tfidf_vectoriser(scope: Scope, operator: Operator,
+                                     container: ModelComponentContainer):
     """
     Converter for scikit-learn's TfidfVectoriser.
     """

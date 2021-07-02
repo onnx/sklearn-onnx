@@ -184,7 +184,7 @@ class Variable:
         else:
             raise NotImplementedError("Unsupported type '{}' as "
                                       "a string ({}).".format(
-                                        type(obj), obj))
+                                          type(obj), obj))
 
         return Variable(name, name, None, ty)
 
@@ -535,7 +535,7 @@ class Topology:
     When all converters were called, method
     :meth:`Topology.compile <skl2onnx.common._topology.Topology.compile>`
     must be called to convert the topological graph into *ONNX* graph.
-    """ # noqa
+    """  # noqa
 
     def __init__(self, model, default_batch_size=1, initial_types=None,
                  reserved_variable_names=None, reserved_operator_names=None,
@@ -570,11 +570,11 @@ class Topology:
         self.raw_model = model
         self.scope_names = set()
         self.variable_name_set = (
-                    reserved_variable_names
-                    if reserved_variable_names is not None else set())
+            reserved_variable_names
+            if reserved_variable_names is not None else set())
         self.operator_name_set = (
-                    reserved_operator_names
-                    if reserved_operator_names is not None else set())
+            reserved_operator_names
+            if reserved_operator_names is not None else set())
         self.initial_types = initial_types if initial_types else list()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
@@ -1259,7 +1259,7 @@ def _update_domain_version(container, onnx_model):
             purified_operator_set[op_domain] = op_version
         else:
             purified_operator_set[op_domain] = max(
-                            purified_operator_set[op_domain], op_version)
+                purified_operator_set[op_domain], op_version)
 
     # Fill operator sets
     i = 0

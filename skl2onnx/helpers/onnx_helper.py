@@ -2,7 +2,7 @@
 
 
 from io import BytesIO
-import onnx # noqa
+import onnx  # noqa
 from onnx import shape_inference
 from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,
@@ -159,7 +159,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
 
     if len(onnx_model.graph.input) != len(model.graph.input):
         raise RuntimeError("Input mismatch {} != {}".format(
-                        len(onnx_model.input), len(model.input)))
+            len(onnx_model.input), len(model.input)))
 
     # fix opset import
     del onnx_model.opset_import[:]
@@ -255,7 +255,7 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
     if len(shapes) == 0:
         raise RuntimeError("Shape inference fails.\n"
                            "*Inputs*\n{}\n*Model*\n{}'".format(
-                            onnx_inputs, original_model))
+                               onnx_inputs, original_model))
     return shapes
 
 
@@ -292,7 +292,7 @@ def change_onnx_domain(model, ops):
 
     if len(onnx_model.graph.input) != len(model.graph.input):
         raise RuntimeError("Input mismatch {} != {}".format(
-                        len(onnx_model.input), len(model.input)))
+            len(onnx_model.input), len(model.input)))
 
     # fix opset import
     domain_set = set()

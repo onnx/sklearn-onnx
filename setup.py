@@ -18,7 +18,7 @@ assert packages
 version_str = '1.0.0'
 with (open(os.path.join(this, 'skl2onnx/__init__.py'), "r")) as f:
     line = [_ for _ in [_.strip("\r\n ")
-                                for _ in f.readlines()] if _.startswith("__version__")]
+                        for _ in f.readlines()] if _.startswith("__version__")]
     if len(line) > 0:
         version_str = line[0].split('=')[1].strip('" ')
 

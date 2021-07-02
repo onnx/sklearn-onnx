@@ -7,12 +7,9 @@ Benchmark of onnxruntime on RandomForest.
 # Authors: Xavier Dupré (benchmark)
 from io import BytesIO
 from time import perf_counter as time
-from itertools import combinations, chain
-from itertools import combinations_with_replacement as combinations_w_r
 import numpy as np
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas
 from sklearn import config_context
@@ -101,8 +98,9 @@ def bench(n_obs, n_features, max_depths, n_estimatorss, methods,
 
                         fct1, fct2 = fcts[method]
 
-                        if not allow_configuration(n=n, nfeat=nfeat,
-                                                   max_depth=max_depth, n_estimator=n_estimators):
+                        if not allow_configuration(
+                                n=n, nfeat=nfeat,
+                                max_depth=max_depth, n_estimator=n_estimators):
                             continue
 
                         obs = dict(n_obs=n, nfeat=nfeat, max_depth=max_depth,
@@ -168,10 +166,13 @@ def plot_results(df, verbose=False):
                 if row == ax.shape[0] - 1:
                     a.set_xlabel("N features", fontsize='x-small')
                 if pos == 0:
-                    a.set_ylabel("Time (s) n_obs={}\nmax_depth={}".format(n_obs, max_depth),
-                                 fontsize='x-small')
+                    a.set_ylabel(
+                        "Time (s) n_obs={}\nmax_depth={}".format(
+                            n_obs, max_depth),
+                        fontsize='x-small')
 
-                for color, n_estimators in zip('brgyc', sorted(set(df.n_estimators))):
+                for color, n_estimators in zip(
+                        'brgyc', sorted(set(df.n_estimators))):
                     subset = df[(df.method == method) & (df.n_obs == n_obs)
                                 & (df.max_depth == max_depth)
                                 & (df.n_estimators == n_estimators)]

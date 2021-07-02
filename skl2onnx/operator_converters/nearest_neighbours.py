@@ -51,6 +51,8 @@ except ImportError:
     OnnxTopK_11 = None
 from ..algebra.complex_functions import onnx_cdist, _onnx_cdist_sqeuclidean
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import (
     Int64TensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
@@ -325,7 +327,8 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
     return top_indices, top_distances, reshaped, wei, norm, axis
 
 
-def convert_nearest_neighbors_regressor(scope, operator, container):
+def convert_nearest_neighbors_regressor(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     """
     Converts *KNeighborsRegressor* into *ONNX*.
     The converted model may return different predictions depending
@@ -426,7 +429,8 @@ def get_proba_and_label(container, nb_classes, reshaped,
     return all_together, sum_prob, res
 
 
-def convert_nearest_neighbors_classifier(scope, operator, container):
+def convert_nearest_neighbors_classifier(scope: Scope, operator: Operator,
+                                         container: ModelComponentContainer):
     """
     Converts *KNeighborsClassifier* into *ONNX*.
     The converted model may return different predictions depending
@@ -510,7 +514,8 @@ def convert_nearest_neighbors_classifier(scope, operator, container):
         probas.add_to(scope, container)
 
 
-def convert_nearest_neighbors_transform(scope, operator, container):
+def convert_nearest_neighbors_transform(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     """
     Converts *NearestNeighbors* into *ONNX*.
     """
@@ -532,7 +537,8 @@ def convert_nearest_neighbors_transform(scope, operator, container):
     ind.add_to(scope, container)
 
 
-def convert_k_neighbours_transformer(scope, operator, container):
+def convert_k_neighbours_transformer(scope: Scope, operator: Operator,
+                                     container: ModelComponentContainer):
     """
     Converts *KNeighborsTransformer* into *ONNX*.
     """
@@ -651,7 +657,8 @@ def _nearest_neighbours(container, model, input_name,
     return node[1], missing_input_name
 
 
-def convert_knn_imputer(scope, operator, container):
+def convert_knn_imputer(scope: Scope, operator: Operator,
+                        container: ModelComponentContainer):
     """
     Converts *KNNImputer* into *ONNX*.
     """
@@ -712,7 +719,8 @@ def convert_knn_imputer(scope, operator, container):
     imputed_out.add_to(scope, container)
 
 
-def convert_nca(scope, operator, container):
+def convert_nca(scope: Scope, operator: Operator,
+                container: ModelComponentContainer):
     """
     Converts *NeighborhoodComponentsAnalysis* into *ONNX*.
     """

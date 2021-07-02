@@ -27,6 +27,7 @@ class OnnxOperatorItem:
     :param onx_op: OnnxOperator
     :param index: integer
     """
+
     def __init__(self, onx_op, index, op_version=None):
         if not isinstance(index, int):
             raise TypeError("index must be an integer.")

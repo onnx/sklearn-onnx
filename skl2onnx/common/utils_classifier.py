@@ -61,7 +61,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     array_feature_extractor_result_name = scope.get_unique_variable_name(
-                                            'array_feature_extractor_result')
+        'array_feature_extractor_result')
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, argmax_output_name],
         array_feature_extractor_result_name, op_domain='ai.onnx.ml',
@@ -71,7 +71,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
     if class_type == onnx_proto.TensorProto.INT32:
         cast2_result_name = scope.get_unique_variable_name('cast2_result')
         reshaped_result_name = scope.get_unique_variable_name(
-                                                'reshaped_result')
+            'reshaped_result')
         apply_cast(scope, array_feature_extractor_result_name,
                    cast2_result_name, container,
                    to=proto_dtype)

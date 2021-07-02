@@ -118,18 +118,18 @@ def convert_sklearn_isolation_forest(
 
         # score
         eq2 = OnnxCast(
-                OnnxEqual(node_sample, np.array([2], dtype=np.float32),
-                          op_version=opv),
-                to=proto_dtype, op_version=opv)
+            OnnxEqual(node_sample, np.array([2], dtype=np.float32),
+                      op_version=opv),
+            to=proto_dtype, op_version=opv)
         eq2.set_onnx_name_prefix('eq2_%d' % i)
 
         # 2.0 * (np.log(n_samples_leaf[not_mask] - 1.0) + np.euler_gamma)
 
         eqp2p = OnnxCast(
-                    OnnxGreater(
-                        node_sample, np.array([2], dtype=np.float32),
-                        op_version=opv),
-                    to=proto_dtype, op_version=opv)
+            OnnxGreater(
+                node_sample, np.array([2], dtype=np.float32),
+                op_version=opv),
+            to=proto_dtype, op_version=opv)
         eqp2p.set_onnx_name_prefix('plus2_%d' % i)
 
         eqp2ps = OnnxMul(eqp2p, node_sample, op_version=opv)
@@ -143,10 +143,10 @@ def convert_sklearn_isolation_forest(
         eqp2p_m1.set_onnx_name_prefix('eqp2p_m1_%d' % i)
 
         eqp_log = OnnxMul(
-                    OnnxAdd(OnnxLog(eqp2p_m1, op_version=opv),
-                            np.array([np.euler_gamma], dtype=dtype),
-                            op_version=opv),
-                    np.array([2], dtype=dtype), op_version=opv)
+            OnnxAdd(OnnxLog(eqp2p_m1, op_version=opv),
+                    np.array([np.euler_gamma], dtype=dtype),
+                    op_version=opv),
+            np.array([2], dtype=dtype), op_version=opv)
         eqp_log.set_onnx_name_prefix('eqp_log%d' % i)
 
         # - 2.0 * (n_samples_leaf[not_mask] - 1.0) / n_samples_leaf[not_mask]
@@ -156,28 +156,28 @@ def convert_sklearn_isolation_forest(
         eqp2p_m0.set_onnx_name_prefix('eqp2p_m1_%d' % i)
 
         eqp_ns = OnnxMul(
-                    OnnxDiv(
-                        eqp2p_m0,
-                        OnnxMax(eqp2ps, np.array([1], dtype=dtype),
-                                op_version=opv),
+            OnnxDiv(
+                eqp2p_m0,
+                OnnxMax(eqp2ps, np.array([1], dtype=dtype),
                         op_version=opv),
-                    np.array([-2], dtype=dtype), op_version=opv)
+                op_version=opv),
+            np.array([-2], dtype=dtype), op_version=opv)
         eqp_ns.set_onnx_name_prefix('eqp_ns%d' % i)
 
         # np.ravel(node_indicator.sum(axis=1))
         # + _average_path_length(n_samples_leaf)
         # - 1.0
         av_path_length_log = OnnxMul(
-                OnnxAdd(eqp_log, eqp_ns, op_version=opv),
-                eqp2p, op_version=opv)
+            OnnxAdd(eqp_log, eqp_ns, op_version=opv),
+            eqp2p, op_version=opv)
         av_path_length_log.set_onnx_name_prefix('avlog%d' % i)
         av_path_length = OnnxAdd(eq2, av_path_length_log, op_version=opv)
         av_path_length.set_onnx_name_prefix('avpl%d' % i)
 
         depth = OnnxAdd(
-                    OnnxAdd(path_length, av_path_length, op_version=opv),
-                    np.array([-1], dtype=dtype),
-                    op_version=opv)
+            OnnxAdd(path_length, av_path_length, op_version=opv),
+            np.array([-1], dtype=dtype),
+            op_version=opv)
         depth.set_onnx_name_prefix('depth%d' % i)
         scores.append(depth)
 
@@ -188,26 +188,26 @@ def convert_sklearn_isolation_forest(
 
     # decision_function
     decision = OnnxAdd(
-                OnnxNeg(
-                    OnnxPow(np.array([2], dtype=dtype),
-                            OnnxNeg(depths, op_version=opv),
-                            op_version=opv),
+        OnnxNeg(
+            OnnxPow(np.array([2], dtype=dtype),
+                    OnnxNeg(depths, op_version=opv),
                     op_version=opv),
-                np.array([-op.offset_], dtype=dtype),
-                op_version=opv, output_names=outputs[1].full_name)
+            op_version=opv),
+        np.array([-op.offset_], dtype=dtype),
+        op_version=opv, output_names=outputs[1].full_name)
     decision.set_onnx_name_prefix('dec')
 
     less = OnnxLess(decision, np.array([0], dtype=dtype),
                     op_version=opv)
     predict = OnnxAdd(
-                    OnnxMul(
-                        OnnxCast(less, op_version=opv,
-                                 to=onnx_proto.TensorProto.INT64),
-                        np.array([-2], dtype=np.int64),
-                        op_version=opv),
-                    np.array([1], dtype=np.int64),
-                    op_version=opv,
-                    output_names=outputs[0].full_name)
+        OnnxMul(
+            OnnxCast(less, op_version=opv,
+                     to=onnx_proto.TensorProto.INT64),
+            np.array([-2], dtype=np.int64),
+            op_version=opv),
+        np.array([1], dtype=np.int64),
+        op_version=opv,
+        output_names=outputs[0].full_name)
     predict.set_onnx_name_prefix('predict')
 
     predict.add_to(scope, container)

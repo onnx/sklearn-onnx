@@ -59,7 +59,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         pipe = Pipeline(steps=[
             ("select",
              ColumnTransformer(
-                [("id", FunctionTransformer(validate=True),
+                 [("id", FunctionTransformer(validate=True),
                   ["X1", "X2", "X3"])])),
             ("logreg", LogisticRegression(max_iter=1400)),
         ])

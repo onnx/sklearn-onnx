@@ -4,10 +4,13 @@
 from ..proto import onnx_proto
 from ..common.data_types import DoubleTensorType
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from .common import concatenate_variables
 
 
-def convert_sklearn_binarizer(scope, operator, container):
+def convert_sklearn_binarizer(scope: Scope, operator: Operator,
+                              container: ModelComponentContainer):
     feature_name = concatenate_variables(scope, operator.inputs, container)
 
     if isinstance(operator.inputs[0].type, DoubleTensorType):

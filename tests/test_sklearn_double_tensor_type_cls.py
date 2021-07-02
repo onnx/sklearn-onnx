@@ -94,9 +94,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 comparable_outputs=comparable_outputs,
                                 basename="Sklearn{}Double2RAW{}"
                                          "ZIP{}CL{}".format(
-                                            name,
-                                            1 if b else 0,
-                                            1 if z else 0, n_cl))
+                                    name,
+                                    1 if b else 0,
+                                    1 if z else 0, n_cl))
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),

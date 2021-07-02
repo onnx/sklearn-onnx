@@ -16,7 +16,7 @@ from onnx.helper import (  # noqa
 
 try:
     from onnx import SparseTensorProto
-    from onnx.helper import make_sparse_tensor # noqa
+    from onnx.helper import make_sparse_tensor  # noqa
 except ImportError:
     # onnx is too old.
     SparseTensorProto = None
@@ -38,7 +38,7 @@ def make_node(
         domain=None,  # type: Optional[Text]
         _dtype=None,  # type: [np.float32, np.float64]
         **kwargs  # type: Any
-        ):  # type: (...) -> NodeProto
+):  # type: (...) -> NodeProto
     """Construct a NodeProto.
 
     Arguments:
@@ -77,7 +77,7 @@ def make_attribute(
         dtype=None,  # type: [np.float32, np.float64]
         domain='',  # type: Text
         doc_string=None  # type: Optional[Text]
-        ):  # type: (...) -> AttributeProto
+):  # type: (...) -> AttributeProto
     """Makes an AttributeProto based on the value type."""
     attr = AttributeProto()
     attr.name = key

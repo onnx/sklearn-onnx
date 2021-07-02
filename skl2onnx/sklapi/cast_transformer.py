@@ -5,7 +5,7 @@ from sklearn.base import TransformerMixin, BaseEstimator
 try:
     from sklearn.utils.validation import _deprecate_positional_args
 except ImportError:
-    _deprecate_positional_args = lambda x: x  # noqa
+    def _deprecate_positional_args(x): return x  # noqa
 
 
 class CastTransformer(TransformerMixin, BaseEstimator):

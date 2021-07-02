@@ -4,21 +4,15 @@
 """
 Benchmark of onnxruntime on RandomForestRegressor.
 """
-import sys
 import warnings
 from io import BytesIO
 from time import perf_counter as time
-from itertools import (
-    combinations, chain,
-    combinations_with_replacement as combinations_w_r)
-import matplotlib
 import numpy as np
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
 import matplotlib.pyplot as plt
 import pandas
 from sklearn import config_context
-from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.utils._testing import ignore_warnings
 from skl2onnx import convert_sklearn
@@ -134,7 +128,8 @@ def bench(n_obs, n_features, max_depths, n_estimatorss,
                             if len(p1.shape) == 1 and len(p2.shape) == 2:
                                 p2 = p2.ravel()
                             try:
-                                assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
+                                assert_almost_equal(
+                                    p1.ravel(), p2.ravel(), decimal=5)
                             except AssertionError as e:
                                 warnings.warn(str(e))
     return res
@@ -163,7 +158,8 @@ def plot_results(df, verbose=False):
                         "Time (s) n_obs={}\nmax_depth={}".format(
                             n_obs, max_depth), fontsize='x-small')
 
-                for color, n_estimators in zip('brgyc', sorted(set(df.n_estimators))):
+                for color, n_estimators in zip(
+                        'brgyc', sorted(set(df.n_estimators))):
                     subset = df[(df.n_obs == n_obs)
                                 & (df.max_depth == max_depth)
                                 & (df.n_estimators == n_estimators)]
@@ -174,14 +170,16 @@ def plot_results(df, verbose=False):
                         print(subset)
 
                     label = "skl ne={}".format(n_estimators)
-                    subset.plot(x="nfeat", y="time_skl", label=label, ax=a,
-                                logx=True, logy=True, c=color, style='--', lw=5)
+                    subset.plot(
+                        x="nfeat", y="time_skl", label=label, ax=a,
+                        logx=True, logy=True, c=color, style='--', lw=5)
                     label = "ort ne={}".format(n_estimators)
                     subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
                                 logx=True, logy=True, c=color, lw=3)
                     label = "lite ne={}".format(n_estimators)
-                    subset.plot(x="nfeat", y="time_lite", label=label, ax=a,
-                                logx=True, logy=True, c=color, style='-.', lw=3)
+                    subset.plot(
+                        x="nfeat", y="time_lite", label=label, ax=a,
+                        logx=True, logy=True, c=color, style='-.', lw=3)
 
                 a.legend(loc=0, fontsize='x-small')
                 if row == 0:
@@ -209,7 +207,7 @@ def run_bench(repeat=100, verbose=False):
     print("Total time = %0.3f sec\n" % (end - start))
 
     # plot the results
-    #plot_results(results_df, verbose=verbose)
+    # plot_results(results_df, verbose=verbose)
     return results_df
 
 

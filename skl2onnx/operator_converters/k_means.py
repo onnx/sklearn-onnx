@@ -4,13 +4,16 @@ import numpy as np
 from sklearn.utils.extmath import row_norms
 from ..common.data_types import Int64TensorType, guess_numpy_type
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
     OnnxReduceSumSquare, OnnxGemm, OnnxMatMul,
     OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul)
 from ..proto import onnx_proto
 
 
-def convert_sklearn_kmeans(scope, operator, container):
+def convert_sklearn_kmeans(scope: Scope, operator: Operator,
+                           container: ModelComponentContainer):
     """
     Computation graph of distances to all centroids for a batch of examples.
     Note that a centriod is just the center of a cluster. We use ``[]`` to

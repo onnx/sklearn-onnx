@@ -70,13 +70,13 @@ class TestOp10(unittest.TestCase):
     @unittest.skipIf(onnx_opset_version() < 10, reason="out of scope")
     def test_voting_classifier(self):
         model = VotingClassifier(
-                    voting="hard",
-                    flatten_transform=False,
-                    estimators=[
-                        ("lr", LogisticRegression()),
-                        ("lr2", LogisticRegression(fit_intercept=False)),
-                    ],
-                )
+            voting="hard",
+            flatten_transform=False,
+            estimators=[
+                ("lr", LogisticRegression()),
+                ("lr2", LogisticRegression(fit_intercept=False)),
+            ],
+        )
         model, X = fit_classification_model(model, 3)
         target_opset = 10
         model_onnx = convert_sklearn(model, "op10",

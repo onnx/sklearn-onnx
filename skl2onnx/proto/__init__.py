@@ -5,15 +5,15 @@
 # we import ONNX protobuf definition here so that we can conduct quick
 # fixes by overwriting ONNX functions without changing any lines
 # elsewhere.
-from onnx import onnx_pb as onnx_proto # noqa
-from onnx import defs # noqa
+from onnx import onnx_pb as onnx_proto  # noqa
+from onnx import defs  # noqa
 
 # Overwrite the make_tensor defined in onnx.helper because of a bug
 # (string tensor get assigned twice)
 from onnx import mapping
-from onnx.onnx_pb import TensorProto, ValueInfoProto # noqa
+from onnx.onnx_pb import TensorProto, ValueInfoProto  # noqa
 try:
-    from onnx.onnx_pb import SparseTensorProto # noqa
+    from onnx.onnx_pb import SparseTensorProto  # noqa
 except ImportError:
     # onnx is too old.
     pass

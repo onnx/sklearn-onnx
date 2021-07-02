@@ -10,6 +10,8 @@ except ImportError:
 from ..proto import onnx_proto
 from ..common.data_types import guess_numpy_type
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSqrt, OnnxMatMul, OnnxSub, OnnxReduceSumApi11,
     OnnxMul, OnnxMax, OnnxReshapeApi13, OnnxDiv, OnnxNot,
@@ -37,7 +39,8 @@ from ._gp_kernels import (
 )
 
 
-def convert_gaussian_process_regressor(scope, operator, container):
+def convert_gaussian_process_regressor(scope: Scope, operator: Operator,
+                                       container: ModelComponentContainer):
     """
     The method *predict* from class *GaussianProcessRegressor*
     may cache some results if it is called with parameter
@@ -172,7 +175,8 @@ def convert_gaussian_process_regressor(scope, operator, container):
         o.add_to(scope, container)
 
 
-def convert_gaussian_process_classifier(scope, operator, container):
+def convert_gaussian_process_classifier(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     """
     The method *predict* from class *GaussianProcessClassifier*
     may cache some results if it is called with parameter
@@ -310,10 +314,10 @@ def convert_gaussian_process_classifier(scope, operator, container):
     if not isinstance(coef_sum, np.ndarray):
         coef_sum = np.array([coef_sum])
     pi_star = OnnxAdd(
-                OnnxReduceSumApi11(
-                    OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
-                    op_version=opv, axes=[0]),
-                coef_sum, op_version=opv)
+        OnnxReduceSumApi11(
+            OnnxMul(COEFS.astype(dtype), integrals, op_version=opv),
+            op_version=opv, axes=[0]),
+        coef_sum, op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star')
 
     pi_star = OnnxReshapeApi13(
@@ -321,11 +325,11 @@ def convert_gaussian_process_classifier(scope, operator, container):
         op_version=opv)
     pi_star.set_onnx_name_prefix('pi_star2')
     final = OnnxConcat(
-                OnnxAdd(OnnxNeg(pi_star, op_version=opv),
-                        np.array([1], dtype=dtype),
-                        op_version=opv),
-                pi_star, op_version=opv, axis=1,
-                output_names=out[1:2])
+        OnnxAdd(OnnxNeg(pi_star, op_version=opv),
+                np.array([1], dtype=dtype),
+                op_version=opv),
+        pi_star, op_version=opv, axis=1,
+        output_names=out[1:2])
     outputs.append(final)
 
     for o in outputs:

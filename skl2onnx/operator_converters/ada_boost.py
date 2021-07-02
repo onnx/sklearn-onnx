@@ -5,6 +5,8 @@ import numpy as np
 from onnx.helper import make_tensor
 from sklearn import __version__
 from ..proto import onnx_proto
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common._apply_operation import (
     apply_add, apply_cast, apply_clip, apply_concat, apply_div, apply_exp,
     apply_mul, apply_reshape, apply_sub, apply_topk, apply_transpose
@@ -233,7 +235,8 @@ def _generate_raw_scores(scope, container, operator, proba_names_list, model):
     return operator.outputs[1].full_name
 
 
-def convert_sklearn_ada_boost_classifier(scope, operator, container):
+def convert_sklearn_ada_boost_classifier(scope: Scope, operator: Operator,
+                                         container: ModelComponentContainer):
     """
     Converter for AdaBoost classifier.
     This function goes through the list of estimators and uses
@@ -494,7 +497,8 @@ def _apply_gather_elements(scope, container, inputs, output, axis,
                 name=scope.get_unique_operator_name('ReduceSum'))
 
 
-def convert_sklearn_ada_boost_regressor(scope, operator, container):
+def convert_sklearn_ada_boost_regressor(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     """
     Converter for AdaBoost regressor.
     This function first calls _get_estimators_label() which returns a

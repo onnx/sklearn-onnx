@@ -3,9 +3,12 @@
 
 from ..common._registration import register_converter
 from ..common._apply_operation import apply_concat, apply_identity
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_function_transformer(scope, operator, container):
+def convert_sklearn_function_transformer(scope: Scope, operator: Operator,
+                                         container: ModelComponentContainer):
     op = operator.raw_operator
     if op.func is not None:
         raise RuntimeError("FunctionTransformer is not supported unless the "

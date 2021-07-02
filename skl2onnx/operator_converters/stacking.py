@@ -7,6 +7,8 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_cast, apply_concat, apply_reshape)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_proto_type
 from .._supported_operators import sklearn_operator_name_map
 
@@ -86,7 +88,8 @@ def _transform(scope, operator, container, model):
     return merged_prob_tensor
 
 
-def convert_sklearn_stacking_classifier(scope, operator, container):
+def convert_sklearn_stacking_classifier(scope: Scope, operator: Operator,
+                                        container: ModelComponentContainer):
     """
     Converter for StackingClassifier. It invokes converters for each
     estimator, concatenating their results before calling converter
@@ -140,7 +143,8 @@ def convert_sklearn_stacking_classifier(scope, operator, container):
                       desired_shape=(-1,))
 
 
-def convert_sklearn_stacking_regressor(scope, operator, container):
+def convert_sklearn_stacking_regressor(scope: Scope, operator: Operator,
+                                       container: ModelComponentContainer):
     """
     Converter for StackingRegressor. It invokes converters for each
     estimator, concatenating their results before calling converter

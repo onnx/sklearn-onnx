@@ -5,15 +5,14 @@
 #
 # Configuration file for the Sphinx documentation builder.
 
+from github_link import make_linkcode_resolve
 import os
 import sys
 import warnings
 import skl2onnx
 import sphinx_readable_theme
-import tabulate
 
 sys.path.append(os.path.abspath('exts'))
-from github_link import make_linkcode_resolve
 
 
 # -- Project information -----------------------------------------------------
@@ -173,8 +172,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 # -- Setup actions -----------------------------------------------------------
 
+
 def setup(app):
     # Placeholder to initialize the folder before
     # generating the documentation.
     return app
-

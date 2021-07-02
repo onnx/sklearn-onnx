@@ -12,6 +12,8 @@ from ..common.data_types import (
     BooleanTensorType, Int64TensorType, guess_numpy_type,
     guess_proto_type)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common.utils_classifier import get_label_classes
 
 
@@ -208,7 +210,8 @@ def _joint_log_likelihood_categorical(
     return sum_result_name
 
 
-def convert_sklearn_naive_bayes(scope, operator, container):
+def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
+                                container: ModelComponentContainer):
     # Computational graph:
     #
     # Note: In the following graph, variable names are in lower case

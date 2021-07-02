@@ -2,6 +2,8 @@
 
 from sklearn.base import BaseEstimator
 from onnx import shape_inference
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 from ..common._registration import get_converter, get_shape_calculator
 from ..common._topology import Variable
 from .._supported_operators import sklearn_operator_name_map
@@ -185,7 +187,8 @@ class OnnxOperatorMixin:
             name = sklearn_operator_name_map[parent]
             return get_converter(name)
 
-        def converter(scope, operator, container):
+        def converter(scope: Scope, operator: Operator,
+                      container: ModelComponentContainer):
             op.add_to(scope, container, operator=operator)
 
         return converter

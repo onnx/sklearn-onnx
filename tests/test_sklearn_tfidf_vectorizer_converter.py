@@ -133,11 +133,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
         corpus = numpy.array([
-                'This is the first document.',
-                'This document is the second document.',
-                'And this is the third one.',
-                ' ',
-                ]).reshape((4, 1))
+            'This is the first document.',
+            'This document is the second document.',
+            'And this is the third one.',
+            ' ',
+        ]).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus[:3].ravel())
         model_onnx = convert_sklearn(vect, 'TfidfVectorizer',

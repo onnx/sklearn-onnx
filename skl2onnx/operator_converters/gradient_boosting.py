@@ -95,9 +95,9 @@ def convert_sklearn_gradient_boosting_classifier(
                    container, to=onnx_proto.TensorProto.FLOAT)
         input_name = cast_input_name
     container.add_node(
-            op_type, input_name,
-            [operator.outputs[0].full_name, operator.outputs[1].full_name],
-            op_domain=op_domain, op_version=op_version, **attrs)
+        op_type, input_name,
+        [operator.outputs[0].full_name, operator.outputs[1].full_name],
+        op_domain=op_domain, op_version=op_version, **attrs)
 
 
 def convert_sklearn_gradient_boosting_regressor(

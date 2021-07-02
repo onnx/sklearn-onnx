@@ -4,9 +4,12 @@ from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_slice, apply_cast, apply_identity, apply_reshape)
 from ..common._registration import register_converter
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
-def _common_convert_sklearn_zipmap(scope, operator, container):
+def _common_convert_sklearn_zipmap(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     zipmap_attrs = {'name': scope.get_unique_operator_name('ZipMap')}
     to_type = onnx_proto.TensorProto.INT64
 
@@ -25,14 +28,16 @@ def _common_convert_sklearn_zipmap(scope, operator, container):
     return zipmap_attrs
 
 
-def convert_sklearn_zipmap(scope, operator, container):
+def convert_sklearn_zipmap(scope: Scope, operator: Operator,
+                           container: ModelComponentContainer):
     zipmap_attrs = _common_convert_sklearn_zipmap(scope, operator, container)
     container.add_node('ZipMap', operator.inputs[1].full_name,
                        operator.outputs[1].full_name,
                        op_domain='ai.onnx.ml', **zipmap_attrs)
 
 
-def convert_sklearn_zipmap_columns(scope, operator, container):
+def convert_sklearn_zipmap_columns(scope: Scope, operator: Operator,
+                                   container: ModelComponentContainer):
     _common_convert_sklearn_zipmap(scope, operator, container)
     probs = operator.inputs[1].full_name
     for i in range(1, len(operator.outputs)):
