@@ -2,7 +2,6 @@
 
 
 import numbers
-import six
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -30,7 +29,7 @@ def convert_sklearn_dict_vectorizer(scope: Scope, operator: Operator,
     attrs = {
         'name': scope.get_unique_operator_name(op_type)
     }
-    if all(isinstance(feature_name, (six.string_types, six.text_type))
+    if all(isinstance(feature_name, str)
            for feature_name in op.feature_names_):
         # all strings, scikit-learn does the following:
         new_cats = []

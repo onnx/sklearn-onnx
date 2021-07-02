@@ -453,13 +453,12 @@ def _create_column(values, dtype):
     "Creates a column from values with dtype"
     if str(dtype) == "tensor(int64)":
         return numpy.array(values, dtype=numpy.int64)
-    elif str(dtype) == "tensor(float)":
+    if str(dtype) == "tensor(float)":
         return numpy.array(values, dtype=numpy.float32)
-    elif str(dtype) == "tensor(string)":
-        return numpy.array(values, dtype=numpy.str)
-    else:
-        raise OnnxRuntimeAssertionError(
-            "Unable to create one column from dtype '{0}'".format(dtype))
+    if str(dtype) == "tensor(string)":
+        return numpy.array(values, dtype=numpy.str_)
+    raise OnnxRuntimeAssertionError(
+        "Unable to create one column from dtype '{0}'".format(dtype))
 
 
 def _compare_expected(expected,

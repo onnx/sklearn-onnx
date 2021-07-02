@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-import six
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
@@ -121,8 +120,7 @@ def convert_sklearn_random_forest_classifier(
         if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
             class_labels = [int(i) for i in classes]
             attr_pairs['classlabels_int64s'] = class_labels
-        elif all(isinstance(i, (six.text_type, six.string_types))
-                 for i in classes):
+        elif all(isinstance(i, str) for i in classes):
             class_labels = [str(i) for i in classes]
             attr_pairs['classlabels_strings'] = class_labels
         else:

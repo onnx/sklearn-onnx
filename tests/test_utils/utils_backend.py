@@ -276,7 +276,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         if len(output.shape) == 3 and output.shape[0] == 1 and len(
                 expected.shape) == 2:
             output = output.reshape(output.shape[1:])
-        if expected.dtype in (numpy.str, numpy.dtype("<U1"),
+        if expected.dtype in (numpy.str_, numpy.dtype("<U1"),
                               numpy.dtype("<U3")):
             try:
                 assert_array_equal(expected, output, verbose=verbose)

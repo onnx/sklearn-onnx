@@ -141,8 +141,8 @@ class GraphState:
         def __fct__(var, operator):
             if isinstance(var, Variable):
                 return [var]
-            if isinstance(var, (np.ndarray, np.bool, np.int64,
-                                np.float32, np.float64, np.bool,
+            if isinstance(var, (np.ndarray, np.bool_, np.int64,
+                                np.float32, np.float64,
                                 np.int8, np.uint8)):
                 return [self._add_constant(var)]
             if hasattr(var, 'ConstantValue'):

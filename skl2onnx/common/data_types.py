@@ -256,8 +256,8 @@ def _guess_numpy_type(data_type, dims):
         return FloatTensorType(dims)
     if data_type == np.float64:
         return DoubleTensorType(dims)
-    if data_type in (np.str, str, object) or str(data_type) in ('<U1', ) or (
-            hasattr(data_type, 'type') and data_type.type is np.str_):  # noqa
+    if data_type in (np.str_, str, object) or str(data_type) in ('<U1', ) or (
+            hasattr(data_type, 'type') and data_type.type is np.str_): # noqa
         return StringTensorType(dims)
     if data_type in (np.int64, ) or str(data_type) == '<U6':
         return Int64TensorType(dims)
@@ -266,9 +266,9 @@ def _guess_numpy_type(data_type, dims):
         return Int32TensorType(dims)
     if data_type == np.uint8:
         return UInt8TensorType(dims)
-    if data_type in (np.bool, np.bool_, bool):
+    if data_type in (np.bool_, bool):
         return BooleanTensorType(dims)
-    if data_type in (np.str, np.str_, str):
+    if data_type in (np.str_, str):
         return StringTensorType(dims)
     if data_type == np.int8:
         return Int8TensorType(dims)
@@ -322,8 +322,12 @@ def guess_numpy_type(data_type):
     Guess the corresponding numpy type based on data_type.
     """
     if data_type in (np.float64, np.float32, np.int8, np.uint8,
-                     np.str, np.bool, np.int32, np.int64):
+                     np.str_, np.bool_, np.int32, np.int64):
         return data_type
+    if data_type == str:
+        return np.str_
+    if data_type == bool:
+        return np.bool_
     if isinstance(data_type, FloatTensorType):
         return np.float32
     if isinstance(data_type, DoubleTensorType):
@@ -333,9 +337,9 @@ def guess_numpy_type(data_type):
     if isinstance(data_type, Int64TensorType):
         return np.int64
     if isinstance(data_type, StringTensorType):
-        return np.str
+        return np.str_
     if isinstance(data_type, BooleanTensorType):
-        return np.bool
+        return np.bool_
     if Complex64TensorType is not None:
         if data_type in (np.complex64, np.complex128):
             return data_type

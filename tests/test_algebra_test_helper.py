@@ -26,7 +26,8 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.int32, Int32TensorType),
             (np.int64, Int64TensorType),
             (np.float32, FloatTensorType),
-            (np.str, StringTensorType),
+            (np.str_, StringTensorType),
+            (np.bool_, BooleanTensorType),
             (np.int8, Int8TensorType),
             (np.uint8, UInt8TensorType)
         ]
@@ -35,7 +36,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
         if Complex128TensorType is not None:
             dtypes.append((np.complex128, Complex128TensorType))
         for dtype, exp in dtypes:
-            if dtype == np.str:
+            if dtype == np.str_:
                 mat = np.empty((3, 3), dtype=dtype)
                 mat[:, :] = ""
             else:
@@ -89,7 +90,8 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.int64, Int64TensorType),
             (np.float32, FloatTensorType),
             (np.float64, DoubleTensorType),
-            (np.str, StringTensorType),
+            (np.str_, StringTensorType),
+            (np.bool_, BooleanTensorType),
             (np.int8, Int8TensorType),
             (np.uint8, UInt8TensorType)
         ]
@@ -111,7 +113,8 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.int64, Int64TensorType, onnx_proto.TensorProto.INT64),
             (np.float32, FloatTensorType, onnx_proto.TensorProto.FLOAT),
             (np.float64, DoubleTensorType, onnx_proto.TensorProto.DOUBLE),
-            (np.str, StringTensorType, onnx_proto.TensorProto.STRING),
+            (np.str_, StringTensorType, onnx_proto.TensorProto.STRING),
+            (np.bool_, BooleanTensorType, onnx_proto.TensorProto.BOOL),
             (np.int8, Int8TensorType, onnx_proto.TensorProto.INT8),
             (np.uint8, UInt8TensorType, onnx_proto.TensorProto.UINT8)
         ]

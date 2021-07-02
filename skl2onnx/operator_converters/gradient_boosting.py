@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-import six
 from ..common._apply_operation import apply_cast
 from ..common.data_types import (
     BooleanTensorType, Int64TensorType, guess_numpy_type)
@@ -57,8 +56,7 @@ def convert_sklearn_gradient_boosting_classifier(
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
         class_labels = [int(i) for i in classes]
         attrs['classlabels_int64s'] = class_labels
-    elif all(isinstance(i, (six.string_types, six.text_type))
-             for i in classes):
+    elif all(isinstance(i, str) for i in classes):
         class_labels = [str(i) for i in classes]
         attrs['classlabels_strings'] = class_labels
     else:

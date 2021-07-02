@@ -12,6 +12,12 @@ from sklearn import __version__ as sklearn_version
 from sklearn import datasets
 
 try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
+try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
     # not available in 0.19
@@ -193,6 +199,7 @@ class TestSklearnPipeline(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")
+    @ignore_warnings(category=RuntimeWarning)
     def test_pipeline_column_transformer(self):
 
         iris = datasets.load_iris()
@@ -367,22 +374,37 @@ class TestSklearnPipeline(unittest.TestCase):
         X_train = X_train.drop(to_drop, axis=1)
         X_test = X_test.drop(to_drop, axis=1)
 
+        # Step 1: without classifier
         clf.fit(X_train, y_train)
-        inputs = convert_dataframe_schema(X_train, to_drop)
-        model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs,
+        initial_inputs = convert_dataframe_schema(X_train, to_drop)
+        model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs,
                                      target_opset=TARGET_OPSET)
 
-        data = X_test[:5]
+        data = X_test
         pred = clf.transform(data)
         data_types = {
             'pclass': numpy.int64,
             'age': numpy.float32,
-            'sex': numpy.str,
+            'sex': numpy.str_,
             'fare': numpy.float32,
-            'embarked': numpy.str,
+            'embarked': numpy.str_,
         }
         inputs = {k: data[k].values.astype(data_types[k]).reshape(-1, 1)
                   for k in data.columns}
+        sess = InferenceSession(model_onnx.SerializeToString())
+        run = sess.run(None, inputs)
+        got = run[-1]
+        assert_almost_equal(pred, got, decimal=5)
+
+        # Step 2: with classifier
+        clf = Pipeline(steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", LogisticRegression(solver="lbfgs")),
+        ]).fit(X_train, y_train)
+        pred = clf.predict_proba(data)
+        model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs,
+                                     target_opset=TARGET_OPSET,
+                                     options={id(clf): {'zipmap': False}})
         sess = InferenceSession(model_onnx.SerializeToString())
         run = sess.run(None, inputs)
         got = run[-1]

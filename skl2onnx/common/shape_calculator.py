@@ -6,7 +6,6 @@ and regressors.
 """
 import numbers
 import numpy as np
-import six
 from .data_types import (
     BooleanTensorType,
     DoubleTensorType,
@@ -53,8 +52,7 @@ def _calculate_linear_classifier_output_shapes(
     number_of_classes = len(class_labels)
     if all(isinstance(i, np.ndarray) for i in class_labels):
         class_labels = np.concatenate(class_labels)
-    if all(isinstance(i, (six.string_types, six.text_type))
-           for i in class_labels):
+    if all(isinstance(i, str) for i in class_labels):
         shape = ([N, len(op.classes_)]
                  if (getattr(op, 'multilabel_', False) or (
                      isinstance(op.classes_, list) and

@@ -3,7 +3,6 @@
 
 import inspect
 import re
-import six
 import sys
 import traceback
 import warnings
@@ -497,9 +496,9 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         if op_version is None:
             op_version = self._get_op_version(op_domain, op_type)
 
-        if isinstance(inputs, (six.string_types, six.text_type)):
+        if isinstance(inputs, str):
             inputs = [inputs]
-        if isinstance(outputs, (six.string_types, six.text_type)):
+        if isinstance(outputs, str):
             outputs = [outputs]
         try:
             common = set(inputs) & set(outputs)
@@ -513,14 +512,12 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                 "variables in common {} in node '{}' "
                 "with name '{}'.".format(common, op_type, name))
         if not isinstance(inputs, list) or not all(
-                isinstance(s, (six.string_types, six.text_type))
-                for s in inputs):
+                isinstance(s, str) for s in inputs):
             type_list = ','.join(list(str(type(s)) for s in inputs))
             raise ValueError('Inputs must be a list of string but get [%s]'
                              % type_list)
         if (not isinstance(outputs, list) or
-                not all(isinstance(s, (six.string_types, six.text_type))
-                        for s in outputs)):
+                not all(isinstance(s, str) for s in outputs)):
             type_list = ','.join(list(str(type(s)) for s in outputs))
             raise ValueError('Outputs must be a list of string but get [%s]'
                              % type_list)

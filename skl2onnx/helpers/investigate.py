@@ -271,7 +271,7 @@ def compare_objects(o1, o2, decimal=4):
     def convert(o):
         if isinstance(o, list) and len(o) == 1:
             if isinstance(o[0], numpy.ndarray):
-                if o[0].dtype in (numpy.str, object):
+                if o[0].dtype in (numpy.str_, object, str):
                     o = list(o[0])
                 else:
                     o = o[0]
