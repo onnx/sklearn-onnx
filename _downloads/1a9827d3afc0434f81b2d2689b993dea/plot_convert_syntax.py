@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-convert-syntax:
@@ -19,6 +19,9 @@ Predict with onnxruntime
 Simple function to check the converted model
 works fine.
 """
+import onnxruntime
+import onnx
+import numpy
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
@@ -73,7 +76,7 @@ X = np.arange(20).reshape(10, 2)
 tr = KMeans(n_clusters=2)
 tr.fit(X)
 
-tr_mixin = wrap_as_onnx_mixin(tr)
+tr_mixin = wrap_as_onnx_mixin(tr, target_opset=12)
 
 onx = tr_mixin.to_onnx(X.astype(np.float32))
 print(predict_with_onnxruntime(onx, X))
@@ -83,7 +86,8 @@ print(predict_with_onnxruntime(onx, X))
 # before fitting the model.
 
 X = np.arange(20).reshape(10, 2)
-tr = wrap_as_onnx_mixin(KMeans(n_clusters=2))
+tr = wrap_as_onnx_mixin(KMeans(n_clusters=2),
+                        target_opset=12)
 tr.fit(X)
 
 onx = tr.to_onnx(X.astype(np.float32))
@@ -157,7 +161,7 @@ X = np.arange(20).reshape(10, 2)
 tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
-tr_mixin = wrap_as_onnx_mixin(tr)
+tr_mixin = wrap_as_onnx_mixin(tr, target_opset=12)
 tr_mixin.to_onnx(X.astype(np.float32))
 
 print(predict_with_onnxruntime(onx, X))
@@ -200,10 +204,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

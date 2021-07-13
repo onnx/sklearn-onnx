@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 One model, many possible conversions with options
 =================================================
@@ -75,21 +77,23 @@ a way to specify which classifier should keep its *ZipMap*
 and which is not. So it is possible to specify options by id.
 """
 
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 from pprint import pformat
-from skl2onnx.common._registration import _converter_pool
+import numpy
+from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
-import numpy
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from skl2onnx.common._registration import _converter_pool
 from skl2onnx import to_onnx
+from onnxruntime import InferenceSession
 from mlprodict.onnxrt import OnnxInference
 
 iris = load_iris()
 X, y = iris.data, iris.target
-X_train, _, y_train, __ = train_test_split(X, y, random_state=11)
+X_train, X_test, y_train, _ = train_test_split(X, y, random_state=11)
 clr = LogisticRegression()
 clr.fit(X_train, y_train)
 
@@ -201,7 +205,6 @@ model_def = to_onnx(
 oinf = OnnxInference(model_def, runtime='python_compiled')
 print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
 
-
 #########################################
 # It did not seem to work... We need to tell
 # that applies on a specific part of the pipeline
@@ -228,6 +231,35 @@ print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
 
 #########################################
 # Negative figures. We still have raw scores.
+
+#######################################
+# Option *decision_path*
+# ++++++++++++++++++++++
+#
+# *scikit-learn* implements a function to retrieve the
+# decision path. It can be enabled by option *decision_path*.
+
+clrrf = RandomForestClassifier(n_estimators=2, max_depth=2)
+clrrf.fit(X_train, y_train)
+clrrf.predict(X_test[:2])
+paths, n_nodes_ptr = clrrf.decision_path(X_test[:2])
+print(paths.todense())
+
+model_def = to_onnx(clrrf, X_train.astype(numpy.float32),
+                    options={id(clrrf): {'decision_path': True,
+                                         'zipmap': False}})
+sess = InferenceSession(model_def.SerializeToString())
+
+##########################################
+# The model produces 3 outputs.
+
+print([o.name for o in sess.get_outputs()])
+
+##########################################
+# Let's display the last one.
+
+res = sess.run(None, {'X': X_test[:2].astype(numpy.float32)})
+print(res[-1])
 
 ############################################################
 # List of available options

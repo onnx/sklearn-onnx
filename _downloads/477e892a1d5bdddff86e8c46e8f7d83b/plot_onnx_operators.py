@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-onnx-operators:
@@ -39,10 +39,14 @@ It relies on *protobuf* whose definition can be found
 on github `onnx.proto
 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`_.
 """
+import onnxruntime
+import numpy
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from onnx import helper, TensorProto, checker
+import onnx
+from onnx import helper
+from onnx import TensorProto
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
@@ -74,7 +78,7 @@ model_def = helper.make_model(graph_def, producer_name='onnx-example')
 model_def.opset_import[0].version = 10
 
 print('The model is:\n{}'.format(model_def))
-checker.check_model(model_def)
+onnx.checker.check_model(model_def)
 print('The model is checked!')
 
 #####################################
@@ -87,26 +91,22 @@ print('The model is checked!')
 
 from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
-pad = OnnxPad('X', output_names=['Y'],
-              mode='constant', value=1.5,
-              pads=[0, 1, 0, 1],
-              op_version=2)
-
+pad = OnnxPad('X', output_names=['Y'], mode='constant', value=1.5,
+              pads=[0, 1, 0, 1], op_version=10)
 model_def = pad.to_onnx({'X': X}, target_opset=10)
 
 print('The model is:\n{}'.format(model_def))
-checker.check_model(model_def)
+onnx.checker.check_model(model_def)
 print('The model is checked!')
 
 ####################################
 # Inputs and outputs can also be skipped.
 
 pad = OnnxPad(mode='constant', value=1.5,
-              pads=[0, 1, 0, 1], op_version=2)
+              pads=[0, 1, 0, 1], op_version=10)
 
-model_def = pad.to_onnx({pad.inputs[0]: X},
-                        target_opset=10)
-checker.check_model(model_def)
+model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
+onnx.checker.check_model(model_def)
 
 ########################################
 # Multiple operators
@@ -129,19 +129,21 @@ graph = helper.make_graph(
 original_model = helper.make_model(graph, producer_name='onnx-examples')
 
 # Check the model and print Y's shape information
-checker.check_model(original_model)
+onnx.checker.check_model(original_model)
 
 #####################################
 # Which we translate into:
 
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
-node = OnnxTranspose(OnnxTranspose('X', perm=[1, 0, 2]), perm=[1, 0, 2])
+node = OnnxTranspose(
+    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
+    perm=[1, 0, 2], op_version=12)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape
-model_def = node.to_onnx({'X': X})
-checker.check_model(model_def)
+model_def = node.to_onnx({'X': X}, target_opset=12)
+onnx.checker.check_model(model_def)
 
 ######################################
 # Let's the output with onnxruntime
@@ -180,10 +182,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

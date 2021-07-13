@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Change the number of outputs by adding a parser
 ===============================================

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Dataframe as an input
 =====================
@@ -71,7 +73,7 @@ ax.get_yaxis().set_visible(False)
 
 
 try:
-    to_onnx(pipe, train_data[:1])
+    onx = to_onnx(pipe, train_data[:1])
 except NotImplementedError as e:
     print(e)
 

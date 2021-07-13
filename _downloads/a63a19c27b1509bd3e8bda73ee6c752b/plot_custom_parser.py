@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-custom-parser:
@@ -25,13 +25,14 @@ the method *validate* mentioned above.
 """
 import inspect
 import numpy as np
+import skl2onnx
 import onnx
 import sklearn
 from sklearn.base import ClassifierMixin, BaseEstimator, clone
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from skl2onnx import update_registered_converter, __version__
+from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
@@ -282,4 +283,4 @@ print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", __version__)
+print("skl2onnx: ", skl2onnx.__version__)

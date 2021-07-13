@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-custom-model:
@@ -52,8 +52,9 @@ from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from matplotlib import offsetbox
 import matplotlib.pyplot as plt
+import sklearn
 from sklearn.model_selection import train_test_split
-from sklearn import datasets, __version__ as skl_version
+from sklearn import datasets
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
@@ -420,7 +421,7 @@ ax.axis('off')
 # **Versions used for this example**
 
 print("numpy:", numpy.__version__)
-print("scikit-learn:", skl_version)
+print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

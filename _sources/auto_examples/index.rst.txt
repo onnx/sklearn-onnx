@@ -119,27 +119,6 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, *sklearn-onnx* converts tha...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_convert_zipmap_thumb.png
-     :alt: Probabilities as a vector or as a ZipMap
-
-     :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_convert_zipmap
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every...">
 
 .. only:: html
@@ -200,6 +179,27 @@ Gallery of examples
    :hidden:
 
    /auto_examples/plot_pipeline_lightgbm
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, *sklearn-onnx* converts tha...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_convert_zipmap_thumb.png
+     :alt: Probabilities as a vector or as a ZipMap
+
+     :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_convert_zipmap
 
 .. raw:: html
 
@@ -392,27 +392,6 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="*scikit-learn* recently shipped `ColumnTransformer &lt;https://scikit-learn.org/stable/modules/ ge...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_complex_pipeline_thumb.png
-     :alt: Convert a pipeline with ColumnTransformer
-
-     :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_complex_pipeline
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: `Column Transformer with Heterogeneous Dat...">
 
 .. only:: html
@@ -431,6 +410,27 @@ Gallery of examples
    :hidden:
 
    /auto_examples/plot_tfidfvectorizer
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="*scikit-learn* recently shipped `ColumnTransformer &lt;https://scikit-learn.org/stable/modules/ ge...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_complex_pipeline_thumb.png
+     :alt: Convert a pipeline with ColumnTransformer
+
+     :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_complex_pipeline
 
 .. raw:: html
 

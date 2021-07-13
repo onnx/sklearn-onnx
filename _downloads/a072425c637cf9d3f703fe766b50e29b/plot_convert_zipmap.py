@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-rf-example-zipmap:
@@ -29,8 +29,9 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 import onnxruntime as rt
 import onnx
+import skl2onnx
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, __version__
+from skl2onnx import convert_sklearn
 from sklearn.linear_model import LogisticRegression
 
 iris = load_iris()
@@ -75,6 +76,25 @@ print("probabilities type:", type(res2[1]))
 print("type for the first observations:", type(res2[1][0]))
 
 ###################################
+# One output per class
+# ++++++++++++++++++++
+#
+# This options removes the final operator ZipMap and splits
+# the probabilities into columns. The final model produces
+# one output for the label, and one output per class.
+
+options = {id(clr): {'zipmap': 'columns'}}
+onx3 = convert_sklearn(clr, initial_types=initial_type, options=options,
+                       target_opset=12)
+
+sess3 = rt.InferenceSession(onx3.SerializeToString())
+res3 = sess3.run(None, {'float_input': X_test.astype(numpy.float32)})
+for i, out in enumerate(sess3.get_outputs()):
+    print("output: '{}' shape={} values={}...".format(
+        out.name, res3[i].shape, res3[i][:2]))
+
+
+###################################
 # Let's compare prediction time
 # +++++++++++++++++++++++++++++
 
@@ -82,13 +102,18 @@ X32 = X_test.astype(numpy.float32)
 
 print("Time with ZipMap:")
 print(repeat(lambda: sess.run(None, {'float_input': X32}),
-             number=100, repeat=3))
+             number=100, repeat=10))
 
 print("Time without ZipMap:")
 print(repeat(lambda: sess2.run(None, {'float_input': X32}),
-             number=100, repeat=3))
+             number=100, repeat=10))
 
-# The prediction is much faster on this example.
+print("Time without ZipMap but with columns:")
+print(repeat(lambda: sess3.run(None, {'float_input': X32}),
+             number=100, repeat=10))
+
+# The prediction is much faster without ZipMap
+# on this example.
 # The optimisation is even faster when the classes
 # are described with strings and not integers
 # as the final result (list of dictionaries) may copy
@@ -101,4 +126,4 @@ print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", __version__)
+print("skl2onnx: ", skl2onnx.__version__)

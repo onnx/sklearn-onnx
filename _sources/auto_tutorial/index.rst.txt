@@ -179,27 +179,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer versio...">
-
-.. only:: html
-
- .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_thumb.png
-     :alt: One model, many possible conversions with options
-
-     :ref:`sphx_glr_auto_tutorial_plot_dbegin_options.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_tutorial/plot_dbegin_options
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="In many cases, a custom models leverages existing models which already have an associated conve...">
 
 .. only:: html
@@ -218,6 +197,27 @@ Examples
    :hidden:
 
    /auto_tutorial/plot_kcustom_converter_wrapper
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer versio...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_thumb.png
+     :alt: One model, many possible conversions with options
+
+     :ref:`sphx_glr_auto_tutorial_plot_dbegin_options.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_dbegin_options
 
 .. raw:: html
 
@@ -305,27 +305,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Transfer learning is common with deep learning. A deep learning model is used as preprocessing ...">
-
-.. only:: html
-
- .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_transfer_learning_thumb.png
-     :alt: Transfer Learning with ONNX
-
-     :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_tutorial/plot_gbegin_transfer_learning
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Most models in scikit-learn do computation with double, not float. Most models in deep learning...">
 
 .. only:: html
@@ -365,6 +344,48 @@ Examples
    :hidden:
 
    /auto_tutorial/plot_icustom_converter
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Transfer learning is common with deep learning. A deep learning model is used as preprocessing ...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_transfer_learning_thumb.png
+     :alt: Transfer Learning with ONNX
+
+     :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_gbegin_transfer_learning
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="`TfidfVectorizer &lt;https://scikit-learn.org/stable/modules/ generated/sklearn.feature_extraction...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_usparse_xgboost_thumb.png
+     :alt: TfIdf and sparse matrices
+
+     :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_usparse_xgboost
 
 .. raw:: html
 

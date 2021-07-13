@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 Custom Operator for NMF Decomposition
@@ -28,6 +28,7 @@ Building a simple model
 
 import os
 import skl2onnx
+import onnxruntime
 import sklearn
 from sklearn.decomposition import NMF
 import numpy as np
@@ -37,7 +38,7 @@ import onnx
 from skl2onnx.algebra.onnx_ops import (
     OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
 from skl2onnx.common.data_types import FloatTensorType
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import InferenceSession
 
 
 mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
@@ -152,5 +153,5 @@ plt.axis('off')
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
-print("onnxruntime: ", ort_version)
+print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
