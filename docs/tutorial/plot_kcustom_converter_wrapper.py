@@ -39,7 +39,6 @@ from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 from skl2onnx import update_registered_converter
-from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx import to_onnx
 
