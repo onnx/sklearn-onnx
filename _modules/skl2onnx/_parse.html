@@ -5,18 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx._parse &#8212; sklearn-onnx 1.7.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/readable.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <title>skl2onnx._parse &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -32,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx._parse</a></li> 
@@ -45,11 +46,8 @@
           <div class="body" role="main">
             
   <h1>Source code for skl2onnx._parse</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
-<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
-<span class="c1"># license information.</span>
-<span class="c1"># --------------------------------------------------------------------------</span>
+<span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">pipeline</span>
@@ -64,6 +62,7 @@
         <span class="k">pass</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="kn">import</span> <span class="n">GaussianProcessRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">BayesianRidge</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
 <span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="kn">import</span> <span class="n">GaussianMixture</span><span class="p">,</span> <span class="n">BayesianGaussianMixture</span>
@@ -75,6 +74,15 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># ColumnTransformer was introduced in 0.20.</span>
     <span class="n">ColumnTransformer</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">Imputer</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># changed in 0.20</span>
+    <span class="n">SimpleImputer</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="kn">from</span> <span class="nn">._supported_operators</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_get_sklearn_operator_name</span><span class="p">,</span> <span class="n">cluster_list</span><span class="p">,</span> <span class="n">outlier_list</span><span class="p">)</span>
@@ -82,7 +90,7 @@
     <span class="n">sklearn_classifier_list</span><span class="p">,</span> <span class="n">sklearn_operator_name_map</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.common._container</span> <span class="kn">import</span> <span class="n">SklearnModelContainerNode</span>
 <span class="kn">from</span> <span class="nn">.common._registration</span> <span class="kn">import</span> <span class="n">_converter_pool</span><span class="p">,</span> <span class="n">_shape_calculator_pool</span>
-<span class="kn">from</span> <span class="nn">.common._topology</span> <span class="kn">import</span> <span class="n">Topology</span>
+<span class="kn">from</span> <span class="nn">.common._topology</span> <span class="kn">import</span> <span class="n">Topology</span><span class="p">,</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">.common.data_types</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DictionaryType</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">,</span> <span class="n">SequenceType</span><span class="p">,</span>
     <span class="n">StringTensorType</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">)</span>
@@ -112,11 +120,11 @@
         <span class="c1"># No need to extract.</span>
         <span class="k">return</span> <span class="n">inputs</span>
     <span class="n">array_feature_extractor_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span>
-                                            <span class="s1">&#39;SklearnArrayFeatureExtractor&#39;</span><span class="p">)</span>
+        <span class="s1">&#39;SklearnArrayFeatureExtractor&#39;</span><span class="p">)</span>
     <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span>
     <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">column_indices</span> <span class="o">=</span> <span class="n">column_indices</span>
     <span class="n">output_variable_name</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
-                            <span class="s1">&#39;extracted_feature_columns&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="s1">&#39;extracted_feature_columns&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
     <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_variable_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">array_feature_extractor_operator</span><span class="o">.</span><span class="n">outputs</span>
 
@@ -209,6 +217,13 @@
             <span class="n">scores_var</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
                 <span class="s1">&#39;score_samples&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores_var</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="n">SimpleImputer</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">}:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">):</span>
+            <span class="n">otype</span> <span class="o">=</span> <span class="n">Int64TensorType</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">otype</span> <span class="o">=</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">otype</span><span class="p">)</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># We assume that all scikit-learn operator produce a single output.</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
@@ -219,6 +234,12 @@
     <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;decision_path&#39;</span><span class="p">]:</span>
         <span class="n">dec_path</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
             <span class="s1">&#39;decision_path&#39;</span><span class="p">,</span> <span class="n">StringTensorType</span><span class="p">())</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dec_path</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">decision_leaf</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">fail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;decision_leaf&#39;</span><span class="p">]:</span>
+        <span class="n">dec_path</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+            <span class="s1">&#39;decision_leaf&#39;</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">())</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dec_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
@@ -373,24 +394,31 @@
 
 <span class="k">def</span> <span class="nf">_parse_sklearn_grid_search_cv</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">_parse_sklearn_classifier</span><span class="p">(</span>
-                <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">else</span>
-            <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
-                                        <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">))</span>
+        <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">else</span>
+        <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+                                    <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_parse_sklearn_classifier</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">probability_tensor</span> <span class="o">=</span> <span class="n">_parse_sklearn_simple_model</span><span class="p">(</span>
-            <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
+        <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="p">[</span><span class="n">NuSVC</span><span class="p">,</span> <span class="n">SVC</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">probability</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">probability_tensor</span>
     <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">zipmap</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;zipmap&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;zipmap&#39;</span><span class="p">],</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;zipmap&#39;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">probability_tensor</span>
-    <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnZipMap&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;zipmap&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span>
+        <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnZipMapColumns&#39;</span><span class="p">)</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">get_label_classes</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+        <span class="n">classes_names</span> <span class="o">=</span> <span class="n">get_label_classes</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">node_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="s1">&#39;SklearnZipMap&#39;</span><span class="p">)</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">get_label_classes</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
     <span class="n">this_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">probability_tensor</span>
     <span class="n">label_type</span> <span class="o">=</span> <span class="n">Int64TensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">])</span>
-    <span class="n">classes</span> <span class="o">=</span> <span class="n">get_label_classes</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
@@ -414,19 +442,26 @@
         <span class="n">label_type</span> <span class="o">=</span> <span class="n">StringTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">])</span>
 
     <span class="n">output_label</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;output_label&#39;</span><span class="p">,</span> <span class="n">label_type</span><span class="p">)</span>
-    <span class="n">output_probability</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
-        <span class="s1">&#39;output_probability&#39;</span><span class="p">,</span>
-        <span class="n">SequenceType</span><span class="p">(</span>
-            <span class="n">DictionaryType</span><span class="p">(</span>
-                <span class="n">label_type</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))))</span>
     <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_label</span><span class="p">)</span>
-    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_probability</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;zipmap&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span>
+        <span class="n">prob_type</span> <span class="o">=</span> <span class="n">probability_tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+        <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">classes_names</span><span class="p">:</span>
+            <span class="n">output_cl</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="n">cl</span><span class="p">,</span> <span class="n">prob_type</span><span class="o">.</span><span class="vm">__class__</span><span class="p">())</span>
+            <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_cl</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output_probability</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+            <span class="s1">&#39;output_probability&#39;</span><span class="p">,</span>
+            <span class="n">SequenceType</span><span class="p">(</span>
+                <span class="n">DictionaryType</span><span class="p">(</span>
+                    <span class="n">label_type</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))))</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_probability</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
 
 
 <span class="k">def</span> <span class="nf">_parse_sklearn_gaussian_process</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">return_cov</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">return_cov</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;return_std&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;return_cov&#39;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Not returning standard deviation of predictions when &quot;</span>
@@ -443,6 +478,23 @@
         <span class="c1"># covariance or standard deviation</span>
         <span class="n">covstd_tensor</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
             <span class="s1">&#39;GPcovstd&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+        <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covstd_tensor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_sklearn_bayesian_ridge</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">alias</span> <span class="o">=</span> <span class="n">_get_sklearn_operator_name</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+    <span class="n">this_operator</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_operator</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="n">mean_tensor</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+        <span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span>
+    <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_tensor</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;return_std&#39;</span><span class="p">]:</span>
+        <span class="c1"># covariance or standard deviation</span>
+        <span class="n">covstd_tensor</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
+            <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covstd_tensor</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span>
 
@@ -467,6 +519,11 @@
 <span class="sd">        (if type is not None) and the name of every output.</span>
 <span class="sd">    :return: The output variables produced by the input model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">inp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Unexpected input type </span><span class="si">%r</span><span class="s2"> for input </span><span class="si">%r</span><span class="s2">: </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">final_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ty</span> <span class="ow">in</span> <span class="n">final_types</span><span class="p">:</span>
@@ -609,13 +666,13 @@
     <span class="c1"># Declare a computational graph. It will become a representation of</span>
     <span class="c1"># the input scikit-learn model after parsing.</span>
     <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span>
-            <span class="n">raw_model_container</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
-            <span class="n">target_opset</span><span class="o">=</span><span class="n">target_opset</span><span class="p">,</span>
-            <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="n">custom_conversion_functions</span><span class="p">,</span>
-            <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="n">custom_shape_calculators</span><span class="p">,</span>
-            <span class="n">registered_models</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">conv</span><span class="o">=</span><span class="n">_converter_pool</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">_shape_calculator_pool</span><span class="p">,</span>
-                <span class="n">aliases</span><span class="o">=</span><span class="n">sklearn_operator_name_map</span><span class="p">))</span>
+        <span class="n">raw_model_container</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
+        <span class="n">target_opset</span><span class="o">=</span><span class="n">target_opset</span><span class="p">,</span>
+        <span class="n">custom_conversion_functions</span><span class="o">=</span><span class="n">custom_conversion_functions</span><span class="p">,</span>
+        <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="n">custom_shape_calculators</span><span class="p">,</span>
+        <span class="n">registered_models</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">conv</span><span class="o">=</span><span class="n">_converter_pool</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">_shape_calculator_pool</span><span class="p">,</span>
+            <span class="n">aliases</span><span class="o">=</span><span class="n">sklearn_operator_name_map</span><span class="p">))</span>
 
     <span class="c1"># Declare an object to provide variables&#39; and operators&#39; naming mechanism.</span>
     <span class="c1"># In contrast to CoreML, one global scope</span>
@@ -652,6 +709,7 @@
     <span class="n">map_parser</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">:</span> <span class="n">_parse_sklearn_pipeline</span><span class="p">,</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">FeatureUnion</span><span class="p">:</span> <span class="n">_parse_sklearn_feature_union</span><span class="p">,</span>
+        <span class="n">BayesianRidge</span><span class="p">:</span> <span class="n">_parse_sklearn_bayesian_ridge</span><span class="p">,</span>
         <span class="n">GaussianProcessRegressor</span><span class="p">:</span> <span class="n">_parse_sklearn_gaussian_process</span><span class="p">,</span>
         <span class="n">GridSearchCV</span><span class="p">:</span> <span class="n">_parse_sklearn_grid_search_cv</span><span class="p">,</span>
     <span class="p">}</span>
@@ -702,7 +760,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -713,8 +771,8 @@
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2020, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
   </div>
   
   </body>

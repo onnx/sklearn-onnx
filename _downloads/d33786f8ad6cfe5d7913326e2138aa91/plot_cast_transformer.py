@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-cast_transformer:
@@ -31,6 +31,9 @@ This is not a typical example, it is build to make it fails
 based on the assumption ``(x / y)`` is usually different from
 ``x * ( 1 / y)`` on a computer.
 """
+import onnxruntime
+import onnx
+import numpy
 import os
 import math
 import numpy as np
@@ -160,10 +163,10 @@ ax.axis('off')
 #################################
 # **Versions used for this example**
 
-import numpy, sklearn  # noqa
+import sklearn  # noqa
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
-import onnx, onnxruntime, skl2onnx  # noqa
+import skl2onnx  # noqa
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

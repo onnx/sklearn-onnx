@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Transfer Learning with ONNX
 ===========================
@@ -37,6 +39,7 @@ from skl2onnx.tutorial.imagenet_classes import class_names
 import numpy
 from PIL import Image
 from onnxruntime import InferenceSession
+from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 import os
 import urllib.request
 
@@ -219,7 +222,10 @@ pipe2 = Pipeline(steps=[
     ('pca', PCA(2))
 ])
 
-pipe2.fit(X_train)
+try:
+    pipe2.fit(X_train)
+except InvalidArgument as e:
+    print("Unable to fit due to", e)
 
 #######################################
 # We check that it is different.

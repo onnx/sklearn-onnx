@@ -5,54 +5,54 @@
 
 Computation times
 =================
-**00:04.125** total execution time for **auto_examples** files:
+**01:29.232** total execution time for **auto_examples** files:
 
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)                 | 00:04.125 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)                                   | 00:18.105 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_backend.py` (``plot_backend.py``)                                     | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)                           | 00:13.092 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)                     | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``plot_tfidfvectorizer.py``)                     | 00:09.996 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)               | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)           | 00:07.416 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)                                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)                   | 00:07.209 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)                     | 00:04.844 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)                   | 00:03.626 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``) | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_convert_syntax.py` (``plot_convert_syntax.py``)                       | 00:03.454 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_convert_model.py` (``plot_convert_model.py``)                         | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)               | 00:03.428 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_convert_syntax.py` (``plot_convert_syntax.py``)                       | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)                   | 00:03.163 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)                       | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)                       | 00:02.435 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)                           | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)           | 00:01.988 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)                         | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)                 | 00:01.964 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py` (``plot_custom_parser_alternative.py``) | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py` (``plot_custom_parser_alternative.py``) | 00:01.960 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py` (``plot_errors_onnxruntime.py``)               | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)                         | 00:01.733 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)                                             | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)                                             | 00:01.542 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)           | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)                                             | 00:01.039 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)           | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)                                   | 00:00.623 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_metadata.py` (``plot_metadata.py``)                                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_convert_model.py` (``plot_convert_model.py``)                         | 00:00.598 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)                                             | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)                       | 00:00.371 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)                       | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``) | 00:00.350 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)                                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py` (``plot_errors_onnxruntime.py``)               | 00:00.152 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_metadata.py` (``plot_metadata.py``)                                   | 00:00.088 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``plot_tfidfvectorizer.py``)                     | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_backend.py` (``plot_backend.py``)                                     | 00:00.058 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+

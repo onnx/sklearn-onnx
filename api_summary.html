@@ -4,23 +4,25 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Summary &#8212; sklearn-onnx 1.7.1 documentation</title>
-    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>API Summary &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Gallery of examples" href="auto_examples/index.html" />
-    <link rel="prev" title="Fast runtime with onnxruntime" href="auto_tutorial/plot_qextend_onnxruntime.html" />
+    <link rel="prev" title="TfIdf and sparse matrices" href="auto_tutorial/plot_usparse_xgboost.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -38,9 +40,9 @@
           <a href="auto_examples/index.html" title="Gallery of examples"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="auto_tutorial/plot_qextend_onnxruntime.html" title="Fast runtime with onnxruntime"
+          <a href="auto_tutorial/plot_usparse_xgboost.html" title="TfIdf and sparse matrices"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">API Summary</a></li> 
       </ul>
     </div>  
@@ -50,7 +52,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="api-summary">
+  <section id="api-summary">
 <h1>API Summary<a class="headerlink" href="#api-summary" title="Permalink to this headline">¶</a></h1>
 <p>Summary of public functions and classes exposed
 in <em>scikit-onnx</em>.</p>
@@ -72,11 +74,11 @@ in <em>scikit-onnx</em>.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="version">
+<section id="version">
 <h2><a class="toc-backref" href="#id1">Version</a><a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="skl2onnx.get_latest_tested_opset_version">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">get_latest_tested_opset_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/proto.html#get_latest_tested_opset_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.get_latest_tested_opset_version" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.get_latest_tested_opset_version">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">get_latest_tested_opset_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/proto.html#get_latest_tested_opset_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.get_latest_tested_opset_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>This module relies on <em>onnxruntime</em> to test every
 converter. The function returns the most recent
 target opset tested with <em>onnxruntime</em> or the opset
@@ -84,8 +86,8 @@ version specified by <em>onnx</em> package if this one is lower
 (return by <cite>onnx.defs.onnx_opset_version()</cite>).</p>
 </dd></dl>
 
-</div>
-<div class="section" id="converters">
+</section>
+<section id="converters">
 <h2><a class="toc-backref" href="#id2">Converters</a><a class="headerlink" href="#converters" title="Permalink to this headline">¶</a></h2>
 <p>Both functions convert a <em>scikit-learn</em> model into ONNX.
 The first one lets the user manually
@@ -97,8 +99,8 @@ implemented in this package. A new converter has then to be
 registered, whether it is imported from another package
 or created from scratch.</p>
 <dl class="py function">
-<dt id="skl2onnx.convert_sklearn">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">convert_sklearn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initial_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">doc_string</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">target_opset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_conversion_functions</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_shape_calculators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_parsers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">intermediate</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">white_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">black_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/convert.html#convert_sklearn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.convert_sklearn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.convert_sklearn">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">convert_sklearn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_conversion_functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_shape_calculators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_parsers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intermediate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">black_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/convert.html#convert_sklearn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.convert_sklearn" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function produces an equivalent ONNX model of the given scikit-learn model.
 The supported converters is returned by function
 <a class="reference internal" href="#skl2onnx.supported_converters" title="skl2onnx.supported_converters"><code class="xref py py-func docutils literal notranslate"><span class="pre">supported_converters</span></code></a>.</p>
@@ -199,8 +201,8 @@ not the version of the <em>onnx</em> package.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.to_onnx">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">to_onnx</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initial_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target_opset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">white_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">black_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/convert.html#to_onnx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.to_onnx" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.to_onnx">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">to_onnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">black_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/convert.html#to_onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.to_onnx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls <a class="reference internal" href="#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn()</span></code></a> with simplified parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -235,8 +237,8 @@ double when it is necessary</p></li>
 in that case otherwise it calls <a class="reference internal" href="#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn()</span></code></a>.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="register-a-new-converter">
+</section>
+<section id="register-a-new-converter">
 <h2><a class="toc-backref" href="#id3">Register a new converter</a><a class="headerlink" href="#register-a-new-converter" title="Permalink to this headline">¶</a></h2>
 <p>If a model has no converter
 implemented in this package, a new converter has then to be
@@ -244,8 +246,8 @@ registered, whether it is imported from another package
 or created from scratch. Section <a class="reference internal" href="supported.html#l-converter-list"><span class="std std-ref">Covered Converters</span></a>
 lists all available converters.</p>
 <dl class="py function">
-<dt id="skl2onnx.supported_converters">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">supported_converters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_sklearn</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx.html#supported_converters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.supported_converters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.supported_converters">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">supported_converters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_sklearn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx.html#supported_converters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.supported_converters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the list of supported converters.
 To find the converter associated to a specific model,
 the library gets the name of the model class,
@@ -265,8 +267,8 @@ whose name is prefixed by <code class="docutils literal notranslate"><span class
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.update_registered_converter">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">update_registered_converter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">alias</span></em>, <em class="sig-param"><span class="n">shape_fct</span></em>, <em class="sig-param"><span class="n">convert_fct</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">parser</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_supported_operators.html#update_registered_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.update_registered_converter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.update_registered_converter">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">update_registered_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_fct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_fct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_supported_operators.html#update_registered_converter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.update_registered_converter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Registers or updates a converter for a new model so that
 it can be converted when inserted in a <em>scikit-learn</em> pipeline.</p>
 <dl class="field-list simple">
@@ -294,15 +296,19 @@ Example:</p>
 <span class="n">update_registered_converter</span><span class="p">(</span><span class="n">SGDClassifier</span><span class="p">,</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
                             <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span>
                             <span class="n">convert_sklearn_random_forest_classifier</span><span class="p">,</span>
-                            <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                            <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">],</span>
                                      <span class="s1">&#39;raw_scores&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]})</span>
 </pre></div>
 </div>
+<p>The function does not update the parser if not specified except if
+option <cite>‘zipmap’</cite> is added to the list. Every classifier
+must declare this option to let the default parser
+automatically handle that option.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.update_registered_parser">
-<code class="sig-prename descclassname">skl2onnx.</code><code class="sig-name descname">update_registered_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">parser_fct</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#update_registered_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.update_registered_parser" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.update_registered_parser">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.</span></span><span class="sig-name descname"><span class="pre">update_registered_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_fct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#update_registered_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.update_registered_parser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Registers or updates a parser for a new model.
 A parser returns the expected output of a model.</p>
 <dl class="field-list simple">
@@ -316,12 +322,12 @@ A parser returns the expected output of a model.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="manipulate-onnx-graphs">
+</section>
+<section id="manipulate-onnx-graphs">
 <h2><a class="toc-backref" href="#id4">Manipulate ONNX graphs</a><a class="headerlink" href="#manipulate-onnx-graphs" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs">
-<code class="sig-prename descclassname">skl2onnx.helpers.onnx_helper.</code><code class="sig-name descname">enumerate_model_node_outputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">add_node</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#enumerate_model_node_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.helpers.onnx_helper.</span></span><span class="sig-name descname"><span class="pre">enumerate_model_node_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#enumerate_model_node_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerates all the nodes of a model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -339,8 +345,8 @@ enumerates tuple (output name, node)</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.helpers.onnx_helper.load_onnx_model">
-<code class="sig-prename descclassname">skl2onnx.helpers.onnx_helper.</code><code class="sig-name descname">load_onnx_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onnx_file_or_bytes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#load_onnx_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.load_onnx_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.helpers.onnx_helper.load_onnx_model">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.helpers.onnx_helper.</span></span><span class="sig-name descname"><span class="pre">load_onnx_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">onnx_file_or_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#load_onnx_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.load_onnx_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads an <em>ONNX</em> file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -353,8 +359,8 @@ enumerates tuple (output name, node)</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.helpers.onnx_helper.select_model_inputs_outputs">
-<code class="sig-prename descclassname">skl2onnx.helpers.onnx_helper.</code><code class="sig-name descname">select_model_inputs_outputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">outputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#select_model_inputs_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.select_model_inputs_outputs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.helpers.onnx_helper.select_model_inputs_outputs">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.helpers.onnx_helper.</span></span><span class="sig-name descname"><span class="pre">select_model_inputs_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#select_model_inputs_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.select_model_inputs_outputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes a model and changes its outputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -372,8 +378,8 @@ enumerates tuple (output name, node)</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.helpers.onnx_helper.save_onnx_model">
-<code class="sig-prename descclassname">skl2onnx.helpers.onnx_helper.</code><code class="sig-name descname">save_onnx_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#save_onnx_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.save_onnx_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.helpers.onnx_helper.save_onnx_model">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.helpers.onnx_helper.</span></span><span class="sig-name descname"><span class="pre">save_onnx_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/helpers/onnx_helper.html#save_onnx_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.helpers.onnx_helper.save_onnx_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves a model as a file or bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -388,12 +394,12 @@ enumerates tuple (output name, node)</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="parsers">
+</section>
+<section id="parsers">
 <h2><a class="toc-backref" href="#id5">Parsers</a><a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="skl2onnx._parse.parse_sklearn">
-<code class="sig-prename descclassname">skl2onnx._parse.</code><code class="sig-name descname">parse_sklearn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scope</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">custom_parsers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#parse_sklearn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx._parse.parse_sklearn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx._parse.parse_sklearn">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx._parse.</span></span><span class="sig-name descname"><span class="pre">parse_sklearn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_parsers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#parse_sklearn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx._parse.parse_sklearn" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a delegate function. It does nothing but invokes the
 correct parsing function according to the input model’s type.</p>
 <dl class="field-list simple">
@@ -420,8 +426,8 @@ but not mandatory, it is used to overwrites the type
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx._parse.parse_sklearn_model">
-<code class="sig-prename descclassname">skl2onnx._parse.</code><code class="sig-name descname">parse_sklearn_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">initial_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target_opset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_conversion_functions</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_shape_calculators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_parsers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">white_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">black_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#parse_sklearn_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx._parse.parse_sklearn_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx._parse.parse_sklearn_model">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx._parse.</span></span><span class="sig-name descname"><span class="pre">parse_sklearn_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_conversion_functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_shape_calculators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_parsers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">black_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/_parse.html#parse_sklearn_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx._parse.parse_sklearn_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Puts <em>scikit-learn</em> object into an abstract container so that
 our framework can work seamlessly on models created
 with different machine learning tools.</p>
@@ -459,12 +465,12 @@ but not mandatory, it is used to overwrites the type
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="utils-for-contributors">
+</section>
+<section id="utils-for-contributors">
 <h2><a class="toc-backref" href="#id6">Utils for contributors</a><a class="headerlink" href="#utils-for-contributors" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="skl2onnx.common.utils.check_input_and_output_numbers">
-<code class="sig-prename descclassname">skl2onnx.common.utils.</code><code class="sig-name descname">check_input_and_output_numbers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">operator</span></em>, <em class="sig-param"><span class="n">input_count_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_count_range</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/onnxconverter_common/utils.html#check_input_and_output_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_numbers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common.utils.check_input_and_output_numbers">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.common.utils.</span></span><span class="sig-name descname"><span class="pre">check_input_and_output_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_count_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_count_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/onnxconverter_common/utils.html#check_input_and_output_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_numbers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the number of input(s)/output(s) is correct</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -480,8 +486,8 @@ infinite ranges like 5 to infinity, you need to use [5, None].
 </dd></dl>
 
 <dl class="py function">
-<dt id="skl2onnx.common.utils.check_input_and_output_types">
-<code class="sig-prename descclassname">skl2onnx.common.utils.</code><code class="sig-name descname">check_input_and_output_types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">operator</span></em>, <em class="sig-param"><span class="n">good_input_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">good_output_types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/onnxconverter_common/utils.html#check_input_and_output_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_types" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common.utils.check_input_and_output_types">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.common.utils.</span></span><span class="sig-name descname"><span class="pre">check_input_and_output_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">good_input_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">good_output_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/onnxconverter_common/utils.html#check_input_and_output_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common.utils.check_input_and_output_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the type(s) of input(s)/output(s) is(are) correct</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -495,29 +501,29 @@ infinite ranges like 5 to infinity, you need to use [5, None].
 :param good_output_types: A list of allowed output types. See good_input_types for its format.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2><a class="toc-backref" href="#id7">Concepts</a><a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="containers">
+<section id="containers">
 <h3><a class="toc-backref" href="#id8">Containers</a><a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
-<dt id="skl2onnx.common._container.SklearnModelContainerNode">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._container.</code><code class="sig-name descname">SklearnModelContainerNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sklearn_model</span></em>, <em class="sig-param"><span class="n">white_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">black_op</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#SklearnModelContainerNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.SklearnModelContainerNode">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._container.</span></span><span class="sig-name descname"><span class="pre">SklearnModelContainerNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sklearn_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">black_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#SklearnModelContainerNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main container for one <em>scikit-learn</em> model.
 Every converter adds nodes to an existing container
 which is converted into a <em>ONNX</em> graph by an instance of
 <a class="reference internal" href="#skl2onnx.common._topology.Topology" title="skl2onnx.common._topology.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>.</p>
-<dl class="py method">
-<dt id="skl2onnx.common._container.SklearnModelContainerNode.input_names">
-<em class="property">property </em><code class="sig-name descname">input_names</code><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode.input_names" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="skl2onnx.common._container.SklearnModelContainerNode.input_names">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">input_names</span></span><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode.input_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function should return a list of strings. Each string
 corresponds to an input variable name.
 :return: a list of string</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="skl2onnx.common._container.SklearnModelContainerNode.output_names">
-<em class="property">property </em><code class="sig-name descname">output_names</code><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode.output_names" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="skl2onnx.common._container.SklearnModelContainerNode.output_names">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_names</span></span><a class="headerlink" href="#skl2onnx.common._container.SklearnModelContainerNode.output_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function should return a list of strings. Each string
 corresponds to an output variable name.
 :return: a list of string</p>
@@ -526,14 +532,14 @@ corresponds to an output variable name.
 </dd></dl>
 
 <dl class="py class">
-<dt id="skl2onnx.common._container.ModelComponentContainer">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._container.</code><code class="sig-name descname">ModelComponentContainer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_opset</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">registered_models</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">white_op</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">black_op</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.ModelComponentContainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._container.</span></span><span class="sig-name descname"><span class="pre">ModelComponentContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_opset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registered_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">black_op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer" title="Permalink to this definition">¶</a></dt>
 <dd><p>In the conversion phase, this class is used to collect all materials
 required to build an <em>ONNX</em> <em>GraphProto</em>, which is encapsulated in a
 <em>ONNX</em> <em>ModelProto</em>.</p>
 <dl class="py method">
-<dt id="skl2onnx.common._container.ModelComponentContainer.add_initializer">
-<code class="sig-name descname">add_initializer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">onnx_type</span></em>, <em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">content</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_initializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_initializer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.ModelComponentContainer.add_initializer">
+<span class="sig-name descname"><span class="pre">add_initializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onnx_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_initializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_initializer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a <em>TensorProto</em> into the initializer list of the final
 ONNX model.</p>
 <dl class="field-list simple">
@@ -554,8 +560,8 @@ or a float array).</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="skl2onnx.common._container.ModelComponentContainer.add_input">
-<code class="sig-name descname">add_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_input" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.ModelComponentContainer.add_input">
+<span class="sig-name descname"><span class="pre">add_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds our <em>Variable</em> object defined _parser.py into the the input
 list of the final ONNX model.</p>
 <dl class="field-list simple">
@@ -566,8 +572,8 @@ list of the final ONNX model.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="skl2onnx.common._container.ModelComponentContainer.add_node">
-<code class="sig-name descname">add_node</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">op_type</span></em>, <em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">op_domain</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">op_version</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">attrs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_node" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.ModelComponentContainer.add_node">
+<span class="sig-name descname"><span class="pre">add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a <em>NodeProto</em> into the node list of the final ONNX model.
 If the input operator’s domain-version information cannot be
 found in our domain-version pool (a Python set), we may add it.</p>
@@ -594,8 +600,8 @@ respectively.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="skl2onnx.common._container.ModelComponentContainer.add_output">
-<code class="sig-name descname">add_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_output" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._container.ModelComponentContainer.add_output">
+<span class="sig-name descname"><span class="pre">add_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_container.html#ModelComponentContainer.add_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._container.ModelComponentContainer.add_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds our <em>Variable</em> object defined <em>_parser.py</em> into the the
 output list of the final ONNX model.</p>
 <dl class="field-list simple">
@@ -607,51 +613,51 @@ output list of the final ONNX model.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="nodes">
+</section>
+<section id="nodes">
 <h3><a class="toc-backref" href="#id9">Nodes</a><a class="headerlink" href="#nodes" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
-<dt id="skl2onnx.common._topology.Operator">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._topology.</code><code class="sig-name descname">Operator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">onnx_name</span></em>, <em class="sig-param"><span class="n">scope</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">raw_operator</span></em>, <em class="sig-param"><span class="n">target_opset</span></em>, <em class="sig-param"><span class="n">scope_inst</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Operator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Operator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Operator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._topology.</span></span><span class="sig-name descname"><span class="pre">Operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">onnx_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Operator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines an operator available in <em>ONNX</em>.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="skl2onnx.common._topology.Variable">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._topology.</code><code class="sig-name descname">Variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_name</span></em>, <em class="sig-param"><span class="n">onnx_name</span></em>, <em class="sig-param"><span class="n">scope</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Variable" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Variable">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._topology.</span></span><span class="sig-name descname"><span class="pre">Variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onnx_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines a variable which holds any data defined
 from <em>ONNX</em> types.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="scope">
+</section>
+<section id="scope">
 <h3><a class="toc-backref" href="#id10">Scope</a><a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
-<dt id="skl2onnx.common._topology.Scope">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._topology.</code><code class="sig-name descname">Scope</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">parent_scopes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variable_name_set</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">operator_name_set</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target_opset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_shape_calculators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">registered_models</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Scope">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._topology.</span></span><span class="sig-name descname"><span class="pre">Scope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_name_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator_name_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_shape_calculators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registered_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope" title="Permalink to this definition">¶</a></dt>
 <dd><p>Every node of an <em>ONNX</em> graph must be unique. This class holds the list
 of existing name for every node already defined in graph. It also
 provides functions to create a unique unused name.</p>
 <dl class="py method">
-<dt id="skl2onnx.common._topology.Scope.get_unique_operator_name">
-<code class="sig-name descname">get_unique_operator_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seed</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope.get_unique_operator_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope.get_unique_operator_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Scope.get_unique_operator_name">
+<span class="sig-name descname"><span class="pre">get_unique_operator_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope.get_unique_operator_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope.get_unique_operator_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a unique operator ID based on the given seed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="skl2onnx.common._topology.Scope.get_unique_variable_name">
-<code class="sig-name descname">get_unique_variable_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seed</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope.get_unique_variable_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope.get_unique_variable_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Scope.get_unique_variable_name">
+<span class="sig-name descname"><span class="pre">get_unique_variable_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Scope.get_unique_variable_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Scope.get_unique_variable_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a unique variable ID based on the given seed.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="topology">
+</section>
+<section id="topology">
 <h3><a class="toc-backref" href="#id11">Topology</a><a class="headerlink" href="#topology" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
-<dt id="skl2onnx.common._topology.Topology">
-<em class="property">class </em><code class="sig-prename descclassname">skl2onnx.common._topology.</code><code class="sig-name descname">Topology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">default_batch_size</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">initial_types</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reserved_variable_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reserved_operator_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target_opset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_conversion_functions</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_shape_calculators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">registered_models</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Topology" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Topology">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.common._topology.</span></span><span class="sig-name descname"><span class="pre">Topology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserved_variable_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserved_operator_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_opset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_conversion_functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_shape_calculators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registered_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Topology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Holds instances on <a class="reference internal" href="#skl2onnx.common._topology.Scope" title="skl2onnx.common._topology.Scope"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scope</span></code></a> and
 <code class="xref py py-class docutils literal notranslate"><span class="pre">SklearnModelContainer</span></code>.
 These are filled by the converters while a pipeline is being converted.
@@ -659,8 +665,8 @@ When all converters were called, method
 <a class="reference internal" href="#skl2onnx.common._topology.Topology.compile" title="skl2onnx.common._topology.Topology.compile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.compile</span></code></a>
 must be called to convert the topological graph into <em>ONNX</em> graph.</p>
 <dl class="py method">
-<dt id="skl2onnx.common._topology.Topology.compile">
-<code class="sig-name descname">compile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Topology.compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skl2onnx.common._topology.Topology.compile" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="skl2onnx.common._topology.Topology.compile">
+<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/common/_topology.html#Topology.compile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.common._topology.Topology.compile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function aims at giving every operator enough information
 so that all operator conversions can happen independently. We
 also want to check, fix, and simplify the network structure
@@ -669,9 +675,9 @@ here.</p>
 
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -705,7 +711,7 @@ here.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="auto_tutorial/plot_qextend_onnxruntime.html" title="previous chapter">Fast runtime with onnxruntime</a></li>
+      <li>Previous: <a href="auto_tutorial/plot_usparse_xgboost.html" title="previous chapter">TfIdf and sparse matrices</a></li>
       <li>Next: <a href="auto_examples/index.html" title="next chapter">Gallery of examples</a></li>
   </ul></li>
 </ul>
@@ -720,7 +726,7 @@ here.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -731,8 +737,8 @@ here.</p>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2020, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
   </div>
   
   </body>

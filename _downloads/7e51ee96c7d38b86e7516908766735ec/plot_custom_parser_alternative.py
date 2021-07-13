@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 .. _l-custom-parser-alternative:
@@ -30,6 +30,7 @@ the method *validate* mentioned above.
 """
 import inspect
 import numpy as np
+import skl2onnx
 import onnx
 import sklearn
 from sklearn.base import ClassifierMixin, BaseEstimator, clone
@@ -40,7 +41,7 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from skl2onnx import to_onnx, get_model_alias, __version__
+from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.algebra.onnx_ops import (
@@ -146,7 +147,8 @@ def validator_classifier_converter(scope, operator, container):
     # The model calls another one. The class `OnnxSubEstimator`
     # calls the converter for this operator.
     model = op.estimator_
-    onnx_op = OnnxSubEstimator(model, input0, op_version=opv)
+    onnx_op = OnnxSubEstimator(model, input0, op_version=opv,
+                               options={'zipmap': False})
 
     rmax = OnnxReduceMax(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
     great = OnnxGreater(rmax, np.array([op.threshold], dtype=np.float32),
@@ -273,4 +275,4 @@ print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", rt.__version__)
-print("skl2onnx: ", __version__)
+print("skl2onnx: ", skl2onnx.__version__)

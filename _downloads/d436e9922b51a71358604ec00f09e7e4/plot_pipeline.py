@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# SPDX-License-Identifier: Apache-2.0
+
 
 """
 Draw a pipeline
@@ -27,16 +27,18 @@ import numpy
 import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-from onnx import ModelProto, __version__ as onnx_version
-
+from onnx import ModelProto
+import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 
-onnx_fct = OnnxAdd(OnnxMul('X', numpy.array([2], dtype=numpy.float32)),
-                   numpy.array([[1, 0], [0, 1]], dtype=numpy.float32),
-                   output_names=['Y'])
+onnx_fct = OnnxAdd(
+    OnnxMul('X', numpy.array([2], dtype=numpy.float32),
+            op_version=12),
+    numpy.array([[1, 0], [0, 1]], dtype=numpy.float32),
+    output_names=['Y'], op_version=12)
 
 X = numpy.array([[4, 5], [-2, 3]], dtype=numpy.float32)
-model = onnx_fct.to_onnx({'X': X})
+model = onnx_fct.to_onnx({'X': X}, target_opset=12)
 print(model)
 
 filename = "example1.onnx"
@@ -80,6 +82,6 @@ plt.axis('off')
 
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-print("onnx: ", onnx_version)
+print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)
