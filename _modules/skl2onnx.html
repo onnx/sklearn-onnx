@@ -5,18 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx &#8212; sklearn-onnx 1.7.1 documentation</title>
-    <link rel="stylesheet" href="../_static/readable.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <title>skl2onnx &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -32,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx</a></li> 
       </ul>
@@ -44,29 +45,26 @@
           <div class="body" role="main">
             
   <h1>Source code for skl2onnx</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
-<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
-<span class="c1"># license information.</span>
-<span class="c1"># --------------------------------------------------------------------------</span>
+<span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Main entry point to the converter from the *scikit-learn* to *onnx*.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.7.1&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.9.1.dev&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Microsoft&quot;</span>
 <span class="n">__producer__</span> <span class="o">=</span> <span class="s2">&quot;skl2onnx&quot;</span>
 <span class="n">__producer_version__</span> <span class="o">=</span> <span class="n">__version__</span>
 <span class="n">__domain__</span> <span class="o">=</span> <span class="s2">&quot;ai.onnx&quot;</span>
 <span class="n">__model_version__</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">__max_supported_opset__</span> <span class="o">=</span> <span class="mi">14</span>
 
 
-<span class="kn">from</span> <span class="nn">.convert</span> <span class="kn">import</span> <span class="n">convert_sklearn</span><span class="p">,</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">wrap_as_onnx_mixin</span> <span class="c1"># noqa</span>
-<span class="kn">from</span> <span class="nn">._supported_operators</span> <span class="kn">import</span> <span class="p">(</span> <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">.convert</span> <span class="kn">import</span> <span class="n">convert_sklearn</span><span class="p">,</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">wrap_as_onnx_mixin</span>  <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">._supported_operators</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa</span>
     <span class="n">update_registered_converter</span><span class="p">,</span> <span class="n">get_model_alias</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">._parse</span> <span class="kn">import</span> <span class="n">update_registered_parser</span> <span class="c1"># noqa</span>
-<span class="kn">from</span> <span class="nn">.proto</span> <span class="kn">import</span> <span class="n">get_latest_tested_opset_version</span> <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">._parse</span> <span class="kn">import</span> <span class="n">update_registered_parser</span>  <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">.proto</span> <span class="kn">import</span> <span class="n">get_latest_tested_opset_version</span>  <span class="c1"># noqa</span>
 
 
 <div class="viewcode-block" id="supported_converters"><a class="viewcode-back" href="../api_summary.html#skl2onnx.supported_converters">[docs]</a><span class="k">def</span> <span class="nf">supported_converters</span><span class="p">(</span><span class="n">from_sklearn</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -83,10 +81,10 @@
 <span class="sd">        whose name is prefixed by ``&#39;Sklearn&#39;``</span>
 <span class="sd">    :return: list of supported models as string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.common._registration</span> <span class="kn">import</span> <span class="n">_converter_pool</span> <span class="c1"># noqa</span>
+    <span class="kn">from</span> <span class="nn">.common._registration</span> <span class="kn">import</span> <span class="n">_converter_pool</span>  <span class="c1"># noqa</span>
     <span class="c1"># The two following lines populates the list of supported converters.</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">shape_calculators</span> <span class="c1"># noqa</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">operator_converters</span> <span class="c1"># noqa</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">shape_calculators</span>  <span class="c1"># noqa</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">operator_converters</span>  <span class="c1"># noqa</span>
 
     <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_converter_pool</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">from_sklearn</span><span class="p">:</span>
@@ -113,7 +111,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -124,8 +122,8 @@
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2020, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
   </div>
   
   </body>

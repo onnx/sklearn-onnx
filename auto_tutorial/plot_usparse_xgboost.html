@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>TfIdf and sparse matrices &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/readable.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Summary" href="../api_summary.html" />
+    <link rel="prev" title="Advanced scenarios" href="../tutorial_4_advanced.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../api_summary.html" title="API Summary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../tutorial_4_advanced.html" title="Advanced scenarios"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tutorial_4_advanced.html" accesskey="U">Advanced scenarios</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">TfIdf and sparse matrices</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-usparse-xgboost-py"><span class="std std-ref">here</span></a>
+to download the full example code or to run this example in your browser via Binder</p>
+</div>
+<section class="sphx-glr-example-title" id="tfidf-and-sparse-matrices">
+<span id="example-sparse-tfidf"></span><span id="sphx-glr-auto-tutorial-plot-usparse-xgboost-py"></span><h1>TfIdf and sparse matrices<a class="headerlink" href="#tfidf-and-sparse-matrices" title="Permalink to this headline">¶</a></h1>
+<p id="index-0"><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidfVectorizer</a>
+usually creates sparse data. If the data is sparse enough, matrices
+usually stays as sparse all along the pipeline until the predictor
+is trained. Sparse matrices do not consider null and missing values
+as they are not present in the datasets. Because some predictors
+do the difference, this ambiguity may introduces discrepencies
+when converter into ONNX. This example looks into several configurations.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#imports-setups" id="id3">Imports, setups</a></p></li>
+<li><p><a class="reference internal" href="#artificial-datasets" id="id4">Artificial datasets</a></p></li>
+<li><p><a class="reference internal" href="#train-ensemble-after-sparse" id="id5">Train ensemble after sparse</a></p></li>
+<li><p><a class="reference internal" href="#dense-data" id="id6">Dense data</a></p></li>
+<li><p><a class="reference internal" href="#dense-data-with-nan" id="id7">Dense data with nan</a></p></li>
+<li><p><a class="reference internal" href="#dense-0-replaced-by-nan" id="id8">Dense, 0 replaced by nan</a></p></li>
+<li><p><a class="reference internal" href="#conclusion" id="id9">Conclusion</a></p></li>
+</ul>
+</div>
+<section id="imports-setups">
+<h2><a class="toc-backref" href="#id3">Imports, setups</a><a class="headerlink" href="#imports-setups" title="Permalink to this headline">¶</a></h2>
+<p>All imports. It also registered onnx converters for <a href="#id1"><span class="problematic" id="id2">:epgk:`xgboost`</span></a>
+and <em>lightgbm</em>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">HistGradientBoostingClassifier</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HistGradientBoostingClassifier</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBClassifier</span>
+<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <span class="n">LGBMClassifier</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span><span class="p">,</span> <span class="n">StringTensorType</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">update_registered_converter</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.sklapi</span> <span class="kn">import</span> <span class="n">CastTransformer</span><span class="p">,</span> <span class="n">ReplaceTransformer</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">onnxmltools.convert.xgboost.operator_converters.XGBoost</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_xgboost</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">onnxmltools.convert.lightgbm.operator_converters.LightGbm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_lightgbm</span><span class="p">)</span>
+
+
+<span class="n">update_registered_converter</span><span class="p">(</span>
+    <span class="n">XGBClassifier</span><span class="p">,</span> <span class="s1">&#39;XGBoostXGBClassifier&#39;</span><span class="p">,</span>
+    <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span> <span class="n">convert_xgboost</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nocl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">]})</span>
+<span class="n">update_registered_converter</span><span class="p">(</span>
+    <span class="n">LGBMClassifier</span><span class="p">,</span> <span class="s1">&#39;LightGbmLGBMClassifier&#39;</span><span class="p">,</span>
+    <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span> <span class="n">convert_lightgbm</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nocl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]})</span>
+</pre></div>
+</div>
+</section>
+<section id="artificial-datasets">
+<h2><a class="toc-backref" href="#id4">Artificial datasets</a><a class="headerlink" href="#artificial-datasets" title="Permalink to this headline">¶</a></h2>
+<p>Iris + a text column.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class zero&#39;</span><span class="p">,</span> <span class="s1">&#39;class one&#39;</span><span class="p">,</span> <span class="s1">&#39;class two&#39;</span><span class="p">]</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">target</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span>
+
+
+<span class="n">ind</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="train-ensemble-after-sparse">
+<h2><a class="toc-backref" href="#id5">Train ensemble after sparse</a><a class="headerlink" href="#train-ensemble-after-sparse" title="Permalink to this headline">¶</a></h2>
+<p>The example use the Iris datasets with artifical text datasets
+preprocessed with a tf-idf. <cite>sparse_threshold=1.</cite> avoids
+sparse matrices to be converted into dense matrices.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_pipelines</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">sparse_threshold</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">replace_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">insert_replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">models</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">HistGradientBoostingClassifier</span><span class="p">,</span>
+            <span class="n">XGBClassifier</span><span class="p">,</span> <span class="n">LGBMClassifier</span><span class="p">]</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">models</span> <span class="k">if</span> <span class="n">_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">pipes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">models</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="n">HistGradientBoostingClassifier</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="n">XGBClassifier</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">use_label_encoder</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">insert_replace</span><span class="p">:</span>
+            <span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+                <span class="p">(</span><span class="s1">&#39;union&#39;</span><span class="p">,</span> <span class="n">ColumnTransformer</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s1">&#39;scale1&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">(),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                    <span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+                     <span class="n">Pipeline</span><span class="p">([</span>
+                         <span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">()),</span>
+                         <span class="p">(</span><span class="s1">&#39;tfidf&#39;</span><span class="p">,</span> <span class="n">TfidfTransformer</span><span class="p">()),</span>
+                         <span class="p">(</span><span class="s1">&#39;repl&#39;</span><span class="p">,</span> <span class="n">ReplaceTransformer</span><span class="p">()),</span>
+                     <span class="p">]),</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
+                <span class="p">],</span> <span class="n">sparse_threshold</span><span class="o">=</span><span class="n">sparse_threshold</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;cast&#39;</span><span class="p">,</span> <span class="n">CastTransformer</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)),</span>
+            <span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+                <span class="p">(</span><span class="s1">&#39;union&#39;</span><span class="p">,</span> <span class="n">ColumnTransformer</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s1">&#39;scale1&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">(),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                    <span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+                     <span class="n">Pipeline</span><span class="p">([</span>
+                         <span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">()),</span>
+                         <span class="p">(</span><span class="s1">&#39;tfidf&#39;</span><span class="p">,</span> <span class="n">TfidfTransformer</span><span class="p">())</span>
+                     <span class="p">]),</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
+                <span class="p">],</span> <span class="n">sparse_threshold</span><span class="o">=</span><span class="n">sparse_threshold</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;cast&#39;</span><span class="p">,</span> <span class="n">CastTransformer</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)),</span>
+            <span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">obs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">pipe</span><span class="o">=</span><span class="n">pipe</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">pipes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="n">model</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+        <span class="k">if</span> <span class="n">replace_nan</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="n">TfidfTransformer</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nan&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+        <span class="c1"># convert</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="p">(</span><span class="ne">FutureWarning</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">))</span>
+            <span class="n">model_onnx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
+                <span class="n">pipe</span><span class="p">,</span>
+                <span class="n">initial_types</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">])),</span>
+                               <span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">StringTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))],</span>
+                <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;model.onnx&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+        <span class="n">sess</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                  <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;text&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+        <span class="n">pred_onx</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="n">pred_onx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">-</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">obs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                   <span class="n">discrepencies</span><span class="o">=</span><span class="n">diff</span><span class="p">,</span>
+                   <span class="n">model_onnx</span><span class="o">=</span><span class="n">model_onnx</span><span class="p">,</span> <span class="n">pipe</span><span class="o">=</span><span class="n">pipe</span><span class="p">)</span>
+        <span class="n">pipes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pipes</span>
+
+
+<span class="n">data_sparse</span> <span class="o">=</span> <span class="n">make_pipelines</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_sparse</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;model_onnx&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stat</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                                                                                                        | 0/3 [00:00&lt;?, ?it/s][12:56:02] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;multi:softprob&#39; was changed from &#39;merror&#39; to &#39;mlogloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
+
+ 67%|##########################################################################################################6                                                     | 2/3 [00:00&lt;00:00, 10.08it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  9.00it/s]
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>discrepencies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForestClassifier</td>
+      <td>0.000006</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>XGBClassifier</td>
+      <td>10.322665</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LGBMClassifier</td>
+      <td>0.000007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>Sparse data hurts.</p>
+</section>
+<section id="dense-data">
+<h2><a class="toc-backref" href="#id6">Dense data</a><a class="headerlink" href="#dense-data" title="Permalink to this headline">¶</a></h2>
+<p>Let’s replace sparse data with dense by using <cite>sparse_threshold=0.</cite></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_dense</span> <span class="o">=</span> <span class="n">make_pipelines</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sparse_threshold</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_dense</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;model_onnx&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stat</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                                                                                                        | 0/3 [00:00&lt;?, ?it/s][12:56:02] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;multi:softprob&#39; was changed from &#39;merror&#39; to &#39;mlogloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
+
+ 67%|##########################################################################################################6                                                     | 2/3 [00:00&lt;00:00,  8.35it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  7.51it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  7.54it/s]
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>discrepencies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForestClassifier</td>
+      <td>0.616221</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>XGBClassifier</td>
+      <td>0.000004</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LGBMClassifier</td>
+      <td>0.000007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>This is much better. Let’s compare how the preprocessing
+applies on the data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sparse&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_sparse</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;pipe&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dense&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_dense</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;pipe&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse
+  (0, 0)        -0.9006811702978088
+  (0, 1)        1.019004351971607
+  (0, 2)        0.4323732931220851
+  (0, 5)        0.9016947018779491
+  (1, 0)        -1.1430169111851105
+  (1, 1)        -0.13197947932162468
+  (1, 2)        0.4323732931220851
+  (1, 5)        0.9016947018779491
+
+dense
+[[-0.90068117  1.01900435  0.43237329  0.          0.          0.9016947 ]
+ [-1.14301691 -0.13197948  0.43237329  0.          0.          0.9016947 ]]
+</pre></div>
+</div>
+<p>This shows <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">RandomForestClassifier</a>,
+<a class="reference external" href="https://xgboost.readthedocs.io/en/latest/python/python_api.html">XGBClassifier</a> do not process
+the same way sparse and
+dense matrix as opposed to <a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html">LGBMClassifier</a>.
+And <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html">HistGradientBoostingClassifier</a>
+fails.</p>
+</section>
+<section id="dense-data-with-nan">
+<h2><a class="toc-backref" href="#id7">Dense data with nan</a><a class="headerlink" href="#dense-data-with-nan" title="Permalink to this headline">¶</a></h2>
+<p>Let’s keep sparse data in the scikit-learn pipeline but
+replace null values by nan in the onnx graph.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_dense</span> <span class="o">=</span> <span class="n">make_pipelines</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sparse_threshold</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">replace_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_dense</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;model_onnx&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stat</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                                                                                                        | 0/3 [00:00&lt;?, ?it/s][12:56:03] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;multi:softprob&#39; was changed from &#39;merror&#39; to &#39;mlogloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
+
+ 67%|##########################################################################################################6                                                     | 2/3 [00:00&lt;00:00,  8.29it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  7.77it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  7.75it/s]
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>discrepencies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForestClassifier</td>
+      <td>44.766490</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>XGBClassifier</td>
+      <td>0.000004</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LGBMClassifier</td>
+      <td>0.000007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /></section>
+<section id="dense-0-replaced-by-nan">
+<h2><a class="toc-backref" href="#id8">Dense, 0 replaced by nan</a><a class="headerlink" href="#dense-0-replaced-by-nan" title="Permalink to this headline">¶</a></h2>
+<p>Instead of using a specific options to replace null values
+into nan values, a custom transformer called
+ReplaceTransformer is explicitely inserted into the pipeline.
+A new converter is added to the list of supported models.
+It is equivalent to the previous options except it is
+more explicit.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_dense</span> <span class="o">=</span> <span class="n">make_pipelines</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sparse_threshold</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">replace_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">insert_replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_dense</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;model_onnx&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stat</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                                                                                                        | 0/3 [00:00&lt;?, ?it/s]
+ 33%|#####################################################3                                                                                                          | 1/3 [00:00&lt;00:00,  8.96it/s][12:56:03] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;multi:softprob&#39; was changed from &#39;merror&#39; to &#39;mlogloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
+
+ 67%|##########################################################################################################6                                                     | 2/3 [00:00&lt;00:00,  7.13it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  6.78it/s]
+100%|################################################################################################################################################################| 3/3 [00:00&lt;00:00,  6.94it/s]
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>discrepencies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForestClassifier</td>
+      <td>45.340640</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>XGBClassifier</td>
+      <td>0.000004</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LGBMClassifier</td>
+      <td>0.000007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /></section>
+<section id="conclusion">
+<h2><a class="toc-backref" href="#id9">Conclusion</a><a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>Unless dense arrays are used, because <em>onnxruntime</em>
+ONNX does not support sparse yet, the conversion needs to be
+tuned depending on the model which follows the TfIdf preprocessing.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.870 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-usparse-xgboost-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_usparse_xgboost.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/2804cd11b5af37d980f2d88395ca6d43/plot_usparse_xgboost.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_usparse_xgboost.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/9780baa920342800e95b07198173bc66/plot_usparse_xgboost.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_usparse_xgboost.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TfIdf and sparse matrices</a><ul>
+<li><a class="reference internal" href="#imports-setups">Imports, setups</a></li>
+<li><a class="reference internal" href="#artificial-datasets">Artificial datasets</a></li>
+<li><a class="reference internal" href="#train-ensemble-after-sparse">Train ensemble after sparse</a></li>
+<li><a class="reference internal" href="#dense-data">Dense data</a></li>
+<li><a class="reference internal" href="#dense-data-with-nan">Dense data with nan</a></li>
+<li><a class="reference internal" href="#dense-0-replaced-by-nan">Dense, 0 replaced by nan</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation index</a><ul>
+  <li><a href="../index_tutorial.html">Tutorial</a><ul>
+  <li><a href="../tutorial_4_advanced.html">Advanced scenarios</a><ul>
+      <li>Previous: <a href="../tutorial_4_advanced.html" title="previous chapter">Advanced scenarios</a></li>
+      <li>Next: <a href="../api_summary.html" title="next chapter">API Summary</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_tutorial/plot_usparse_xgboost.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
+  </div>
+  
+  </body>
+</html>

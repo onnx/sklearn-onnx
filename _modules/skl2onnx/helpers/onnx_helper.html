@@ -5,18 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.helpers.onnx_helper &#8212; sklearn-onnx 1.7.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <title>skl2onnx.helpers.onnx_helper &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -32,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.helpers.onnx_helper</a></li> 
@@ -45,14 +46,11 @@
           <div class="body" role="main">
             
   <h1>Source code for skl2onnx.helpers.onnx_helper</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (c) Microsoft Corporation. All rights reserved.</span>
-<span class="c1"># Licensed under the MIT License. See License.txt in the project root for</span>
-<span class="c1"># license information.</span>
-<span class="c1"># --------------------------------------------------------------------------</span>
+<span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
 
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">import</span> <span class="nn">onnx</span> <span class="c1"># noqa</span>
+<span class="kn">import</span> <span class="nn">onnx</span>  <span class="c1"># noqa</span>
 <span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">shape_inference</span>
 <span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">make_node</span><span class="p">,</span> <span class="n">make_tensor_value_info</span><span class="p">,</span> <span class="n">make_graph</span><span class="p">,</span>
@@ -209,9 +207,10 @@
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Input mismatch </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">input</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">input</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
 
     <span class="c1"># fix opset import</span>
+    <span class="k">del</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">[:]</span>
     <span class="k">for</span> <span class="n">oimp</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">:</span>
         <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">oimp</span><span class="o">.</span><span class="n">domain</span>
@@ -294,13 +293,72 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">get_latest_tested_opset_version</span><span class="p">()</span>
 
-    <span class="n">inferred_model</span> <span class="o">=</span> <span class="n">shape_inference</span><span class="o">.</span><span class="n">infer_shapes</span><span class="p">(</span><span class="n">original_model</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">inferred_model</span> <span class="o">=</span> <span class="n">shape_inference</span><span class="o">.</span><span class="n">infer_shapes</span><span class="p">(</span><span class="n">original_model</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to infer shape of node &#39;</span><span class="si">{}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">op_type</span><span class="p">,</span> <span class="n">original_model</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
     <span class="n">shapes</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_pb</span><span class="p">(</span><span class="n">inferred_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">value_info</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Shape inference fails.</span><span class="se">\n</span><span class="s2">&quot;</span>
                            <span class="s2">&quot;*Inputs*</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">*Model*</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">onnx_inputs</span><span class="p">,</span> <span class="n">original_model</span><span class="p">))</span>
+                               <span class="n">onnx_inputs</span><span class="p">,</span> <span class="n">original_model</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">shapes</span>
+
+
+<span class="k">def</span> <span class="nf">change_onnx_domain</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ops</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes a model and changes its outputs.</span>
+
+<span class="sd">    :param model: *ONNX* model</span>
+<span class="sd">    :param ops: dictionary { optype: (&#39;optype&#39;, &#39;new domain&#39;) }</span>
+<span class="sd">    :return: modified model</span>
+
+<span class="sd">    The function removes unneeded files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">rep</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">op_type</span> <span class="o">=</span> <span class="n">rep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                       <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">initializer</span><span class="p">)</span>
+    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">ir_version</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">producer_name</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">producer_version</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">domain</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">model_version</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model_version</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">doc_string</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">doc_string</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">metadata_props</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">metadata_props</span><span class="p">}</span>
+        <span class="n">onnx</span><span class="o">.</span><span class="n">helper</span><span class="o">.</span><span class="n">set_model_props</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Input mismatch </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">input</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
+
+    <span class="c1"># fix opset import</span>
+    <span class="n">domain_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">has_domain</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">del</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">[:]</span>
+    <span class="k">for</span> <span class="n">oimp</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">:</span>
+        <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">oimp</span><span class="o">.</span><span class="n">domain</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">oimp</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">domain_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">oimp</span><span class="o">.</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_domain</span><span class="p">:</span>
+            <span class="n">has_domain</span> <span class="o">=</span> <span class="n">oimp</span><span class="o">.</span><span class="n">domain</span> <span class="ow">in</span> <span class="n">domain_set</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">domain_set</span><span class="p">:</span>
+            <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+            <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">onnx_model</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -324,7 +382,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -335,8 +393,8 @@
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2020, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
   </div>
   
   </body>
