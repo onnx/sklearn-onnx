@@ -8,9 +8,11 @@ Converter for pyod.models.iforest.IForest
 
 .. index:: pyod, iforest
 
-This example answers issues `685 <https://github.com/onnx/sklearn-onnx/issues/685>`_.
+This example answers issues `685
+<https://github.com/onnx/sklearn-onnx/issues/685>`_.
 It implements a custom converter for model `pyod.models.iforest.IForest
-<https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.iforest>`_.
+<https://pyod.readthedocs.io/en/latest/
+pyod.models.html#module-pyod.models.iforest>`_.
 This example uses :ref:`l-plot-custom-converter` as a start.
 
 .. contents::
@@ -38,8 +40,8 @@ from pyod.models.iforest import IForest
 data1 = {'First':  [500, 500, 400, 100, 200, 300, 100],
          'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
 
-df1 = pd.DataFrame(data1,columns=['First','Second'])
-dumdf1 = pd.get_dummies(df1) 
+df1 = pd.DataFrame(data1, columns=['First', 'Second'])
+dumdf1 = pd.get_dummies(df1)
 scaler = MinMaxScaler()
 scaler.partial_fit(dumdf1)
 sc_data = scaler.transform(dumdf1)
@@ -88,13 +90,13 @@ def pyod_iforest_parser(scope, model, inputs, custom_parsers=None):
 
 
 def pyod_iforest_shape_calculator(operator):
-    op = operator.raw_operator
     N = operator.inputs[0].get_first_dimension()
     operator.outputs[0].type.shape = [N, 1]
-    operator.outputs[1].type.shape = [N, 1]
+    operator.outputs[1].type.shape = [N, 2]
 
 ############################################
 # Then the converter.
+
 
 def pyod_iforest_converter(scope, operator, container):
     op = operator.raw_operator
@@ -109,18 +111,18 @@ def pyod_iforest_converter(scope, operator, container):
     # about types, every constant should have the same
     # type as the input.
     dtype = guess_numpy_type(X.type)
-    
-    detector = op.detector_  #Should be IForest from scikit-learn.
+
+    detector = op.detector_  # Should be IForest from scikit-learn.
     lab_pred = OnnxSubEstimator(detector, X, op_version=opv)
     scores = OnnxIdentity(lab_pred[1], op_version=opv)
 
     # labels
     threshold = op.threshold_
     above = OnnxLess(scores, np.array([threshold], dtype=dtype),
-                        op_version=opv)
+                     op_version=opv)
     labels = OnnxCast(above, op_version=opv, to=onnx_proto.TensorProto.INT64,
                       output_names=out[:1])
-    
+
     # probabilities
     train_scores = op.decision_scores_
     scaler = MinMaxScaler().fit(train_scores.reshape(-1, 1))
@@ -128,9 +130,10 @@ def pyod_iforest_converter(scope, operator, container):
                       op_version=opv)
     print(scaler.min_)
     print(scaler.scale_)
-                      
+
     scaled = OnnxMul(scores_, scaler.scale_.astype(dtype), op_version=opv)
-    scaled_centered = OnnxAdd(scaled, scaler.min_.astype(dtype), op_version=opv)
+    scaled_centered = OnnxAdd(scaled, scaler.min_.astype(dtype),
+                              op_version=opv)
     clipped = OnnxClip(scaled_centered, np.array([0], dtype=dtype),
                        np.array([1], dtype=dtype),
                        op_version=opv)
@@ -139,7 +142,7 @@ def pyod_iforest_converter(scope, operator, container):
                 op_version=opv),
         np.array([1], dtype=dtype),
         op_version=opv)
-    
+
     scores_2d = OnnxConcat(clipped_, clipped, axis=1, op_version=opv,
                            output_names=out[1:])
 
@@ -148,6 +151,7 @@ def pyod_iforest_converter(scope, operator, container):
 
 ########################################
 # Finally the registration.
+
 
 update_registered_converter(
     IForest, "PyodIForest",
@@ -188,4 +192,3 @@ print("dicrepencies:", diff_labels, diff_proba)
 
 print(onx_labels)
 print(onx_proba)
-
