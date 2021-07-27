@@ -772,6 +772,16 @@ class Topology:
             # least one operator should be evaluated. If not, we need
             # to terminate this procedure to avoid dead lock.
             if not is_evaluation_happened:
+                for op in self.unordered_operator_iterator():
+                    if not op.is_evaluated and op.raw_operator is not None:
+                        raise RuntimeError(
+                            "One operator was not evaluated ("
+                            "inputs fed=%r, outputs fed=%r, op=%r)." % (
+                                all(variable.is_fed
+                                    for variable in operator.inputs),
+                                all(variable.is_fed
+                                    for variable in operator.outputs),
+                                op))
                 break
 
     def _check_structure(self):
