@@ -16,6 +16,7 @@ py-spy
 pandas
 pydot
 pyinstrument
+pyod
 pyquickhelper>=1.9.3359
 pytest
 pytest-cov

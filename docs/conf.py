@@ -12,7 +12,7 @@ import skl2onnx
 import sphinx_readable_theme
 
 sys.path.append(os.path.abspath('exts'))
-from github_link import make_linkcode_resolve
+from github_link import make_linkcode_resolve  # noqa
 
 
 # -- Project information -----------------------------------------------------

@@ -19,6 +19,7 @@ involving operator not actually implemented in
     tutorial_2_new_converter
     tutorial_3_new_operator
     tutorial_4_advanced
+    tutorial_2-5_extlib
 
 The tutorial was tested with following version:
 
@@ -44,4 +45,3 @@ The tutorial was tested with following version:
     mx = max(len(_[0]) for _ in mods) + 1
     for name, vers in sorted(mods):
         print("%s%s%s" % (name, " " * (mx - len(name)), vers))
-
