@@ -305,5 +305,5 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOnnxOperatorSubEstimator().test_sub_sub_estimator()
+    # TestOnnxOperatorSubEstimator().test_sub_sub_estimator()
     unittest.main()
