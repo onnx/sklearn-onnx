@@ -19,7 +19,7 @@ from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common.data_types import (
-    FloatTensorType, Int64TensorType, guess_numpy_type)
+    FloatTensorType, Int64TensorType)
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from test_utils import TARGET_OPSET
 
@@ -305,5 +305,4 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestOnnxOperatorSubEstimator().test_sub_sub_estimator()
     unittest.main()

@@ -518,6 +518,8 @@ class GraphState:
                         self.computed_outputs_.append((name, kind))
                     else:
                         var = self.scope.declare_local_variable(name, kind)
-                        var.onnx_name = name  # name already comes from scope.get_unique_variable_name
+                        # name already comes from
+                        # scope.get_unique_variable_name
+                        var.onnx_name = name
                         var.is_fed = True
                         self.computed_outputs_.append(var)

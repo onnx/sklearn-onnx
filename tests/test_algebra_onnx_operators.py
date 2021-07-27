@@ -7,12 +7,16 @@ from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
+from onnx import (
+    helper, TensorProto, load_model,
+    __version__ as onnx__version__)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
+from skl2onnx.common._topology import Variable
 from skl2onnx.common.data_types import (
     FloatTensorType, guess_numpy_type, DoubleTensorType)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
@@ -21,12 +25,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
-    OnnxPad, OnnxBatchNormalization
-)
-from onnx import (
-    helper, TensorProto, load_model,
-    __version__ as onnx__version__
-)
+    OnnxPad, OnnxBatchNormalization)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -226,9 +225,12 @@ class TestOnnxOperators(unittest.TestCase):
         onnx2 = model_def.SerializeToString()
         self.assertIsInstance(onx.outputs, list)
         self.assertEqual(len(onx.outputs), 1)
-        self.assertIsInstance(onx.outputs[0], tuple)
-        self.assertEqual(len(onx.outputs[0]), 2)
-        self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
+        self.assertIsInstance(onx.outputs[0], (Variable, tuple))
+        if isinstance(onx.outputs[0], tuple):
+            self.assertEqual(len(onx.outputs[0]), 2)
+            self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
+        else:
+            self.assertIsInstance(onx.outputs[0].type, DoubleTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))
