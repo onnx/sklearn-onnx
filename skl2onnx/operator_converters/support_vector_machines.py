@@ -250,10 +250,6 @@ def convert_sklearn_svm_classifier(
         #     transformed_confidences = (
         #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
         #     return votes + transformed_confidences
-        if list(op.classes_) != list(range(len(op.classes_))):
-            raise RuntimeError(
-                "Classes different from first n integers are not supported "
-                "in SVC converter.")
 
         cst3 = scope.get_unique_variable_name('cst3')
         container.add_initializer(cst3, proto_dtype, [], [3])
