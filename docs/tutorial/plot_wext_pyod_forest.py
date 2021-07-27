@@ -29,7 +29,8 @@ import pandas as pd
 from onnxruntime import InferenceSession
 from sklearn.preprocessing import MinMaxScaler
 from skl2onnx.proto import onnx_proto
-from skl2onnx.common.data_types import FloatTensorType, guess_numpy_type
+from skl2onnx.common.data_types import (
+    FloatTensorType, Int64TensorType, guess_numpy_type)
 from skl2onnx import to_onnx, update_registered_converter, get_model_alias
 from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity, OnnxMul, OnnxLess, OnnxConcat, OnnxCast, OnnxAdd,
@@ -80,7 +81,7 @@ def pyod_iforest_parser(scope, model, inputs, custom_parsers=None):
 
     # outputs
     cls_type = inputs[0].type.__class__
-    val_y1 = scope.declare_local_variable('label', cls_type())
+    val_y1 = scope.declare_local_variable('label', Int64TensorType())
     val_y2 = scope.declare_local_variable('probability', cls_type())
     this_operator.outputs.append(val_y1)
     this_operator.outputs.append(val_y2)
@@ -176,12 +177,6 @@ expected_proba = model1.predict_proba(data)
 sess = InferenceSession(onx.SerializeToString())
 res = sess.run(None, {'float_input': data})
 
-# from mlprodict.onnxrt import OnnxInference
-# oinf = OnnxInference(onx)
-# res = oinf.run({'float_input': data})
-# res = [res['label'], res['probability']]
-
-
 onx_labels = res[0]
 onx_proba = res[1]
 
@@ -190,5 +185,5 @@ diff_proba = np.abs(onx_proba.ravel() - expected_proba.ravel()).max()
 
 print("dicrepencies:", diff_labels, diff_proba)
 
-print(onx_labels)
-print(onx_proba)
+print("ONNX labels", onx_labels)
+print("ONNX probabilities", onx_proba)
