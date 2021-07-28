@@ -4,9 +4,11 @@
 Tests scikit-imputer converter.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
+import sklearn
 try:
     from sklearn.preprocessing import Imputer
 except ImportError:
@@ -135,6 +137,9 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     @unittest.skipIf(SimpleImputer is None,
                      reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        StrictVersion(sklearn.__version__) < StrictVersion('0.24'),
+        reason="SimpleImputer does not support strings")
     def test_simple_imputer_string_inputs_int_mostf(self):
         model = SimpleImputer(
             strategy="most_frequent", fill_value="nan", missing_values="")
