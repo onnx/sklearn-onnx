@@ -19,7 +19,8 @@ except ImportError:
     SimpleImputer = None
 
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    FloatTensorType, Int64TensorType, StringTensorType)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -31,6 +32,15 @@ class TestSklearnImputerConverter(unittest.TestCase):
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         assert_almost_equal(res, exp)
+
+    def _check_outputs_strings(self, model, model_onnx, data):
+        idata = {'input': np.array(data).astype(np.str_)}
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, idata)[0]
+        exp = model.transform(data)
+        if list(exp.ravel()) != list(res.ravel()):
+            raise AssertionError(
+                "Unexpected output expected %r != %r." % (exp, res))
 
     @unittest.skipIf(Imputer is None,
                      reason="Imputer removed in 0.21")
@@ -122,6 +132,22 @@ class TestSklearnImputerConverter(unittest.TestCase):
                 target_opset=TARGET_OPSET)
         except RuntimeError as e:
             assert "nan values are replaced by float" in str(e)
+
+    @unittest.skipIf(SimpleImputer is None,
+                     reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_string_inputs_int_mostf(self):
+        model = SimpleImputer(
+            strategy="most_frequent", fill_value="nan", missing_values="")
+        data = [["s1", "s2"], ["", "s3"], ["s7", "s6"], ["s8", ""]]
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model, "scikit-learn simple imputer",
+            [("input", StringTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
+        self.assertIn("ai.onnx.ml", str(model_onnx))
+        self.assertTrue(model_onnx.graph.node is not None)
+        self.assertEqual(len(model_onnx.graph.output), 1)
+        self._check_outputs_strings(model, model_onnx, data)
 
 
 if __name__ == "__main__":
