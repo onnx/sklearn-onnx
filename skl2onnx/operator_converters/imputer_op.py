@@ -72,7 +72,8 @@ def convert_sklearn_imputer(scope: Scope, operator: Operator,
         if isinstance(operator.inputs[0].type, Int64TensorType):
             attrs['imputed_value_int64s'] = op.statistics_.astype(np.int64)
             use_int = True
-            delta = np.max(np.abs(attrs['imputed_value_int64s'] - op.statistics_))
+            delta = np.max(
+                np.abs(attrs['imputed_value_int64s'] - op.statistics_))
             if delta != 0:
                 raise RuntimeError(
                     "SimpleImputer takes integer as input but nan values are "
