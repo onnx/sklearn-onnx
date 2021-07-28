@@ -40,6 +40,7 @@ from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import polynomial_features
 from . import power_transformer
+from . import quantile_transformer
 from . import random_forest
 from . import random_projection
 from . import ransac_regressor
@@ -93,6 +94,7 @@ __all__ = [
     ordinal_encoder,
     polynomial_features,
     power_transformer,
+    quantile_transformer,
     random_forest,
     random_projection,
     ransac_regressor,

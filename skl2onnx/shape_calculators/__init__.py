@@ -27,6 +27,7 @@ from . import nearest_neighbours
 from . import one_hot_encoder
 from . import ordinal_encoder
 from . import one_vs_rest_classifier
+from . import quantile_transformer
 from . import polynomial_features
 from . import power_transformer
 from . import random_projection
@@ -67,6 +68,7 @@ __all__ = [
     one_vs_rest_classifier,
     polynomial_features,
     power_transformer,
+    quantile_transformer,
     random_projection,
     replace_op,
     scaler,

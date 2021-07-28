@@ -172,7 +172,9 @@ except ImportError:
 from sklearn.preprocessing import (
     MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
-    PolynomialFeatures, RobustScaler,
+    PolynomialFeatures,
+    QuantileTransformer,
+    RobustScaler,
     StandardScaler,
 )
 
@@ -322,6 +324,7 @@ def build_sklearn_operator_name_map():
         PLSRegression,
         PolynomialFeatures,
         PowerTransformer,
+        QuantileTransformer,
         RadiusNeighborsClassifier,
         RadiusNeighborsRegressor,
         RandomForestClassifier,
