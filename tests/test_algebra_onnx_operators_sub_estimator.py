@@ -301,7 +301,7 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
             model, X32, target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'X': X32})
-        assert_almost_equal(model.transform(X32), res[0])
+        assert_almost_equal(model.transform(X32), res[0], decimal=5)
 
 
 if __name__ == "__main__":
