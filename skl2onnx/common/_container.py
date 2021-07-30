@@ -735,14 +735,22 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         if len(missing_ops) > 0:
             def nstr(name):
                 if name in order:
-                    return "%s(%d)" % (name, order[name])
+                    return "%s#%d" % (name, order[name])
                 return name
-            rows = ["%s (%s) -> (%s)" % (
+            rows = ["%s(%s) -> [%s]" % (
                 n.name or n.op_type,
                 ', '.join(map(nstr, n.input)),
                 ', '.join(n.output))
                 for n in missing_ops]
             rows.insert(0, "")
+            rows.append("--")
+            rows.append("--all-nodes--")
+            rows.append("--")
+            rows.extend("%s(%s) -> [%s]" % (
+                n.name or n.op_type,
+                ', '.join(map(nstr, n.input)),
+                ', '.join(n.output))
+                for n in self.nodes)
             raise RuntimeError(
                 "After %d iterations for %d nodes, still unable "
                 "to sort names %r. The graph may be disconnected. "
