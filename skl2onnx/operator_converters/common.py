@@ -3,7 +3,8 @@
 
 from ..common._apply_operation import apply_cast
 from ..common.data_types import (
-    Int64TensorType, FloatTensorType, DoubleTensorType, guess_proto_type)
+    Int64TensorType, FloatTensorType, DoubleTensorType,
+    StringTensorType, guess_proto_type)
 
 
 def concatenate_variables(scope, variables, container, main_type=None):
@@ -17,7 +18,8 @@ def concatenate_variables(scope, variables, container, main_type=None):
 
     # Check if it's possible to concatenate those inputs.
     type_set = set(type(variable.type) for variable in variables)
-    number_type_set = {FloatTensorType, Int64TensorType, DoubleTensorType}
+    number_type_set = {FloatTensorType, Int64TensorType, DoubleTensorType,
+                       StringTensorType}
     if any(itype not in number_type_set for itype in type_set):
         raise RuntimeError('Numerical tensor(s) and string tensor(s) '
                            'cannot be concatenated.')
