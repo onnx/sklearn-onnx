@@ -3,8 +3,7 @@
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
-    FloatTensorType, Int64TensorType, DoubleTensorType
-)
+    FloatTensorType, Int64TensorType, DoubleTensorType, StringTensorType)
 from ..common.utils import check_input_and_output_numbers
 from ..common.utils import check_input_and_output_types
 
@@ -22,7 +21,14 @@ def calculate_sklearn_imputer_output_shapes(operator):
                                    output_count_range=1)
     check_input_and_output_types(
         operator, good_input_types=[
-            FloatTensorType, Int64TensorType, DoubleTensorType])
+            FloatTensorType, Int64TensorType, DoubleTensorType,
+            StringTensorType])
+    if type(operator.inputs[0].type) != type(operator.outputs[0].type):  # noqa
+        raise RuntimeError(
+            "Inputs and outputs should have the same type "
+            "%r != %r." % (
+                type(operator.inputs[0].type),
+                type(operator.outputs[0].type)))
 
     N = operator.inputs[0].get_first_dimension()
     C = 0
