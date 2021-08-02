@@ -82,8 +82,8 @@ class Variable:
                 if len(not_none) and min(not_none) == 0:
                     raise RuntimeError(
                         "A variable cannot be empty, raw_name=%r, "
-                        "onnx_name=%r, type=%r." % (
-                            raw_name, onnx_name, type))
+                        "onnx_name=%r, shape=%r, type=%r." % (
+                            raw_name, onnx_name, shape, type))
 
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
@@ -141,6 +141,8 @@ class Variable:
         """
         def get_dim(d):
             r = d.dim_value
+            if "dim_param" in str(d):
+                return None
             if r == 0:
                 # dim_value is 0 when it is 0 or undefined
                 return 0 if "0" in str(d) else None
@@ -152,6 +154,7 @@ class Variable:
 
         if hasattr(obj, 'extend'):
             return [Variable.from_pb(o) for o in obj]
+
         name = obj.name
         if obj.type.tensor_type:
             tt = obj.type.tensor_type
