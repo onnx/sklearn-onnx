@@ -68,7 +68,7 @@ class Variable:
         :param type: A type object defined in .common.data_types.py;
                      e.g., FloatTensorType
         """
-        if not isinstance(raw_name, str) or '(' in raw_name:
+        if not isinstance(raw_name, str):
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
