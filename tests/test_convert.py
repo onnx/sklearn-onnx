@@ -13,6 +13,7 @@ except ImportError:
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.datasets import load_iris
 from skl2onnx import to_onnx, convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from test_utils import TARGET_OPSET
 
 
@@ -36,6 +37,28 @@ class TestConvert(unittest.TestCase):
             dom = get_domain_opset(model_onnx)
             self.assertEqual(len(dom), 1)
             assert dom[''] <= i
+
+    def test_parenthesis(self):
+        data = load_iris()
+        X = data.data
+        model = KMeans(n_clusters=3)
+        model.fit(X)
+        model_onnx = to_onnx(
+            model, initial_types=[('X', FloatTensorType())],
+            target_opset=13)
+        self.assertTrue(model_onnx is not None)
+        with self.assertRaises(RuntimeError):
+            to_onnx(
+                model, initial_types=[('X()', FloatTensorType())],
+                target_opset=13)
+        with self.assertRaises(RuntimeError):
+            to_onnx(
+                model, initial_types=[('X(', FloatTensorType())],
+                target_opset=13)
+        with self.assertRaises(RuntimeError):
+            to_onnx(
+                model, initial_types=[('X)', FloatTensorType())],
+                target_opset=13)
 
     def test_target_opset_dict(self):
         data = load_iris()

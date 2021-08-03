@@ -71,9 +71,11 @@ class Variable:
         if not isinstance(raw_name, str):
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
-        if not isinstance(onnx_name, str) or '(' in onnx_name:
+        if (not isinstance(onnx_name, str) or
+            '(' in onnx_name or ')' in onnx_name):
             raise TypeError(
-                "raw_name must be a string not %r." % type(onnx_name))
+                "raw_name must be a string without any character in '()' "
+                "not %r." % type(onnx_name))
 
         if type is not None:
             shape = type.shape
