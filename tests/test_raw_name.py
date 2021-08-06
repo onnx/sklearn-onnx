@@ -14,6 +14,7 @@ class RawNameTest(unittest.TestCase):
     _raw_names = (
         "float_input",
         "float_input--",
+        "float_input("
     )
 
     @staticmethod
