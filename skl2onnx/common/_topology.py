@@ -1126,7 +1126,10 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     for variable in topology.raw_model._inputs:
         name = variable.raw_name
         # Check input naming convention
-        input_name = variable.onnx_name.replace('_', '').replace(":", "").replace("/", "")
+        input_name = (
+            variable.onnx_name.replace('_', '')
+            .replace(":", "").replace("/", "")
+        )
         if input_name and (input_name[0].isdigit() or
                            (not input_name.isalnum())):
             invalid_name.append(name)

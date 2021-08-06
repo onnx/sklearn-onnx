@@ -39,15 +39,19 @@ class RawNameTest(unittest.TestCase):
 
     def test_raw_name(self):
         """
-        Assert that input raw names do not break the compilation of the graph and that
-        the ONNX model still produces correct predictions.
+        Assert that input raw names do not break the compilation
+        of the graph and that the ONNX model still produces
+        correct predictions.
         """
         X, y = self._load_data()
         clr = self._train_model(X, y)
         pred = clr.predict(X)
         for raw_name in self._raw_names:
             with self.subTest(raw_name=raw_name):
-                clr_onnx = convert_sklearn(clr, initial_types=self._get_initial_types(X, raw_name))
+                clr_onnx = convert_sklearn(
+                    clr,
+                    initial_types=self._get_initial_types(X, raw_name)
+                )
                 pred_onnx = self._predict(clr_onnx, X)
                 assert_almost_equal(
                     pred,
