@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 
 
-class SpecialRawNameTest(unittest.TestCase):
+class RawNameTest(unittest.TestCase):
 
     _raw_names = (
         "float_input",
