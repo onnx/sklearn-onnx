@@ -68,7 +68,7 @@ class Variable:
         :param type: A type object defined in .common.data_types.py;
                      e.g., FloatTensorType
         """
-        if not isinstance(raw_name, str) or '(' in raw_name:
+        if not isinstance(raw_name, str):
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
@@ -1123,9 +1123,13 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     nhwc_inputs = []
     if channel_first_inputs is None:
         channel_first_inputs = []
-    for name in topology.raw_model.input_names:
+    for variable in topology.raw_model._inputs:
+        name = variable.raw_name
         # Check input naming convention
-        input_name = name.replace('_', '').replace(":", "").replace("/", "")
+        input_name = (
+            variable.onnx_name.replace('_', '')
+            .replace(":", "").replace("/", "")
+        )
         if input_name and (input_name[0].isdigit() or
                            (not input_name.isalnum())):
             invalid_name.append(name)
@@ -1143,7 +1147,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     if invalid_name:
         warnings.warn('Some input names are not compliant with ONNX naming '
                       'convention: %s' % invalid_name)
-    for name in topology.raw_model.input_names:
+    for variable in topology.raw_model._inputs:
+        name = variable.raw_name
         if name in other_inputs:
             container.add_input(other_inputs[name])
 
