@@ -20,7 +20,7 @@ class RawNameTest(unittest.TestCase):
     @staticmethod
     def _load_data():
         iris = load_iris()
-        return iris.data, iris.target
+        return iris.data[:, :2], iris.target
 
     @staticmethod
     def _train_model(X, y):
