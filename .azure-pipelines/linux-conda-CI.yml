@@ -13,11 +13,11 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-      Py39-Onnx1100-Rt181-Skl0242:
+      Py39-Onnx1101-Rt181-Skl0242:
         do.bench: '0'
         python.version: '3.9'
         numpy.version: '>=1.18.1'
-        onnx.version: '==1.10.0'  # 'test'
+        onnx.version: '==1.10.1'  # 'test'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime>=1.8.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '>=0.24.2'
