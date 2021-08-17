@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+import io
+from contextlib import redirect_stdout
 import numpy
 from numpy.testing import assert_almost_equal
 try:
@@ -14,12 +16,13 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import RobustScaler, StandardScaler
 import onnxruntime
 from skl2onnx import convert_sklearn
-from skl2onnx.helpers import collect_intermediate_steps, compare_objects
-from skl2onnx.helpers import enumerate_pipeline_models
+from skl2onnx.helpers import (
+    collect_intermediate_steps, compare_objects,
+    enumerate_pipeline_models)
 from skl2onnx.helpers.investigate import _alter_model_for_debugging
 from skl2onnx.common import MissingShapeCalculator
-from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.common.data_types import guess_data_type
+from skl2onnx.common.data_types import (
+    FloatTensorType, guess_data_type)
 from test_utils import TARGET_OPSET
 
 
@@ -221,6 +224,19 @@ class TestInvestigate(unittest.TestCase):
                 skl_outputs = dbg_outputs['predict_proba']
             assert_almost_equal(onnx_output, skl_outputs, decimal=6)
             compare_objects(onnx_output, skl_outputs)
+
+    def test_verbose(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        model = Pipeline([("scaler1", StandardScaler()),
+                          ("lr", LogisticRegression())])
+        model.fit(X, y)
+        st = io.StringIO()
+        with redirect_stdout(st):
+            convert_sklearn(
+                model, initial_types=[('X', FloatTensorType())],
+                verbose=1)
+        self.assertIn("[convert_sklearn] convert_topology", st.getvalue())
 
 
 if __name__ == "__main__":
