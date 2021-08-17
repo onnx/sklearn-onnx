@@ -161,7 +161,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         print("[convert_sklearn] convert_topology")
     onnx_model = convert_topology(topology, name, doc_string, target_opset,
                                   options=options,
-                                  remove_identity=not intermediate)
+                                  remove_identity=not intermediate,
+                                  verbose=verbose)
 
     if verbose >= 1:
         print("[convert_sklearn] end")
