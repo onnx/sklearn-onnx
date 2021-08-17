@@ -1048,14 +1048,16 @@ class Topology:
 
 def convert_topology(topology, model_name, doc_string, target_opset,
                      channel_first_inputs=None,
-                     options=None, remove_identity=True):
+                     options=None, remove_identity=True,
+                     verbose=0):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
+
     :param topology: The Topology object we are going to convert
     :param model_name: GraphProto's name. Let "model" denote the
-                       returned model. The string "model_name" would be
-                       assigned to "model.graph.name."
+        returned model. The string "model_name" would be
+        assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
     :param target_opset: number or dictionary,
         for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
@@ -1063,7 +1065,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         different domains
     :param options: see :ref:`l-conv-options`
     :param remove_identity: removes identity nodes
-    include '1.1.2', '1.2', and so on.
+        include '1.1.2', '1.2', and so on.
+    :param verbose: displays information while converting
     :return: a ONNX ModelProto
     """
     if target_opset is None:
@@ -1095,7 +1098,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         target_opset, options=options,
         registered_models=topology.registered_models,
         white_op=topology.raw_model._white_op,
-        black_op=topology.raw_model._black_op)
+        black_op=topology.raw_model._black_op,
+        verbose=verbose)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.
