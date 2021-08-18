@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -15,6 +16,7 @@ from skl2onnx.common.shape_calculator import (
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm  # noqa
 )
+import onnxmltools
 from onnxmltools.convert.lightgbm._parse import WrappedBooster  #noqa
 from skl2onnx import to_onnx
 from skl2onnx._parse import _parse_sklearn_classifier, _parse_sklearn_simple_model
@@ -138,6 +140,9 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
         model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
         dump_single_regression(model, suffix="2")
 
+    @unittest.skipIf(
+        StrictVersion(onnxmltools.__version__) < StrictVersion('1.8.0'),
+        reason="converter for lightgbm is too old")
     def test_lightgbm_booster_multi_classifier(self):
         X = [[0, 1], [1, 1], [2, 0], [1, 2], [-1, 2], [1, -2]]
         X = numpy.array(X, dtype=numpy.float32)
