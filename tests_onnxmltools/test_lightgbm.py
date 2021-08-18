@@ -141,7 +141,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
         dump_single_regression(model, suffix="2")
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.8.0'),
+        StrictVersion(onnxmltools.__version__) < StrictVersion('1.8.1'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_booster_multi_classifier(self):
         X = [[0, 1], [1, 1], [2, 0], [1, 2], [-1, 2], [1, -2]]
