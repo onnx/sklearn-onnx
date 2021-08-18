@@ -17,9 +17,10 @@ from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm  # noqa
 )
 import onnxmltools
-from onnxmltools.convert.lightgbm._parse import WrappedBooster  #noqa
+from onnxmltools.convert.lightgbm._parse import WrappedBooster  # noqa
 from skl2onnx import to_onnx
-from skl2onnx._parse import _parse_sklearn_classifier, _parse_sklearn_simple_model
+from skl2onnx._parse import (
+    _parse_sklearn_classifier, _parse_sklearn_simple_model)
 
 try:
     from test_utils import dump_single_regression
@@ -30,10 +31,7 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
-from test_utils import (
-    dump_binary_classification, dump_multiple_classification,
-    dump_data_and_model)
-
+from test_utils import dump_binary_classification, dump_multiple_classification
 
 
 def calculate_lightgbm_output_shapes(operator):
@@ -154,7 +152,8 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             data)
 
         update_registered_converter(
-            WrappedLightGbmBoosterClassifier, 'WrappedLightGbmBoosterClassifier',
+            WrappedLightGbmBoosterClassifier,
+            'WrappedLightGbmBoosterClassifier',
             calculate_lightgbm_output_shapes,
             convert_lightgbm, parser=lightgbm_parser,
             options={'zipmap': [False, True], 'nocl': [False, True]})
