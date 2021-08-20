@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.9.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.common._topology</a></li> 
@@ -116,7 +116,7 @@
 <span class="sd">        :param type: A type object defined in .common.data_types.py;</span>
 <span class="sd">                     e.g., FloatTensorType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;(&#39;</span> <span class="ow">in</span> <span class="n">raw_name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;raw_name must be a string not &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">raw_name</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">onnx_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;(&#39;</span> <span class="ow">in</span> <span class="n">onnx_name</span><span class="p">:</span>
@@ -130,8 +130,8 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_none</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">not_none</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                         <span class="s2">&quot;A variable cannot be empty, raw_name=</span><span class="si">%r</span><span class="s2">, &quot;</span>
-                        <span class="s2">&quot;onnx_name=</span><span class="si">%r</span><span class="s2">, type=</span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                            <span class="n">raw_name</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
+                        <span class="s2">&quot;onnx_name=</span><span class="si">%r</span><span class="s2">, shape=</span><span class="si">%r</span><span class="s2">, type=</span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">raw_name</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">raw_name</span> <span class="o">=</span> <span class="n">raw_name</span>  <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onnx_name</span> <span class="o">=</span> <span class="n">onnx_name</span>  <span class="c1">#</span>
@@ -189,6 +189,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">get_dim</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dim_value</span>
+            <span class="k">if</span> <span class="s2">&quot;dim_param&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># dim_value is 0 when it is 0 or undefined</span>
                 <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="s2">&quot;0&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
@@ -200,6 +202,7 @@
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;extend&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">Variable</span><span class="o">.</span><span class="n">from_pb</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+
         <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">tensor_type</span><span class="p">:</span>
             <span class="n">tt</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">tensor_type</span>
@@ -820,6 +823,16 @@
             <span class="c1"># least one operator should be evaluated. If not, we need</span>
             <span class="c1"># to terminate this procedure to avoid dead lock.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_evaluation_happened</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unordered_operator_iterator</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">is_evaluated</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">raw_operator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="s2">&quot;One operator was not evaluated (&quot;</span>
+                            <span class="s2">&quot;inputs fed=</span><span class="si">%r</span><span class="s2">, outputs fed=</span><span class="si">%r</span><span class="s2">, op=</span><span class="si">%r</span><span class="s2">).&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                                <span class="nb">all</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span>
+                                    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
+                                <span class="nb">all</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">is_fed</span>
+                                    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span>
+                                <span class="n">op</span><span class="p">))</span>
                 <span class="k">break</span>
 
     <span class="k">def</span> <span class="nf">_check_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1083,14 +1096,16 @@
 
 <span class="k">def</span> <span class="nf">convert_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">doc_string</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">,</span>
                      <span class="n">channel_first_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_identity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                     <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_identity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function is used to convert our Topology object defined in</span>
 <span class="sd">    _parser.py into a ONNX model (type: ModelProto).</span>
+
 <span class="sd">    :param topology: The Topology object we are going to convert</span>
 <span class="sd">    :param model_name: GraphProto&#39;s name. Let &quot;model&quot; denote the</span>
-<span class="sd">                       returned model. The string &quot;model_name&quot; would be</span>
-<span class="sd">                       assigned to &quot;model.graph.name.&quot;</span>
+<span class="sd">        returned model. The string &quot;model_name&quot; would be</span>
+<span class="sd">        assigned to &quot;model.graph.name.&quot;</span>
 <span class="sd">    :param doc_string: A string attached to the produced model</span>
 <span class="sd">    :param target_opset: number or dictionary,</span>
 <span class="sd">        for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,</span>
@@ -1098,7 +1113,8 @@
 <span class="sd">        different domains</span>
 <span class="sd">    :param options: see :ref:`l-conv-options`</span>
 <span class="sd">    :param remove_identity: removes identity nodes</span>
-<span class="sd">    include &#39;1.1.2&#39;, &#39;1.2&#39;, and so on.</span>
+<span class="sd">        include &#39;1.1.2&#39;, &#39;1.2&#39;, and so on.</span>
+<span class="sd">    :param verbose: displays information while converting</span>
 <span class="sd">    :return: a ONNX ModelProto</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">target_opset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1130,7 +1146,8 @@
         <span class="n">target_opset</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
         <span class="n">registered_models</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">registered_models</span><span class="p">,</span>
         <span class="n">white_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_white_op</span><span class="p">,</span>
-        <span class="n">black_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_black_op</span><span class="p">)</span>
+        <span class="n">black_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_black_op</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># Put roots and leaves as ONNX&#39;s model into buffers. They will be</span>
     <span class="c1"># added into ModelComponentContainer later.</span>
@@ -1158,9 +1175,13 @@
     <span class="n">nhwc_inputs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">channel_first_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">channel_first_inputs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">input_names</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">raw_name</span>
         <span class="c1"># Check input naming convention</span>
-        <span class="n">input_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">input_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">input_name</span> <span class="ow">and</span> <span class="p">(</span><span class="n">input_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">or</span>
                            <span class="p">(</span><span class="ow">not</span> <span class="n">input_name</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())):</span>
             <span class="n">invalid_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1178,7 +1199,8 @@
     <span class="k">if</span> <span class="n">invalid_name</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Some input names are not compliant with ONNX naming &#39;</span>
                       <span class="s1">&#39;convention: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">invalid_name</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">input_names</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">raw_name</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">other_inputs</span><span class="p">:</span>
             <span class="n">container</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">other_inputs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
 
@@ -1381,7 +1403,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
   </div>
   
   </body>

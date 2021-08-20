@@ -28,6 +28,7 @@ Retrieve and load a model
 We download one model from the :epkg:`ONNX Zoo` but the model
 could be trained and produced by another converter library.
 """
+import sys
 from io import BytesIO
 import onnx
 from mlprodict.sklapi import OnnxTransformer
@@ -64,7 +65,11 @@ model_name = "squeezenet1.1-7.onnx"
 url_name = ("https://github.com/onnx/models/raw/master/vision/"
             "classification/squeezenet/model")
 url_name += "/" + model_name
-download_file(url_name, model_name, 100000)
+try:
+    download_file(url_name, model_name, 100000)
+except RuntimeError as e:
+    print(e)
+    sys.exit(1)
 
 
 ################################################

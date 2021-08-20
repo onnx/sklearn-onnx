@@ -284,7 +284,7 @@ Convert the pipeline into ONNX
 
  .. code-block:: none
 
-    Isolated variables exist: {'home_dest', 'cabin', 'sibsp', 'body', 'parch', 'boat', 'name', 'ticket'}
+    Isolated variables exist: {'boat', 'parch', 'cabin', 'sibsp', 'ticket', 'body', 'name', 'home_dest'}
 
 
 
@@ -371,9 +371,9 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [1 0 0 0 1]
-    predict_proba [[0.09577561 0.90422439]
-     [0.53138004 0.46861996]]
+    predict [0 0 0 0 0]
+    predict_proba [[0.9173195  0.0826805 ]
+     [0.58413894 0.41586106]]
 
 
 
@@ -433,8 +433,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [1 0 0 0 1]
-    predict_proba [{0: 0.09577557444572449, 1: 0.9042243957519531}, {0: 0.5313799977302551, 1: 0.4686200022697449}]
+    predict [0 0 0 0 0]
+    predict_proba [{0: 0.9173195362091064, 1: 0.08268049359321594}, {0: 0.5841389298439026, 1: 0.4158610701560974}]
 
 
 
@@ -471,9 +471,9 @@ an additional option zipmap.
 
  .. code-block:: none
 
-    predict [1 0 0 0 1]
-    predict_proba [[0.09577557 0.9042244 ]
-     [0.53138    0.46862   ]]
+    predict [0 0 0 0 0]
+    predict_proba [[0.91731954 0.08268049]
+     [0.58413893 0.41586107]]
 
 
 
@@ -539,7 +539,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 5874.5, 6812.5, -0.5)
+    (-0.5, 5875.5, 6812.5, -0.5)
 
 
 
@@ -567,11 +567,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.21.0
+    numpy: 1.21.1
     scikit-learn: 0.24.2
     onnx:  1.9.0
-    onnxruntime:  1.8.0
-    skl2onnx:  1.9.1.dev
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
 
 
 
@@ -579,7 +579,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.209 seconds)
+   **Total running time of the script:** ( 0 minutes  15.737 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:

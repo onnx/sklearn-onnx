@@ -260,8 +260,8 @@ And conversion.
 
  .. code-block:: none
 
-    (6.046576261908854e-07, 0.0002951417076574247)
-    (2.0175704258384997e-06, 0.0005483764991632607)
+    (6.046576236373724e-07, 0.0002951417081357655)
+    (2.017570421175563e-06, 0.0005483764996414804)
 
 
 
@@ -290,14 +290,14 @@ It works. The final looks like the following.
 
     OnnxInference(...)
         def compiled_run(dict_inputs):
-            # init: Su_Subcst
-            # init: Ma_MatMulcst
-            # init: Ge_Gemmcst1
+            # init: Ge_Gemmcst1 (Ge_Gemmcst1)
+            # init: Ma_MatMulcst (Ma_MatMulcst)
+            # init: Su_Subcst (Su_Subcst)
             # inputs
             X = dict_inputs['X']
             (Su_C0, ) = n0_sub(X, Su_Subcst)
-            (gemm, ) = n1_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
-            (nogemm, ) = n2_matmul(Su_C0, Ma_MatMulcst)
+            (nogemm, ) = n1_matmul(Su_C0, Ma_MatMulcst)
+            (gemm, ) = n2_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
             return {
                 'nogemm': nogemm,
                 'gemm': gemm,
@@ -333,7 +333,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.689 seconds)
+   **Total running time of the script:** ( 0 minutes  1.080 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:

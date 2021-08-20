@@ -4,9 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>Train and deploy a scikit-learn pipeline &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Train and deploy a scikit-learn pipeline &#8212; sklearn-onnx 1.9.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -42,7 +41,7 @@
         <li class="right" >
           <a href="../tutorial_1_simple.html" title="The easy case"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../tutorial_1_simple.html" accesskey="U">The easy case</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Train and deploy a scikit-learn pipeline</a></li> 
@@ -59,7 +58,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-abegin-convert-pipeline-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<section class="sphx-glr-example-title" id="train-and-deploy-a-scikit-learn-pipeline">
+<div class="sphx-glr-example-title section" id="train-and-deploy-a-scikit-learn-pipeline">
 <span id="l-simple-deploy-1"></span><span id="sphx-glr-auto-tutorial-plot-abegin-convert-pipeline-py"></span><h1>Train and deploy a scikit-learn pipeline<a class="headerlink" href="#train-and-deploy-a-scikit-learn-pipeline" title="Permalink to this headline">¶</a></h1>
 <p id="index-0">This program starts from an example in <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>
 documentation: <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/ensemble/plot_voting_regressor.html">Plot individual and voting regression predictions</a>,
@@ -75,9 +74,9 @@ a different runtime.</p>
 <li><p><a class="reference internal" href="#final-graph" id="id6">Final graph</a></p></li>
 </ul>
 </div>
-<section id="training-a-pipeline">
+<div class="section" id="training-a-pipeline">
 <h2><a class="toc-backref" href="#id1">Training a pipeline</a><a class="headerlink" href="#training-a-pipeline" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyquickhelper.helpgen.graphviz_helper</span> <span class="kn">import</span> <span class="n">plot_graphviz</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyquickhelper.helpgen.graphviz_helper</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
@@ -88,11 +87,11 @@ a different runtime.</p>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
-<span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <span class="n">OnnxInference</span>
+<span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a>
 
 
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">load_diabetes</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <span class="n">load_diabetes</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
 
 <span class="c1"># Train classifiers</span>
 <span class="n">reg1</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -102,7 +101,7 @@ a different runtime.</p>
 <span class="n">ereg</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;voting&#39;</span><span class="p">,</span> <span class="n">VotingRegressor</span><span class="p">([(</span><span class="s1">&#39;gb&#39;</span><span class="p">,</span> <span class="n">reg1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;rf&#39;</span><span class="p">,</span> <span class="n">reg2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;lr&#39;</span><span class="p">,</span> <span class="n">reg3</span><span class="p">)])),</span>
 <span class="p">])</span>
-<span class="n">ereg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">ereg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -114,56 +113,56 @@ a different runtime.</p>
                                              (&#39;lr&#39;, LinearRegression())]))])
 </pre></div>
 </div>
-</section>
-<section id="converts-the-model">
+</div>
+<div class="section" id="converts-the-model">
 <h2><a class="toc-backref" href="#id2">Converts the model</a><a class="headerlink" href="#converts-the-model" title="Permalink to this headline">¶</a></h2>
 <p>The second argument gives a sample of the data
 used to train the model. It is used to infer
 the input type of the ONNX graph. It is converted
 into single float and ONNX runtimes may not fully
 support doubles.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">ereg</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">ereg</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span>
               <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="prediction-with-onnx">
+</div>
+<div class="section" id="prediction-with-onnx">
 <h2><a class="toc-backref" href="#id3">Prediction with ONNX</a><a class="headerlink" href="#prediction-with-onnx" title="Permalink to this headline">¶</a></h2>
 <p>The first example uses <a class="reference external" href="https://microsoft.github.io/onnxruntime/">onnxruntime</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
-<span class="n">pred_ort</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">X_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_ort</span></a> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="n">pred_skl</span> <span class="o">=</span> <span class="n">ereg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_skl</span></a> <span class="o">=</span> <span class="n">ereg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
 
-<span class="n">pred_ort</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="n">pred_skl</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_ort</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_skl</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(array([[273.63602],
-       [179.0986 ],
-       [237.44885],
-       [162.38895],
-       [198.60275]], dtype=float32), array([273.63600838, 179.09859435, 237.44884773, 162.38894411,
-       198.60274979]))
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(array([[158.58961],
+       [184.20035],
+       [135.89264],
+       [165.69168],
+       [262.32513]], dtype=float32), array([158.58961362, 184.20033778, 135.89263566, 165.69167535,
+       262.32510066]))
 </pre></div>
 </div>
-</section>
-<section id="comparison">
+</div>
+<div class="section" id="comparison">
 <span id="l-diff-dicrepencies"></span><h2><a class="toc-backref" href="#id4">Comparison</a><a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h2>
 <p>Before deploying, we need to compare that both
 <em>scikit-learn</em> and <em>ONNX</em> return the same predictions.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p1</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">d</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="p">(</span><span class="n">d</span> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">p1</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
 
-<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><span class="n">pred_skl</span><span class="p">,</span> <span class="n">pred_ort</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_skl</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_ort</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3.327880816073048e-05, 1.42833532086617e-07)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3.3615769154948794e-05, 1.9266832596449498e-07)
 </pre></div>
 </div>
 <p>It looks good. Biggest errors (absolute and relative)
@@ -172,132 +171,132 @@ floats instead of doubles.
 We can save the model into ONNX
 format and compute the same predictions in many
 platform using <a class="reference external" href="https://microsoft.github.io/onnxruntime/">onnxruntime</a>.</p>
-</section>
-<section id="python-runtime">
+</div>
+<div class="section" id="python-runtime">
 <h2><a class="toc-backref" href="#id5">Python runtime</a><a class="headerlink" href="#python-runtime" title="Permalink to this headline">¶</a></h2>
 <p>A python runtime can be used as well to compute
 the prediction. It is not meant to be used into
 production (it still relies on python), but it is
 useful to investigate why the conversion went wrong.
 It uses module <a class="reference external" href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/index.html">mlprodict</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">oinf</span> <span class="o">=</span> <span class="n">OnnxInference</span><span class="p">(</span><span class="n">onx</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s2">&quot;python_compiled&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">oinf</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a><span class="p">(</span><span class="n">onx</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="s2">&quot;python_compiled&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OnnxInference(...)
     def compiled_run(dict_inputs):
-        # init: w0
+        # init: w0 (w0)
         # inputs
         X = dict_inputs[&#39;X&#39;]
-        (dpath95, ) = n0_treeensembleregressor(X)
-        (dpath93, ) = n1_treeensembleregressor(X)
-        (dpath98, ) = n2_treeensembleregressor(X)
-        (dpath96, ) = n3_treeensembleregressor(X)
-        (dpath91, ) = n4_treeensembleregressor(X)
-        (dpath94, ) = n5_treeensembleregressor(X)
-        (dpath92, ) = n6_treeensembleregressor(X)
-        (var_2, ) = n7_linearregressor(X)
-        (dpath97, ) = n8_treeensembleregressor(X)
-        (dpath99, ) = n9_treeensembleregressor(X)
-        (var_1, ) = n10_treeensembleregressor(X)
-        (dpath7, ) = n11_treeensembleregressor(X)
-        (dpath2, ) = n12_treeensembleregressor(X)
-        (dpath3, ) = n13_treeensembleregressor(X)
-        (dpath9, ) = n14_treeensembleregressor(X)
-        (var_0, ) = n15_treeensembleregressor(X)
-        (dpath1, ) = n16_treeensembleregressor(X)
-        (dpath4, ) = n17_treeensembleregressor(X)
-        (dpath50, ) = n18_treeensembleregressor(X)
-        (dpath6, ) = n19_treeensembleregressor(X)
-        (dpath8, ) = n20_treeensembleregressor(X)
-        (dpath49, ) = n21_treeensembleregressor(X)
-        (dpath5, ) = n22_treeensembleregressor(X)
-        (dpath0, ) = n23_treeensembleregressor(X)
-        (dpath90, ) = n24_treeensembleregressor(X)
-        (dpath12, ) = n25_treeensembleregressor(X)
-        (dpath14, ) = n26_treeensembleregressor(X)
-        (dpath17, ) = n27_treeensembleregressor(X)
-        (dpath10, ) = n28_treeensembleregressor(X)
-        (dpath16, ) = n29_treeensembleregressor(X)
-        (dpath15, ) = n30_treeensembleregressor(X)
-        (dpath20, ) = n31_treeensembleregressor(X)
-        (dpath22, ) = n32_treeensembleregressor(X)
-        (dpath11, ) = n33_treeensembleregressor(X)
-        (dpath23, ) = n34_treeensembleregressor(X)
-        (dpath26, ) = n35_treeensembleregressor(X)
-        (dpath13, ) = n36_treeensembleregressor(X)
-        (dpath24, ) = n37_treeensembleregressor(X)
-        (dpath25, ) = n38_treeensembleregressor(X)
-        (dpath21, ) = n39_treeensembleregressor(X)
-        (dpath27, ) = n40_treeensembleregressor(X)
-        (dpath19, ) = n41_treeensembleregressor(X)
-        (dpath41, ) = n42_treeensembleregressor(X)
-        (dpath34, ) = n43_treeensembleregressor(X)
+        (dpath96, ) = n0_treeensembleregressor(X)
+        (dpath88, ) = n1_treeensembleregressor(X)
+        (var_2, ) = n2_linearregressor(X)
+        (dpath95, ) = n3_treeensembleregressor(X)
+        (dpath87, ) = n4_treeensembleregressor(X)
+        (dpath99, ) = n5_treeensembleregressor(X)
+        (dpath90, ) = n6_treeensembleregressor(X)
+        (dpath98, ) = n7_treeensembleregressor(X)
+        (dpath91, ) = n8_treeensembleregressor(X)
+        (dpath89, ) = n9_treeensembleregressor(X)
+        (dpath93, ) = n10_treeensembleregressor(X)
+        (dpath92, ) = n11_treeensembleregressor(X)
+        (dpath97, ) = n12_treeensembleregressor(X)
+        (dpath85, ) = n13_treeensembleregressor(X)
+        (dpath78, ) = n14_treeensembleregressor(X)
+        (dpath94, ) = n15_treeensembleregressor(X)
+        (dpath84, ) = n16_treeensembleregressor(X)
+        (dpath83, ) = n17_treeensembleregressor(X)
+        (dpath76, ) = n18_treeensembleregressor(X)
+        (dpath73, ) = n19_treeensembleregressor(X)
+        (dpath74, ) = n20_treeensembleregressor(X)
+        (dpath80, ) = n21_treeensembleregressor(X)
+        (dpath86, ) = n22_treeensembleregressor(X)
+        (dpath82, ) = n23_treeensembleregressor(X)
+        (dpath81, ) = n24_treeensembleregressor(X)
+        (dpath75, ) = n25_treeensembleregressor(X)
+        (dpath72, ) = n26_treeensembleregressor(X)
+        (dpath79, ) = n27_treeensembleregressor(X)
+        (dpath77, ) = n28_treeensembleregressor(X)
+        (dpath9, ) = n29_treeensembleregressor(X)
+        (var_1, ) = n30_treeensembleregressor(X)
+        (dpath10, ) = n31_treeensembleregressor(X)
+        (dpath0, ) = n32_treeensembleregressor(X)
+        (var_0, ) = n33_treeensembleregressor(X)
+        (dpath6, ) = n34_treeensembleregressor(X)
+        (dpath4, ) = n35_treeensembleregressor(X)
+        (dpath15, ) = n36_treeensembleregressor(X)
+        (dpath1, ) = n37_treeensembleregressor(X)
+        (dpath5, ) = n38_treeensembleregressor(X)
+        (dpath8, ) = n39_treeensembleregressor(X)
+        (dpath7, ) = n40_treeensembleregressor(X)
+        (dpath2, ) = n41_treeensembleregressor(X)
+        (dpath3, ) = n42_treeensembleregressor(X)
+        (dpath14, ) = n43_treeensembleregressor(X)
         (dpath18, ) = n44_treeensembleregressor(X)
-        (dpath33, ) = n45_treeensembleregressor(X)
-        (dpath32, ) = n46_treeensembleregressor(X)
-        (dpath29, ) = n47_treeensembleregressor(X)
-        (dpath28, ) = n48_treeensembleregressor(X)
-        (dpath30, ) = n49_treeensembleregressor(X)
-        (dpath39, ) = n50_treeensembleregressor(X)
-        (dpath43, ) = n51_treeensembleregressor(X)
-        (dpath31, ) = n52_treeensembleregressor(X)
-        (dpath42, ) = n53_treeensembleregressor(X)
-        (dpath40, ) = n54_treeensembleregressor(X)
-        (dpath38, ) = n55_treeensembleregressor(X)
-        (dpath37, ) = n56_treeensembleregressor(X)
-        (dpath35, ) = n57_treeensembleregressor(X)
-        (dpath47, ) = n58_treeensembleregressor(X)
-        (dpath48, ) = n59_treeensembleregressor(X)
-        (dpath36, ) = n60_treeensembleregressor(X)
-        (dpath89, ) = n61_treeensembleregressor(X)
-        (dpath46, ) = n62_treeensembleregressor(X)
-        (dpath45, ) = n63_treeensembleregressor(X)
-        (dpath44, ) = n64_treeensembleregressor(X)
-        (dpath61, ) = n65_treeensembleregressor(X)
-        (dpath54, ) = n66_treeensembleregressor(X)
-        (dpath69, ) = n67_treeensembleregressor(X)
-        (dpath68, ) = n68_treeensembleregressor(X)
-        (dpath77, ) = n69_treeensembleregressor(X)
-        (dpath72, ) = n70_treeensembleregressor(X)
-        (dpath65, ) = n71_treeensembleregressor(X)
-        (dpath64, ) = n72_treeensembleregressor(X)
-        (dpath67, ) = n73_treeensembleregressor(X)
-        (dpath81, ) = n74_treeensembleregressor(X)
-        (dpath53, ) = n75_treeensembleregressor(X)
-        (dpath62, ) = n76_treeensembleregressor(X)
-        (dpath70, ) = n77_treeensembleregressor(X)
-        (dpath78, ) = n78_treeensembleregressor(X)
-        (dpath79, ) = n79_treeensembleregressor(X)
-        (dpath75, ) = n80_treeensembleregressor(X)
-        (dpath74, ) = n81_treeensembleregressor(X)
-        (dpath73, ) = n82_treeensembleregressor(X)
-        (dpath76, ) = n83_treeensembleregressor(X)
-        (dpath51, ) = n84_treeensembleregressor(X)
-        (dpath52, ) = n85_treeensembleregressor(X)
-        (dpath71, ) = n86_treeensembleregressor(X)
-        (dpath55, ) = n87_treeensembleregressor(X)
-        (dpath80, ) = n88_treeensembleregressor(X)
-        (dpath87, ) = n89_treeensembleregressor(X)
-        (dpath86, ) = n90_treeensembleregressor(X)
-        (dpath85, ) = n91_treeensembleregressor(X)
-        (dpath84, ) = n92_treeensembleregressor(X)
-        (dpath82, ) = n93_treeensembleregressor(X)
-        (dpath88, ) = n94_treeensembleregressor(X)
-        (dpath60, ) = n95_treeensembleregressor(X)
-        (dpath83, ) = n96_treeensembleregressor(X)
-        (dpath57, ) = n97_treeensembleregressor(X)
-        (dpath63, ) = n98_treeensembleregressor(X)
-        (dpath56, ) = n99_treeensembleregressor(X)
-        (dpath66, ) = n100_treeensembleregressor(X)
-        (dpath59, ) = n101_treeensembleregressor(X)
-        (dpath58, ) = n102_treeensembleregressor(X)
-        (wvar_0, ) = n103_mul(var_0, w0)
-        (wvar_2, ) = n104_mul(var_2, w0)
-        (wvar_1, ) = n105_mul(var_1, w0)
-        (fvar_0, ) = n106_flatten(wvar_0)
-        (fvar_1, ) = n107_flatten(wvar_1)
+        (dpath13, ) = n45_treeensembleregressor(X)
+        (dpath70, ) = n46_treeensembleregressor(X)
+        (dpath17, ) = n47_treeensembleregressor(X)
+        (dpath12, ) = n48_treeensembleregressor(X)
+        (dpath11, ) = n49_treeensembleregressor(X)
+        (dpath27, ) = n50_treeensembleregressor(X)
+        (dpath24, ) = n51_treeensembleregressor(X)
+        (dpath25, ) = n52_treeensembleregressor(X)
+        (dpath21, ) = n53_treeensembleregressor(X)
+        (dpath20, ) = n54_treeensembleregressor(X)
+        (dpath22, ) = n55_treeensembleregressor(X)
+        (dpath26, ) = n56_treeensembleregressor(X)
+        (dpath16, ) = n57_treeensembleregressor(X)
+        (dpath29, ) = n58_treeensembleregressor(X)
+        (dpath30, ) = n59_treeensembleregressor(X)
+        (dpath19, ) = n60_treeensembleregressor(X)
+        (dpath71, ) = n61_treeensembleregressor(X)
+        (dpath31, ) = n62_treeensembleregressor(X)
+        (dpath28, ) = n63_treeensembleregressor(X)
+        (dpath23, ) = n64_treeensembleregressor(X)
+        (dpath35, ) = n65_treeensembleregressor(X)
+        (dpath41, ) = n66_treeensembleregressor(X)
+        (dpath54, ) = n67_treeensembleregressor(X)
+        (dpath45, ) = n68_treeensembleregressor(X)
+        (dpath50, ) = n69_treeensembleregressor(X)
+        (dpath49, ) = n70_treeensembleregressor(X)
+        (dpath48, ) = n71_treeensembleregressor(X)
+        (dpath47, ) = n72_treeensembleregressor(X)
+        (dpath51, ) = n73_treeensembleregressor(X)
+        (dpath46, ) = n74_treeensembleregressor(X)
+        (dpath64, ) = n75_treeensembleregressor(X)
+        (dpath37, ) = n76_treeensembleregressor(X)
+        (dpath44, ) = n77_treeensembleregressor(X)
+        (dpath33, ) = n78_treeensembleregressor(X)
+        (dpath53, ) = n79_treeensembleregressor(X)
+        (dpath61, ) = n80_treeensembleregressor(X)
+        (dpath58, ) = n81_treeensembleregressor(X)
+        (dpath57, ) = n82_treeensembleregressor(X)
+        (dpath56, ) = n83_treeensembleregressor(X)
+        (dpath59, ) = n84_treeensembleregressor(X)
+        (dpath55, ) = n85_treeensembleregressor(X)
+        (dpath36, ) = n86_treeensembleregressor(X)
+        (dpath68, ) = n87_treeensembleregressor(X)
+        (dpath52, ) = n88_treeensembleregressor(X)
+        (dpath34, ) = n89_treeensembleregressor(X)
+        (dpath60, ) = n90_treeensembleregressor(X)
+        (dpath67, ) = n91_treeensembleregressor(X)
+        (dpath65, ) = n92_treeensembleregressor(X)
+        (dpath66, ) = n93_treeensembleregressor(X)
+        (dpath62, ) = n94_treeensembleregressor(X)
+        (dpath69, ) = n95_treeensembleregressor(X)
+        (dpath40, ) = n96_treeensembleregressor(X)
+        (dpath63, ) = n97_treeensembleregressor(X)
+        (dpath39, ) = n98_treeensembleregressor(X)
+        (dpath38, ) = n99_treeensembleregressor(X)
+        (dpath32, ) = n100_treeensembleregressor(X)
+        (dpath43, ) = n101_treeensembleregressor(X)
+        (dpath42, ) = n102_treeensembleregressor(X)
+        (wvar_2, ) = n103_mul(var_2, w0)
+        (wvar_1, ) = n104_mul(var_1, w0)
+        (wvar_0, ) = n105_mul(var_0, w0)
+        (fvar_1, ) = n106_flatten(wvar_1)
+        (fvar_0, ) = n107_flatten(wvar_0)
         (fvar_2, ) = n108_flatten(wvar_2)
         (variable, ) = n109_sum(fvar_0, fvar_1, fvar_2)
         return {
@@ -306,24 +305,24 @@ It uses module <a class="reference external" href="http://www.xavierdupre.fr/app
 </pre></div>
 </div>
 <p>It works almost the same way.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pred_pyrt</span> <span class="o">=</span> <span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">X_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})[</span><span class="s1">&#39;variable&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><span class="n">pred_skl</span><span class="p">,</span> <span class="n">pred_pyrt</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_pyrt</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference.run" title="mlprodict.onnxrt.onnx_inference.OnnxInference.run" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-method"><span class="n">oinf</span><span class="o">.</span><span class="n">run</span></a><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})[</span><span class="s1">&#39;variable&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_skl</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_pyrt</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(5.403388405511578e-05, 2.8938521084700273e-07)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(4.541456351603301e-05, 3.7607920118458317e-07)
 </pre></div>
 </div>
-</section>
-<section id="final-graph">
+</div>
+<div class="section" id="final-graph">
 <h2><a class="toc-backref" href="#id6">Final graph</a><a class="headerlink" href="#final-graph" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_graphviz</span><span class="p">(</span><span class="n">oinf</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="plot abegin convert pipeline" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_abegin_convert_pipeline_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.822 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.061 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-abegin-convert-pipeline-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_abegin_convert_pipeline.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -336,8 +335,8 @@ It uses module <a class="reference external" href="http://www.xavierdupre.fr/app
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -395,7 +394,7 @@ It uses module <a class="reference external" href="http://www.xavierdupre.fr/app
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
   </div>
   
   </body>

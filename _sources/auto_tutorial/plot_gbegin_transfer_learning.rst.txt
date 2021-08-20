@@ -45,10 +45,11 @@ Retrieve and load a model
 We download one model from the :epkg:`ONNX Zoo` but the model
 could be trained and produced by another converter library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-70
+.. GENERATED FROM PYTHON SOURCE LINES 31-75
 
 .. code-block:: default
 
+    import sys
     from io import BytesIO
     import onnx
     from mlprodict.sklapi import OnnxTransformer
@@ -85,7 +86,11 @@ could be trained and produced by another converter library.
     url_name = ("https://github.com/onnx/models/raw/master/vision/"
                 "classification/squeezenet/model")
     url_name += "/" + model_name
-    download_file(url_name, model_name, 100000)
+    try:
+        download_file(url_name, model_name, 100000)
+    except RuntimeError as e:
+        print(e)
+        sys.exit(1)
 
 
 
@@ -98,16 +103,17 @@ could be trained and produced by another converter library.
 
  .. code-block:: none
 
-    'squeezenet1.1-7.onnx' already downloaded
+    download 'https://github.com/onnx/models/raw/master/vision/classification/squeezenet/model/squeezenet1.1-7.onnx'
+    downloaded 4956208 bytes.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-72
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 Loading the ONNX file and use it on one image.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-78
+.. GENERATED FROM PYTHON SOURCE LINES 77-83
 
 .. code-block:: default
 
@@ -132,17 +138,17 @@ Loading the ONNX file and use it on one image.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 84-86
 
 The model expects a series of images of size
 `[3, 224, 224]`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 88-90
 
 Classifying an image
 ++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-95
+.. GENERATED FROM PYTHON SOURCE LINES 90-100
 
 .. code-block:: default
 
@@ -166,16 +172,17 @@ Classifying an image
 
  .. code-block:: none
 
-    'East_Coker_elm.jpg' already downloaded
+    download 'https://upload.wikimedia.org/wikipedia/commons/d/d2/East_Coker_elm%2C_2.jpg'
+    downloaded 712230 bytes.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-97
+.. GENERATED FROM PYTHON SOURCE LINES 101-102
 
 Image to numpy and predection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-112
+.. GENERATED FROM PYTHON SOURCE LINES 102-117
 
 .. code-block:: default
 
@@ -209,11 +216,11 @@ Image to numpy and predection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-114
+.. GENERATED FROM PYTHON SOURCE LINES 118-119
 
 Interpretation
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-119
+.. GENERATED FROM PYTHON SOURCE LINES 119-124
 
 .. code-block:: default
 
@@ -237,7 +244,7 @@ Interpretation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-125
+.. GENERATED FROM PYTHON SOURCE LINES 125-130
 
 Classifying more images
 +++++++++++++++++++++++
@@ -245,7 +252,7 @@ Classifying more images
 The initial image is rotated,
 the answer is changing.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-151
+.. GENERATED FROM PYTHON SOURCE LINES 130-156
 
 .. code-block:: default
 
@@ -309,7 +316,7 @@ the answer is changing.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-158
+.. GENERATED FROM PYTHON SOURCE LINES 157-163
 
 Transfer learning in a pipeline
 +++++++++++++++++++++++++++++++
@@ -318,7 +325,7 @@ The proposed transfer learning consists
 using a PCA to projet the probabilities
 on a graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-176
+.. GENERATED FROM PYTHON SOURCE LINES 163-181
 
 .. code-block:: default
 
@@ -350,28 +357,28 @@ on a graph.
 
  .. code-block:: none
 
-    [[-676.5763   -203.3544  ]
-     [-570.6654   -208.0976  ]
-     [-339.8116    -86.3398  ]
-     [ -14.555648 -168.44843 ]
-     [ 357.22363  -157.61398 ]
-     [ 596.3861    -90.21019 ]
-     [ 918.8614    -26.339548]
-     [ 499.87158   128.2727  ]
-     [ 306.68555   156.42888 ]
-     [-125.91209   119.21815 ]
-     [-446.60464   342.45844 ]
-     [-504.90247   194.02577 ]]
+    [[-676.5762   -203.35469 ]
+     [-570.6654   -208.09761 ]
+     [-339.81158   -86.3397  ]
+     [ -14.555643 -168.44814 ]
+     [ 357.2236   -157.61383 ]
+     [ 596.38605   -90.21025 ]
+     [ 918.8611    -26.339874]
+     [ 499.87164   128.27267 ]
+     [ 306.68555   156.42918 ]
+     [-125.912056  119.21854 ]
+     [-446.6046    342.4585  ]
+     [-504.90247   194.02522 ]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-179
+.. GENERATED FROM PYTHON SOURCE LINES 182-184
 
 Graph for the PCA
 -----------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-191
+.. GENERATED FROM PYTHON SOURCE LINES 184-196
 
 .. code-block:: default
 
@@ -398,7 +405,7 @@ Graph for the PCA
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-198
+.. GENERATED FROM PYTHON SOURCE LINES 197-203
 
 Remove one layer at the end
 ---------------------------
@@ -407,7 +414,7 @@ The last is often removed before the model is
 inserted in a pipeline. Let's see how to do that.
 First, we need the list of output for every node.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-206
+.. GENERATED FROM PYTHON SOURCE LINES 203-211
 
 .. code-block:: default
 
@@ -499,11 +506,11 @@ First, we need the list of output for every node.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-208
+.. GENERATED FROM PYTHON SOURCE LINES 212-213
 
 We select one of the last one.
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-212
+.. GENERATED FROM PYTHON SOURCE LINES 213-217
 
 .. code-block:: default
 
@@ -526,13 +533,13 @@ We select one of the last one.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-216
+.. GENERATED FROM PYTHON SOURCE LINES 218-221
 
 And we tell *OnnxTransformer* to use that
 specific one and to flatten the output
 as the dimension is not a matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-230
+.. GENERATED FROM PYTHON SOURCE LINES 221-235
 
 .. code-block:: default
 
@@ -557,7 +564,7 @@ as the dimension is not a matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-236
+.. GENERATED FROM PYTHON SOURCE LINES 236-241
 
 We check that it is different.
 The following values are the shape of the
@@ -565,7 +572,7 @@ PCA components. The number of column is the number
 of dimensions of the outputs of the transfered
 neural network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-240
+.. GENERATED FROM PYTHON SOURCE LINES 241-245
 
 .. code-block:: default
 
@@ -588,11 +595,11 @@ neural network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-242
+.. GENERATED FROM PYTHON SOURCE LINES 246-247
 
 Graph again.
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-255
+.. GENERATED FROM PYTHON SOURCE LINES 247-260
 
 .. code-block:: default
 
@@ -623,7 +630,7 @@ Graph again.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.595 seconds)
+   **Total running time of the script:** ( 0 minutes  11.086 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_transfer_learning.py:

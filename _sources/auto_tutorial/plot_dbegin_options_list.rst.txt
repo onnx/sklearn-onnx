@@ -68,8 +68,6 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\sklearn\cluster\_kmeans.py:881: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
-      warnings.warn(
 
     GaussianMixture()
 
@@ -106,12 +104,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-4.63413544 -1.82908431 -2.74063698 -5.7397913  -3.38552462]
-    [[-4.634138 ]
-     [-1.8290834]
-     [-2.7406368]
-     [-5.739794 ]
-     [-3.3855247]]
+    [-3.07600669 -2.07610084 -1.21975197 -1.0168128  -3.65084023]
+    [[-3.0760052]
+     [-2.076102 ]
+     [-1.2197521]
+     [-1.016813 ]
+     [-3.650841 ]]
 
 
 
@@ -177,12 +175,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-4.63413544 -1.82908431 -2.74063698 -5.7397913  -3.38552462]
-    [[-4.634138 ]
-     [-1.8290834]
-     [-2.7406373]
-     [-5.739794 ]
-     [-3.3855252]]
+    [-3.07600669 -2.07610084 -1.21975197 -1.0168128  -3.65084023]
+    [[-3.0760052]
+     [-2.076102 ]
+     [-1.2197521]
+     [-1.016813 ]
+     [-3.6508405]]
 
 
 
@@ -239,8 +237,8 @@ Processing time
 
  .. code-block:: none
 
-    0.4192585000000122
-    0.4977758999999935
+    1.1683917999999949
+    1.5455498000000034
 
 
 
@@ -290,7 +288,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.315 seconds)
+   **Total running time of the script:** ( 0 minutes  5.131 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_list.py:

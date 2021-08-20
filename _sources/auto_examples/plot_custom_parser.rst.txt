@@ -142,7 +142,7 @@ a threshold.
 
  .. code-block:: none
 
-    [1 0 0 0 1 1 0 1 0 0 0 0 1 1 1 1 0 0 1 1 0 1 0 1 0 0 1 1 0 1 0 1 1 0 1 1 1
+    [1 0 0 1 1 0 1 0 0 0 1 1 1 0 0 1 1 0 1 0 1 0 1 1 0 1 1 1 0 1 0 0 0 0 0 0 0
      0]
 
 
@@ -463,22 +463,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [2 1 2 2 2]
-    onnx [2 1 2 2 2]
+    sklearn [1 2 1 0 2]
+    onnx [1 2 1 0 2]
     --probabilities--
-    sklearn [[0.00186504 0.18422639 0.81390857]
-     [0.00334885 0.50403456 0.49261659]
-     [0.00110833 0.37353869 0.62535299]
-     [0.00195394 0.3274598  0.67058626]
-     [0.0010589  0.18005162 0.81888949]]
-    onnx [[0.00186501 0.1842264  0.81390864]
-     [0.00334883 0.5040347  0.4926165 ]
-     [0.00110831 0.3735387  0.625353  ]
-     [0.00195391 0.32745987 0.6705862 ]
-     [0.00105892 0.18005161 0.8188895 ]]
+    sklearn [[6.05412855e-02 7.91920245e-01 1.47538470e-01]
+     [1.77924124e-03 3.86253236e-01 6.11967522e-01]
+     [2.27815083e-02 6.91736410e-01 2.85482081e-01]
+     [8.55729988e-01 1.44149948e-01 1.20064231e-04]
+     [8.78875124e-04 2.01259951e-01 7.97861174e-01]]
+    onnx [[6.0541268e-02 7.9192030e-01 1.4753845e-01]
+     [1.7792583e-03 3.8625324e-01 6.1196750e-01]
+     [2.2781577e-02 6.9173640e-01 2.8548202e-01]
+     [8.5572982e-01 1.4414996e-01 1.2010324e-04]
+     [8.7882235e-04 2.0125996e-01 7.9786122e-01]]
     --validation--
-    sklearn [1 0 0 0 1]
-    onnx [1 0 0 0 1]
+    sklearn [1 0 0 1 1]
+    onnx [1 0 0 1 1]
 
 
 
@@ -551,11 +551,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.0
+    numpy: 1.21.1
     scikit-learn: 0.24.2
     onnx:  1.9.0
-    onnxruntime:  1.8.0
-    skl2onnx:  1.9.1.dev
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
 
 
 
@@ -563,7 +563,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.733 seconds)
+   **Total running time of the script:** ( 0 minutes  4.499 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser.py:
