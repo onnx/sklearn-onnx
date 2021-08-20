@@ -208,6 +208,8 @@ class TestOnnxOperators(unittest.TestCase):
         for opset in [TARGET_OPSET, 14, 13, 12, 11, 10, 9]:
             for value in [np.array([5], dtype=np.float32),
                           np.array(5, dtype=np.float32)]:
+                if opset > TARGET_OPSET:
+                    continue
                 with self.subTest(opset=opset, value=value):
                     tensor_value = onnx.helper.make_tensor(
                         "value", onnx.TensorProto.FLOAT,
