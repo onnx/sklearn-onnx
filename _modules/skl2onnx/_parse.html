@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx._parse &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <title>skl2onnx._parse &#8212; sklearn-onnx 1.9.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx._parse</a></li> 
@@ -218,8 +218,8 @@
                 <span class="s1">&#39;score_samples&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores_var</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="n">SimpleImputer</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">}:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">):</span>
-            <span class="n">otype</span> <span class="o">=</span> <span class="n">Int64TensorType</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">(</span><span class="n">Int64TensorType</span><span class="p">,</span> <span class="n">StringTensorType</span><span class="p">)):</span>
+            <span class="n">otype</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">otype</span> <span class="o">=</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">otype</span><span class="p">)</span>
@@ -772,7 +772,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
   </div>
   
   </body>

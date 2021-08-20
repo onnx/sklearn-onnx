@@ -347,6 +347,27 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example answers issues `685 &lt;https://github.com/onnx/sklearn-onnx/issues/685&gt;`_. It implem...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_wext_pyod_forest_thumb.png
+     :alt: Converter for pyod.models.iforest.IForest
+
+     :ref:`sphx_glr_auto_tutorial_plot_wext_pyod_forest.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_wext_pyod_forest
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Transfer learning is common with deep learning. A deep learning model is used as preprocessing ...">
 
 .. only:: html

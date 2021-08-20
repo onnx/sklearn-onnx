@@ -185,8 +185,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [1 0 1 0 1]
-    predict_proba [[0.25335584 0.45934348 0.28730068]]
+    predict [2 0 1 2 0]
+    predict_proba [[0.24494482 0.33989718 0.415158  ]]
 
 
 
@@ -222,8 +222,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 0 1 0 1]
-    predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.287300705909729}]
+    predict [2 0 1 2 0]
+    predict_proba [{0: 0.24494479596614838, 1: 0.33989718556404114, 2: 0.4151580035686493}]
 
 
 
@@ -297,11 +297,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.0
+    numpy: 1.21.1
     scikit-learn: 0.24.2
     onnx:  1.9.0
-    onnxruntime:  1.8.0
-    skl2onnx:  1.9.1.dev
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
     onnxmltools:  1.8.0
     lightgbm:  3.2.1
 
@@ -311,7 +311,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.964 seconds)
+   **Total running time of the script:** ( 0 minutes  2.981 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_lightgbm.py:

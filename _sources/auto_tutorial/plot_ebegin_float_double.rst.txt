@@ -141,7 +141,7 @@ the discord areas.
  .. code-block:: none
 
 
-    <matplotlib.legend.Legend object at 0x000001EE1621E040>
+    <matplotlib.legend.Legend object at 0x000001EF8DAB6C40>
 
 
 
@@ -238,7 +238,7 @@ look into the conversion.
 
  .. code-block:: none
 
-    (363.4781090786519, 2.6694189950206964)
+    (182.70036615564243, 2.716634958859278)
 
 
 
@@ -337,7 +337,7 @@ The discrepencies.
 
  .. code-block:: none
 
-    (363.4781090786519, 2.6694189950206964)
+    (141.1630174317506, 2.716634958859278)
 
 
 
@@ -383,7 +383,7 @@ double in ONNX normalizer.
 
  .. code-block:: none
 
-    (2.62539883806312e-05, 5.761867790906556e-08)
+    (1.5198719211184653e-05, 5.71819629972324e-08)
 
 
 
@@ -439,7 +439,7 @@ class :epkg:`OnnxPipeline`.
 
 
     OnnxPipeline(steps=[('scaler',
-                         OnnxTransformer(onnx_bytes=b'\x08\x06\x12\x08skl2onnx\x1a\t1.9.1.dev"\x07ai.onnx(\x002\x00:\xf4\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=+=\xc0\xba=RI\x1d\xbb=.\xda\xf6\xbc=\xdbC\xd5\xbd=\xe1U\xe9\xbe=M_b\xbe=a\x9e\xa8>=\xb1\x9a\xa1\xbf=,@.?=\xc5 \x90\xc0\xa0\x01\x06*<\n\x05scale=\xf8C...1a?=\x88k\x8f>=\xa0Q\x07>=\x11\xa1\x83==\x1a\xf1\x00==87\x7f<=-\'\x00<=\xbc\x03\x80;=\xf7,\xff:\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x16\n\x08variable\x12\n\n\x08\x08\x01\x12\x04\n\x00\n\x00B\x0e\n\nai.onnx.ml\x10\x01')),
+                         OnnxTransformer(onnx_bytes=b'\x08\x06\x12\x08skl2onnx\x1a\x051.9.2"\x07ai.onnx(\x002\x00:\xf4\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=\x0et\xda;=8\xd3\x17==\xa98{\xbc=HP|==@\x7f\xb4==$M\xa9==\x1f\xf4\xec>=I\xc2\xeb?=\xd6V\xac\xbf=\xa3H$@\xa0\x01\x06*<\n\x05scale=\x07\xb1\xb9?=\xae\x8...\x8b>=\xa0\n\x07>=\xa9\xa3\x83==\xe1\x04\x02==Y\xaa\x80<=\xda\x0e\x01<=\x01V\x80;=\xf8\x7f\xff:\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x16\n\x08variable\x12\n\n\x08\x08\x01\x12\x04\n\x00\n\x00B\x0e\n\nai.onnx.ml\x10\x01')),
                         ('dt', DecisionTreeRegressor(max_depth=10))])
 
 
@@ -472,7 +472,7 @@ The conversion.
 
  .. code-block:: none
 
-    (2.8972554787287663e-05, 5.761867790906556e-08)
+    (1.5053630079364666e-05, 5.718196321286727e-08)
 
 
 
@@ -638,7 +638,7 @@ Success!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.996 seconds)
+   **Total running time of the script:** ( 0 minutes  2.862 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_ebegin_float_double.py:

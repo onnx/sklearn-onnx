@@ -1,7 +1,7 @@
 ..  SPDX-License-Identifier: Apache-2.0
 
-Using converter from other libraries
-====================================
+Using converters from other libraries
+=====================================
 
 Before starting writing our own converter,
 we can use some available in other libraries

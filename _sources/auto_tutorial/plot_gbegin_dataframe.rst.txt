@@ -238,7 +238,7 @@ Prediction with ONNX
     run(): incompatible function arguments. The following argument types are supported:
         1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -> List[object]
 
-    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x000001EE0C4C51B0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
+    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x000001EFC50CD9F0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
     0    a    c  0.50  0.60
     1    b    d  0.40  0.80
     2    a    d  0.50  0.56
@@ -302,17 +302,17 @@ And probilities.
  .. code-block:: none
 
     [[0.84 0.16]
-     [0.28 0.72]
-     [0.73 0.27]
-     [0.3  0.7 ]
-     [0.77 0.23]
-     [0.38 0.62]]
+     [0.27 0.73]
+     [0.71 0.29]
+     [0.25 0.75]
+     [0.61 0.39]
+     [0.32 0.68]]
     [[0.84000003 0.16      ]
-     [0.28000015 0.71999985]
-     [0.73       0.26999998]
-     [0.30000013 0.69999987]
-     [0.77       0.22999999]
-     [0.38000005 0.61999995]]
+     [0.2700001  0.7299999 ]
+     [0.71000004 0.29      ]
+     [0.25000012 0.7499999 ]
+     [0.61       0.39      ]
+     [0.3200001  0.6799999 ]]
 
 
 
@@ -521,17 +521,17 @@ And probilities.
  .. code-block:: none
 
     [[0.84 0.16]
-     [0.28 0.72]
-     [0.73 0.27]
-     [0.3  0.7 ]
-     [0.77 0.23]
-     [0.38 0.62]]
+     [0.27 0.73]
+     [0.71 0.29]
+     [0.25 0.75]
+     [0.61 0.39]
+     [0.32 0.68]]
     [[0.84000003 0.16      ]
-     [0.2800004  0.7199996 ]
-     [0.73       0.27      ]
-     [0.30000037 0.69999963]
-     [0.77       0.23000003]
-     [0.3800003  0.6199997 ]]
+     [0.2700004  0.7299996 ]
+     [0.71000004 0.29      ]
+     [0.25000042 0.7499996 ]
+     [0.61000013 0.3899999 ]
+     [0.32000035 0.67999965]]
 
 
 
@@ -539,7 +539,7 @@ And probilities.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.517 seconds)
+   **Total running time of the script:** ( 0 minutes  4.320 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py:
