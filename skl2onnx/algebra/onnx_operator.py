@@ -14,7 +14,7 @@ from ..common import utils
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
-from ..proto.onnx_helper_modified import make_graph, make_model
+from ..proto.onnx_helper_modified import make_graph, make_model, from_array
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
@@ -218,7 +218,7 @@ class OnnxOperator:
                  domain=None, **kwargs):
 
         if (output_names is None and
-                self.__class__.__name__ in {"OnnxScan"}):
+                self.__class__.__name__.startswith("OnnxScan")):
             raise NotImplementedError(
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
@@ -381,7 +381,34 @@ class OnnxOperator:
                 self.expected_inputs.append(inp)
 
         self.output_names_ = None
+        self._post_process_attributes()
 
+    def _post_process_attributes(self):
+        """
+        Walks through attributes and replaces them by ONNX
+        values.
+        """
+        if (self.__class__.__name__.startswith("OnnxConstantOfShape") and
+                "value" in self.kwargs):
+            value = self.kwargs['value']
+            if isinstance(value, TensorProto):
+                return
+            if isinstance(value, np.ndarray):
+                if value.shape == (1, ):
+                    val = value[0]
+                elif len(value.shape) == 0:
+                    val = value
+                else:
+                    raise RuntimeError(
+                        "Unexpected shape %r for value, it must be an array "
+                        "of one element." % value.shape)
+                self.kwargs['value'] = from_array(
+                    np.array([val], dtype=value.dtype))
+                return
+            raise TypeError(
+                "Unexpected type %r for value. It should be an array "
+                "of one element." % type(value))
+        
     def __str__(self):
         """
         usual
