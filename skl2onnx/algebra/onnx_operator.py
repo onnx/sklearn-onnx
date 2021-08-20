@@ -408,7 +408,7 @@ class OnnxOperator:
             raise TypeError(
                 "Unexpected type %r for value. It should be an array "
                 "of one element." % type(value))
-        
+
     def __str__(self):
         """
         usual
