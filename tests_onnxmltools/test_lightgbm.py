@@ -5,6 +5,11 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
+except ImportError:
+    # onnxruntime <= 0.5
+    InvalidArgument = RuntimeError
 from sklearn.base import ClassifierMixin
 from lightgbm import LGBMClassifier, LGBMRegressor, Dataset, train, Booster
 from skl2onnx import update_registered_converter
@@ -31,7 +36,9 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
-from test_utils import dump_binary_classification, dump_multiple_classification
+from test_utils import (
+    dump_binary_classification, dump_multiple_classification,
+    TARGET_OPSET)
 
 
 def calculate_lightgbm_output_shapes(operator):
@@ -168,9 +175,14 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
 
         model_onnx = to_onnx(
             model, initial_types=[('X', FloatTensorType([None, 2]))],
-            options={WrappedLightGbmBoosterClassifier: {'zipmap': False}})
+            options={WrappedLightGbmBoosterClassifier: {'zipmap': False}},
+            target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString())
+        except InvalidArgument as e:
+            raise AssertionError(
+                "Cannot load model\n%r" % str(model_onnx)) from e
         expected = model.predict(X)
         res = sess.run(None, {'X': X})
         assert_almost_equal(expected, res[1])
