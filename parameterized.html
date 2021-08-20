@@ -4,9 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>Converters with options &#8212; sklearn-onnx 1.9.1.dev documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Converters with options &#8212; sklearn-onnx 1.9.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -42,7 +41,7 @@
         <li class="right" >
           <a href="pipeline.html" title="Convert a pipeline"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.9.1.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Converters with options</a></li> 
       </ul>
     </div>  
@@ -52,7 +51,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="converters-with-options">
+  <div class="section" id="converters-with-options">
 <span id="l-conv-options"></span><h1>Converters with options<a class="headerlink" href="#converters-with-options" title="Permalink to this headline">¶</a></h1>
 <p>Most of the converters always produce the same converted model
 which computes the same outputs as the original model.
@@ -76,7 +75,7 @@ Below is the list of models which enable this mechanism.</p>
 <li><p><a class="reference internal" href="#pickability-and-pipeline" id="id12">Pickability and Pipeline</a></p></li>
 </ul>
 </div>
-<section id="gaussianprocessregressor-nearestneighbors">
+<div class="section" id="gaussianprocessregressor-nearestneighbors">
 <h2><a class="toc-backref" href="#id6">GaussianProcessRegressor, NearestNeighbors</a><a class="headerlink" href="#gaussianprocessregressor-nearestneighbors" title="Permalink to this headline">¶</a></h2>
 <p id="index-0">Both models require to compure pairwise distances.
 Function <code class="xref py py-func docutils literal notranslate"><span class="pre">onnx_cdist</span></code>
@@ -96,8 +95,8 @@ only for one model by using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">model</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;optim&#39;</span><span class="p">:</span> <span class="s1">&#39;cdist&#39;</span><span class="p">}}</span>
 </pre></div>
 </div>
-</section>
-<section id="tfidfvectorizer-countvectorizer">
+</div>
+<div class="section" id="tfidfvectorizer-countvectorizer">
 <h2><a class="toc-backref" href="#id7">TfidfVectorizer, CountVectorizer</a><a class="headerlink" href="#tfidfvectorizer-countvectorizer" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="skl2onnx.operator_converters.text_vectoriser.convert_sklearn_text_vectorizer">
@@ -153,11 +152,11 @@ The mode <code class="docutils literal notranslate"><span class="pre">analyser==
 </div>
 </dd></dl>
 
-</section>
-<section id="classifiers">
+</div>
+<div class="section" id="classifiers">
 <h2><a class="toc-backref" href="#id8">Classifiers</a><a class="headerlink" href="#classifiers" title="Permalink to this headline">¶</a></h2>
 <p>Converters for classifiers implement multiple options.</p>
-<section id="zipmap">
+<div class="section" id="zipmap">
 <h3><a class="toc-backref" href="#id9">ZipMap</a><a class="headerlink" href="#zipmap" title="Permalink to this headline">¶</a></h3>
 <p>The operator <em>ZipMap</em> produces a list of dictionaries.
 It repeats class names or ids but that’s not necessary
@@ -167,8 +166,8 @@ By default, ZipMap operator is added, it can be deactivated by using:</p>
 </pre></div>
 </div>
 <p>It is implemented by PR <a class="reference external" href="https://github.com/onnx/sklearn-onnx/pull/327">327</a>.</p>
-</section>
-<section id="class-information">
+</div>
+<div class="section" id="class-information">
 <h3><a class="toc-backref" href="#id10">Class information</a><a class="headerlink" href="#class-information" title="Permalink to this headline">¶</a></h3>
 <p>Class information is usually repeated in the ONNX operator
 which classifies and the output of the ZipMap operator
@@ -179,8 +178,8 @@ in the ONNX operator to get smaller models.</p>
 </pre></div>
 </div>
 <p>Classes are replaced by integers from 0 to the number of classes.</p>
-</section>
-<section id="raw-scores">
+</div>
+<div class="section" id="raw-scores">
 <h3><a class="toc-backref" href="#id11">Raw scores</a><a class="headerlink" href="#raw-scores" title="Permalink to this headline">¶</a></h3>
 <p>Almost all classifiers are converted in order to get probabilities
 and not raw scores. That’s the default behaviour. It can be deactivated
@@ -189,9 +188,9 @@ by using option:</p>
 </pre></div>
 </div>
 <p>It is implemented by PR <a class="reference external" href="https://github.com/onnx/sklearn-onnx/pull/308">308</a>.</p>
-</section>
-</section>
-<section id="pickability-and-pipeline">
+</div>
+</div>
+<div class="section" id="pickability-and-pipeline">
 <h2><a class="toc-backref" href="#id12">Pickability and Pipeline</a><a class="headerlink" href="#pickability-and-pipeline" title="Permalink to this headline">¶</a></h2>
 <p>The proposed way to specify options is not always pickable.
 Function <code class="docutils literal notranslate"><span class="pre">id(model)</span></code> depends on the execution and map an option
@@ -224,8 +223,8 @@ options would have the same effect:</p>
 <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;classifier__zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -282,7 +281,7 @@ options would have the same effect:</p>
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
   </div>
   
   </body>

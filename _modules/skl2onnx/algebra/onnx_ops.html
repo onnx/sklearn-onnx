@@ -5,18 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.algebra.onnx_ops &#8212; sklearn-onnx 1.7.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/readable.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <title>skl2onnx.algebra.onnx_ops &#8212; sklearn-onnx 1.9.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -32,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.7.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.algebra.onnx_ops</a></li> 
@@ -45,11 +46,17 @@
           <div class="body" role="main">
             
   <h1>Source code for skl2onnx.algebra.onnx_ops</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Place holder for all ONNX operators.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.coo</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
 <span class="kn">import</span> <span class="nn">onnx</span>
+<span class="kn">from</span> <span class="nn">..common.data_types</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">..common._topology</span> <span class="kn">import</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">.automation</span> <span class="kn">import</span> <span class="n">get_rst_doc</span>
 
 
@@ -58,7 +65,7 @@
                  <span class="n">domain</span><span class="p">,</span> <span class="n">attr_names</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span>
                  <span class="n">deprecated</span><span class="p">,</span> <span class="n">since_version</span><span class="p">,</span>
                  <span class="n">past_version</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="kn">import</span> <span class="n">OnnxOperator</span>
+    <span class="kn">from</span> <span class="nn">.onnx_operator</span> <span class="kn">import</span> <span class="n">OnnxOperator</span><span class="p">,</span> <span class="n">OnnxOperatorItem</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -117,11 +124,34 @@
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;output_names&#39;</span><span class="p">,</span> <span class="s1">&#39;op_version&#39;</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">,</span> <span class="s1">&#39;ir_version&#39;</span><span class="p">}:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;</span><span class="si">%s</span><span class="s2">&#39; not valid for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
-                                <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">op_name</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;</span><span class="si">%s</span><span class="s2">&#39; not valid for &#39;</span><span class="si">%s</span><span class="s2">&#39; opset=</span><span class="si">%s</span><span class="s2">.&quot;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;op_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_version</span>
+        <span class="c1"># This class can only be created by a user. Let&#39;s check</span>
+        <span class="c1"># types are either a variable, an operator or an array.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Input </span><span class="si">%r</span><span class="s2"> is a tuple or class </span><span class="si">%r</span><span class="s2">, it must have two &quot;</span>
+                        <span class="s2">&quot;elements (name, type) not </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span>
+                        <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">DataType</span><span class="p">)):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Input </span><span class="si">%r</span><span class="s2"> is a tuple or class </span><span class="si">%r</span><span class="s2">, it must be a tuple &quot;</span>
+                        <span class="s2">&quot;(name, type) not </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="n">Variable</span><span class="p">,</span> <span class="n">OnnxOperator</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">OnnxOperatorItem</span><span class="p">,</span> <span class="n">coo_matrix</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unexpected type </span><span class="si">%r</span><span class="s2"> for input </span><span class="si">%r</span><span class="s2"> of operator </span><span class="si">%r</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;It must be an instance of Variable (or a string), &quot;</span>
+                    <span class="s2">&quot;OnnxOperator, OnnxOperatorItem, numpy.ndarray, &quot;</span>
+                    <span class="s2">&quot;coo_matrix).&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">class_name</span><span class="p">))</span>
         <span class="n">OnnxOperator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="n">newclass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="p">(</span><span class="n">OnnxOperator</span><span class="p">,),</span>
@@ -213,6 +243,142 @@
 
 
 <span class="n">_update_module</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxReduceSumApi11</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator ReduceSum with opset&gt;=13 following API from opset 12.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;op_version must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">OnnxReduceSum</span><span class="p">(</span>  <span class="c1"># noqa</span>
+                <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OnnxReduceSum</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+            <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">OnnxReduceSum_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+                <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span>
+                <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OnnxReduceSum_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxReduceSum_1</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                               <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                               <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxReduceSum_1</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                           <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxSplitApi11</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator Split with opset&gt;=13 following API from opset 11.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;op_version must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">OnnxSplit</span><span class="p">(</span>  <span class="c1"># noqa</span>
+                <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OnnxSplit</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">OnnxSplit_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+                <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OnnxSplit_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+            <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxSplit_2</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxSplit_2</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                       <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxSqueezeApi11</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator Squeeze with opset&gt;=13 following API from opset 11.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;op_version must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxSqueeze</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxSqueeze_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+            <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxSqueeze_1</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                         <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxUnsqueezeApi11</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator Unsqueeze with opset&gt;=13 following API from opset 11.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;op_version must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxUnsqueeze</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxUnsqueeze_11</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+            <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxUnsqueeze_1</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                           <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxReduceL2_typed</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator ReduceL2 for float or double.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxReduceL2</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="n">keepdims</span><span class="p">,</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">OnnxMul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">)</span>  <span class="c1"># noqa</span>
+    <span class="n">red</span> <span class="o">=</span> <span class="n">OnnxReduceSumApi11</span><span class="p">(</span>
+        <span class="n">x2</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">keepdims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxSqrt</span><span class="p">(</span>  <span class="c1"># noqa</span>
+        <span class="n">red</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">OnnxReshapeApi13</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">allowzero</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">output_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds operator Reshape with opset&gt;=14 following API from opset 13.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;op_version must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxReshape</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">allowzero</span><span class="o">=</span><span class="n">allowzero</span><span class="p">,</span>
+            <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">op_version</span> <span class="o">&gt;=</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OnnxReshape_13</span><span class="p">(</span>  <span class="c1"># noqa</span>
+            <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+            <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">OnnxReshape_5</span><span class="p">(</span>  <span class="c1"># noqa</span>
+        <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+        <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -236,7 +402,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -247,8 +413,8 @@
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2018-2020, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.
+    &copy; Copyright 2018-2021, Microsoft.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
   </div>
   
   </body>

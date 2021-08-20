@@ -272,7 +272,7 @@ Cast.
 
  .. code-block:: none
 
-    2.988456890307134e-05
+    2.9884569016758178e-05
 
 
 
@@ -344,11 +344,11 @@ The graph.
 
  .. code-block:: none
 
-    numpy: 1.21.0
+    numpy: 1.21.1
     scikit-learn: 0.24.2
     onnx:  1.9.0
-    onnxruntime:  1.8.0
-    skl2onnx:  1.9.1.dev
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
 
 
 
@@ -356,7 +356,7 @@ The graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.626 seconds)
+   **Total running time of the script:** ( 0 minutes  8.481 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_cast_transformer.py:

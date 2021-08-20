@@ -14,27 +14,6 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="*ONNX Runtime* extends the `onnx backend API &lt;https://github.com/onnx/onnx/blob/master/docs/ Im...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_backend_thumb.png
-     :alt: ONNX Runtime Backend for ONNX
-
-     :ref:`sphx_glr_auto_examples_plot_backend.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_backend
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the mode...">
 
 .. only:: html
@@ -74,6 +53,27 @@ Gallery of examples
    :hidden:
 
    /auto_examples/plot_pipeline
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="*ONNX Runtime* extends the `onnx backend API &lt;https://github.com/onnx/onnx/blob/master/docs/ Im...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_backend_thumb.png
+     :alt: ONNX Runtime Backend for ONNX
+
+     :ref:`sphx_glr_auto_examples_plot_backend.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_backend
 
 .. raw:: html
 

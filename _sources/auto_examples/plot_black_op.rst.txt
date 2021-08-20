@@ -71,8 +71,6 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\sklearn\cluster\_kmeans.py:881: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
-      warnings.warn(
 
     GaussianMixture()
 
@@ -109,12 +107,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-0.8290423  -2.02545892 -5.58662959 -1.04839146 -2.46100054]
-    [[-0.8290422]
-     [-2.0254586]
-     [-5.586632 ]
-     [-1.0483916]
-     [-2.461002 ]]
+    [-1.1393122  -1.28520738 -7.69402172 -4.84991894 -1.06034404]
+    [[-1.1393118]
+     [-1.2852073]
+     [-7.6940236]
+     [-4.849919 ]
+     [-1.0603442]]
 
 
 
@@ -196,12 +194,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-0.8290423  -2.02545892 -5.58662959 -1.04839146 -2.46100054]
-    [[-0.8290422]
-     [-2.0254586]
-     [-5.586632 ]
-     [-1.0483916]
-     [-2.461002 ]]
+    [-1.1393122  -1.28520738 -7.69402172 -4.84991894 -1.06034404]
+    [[-1.1393118]
+     [-1.2852073]
+     [-7.6940236]
+     [-4.849919 ]
+     [-1.0603442]]
 
 
 
@@ -274,8 +272,8 @@ Processing time
 
  .. code-block:: none
 
-    0.5032862000000051
-    0.512622400000005
+    1.0554344999999898
+    1.1845239999999961
 
 
 
@@ -350,11 +348,11 @@ a blacklisted operator (or only whitelisted operators),
 
  .. code-block:: none
 
-    numpy: 1.21.0
+    numpy: 1.21.1
     scikit-learn: 0.24.2
     onnx:  1.9.0
-    onnxruntime:  1.8.0
-    skl2onnx:  1.9.1.dev
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
 
 
 
@@ -362,7 +360,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.105 seconds)
+   **Total running time of the script:** ( 0 minutes  30.521 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:

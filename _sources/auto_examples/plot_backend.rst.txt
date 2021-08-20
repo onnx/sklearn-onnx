@@ -32,7 +32,7 @@ to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-43
+.. GENERATED FROM PYTHON SOURCE LINES 20-34
 
 .. code-block:: default
 
@@ -40,6 +40,8 @@ of a simple logistic regression model.
     import onnxruntime
     import onnx
     import sklearn
+    from sklearn.datasets import load_iris
+    from sklearn.linear_model import LogisticRegression
     import numpy
     from onnxruntime import get_device
     import numpy as np
@@ -47,9 +49,48 @@ of a simple logistic regression model.
     import onnxruntime.backend as backend
     from onnx import load
 
-    name = datasets.get_example("logreg_iris.onnx")
-    model = load(name)
 
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 35-36
+
+Let's create an ONNX graph first.
+
+.. GENERATED FROM PYTHON SOURCE LINES 36-45
+
+.. code-block:: default
+
+
+    data = load_iris()
+    X, Y = data.data, data.target
+    logreg = LogisticRegression(C=1e5).fit(X, Y)
+    model = skl2onnx.to_onnx(logreg, X.astype(np.float32))
+    name = "logreg_iris.onnx"
+    with open(name, "wb") as f:
+        f.write(model.SerializeToString())
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
+
+Let's use ONNX backend API to test it.
+
+.. GENERATED FROM PYTHON SOURCE LINES 47-58
+
+.. code-block:: default
+
+
+    model = onnx.load(name)
     rep = backend.prepare(model, 'CPU')
     x = np.array([[-1.0, -2.0, 5.0, 6.0],
                   [-1.0, -2.0, -3.0, -4.0],
@@ -61,42 +102,52 @@ of a simple logistic regression model.
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ Out:
 
-    Traceback (most recent call last):
-      File "C:\xadupre\microsoft_xadupre\sklearn-onnx\docs\examples\plot_backend.py", line 39, in <module>
-        label, proba = rep.run(x)
-      File "C:\xadupre\microsoft_xadupre\onnxruntime\build\Windows\Release\Release\onnxruntime\backend\backend_rep.py", line 51, in run
-        return self._session.run(None, inps, options)
-      File "C:\xadupre\microsoft_xadupre\onnxruntime\build\Windows\Release\Release\onnxruntime\capi\onnxruntime_inference_collection.py", line 188, in run
-        return self._sess.run(output_names, input_feed, run_options)
-    onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument: [ONNXRuntimeError] : 2 : INVALID_ARGUMENT : Got invalid dimensions for input: float_input for the following indices
-     index: 1 Got: 4 Expected: 2
-     Please fix either the inputs or the model.
+ .. code-block:: none
+
+    label=[2 1 2]
+    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-46
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 The device depends on how the package was compiled,
 GPU or CPU.
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-48
+.. GENERATED FROM PYTHON SOURCE LINES 61-63
 
 .. code-block:: default
 
     print(get_device())
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-51
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    CPU
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 64-66
 
 The backend can also directly load the model
 without using *onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-61
+.. GENERATED FROM PYTHON SOURCE LINES 66-76
 
 .. code-block:: default
 
@@ -111,17 +162,32 @@ without using *onnx*.
     print("probabilities={}".format(proba))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-65
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    label=[1 1 1]
+    probabilities=[{0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}]
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 77-80
 
 The backend API is implemented by other frameworks
 and makes it easier to switch between multiple runtimes
 with the same API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-68
+.. GENERATED FROM PYTHON SOURCE LINES 82-83
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-74
+.. GENERATED FROM PYTHON SOURCE LINES 83-89
 
 .. code-block:: default
 
@@ -133,9 +199,27 @@ with the same API.
     print("skl2onnx: ", skl2onnx.__version__)
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    numpy: 1.21.1
+    scikit-learn: 0.24.2
+    onnx:  1.9.0
+    onnxruntime:  1.8.1
+    skl2onnx:  1.9.2
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.058 seconds)
+   **Total running time of the script:** ( 0 minutes  0.532 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
