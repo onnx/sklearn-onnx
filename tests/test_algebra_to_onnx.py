@@ -83,7 +83,13 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                             [('Y', FloatTensorType(shape=[]))]]
                 for i, node in enumerate(nodes):
                     shape = node.get_output_type_inference(inputs)
-                    self.assertEqual(str(expected[i]), str(shape))
+                    self.assertEqual(len(shape), 1)
+                    if isinstance(shape[0], tuple):
+                        self.assertEqual(str(expected[i]), str(shape))
+                    else:
+                        self.assertEqual(
+                            str(expected[i]),
+                            str([(shape[0].onnx_name, shape[0].type)]))
                     inputs = shape
 
     def common_test_sub_graph(self, first_input, model, options=None,

@@ -32,25 +32,33 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     if isinstance(op, StandardScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
-        attrs['offset'] = op.mean_ if op.with_mean else [0.0] * C
-        attrs['scale'] = 1.0 / op.scale_ if op.with_std else [1.0] * C
+        attrs['offset'] = (
+            op.mean_ if op.with_mean else
+            np.array([0.0] * C, dtype=np.float32))
+        attrs['scale'] = (
+            1.0 / op.scale_ if op.with_std else
+            np.array([1.0] * C, dtype=np.float32))
         inv_scale = op.scale_ if op.with_std else None
     elif isinstance(op, RobustScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
-        attrs['offset'] = op.center_ if op.with_centering else [0.0] * C
-        attrs['scale'] = 1.0 / op.scale_ if op.with_scaling else [1.0] * C
+        attrs['offset'] = (
+            op.center_ if op.with_centering else
+            np.array([0.0] * C, dtype=np.float32))
+        attrs['scale'] = (
+            1.0 / op.scale_ if op.with_scaling else
+            np.array([1.0] * C, dtype=np.float32))
         inv_scale = op.scale_ if op.with_scaling else None
     elif isinstance(op, MinMaxScaler):
         attrs['scale'] = op.scale_
         # Add 1e-8 to avoid divided by 0
-        attrs['offset'] = -op.min_/(op.scale_ + 1e-8)
+        attrs['offset'] = -op.min_ / (op.scale_ + 1e-8)
         inv_scale = None
     elif isinstance(op, MaxAbsScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
         attrs['scale'] = 1.0 / op.scale_
-        attrs['offset'] = [0.] * C
+        attrs['offset'] = np.array([0.] * C, dtype=np.float32)
         inv_scale = op.scale_
     else:
         raise ValueError('Only scikit-learn StandardScaler and RobustScaler '
@@ -106,6 +114,13 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
                             output_names=[operator.outputs[0].full_name])
             cast.add_to(scope, container)
             return
+
+    if attrs['offset'].size != attrs['scale'].size:
+        # Scaler does not accept different size for offset and scale.
+        size = max(attrs['offset'].size, attrs['scale'].size)
+        ones = np.ones(size, dtype=attrs['offset'].dtype)
+        attrs['offset'] = attrs['offset'] * ones
+        attrs['scale'] = attrs['scale'] * ones
 
     container.add_node(
         op_type, feature_name, operator.outputs[0].full_name,

@@ -68,7 +68,7 @@ class Variable:
         :param type: A type object defined in .common.data_types.py;
                      e.g., FloatTensorType
         """
-        if not isinstance(raw_name, str) or '(' in raw_name:
+        if not isinstance(raw_name, str):
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
@@ -82,8 +82,8 @@ class Variable:
                 if len(not_none) and min(not_none) == 0:
                     raise RuntimeError(
                         "A variable cannot be empty, raw_name=%r, "
-                        "onnx_name=%r, type=%r." % (
-                            raw_name, onnx_name, type))
+                        "onnx_name=%r, shape=%r, type=%r." % (
+                            raw_name, onnx_name, shape, type))
 
         self.raw_name = raw_name  #
         self.onnx_name = onnx_name  #
@@ -141,6 +141,8 @@ class Variable:
         """
         def get_dim(d):
             r = d.dim_value
+            if "dim_param" in str(d):
+                return None
             if r == 0:
                 # dim_value is 0 when it is 0 or undefined
                 return 0 if "0" in str(d) else None
@@ -152,6 +154,7 @@ class Variable:
 
         if hasattr(obj, 'extend'):
             return [Variable.from_pb(o) for o in obj]
+
         name = obj.name
         if obj.type.tensor_type:
             tt = obj.type.tensor_type
@@ -772,6 +775,16 @@ class Topology:
             # least one operator should be evaluated. If not, we need
             # to terminate this procedure to avoid dead lock.
             if not is_evaluation_happened:
+                for op in self.unordered_operator_iterator():
+                    if not op.is_evaluated and op.raw_operator is not None:
+                        raise RuntimeError(
+                            "One operator was not evaluated ("
+                            "inputs fed=%r, outputs fed=%r, op=%r)." % (
+                                all(variable.is_fed
+                                    for variable in operator.inputs),
+                                all(variable.is_fed
+                                    for variable in operator.outputs),
+                                op))
                 break
 
     def _check_structure(self):
@@ -1035,14 +1048,16 @@ class Topology:
 
 def convert_topology(topology, model_name, doc_string, target_opset,
                      channel_first_inputs=None,
-                     options=None, remove_identity=True):
+                     options=None, remove_identity=True,
+                     verbose=0):
     """
     This function is used to convert our Topology object defined in
     _parser.py into a ONNX model (type: ModelProto).
+
     :param topology: The Topology object we are going to convert
     :param model_name: GraphProto's name. Let "model" denote the
-                       returned model. The string "model_name" would be
-                       assigned to "model.graph.name."
+        returned model. The string "model_name" would be
+        assigned to "model.graph.name."
     :param doc_string: A string attached to the produced model
     :param target_opset: number or dictionary,
         for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
@@ -1050,7 +1065,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         different domains
     :param options: see :ref:`l-conv-options`
     :param remove_identity: removes identity nodes
-    include '1.1.2', '1.2', and so on.
+        include '1.1.2', '1.2', and so on.
+    :param verbose: displays information while converting
     :return: a ONNX ModelProto
     """
     if target_opset is None:
@@ -1082,7 +1098,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         target_opset, options=options,
         registered_models=topology.registered_models,
         white_op=topology.raw_model._white_op,
-        black_op=topology.raw_model._black_op)
+        black_op=topology.raw_model._black_op,
+        verbose=verbose)
 
     # Put roots and leaves as ONNX's model into buffers. They will be
     # added into ModelComponentContainer later.
@@ -1110,9 +1127,13 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     nhwc_inputs = []
     if channel_first_inputs is None:
         channel_first_inputs = []
-    for name in topology.raw_model.input_names:
+    for variable in topology.raw_model._inputs:
+        name = variable.raw_name
         # Check input naming convention
-        input_name = name.replace('_', '').replace(":", "").replace("/", "")
+        input_name = (
+            variable.onnx_name.replace('_', '')
+            .replace(":", "").replace("/", "")
+        )
         if input_name and (input_name[0].isdigit() or
                            (not input_name.isalnum())):
             invalid_name.append(name)
@@ -1130,7 +1151,8 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     if invalid_name:
         warnings.warn('Some input names are not compliant with ONNX naming '
                       'convention: %s' % invalid_name)
-    for name in topology.raw_model.input_names:
+    for variable in topology.raw_model._inputs:
+        name = variable.raw_name
         if name in other_inputs:
             container.add_input(other_inputs[name])
 

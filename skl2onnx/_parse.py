@@ -170,8 +170,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                 'score_samples', guess_tensor_type(inputs[0].type))
             this_operator.outputs.append(scores_var)
     elif type(model) in {SimpleImputer, Imputer}:
-        if isinstance(inputs[0].type, Int64TensorType):
-            otype = Int64TensorType()
+        if isinstance(inputs[0].type, (Int64TensorType, StringTensorType)):
+            otype = inputs[0].type.__class__()
         else:
             otype = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable('variable', otype)

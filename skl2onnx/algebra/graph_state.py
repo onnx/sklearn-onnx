@@ -503,10 +503,23 @@ class GraphState:
                 self.container.add_node(
                     self.operator_name, input_names, output_names,
                     name=name, **self.attrs)
-                self.computed_outputs_ = [
+                computed_outputs = [
                     (name, ct[1]) for name, ct in zip(
                         output_names, self._expected_outputs)]
                 self._update_contraints(
-                    self.computed_outputs_, self._expected_outputs,
+                    computed_outputs, self._expected_outputs,
                     self.computed_inputs_, self._expected_inputs,
                     debug=self.operator_name)
+
+                # Registers the variables into scope.
+                self.computed_outputs_ = []
+                for name, kind in computed_outputs:
+                    if isinstance(kind, str):
+                        self.computed_outputs_.append((name, kind))
+                    else:
+                        var = self.scope.declare_local_variable(name, kind)
+                        # name already comes from
+                        # scope.get_unique_variable_name
+                        var.onnx_name = name
+                        var.is_fed = True
+                        self.computed_outputs_.append(var)
