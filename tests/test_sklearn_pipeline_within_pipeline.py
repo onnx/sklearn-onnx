@@ -358,7 +358,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         initial_type = [('CAT1', StringTensorType([None, 1])),
                         ('CAT2', StringTensorType([None, 1])),
                         ('TEXT', StringTensorType([None, 1]))]
-        onx = to_onnx(preprocessor, initial_types=initial_type)
+        onx = to_onnx(preprocessor, initial_types=initial_type,
+                      target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_train, preprocessor, onx,
             basename="SklearnPipelineComplex")
