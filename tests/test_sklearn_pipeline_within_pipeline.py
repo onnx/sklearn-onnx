@@ -352,7 +352,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
                         ('CAT2', StringTensorType([None, 1])),
                         ('TEXTs', StringTensorType([None, 1]))]
         with self.assertRaises(RuntimeError):
-            to_onnx(preprocessor, initial_types=initial_type)
+            to_onnx(preprocessor, initial_types=initial_type,
+                    target_opset=TARGET_OPSET)
 
         initial_type = [('CAT1', StringTensorType([None, 1])),
                         ('CAT2', StringTensorType([None, 1])),
