@@ -15,5 +15,17 @@ def multioutput_regressor_shape_calculator(operator):
     o.type = o.type.__class__([N, C])
 
 
+def multioutput_classifier_shape_calculator(operator):
+    """Shape calculator for MultiOutputClassifier"""
+    i = operator.inputs[0]
+    outputs = operator.outputs
+    N = i.get_first_dimension()
+    C = len(operator.raw_operator.estimators_)
+    outputs[0].type.shape = [N, C]
+    outputs[1].type.shape = [N, C]
+
+
 register_shape_calculator('SklearnMultiOutputRegressor',
                           multioutput_regressor_shape_calculator)
+register_shape_calculator('SklearnMultiOutputClassifier',
+                          multioutput_classifier_shape_calculator)

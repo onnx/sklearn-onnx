@@ -209,6 +209,18 @@ class Operator(OperatorBase):
     Defines an operator available in *ONNX*.
     """
 
+    class OperatorList(list):
+        def __init__(self, parent):
+            super(Operator.OperatorList, self).__init__()
+            self.parent = parent
+
+        def append(self, v):
+            if not isinstance(v, Variable):
+                raise TypeError(
+                    "Input and output must be of type Variable not %r."
+                    "" % type(v))
+            super(Operator.OperatorList, self).append(v)
+
     def __init__(self, onnx_name, scope, type, raw_operator,
                  target_opset, scope_inst):
         """
@@ -236,8 +248,8 @@ class Operator(OperatorBase):
         self.scope = scope
         self.type = type
         self.raw_operator = raw_operator
-        self.inputs = []
-        self.outputs = []
+        self.inputs = Operator.OperatorList(self)
+        self.outputs = Operator.OperatorList(self)
         self.is_evaluated = None
         self.is_abandoned = False
         self.target_opset = target_opset
@@ -714,24 +726,39 @@ class Topology:
                             add.append("self.operator_name_set=%s" % (
                                 pprint.pformat(self.operator_name_set)))
                             for scope in self.scopes:
+                                add.append('---')
                                 add.append(pprint.pformat(
                                     scope.variable_name_mapping))
+                                add.append('---')
                                 for var in scope.variables.values():
                                     add.append("   is_fed=%s %s" % (
                                         getattr(var, 'is_fed', '?'), var))
+                                add.append('---')
                                 for op in scope.operators.values():
                                     add.append("   is_evaluated=%s %s" % (
                                         getattr(op, 'is_evaluated', '?'), op))
+                            add.append('---')
+                            for v in operator.inputs:
+                                add.append(" inputs={}".format(v))
+                            for v in operator.outputs:
+                                add.append(" outputs={}".format(v))
                             raise RuntimeError(
                                 "A variable is already assigned ({}) "
-                                "for operator '{}' (name='{}'). This "
-                                "may still happen if a converter is a "
+                                "for operator '{}' (name='{}'). "
+                                "operator.is_evaluated={}, inputs.is_fed={}, "
+                                "outputs.is_fed={}. "
+                                "This may still happen if a converter is a "
                                 "combination of sub-estimators and one "
                                 "of them is producing this output. "
                                 "In that case, an identity node must be "
                                 "added.{}".format(
                                     variable, operator.type,
                                     operator.onnx_name,
+                                    operator.is_evaluated,
+                                    [v.is_fed
+                                     for v in operator.inputs],
+                                    [v.is_fed
+                                     for v in operator.outputs],
                                     "\n".join(add)))
                         # Mark this variable as filled
                         variable.is_fed = True

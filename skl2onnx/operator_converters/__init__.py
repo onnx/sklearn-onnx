@@ -31,7 +31,7 @@ from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
 from . import multilayer_perceptron
-from . import multi_output
+from . import multioutput
 from . import multiply_op
 from . import naive_bayes
 from . import nearest_neighbours
@@ -85,7 +85,7 @@ __all__ = [
     linear_classifier,
     linear_regressor,
     multilayer_perceptron,
-    multi_output,
+    multioutput,
     multiply_op,
     naive_bayes,
     nearest_neighbours,

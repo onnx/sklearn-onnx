@@ -490,6 +490,15 @@ class GraphState:
                     conv = get_converter(self.operator_name)
                     conv(self.scope, sub_op, self.container)
             else:
+
+                def _name_(obj):
+                    if isinstance(obj, tuple) and len(obj) == 2:
+                        return obj[0]
+                    if hasattr(obj, 'onnx_name'):
+                        return obj.onnx_name
+                    raise TypeError(
+                        "Unable to extract variable name from %r." % obj)
+
                 # only one node is added
                 if self.options is not None:
                     raise RuntimeError(
@@ -498,8 +507,8 @@ class GraphState:
                 outputs = [
                     self._get_output_name(self._output_names, o, self.scope)
                     for o in expected_outputs]
-                input_names = [i[0] for i in inputs]
-                output_names = [i[0] for i in outputs]
+                input_names = [_name_(i) for i in inputs]
+                output_names = [_name_(i) for i in outputs]
                 self.container.add_node(
                     self.operator_name, input_names, output_names,
                     name=name, **self.attrs)

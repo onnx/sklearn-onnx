@@ -362,14 +362,14 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         return probability_tensor
 
     if options['zipmap'] == 'columns':
-        this_operator = scope.declare_local_operator('SklearnZipMapColumns')
+        zipmap_operator = scope.declare_local_operator('SklearnZipMapColumns')
         classes = get_label_classes(scope, model)
         classes_names = get_label_classes(scope, model, node_names=True)
     else:
-        this_operator = scope.declare_local_operator('SklearnZipMap')
+        zipmap_operator = scope.declare_local_operator('SklearnZipMap')
         classes = get_label_classes(scope, model)
 
-    this_operator.inputs = probability_tensor
+    zipmap_operator.inputs = probability_tensor
     label_type = Int64TensorType([None])
 
     if (isinstance(model.classes_, list) and
@@ -383,32 +383,32 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
                                "labels into integers but at least one label "
                                "is not an integer. Class labels should "
                                "be integers or strings.")
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.unsignedinteger):
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
-        this_operator.classlabels_strings = classes
+        zipmap_operator.classlabels_strings = classes
         label_type = StringTensorType([None])
 
     output_label = scope.declare_local_variable('output_label', label_type)
-    this_operator.outputs.append(output_label)
+    zipmap_operator.outputs.append(output_label)
 
     if options['zipmap'] == 'columns':
         prob_type = probability_tensor[1].type
         for cl in classes_names:
             output_cl = scope.declare_local_variable(cl, prob_type.__class__())
-            this_operator.outputs.append(output_cl)
+            zipmap_operator.outputs.append(output_cl)
     else:
         output_probability = scope.declare_local_variable(
             'output_probability',
             SequenceType(
                 DictionaryType(
                     label_type, guess_tensor_type(inputs[0].type))))
-        this_operator.outputs.append(output_probability)
-    return this_operator.outputs
+        zipmap_operator.outputs.append(output_probability)
+    return zipmap_operator.outputs
 
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
