@@ -165,7 +165,7 @@ class OnnxOperatorMixin:
                                        "infered. onnx_shape_calculator "
                                        "must be overriden and return "
                                        "a shape calculator.".format(name))
-                o.type = shapes[name].type
+                o.set_type(shapes[name].type)
 
         return shape_calculator
 

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import onnx_proto, TensorProto
@@ -8,6 +9,9 @@ from ..common.data_types import (
     _guess_type_proto, FloatType, DoubleType, Int64Type, copy_type)
 from ..common._topology import Variable
 from ..common._registration import get_shape_calculator, get_converter
+
+
+logger = getLogger('skl2onnx')
 
 
 class GraphStateVar:
@@ -324,12 +328,13 @@ class GraphState:
                     "Inputs %d - %r must be of type Variable." % (i, inp))
             if names is not None:
                 try:
-                    inp.onnx_name = (
+                    onnx_name = (
                         names[i] if isinstance(names[i], str)
                         else names[i][0])
                 except IndexError as e:
                     raise IndexError(
                         "Wrong index %d, list=%s." % (i, names)) from e
+                inp.set_onnx_name(onnx_name)
 
         # Second pass.
         if expected_inputs is not None:
@@ -349,7 +354,7 @@ class GraphState:
                                     j >= input_range[0]):
                                 continue
                             if new_inputs[j].type is not None:
-                                new_inputs[i].type = (
+                                new_inputs[i].set_type(
                                     new_inputs[j].type.__class__())
                                 break
 
@@ -387,7 +392,7 @@ class GraphState:
             if hasattr(inp, 'type') and inp.type is None:
                 ct = expected1[i][1]
                 if ct in memo:
-                    vars1[i].type = copy_type(memo[ct][0])
+                    vars1[i].set_type(copy_type(memo[ct][0]))
             elif isinstance(inp, tuple):
                 ct = expected1[i][1]
                 if ct in memo:
@@ -455,7 +460,12 @@ class GraphState:
                 sub_op.outputs = sub_outputs
 
                 shape_calc = get_shape_calculator(self.operator_name)
+                logger.debug("[StateShape] %r fed %r - %r" % (
+                    sub_op,
+                    "".join(str(i.is_fed) for i in sub_op.inputs),
+                    "".join(str(i.is_fed) for i in sub_op.outputs)))
                 shape_calc(sub_op)
+                logger.debug("[StateShape] %r - end." % sub_op)
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
@@ -488,7 +498,12 @@ class GraphState:
                     # The parser was run on sub-operators but not the
                     # converter.
                     conv = get_converter(self.operator_name)
+                    logger.debug("[StateConv] %r fed %r - %r" % (
+                        sub_op,
+                        "".join(str(i.is_fed) for i in sub_op.inputs),
+                        "".join(str(i.is_fed) for i in sub_op.outputs)))
                     conv(self.scope, sub_op, self.container)
+                    logger.debug("[StateConv] %r - end." % sub_op)
             else:
 
                 def _name_(obj):
@@ -529,6 +544,6 @@ class GraphState:
                         var = self.scope.declare_local_variable(name, kind)
                         # name already comes from
                         # scope.get_unique_variable_name
-                        var.onnx_name = name
-                        var.is_fed = True
+                        var.set_onnx_name(name)
+                        var.init_status(is_fed=True)
                         self.computed_outputs_.append(var)

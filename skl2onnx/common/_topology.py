@@ -4,6 +4,7 @@
 import re
 import warnings
 import pprint
+from logging import getLogger
 import numpy as np
 from onnx import onnx_pb as onnx_proto
 from onnxconverter_common.data_types import (  # noqa
@@ -33,6 +34,7 @@ from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
 from .interface import OperatorBase
 from .onnx_optimisation_identity import onnx_remove_node_identity
+
 type_fct = type
 
 
@@ -47,6 +49,8 @@ except (ImportError, KeyError):
     }
 
 OPSET_ML_TO_OPSET = {1: 11, 2: 13}
+
+logger = getLogger('skl2onnx')
 
 
 class Variable:
@@ -85,16 +89,17 @@ class Variable:
                         "onnx_name=%r, shape=%r, type=%r." % (
                             raw_name, onnx_name, shape, type))
 
-        self.raw_name = raw_name  #
-        self.onnx_name = onnx_name  #
-        self.scope = scope
-        self.type = type
+        self._raw_name = raw_name
+        self._onnx_name = onnx_name
+        self._scope = scope
+        self._type = type
+
         # The following fields are bool variables used in parsing and
         # compiling stages
-        self.is_fed = None
-        self.is_root = None
-        self.is_leaf = None
-        self.is_abandoned = False
+        self._is_fed = None
+        self._is_root = None
+        self._is_leaf = None
+        self._is_abandoned = False
         if self.type is not None and not isinstance(self.type, DataType):
             raise TypeError(
                 "shape must be a DataType not {}.".format(self.type))
@@ -112,6 +117,71 @@ class Variable:
                 if not isinstance(dim, (int, np.int32, np.int64)):
                     raise TypeError("shape must contains integers not "
                                     "'{}'.".format(dim))
+        logger.debug('[Var] +%s' % self)
+
+    @property
+    def raw_name(self):
+        return self._raw_name
+
+    @property
+    def onnx_name(self):
+        return self._onnx_name
+
+    @property
+    def scope(self):
+        return self._scope
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def is_fed(self):
+        return self._is_fed
+
+    @property
+    def is_root(self):
+        return self._is_root
+
+    @property
+    def is_leaf(self):
+        return self._is_leaf
+
+    @property
+    def is_abandoned(self):
+        return self._is_abandoned
+
+    def init_status(self, is_fed=None, is_root=None, is_leaf=None):
+        if is_fed is not None and is_fed != self.is_fed:
+            logger.debug('[Var] update is_fed=%r for %r' % (is_fed, self))
+            self._is_fed = is_fed
+        if is_root is not None and is_root != self.is_root:
+            logger.debug('[Var] update is_root=%r for %r' % (is_root, self))
+            self._is_root = is_root
+        if is_leaf is not None and is_leaf != self.is_leaf:
+            logger.debug('[Var] update is_leaf=%r for %r' % (is_leaf, self))
+            self._is_leaf = is_leaf
+
+    def __setattr__(self, name, value):
+        if name == "type":
+            self.set_type(value)
+        elif name == "onnx_name":
+            raise AttributeError("You must use method set_onnx_name.")
+        elif name in {"is_fed", "is_root", "is_leaf"}:
+            raise AttributeError("You must use method init_status.")
+        elif name in {'scope', 'raw_name'}:
+            raise AttributeError("scope or raw_name cannot be changed.")
+        super().__setattr__(name, value)
+
+    def set_type(self, new_type):
+        logger.debug('[Var] update type= for %r' % self)
+        self._type = new_type
+
+    def set_onnx_name(self, onnx_name):
+        if onnx_name != self._onnx_name:
+            logger.debug('[Var] update onnx_name, from %r to %r in %r' % (
+                self.onnx_name, onnx_name, self))
+            self._onnx_name = onnx_name
 
     def get_first_dimension(self):
         """
@@ -131,7 +201,7 @@ class Variable:
         return self.onnx_name
 
     def __repr__(self):
-        return ("Variable(raw_name='{0}', onnx_name='{1}', type={2})".format(
+        return ("Variable('{0}', '{1}', type={2})".format(
                 self.raw_name, self.onnx_name, self.type))
 
     @staticmethod
@@ -208,17 +278,18 @@ class Operator(OperatorBase):
     """
     Defines an operator available in *ONNX*.
     """
-
     class OperatorList(list):
-        def __init__(self, parent):
+        def __init__(self, parent, kind):
             super(Operator.OperatorList, self).__init__()
             self.parent = parent
+            self.kind = kind
 
         def append(self, v):
             if not isinstance(v, Variable):
                 raise TypeError(
                     "Input and output must be of type Variable not %r."
                     "" % type(v))
+            logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
             super(Operator.OperatorList, self).append(v)
 
     def __init__(self, onnx_name, scope, type, raw_operator,
@@ -248,12 +319,13 @@ class Operator(OperatorBase):
         self.scope = scope
         self.type = type
         self.raw_operator = raw_operator
-        self.inputs = Operator.OperatorList(self)
-        self.outputs = Operator.OperatorList(self)
-        self.is_evaluated = None
-        self.is_abandoned = False
+        self.inputs = Operator.OperatorList(self, 'In')
+        self.outputs = Operator.OperatorList(self, 'Out')
+        self._is_evaluated = None
+        self._is_abandoned = False
         self.target_opset = target_opset
         self.scope_inst = scope_inst
+        logger.debug('[Op] +%r' % self)
 
     def __repr__(self):
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
@@ -262,6 +334,24 @@ class Operator(OperatorBase):
                     ','.join(v.onnx_name for v in self.inputs),
                     ','.join(v.onnx_name for v in self.outputs),
                     self.raw_operator))
+
+    @property
+    def is_evaluated(self):
+        return self._is_evaluated
+
+    @property
+    def is_abandoned(self):
+        return self._is_abandoned
+
+    def init_status(self, is_evaluated=None, is_abandoned=None):
+        if is_evaluated is not None and is_evaluated != self.is_evaluated:
+            logger.debug('[Op] update is_evaluated=%r for %r' % (
+                is_evaluated, self))
+            self._is_evaluated = is_evaluated
+        if is_abandoned is not None and is_abandoned != self.is_abandoned:
+            logger.debug('[Op] update is_abandoned=%r for %r' % (
+                is_abandoned, self))
+            self._is_abandoned = is_abandoned
 
     @property
     def full_name(self):
@@ -303,6 +393,10 @@ class Operator(OperatorBase):
             raise MissingShapeCalculator(
                 "Unable to find a shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
+        logger.debug("[Shape0] %r fed %r - %r" % (
+            self,
+            "".join(str(i.is_fed) for i in self.inputs),
+            "".join(str(i.is_fed) for i in self.outputs)))
         shape_calc(self)
 
 
@@ -688,7 +782,7 @@ class Topology:
             for variable in scope.variables.values():
                 yield variable
 
-    def topological_operator_iterator(self):
+    def topological_operator_iterator(self, verbose=0):
         """
         This is an iterator of all operators in Topology object.
         Operators may be produced in a topological order. If you want to
@@ -696,6 +790,8 @@ class Topology:
         topological structure, please use another function,
         unordered_operator_iterator.
         """
+        if verbose > 0:
+            print("[topological_operator_iterator] begin")
         self._initialize_graph_status_for_traversing()
         priorities = {
             'tensorToProbabilityMap': 2,
@@ -704,6 +800,8 @@ class Topology:
         while not all(operator.is_evaluated for scope in self.scopes
                       for operator in scope.operators.values()):
             is_evaluation_happened = False
+            if verbose > 0:
+                print("[topological_operator_iterator] new iteration")
             for operator in sorted(self.unordered_operator_iterator(),
                                    key=lambda op: priorities[op.type]
                                    if op.type in priorities else 0):
@@ -761,13 +859,16 @@ class Topology:
                                      for v in operator.outputs],
                                     "\n".join(add)))
                         # Mark this variable as filled
-                        variable.is_fed = True
+                        variable.init_status(is_fed=True)
 
                     # Make this operator as handled
-                    operator.is_evaluated = True
+                    operator.init_status(is_evaluated=True)
                     is_evaluation_happened = True
 
                     # Send out an operator
+                    if verbose > 0:
+                        print('[topological_operator_iterator] yield %r.'
+                              '' % operator)
                     yield operator
 
                     # This step may create new nodes if the
@@ -795,7 +896,7 @@ class Topology:
                                   variable.onnx_name not in self.root_names
                                   else True)
                         if update:
-                            variable.is_fed = True
+                            variable.init_status(is_fed=True)
                             is_evaluation_happened = True
 
             # After scanning through the whole computational graph, at
@@ -813,6 +914,10 @@ class Topology:
                                     for variable in operator.outputs),
                                 op))
                 break
+            if verbose > 0:
+                print("[topological_operator_iterator] end iteration")
+        if verbose > 0:
+            print("[topological_operator_iterator] end.")
 
     def _check_structure(self):
         """
@@ -857,16 +962,17 @@ class Topology:
         Initialize the status of all variables and operators for
         traversing the underline graph
         """
+        logger.debug('[Topo:begin] _initialize_graph_status_for_traversing')
         # In the beginning, we set is_root and is_leaf true. For is_fed,
         # we have two different behaviors depending on whether
         # root_names is empty.
         for variable in self.unordered_variable_iterator():
             # If root_names is set, we only set those variable to be
             # fed. Otherwise, all roots would be fed.
-            variable.is_fed = (False if self.root_names and variable.onnx_name
-                               not in self.root_names else True)
-            variable.is_root = True
-            variable.is_leaf = True
+            variable.init_status(
+                is_fed=(False if self.root_names and variable.onnx_name
+                        not in self.root_names else True),
+                is_root=True, is_leaf=True)
 
         # Then, we flip some flags by applying some simple rules so
         # that only
@@ -874,22 +980,23 @@ class Topology:
         #   2. all leaves get is_leaf=True
         for operator in self.unordered_operator_iterator():
             # All operators are not processed in the beginning
-            operator.is_evaluated = False
+            operator.init_status(is_evaluated=False)
             for variable in operator.outputs:
                 # Output cannot be fed before graph traversing
-                variable.is_fed = False
                 # If the variable is an output of one operator,
                 # it must not be a root
-                variable.is_root = False
+                variable.init_status(is_fed=False, is_root=False)
             for variable in operator.inputs:
                 # If the variable is an input of one operator,
                 # it must not be a leaf
-                variable.is_leaf = False
+                variable.init_status(is_leaf=False)
+        logger.debug('[Topo:end] _initialize_graph_status_for_traversing')
 
     def _infer_all_types(self):
         """
         Infer all variables' shapes in the computational graph.
         """
+        logger.debug('[Topo:begin] _infer_all_types')
         self._initialize_graph_status_for_traversing()
 
         # Deliver user-specified types to root variables
@@ -908,21 +1015,31 @@ class Topology:
                     if variable.is_root:
                         # Assign type to the root; existing type
                         # produced by parser may be overwritten
-                        variable.type = initial_type
+                        variable.set_type(initial_type)
 
         # Traverse the graph from roots to leaves
         for operator in self.topological_operator_iterator():
             mtype = type(operator.raw_operator)
             if mtype in self.custom_shape_calculators:
                 # overwritten operator.
-                self.custom_shape_calculators[mtype](operator)
+                shape_calc = self.custom_shape_calculators[mtype]
             elif operator.type in self.custom_shape_calculators:
-                self.custom_shape_calculators[operator.type](operator)
+                shape_calc = self.custom_shape_calculators[operator.type]
             elif hasattr(operator.raw_operator, "onnx_shape_calculator"):
                 shape_calc = operator.raw_operator.onnx_shape_calculator()
+            else:
+                shape_calc = None
+            if shape_calc is not None:
+                logger.debug("[Shape1] %r fed %r - %r" % (
+                    operator,
+                    "".join(str(i.is_fed) for i in operator.inputs),
+                    "".join(str(i.is_fed) for i in operator.outputs)))
                 shape_calc(operator)
             else:
+                logger.debug('[Shape2] call infer_types '
+                             'for %r' % operator)
                 operator.infer_types()
+        logger.debug('[Topo:end] _infer_all_types')
 
     def _resolve_duplicates(self):
         """
@@ -1203,7 +1320,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     # Traverse the graph from roots to leaves
     # This loop could eventually be parallelized.
-    for operator in topology.topological_operator_iterator():
+    for operator in topology.topological_operator_iterator(verbose=verbose):
         scope = next(scope for scope in topology.scopes
                      if scope.name == operator.scope)
         mtype = type(operator.raw_operator)
@@ -1226,7 +1343,14 @@ def convert_topology(topology, model_name, doc_string, target_opset,
                     "".format(operator.type,
                               type(getattr(operator, 'raw_model', None))))
         container.validate_options(operator)
+        if verbose > 0:
+            print("[convert_topology] call converter for %r." % operator.type)
+        logger.debug("[Conv] %r fed %r - %r" % (
+            operator,
+            "".join(str(i.is_fed) for i in operator.inputs),
+            "".join(str(i.is_fed) for i in operator.outputs)))
         conv(scope, operator, container)
+        logger.debug("[Conv] %r - end." % operator)
 
     container.ensure_topological_order()
 
