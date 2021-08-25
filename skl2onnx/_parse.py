@@ -353,12 +353,13 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    no_zipmap = (
+        (isinstance(options['zipmap'], bool) and not options['zipmap']) or
+        (model.__class__ in [NuSVC, SVC] and not model.probability))
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers)
-    if model.__class__ in [NuSVC, SVC] and not model.probability:
-        return probability_tensor
-    options = scope.get_options(model, dict(zipmap=True))
-    if isinstance(options['zipmap'], bool) and not options['zipmap']:
+    if no_zipmap:
         return probability_tensor
 
     if options['zipmap'] == 'columns':
@@ -393,8 +394,8 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         zipmap_operator.classlabels_strings = classes
         label_type = StringTensorType([None])
 
-    output_label = scope.declare_local_variable('output_label', label_type)
-    zipmap_operator.outputs.append(output_label)
+    zip_label = scope.declare_local_variable('output_label', label_type)
+    zipmap_operator.outputs.append(zip_label)
 
     if options['zipmap'] == 'columns':
         prob_type = probability_tensor[1].type
@@ -402,12 +403,13 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
             output_cl = scope.declare_local_variable(cl, prob_type.__class__())
             zipmap_operator.outputs.append(output_cl)
     else:
-        output_probability = scope.declare_local_variable(
+        zip_probability = scope.declare_local_variable(
             'output_probability',
             SequenceType(
                 DictionaryType(
                     label_type, guess_tensor_type(inputs[0].type))))
-        zipmap_operator.outputs.append(output_probability)
+        zipmap_operator.outputs.append(zip_probability)
+
     return zipmap_operator.outputs
 
 

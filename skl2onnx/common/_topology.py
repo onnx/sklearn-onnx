@@ -284,6 +284,10 @@ class Operator(OperatorBase):
             self.parent = parent
             self.kind = kind
 
+        def __eq__(self, second):
+            raise NotImplementedError(
+                "Operator equal not implemented and not needed.")
+
         def append(self, v):
             if not isinstance(v, Variable):
                 raise TypeError(
@@ -291,6 +295,19 @@ class Operator(OperatorBase):
                     "" % type(v))
             logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
             super(Operator.OperatorList, self).append(v)
+
+        def extend(self, vs):
+            for v in vs:
+                self.append(v)
+
+        def to_string(self):
+            names = []
+            for o in self:
+                if hasattr(o, 'onnx_name'):
+                    names.append(o.onnx_name)
+                else:
+                    names.append('"%s"' % str(o))
+            return ",".join(names)
 
     def __init__(self, onnx_name, scope, type, raw_operator,
                  target_opset, scope_inst):
@@ -331,9 +348,32 @@ class Operator(OperatorBase):
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
                 "outputs='{3}', raw_operator={4})".format(
                     self.type, self.onnx_name,
-                    ','.join(v.onnx_name for v in self.inputs),
-                    ','.join(v.onnx_name for v in self.outputs),
+                    self.inputs.to_string(),
+                    self.outputs.to_string(),
                     self.raw_operator))
+
+    def __setattr__(self, name, value):
+        if name in ('inputs', 'outputs'):
+            if (isinstance(value, list) and
+                    not isinstance(value, Operator.OperatorList)):
+                if name == 'inputs':
+                    if hasattr(self, 'inputs'):
+                        del self.inputs[:]
+                    else:
+                        self.inputs = Operator.OperatorList(self, 'In')
+                    self.inputs.extend(value)
+                return
+                if name == 'outputs':
+                    if hasattr(self, 'outputs'):
+                        del self.outputs[:]
+                    else:
+                        self.outputs = Operator.OperatorList(self, 'Out')
+                    self.outputs.extend(value)
+                return
+            if not isinstance(value, Operator.OperatorList):
+                raise TypeError(
+                    "inputs or outputs must be of type Operator.OperatorList.")
+        self.__dict__[name] = value
 
     @property
     def is_evaluated(self):
@@ -1329,7 +1369,11 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         elif operator.type in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[operator.type]
         elif hasattr(operator.raw_operator, "onnx_converter"):
-            conv = operator.raw_operator.onnx_converter()
+            conv = operator.raw_operator.onnx_converter(
+                target_opset=target_opset,
+                white_op=topology.raw_model._white_op,
+                black_op=topology.raw_model._black_op,
+                verbose=verbose)
         else:
             # Convert the selected operator into some ONNX objects and
             # save them into the container

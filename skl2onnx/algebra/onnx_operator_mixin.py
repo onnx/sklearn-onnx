@@ -19,7 +19,7 @@ class OnnxOperatorMixin:
 
     def to_onnx(self, X=None, name=None,
                 options=None, white_op=None, black_op=None,
-                final_types=None, verbose=0):
+                final_types=None, target_opset=None, verbose=0):
         """
         Converts the model in *ONNX* format.
         It calls method *_to_onnx* which must be
@@ -38,6 +38,7 @@ class OnnxOperatorMixin:
         :param final_types: a python list. Works the same way as initial_types
             but not mandatory, it is used to overwrites the type
             (if type is not None) and the name of every output.
+        :param target_opset: to overwrite `self.op_version`
         :param verbose: displays information while converting
         """
         from .. import convert_sklearn
@@ -54,9 +55,9 @@ class OnnxOperatorMixin:
                     self.__class__.__name__, name))
         return convert_sklearn(
             self, initial_types=initial_types,
-            target_opset=self.op_version, options=options,
-            white_op=white_op, black_op=black_op,
-            final_types=final_types, verbose=verbose)
+            target_opset=target_opset or self.op_version, options=options,
+            white_op=white_op, black_op=black_op, final_types=final_types,
+            verbose=verbose)
 
     def infer_initial_types(self):
         """
@@ -85,7 +86,8 @@ class OnnxOperatorMixin:
                            "BaseEstimator: {}.".format(
                                ", ".join(map(str, self.__class__.__bases__))))
 
-    def to_onnx_operator(self, inputs=None, outputs=None):
+    def to_onnx_operator(self, inputs=None, outputs=None,
+                         target_opset=None, **kwargs):
         """
         This function must be overloaded.
         """
@@ -170,7 +172,7 @@ class OnnxOperatorMixin:
 
         return shape_calculator
 
-    def onnx_converter(self):
+    def onnx_converter(self, target_opset=None, **kwargs):
         """
         Returns a converter for this model.
         If not overloaded, it fetches the converter
@@ -180,9 +182,10 @@ class OnnxOperatorMixin:
         inputs = getattr(self, "parsed_inputs_", None)
         try:
             if inputs:
-                op = self.to_onnx_operator(inputs=inputs)
+                op = self.to_onnx_operator(
+                    inputs=inputs, target_opset=target_opset, **kwargs)
             else:
-                op = self.to_onnx_operator()
+                op = self.to_onnx_operator(target_opset=target_opset, **kwargs)
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map[parent]

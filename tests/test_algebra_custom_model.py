@@ -36,7 +36,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return (X - self.W_) / self.S_
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
+                         target_opset=None, **kwargs):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         i0 = self.get_inputs(inputs, 0)

@@ -36,7 +36,8 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
             operator.outputs[0].type = operator.inputs[0].type
         return shape_calculator
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
+                         target_opset=None, **kwargs):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         i0 = self.get_inputs(inputs, 0)
