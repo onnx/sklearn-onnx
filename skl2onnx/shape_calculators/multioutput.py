@@ -22,7 +22,7 @@ def multioutput_classifier_shape_calculator(operator):
     N = i.get_first_dimension()
     C = len(operator.raw_operator.estimators_)
     outputs[0].type.shape = [N, C]
-    outputs[1].type.shape = [N, C]
+    outputs[1].type.shape = [N, C, 2]
 
 
 register_shape_calculator('SklearnMultiOutputRegressor',

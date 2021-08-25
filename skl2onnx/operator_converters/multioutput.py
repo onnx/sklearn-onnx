@@ -37,8 +37,7 @@ def convert_multi_output_classifier_converter(
     op = operator.raw_operator
     inp = operator.inputs[0]
     y_list = [OnnxSubEstimator(sub, inp, op_version=op_version,
-                               # options={'zipmap': False})
-                               )
+                               options={'zipmap': False})
               for sub in op.estimators_]
 
     # labels
@@ -54,8 +53,11 @@ def convert_multi_output_classifier_converter(
     proba_list = [OnnxIdentity(y[1], op_version=op_version)
                   for y in y_list]
 
-    proba = OnnxConcat(*proba_list, axis=1, op_version=op_version,
-                       output_names=[operator.outputs[1]])
+    proba = OnnxReshape(
+        OnnxConcat(*proba_list, axis=1, op_version=op_version),
+        np.array([-1, len(op.estimators_), 2], dtype=np.int64),
+        op_version=op_version,
+        output_names=[operator.outputs[1]])
     proba.add_to(scope=scope, container=container)
 
 
