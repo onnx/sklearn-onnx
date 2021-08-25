@@ -483,6 +483,7 @@ class GraphState:
                     raise RuntimeError(
                         "sub_op.outputs is None as well as expected_outputs "
                         "for operator %r." % sub_op)
+
                 if len(outputs) != len(sub_op.outputs):
                     raise RuntimeError(
                         "Mismatched number of outputs %s and %s." % (
@@ -508,6 +509,21 @@ class GraphState:
                         "".join(str(i.is_fed) for i in sub_op.outputs)))
                     conv(self.scope, sub_op, self.container)
                     logger.debug("[StateConv] %r - end." % sub_op)
+                else:
+                    if (expected_outputs is not None and
+                            len(sub_op.outputs) == len(expected_outputs)):
+                        for v1, v2 in zip(sub_op.outputs, expected_outputs):
+                            if isinstance(v2, tuple):
+                                v2 = v2[0]
+                            if (hasattr(v1, 'onnx_name') and
+                                    hasattr(v2, 'onnx_name')):
+                                if v1.onnx_name != v2.onnx_name:
+                                    # One identity is missing
+                                    n = self.scope.get_unique_operator_name(
+                                        'idgstate')
+                                    self.container.add_node(
+                                        'Identity', [v1.onnx_name],
+                                        [v2.onnx_name], name=n)
             else:
 
                 def _name_(obj):

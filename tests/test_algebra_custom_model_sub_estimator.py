@@ -5,6 +5,7 @@ Tests scikit-learn's binarizer converter.
 """
 import unittest
 import logging
+import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -44,6 +45,38 @@ class CustomOpTransformer1(BaseEstimator, TransformerMixin,
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = target_opset or self.op_version
+        i0 = self.get_inputs(inputs, 0)
+        out = OnnxSubEstimator(self.norm_, i0, op_version=opv)
+        return OnnxIdentity(out, op_version=self.op_version,
+                            output_names=outputs)
+
+    def onnx_shape_calculator(self):
+        def shape_calculator(operator):
+            operator.outputs[0].type = FloatTensorType(
+                shape=operator.inputs[0].type.shape)
+        return shape_calculator
+
+
+class CustomOpTransformer1w(BaseEstimator, TransformerMixin,
+                            OnnxOperatorMixin):
+
+    def __init__(self, op_version=None):
+        BaseEstimator.__init__(self)
+        TransformerMixin.__init__(self)
+        OnnxOperatorMixin.__init__(self)
+        self.op_version = op_version
+
+    def fit(self, X, y=None):
+        self.norm_ = StandardScaler().fit(X)
+        return self
+
+    def transform(self, X):
+        return self.norm_.transform(X)
+
+    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+        if inputs is None:
+            raise RuntimeError("inputs should contain one name")
+        opv = self.op_version
         i0 = self.get_inputs(inputs, 0)
         out = OnnxSubEstimator(self.norm_, i0, op_version=opv)
         return OnnxIdentity(out, op_version=self.op_version,
@@ -181,6 +214,17 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         tr = CustomOpTransformer1(op_version=TARGET_OPSET)
         tr.fit(X)
         self.check_transform(tr, X)
+
+    def test_custom_scaler_1w(self):
+        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        tr = CustomOpTransformer1w(op_version=TARGET_OPSET)
+        tr.fit(X)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            self.check_transform(tr, X)
+            self.assertEqual(len(w), 1)
+            assert isinstance(w[0].message, DeprecationWarning)
+            self.assertIn("to_onnx_operator", str(w[0].message))
 
     def test_custom_scaler_2(self):
         X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)

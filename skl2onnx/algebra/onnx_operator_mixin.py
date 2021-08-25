@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 from sklearn.base import BaseEstimator
 from onnx import shape_inference
 from ..common._topology import Scope, Operator
@@ -183,12 +184,32 @@ class OnnxOperatorMixin:
         it can find.
         """
         inputs = getattr(self, "parsed_inputs_", None)
+        outputs = kwargs.get('outputs', None)
         try:
             if inputs:
                 op = self.to_onnx_operator(
-                    inputs=inputs, target_opset=target_opset, **kwargs)
+                    inputs=inputs, outputs=outputs,
+                    target_opset=target_opset, **kwargs)
             else:
-                op = self.to_onnx_operator(target_opset=target_opset, **kwargs)
+                op = self.to_onnx_operator(
+                    target_opset=target_opset,
+                    outputs=outputs, **kwargs)
+        except TypeError:
+            warnings.warn(
+                "Signature should be to_onnx_operator(self, inputs=None, "
+                "outputs=None, target_opset=None, **kwargs). "
+                "This will be the case in version 1.11.",
+                DeprecationWarning)
+            try:
+                if inputs:
+                    op = self.to_onnx_operator(
+                        inputs=inputs, outputs=outputs)
+                else:
+                    op = self.to_onnx_operator()
+            except NotImplementedError:
+                parent = self._find_sklearn_parent()
+                name = sklearn_operator_name_map[parent]
+                return get_converter(name)
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map[parent]
