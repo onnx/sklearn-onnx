@@ -909,8 +909,7 @@ class OnnxSubEstimator(OnnxOperator):
             if self.output_names_ is not None:
                 pass
             elif operator is not None:
-                outputs = [o.onnx_name for o in operator.outputs]
-                self.output_names_ = operator.outputs  # outputs
+                self.output_names_ = operator.outputs
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
