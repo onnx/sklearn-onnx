@@ -96,14 +96,15 @@ class OnnxOperatorMixin:
     def onnx_parser(self, scope=None, inputs=None):
         """
         Returns a parser for this model.
-        If not overloaded, it fetches the parser
+        If not overloaded, it calls the converter to guess the number
+        of outputs. If it still fails, it fetches the parser
         mapped to the first *scikit-learn* parent
         it can find.
         """
         if inputs:
             self.parsed_inputs_ = inputs
         try:
-            op = self.to_onnx_operator(inputs=inputs)
+            op = self.to_onnx_operator(inputs=inputs, outputs=None)
         except NotImplementedError:
             self._find_sklearn_parent()
             return None
@@ -116,6 +117,8 @@ class OnnxOperatorMixin:
                     if name is None:
                         break
                     names.append(name)
+                except AttributeError:
+                    return None
                 except IndexError:
                     break
             return names

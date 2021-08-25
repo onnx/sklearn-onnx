@@ -291,8 +291,7 @@ class GraphState:
         if isinstance(output, tuple):
             if output[0] in output_names:
                 return output
-            return (scope.get_unique_variable_name(output[0]),
-                    output[1])
+            return (scope.get_unique_variable_name(output[0]), output[1])
         raise NotImplementedError(
             "Unexpected output type {} [{}]. "
             "You may raise an issue at https://github.com/onnx/"
@@ -460,25 +459,29 @@ class GraphState:
                 sub_op.outputs = sub_outputs
 
                 shape_calc = get_shape_calculator(self.operator_name)
-                logger.debug("[StateShape] %r fed %r - %r" % (
+                logger.debug("[StateShape] call %r fed %r - %r" % (
                     sub_op,
                     "".join(str(i.is_fed) for i in sub_op.inputs),
                     "".join(str(i.is_fed) for i in sub_op.outputs)))
                 shape_calc(sub_op)
-                logger.debug("[StateShape] %r - end." % sub_op)
+                logger.debug("[StateShape] end - %r" % sub_op)
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
-                if expected_outputs is not None:
+                if sub_op.outputs is not None:
+                    outputs = [
+                        self.scope.declare_local_variable(
+                            o.onnx_name, type=o.type)
+                        for o in sub_op.outputs]
+                elif expected_outputs is not None:
                     outputs = [
                         self._get_output_name(
                             self._output_names, o, self.scope)
                         for o in expected_outputs]
                 else:
-                    outputs = [
-                        self.scope.declare_local_variable(
-                            o.onnx_name, type=o.type)
-                        for o in sub_op.outputs]
+                    raise RuntimeError(
+                        "sub_op.outputs is None as well as expected_outputs "
+                        "for operator %r." % sub_op)
                 if len(outputs) != len(sub_op.outputs):
                     raise RuntimeError(
                         "Mismatched number of outputs %s and %s." % (
@@ -492,7 +495,7 @@ class GraphState:
                 self.computed_outputs_ = outputs
                 self.computed_inputs2_ = sub_op.inputs
                 self.computed_outputs2_ = [
-                    (v.raw_name, v.type) for v in self.computed_outputs_]
+                    (v[0], v[1]) for v in self.computed_outputs_]
 
                 if self.run_converters:
                     # The parser was run on sub-operators but not the

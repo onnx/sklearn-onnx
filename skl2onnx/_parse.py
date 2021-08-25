@@ -104,11 +104,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         parser_names = model.onnx_parser(scope=scope, inputs=inputs)
         if parser_names is not None:
             names = parser_names()
-            for name in names:
-                var = scope.declare_local_variable(
-                    name, guess_tensor_type(inputs[0].type))
-                this_operator.outputs.append(var)
-            return this_operator.outputs
+            if names is not None:
+                for name in names:
+                    var = scope.declare_local_variable(
+                        name, guess_tensor_type(inputs[0].type))
+                    this_operator.outputs.append(var)
+                return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list
             or isinstance(model, ClassifierMixin)
@@ -410,6 +411,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
                     label_type, guess_tensor_type(inputs[0].type))))
         zipmap_operator.outputs.append(zip_probability)
 
+    zipmap_operator.init_status(is_evaluated=True)
     return zipmap_operator.outputs
 
 

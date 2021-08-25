@@ -465,6 +465,11 @@ class OnnxOperator:
                     name = oout.onnx_name
                 outputs.append(name)
             self.output_names_ = outputs
+        elif self.expected_outputs is None:
+            raise AttributeError(
+                "expected_outputs is None for operator=%r, output_names=%r, "
+                "output_variables=%r, operator=%r" % (
+                    self, self.output_names, self.output_variables, operator))
         else:
             if scope is None:
                 raise RuntimeError("scope must not be None.")

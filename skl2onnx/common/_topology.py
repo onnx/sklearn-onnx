@@ -93,6 +93,7 @@ class Variable:
         self._onnx_name = onnx_name
         self._scope = scope
         self._type = type
+        self._parent = None
 
         # The following fields are bool variables used in parsing and
         # compiling stages
@@ -153,7 +154,8 @@ class Variable:
 
     def init_status(self, is_fed=None, is_root=None, is_leaf=None):
         if is_fed is not None and is_fed != self.is_fed:
-            logger.debug('[Var] update is_fed=%r for %r' % (is_fed, self))
+            logger.debug('[Var] update is_fed=%r for %r, parent=%r' % (
+                is_fed, self, self._parent))
             self._is_fed = is_fed
         if is_root is not None and is_root != self.is_root:
             logger.debug('[Var] update is_root=%r for %r' % (is_root, self))
@@ -182,6 +184,15 @@ class Variable:
             logger.debug('[Var] update onnx_name, from %r to %r in %r' % (
                 self.onnx_name, onnx_name, self))
             self._onnx_name = onnx_name
+
+    def set_parent(self, operator):
+        if self._parent is not None:
+            raise RuntimeError(
+                "This variable is already the output of operator %r. "
+                "It cannot be the output of %r." % (self._parent, operator))
+        logger.debug('[Var] set parent for %r, parent=%r' % (
+            self, operator))
+        self._parent = operator
 
     def get_first_dimension(self):
         """
@@ -293,6 +304,8 @@ class Operator(OperatorBase):
                 raise TypeError(
                     "Input and output must be of type Variable not %r."
                     "" % type(v))
+            if self.kind == 'Out':
+                v.set_parent(self.parent)
             logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
             super(Operator.OperatorList, self).append(v)
 
@@ -893,10 +906,8 @@ class Topology:
                                     variable, operator.type,
                                     operator.onnx_name,
                                     operator.is_evaluated,
-                                    [v.is_fed
-                                     for v in operator.inputs],
-                                    [v.is_fed
-                                     for v in operator.outputs],
+                                    [v.is_fed for v in operator.inputs],
+                                    [v.is_fed for v in operator.outputs],
                                     "\n".join(add)))
                         # Mark this variable as filled
                         variable.init_status(is_fed=True)
@@ -1389,12 +1400,12 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         container.validate_options(operator)
         if verbose > 0:
             print("[convert_topology] call converter for %r." % operator.type)
-        logger.debug("[Conv] %r fed %r - %r" % (
+        logger.debug("[Conv] call %r fed %r - %r" % (
             operator,
             "".join(str(i.is_fed) for i in operator.inputs),
             "".join(str(i.is_fed) for i in operator.outputs)))
         conv(scope, operator, container)
-        logger.debug("[Conv] %r - end." % operator)
+        logger.debug("[Conv] end - %r" % operator)
 
     container.ensure_topological_order()
 

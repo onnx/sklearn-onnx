@@ -8,6 +8,10 @@ import logging
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
+except ImportError:
+    InvalidArgument = RuntimeError
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -154,16 +158,21 @@ class CustomOpTransformer4(BaseEstimator, TransformerMixin,
 
 class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
-    def setUp(self):
-        if __name__ == "__main__":
-            log = logging.getLogger('skl2onnx')
-            log.setLevel(logging.DEBUG)
+    def setUp(self, log=False):
+        self.log = logging.getLogger('skl2onnx')
+        if log:
+            self.log.setLevel(logging.DEBUG)
             logging.basicConfig(level=logging.DEBUG)
 
     def check_transform(self, obj, X):
+        self.log.debug("[check_transform------] type(obj)=%r" % type(obj))
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        try:
+            sess = InferenceSession(onx.SerializeToString())
+        except InvalidArgument as e:
+            raise AssertionError(
+                "Issue %r with\n%s" % (e, str(onx))) from e
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 
@@ -195,7 +204,7 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    cl = TestCustomModelAlgebraSubEstimator()
-    cl.setUp()
-    cl.test_custom_scaler_4()
+    # cl = TestCustomModelAlgebraSubEstimator()
+    # cl.setUp(log=False)
+    # cl.test_custom_scaler_2()
     unittest.main()
