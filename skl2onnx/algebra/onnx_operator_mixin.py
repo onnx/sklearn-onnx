@@ -19,7 +19,7 @@ class OnnxOperatorMixin:
 
     def to_onnx(self, X=None, name=None,
                 options=None, white_op=None, black_op=None,
-                final_types=None):
+                final_types=None, verbose=0):
         """
         Converts the model in *ONNX* format.
         It calls method *_to_onnx* which must be
@@ -38,6 +38,7 @@ class OnnxOperatorMixin:
         :param final_types: a python list. Works the same way as initial_types
             but not mandatory, it is used to overwrites the type
             (if type is not None) and the name of every output.
+        :param verbose: displays information while converting
         """
         from .. import convert_sklearn
         if X is None:
@@ -55,7 +56,7 @@ class OnnxOperatorMixin:
             self, initial_types=initial_types,
             target_opset=self.op_version, options=options,
             white_op=white_op, black_op=black_op,
-            final_types=final_types)
+            final_types=final_types, verbose=verbose)
 
     def infer_initial_types(self):
         """

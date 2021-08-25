@@ -171,7 +171,7 @@ class Variable:
             raise AttributeError("You must use method init_status.")
         elif name in {'scope', 'raw_name'}:
             raise AttributeError("scope or raw_name cannot be changed.")
-        super().__setattr__(name, value)
+        self.__dict__[name] = value
 
     def set_type(self, new_type):
         logger.debug('[Var] update type= for %r' % self)
