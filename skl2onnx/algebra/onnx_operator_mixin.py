@@ -199,7 +199,7 @@ class OnnxOperatorMixin:
                 "Signature should be to_onnx_operator(self, inputs=None, "
                 "outputs=None, target_opset=None, **kwargs). "
                 "This will be the case in version 1.11, class=%r."
-                "" % type(op),
+                "" % type(self),
                 DeprecationWarning)
             try:
                 if inputs:
