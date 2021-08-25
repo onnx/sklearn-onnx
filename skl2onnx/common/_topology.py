@@ -358,12 +358,17 @@ class Operator(OperatorBase):
         logger.debug('[Op] +%r' % self)
 
     def __repr__(self):
+        try:
+            textop = repr(self.raw_operator)
+        except KeyError:
+            # The line above fails for python 3.7
+            textop = type(self.raw_operator)
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
                 "outputs='{3}', raw_operator={4})".format(
                     self.type, self.onnx_name,
                     self.inputs.to_string(),
                     self.outputs.to_string(),
-                    self.raw_operator))
+                    textop))
 
     def __setattr__(self, name, value):
         if name in ('inputs', 'outputs'):
