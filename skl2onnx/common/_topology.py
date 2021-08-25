@@ -1380,11 +1380,20 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         elif operator.type in topology.custom_conversion_functions:
             conv = topology.custom_conversion_functions[operator.type]
         elif hasattr(operator.raw_operator, "onnx_converter"):
-            conv = operator.raw_operator.onnx_converter(
-                target_opset=target_opset,
-                white_op=topology.raw_model._white_op,
-                black_op=topology.raw_model._black_op,
-                verbose=verbose)
+            try:
+                conv = operator.raw_operator.onnx_converter(
+                    target_opset=target_opset,
+                    white_op=topology.raw_model._white_op,
+                    black_op=topology.raw_model._black_op,
+                    verbose=verbose)
+            except TypeError:
+                warnings.warn(
+                    "Signature should be to_onnx_operator(self, inputs=None, "
+                    "outputs=None, target_opset=None, **kwargs). "
+                    "This will be the case in version 1.11, class=%r."
+                    "" % type(operator.raw_operator),
+                    DeprecationWarning)
+                conv = operator.raw_operator.onnx_converter()
         else:
             # Convert the selected operator into some ONNX objects and
             # save them into the container
