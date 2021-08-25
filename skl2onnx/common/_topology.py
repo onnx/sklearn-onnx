@@ -375,14 +375,14 @@ class Operator(OperatorBase):
                     else:
                         self.inputs = Operator.OperatorList(self, 'In')
                     self.inputs.extend(value)
-                return
+                    return
                 if name == 'outputs':
                     if hasattr(self, 'outputs'):
                         del self.outputs[:]
                     else:
                         self.outputs = Operator.OperatorList(self, 'Out')
                     self.outputs.extend(value)
-                return
+                    return
             if not isinstance(value, Operator.OperatorList):
                 raise TypeError(
                     "inputs or outputs must be of type Operator.OperatorList.")

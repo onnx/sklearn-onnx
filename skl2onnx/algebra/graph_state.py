@@ -468,12 +468,13 @@ class GraphState:
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
-                if sub_op.outputs is not None:
+                if sub_op.outputs is not None and len(sub_op.outputs) > 0:
                     outputs = [
                         self.scope.declare_local_variable(
                             o.onnx_name, type=o.type)
                         for o in sub_op.outputs]
-                elif expected_outputs is not None:
+                elif (expected_outputs is not None and
+                        len(expected_outputs) > 0):
                     outputs = [
                         self._get_output_name(
                             self._output_names, o, self.scope)
