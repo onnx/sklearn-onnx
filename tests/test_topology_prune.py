@@ -87,8 +87,8 @@ class TestTopologyPrune(unittest.TestCase):
                             op_version=TARGET_OPSET)
 
         model_def = cop2.to_onnx(
-            {'input': FloatTensorType()},
-            outputs=[('cdist', FloatTensorType())],
+            {'input': FloatTensorType([None, None])},
+            outputs=[('cdist', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
         sess = InferenceSession(model_def.SerializeToString())
         res = sess.run(None, {'input': x})
@@ -108,8 +108,8 @@ class TestTopologyPrune(unittest.TestCase):
                        op_version=TARGET_OPSET)
 
         model_def = cop2.to_onnx(
-            {'input': FloatTensorType()},
-            outputs=[('cdist', FloatTensorType())],
+            {'input': FloatTensorType([None, None])},
+            outputs=[('cdist', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
         sess = InferenceSession(model_def.SerializeToString())
         res = sess.run(None, {'input': x})
