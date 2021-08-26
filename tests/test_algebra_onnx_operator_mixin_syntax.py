@@ -244,36 +244,46 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
                 return
             raise e
         X = X.astype(np.float32)
-        got = oinf.run(None, {'X': X})[0]
+        try:
+            got = oinf.run(None, {'X': X})[0]
+        except Exception as e:
+            raise AssertionError(
+                "Cannot run model due to %r\n%r\n%s" % (
+                    e, onx, str(model_def))) from e
         assert_almost_equal(np_fct(X), got, decimal=6)
 
     @unittest.skipIf(onnx.defs.onnx_opset_version() < 10, "irrelevant")
     def test_onnx_clip_10(self):
-        self.common_test_onnxt_runtime_unary(
-            lambda x, output_names=None: OnnxClip_6(
-                x, min=1e-5, max=1e5, output_names=output_names),
-            lambda x: np.clip(x, 1e-5, 1e5),
-            op_version=10)
-        self.common_test_onnxt_runtime_unary(
-            lambda x, output_names=None: OnnxClip(
-                x, min=1e-5, max=1e5, output_names=output_names,
-                op_version=10),
-            lambda x: np.clip(x, 1e-5, 1e5),
-            op_version=10)
-        self.common_test_onnxt_runtime_unary(
-            lambda x, output_names=None: OnnxClip(
-                x, max=1e-5, output_names=output_names,
-                op_version=10),
-            lambda x: np.clip(x, -1e5, 1e-5),
-            op_version=10)
-        self.common_test_onnxt_runtime_unary(
-            lambda x, output_names=None: OnnxClip(
-                x, min=0.1, max=2.1,
-                output_names=output_names,
-                op_version=10),
-            lambda x: np.clip(x, 0.1, 2.1),
-            op_version=10)
+        with self.subTest(name="OnnxClip_6[1e-5, 1e5]"):
+            self.common_test_onnxt_runtime_unary(
+                lambda x, output_names=None: OnnxClip_6(
+                    x, min=1e-5, max=1e5, output_names=output_names),
+                lambda x: np.clip(x, 1e-5, 1e5),
+                op_version=10)
+        with self.subTest(name="OnnxClip-10[1e-5, 1e5]"):
+            self.common_test_onnxt_runtime_unary(
+                lambda x, output_names=None: OnnxClip(
+                    x, min=1e-5, max=1e5, output_names=output_names,
+                    op_version=10),
+                lambda x: np.clip(x, 1e-5, 1e5),
+                op_version=10)
+        with self.subTest(name="OnnxClip-10[-1e5, 1e-5]"):
+            self.common_test_onnxt_runtime_unary(
+                lambda x, output_names=None: OnnxClip(
+                    x, max=1e-5, output_names=output_names,
+                    op_version=10),
+                lambda x: np.clip(x, -1e5, 1e-5),
+                op_version=10)
+        with self.subTest(name="OnnxClip-10[0.1, 2.1]"):
+            self.common_test_onnxt_runtime_unary(
+                lambda x, output_names=None: OnnxClip(
+                    x, min=0.1, max=2.1,
+                    output_names=output_names,
+                    op_version=10),
+                lambda x: np.clip(x, 0.1, 2.1),
+                op_version=10)
 
 
 if __name__ == "__main__":
+    TestOnnxOperatorMixinSyntax().test_onnx_clip_10()
     unittest.main()

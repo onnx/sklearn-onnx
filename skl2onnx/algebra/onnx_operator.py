@@ -7,7 +7,7 @@ from ..proto import TensorProto
 from ..common.data_types import (
     _guess_type_proto_str, _guess_type_proto_str_inv)
 from ..common._topology import (
-    Variable, Scope, _update_domain_version,
+    Variable, VariableStr, Scope, _update_domain_version, Operator,
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
@@ -223,8 +223,23 @@ class OnnxOperator:
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
-        if isinstance(output_names, str):
+        if isinstance(output_names, (str, Variable)):
             output_names = [output_names]
+            if isinstance(output_names[0], str):
+                output_names[0] = VariableStr(output_names[0])
+        elif isinstance(output_names, Operator):
+            output_names = output_names.outputs.copy()
+        elif isinstance(output_names, Operator.OperatorList):
+            output_names = output_names.copy()
+        elif isinstance(output_names, list):
+            output_names = output_names.copy()
+            for i in range(len(output_names)):
+                if isinstance(output_names[i], str):
+                    output_names[i] = VariableStr(output_names[i])
+        elif output_names is not None:
+            raise TypeError(
+                "output_names must be a string or a list not %r."
+                "" % type(output_names))
 
         if op_version is None:
             if domain == '':
@@ -325,27 +340,23 @@ class OnnxOperator:
                         len(self.inputs), op_version, self.op_version))
 
         # check output
-        if (hasattr(output_names, 'outputs') and
-                output_names.outputs is not None):
-            self.output_names = [out.onnx_name
-                                 for out in output_names.outputs]
-            self.output_variables = output_names
-        else:
-            self.output_names = output_names
-            self.output_variables = None
+        self.output_names = output_names
+        self.output_variables = None
 
-        if self.output_names:
+        if self.output_names is not None:
+            if len(self.output_names) == 0:
+                raise ValueError(
+                    "output_names can be None but cannot be empty.")
             if self.output_variables is None:
                 self.output_variables = [None for o in self.output_names]
             for i in range(len(self.output_names)):
                 name = self.output_names[i]
                 if isinstance(name, Variable):
-                    self.output_names[i] = name.onnx_name
                     self.output_variables[i] = name
-                elif not isinstance(name, str):
+                else:
                     raise TypeError("output_names must be a list of strings "
-                                    "and element {} is {}".format(
-                                        i, type(name)))
+                                    "and element %r is %r (%r)" % (
+                                        i, type(name), name))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
 
@@ -808,10 +819,11 @@ class OnnxOperator:
             shapes = infer_outputs(container, container.inputs,
                                    initializer=container.initializers,
                                    target_opset=target_opset)
-
             if self.output_names:
+                set_names = set(v.onnx_name if hasattr(v, 'onnx_name') else v
+                                for v in self.output_names)
                 shapes = [shape for shape in shapes
-                          if shape.onnx_name in self.output_names]
+                          if shape.onnx_name in set_names]
 
         # add the output to the container
         for shape in shapes:
@@ -944,8 +956,18 @@ class OnnxSubEstimator(OnnxOperator):
                     louts = self.output_names
                 outputs = []
                 for name in louts:
-                    if name.startswith('u(') and name[-1] == ')':
-                        name = scope.get_unique_variable_name(name[2:-1])
+                    if (isinstance(name, str) and name.startswith('u(') and
+                            name[-1] == ')'):
+                        name = VariableStr(
+                            scope.get_unique_variable_name(name[2:-1]),
+                            scope=scope)
+                    if (isinstance(name, Variable) and
+                            name.raw_name.startswith('u(') and
+                            name.raw_name[-1] == ')'):
+                        name = VariableStr(
+                            scope.get_unique_variable_name(
+                                name.raw_name[2:-1]),
+                            scope=scope, type=name.type)
                     outputs.append(name)
                 self.output_names_ = outputs
             else:

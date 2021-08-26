@@ -36,7 +36,7 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return (X - self.W_) / self.S_
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
+    def to_onnx_operator(self, inputs=None, outputs=None,
                          target_opset=None, **kwargs):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
@@ -141,7 +141,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         # Next instructions fails...
         # Field 'shape' of type is required but missing.
-        # onnx.checker.check_model(model_onnx)
+        onnx.checker.check_model(model_onnx)
 
         dump_data_and_model(
             mat.astype(np.float32), pipe, model_onnx,

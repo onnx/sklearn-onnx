@@ -77,7 +77,7 @@ class Variable:
                 "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
             raise TypeError(
-                "raw_name must be a string not %r." % type(onnx_name))
+                "raw_name must be a string not %r." % onnx_name)
 
         if type is not None:
             shape = type.shape
@@ -285,6 +285,28 @@ class Variable:
         raise IndexError("Unreachable element at index %d." % index)
 
 
+class VariableStr(Variable):
+    """
+    Defines a variable a string. This should be avoided.
+    """
+
+    def __init__(self, name, scope=None, type=None):
+        Variable.__init__(self, name, name.replace(")", "").replace("(", ""),
+                          scope=scope, type=type)
+
+    @property
+    def raw_name(self):
+        return self._raw_name
+
+    @property
+    def onnx_name(self):
+        if self._onnx_name.startswith("u("):
+            raise RuntimeError(
+                "Variable should be renamed as onnx_name=%r."
+                "" % self._onnx_name)
+        return self._onnx_name
+
+
 class Operator(OperatorBase):
     """
     Defines an operator available in *ONNX*.
@@ -312,6 +334,17 @@ class Operator(OperatorBase):
         def extend(self, vs):
             for v in vs:
                 self.append(v)
+
+        def __getitem__(self, i):
+            v = list.__getitem__(self, i)
+            if isinstance(i, int) and not isinstance(v, Variable):
+                raise TypeError("Element %d must be a Variable not %r." % (
+                    i, type(v)))
+            return v
+
+        def __setitem__(self, i, v):
+            raise RuntimeError(
+                "Setter should not be used to modify an element.")
 
         def to_string(self):
             names = []
@@ -375,17 +408,11 @@ class Operator(OperatorBase):
             if (isinstance(value, list) and
                     not isinstance(value, Operator.OperatorList)):
                 if name == 'inputs':
-                    if hasattr(self, 'inputs'):
-                        del self.inputs[:]
-                    else:
-                        self.inputs = Operator.OperatorList(self, 'In')
+                    self.inputs = Operator.OperatorList(self, 'In')
                     self.inputs.extend(value)
                     return
                 if name == 'outputs':
-                    if hasattr(self, 'outputs'):
-                        del self.outputs[:]
-                    else:
-                        self.outputs = Operator.OperatorList(self, 'Out')
+                    self.outputs = Operator.OperatorList(self, 'Out')
                     self.outputs.extend(value)
                     return
             if not isinstance(value, Operator.OperatorList):
@@ -863,10 +890,22 @@ class Topology:
             for operator in sorted(self.unordered_operator_iterator(),
                                    key=lambda op: priorities[op.type]
                                    if op.type in priorities else 0):
-                if not isinstance(operator.inputs, list):
+                if not isinstance(operator.inputs, Operator.OperatorList):
                     raise TypeError(
-                        "operator.inputs must be a list not {}".format(
-                            type(operator.inputs)))
+                        "operator.inputs must be a Operator.OperatorList "
+                        "not %r." % type(operator.inputs))
+                if not isinstance(operator.outputs, Operator.OperatorList):
+                    raise TypeError(
+                        "operator.outputs must be a Operator.OperatorList "
+                        "not %r." % type(operator.outputs))
+                if any(not isinstance(i, Variable) for i in operator.inputs):
+                    raise TypeError(
+                        "One input is not a Variable for operator %r - %r."
+                        "" % (type(operator.raw_operator), operator))
+                if any(not isinstance(i, Variable) for i in operator.outputs):
+                    raise TypeError(
+                        "One output is not a Variable for operator %r - %r."
+                        "" % (type(operator.raw_operator), operator))
 
                 if (all(variable.is_fed for variable in operator.inputs)
                         and not operator.is_evaluated):

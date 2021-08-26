@@ -96,6 +96,10 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     if isinstance(model, str):
         raise RuntimeError("Parameter model must be an object not a "
                            "string '{0}'.".format(model))
+    if any(not isinstance(i, Variable) for i in inputs):
+        raise TypeError(
+            "One input is not a Variable for model %r - %r."
+            "" % (model, inputs))
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
