@@ -88,7 +88,7 @@ class OnnxOperatorMixin:
                                ", ".join(map(str, self.__class__.__bases__))))
 
     def to_onnx_operator(self, inputs=None, outputs=None,
-                         target_opset=None, **kwargs):
+                         target_opset=None, options=None):
         """
         This function must be overloaded.
         """
@@ -176,48 +176,52 @@ class OnnxOperatorMixin:
 
         return shape_calculator
 
-    def onnx_converter(self, target_opset=None, **kwargs):
+    def onnx_converter(self):
         """
         Returns a converter for this model.
         If not overloaded, it fetches the converter
         mapped to the first *scikit-learn* parent
         it can find.
         """
-        inputs = getattr(self, "parsed_inputs_", None)
-        outputs = kwargs.get('outputs', None)
-        try:
-            if inputs:
-                op = self.to_onnx_operator(
-                    inputs=inputs, outputs=outputs,
-                    target_opset=target_opset, **kwargs)
-            else:
-                op = self.to_onnx_operator(
-                    target_opset=target_opset,
-                    outputs=outputs, **kwargs)
-        except TypeError:
-            warnings.warn(
-                "Signature should be to_onnx_operator(self, inputs=None, "
-                "outputs=None, target_opset=None, **kwargs). "
-                "This will be the case in version 1.11, class=%r."
-                "" % type(self),
-                DeprecationWarning)
+        def converter(scope: Scope, operator: Operator,
+                      container: ModelComponentContainer):
+            inputs = operator.inputs  # getattr(self, "parsed_inputs_", None)
+            outputs = operator.outputs  # kwargs.get('outputs', None)
+            op_version = container.target_opset
+            options = scope.get_options(operator.raw_operator, fail=False)
             try:
                 if inputs:
                     op = self.to_onnx_operator(
-                        inputs=inputs, outputs=outputs)
+                        inputs=inputs, outputs=outputs,
+                        target_opset=op_version, options=options)
                 else:
-                    op = self.to_onnx_operator()
+                    op = self.to_onnx_operator(
+                        target_opset=op_version,
+                        outputs=outputs, options=options)
+            except TypeError:
+                warnings.warn(
+                    "Signature should be to_onnx_operator(self, inputs=None, "
+                    "outputs=None, target_opset=None, **kwargs). "
+                    "This will be the case in version 1.11, class=%r."
+                    "" % type(self),
+                    DeprecationWarning)
+                try:
+                    if inputs:
+                        op = self.to_onnx_operator(
+                            inputs=inputs, outputs=outputs)
+                    else:
+                        op = self.to_onnx_operator()
+                except NotImplementedError:
+                    parent = self._find_sklearn_parent()
+                    name = sklearn_operator_name_map[parent]
+                    conv = get_converter(name)
+                    return conv(scope, operator, container)
             except NotImplementedError:
                 parent = self._find_sklearn_parent()
                 name = sklearn_operator_name_map[parent]
-                return get_converter(name)
-        except NotImplementedError:
-            parent = self._find_sklearn_parent()
-            name = sklearn_operator_name_map[parent]
-            return get_converter(name)
+                conv = get_converter(name)
+                return conv(scope, operator, container)
 
-        def converter(scope: Scope, operator: Operator,
-                      container: ModelComponentContainer):
             op.add_to(scope, container, operator=operator)
 
         return converter
