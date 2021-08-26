@@ -3,9 +3,11 @@
 """
 Tests pipeline within pipelines.
 """
-
-import numpy as np
+from textwrap import dedent
 import unittest
+from io import StringIO
+import numpy as np
+import pandas
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -19,10 +21,11 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import RobustScaler, StandardScaler
-from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from sklearn.preprocessing import (
+    MinMaxScaler, RobustScaler, StandardScaler, OneHotEncoder)
+from sklearn.feature_extraction.text import CountVectorizer
+from skl2onnx import convert_sklearn, to_onnx
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, TARGET_OPSET
 
@@ -268,8 +271,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer_pipeline_imputer_scaler_lr(self):
@@ -315,6 +317,52 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " <= StrictVersion('0.2.1')",
         )
+
+    @unittest.skipIf(
+        ColumnTransformer is None,
+        reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_complex_pipeline(self):
+
+        df = pandas.read_csv(StringIO(dedent("""
+            CAT1,CAT2,TEXT
+            A,M,clean
+            B,N,text
+            A,M,cleaning
+            B,N,normalizing""")))
+
+        X_train = df
+        y_train = np.array([[1, 0, 1, 0], [1, 0, 1, 0]]).T
+
+        categorical_features = ['CAT1', 'CAT2']
+        textual_feature = 'TEXT'
+
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('cat_transform', OneHotEncoder(handle_unknown='ignore'),
+                 categorical_features),
+                ('count_vector', Pipeline(steps=[
+                    ('count_vect', CountVectorizer(
+                        max_df=0.8, min_df=0.05, max_features=1000))]),
+                 textual_feature)])
+
+        preprocessor.fit(X_train, y_train)
+        initial_type = [('CAT1', StringTensorType([None, 1])),
+                        ('CAT2', StringTensorType([None, 1])),
+                        ('TEXTs', StringTensorType([None, 1]))]
+        with self.assertRaises(RuntimeError):
+            to_onnx(preprocessor, initial_types=initial_type,
+                    target_opset=TARGET_OPSET)
+
+        initial_type = [('CAT1', StringTensorType([None, 1])),
+                        ('CAT2', StringTensorType([None, 1])),
+                        ('TEXT', StringTensorType([None, 1]))]
+        onx = to_onnx(preprocessor, initial_types=initial_type,
+                      target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X_train, preprocessor, onx,
+            basename="SklearnPipelineComplex")
 
 
 if __name__ == "__main__":
