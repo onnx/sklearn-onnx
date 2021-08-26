@@ -228,10 +228,22 @@ class OnnxOperator:
             if isinstance(output_names[0], str):
                 output_names[0] = VariableStr(output_names[0])
         elif isinstance(output_names, Operator):
+            if len(output_names.outputs) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % output_names)
             output_names = output_names.outputs.copy()
         elif isinstance(output_names, Operator.OperatorList):
+            if len(output_names) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % self.__class__.__name__)
             output_names = output_names.copy()
         elif isinstance(output_names, list):
+            if len(output_names) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % self.__class__.__name__)
             output_names = output_names.copy()
             for i in range(len(output_names)):
                 if isinstance(output_names[i], str):
@@ -346,7 +358,8 @@ class OnnxOperator:
         if self.output_names is not None:
             if len(self.output_names) == 0:
                 raise ValueError(
-                    "output_names can be None but cannot be empty.")
+                    "output_names can be None but cannot be empty for "
+                    "operator %r." % self)
             if self.output_variables is None:
                 self.output_variables = [None for o in self.output_names]
             for i in range(len(self.output_names)):

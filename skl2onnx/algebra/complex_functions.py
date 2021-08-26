@@ -19,13 +19,12 @@ def onnx_squareform_pdist(X, metric='sqeuclidean', dtype=None,
     if metric == 'sqeuclidean':
         return _onnx_squareform_pdist_sqeuclidean(
             X, dtype=dtype, op_version=op_version, **kwargs)
-    elif metric == 'euclidean':
+    if metric == 'euclidean':
         res = _onnx_squareform_pdist_sqeuclidean(
             X, dtype=dtype, op_version=op_version)
         return OnnxSqrt(res, op_version=op_version, **kwargs)
-    else:
-        raise NotImplementedError("metric='{}' is not implemented.".format(
-            metric))
+    raise NotImplementedError(
+        "metric='{}' is not implemented.".format(metric))
 
 
 def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,

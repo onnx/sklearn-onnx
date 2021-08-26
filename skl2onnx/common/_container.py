@@ -737,8 +737,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                     if name in order:
                         raise RuntimeError(
                             "Unable to sort a node (cycle). An output was "
-                            "already ordered %r (iteration=%r)." % (
-                                name, n_iter))
+                            "already ordered with name %r (iteration=%r)."
+                            "" % (name, n_iter))
                     order[name] = maxi
             if len(missing_names) == 0:
                 continue

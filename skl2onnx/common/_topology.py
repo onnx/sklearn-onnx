@@ -76,8 +76,18 @@ class Variable:
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
         if not isinstance(onnx_name, str) or '(' in onnx_name:
-            raise TypeError(
-                "raw_name must be a string not %r." % onnx_name)
+            if onnx_name.startswith('u(') and onnx_name[-1] == ')':
+                onnx_name0 = onnx_name
+                if scope is None:
+                    onnx_name = "U%d" % id(self)
+                else:
+                    onnx_name = scope.get_unique_variable_name("U")
+                logger.debug(
+                    '[Var] rename raw_name=%r, onnx_name=%r into %r' % (
+                        raw_name, onnx_name0, onnx_name))
+            else:
+                raise TypeError(
+                    "onnx_name must be a string not %r." % onnx_name)
 
         if type is not None:
             shape = type.shape
@@ -291,8 +301,7 @@ class VariableStr(Variable):
     """
 
     def __init__(self, name, scope=None, type=None):
-        Variable.__init__(self, name, name.replace(")", "").replace("(", ""),
-                          scope=scope, type=type)
+        Variable.__init__(self, name, name, scope=scope, type=type)
 
     @property
     def raw_name(self):
@@ -343,8 +352,17 @@ class Operator(OperatorBase):
             return v
 
         def __setitem__(self, i, v):
-            raise RuntimeError(
+            raise LookupError(
                 "Setter should not be used to modify an element.")
+
+        def set_element(self, i, v):
+            "Updates element i."
+            if not isinstance(v, Variable):
+                raise TypeError(
+                    "Value v must be a Variable not %r." % type(v))
+            logger.debug("[Op] %s-change element %d from %r to %r in %r" % (
+                self.kind, i, self[i], v, self.parent))
+            list.__setitem__(self, i, v)
 
         def to_string(self):
             names = []
@@ -1161,7 +1179,7 @@ class Topology:
                         if (another_operator.inputs[i].onnx_name
                                 != duplicate.onnx_name):
                             continue
-                        another_operator.inputs[i] = original
+                        another_operator.inputs.set_element(i, original)
 
             # When original variable's documentation string or
             # denotation is empty but duplicate's is not, we copy that

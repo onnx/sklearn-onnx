@@ -14,6 +14,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 import onnxruntime
 try:
     from skl2onnx.common._apply_operation import apply_less
@@ -29,6 +35,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_float(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -52,6 +59,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_float_nozipmap(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -71,6 +79,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_int(self):
         data = load_digits()
         X, y = data.data, data.target
@@ -97,23 +106,20 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_isotonic_float(self):
         data = load_iris()
         X, y = data.data, data.target
         clf = KNeighborsClassifier().fit(X, y)
         model = CalibratedClassifierCV(clf, cv=2, method="isotonic").fit(X, y)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn CalibratedClassifierCVKNN",
+            model, "scikit-learn CalibratedClassifierCVKNN",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         try:
             dump_data_and_model(
-                X.astype(np.float32),
-                model,
-                model_onnx,
+                X.astype(np.float32), model, model_onnx,
                 basename="SklearnCalibratedClassifierCVIsotonicFloat")
         except Exception as e:
             raise AssertionError("Issue with model\n{}".format(
@@ -121,6 +127,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -148,6 +155,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_isotonic_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -155,16 +163,12 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         clf = KNeighborsClassifier().fit(X, y)
         model = CalibratedClassifierCV(clf, cv=2, method="isotonic").fit(X, y)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn CalibratedClassifierCV",
+            model, "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
+            X.astype(np.float32), model, model_onnx,
             basename="SklearnCalibratedClassifierCVIsotonicBinaryKNN")
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -172,6 +176,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_logistic_regression(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -198,6 +203,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_rf(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -220,6 +226,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
+    @ignore_warnings(category=FutureWarning)
     def test_model_calibrated_classifier_cv_svc(self):
         data = load_iris()
         X, y = data.data, data.target

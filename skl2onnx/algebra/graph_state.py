@@ -26,6 +26,7 @@ class GraphState:
                  expected_outputs=None, input_range=None,
                  output_range=None, operator=None,
                  run_converters=False, **attrs):
+
         self.inputs = inputs
         self._output_names = output_names
         self._input_range = input_range.copy() if input_range else [1, 1e9]
