@@ -34,6 +34,25 @@ or created from scratch.
 
 .. autofunction:: skl2onnx.to_onnx
 
+Logging
+=======
+
+.. index:: logging
+
+The conversion of a pipeline fails if it contains an object without any
+associated converter. It may also fails if one of the object is mapped
+by a custom converter. If the error message is not explicit enough,
+it is possible to enable logging:
+
+::
+
+    import logging
+    logger = logging.getLogger('skl2onnx')
+    logger.setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
+
+Example :ref:`l-example-logging` illustrates what it looks like.
+
 Register a new converter
 ========================
 
@@ -105,5 +124,6 @@ Topology
 --------
 
 .. autoclass:: skl2onnx.common._topology.Topology
-    :members: compile
+    :members: compile, topological_operator_iterator
 
+.. autofunction:: skl2onnx.common._topology.convert_topology
