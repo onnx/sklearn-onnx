@@ -4,6 +4,12 @@ import unittest
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
@@ -54,6 +60,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="Missing Gemm (11)")
+    @ignore_warnings(category=UserWarning)
     def test_model_gaussian_mixture_binary_classification(self):
         model, X = self._fit_model_binary_classification(
             GaussianMixture(), load_iris())
@@ -71,6 +78,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                     "<= StrictVersion('0.2.1')")
                 self._test_score(model, X, tg)
 
+    @ignore_warnings(category=UserWarning)
     def test_model_bayesian_mixture_binary_classification(self):
         for cov in ["full", "tied", "diag", "spherical"]:
             with self.subTest(cov=cov):
@@ -96,6 +104,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_model_gaussian_mixture_multiclass(self):
         model, X = self._fit_model_multiclass_classification(
             GaussianMixture(), load_iris())
@@ -118,6 +127,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_comp2(self):
         data = load_iris()
         X = data.data
@@ -141,6 +151,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full(self):
         data = load_iris()
         X = data.data
@@ -164,6 +175,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_tied(self):
         data = load_iris()
         X = data.data
@@ -187,6 +199,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_diag(self):
         data = load_iris()
         X = data.data
@@ -211,6 +224,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_spherical(self):
         data = load_iris()
         X = data.data
@@ -232,6 +246,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full_black_op(self):
         data = load_iris()
         X = data.data
@@ -262,6 +277,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full_black_op_noargmax(self):
         data = load_iris()
         X = data.data
@@ -292,6 +308,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
+    @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full_black_op_noargmax_inf(self):
         data = load_iris()
         X = data.data

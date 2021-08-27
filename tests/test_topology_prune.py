@@ -4,13 +4,15 @@
 Tests topology.
 """
 import unittest
+import numpy
+from onnxruntime import InferenceSession
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import make_pipeline
 from sklearn import datasets
-
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.algebra.onnx_ops import OnnxIdentity
+from skl2onnx.algebra.onnx_ops import OnnxIdentity, OnnxAdd
+from skl2onnx.algebra.complex_functions import onnx_squareform_pdist
 from test_utils import TARGET_OPSET
 
 
@@ -73,6 +75,52 @@ class TestTopologyPrune(unittest.TestCase):
                   if node.op_type == "Identity"]
         self.assertEqual(len(idnode), 1)
 
+    def test_onnx_subgraphs1(self):
+        x = numpy.array([1, 2, 4, 5, 5, 4]).astype(
+            numpy.float32).reshape((3, 2))
+        cop = OnnxAdd(
+            OnnxIdentity('input', op_version=TARGET_OPSET),
+            'input', op_version=TARGET_OPSET)
+        cdist = onnx_squareform_pdist(
+            cop, dtype=numpy.float32, op_version=TARGET_OPSET)
+        cop2 = OnnxIdentity(cdist, output_names=['cdist'],
+                            op_version=TARGET_OPSET)
+
+        model_def = cop2.to_onnx(
+            {'input': FloatTensorType([None, None])},
+            outputs=[('cdist', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        self.assertEqual(len(res), 1)
+
+    def test_onnx_subgraphs2(self):
+        x = numpy.array([1, 2, 4, 5, 5, 4]).astype(
+            numpy.float32).reshape((3, 2))
+        cop = OnnxAdd(
+            OnnxIdentity('input', op_version=TARGET_OPSET),
+            'input', op_version=TARGET_OPSET)
+        cdist = onnx_squareform_pdist(
+            cop, dtype=numpy.float32, op_version=TARGET_OPSET)
+        cdist2 = onnx_squareform_pdist(
+            cop, dtype=numpy.float32, op_version=TARGET_OPSET)
+        cop2 = OnnxAdd(cdist, cdist2, output_names=['cdist'],
+                       op_version=TARGET_OPSET)
+
+        model_def = cop2.to_onnx(
+            {'input': FloatTensorType([None, None])},
+            outputs=[('cdist', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'input': x})
+        self.assertEqual(len(res), 1)
+
 
 if __name__ == "__main__":
+    # import logging
+    # log = logging.getLogger('skl2onnx')
+    # log.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
+    # TestTopologyPrune().test_onnx_subgraphs1()
+    # TestTopologyPrune().test_onnx_subgraphs2()
     unittest.main()

@@ -65,14 +65,14 @@ class TestOnnxOperators(unittest.TestCase):
             nin = list(op.enumerate_initial_types())
             nno = list(op.enumerate_nodes())
             nva = list(op.enumerate_variables())
-            assert len(nin) == 1
-            assert nin[0][0] == 'input'
-            assert nin[0][1].shape == [None, 2]
-            assert len(nno) == 1
-            assert nno[0].output_names == ['variable']
-            assert len(nva) == 1
+            self.assertEqual(len(nin), 1)
+            self.assertEqual(nin[0][0], 'input')
+            self.assertEqual(nin[0][1].shape, [None, 2])
+            self.assertEqual(len(nno), 1)
+            self.assertEqual(nno[0].output_names[0].onnx_name, 'variable')
+            self.assertEqual(len(nva), 1)
             assert isinstance(nva[0], tuple)
-            assert nva[0][1] == 0
+            self.assertEqual(nva[0][1], 0)
 
         def shape(operator):
             N = operator.inputs[0].type.shape[0]

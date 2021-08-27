@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
 from ..proto import onnx_proto, TensorProto
@@ -8,6 +9,9 @@ from ..common.data_types import (
     _guess_type_proto, FloatType, DoubleType, Int64Type, copy_type)
 from ..common._topology import Variable
 from ..common._registration import get_shape_calculator, get_converter
+
+
+logger = getLogger('skl2onnx')
 
 
 class GraphStateVar:
@@ -22,6 +26,7 @@ class GraphState:
                  expected_outputs=None, input_range=None,
                  output_range=None, operator=None,
                  run_converters=False, **attrs):
+
         self.inputs = inputs
         self._output_names = output_names
         self._input_range = input_range.copy() if input_range else [1, 1e9]
@@ -287,8 +292,7 @@ class GraphState:
         if isinstance(output, tuple):
             if output[0] in output_names:
                 return output
-            return (scope.get_unique_variable_name(output[0]),
-                    output[1])
+            return (scope.get_unique_variable_name(output[0]), output[1])
         raise NotImplementedError(
             "Unexpected output type {} [{}]. "
             "You may raise an issue at https://github.com/onnx/"
@@ -324,12 +328,13 @@ class GraphState:
                     "Inputs %d - %r must be of type Variable." % (i, inp))
             if names is not None:
                 try:
-                    inp.onnx_name = (
+                    onnx_name = (
                         names[i] if isinstance(names[i], str)
                         else names[i][0])
                 except IndexError as e:
                     raise IndexError(
                         "Wrong index %d, list=%s." % (i, names)) from e
+                inp.set_onnx_name(onnx_name)
 
         # Second pass.
         if expected_inputs is not None:
@@ -349,7 +354,7 @@ class GraphState:
                                     j >= input_range[0]):
                                 continue
                             if new_inputs[j].type is not None:
-                                new_inputs[i].type = (
+                                new_inputs[i].set_type(
                                     new_inputs[j].type.__class__())
                                 break
 
@@ -387,7 +392,7 @@ class GraphState:
             if hasattr(inp, 'type') and inp.type is None:
                 ct = expected1[i][1]
                 if ct in memo:
-                    vars1[i].type = copy_type(memo[ct][0])
+                    vars1[i].set_type(copy_type(memo[ct][0]))
             elif isinstance(inp, tuple):
                 ct = expected1[i][1]
                 if ct in memo:
@@ -455,20 +460,31 @@ class GraphState:
                 sub_op.outputs = sub_outputs
 
                 shape_calc = get_shape_calculator(self.operator_name)
+                logger.debug("[StateShape] call %r fed %r - %r" % (
+                    sub_op,
+                    "".join(str(i.is_fed) for i in sub_op.inputs),
+                    "".join(str(i.is_fed) for i in sub_op.outputs)))
                 shape_calc(sub_op)
+                logger.debug("[StateShape] end - %r" % sub_op)
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
-                if expected_outputs is not None:
+                if sub_op.outputs is not None and len(sub_op.outputs) > 0:
+                    outputs = [
+                        self.scope.declare_local_variable(
+                            o.onnx_name, type=o.type)
+                        for o in sub_op.outputs]
+                elif (expected_outputs is not None and
+                        len(expected_outputs) > 0):
                     outputs = [
                         self._get_output_name(
                             self._output_names, o, self.scope)
                         for o in expected_outputs]
                 else:
-                    outputs = [
-                        self.scope.declare_local_variable(
-                            o.onnx_name, type=o.type)
-                        for o in sub_op.outputs]
+                    raise RuntimeError(
+                        "sub_op.outputs is None as well as expected_outputs "
+                        "for operator %r." % sub_op)
+
                 if len(outputs) != len(sub_op.outputs):
                     raise RuntimeError(
                         "Mismatched number of outputs %s and %s." % (
@@ -482,14 +498,43 @@ class GraphState:
                 self.computed_outputs_ = outputs
                 self.computed_inputs2_ = sub_op.inputs
                 self.computed_outputs2_ = [
-                    (v.raw_name, v.type) for v in self.computed_outputs_]
+                    (v[0], v[1]) for v in self.computed_outputs_]
 
                 if self.run_converters:
                     # The parser was run on sub-operators but not the
                     # converter.
                     conv = get_converter(self.operator_name)
+                    logger.debug("[StateConv] %r fed %r - %r" % (
+                        sub_op,
+                        "".join(str(i.is_fed) for i in sub_op.inputs),
+                        "".join(str(i.is_fed) for i in sub_op.outputs)))
                     conv(self.scope, sub_op, self.container)
+                    logger.debug("[StateConv] %r - end." % sub_op)
+                else:
+                    if (expected_outputs is not None and
+                            len(sub_op.outputs) == len(expected_outputs)):
+                        for v1, v2 in zip(sub_op.outputs, expected_outputs):
+                            if isinstance(v2, tuple):
+                                v2 = v2[0]
+                            if (hasattr(v1, 'onnx_name') and
+                                    hasattr(v2, 'onnx_name')):
+                                if v1.onnx_name != v2.onnx_name:
+                                    # One identity is missing
+                                    n = self.scope.get_unique_operator_name(
+                                        'idgstate')
+                                    self.container.add_node(
+                                        'Identity', [v1.onnx_name],
+                                        [v2.onnx_name], name=n)
             else:
+
+                def _name_(obj):
+                    if isinstance(obj, tuple) and len(obj) == 2:
+                        return obj[0]
+                    if hasattr(obj, 'onnx_name'):
+                        return obj.onnx_name
+                    raise TypeError(
+                        "Unable to extract variable name from %r." % obj)
+
                 # only one node is added
                 if self.options is not None:
                     raise RuntimeError(
@@ -498,8 +543,8 @@ class GraphState:
                 outputs = [
                     self._get_output_name(self._output_names, o, self.scope)
                     for o in expected_outputs]
-                input_names = [i[0] for i in inputs]
-                output_names = [i[0] for i in outputs]
+                input_names = [_name_(i) for i in inputs]
+                output_names = [_name_(i) for i in outputs]
                 self.container.add_node(
                     self.operator_name, input_names, output_names,
                     name=name, **self.attrs)
@@ -520,6 +565,6 @@ class GraphState:
                         var = self.scope.declare_local_variable(name, kind)
                         # name already comes from
                         # scope.get_unique_variable_name
-                        var.onnx_name = name
-                        var.is_fed = True
+                        var.set_onnx_name(name)
+                        var.init_status(is_fed=True)
                         self.computed_outputs_.append(var)

@@ -23,6 +23,7 @@ from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
 from . import mixture
+from . import multioutput
 from . import nearest_neighbours
 from . import one_hot_encoder
 from . import ordinal_encoder
@@ -61,6 +62,7 @@ __all__ = [
     linear_classifier,
     linear_regressor,
     mixture,
+    multioutput,
     nearest_neighbours,
     one_hot_encoder,
     ordinal_encoder,

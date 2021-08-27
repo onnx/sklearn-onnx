@@ -10,7 +10,7 @@ jobs:
 
 - job: 'CI_Linux'
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
       Py39-Onnx1101-Rt181-Skl0242:

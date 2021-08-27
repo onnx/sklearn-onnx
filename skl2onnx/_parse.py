@@ -96,6 +96,10 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     if isinstance(model, str):
         raise RuntimeError("Parameter model must be an object not a "
                            "string '{0}'.".format(model))
+    if any(not isinstance(i, Variable) for i in inputs):
+        raise TypeError(
+            "One input is not a Variable for model %r - %r."
+            "" % (model, inputs))
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
@@ -104,11 +108,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         parser_names = model.onnx_parser(scope=scope, inputs=inputs)
         if parser_names is not None:
             names = parser_names()
-            for name in names:
-                var = scope.declare_local_variable(
-                    name, guess_tensor_type(inputs[0].type))
-                this_operator.outputs.append(var)
-            return this_operator.outputs
+            if names is not None:
+                for name in names:
+                    var = scope.declare_local_variable(
+                        name, guess_tensor_type(inputs[0].type))
+                    this_operator.outputs.append(var)
+                return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list
             or isinstance(model, ClassifierMixin)
@@ -345,31 +350,32 @@ def _parse_sklearn_column_transformer(scope, model, inputs,
 
 
 def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
-    return (_parse_sklearn_classifier(
-        scope, model, inputs, custom_parsers=None)
-        if is_classifier(model) else
-        _parse_sklearn_simple_model(scope, model, inputs,
-                                    custom_parsers=custom_parsers))
+    options = scope.get_options(model)
+    if options:
+        scope.add_options(id(model.best_estimator_), options)
+    return parse_sklearn(scope, model.best_estimator_, inputs,
+                         custom_parsers=custom_parsers)
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    no_zipmap = (
+        (isinstance(options['zipmap'], bool) and not options['zipmap']) or
+        (model.__class__ in [NuSVC, SVC] and not model.probability))
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers)
-    if model.__class__ in [NuSVC, SVC] and not model.probability:
-        return probability_tensor
-    options = scope.get_options(model, dict(zipmap=True))
-    if isinstance(options['zipmap'], bool) and not options['zipmap']:
+    if no_zipmap:
         return probability_tensor
 
     if options['zipmap'] == 'columns':
-        this_operator = scope.declare_local_operator('SklearnZipMapColumns')
+        zipmap_operator = scope.declare_local_operator('SklearnZipMapColumns')
         classes = get_label_classes(scope, model)
         classes_names = get_label_classes(scope, model, node_names=True)
     else:
-        this_operator = scope.declare_local_operator('SklearnZipMap')
+        zipmap_operator = scope.declare_local_operator('SklearnZipMap')
         classes = get_label_classes(scope, model)
 
-    this_operator.inputs = probability_tensor
+    zipmap_operator.inputs = probability_tensor
     label_type = Int64TensorType([None])
 
     if (isinstance(model.classes_, list) and
@@ -383,32 +389,34 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
                                "labels into integers but at least one label "
                                "is not an integer. Class labels should "
                                "be integers or strings.")
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.unsignedinteger):
-        this_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = classes
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
-        this_operator.classlabels_strings = classes
+        zipmap_operator.classlabels_strings = classes
         label_type = StringTensorType([None])
 
-    output_label = scope.declare_local_variable('output_label', label_type)
-    this_operator.outputs.append(output_label)
+    zip_label = scope.declare_local_variable('output_label', label_type)
+    zipmap_operator.outputs.append(zip_label)
 
     if options['zipmap'] == 'columns':
         prob_type = probability_tensor[1].type
         for cl in classes_names:
             output_cl = scope.declare_local_variable(cl, prob_type.__class__())
-            this_operator.outputs.append(output_cl)
+            zipmap_operator.outputs.append(output_cl)
     else:
-        output_probability = scope.declare_local_variable(
+        zip_probability = scope.declare_local_variable(
             'output_probability',
             SequenceType(
                 DictionaryType(
                     label_type, guess_tensor_type(inputs[0].type))))
-        this_operator.outputs.append(output_probability)
-    return this_operator.outputs
+        zipmap_operator.outputs.append(zip_probability)
+
+    zipmap_operator.init_status(is_evaluated=True)
+    return zipmap_operator.outputs
 
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):

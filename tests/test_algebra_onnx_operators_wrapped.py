@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
-from skl2onnx.algebra.onnx_operator import OnnxSubEstimator as SubOp
+from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx import update_registered_converter
 from onnxruntime import __version__ as ortv
 from test_utils import TARGET_OPSET
@@ -61,7 +61,7 @@ def decorrelate_transformer_convertor(scope, operator, container):
     opv = container.target_opset
     out = operator.outputs
     X = operator.inputs[0]
-    subop = SubOp(op.pca_, X, op_version=opv)
+    subop = OnnxSubEstimator(op.pca_, X, op_version=opv)
     Y = OnnxIdentity(subop, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 
@@ -71,7 +71,7 @@ def decorrelate_transformer_convertor2(scope, operator, container):
     opv = container.target_opset
     out = operator.outputs
     X = operator.inputs[0]
-    Y = SubOp(op.pca_, X, op_version=opv, output_names=out[:1])
+    Y = OnnxSubEstimator(op.pca_, X, op_version=opv, output_names=out[:1])
     Y.add_to(scope, container)
 
 
