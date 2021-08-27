@@ -97,12 +97,12 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 else:
                     res.append(True)
                 inlist.append(tuple(res))
-            
+
             self.intervals_.append(inlist)
             self.indices_.append((dim, dim + len(inlist)))
             dim += len(inlist)
 
-        self.n_dims_ = dim        
+        self.n_dims_ = dim
         return self
 
     def _transform_column(self, X, i):
@@ -136,7 +136,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
     def get_feature_names(self):
         """
         Returns the features names.
-        """        
+        """
         names = []
         for i, intervals in enumerate(self.intervals_):
             if intervals is None:
