@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 import numpy as np
 
 from sklearn import pipeline
@@ -565,7 +566,10 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
 
     if final_types is None and reserved is not None:
         for r in reserved:
-            scope.unreserve_name(r)
+            if r not in scope.variables:
+                scope.unreserve_name(r)
+            else:
+                warnings.warn(f"Tried to unreserve already declared variable '{r}'.")
 
         outputs = []
         for var, name in zip(res, reserved):

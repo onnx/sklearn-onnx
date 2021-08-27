@@ -651,6 +651,10 @@ class Scope:
         """
         Deletes a name from the reserved list.
         """
+        if name in self.variables:
+            raise RuntimeError(
+                f"Cannot unreserve '{name}' as it is already a declared variable: {self.variables[name]}."
+            )
         if name not in self.reserved:
             raise RuntimeError(
                 "Name '{}' not reserved.".format(name))
