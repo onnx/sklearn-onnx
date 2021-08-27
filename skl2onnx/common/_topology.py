@@ -58,6 +58,7 @@ class Variable:
     Defines a variable which holds any data defined
     from *ONNX* types.
     """
+    _UNIQUE_NUMBER_ = 0
 
     def __init__(self, raw_name, onnx_name, scope, type=None):
         """
@@ -79,7 +80,8 @@ class Variable:
             if onnx_name.startswith('u(') and onnx_name[-1] == ')':
                 onnx_name0 = onnx_name
                 if scope is None:
-                    onnx_name = "U%d" % id(self)
+                    onnx_name = "UU%03dUU" % Variable._UNIQUE_NUMBER_
+                    Variable._UNIQUE_NUMBER_ += 1
                 else:
                     onnx_name = scope.get_unique_variable_name("U")
                 logger.debug(
