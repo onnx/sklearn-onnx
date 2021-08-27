@@ -23,7 +23,6 @@ class TestMultiOutputConverter(unittest.TestCase):
             pass
 
     def test_multi_output_regressor(self):
-
         X, y = load_linnerud(return_X_y=True)
         clf = MultiOutputRegressor(Ridge(random_state=123)).fit(X, y)
         onx = to_onnx(clf, X[:1].astype(numpy.float32),
@@ -33,12 +32,37 @@ class TestMultiOutputConverter(unittest.TestCase):
             basename="SklearnMultiOutputRegressor")
 
     def test_multi_output_classifier(self):
-
         X, y = make_multilabel_classification(n_classes=3, random_state=0)
         X = X.astype(numpy.float32)
         clf = MultiOutputClassifier(LogisticRegression()).fit(X, y)
+        with self.assertRaises(NameError):
+            to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
+                    options={id(clf): {'zipmap': False}})
+        onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET)
+        self.assertNotIn("ZipMap", str(onx))
+
+        sess = InferenceSession(onx.SerializeToString())
+        res = sess.run(None, {'X': X})
+        exp_lab = clf.predict(X)
+        exp_prb = numpy.transpose(clf.predict_proba(X), (1, 0, 2))
+        assert_almost_equal(exp_lab, res[0])
+        assert_almost_equal(exp_prb, res[1], decimal=5)
+
+        # check option nocl=True
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
-                      options={id(clf): {'zipmap': False}}, verbose=0)
+                      options={id(clf): {'nocl': True}})
+        self.assertNotIn("ZipMap", str(onx))
+
+        sess = InferenceSession(onx.SerializeToString())
+        res = sess.run(None, {'X': X})
+        exp_lab = clf.predict(X)
+        exp_prb = numpy.transpose(clf.predict_proba(X), (1, 0, 2))
+        assert_almost_equal(exp_lab, res[0])
+        assert_almost_equal(exp_prb, res[1], decimal=5)
+
+        # check option nocl=False
+        onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
+                      options={id(clf): {'nocl': False}})
         self.assertNotIn("ZipMap", str(onx))
 
         sess = InferenceSession(onx.SerializeToString())
