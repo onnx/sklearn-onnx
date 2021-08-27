@@ -139,9 +139,9 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
 
-        # Next instructions fails...
-        # Field 'shape' of type is required but missing.
-        onnx.checker.check_model(model_onnx)
+        if StrictVersion(onnx.__version__) >= StrictVersion("1.8.0"):
+            # It fails for older version of onnx.
+            onnx.checker.check_model(model_onnx)
 
         dump_data_and_model(
             mat.astype(np.float32), pipe, model_onnx,
