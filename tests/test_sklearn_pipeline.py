@@ -32,6 +32,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import SVC
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -575,6 +577,45 @@ class TestSklearnPipeline(unittest.TestCase):
         onxp = oinf.run(None, inputs)
         got = onxp[0]
         assert_almost_equal(pred, got)
+
+    def test_pipeline_tfidf_svc(self):
+        pipe = Pipeline([
+            ('tfidf', TfidfVectorizer()),
+            ('clf_svc', SVC(probability=True, kernel='linear'))])
+        data = numpy.array(["first sentance", "second sentence",
+                            "many sentances", "dummy sentance",
+                            "no sentance at all"])
+        y = numpy.array([0, 0, 1, 0, 1])
+        pipe.fit(data, y)
+        expected_label = pipe.predict(data)
+        expected_proba = pipe.predict_proba(data)
+        df = pandas.DataFrame(data)
+        df.columns = ['text']
+
+        # first conversion if shape=[None, 1]
+        model_onnx = convert_sklearn(
+            pipe, initial_types=[('text', StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+            options={id(pipe): {'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'text': data.reshape((-1, 1))})
+        assert_almost_equal(expected_proba, got[1])
+        assert_almost_equal(expected_label, got[0])
+        # sess.run(None, {'text': df}) --> failures
+        # sess.run(None, {'text': df["text"]}) --> failures
+
+        # second conversion with shape=[None]
+        model_onnx = convert_sklearn(
+            pipe, initial_types=[('text', StringTensorType([None]))],
+            target_opset=TARGET_OPSET,
+            options={id(pipe): {'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'text': data})
+        assert_almost_equal(expected_proba, got[1])
+        assert_almost_equal(expected_label, got[0])
+        # sess.run(None, {'text': df})  failure
+        # sess.run(None, {'text': df["text"]})  failure
+        sess.run(None, {'text': df["text"].values})  # success
 
 
 if __name__ == "__main__":
