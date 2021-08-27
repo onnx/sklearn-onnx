@@ -353,8 +353,11 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model)
     if options:
         scope.add_options(id(model.best_estimator_), options)
-    return parse_sklearn(scope, model.best_estimator_, inputs,
-                         custom_parsers=custom_parsers)
+    res = parse_sklearn(scope, model.best_estimator_, inputs,
+                        custom_parsers=custom_parsers)
+    scope.replace_raw_operator(
+        model.best_estimator_, model, "SklearnGridSearchCV")
+    return res
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
