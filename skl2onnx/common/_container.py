@@ -757,8 +757,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             rows.append("--")
             rows.append("--all-nodes--")
             rows.append("--")
-            rows.extend("%s(%s) -> [%s]" % (
-                n.name or n.op_type,
+            rows.extend("%s|%s(%s) -> [%s]" % (
+                n.op_type, n.name or n.op_type,
                 ', '.join(map(nstr, n.input)),
                 ', '.join(n.output))
                 for n in self.nodes)
