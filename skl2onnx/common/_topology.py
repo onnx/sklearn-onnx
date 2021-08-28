@@ -410,6 +410,18 @@ class Operator(OperatorBase):
         self.scope_inst = scope_inst
         logger.debug('[Op] +%r' % self)
 
+    def new_raw_operator(self, raw_operator, alias):
+        """
+        Returns a shallow copy of this operator,
+        changes the raw_operator but keeps the same inputs
+        and outputs.
+        """
+        op = Operator(self.onnx_name, self.scope, alias, raw_operator,
+                      self.target_opset, self.scope_inst)
+        op.inputs = self.inputs
+        op.outputs = self.outputs
+        return op
+
     def __repr__(self):
         try:
             textop = repr(self.raw_operator)
@@ -739,6 +751,18 @@ class Scope:
             model, self.options, default_values,
             self._get_allowed_options(model, fail=fail),
             fail=fail)
+
+    def replace_raw_operator(self, op1, op2, alias):
+        """
+        Replaces every raw operator op1 by op2.
+        The function uses `id()` to detect op1.
+        """
+        for v in self.operators.values():
+            if id(v.raw_operator) == id(op1):
+                logger.debug('[Scope] replace %d by %d in %r.' % (
+                    id(v.raw_operator), id(op1), v))
+                v.raw_operator = op2
+                v.type = alias
 
 
 class Topology:
