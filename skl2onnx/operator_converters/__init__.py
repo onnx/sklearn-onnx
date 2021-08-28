@@ -39,6 +39,7 @@ from . import normaliser
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
+from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import random_forest
@@ -93,6 +94,7 @@ __all__ = [
     one_hot_encoder,
     one_vs_rest_classifier,
     ordinal_encoder,
+    pipelines,
     polynomial_features,
     power_transformer,
     random_forest,

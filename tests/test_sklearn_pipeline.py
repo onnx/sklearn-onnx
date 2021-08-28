@@ -28,11 +28,13 @@ try:
     from sklearn.impute import SimpleImputer
 except ImportError:
     from sklearn.preprocessing import Imputer as SimpleImputer
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import VotingClassifier
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
@@ -73,6 +75,8 @@ class PipeConcatenateInput:
 
 
 class TestSklearnPipeline(unittest.TestCase):
+
+    @ignore_warnings(category=FutureWarning)
     def test_pipeline(self):
         data = numpy.array([[0, 0], [0, 0], [1, 1], [1, 1]],
                            dtype=numpy.float32)
@@ -84,16 +88,14 @@ class TestSklearnPipeline(unittest.TestCase):
                                      [("input", FloatTensorType([None, 2]))],
                                      target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(data,
-                            model,
-                            model_onnx,
+        dump_data_and_model(data, model, model_onnx,
                             basename="SklearnPipelineScaler")
 
+    @ignore_warnings(category=FutureWarning)
     def test_combine_inputs(self):
         data = numpy.array(
             [[0.0, 0.0], [0.0, 0.0], [1.0, 1.0], [1.0, 1.0]],
-            dtype=numpy.float32,
-        )
+            dtype=numpy.float32)
         scaler = StandardScaler()
         scaler.fit(data)
         model = Pipeline([("scaler1", scaler), ("scaler2", scaler)])
@@ -113,15 +115,13 @@ class TestSklearnPipeline(unittest.TestCase):
             "input2": data[:, 1].reshape((-1, 1)),
         }
         dump_data_and_model(
-            data,
-            PipeConcatenateInput(model),
-            model_onnx,
-            basename="SklearnPipelineScaler11",
-        )
+            data, PipeConcatenateInput(model),
+            model_onnx, basename="SklearnPipelineScaler11")
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('0.4.0'),
         reason="onnxruntime too old")
+    @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_union_in_pipeline(self):
         from sklearn.preprocessing import StandardScaler
         from sklearn.pipeline import Pipeline
@@ -156,15 +156,13 @@ class TestSklearnPipeline(unittest.TestCase):
             "input2": data[:, 1].reshape((-1, 1)),
         }
         dump_data_and_model(
-            data,
-            PipeConcatenateInput(model),
-            model_onnx,
-            basename="SklearnPipelineScaler11Union",
-        )
+            data, PipeConcatenateInput(model),
+            model_onnx, basename="SklearnPipelineScaler11Union")
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('0.4.0'),
         reason="onnxruntime too old")
+    @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_floats_ints(self):
         data = [[0, 0.0], [0, 0.0], [1, 1.0], [1, 1.0]]
         scaler = StandardScaler()
@@ -187,11 +185,8 @@ class TestSklearnPipeline(unittest.TestCase):
             "input2": data[:, 1].reshape((-1, 1)).astype(numpy.float32),
         }
         dump_data_and_model(
-            data,
-            PipeConcatenateInput(model),
-            model_onnx,
-            basename="SklearnPipelineScalerMixed",
-        )
+            data, PipeConcatenateInput(model),
+            model_onnx, basename="SklearnPipelineScalerMixed")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -201,7 +196,7 @@ class TestSklearnPipeline(unittest.TestCase):
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
                      reason="issues with shapes")
-    @ignore_warnings(category=RuntimeWarning)
+    @ignore_warnings(category=(RuntimeWarning, FutureWarning))
     def test_pipeline_column_transformer(self):
 
         iris = datasets.load_iris()
@@ -219,11 +214,7 @@ class TestSklearnPipeline(unittest.TestCase):
         classifier = LogisticRegression(
             C=0.01,
             class_weight=dict(zip([False, True], [0.2, 0.8])),
-            n_jobs=1,
-            max_iter=10,
-            solver="lbfgs",
-            tol=1e-3,
-        )
+            n_jobs=1, max_iter=10, solver="lbfgs", tol=1e-3)
 
         numeric_transformer = Pipeline(steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -260,15 +251,12 @@ class TestSklearnPipeline(unittest.TestCase):
                                      target_opset=TARGET_OPSET)
 
         dump_data_and_model(
-            X_train,
-            model,
-            model_onnx,
+            X_train, model, model_onnx,
             basename="SklearnPipelineColumnTransformerPipeliner",
             allow_failure="StrictVersion(onnx.__version__)"
                           " < StrictVersion('1.3') or "
                           "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
-        )
+                          " <= StrictVersion('0.4.0')")
 
         if __name__ == "__main__":
             from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
@@ -277,8 +265,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 model_onnx.graph,
                 name=model_onnx.graph.name,
                 rankdir="TP",
-                node_producer=GetOpNodeProducer("docstring"),
-            )
+                node_producer=GetOpNodeProducer("docstring"))
             pydot_graph.write_dot("graph.dot")
 
             import os
@@ -293,6 +280,7 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         not check_scikit_version(),
         reason="Scikit 0.20 causes some mismatches")
+    @ignore_warnings(category=FutureWarning)
     def test_pipeline_column_transformer_titanic(self):
 
         # fit
@@ -414,10 +402,10 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_column_transformer_weights(self):
         model, X = fit_classification_model(
             ColumnTransformer(
@@ -431,20 +419,17 @@ class TestSklearnPipeline(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnColumnTransformerWeights-Dec4",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_column_transformer_drop(self):
         model, X = fit_classification_model(
             ColumnTransformer(
@@ -458,20 +443,17 @@ class TestSklearnPipeline(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnColumnTransformerDrop",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough(self):
         model, X = fit_classification_model(
             ColumnTransformer(
@@ -486,20 +468,17 @@ class TestSklearnPipeline(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnColumnTransformerPassthrough",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough_no_weights(self):
         model, X = fit_classification_model(
             ColumnTransformer(
@@ -513,18 +492,15 @@ class TestSklearnPipeline(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnColumnTransformerPassthroughNoWeights",
             allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            "<= StrictVersion('0.2.1')")
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
+        reason="ColumnTransformer not available in 0.19")
+    @ignore_warnings(category=FutureWarning)
     def test_pipeline_dataframe(self):
         text = """
                 fixed_acidity,volatile_acidity,citric_acid,residual_sugar,chlorides,free_sulfur_dioxide,total_sulfur_dioxide,density,pH,sulphates,alcohol,quality,color
@@ -578,6 +554,7 @@ class TestSklearnPipeline(unittest.TestCase):
         got = onxp[0]
         assert_almost_equal(pred, got)
 
+    @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_tfidf_svc(self):
         pipe = Pipeline([
             ('tfidf', TfidfVectorizer()),
@@ -616,6 +593,41 @@ class TestSklearnPipeline(unittest.TestCase):
         # sess.run(None, {'text': df})  failure
         # sess.run(None, {'text': df["text"]})  failure
         sess.run(None, {'text': df["text"].values})  # success
+
+    @ignore_warnings(category=(FutureWarning, UserWarning))
+    def test_pipeline_voting_tfidf_svc(self):
+        pipe1 = Pipeline([
+            ('tfidf1', TfidfVectorizer()),
+            ('svc', SVC(probability=True, kernel='linear'))])
+        pipe2 = Pipeline([
+            ('tfidf2', TfidfVectorizer(norm='l2', use_idf=False)),
+            ('sgd', SGDClassifier(alpha=0.0001, penalty='l2',
+                                  loss='modified_huber'))])
+        pipe3 = Pipeline([
+            ('tfidf3', TfidfVectorizer()),
+            ('mnb', MultinomialNB())])
+        voting = VotingClassifier(
+            [('p1', pipe1), ('p2', pipe2), ('p3', pipe3)],
+            voting='soft', flatten_transform=False)
+        data = numpy.array(["first sentance", "second sentence",
+                            "many sentances", "dummy sentance",
+                            "no sentance at all"])
+        y = numpy.array([0, 0, 1, 0, 1])
+        voting.fit(data, y)
+        expected_label = voting.predict(data)
+        expected_proba = voting.predict_proba(data)
+        df = pandas.DataFrame(data)
+        df.columns = ['text']
+
+        # first conversion if shape=[None, 1]
+        model_onnx = convert_sklearn(
+            voting, initial_types=[('text', StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+            options={id(voting): {'zipmap': False}})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'text': data.reshape((-1, 1))})
+        assert_almost_equal(expected_proba, got[1])
+        assert_almost_equal(expected_label, got[0])
 
 
 if __name__ == "__main__":

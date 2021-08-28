@@ -2,8 +2,10 @@
 
 
 from ..common._registration import register_shape_calculator
-from ..common.shape_calculator import calculate_linear_regressor_output_shapes
+from ..common.shape_calculator import _calculate_linear_regressor_output_shapes
 
 
-register_shape_calculator('SklearnVotingRegressor',
-                          calculate_linear_regressor_output_shapes)
+register_shape_calculator(
+    'SklearnVotingRegressor',
+    lambda op: _calculate_linear_regressor_output_shapes(
+        op, enable_type_checking=False))
