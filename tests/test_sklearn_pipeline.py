@@ -636,5 +636,5 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    TestSklearnPipeline().test_pipeline_voting_tfidf_svc()
+    # TestSklearnPipeline().test_pipeline_voting_tfidf_svc()
     unittest.main()

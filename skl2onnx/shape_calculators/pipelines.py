@@ -1,9 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
-import numpy as np
 from ..common._registration import register_shape_calculator
-from ..common.data_types import FloatTensorType, Int64TensorType
 
 
 def pipeline_shape_calculator(operator):
@@ -18,6 +15,9 @@ def column_transformer_shape_calculator(operator):
     pass
 
 
-register_shape_calculator('SklearnPipeline', pipeline_shape_calculator)
-register_shape_calculator('SklearnFeatureUnion', feature_union_shape_calculator)
-register_shape_calculator('SklearnColumnTransformer', column_transformer_shape_calculator)
+register_shape_calculator(
+    'SklearnPipeline', pipeline_shape_calculator)
+register_shape_calculator(
+    'SklearnFeatureUnion', feature_union_shape_calculator)
+register_shape_calculator(
+    'SklearnColumnTransformer', column_transformer_shape_calculator)

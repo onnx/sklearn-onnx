@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from sklearn.base import is_classifier
-from ..common._apply_operation import apply_concat, apply_cast
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -23,7 +22,7 @@ def convert_pipeline(scope: Scope, operator: Operator,
         raise RuntimeError(
             "Mismatch between pipeline output %d and "
             "last step outputs %d." % (
-                len(last_op.outputs), len(operator.outputs)))
+                len(outputs), len(operator.outputs)))
     for fr, to in zip(outputs, operator.outputs):
         container.add_node(
             'Identity', fr.full_name, to.full_name,
