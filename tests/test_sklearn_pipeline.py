@@ -619,11 +619,12 @@ class TestSklearnPipeline(unittest.TestCase):
         df = pandas.DataFrame(data)
         df.columns = ['text']
 
-        # first conversion if shape=[None, 1]
         model_onnx = convert_sklearn(
             voting, initial_types=[('text', StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
             options={id(voting): {'zipmap': False}})
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(model_onnx.SerializeToString())
         sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1])
@@ -631,4 +632,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # import logging
+    # logger = logging.getLogger('skl2onnx')
+    # logger.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
+    TestSklearnPipeline().test_pipeline_voting_tfidf_svc()
     unittest.main()

@@ -53,7 +53,7 @@ def convert_voting_classifier(scope: Scope, operator: Operator,
 
         label_name = scope.declare_local_variable('label_%d' % i)
         prob_name = scope.declare_local_variable(
-            'proba_%d' % i, operator.inputs[0].type.__class__())
+            'voting_proba_%d' % i, operator.inputs[0].type.__class__())
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(prob_name)
 
