@@ -245,7 +245,6 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     LogisticRegressionCV,
     MLPClassifier,
     MultinomialNB,
-    MultiOutputClassifier,
     NuSVC,
     OneVsRestClassifier,
     PassiveAggressiveClassifier,
