@@ -5,7 +5,10 @@ from ..common.shape_calculator import (
     _calculate_linear_classifier_output_shapes)
 
 
+def voting_classifier_shape_calculator(operator):
+    return _calculate_linear_classifier_output_shapes(
+        operator, enable_type_checking=False)
+
+
 register_shape_calculator(
-    'SklearnVotingClassifier',
-    lambda op: _calculate_linear_classifier_output_shapes(
-        op, enable_type_checking=False))
+    'SklearnVotingClassifier', voting_classifier_shape_calculator)

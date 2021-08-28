@@ -31,7 +31,9 @@ except ImportError:
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler
+from sklearn.preprocessing import (
+    OneHotEncoder, StandardScaler, MinMaxScaler,
+    MaxAbsScaler)
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import VotingClassifier
 from sklearn.naive_bayes import MultinomialNB
@@ -630,11 +632,51 @@ class TestSklearnPipeline(unittest.TestCase):
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
 
+    @ignore_warnings(category=(FutureWarning, UserWarning))
+    def test_pipeline_pipeline_voting_tfidf_svc(self):
+        pipe1 = Pipeline([
+            ('ntfidf1', Pipeline([
+                ('tfidf1', TfidfVectorizer()),
+                ('scaler', FeatureUnion([
+                    ('scaler2', StandardScaler(with_mean=False)),
+                    ('mm', MaxAbsScaler())]))])),
+            ('svc', SVC(probability=True, kernel='linear'))])
+        pipe2 = Pipeline([
+            ('tfidf2', TfidfVectorizer(norm='l2', use_idf=False)),
+            ('sgd', SGDClassifier(alpha=0.0001, penalty='l2',
+                                  loss='modified_huber'))])
+        pipe3 = Pipeline([
+            ('tfidf3', TfidfVectorizer()),
+            ('mnb', MultinomialNB())])
+        voting = VotingClassifier(
+            [('p1', pipe1), ('p2', pipe2), ('p3', pipe3)],
+            voting='soft', flatten_transform=False)
+        data = numpy.array(["first sentance", "second sentence",
+                            "many sentances", "dummy sentance",
+                            "no sentance at all"])
+        y = numpy.array([0, 0, 1, 0, 1])
+        voting.fit(data, y)
+        expected_label = voting.predict(data)
+        expected_proba = voting.predict_proba(data)
+        df = pandas.DataFrame(data)
+        df.columns = ['text']
+
+        model_onnx = convert_sklearn(
+            voting, initial_types=[('text', StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+            options={id(voting): {'zipmap': False}})
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(model_onnx.SerializeToString())
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'text': data.reshape((-1, 1))})
+        assert_almost_equal(expected_proba, got[1])
+        assert_almost_equal(expected_label, got[0])
+
 
 if __name__ == "__main__":
     # import logging
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnPipeline().test_pipeline_voting_tfidf_svc()
+    # TestSklearnPipeline().test_pipeline_pipeline_voting_tfidf_svc()
     unittest.main()
