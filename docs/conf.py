@@ -122,11 +122,11 @@ sphinx_gallery_conf = {
     'ignore_repr_types': r'matplotlib.text|matplotlib.axes',
     'binder': {
         'org': 'onnx',
-        'repo': 'sklearn-onnx',
+        'repo': 'onnx.ai/sklearn-onnx/',
+        'notebooks_dir': 'auto_examples',
         'binderhub_url': 'https://mybinder.org',
         'branch': 'master',
-        'dependencies': os.path.abspath(
-            os.path.join(os.path.dirname(__file__), 'requirements.txt'))
+        'dependencies': './requirements.txt'
     },
 }
 
