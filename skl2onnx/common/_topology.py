@@ -427,7 +427,7 @@ class Operator:
         except KeyError:
             # The line above fails for python 3.7
             textop = type(self.raw_operator)
-        if "\n" in textop:
+        if isinstance(textop, str) and "\n" in textop:
             textop = textop.replace('\n', '').replace(' ', '')
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
                 "outputs='{3}', raw_operator={4})".format(
