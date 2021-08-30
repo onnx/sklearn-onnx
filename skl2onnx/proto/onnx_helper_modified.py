@@ -2,7 +2,6 @@
 
 # Modified file from
 # https://github.com/onnx/onnx/blob/master/onnx/helper.py.
-import collections
 import numbers
 
 from onnx import (
@@ -84,7 +83,11 @@ def make_attribute(
     if doc_string:
         attr.doc_string = doc_string
 
-    is_iterable = isinstance(value, collections.abc.Iterable)
+    try:
+        iter(value)
+        is_iterable = True
+    except TypeError:
+        is_iterable = False
     bytes_or_false = _to_bytes_or_false(value)
 
     use_float64 = dtype == np.float64 and domain not in ('', 'ai.onnx.ml')

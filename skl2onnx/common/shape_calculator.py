@@ -32,7 +32,8 @@ def calculate_linear_classifier_output_shapes(operator):
 
 
 def _calculate_linear_classifier_output_shapes(
-        operator, decision_path=False, decision_leaf=False):
+        operator, decision_path=False, decision_leaf=False,
+        enable_type_checking=True):
     n_out = 0
     if decision_path:
         n_out += 1
@@ -41,9 +42,10 @@ def _calculate_linear_classifier_output_shapes(
     out_range = [2, 2 + n_out]
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=out_range)
-    check_input_and_output_types(operator, good_input_types=[
-        BooleanTensorType, DoubleTensorType,
-        FloatTensorType, Int64TensorType])
+    if enable_type_checking:
+        check_input_and_output_types(operator, good_input_types=[
+            BooleanTensorType, DoubleTensorType,
+            FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].get_first_dimension()
     op = operator.raw_operator
@@ -102,11 +104,17 @@ def calculate_linear_regressor_output_shapes(operator):
     batch. If the input batch size is N, the output shape may be
     [N, 1].
     """
+    _calculate_linear_regressor_output_shapes(operator)
+
+
+def _calculate_linear_regressor_output_shapes(
+        operator, enable_type_checking=True):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
-    check_input_and_output_types(operator, good_input_types=[
-        BooleanTensorType, DoubleTensorType,
-        FloatTensorType, Int64TensorType])
+    if enable_type_checking:
+        check_input_and_output_types(operator, good_input_types=[
+            BooleanTensorType, DoubleTensorType,
+            FloatTensorType, Int64TensorType])
 
     inp0 = operator.inputs[0].type
     if isinstance(inp0, (FloatTensorType, DoubleTensorType)):

@@ -204,6 +204,14 @@ except ImportError:
 
 from sklearn.random_projection import GaussianRandomProjection
 
+try:
+    from sklearn.compose import ColumnTransformer
+except ImportError:
+    # ColumnTransformer was introduced in 0.20.
+    ColumnTransformer = None
+
+from sklearn.pipeline import Pipeline, FeatureUnion
+
 # Custom extension
 from .sklapi import CastRegressor, CastTransformer, ReplaceTransformer
 
@@ -274,6 +282,7 @@ def build_sklearn_operator_name_map():
         CategoricalNB,
         CastRegressor,
         CastTransformer,
+        ColumnTransformer,
         ComplementNB,
         CountVectorizer,
         DictVectorizer,
@@ -284,6 +293,7 @@ def build_sklearn_operator_name_map():
         ExtraTreeRegressor,
         ExtraTreesClassifier,
         ExtraTreesRegressor,
+        FeatureUnion,
         FunctionTransformer,
         GaussianMixture,
         GaussianProcessClassifier,
@@ -325,6 +335,7 @@ def build_sklearn_operator_name_map():
         OrdinalEncoder,
         PCA,
         PLSRegression,
+        Pipeline,
         PolynomialFeatures,
         PowerTransformer,
         RadiusNeighborsClassifier,

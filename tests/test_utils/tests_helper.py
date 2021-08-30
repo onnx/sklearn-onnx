@@ -343,19 +343,14 @@ def dump_data_and_model(
     with open(dest, "wb") as f:
         pickle.dump(data, f)
 
-    if hasattr(model, "save"):
-        dest = os.path.join(folder, basename + ".model.keras")
-        names.append(dest)
-        model.save(dest)
-    else:
-        dest = os.path.join(folder, basename + ".model.pkl")
-        names.append(dest)
-        with open(dest, "wb") as f:
-            try:
-                pickle.dump(model, f)
-            except AttributeError as e:
-                print("[dump_data_and_model] cannot pickle model '{}'"
-                      " due to {}.".format(dest, e))
+    dest = os.path.join(folder, basename + ".model.pkl")
+    names.append(dest)
+    with open(dest, "wb") as f:
+        try:
+            pickle.dump(model, f)
+        except AttributeError as e:
+            print("[dump_data_and_model] cannot pickle model '{}'"
+                  " due to {}.".format(dest, e))
 
     if dump_error_log:
         error_dump = os.path.join(folder, basename + ".err")

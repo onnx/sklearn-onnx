@@ -23,7 +23,6 @@ except ImportError:
     # onnx is too old.
     SparseTensorProto = None
     make_sparse_tensor = None
-from .interface import ModelContainer
 from .utils import get_domain
 
 
@@ -201,7 +200,7 @@ class SklearnModelContainerNode(RawModelContainerNode):
             self._outputs.append(variable)
 
 
-class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
+class ModelComponentContainer(_WhiteBlackContainer):
     """
     In the conversion phase, this class is used to collect all materials
     required to build an *ONNX* *GraphProto*, which is encapsulated in a
@@ -757,8 +756,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             rows.append("--")
             rows.append("--all-nodes--")
             rows.append("--")
-            rows.extend("%s(%s) -> [%s]" % (
-                n.name or n.op_type,
+            rows.extend("%s|%s(%s) -> [%s]" % (
+                n.op_type, n.name or n.op_type,
                 ', '.join(map(nstr, n.input)),
                 ', '.join(n.output))
                 for n in self.nodes)

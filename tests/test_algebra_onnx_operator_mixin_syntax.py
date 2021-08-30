@@ -285,5 +285,4 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOnnxOperatorMixinSyntax().test_onnx_clip_10()
     unittest.main()

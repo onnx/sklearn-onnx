@@ -32,7 +32,6 @@ from . import _registration
 from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
-from .interface import OperatorBase
 from .onnx_optimisation_identity import onnx_remove_node_identity
 
 type_fct = type
@@ -318,7 +317,7 @@ class VariableStr(Variable):
         return self._onnx_name
 
 
-class Operator(OperatorBase):
+class Operator:
     """
     Defines an operator available in *ONNX*.
     """
@@ -428,6 +427,8 @@ class Operator(OperatorBase):
         except KeyError:
             # The line above fails for python 3.7
             textop = type(self.raw_operator)
+        if isinstance(textop, str) and "\n" in textop:
+            textop = textop.replace('\n', '').replace(' ', '')
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
                 "outputs='{3}', raw_operator={4})".format(
                     self.type, self.onnx_name,

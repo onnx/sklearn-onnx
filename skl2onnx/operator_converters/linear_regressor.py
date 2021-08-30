@@ -1,9 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 
-try:
-    import collections.abc as cabc
-except ImportError:
-    import collections as cabc
 import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_add, apply_sqrt, apply_div, apply_sub,
@@ -49,9 +45,7 @@ def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
         dtype = np.float32
     attrs = {'name': scope.get_unique_operator_name(op_type)}
     attrs['coefficients'] = op.coef_.astype(dtype).ravel()
-    attrs['intercepts'] = (op.intercept_.astype(dtype)
-                           if isinstance(op.intercept_, cabc.Iterable)
-                           else np.array([op.intercept_], dtype=dtype))
+    attrs['intercepts'] = np.array([op.intercept_], dtype=dtype).ravel()
     if len(op.coef_.shape) == 2:
         attrs['targets'] = op.coef_.shape[0]
 

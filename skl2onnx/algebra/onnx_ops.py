@@ -117,7 +117,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                      'is_deprecated': deprecated,
                      'since_version': since_version,
                      'past_version': past_version,
-                     'attr_names': attr_names})
+                     'attr_names': attr_names,
+                     '__module__': __name__})
     return newclass
 
 
