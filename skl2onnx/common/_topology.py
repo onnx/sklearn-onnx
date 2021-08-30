@@ -32,7 +32,6 @@ from . import _registration
 from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
-from .interface import OperatorBase
 from .onnx_optimisation_identity import onnx_remove_node_identity
 
 type_fct = type
@@ -318,7 +317,7 @@ class VariableStr(Variable):
         return self._onnx_name
 
 
-class Operator(OperatorBase):
+class Operator:
     """
     Defines an operator available in *ONNX*.
     """
