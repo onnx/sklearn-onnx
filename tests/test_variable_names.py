@@ -10,7 +10,7 @@ from onnxruntime import InferenceSession
 from skl2onnx import get_model_alias, update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx import convert_sklearn
-from onnxconverter_common.data_types import Int64TensorType
+from onnxconverter_common.data_types import FloatTensorType
 
 
 class Passthrough:
@@ -62,7 +62,7 @@ class TestVariableNames(unittest.TestCase):
             parser=parser)
 
         pipeline = Pipeline([("passthrough", Passthrough())])
-        initial_types = [("input", Int64TensorType([None, 2]))]
+        initial_types = [("input", FloatTensorType([None, 2]))]
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             model_onnx = convert_sklearn(pipeline, initial_types=initial_types)
