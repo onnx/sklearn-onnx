@@ -34,8 +34,8 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import (
     OneHotEncoder, StandardScaler, MinMaxScaler,
     MaxAbsScaler)
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.ensemble import VotingClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 from skl2onnx import convert_sklearn
@@ -44,6 +44,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
+from sklearn.multioutput import MultiOutputClassifier
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model, fit_classification_model, TARGET_OPSET)
@@ -672,11 +673,56 @@ class TestSklearnPipeline(unittest.TestCase):
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
 
+    @ignore_warnings(category=(FutureWarning, UserWarning))
+    def test_pipeline_pipeline_rf(self):
+        cat_feat = ['A', 'B']
+        text_feat = 'TEXT'
+
+        pipe = Pipeline(steps=[
+            ('preprocessor', ColumnTransformer(
+                transformers=[
+                    ('cat_tr', OneHotEncoder(handle_unknown='ignore'),
+                     cat_feat),
+                    ('count_vect', Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))]),
+                     text_feat)])),
+            ('classifier', MultiOutputClassifier(
+                estimator=RandomForestClassifier(
+                    n_estimators=5, max_depth=5)))])
+
+        data = numpy.array([
+            ["cat1", "cat2", "cat3", "cat1", "cat2"],
+            ["C1", "C2", "C3", "C3", "C4"],
+            ["first sentance", "second sentence",
+             "many sentances", "dummy sentance",
+             "no sentance at all"]]).T
+        y = numpy.array([[0, 1], [0, 1], [1, 0], [0, 1], [1, 1]])
+        df = pandas.DataFrame(data, columns=['A', 'B', 'TEXT'])
+        pipe.fit(df, y)
+        expected_label = pipe.predict(df)
+        expected_proba = pipe.predict_proba(df)
+
+        model_onnx = convert_sklearn(
+            pipe, initial_types=[
+                ('A', StringTensorType([None, 1])),
+                ('B', StringTensorType([None, 1])),
+                ('TEXT', StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET)
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(model_onnx.SerializeToString())
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'A': data[:, :1], 'B': data[:, 1:2],
+                              'TEXT': data[:, 2:]})
+        assert_almost_equal(
+            numpy.transpose(expected_proba, (1, 0, 2)), got[1])
+        assert_almost_equal(expected_label, got[0])
+
 
 if __name__ == "__main__":
     # import logging
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnPipeline().test_pipeline_pipeline_voting_tfidf_svc()
+    # TestSklearnPipeline().test_pipeline_pipeline_rf()
     unittest.main()
