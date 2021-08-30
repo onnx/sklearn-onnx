@@ -629,7 +629,7 @@ class TestSklearnPipeline(unittest.TestCase):
         #     f.write(model_onnx.SerializeToString())
         sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'text': data.reshape((-1, 1))})
-        assert_almost_equal(expected_proba, got[1])
+        assert_almost_equal(expected_proba, got[1], decimal=5)
         assert_almost_equal(expected_label, got[0])
 
     @ignore_warnings(category=(FutureWarning, UserWarning))
