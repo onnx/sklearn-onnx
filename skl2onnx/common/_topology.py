@@ -528,7 +528,7 @@ class Scope:
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 registered_models=None):
+                 registered_models=None, reserved=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -547,6 +547,8 @@ class Scope:
                                 the user customized shape calculator
         :param options: see :ref:`l-conv-options`
         :param registered_models: registered models
+        :param reserved: set of reserved names, these names
+            cannot be used to name a new variable
         """
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
@@ -579,6 +581,9 @@ class Scope:
 
         # Reserved variables.
         self.reserved = {}
+        if reserved is not None:
+            for k in reserved:
+                self.reserve_name(k)
 
     def get(self, var_name, default_value):
         "Returns variable with 'name' or default value is not found."
@@ -593,7 +598,8 @@ class Scope:
             target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
             options=self.options,
-            registered_models=self.registered_models)
+            registered_models=self.registered_models,
+            reserved=list(self.reserved))
         return scope
 
     def has_variable_name(self, name):
@@ -659,6 +665,12 @@ class Scope:
                 "Name '{}' already reserved.".format(raw_name))
         self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
         return raw_name
+
+    def is_reserved(self, name):
+        """
+        Tells if a name is reserved.
+        """
+        return name in self.reserved
 
     def unreserve_name(self, name):
         """

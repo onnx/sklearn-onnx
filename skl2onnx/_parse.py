@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 import numpy as np
 
 from sklearn import pipeline
@@ -559,7 +560,18 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
 
         reserved = []
         for o in outputs:
-            reserved.append(scope.reserve_name(o.raw_name))
+            if scope.is_reserved(o.raw_name):
+                from logging import getLogger
+                mes = (
+                    "Name %r is reserved. It is usually due to input and "
+                    "output sharing the same name (not allowed). It will "
+                    "be renamed in %r." % (o.raw_name, o.onnx_name))
+                logger = getLogger('skl2onnx')
+                logger.info("[Var] " + mes)
+                warnings.warn(mes)
+                reserved.append(scope.reserve_name(o.onnx_name))
+            else:
+                reserved.append(scope.reserve_name(o.raw_name))
     else:
         reserved = None
 
@@ -647,7 +659,9 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # model you want to convert into ONNX.
     inputs = []
     for var_name, initial_type in initial_types:
-        inputs.append(scope.declare_local_variable(var_name, initial_type))
+        var = scope.declare_local_variable(var_name, initial_type)
+        inputs.append(var)
+        scope.reserve_name(var.onnx_name)
 
     # The object raw_model_container is a part of the topology
     # we're going to return. We use it to store the inputs of
