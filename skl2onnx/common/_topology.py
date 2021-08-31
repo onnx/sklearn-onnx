@@ -914,8 +914,11 @@ class Topology:
             'tensorToProbabilityMap': 2,
             'tensorToLabel': 1
         }
-        while not all(operator.is_evaluated for scope in self.scopes
-                      for operator in scope.operators.values()):
+        changes = 1
+        while changes > 0 and not all(
+                operator.is_evaluated for scope in self.scopes
+                for operator in scope.operators.values()):
+            changes = 0
             if verbose > 0:
                 print("[topological_operator_iterator] new iteration")
             for operator in sorted(self.unordered_operator_iterator(),
@@ -989,6 +992,7 @@ class Topology:
 
                     # Make this operator as handled
                     operator.init_status(is_evaluated=True)
+                    changes += 1
 
                     # Send out an operator
                     if verbose > 0:
