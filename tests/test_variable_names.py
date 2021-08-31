@@ -74,15 +74,15 @@ class TestVariableNames(unittest.TestCase):
 
     def test_variable_names_distinct(self):
         pipeline = Pipeline([("passthrough", Passthrough())])
-        initial_types = [("INPUT5", FloatTensorType([None, 2]))]
-        final_types = [("OUTPUT5", FloatTensorType([None, 2]))]
+        initial_types = [("INPUTA", FloatTensorType([None, 2]))]
+        final_types = [("OUTPUTA", FloatTensorType([None, 2]))]
         model_onnx = convert_sklearn(pipeline, initial_types=initial_types,
                                      target_opset=TARGET_OPSET,
                                      final_types=final_types,
                                      verbose=0)
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(model_onnx.SerializeToString())
-        got = sess.run(None, {'INPUT5': x})
+        got = sess.run(None, {'INPUTA': x})
         assert_almost_equal(x, got[0])
 
     def test_variable_names_output(self):

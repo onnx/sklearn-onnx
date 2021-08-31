@@ -619,6 +619,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # we're going to return. We use it to store the inputs of
     # the scikit-learn's computational graph.
     for variable in inputs:
+        variable.init_status(is_root=True)
         raw_model_container.add_input(variable)
 
     # Parse the input scikit-learn model as a Topology object.
