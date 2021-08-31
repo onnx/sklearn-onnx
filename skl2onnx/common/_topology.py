@@ -649,13 +649,15 @@ class Scope:
         self.input_variables.append(var)
         return var
 
-    def declare_local_output(self, raw_name, type=None, prepend=False):
+    def declare_local_output(self, raw_name, type=None, prepend=False,
+                             missing_type=False):
         """
         Calls `declare_local_variable`. Registers this variable
         as an output.
         """
         var = self.declare_local_variable(
-            raw_name, type=type, prepend=prepend)
+            raw_name, type=type, prepend=prepend,
+            missing_type=missing_type)
         self.output_variables.append(var)
         return var
 

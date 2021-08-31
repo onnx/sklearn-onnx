@@ -522,7 +522,7 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
     if final_types is not None:
         outputs = []
         for name, ty in final_types:
-            var = scope.declare_local_output(name, ty)
+            var = scope.declare_local_output(name, ty, missing_type=True)
             if var.onnx_name != name:
                 raise RuntimeError(
                     "Unable to add duplicated output '{}', '{}'. "
@@ -548,6 +548,8 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
             iop.outputs = [o]
             h.init_status(is_leaf=False)
             o.init_status(is_leaf=True)
+            if o.type is None and h.type is not None:
+                o.type = h.type
         return outputs
 
     res = _parse_sklearn(
