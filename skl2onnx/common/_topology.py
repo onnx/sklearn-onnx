@@ -338,8 +338,8 @@ class Operator:
                     "" % type(v))
             if self.kind == 'Out':
                 v.set_parent(self.parent)
-            logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
             super(Operator.OperatorList, self).append(v)
+            logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
 
         def extend(self, vs):
             for v in vs:
@@ -528,7 +528,7 @@ class Scope:
     def __init__(self, name, parent_scopes=None, variable_name_set=None,
                  operator_name_set=None, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 registered_models=None, reserved=None):
+                 registered_models=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -547,8 +547,6 @@ class Scope:
                                 the user customized shape calculator
         :param options: see :ref:`l-conv-options`
         :param registered_models: registered models
-        :param reserved: set of reserved names, these names
-            cannot be used to name a new variable
         """
         self.name = name
         self.parent_scopes = parent_scopes if parent_scopes else list()
@@ -568,6 +566,8 @@ class Scope:
         # A map of local variables defined in this scope.
         # (key, value) = (onnx_name, variable)
         self.variables = {}
+        self.input_variables = []
+        self.output_variables = []
 
         # A map of local operators defined in this scope.
         # (key, value) = (onnx_name, operator)
@@ -578,12 +578,6 @@ class Scope:
 
         # Registered models
         self.registered_models = registered_models
-
-        # Reserved variables.
-        self.reserved = {}
-        if reserved is not None:
-            for k in reserved:
-                self.reserve_name(k)
 
     def get(self, var_name, default_value):
         "Returns variable with 'name' or default value is not found."
@@ -598,8 +592,7 @@ class Scope:
             target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
             options=self.options,
-            registered_models=self.registered_models,
-            reserved=list(self.reserved))
+            registered_models=self.registered_models)
         return scope
 
     def has_variable_name(self, name):
@@ -656,31 +649,25 @@ class Scope:
             self.variable_name_mapping[raw_name] = [onnx_name]
         return variable
 
-    def reserve_name(self, raw_name):
+    def declare_local_input(self, raw_name, type=None, prepend=False):
         """
-        Keeps this name to be used by other converters.
+        Calls `declare_local_variable`. Registers this variable
+        as an input.
         """
-        if raw_name in self.reserved:
-            raise RuntimeError(
-                "Name '{}' already reserved.".format(raw_name))
-        self.reserved[raw_name] = self.get_unique_variable_name(raw_name)
-        return raw_name
+        var = self.declare_local_variable(
+            raw_name, type=type, prepend=prepend)
+        self.input_variables.append(var)
+        return var
 
-    def is_reserved(self, name):
+    def declare_local_output(self, raw_name, type=None, prepend=False):
         """
-        Tells if a name is reserved.
+        Calls `declare_local_variable`. Registers this variable
+        as an output.
         """
-        return name in self.reserved
-
-    def unreserve_name(self, name):
-        """
-        Deletes a name from the reserved list.
-        """
-        if name not in self.reserved:
-            raise RuntimeError(
-                "Name '{}' not reserved.".format(name))
-        self.onnx_variable_names.discard(name)
-        del self.reserved[name]
+        var = self.declare_local_variable(
+            raw_name, type=type, prepend=prepend)
+        self.output_variables.append(var)
+        return var
 
     def declare_local_operator(self, type, raw_model=None):
         """
@@ -789,7 +776,6 @@ class Topology:
     """  # noqa
 
     def __init__(self, model, default_batch_size=1, initial_types=None,
-                 reserved_variable_names=None, reserved_operator_names=None,
                  target_opset=None, custom_conversion_functions=None,
                  custom_shape_calculators=None, registered_models=None):
         """
@@ -805,12 +791,6 @@ class Topology:
                               root variables.
         Each element is a tuple of a variable name and a type defined
         in *data_types.py*.
-        :param reserved_variable_names: A set of strings which are not
-                                        allowed to be used as a variable
-                                        name
-        :param reserved_operator_names: A set of strings which are not
-                                        allowed to be used as a operator
-                                        name
         :param custom_conversion_functions: a dictionary for specifying
                                 the user customized conversion function
         :param custom_shape_calculators: a dictionary for specifying the
@@ -820,12 +800,8 @@ class Topology:
         self.scopes = []
         self.raw_model = model
         self.scope_names = set()
-        self.variable_name_set = (
-            reserved_variable_names
-            if reserved_variable_names is not None else set())
-        self.operator_name_set = (
-            reserved_operator_names
-            if reserved_operator_names is not None else set())
+        self.variable_name_set = set()
+        self.operator_name_set = set()
         self.initial_types = initial_types if initial_types else list()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
@@ -833,16 +809,6 @@ class Topology:
             custom_conversion_functions if custom_conversion_functions else {})
         self.custom_shape_calculators = (
             custom_shape_calculators if custom_shape_calculators else {})
-
-        # This attribute is used in optimizing the graph structure. If
-        # root_names is not empty, only the variables specified will be
-        # treated as the roots (i.e., set is_fed to True in the
-        # beginning of a graph evaluation) of the graph. Specifying all
-        # root variables in this list and leaving it empty are
-        # equivalent. This attribute directly affects
-        # _initialize_graph_status_for_traversing function and
-        # indirectly affects _infer_all_shapes and _prune functions.
-        self.root_names = list()
 
         for k in self.custom_conversion_functions:
             if not callable(k):
@@ -906,11 +872,20 @@ class Topology:
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
         """
+        if len(self.scopes) != 0:
+            raise RuntimeError(
+                "Only one scope can be created.")
         scope = Scope(
             self.get_unique_scope_name(seed), parent_scopes,
             self.variable_name_set, self.operator_name_set, self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
             options=options, registered_models=self.registered_models)
+
+        # Declare input variables.
+        # They should be the inputs of the scikit-learn
+        # model you want to convert into ONNX.
+        for var_name, initial_type in self.initial_types:
+            scope.declare_local_input(var_name, initial_type)
         self.scopes.append(scope)
         return scope
 
@@ -941,7 +916,6 @@ class Topology:
         }
         while not all(operator.is_evaluated for scope in self.scopes
                       for operator in scope.operators.values()):
-            is_evaluation_happened = False
             if verbose > 0:
                 print("[topological_operator_iterator] new iteration")
             for operator in sorted(self.unordered_operator_iterator(),
@@ -1015,7 +989,6 @@ class Topology:
 
                     # Make this operator as handled
                     operator.init_status(is_evaluated=True)
-                    is_evaluation_happened = True
 
                     # Send out an operator
                     if verbose > 0:
@@ -1023,49 +996,6 @@ class Topology:
                               '' % operator)
                     yield operator
 
-                    # This step may create new nodes if the
-                    # the converter is called while looping on
-                    # the nodes. The outputs of an operator
-                    # are not necessary the inputs of the next
-                    # one and but can processed by other ONNX nodes
-                    # inserted in the container. As a result, some
-                    # variables never have is_fed set to True which
-                    # is updated now unless they are an operator
-                    # output.
-                    known_outputs = {}
-                    for op in self.unordered_operator_iterator():
-                        for out in op.outputs:
-                            if hasattr(out, 'onnx_name'):
-                                known_outputs[out.onnx_name] = out
-                            else:
-                                known_outputs[out] = out
-                    for variable in self.unordered_variable_iterator():
-                        if variable.is_fed:
-                            continue
-                        if variable.onnx_name in known_outputs:
-                            continue
-                        update = (False if self.root_names and
-                                  variable.onnx_name not in self.root_names
-                                  else True)
-                        if update:
-                            variable.init_status(is_fed=True)
-                            is_evaluation_happened = True
-
-            # After scanning through the whole computational graph, at
-            # least one operator should be evaluated. If not, we need
-            # to terminate this procedure to avoid dead lock.
-            if not is_evaluation_happened:
-                for op in self.unordered_operator_iterator():
-                    if not op.is_evaluated and op.raw_operator is not None:
-                        raise RuntimeError(
-                            "One operator was not evaluated ("
-                            "inputs fed=%r, outputs fed=%r, op=%r)." % (
-                                all(variable.is_fed
-                                    for variable in operator.inputs),
-                                all(variable.is_fed
-                                    for variable in operator.outputs),
-                                op))
-                break
             if verbose > 0:
                 print("[topological_operator_iterator] end iteration")
         if verbose > 0:
@@ -1114,17 +1044,15 @@ class Topology:
         Initialize the status of all variables and operators for
         traversing the underline graph
         """
+        if len(self.scopes) != 1:
+            raise RuntimeError(
+                "Only one scope is allowed not %d." % len(self.scopes))
         logger.debug('[Topo:begin] _initialize_graph_status_for_traversing')
-        # In the beginning, we set is_root and is_leaf true. For is_fed,
-        # we have two different behaviors depending on whether
-        # root_names is empty.
+        input_names = set(v.onnx_name for v in self.scopes[0].input_variables)
         for variable in self.unordered_variable_iterator():
-            # If root_names is set, we only set those variable to be
-            # fed. Otherwise, all roots would be fed.
+            is_input = variable.onnx_name in input_names
             variable.init_status(
-                is_fed=(False if self.root_names and variable.onnx_name
-                        not in self.root_names else True),
-                is_root=True, is_leaf=True)
+                is_fed=is_input, is_root=is_input)
 
         # Then, we flip some flags by applying some simple rules so
         # that only
@@ -1454,6 +1382,9 @@ def convert_topology(topology, model_name, doc_string, target_opset,
 
     # Add leaves the graph according to their order in
     # the original model
+    if len(topology.raw_model.output_names) == 0:
+        for out in sorted(tensor_outputs.items()):
+            topology.raw_model.add_output(out[1])
     invalid_name = []
     for name in topology.raw_model.output_names:
         # Check output naming convention
@@ -1505,6 +1436,15 @@ def convert_topology(topology, model_name, doc_string, target_opset,
         logger.debug("[Conv] end - %r" % operator)
 
     container.ensure_topological_order()
+    if len(container.inputs) == 0:
+        raise RuntimeError("No detected inputs after conversion.")
+    if len(container.outputs) == 0:
+        raise RuntimeError("No detected outputs after conversion.")
+    if verbose >= 2:
+        print("---NODES---")
+        for node in container.nodes:
+            print("  %s - %s: %r -> %r" % (
+                node.op_type, node.name, node.input, node.output))
 
     # Create a graph from its main components
     if container.target_opset_onnx < 9:

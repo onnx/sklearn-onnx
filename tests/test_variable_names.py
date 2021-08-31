@@ -2,7 +2,6 @@
 
 import unittest
 import copy
-import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.pipeline import Pipeline
@@ -55,24 +54,45 @@ def converter(scope, operator, container):
 
 class TestVariableNames(unittest.TestCase):
 
-    def test_variable_names(self):
-
+    def setUp(self):
         update_registered_converter(
             Passthrough, "Passthrough",
             shape_calculator, converter,
             parser=parser)
 
+    def test_variable_names(self):
         pipeline = Pipeline([("passthrough", Passthrough())])
         initial_types = [("input", FloatTensorType([None, 2]))]
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            model_onnx = convert_sklearn(pipeline, initial_types=initial_types,
-                                         target_opset=TARGET_OPSET)
-            self.assertEqual(len(w), 1)
+        model_onnx = convert_sklearn(pipeline, initial_types=initial_types,
+                                     target_opset=TARGET_OPSET,
+                                     verbose=0)
+        self.assertIn('Identity', str(model_onnx))
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'input': x})
         assert_almost_equal(x, got[0])
+
+    def test_variable_names_distinct(self):
+        pipeline = Pipeline([("passthrough", Passthrough())])
+        initial_types = [("INPUT5", FloatTensorType([None, 2]))]
+        final_types = [("OUTPUT5", FloatTensorType([None, 2]))]
+        model_onnx = convert_sklearn(pipeline, initial_types=initial_types,
+                                     target_opset=TARGET_OPSET,
+                                     final_types=final_types,
+                                     verbose=0)
+        x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'INPUT5': x})
+        assert_almost_equal(x, got[0])
+
+    def test_variable_names_output(self):
+        pipeline = Pipeline([("passthrough", Passthrough())])
+        initial_types = [("input", FloatTensorType([None, 2]))]
+        final_types = initial_types
+        with self.assertRaises(RuntimeError):
+            convert_sklearn(pipeline, initial_types=initial_types,
+                            target_opset=TARGET_OPSET,
+                            final_types=final_types)
 
 
 if __name__ == "__main__":
