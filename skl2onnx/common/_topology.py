@@ -613,13 +613,14 @@ class Scope:
         """
         return Topology._generate_unique_name(seed, self.onnx_operator_names)
 
-    def declare_local_variable(self, raw_name, type=None, prepend=False):
+    def declare_local_variable(self, raw_name, type=None, prepend=False,
+                               missing_type=False):
         """
         This function may create a new variable in this scope. If
         *raw_name* has been used to create other variables, the new
         variable will hide all other variables created using *raw_name*.
         """
-        if type is None:
+        if type is None and not missing_type:
             raise RuntimeError("Unknown type for %r." % raw_name)
         # Get unique ID for the new variable
         onnx_name = self.get_unique_variable_name(raw_name)
