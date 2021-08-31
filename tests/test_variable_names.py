@@ -11,6 +11,7 @@ from skl2onnx import get_model_alias, update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx import convert_sklearn
 from onnxconverter_common.data_types import FloatTensorType
+from test_utils import TARGET_OPSET
 
 
 class Passthrough:
@@ -65,7 +66,8 @@ class TestVariableNames(unittest.TestCase):
         initial_types = [("input", FloatTensorType([None, 2]))]
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            model_onnx = convert_sklearn(pipeline, initial_types=initial_types)
+            model_onnx = convert_sklearn(pipeline, initial_types=initial_types,
+                                         target_opset=TARGET_OPSET)
             self.assertEqual(len(w), 1)
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(model_onnx.SerializeToString())

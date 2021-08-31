@@ -565,7 +565,7 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
                 mes = (
                     "Name %r is reserved. It is usually due to input and "
                     "output sharing the same name (not allowed). It will "
-                    "be renamed in %r." % (o.raw_name, o.onnx_name))
+                    "be renamed to %r." % (o.raw_name, o.onnx_name))
                 logger = getLogger('skl2onnx')
                 logger.info("[Var] " + mes)
                 warnings.warn(mes)
