@@ -8,7 +8,7 @@ from ..common._apply_operation import (
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type
+from ..common.data_types import guess_numpy_type, Int64TensorType
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -262,7 +262,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     if container.has_options(base_model, 'raw_scores'):
         container.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
-    label_name = scope.declare_local_variable('label')
+    label_name = scope.declare_local_variable('label', Int64TensorType())
     df_name = scope.declare_local_variable(
         'probability_tensor', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)

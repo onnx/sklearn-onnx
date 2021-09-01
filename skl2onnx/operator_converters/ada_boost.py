@@ -12,7 +12,8 @@ from ..common._apply_operation import (
     apply_mul, apply_reshape, apply_sub, apply_topk, apply_transpose
 )
 from ..common.data_types import (
-    FloatTensorType, DoubleTensorType, guess_proto_type, guess_numpy_type)
+    FloatTensorType, DoubleTensorType, guess_proto_type, guess_numpy_type,
+    Int64TensorType)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
@@ -285,7 +286,8 @@ def convert_sklearn_ada_boost_classifier(scope: Scope, operator: Operator,
         dtype = np.float32
 
     for i_est, estimator in enumerate(op.estimators_):
-        label_name = scope.declare_local_variable('elab_name_%d' % i_est)
+        label_name = scope.declare_local_variable(
+            'elab_name_%d' % i_est, Int64TensorType())
         proba_name = scope.declare_local_variable(
             'eprob_name_%d' % i_est, operator.inputs[0].type.__class__())
 

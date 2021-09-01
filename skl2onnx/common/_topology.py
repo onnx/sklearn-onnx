@@ -76,6 +76,10 @@ class Variable:
         if not isinstance(raw_name, str):
             raise TypeError(
                 "raw_name must be a string not '%s'." % raw_name.__class__)
+        if type is not None and not hasattr(type, 'shape'):
+            raise TypeError(
+                "Unexpected type for variable raw_name=%r, type=%r." % (
+                    raw_name, type))
         if not isinstance(onnx_name, str) or '(' in onnx_name:
             if onnx_name.startswith('u(') and onnx_name[-1] == ')':
                 onnx_name0 = onnx_name
@@ -183,6 +187,11 @@ class Variable:
         self.__dict__[name] = value
 
     def set_type(self, new_type):
+        if (new_type is None or isinstance(new_type, (str, Variable)) or
+                not hasattr(new_type, 'shape')):
+            raise TypeError(
+                "Unexpected new type for variable %r, new_type=%r." % (
+                    self, new_type))
         logger.debug('[Var] update type= for %r' % self)
         self._type = new_type
 
