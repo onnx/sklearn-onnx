@@ -32,7 +32,6 @@ from . import _registration
 from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
 from ._container import ModelComponentContainer, _build_options
-from .interface import OperatorBase
 from .onnx_optimisation_identity import onnx_remove_node_identity
 
 type_fct = type
@@ -318,7 +317,7 @@ class VariableStr(Variable):
         return self._onnx_name
 
 
-class Operator(OperatorBase):
+class Operator:
     """
     Defines an operator available in *ONNX*.
     """
@@ -410,12 +409,26 @@ class Operator(OperatorBase):
         self.scope_inst = scope_inst
         logger.debug('[Op] +%r' % self)
 
+    def new_raw_operator(self, raw_operator, alias):
+        """
+        Returns a shallow copy of this operator,
+        changes the raw_operator but keeps the same inputs
+        and outputs.
+        """
+        op = Operator(self.onnx_name, self.scope, alias, raw_operator,
+                      self.target_opset, self.scope_inst)
+        op.inputs = self.inputs
+        op.outputs = self.outputs
+        return op
+
     def __repr__(self):
         try:
             textop = repr(self.raw_operator)
         except KeyError:
             # The line above fails for python 3.7
             textop = type(self.raw_operator)
+        if isinstance(textop, str) and "\n" in textop:
+            textop = textop.replace('\n', '').replace(' ', '')
         return ("Operator(type='{0}', onnx_name='{1}', inputs='{2}', "
                 "outputs='{3}', raw_operator={4})".format(
                     self.type, self.onnx_name,
@@ -739,6 +752,18 @@ class Scope:
             model, self.options, default_values,
             self._get_allowed_options(model, fail=fail),
             fail=fail)
+
+    def replace_raw_operator(self, op1, op2, alias):
+        """
+        Replaces every raw operator op1 by op2.
+        The function uses `id()` to detect op1.
+        """
+        for v in self.operators.values():
+            if id(v.raw_operator) == id(op1):
+                logger.debug('[Scope] replace %d by %d in %r.' % (
+                    id(v.raw_operator), id(op1), v))
+                v.raw_operator = op2
+                v.type = alias
 
 
 class Topology:

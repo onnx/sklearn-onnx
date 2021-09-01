@@ -18,6 +18,7 @@ from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
+from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC, NuSVC, SVC
@@ -353,8 +354,11 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model)
     if options:
         scope.add_options(id(model.best_estimator_), options)
-    return parse_sklearn(scope, model.best_estimator_, inputs,
-                         custom_parsers=custom_parsers)
+    res = parse_sklearn(scope, model.best_estimator_, inputs,
+                        custom_parsers=custom_parsers)
+    scope.replace_raw_operator(
+        model.best_estimator_, model, "SklearnGridSearchCV")
+    return res
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
@@ -672,6 +676,7 @@ def build_sklearn_parsers_map():
         BayesianRidge: _parse_sklearn_bayesian_ridge,
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
         GridSearchCV: _parse_sklearn_grid_search_cv,
+        MultiOutputClassifier: _parse_sklearn_simple_model,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer

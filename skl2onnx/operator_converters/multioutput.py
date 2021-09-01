@@ -36,8 +36,14 @@ def convert_multi_output_classifier_converter(
     op_version = container.target_opset
     op = operator.raw_operator
     inp = operator.inputs[0]
+    options = scope.get_options(op)
+    if options.get('nocl', True):
+        options = options.copy()
+    else:
+        options = {}
+    options.update({'zipmap': False})
     y_list = [OnnxSubEstimator(sub, inp, op_version=op_version,
-                               options={'zipmap': False})
+                               options=options)
               for sub in op.estimators_]
 
     # labels
@@ -65,4 +71,4 @@ register_converter('SklearnMultiOutputRegressor',
                    convert_multi_output_regressor_converter)
 register_converter('SklearnMultiOutputClassifier',
                    convert_multi_output_classifier_converter,
-                   options={'zipmap': [False], 'nocl': [False, True]})
+                   options={'nocl': [False, True]})

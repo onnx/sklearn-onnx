@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
-from sklearn.base import is_classifier
 from ..common._apply_operation import apply_identity
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
@@ -22,17 +20,11 @@ def convert_sklearn_grid_search_cv(scope: Scope, operator: Operator,
         op_type, best_estimator)
     container.add_options(id(best_estimator), opts)
     grid_search_operator.inputs = operator.inputs
-    label_name = scope.declare_local_variable('label')
-    grid_search_operator.outputs.append(label_name)
-    if is_classifier(best_estimator):
-        proba_name = scope.declare_local_variable(
-            'probability_tensor', operator.inputs[0].type.__class__())
-        grid_search_operator.outputs.append(proba_name)
-    apply_identity(scope, label_name.full_name,
-                   operator.outputs[0].full_name, container)
-    if is_classifier(best_estimator):
-        apply_identity(scope, proba_name.full_name,
-                       operator.outputs[1].full_name, container)
+
+    for i, o in enumerate(operator.outputs):
+        v = scope.declare_local_variable(o.onnx_name, type=o.type)
+        grid_search_operator.outputs.append(v)
+        apply_identity(scope, v.full_name, o.full_name, container)
 
 
 register_converter('SklearnGridSearchCV',

@@ -59,7 +59,7 @@ def calculate_sklearn_svm_output_shapes(operator):
         operator.outputs[0].type.shape = [N, 1]
     else:
         raise RuntimeError(
-            "New kind of SVM, no shape calculer exist for '{}'.".format(
+            "New kind of SVM, no shape calculator exist for '{}'.".format(
                 operator.type))
 
 
