@@ -130,9 +130,10 @@ class Variable:
             for dim in shape:
                 if dim is None:
                     continue
-                if not isinstance(dim, (int, np.int32, np.int64)):
-                    raise TypeError("shape must contains integers not "
-                                    "'{}'.".format(dim))
+                if not isinstance(dim, (int, np.int32, np.int64, np.intc)):
+                    raise TypeError(
+                        "shape must contains integers not %r (type=%r)."
+                        "" % (dim, dim.__class__))
         logger.debug('[Var] +%s' % self)
 
     @property
