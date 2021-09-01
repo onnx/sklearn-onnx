@@ -562,7 +562,8 @@ class GraphState:
                     if isinstance(kind, str):
                         self.computed_outputs_.append((name, kind))
                     else:
-                        var = self.scope.declare_local_variable(name, kind)
+                        var = self.scope.declare_local_variable(
+                            name, kind, missing_type=True)
                         # name already comes from
                         # scope.get_unique_variable_name
                         var.set_onnx_name(name)

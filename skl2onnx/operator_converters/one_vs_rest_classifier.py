@@ -11,7 +11,7 @@ from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import (
     apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
 from ..common.utils_classifier import _finalize_converter_classes
-from ..common.data_types import guess_proto_type
+from ..common.data_types import guess_proto_type, Int64TensorType
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -51,7 +51,8 @@ def convert_one_vs_rest_classifier(scope: Scope, operator: Operator,
             if container.has_options(estimator, 'raw_scores'):
                 container.add_options(
                     id(estimator), {'raw_scores': use_raw_scores})
-            label_name = scope.declare_local_variable('label_%d' % i)
+            label_name = scope.declare_local_variable(
+                'label_%d' % i, Int64TensorType())
             prob_name = scope.declare_local_variable(
                 'proba_%d' % i, operator.inputs[0].type.__class__())
             this_operator.outputs.append(label_name)

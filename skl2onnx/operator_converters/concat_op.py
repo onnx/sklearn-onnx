@@ -9,14 +9,14 @@ from ..common._container import ModelComponentContainer
 
 def convert_sklearn_concat(scope: Scope, operator: Operator,
                            container: ModelComponentContainer):
-    exptype = operator.outputs[0]
+    exptype = operator.outputs[0].type
     new_inputs = []
     for inp in operator.inputs:
-        if inp.set_type(exptype):
+        if inp.type == exptype:
             new_inputs.append(inp.full_name)
             continue
         name = scope.get_unique_variable_name("{}_cast".format(inp.full_name))
-        res = exptype.type.to_onnx_type()
+        res = exptype.to_onnx_type()
         et = res.tensor_type.elem_type
         apply_cast(scope, inp.full_name, name, container, to=et)
         new_inputs.append(name)

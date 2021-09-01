@@ -20,7 +20,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     white_op=None, black_op=None, final_types=None,
                     dtype=None, verbose=0):
     """
-    This function produces an equivalent ONNX model of the given scikit-learn model.
+    This function produces an equivalent
+    ONNX model of the given scikit-learn model.
     The supported converters is returned by function
     :func:`supported_converters <skl2onnx.supported_converters>`.
 
@@ -32,40 +33,57 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     *ONNX* model name can also be specified.
 
     :param model: A scikit-learn model
-    :param initial_types: a python list. Each element is a tuple of a variable name
+    :param initial_types: a python list.
+        Each element is a tuple of a variable name
         and a type defined in `data_types.py`
-    :param name: The name of the graph (type: GraphProto) in the produced ONNX model (type: ModelProto)
+    :param name: The name of the graph (type: GraphProto)
+        in the produced ONNX model (type: ModelProto)
     :param doc_string: A string attached onto the produced ONNX model
-    :param target_opset: number, for example, 7 for ONNX 1.2, and 8 for ONNX 1.3,
-        if value is not specified, the function will choose the latest tested opset
+    :param target_opset: number, for example, 7 for
+        ONNX 1.2, and 8 for ONNX 1.3,
+        if value is not specified, the function will
+        choose the latest tested opset
         (see :py:func:`skl2onnx.get_latest_tested_opset_version`)
-    :param custom_conversion_functions: a dictionary for specifying the user customized conversion function,
+    :param custom_conversion_functions: a dictionary for
+        specifying the user customized conversion function,
         it takes precedence over registered converters
-    :param custom_shape_calculators: a dictionary for specifying the user customized shape calculator
+    :param custom_shape_calculators: a dictionary for
+        specifying the user customized shape calculator
         it takes precedence over registered shape calculators.
-    :param custom_parsers: parsers determines which outputs is expected for which particular task,
-        default parsers are defined for classifiers, regressors, pipeline but they can be rewritten,
-        *custom_parsers* is a dictionary ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
-    :param options: specific options given to converters (see :ref:`l-conv-options`)
-    :param intermediate: if True, the function returns the converted model and , and :class:`Topology`,
+    :param custom_parsers: parsers determines which outputs
+        is expected for which particular task,
+        default parsers are defined for classifiers,
+        regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary
+        ``{ type: fct_parser(scope, model, inputs, custom_parsers=None) }``
+    :param options: specific options given to converters
+        (see :ref:`l-conv-options`)
+    :param intermediate: if True, the function returns the
+        converted model and , and :class:`Topology`,
         it returns the converted model otherwise
-    :param white_op: white list of ONNX nodes allowed while converting a pipeline,
+    :param white_op: white list of ONNX nodes allowed
+        while converting a pipeline,
         if empty, all are allowed
-    :param black_op: black list of ONNX nodes allowed while converting a pipeline,
+    :param black_op: black list of ONNX nodes
+        allowed while converting a pipeline,
         if empty, none are blacklisted
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
-    :param dtype: removed in version 1.7.5, dtype is now inferred from input types,
-        converters may add operators Cast to switch to double when it is necessary
+    :param dtype: removed in version 1.7.5, dtype is
+        now inferred from input types,
+        converters may add operators Cast to switch
+        to double when it is necessary
     :param verbose: display progress while converting a model
-    :return: An ONNX model (type: ModelProto) which is equivalent to the input scikit-learn model
+    :return: An ONNX model (type: ModelProto) which is
+        equivalent to the input scikit-learn model
 
     Example of *initial_types*:
-    Assume that the specified *scikit-learn* model takes a heterogeneous list as its input.
+    Assume that the specified *scikit-learn* model takes
+    a heterogeneous list as its input.
     If the first 5 elements are floats and the last 10 elements are integers,
-    we need to specify initial types as below. The [None] in [None, 5] indicates
-    the batch size here is unknown.
+    we need to specify initial types as below. The [None] in
+    [None, 5] indicates the batch size here is unknown.
 
     ::
 
@@ -76,9 +94,12 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     .. note::
 
         If a pipeline includes an instance of
-        `ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_,
-        *scikit-learn* allow the user to specify columns by names. This option is not supported
-        by *sklearn-onnx* as features names could be different in input data and the ONNX graph
+        `ColumnTransformer <https://scikit-learn.org/stable/modules/
+        generated/sklearn.compose.ColumnTransformer.html>`_,
+        *scikit-learn* allow the user to specify columns by names.
+        This option is not supported
+        by *sklearn-onnx* as features names could be different
+        in input data and the ONNX graph
         (defined by parameter *initial_types*), only integers are supported.
 
     .. _l-conv-options:
@@ -102,9 +123,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
         extra = {TfidfVectorizer: {"separators": [' ', '[.]', '\\\\?',
                     ',', ';', ':', '\\\\!', '\\\\(', '\\\\)']}}
-        model_onnx = convert_sklearn(model, "tfidf",
-                                     initial_types=[("input", StringTensorType([None, 1]))],
-                                     options=extra)
+        model_onnx = convert_sklearn(
+            model, "tfidf",
+            initial_types=[("input", StringTensorType([None, 1]))],
+            options=extra)
 
     But if a pipeline contains two model of the same class,
     it is possible to distinguish between the two with function *id*:
@@ -113,9 +135,10 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
         extra = {id(model): {"separators": [' ', '.', '\\\\?', ',', ';',
                     ':', '\\\\!', '\\\\(', '\\\\)']}}
-        model_onnx = convert_sklearn(pipeline, "pipeline-with-2-tfidf",
-                                     initial_types=[("input", StringTensorType([None, 1]))],
-                                     options=extra)
+        model_onnx = convert_sklearn(
+            pipeline, "pipeline-with-2-tfidf",
+            initial_types=[("input", StringTensorType([None, 1]))],
+            options=extra)
 
     It is used in example :ref:`l-example-tfidfvectorizer`.
 
@@ -124,7 +147,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         the latest tested opset returned by
         :py:func:`skl2onnx.get_latest_tested_opset_version` and
         not the version of the *onnx* package.
-    """  # noqa
+    """
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
             initial_types = model.infer_initial_types()
@@ -152,20 +175,32 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         white_op=white_op, black_op=black_op,
         final_types=final_types)
 
-    # Infer variable shapes
-    topology.compile()
-
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
     if verbose >= 1:
         print("[convert_sklearn] convert_topology")
-    onnx_model = convert_topology(topology, name, doc_string, target_opset,
-                                  options=options,
-                                  remove_identity=not intermediate,
-                                  verbose=verbose)
-
+    onnx_model = convert_topology(
+        topology, name, doc_string, target_opset, options=options,
+        remove_identity=not intermediate, verbose=verbose)
     if verbose >= 1:
         print("[convert_sklearn] end")
+        if verbose >= 2:
+            scope = topology.scopes[0]
+            print("---INPUTS---")
+            for inp in scope.input_variables:
+                print("  %r" % inp)
+            print("---OUTPUTS---")
+            for inp in scope.output_variables:
+                print("  %r" % inp)
+            print("---VARIABLESS---")
+            for k, v in sorted(scope.variables.items()):
+                print("  %r: is.fed=%r is_leaf=%r - %r" % (
+                    k, v.is_fed, v.is_leaf, v))
+            print("---OPERATORS---")
+            for k, v in sorted(scope.operators.items()):
+                print("  %r: is.evaluated=%r - %r" % (
+                    k, v.is_evaluated, v))
+
     return (onnx_model, topology) if intermediate else onnx_model
 
 

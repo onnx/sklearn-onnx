@@ -9,7 +9,7 @@ from ..common._apply_operation import (
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_proto_type
+from ..common.data_types import guess_proto_type, Int64TensorType
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -20,11 +20,14 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
     if container.has_options(model, 'raw_scores'):
         container.add_options(id(model), {'raw_scores': raw_scores})
     this_operator.inputs.append(inputs)
-    label_name = scope.declare_local_variable('label')
-    this_operator.outputs.append(label_name)
     if is_regressor:
-        output_proba = label_name
+        output_proba = scope.declare_local_variable(
+            'variable', inputs.type.__class__())
+        this_operator.outputs.append(output_proba)
     else:
+        label_name = scope.declare_local_variable(
+            'label', Int64TensorType())
+        this_operator.outputs.append(label_name)
         output_proba = scope.declare_local_variable(
             'probability_tensor', inputs.type.__class__())
         this_operator.outputs.append(output_proba)
