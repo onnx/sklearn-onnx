@@ -34,7 +34,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
     * `(a, b, True, True)` means `[a, b]`
     Boolean defines if the extremity belongs to the interval or not.
     By default `(a, b)` is equivalent to `(a, b, False, True)`.
-    """  # noqa
+    """
 
     @_deprecate_positional_args
     def __init__(self, intervals=None):
@@ -149,3 +149,17 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                     "]" if interval[3] else "["]
                 names.append("".join(name))
         return names
+
+    def _decision_thresholds(self):
+        "Returns all decision thresholds."
+        extremities = []
+        for intervals in self.intervals_:
+            if intervals is None:
+                extremities.append(None)
+                continue
+            thresholds = []
+            for interval in intervals:
+                thresholds.append((interval[0], not interval[2]))
+                thresholds.append((interval[1], interval[3]))
+            extremities.append(list(sorted(set(thresholds))))
+        return extremities
