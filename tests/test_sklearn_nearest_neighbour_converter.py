@@ -192,6 +192,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor64")
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
+    @unittest.skipIf(
+        StrictVersion(onnxruntime.__version__) < StrictVersion("1.7.0"),
+        reason="nan may happen during computation")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double_radius(self):
         model, X = self._fit_model(RadiusNeighborsRegressor())
