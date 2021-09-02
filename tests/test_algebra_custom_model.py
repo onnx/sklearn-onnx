@@ -72,6 +72,8 @@ class TestCustomModelAlgebra(unittest.TestCase):
         except RuntimeError as e:
             assert "Method enumerate_initial_types is missing" in str(e)
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.7.0"),
+                     reason="checm_model crashes")
     def test_custom_scaler(self):
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         tr = CustomOpTransformerShape(op_version=TARGET_OPSET)
@@ -81,14 +83,13 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         matf = mat.astype(np.float32)
         model_onnx = tr.to_onnx(matf)
-        # Next instructions fails...
-        # Field 'shape' of type is required but missing.
-        # onnx.checker.check_model(model_onnx)
-
+        onnx.checker.check_model(model_onnx)
         dump_data_and_model(
             mat.astype(np.float32), tr, model_onnx,
             basename="CustomTransformerAlgebra")
 
+    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.7.0"),
+                     reason="checm_model crashes")
     def test_custom_scaler_pipeline_right(self):
         pipe = make_pipeline(
             StandardScaler(),
@@ -100,12 +101,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         matf = mat.astype(np.float32)
         model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
-        # Next instructions fails...
-        # Field 'shape' of type is required but missing.
-        # onnx.checker.check_model(model_onnx)
-
-        # use assert_consistent_outputs
-        # calls dump_data_and_model
+        onnx.checker.check_model(model_onnx)
         dump_data_and_model(
             mat.astype(np.float32), pipe, model_onnx,
             basename="CustomTransformerPipelineRightAlgebra")
@@ -125,7 +121,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
         try:
             model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
         except RuntimeError as e:
-            assert "cannot be infered" in str(e)
+            assert "inputs should contain one name" in str(e)
 
         pipe = make_pipeline(
             CustomOpTransformerShape(op_version=TARGET_OPSET),

@@ -94,7 +94,7 @@ class OnnxOperatorMixin:
         """
         raise NotImplementedError()
 
-    def onnx_parser(self, scope=None, inputs=None):
+    def onnx_parser(self):
         """
         Returns a parser for this model.
         If not overloaded, it calls the converter to guess the number
@@ -102,15 +102,13 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
-        if inputs:
-            self.parsed_inputs_ = inputs
-        try:
-            op = self.to_onnx_operator(inputs=inputs, outputs=None)
-        except NotImplementedError:
-            self._find_sklearn_parent()
-            return None
+        def parser(scope=None, inputs=None):
+            try:
+                op = self.to_onnx_operator(inputs=inputs, outputs=None)
+            except NotImplementedError:
+                self._find_sklearn_parent()
+                return None
 
-        def parser():
             names = []
             while True:
                 try:
@@ -147,12 +145,8 @@ class OnnxOperatorMixin:
                 "Class '{}' should have an attribute 'op_version'.".format(
                     self.__class__.__name__))
 
-        inputs = getattr(self, "parsed_inputs_", None)
         try:
-            if inputs:
-                op = self.to_onnx_operator(inputs=inputs)
-            else:
-                op = self.to_onnx_operator()
+            op = self.to_onnx_operator()
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map.get(

@@ -13,6 +13,12 @@ jobs:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
+      Py39-OnnxLatest-Sk0242:
+        python.version: '3.9'
+        numpy.version: '>=1.18.3'
+        onnx.version: ''
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '==0.24.2'
       Py38-Onnx170-Sk0240:
         python.version: '3.8'
         numpy.version: '>=1.18.3'
