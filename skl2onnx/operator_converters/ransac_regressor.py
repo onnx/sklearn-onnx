@@ -17,7 +17,8 @@ def convert_sklearn_ransac_regressor(scope: Scope, operator: Operator,
     op_type = sklearn_operator_name_map[type(ransac_op.estimator_)]
     this_operator = scope.declare_local_operator(op_type, ransac_op.estimator_)
     this_operator.inputs = operator.inputs
-    label_name = scope.declare_local_variable('label')
+    label_name = scope.declare_local_variable(
+        'label', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     apply_identity(scope, label_name.full_name,
                    operator.outputs[0].full_name, container)

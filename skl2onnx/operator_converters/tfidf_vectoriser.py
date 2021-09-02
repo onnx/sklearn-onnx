@@ -21,7 +21,6 @@ def convert_sklearn_tfidf_vectoriser(scope: Scope, operator: Operator,
     op_type = sklearn_operator_name_map[CountVectorizer]
     cv_operator = scope.declare_local_operator(op_type, tfidf_op)
     cv_operator.inputs = operator.inputs
-    cv_output_name = scope.declare_local_variable('count_vec_output')
     columns = max(operator.raw_operator.vocabulary_.values()) + 1
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
@@ -34,13 +33,14 @@ def convert_sklearn_tfidf_vectoriser(scope: Scope, operator: Operator,
         raise RuntimeError(
             "Unexpected dtype '{}'. Float or double expected.".format(
                 proto_dtype))
-    cv_output_name.type = clr([None, columns])
+    cv_output_name = scope.declare_local_variable(
+        'count_vec_output', clr([None, columns]))
     cv_operator.outputs.append(cv_output_name)
 
     op_type = sklearn_operator_name_map[TfidfTransformer]
     tfidf_operator = scope.declare_local_operator(op_type, tfidf_op)
     tfidf_operator.inputs.append(cv_output_name)
-    tfidf_output_name = scope.declare_local_variable('tfidf_output')
+    tfidf_output_name = scope.declare_local_variable('tfidf_output', clr())
     tfidf_operator.outputs.append(tfidf_output_name)
 
     apply_identity(scope, tfidf_output_name.full_name,

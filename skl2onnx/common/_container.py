@@ -702,6 +702,8 @@ class ModelComponentContainer(_WhiteBlackContainer):
         can only be an input for a node later in this list).
         The function raises an exception if a cycle is detected.
         """
+        if len(self.inputs) == 0:
+            raise RuntimeError("No input is defined.")
         order = {}
         for inp in self.inputs:
             name = inp.name

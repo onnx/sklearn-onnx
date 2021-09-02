@@ -7,7 +7,7 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..common._apply_operation import apply_mul
 from ..common.utils_classifier import _finalize_converter_classes
-from ..common.data_types import guess_proto_type
+from ..common.data_types import guess_proto_type, Int64TensorType
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import onnx_proto
 
@@ -51,7 +51,8 @@ def convert_voting_classifier(scope: Scope, operator: Operator,
         this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = operator.inputs
 
-        label_name = scope.declare_local_variable('label_%d' % i)
+        label_name = scope.declare_local_variable(
+            'label_%d' % i, Int64TensorType())
         prob_name = scope.declare_local_variable(
             'voting_proba_%d' % i, operator.inputs[0].type.__class__())
         this_operator.outputs.append(label_name)

@@ -3,6 +3,7 @@
 
 import numpy as np
 from .._supported_operators import sklearn_operator_name_map
+from ..common.data_types import Int64TensorType
 from ..common._apply_operation import (
     apply_cast, apply_concat,
     apply_div, apply_reshape)
@@ -32,7 +33,8 @@ def _calculate_proba(scope, operator, container, model):
             container.add_options(
                 id(estimator), {'raw_scores': use_raw_scores})
 
-        label_name = scope.declare_local_variable('label_%d' % index)
+        label_name = scope.declare_local_variable(
+            'label_%d' % index, Int64TensorType())
         proba_name = scope.declare_local_variable(
             'proba_%d' % index, operator.inputs[0].type.__class__())
 
@@ -44,7 +46,8 @@ def _calculate_proba(scope, operator, container, model):
             # subset of features
             feat_name = scope.declare_local_variable(
                 'fsel_%d' % index, operator.inputs[0].type.__class__())
-            index_name = scope.get_unique_variable_name('index_name')
+            index_name = scope.get_unique_variable_name(
+                'index_name_%d' % index)
             container.add_initializer(
                 index_name, onnx_proto.TensorProto.INT64,
                 (len(features), ), list(features))
@@ -193,7 +196,8 @@ def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
                 name=scope.get_unique_operator_name('GatherBG'), axis=1)
             this_operator.inputs.append(feat_name)
 
-        label_name = scope.declare_local_variable('label_%d' % index)
+        label_name = scope.declare_local_variable(
+            'variable_%d' % index, this_operator.inputs[0].type.__class__())
         this_operator.outputs.append(label_name)
         reshaped_proba_name = scope.get_unique_variable_name('reshaped_proba')
         apply_reshape(scope, label_name.onnx_name, reshaped_proba_name,

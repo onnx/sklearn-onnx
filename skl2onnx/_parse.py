@@ -4,8 +4,7 @@ import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import (
-    ClassifierMixin, ClusterMixin, is_classifier
-)
+    ClassifierMixin, ClusterMixin, is_classifier)
 try:
     from sklearn.base import OutlierMixin
 except ImportError:
@@ -50,7 +49,7 @@ from .common.data_types import (
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
-from .common.utils_sklearn import has_pipeline, _process_options
+from .common.utils_sklearn import _process_options
 
 
 do_not_merge_columns = tuple(
@@ -463,8 +462,7 @@ def _parse_sklearn_bayesian_ridge(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
-def _parse_sklearn(scope, model, inputs, custom_parsers=None,
-                   final_types=None):
+def _parse_sklearn(scope, model, inputs, custom_parsers=None):
     """
     This is a delegate function. It does nothing but invokes the
     correct parsing function according to the input model's type.
@@ -478,9 +476,6 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None,
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
         model, inputs, custom_parsers=None) }``
-    :param final_types: a python list. Works the same way as initial_types
-        but not mandatory, it is used to overwrites the type
-        (if type is not None) and the name of every output.
     :return: The output variables produced by the input model
     """
     for i, inp in enumerate(inputs):
@@ -488,31 +483,6 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None,
             raise TypeError(
                 "Unexpected input type %r for input %r: %r." % (
                     type(inp), i, inp))
-    if final_types is not None:
-        outputs = []
-        for name, ty in final_types:
-            var = scope.declare_local_variable(name, ty)
-            if var.onnx_name != name:
-                raise RuntimeError(
-                    "Unable to add duplicated output '{}', '{}'.".format(
-                        var.onnx_name, name))
-            outputs.append(var)
-        hidden_outputs = _parse_sklearn(
-            scope, model, inputs, custom_parsers=custom_parsers)
-        if len(hidden_outputs) != len(outputs):
-            raise RuntimeError(
-                "Number of declared outputs is unexpected, declared '{}' "
-                "found '{}'.".format(
-                    ", ".join(_.onnx_name for _ in outputs),
-                    ", ".join(_.onnx_name for _ in hidden_outputs)))
-        for h, o in zip(hidden_outputs, outputs):
-            if o.type is None:
-                iop = scope.declare_local_operator('SklearnIdentity')
-            else:
-                iop = scope.declare_local_operator('SklearnCast')
-            iop.inputs = [h]
-            iop.outputs = [o]
-        return outputs
 
     tmodel = type(model)
     if custom_parsers is not None and tmodel in custom_parsers:
@@ -549,40 +519,43 @@ def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
         (if type is not None) and the name of every output.
     :return: The output variables produced by the input model
     """
-    if final_types is None and has_pipeline(model):
-        try:
-            outputs = _parse_sklearn(
-                scope.temp(), model, inputs, custom_parsers=custom_parsers)
-        except RuntimeError:
-            return _parse_sklearn(
-                scope, model, inputs, custom_parsers=custom_parsers)
-
-        reserved = []
-        for o in outputs:
-            reserved.append(scope.reserve_name(o.raw_name))
-    else:
-        reserved = None
-
-    res = _parse_sklearn(
-        scope, model, inputs, custom_parsers=custom_parsers,
-        final_types=final_types)
-
-    if final_types is None and reserved is not None:
-        for r in reserved:
-            scope.unreserve_name(r)
-
+    if final_types is not None:
         outputs = []
-        for var, name in zip(res, reserved):
-            var2 = scope.declare_local_variable(name, var.type)
-            outputs.append(var2)
+        for name, ty in final_types:
+            var = scope.declare_local_output(name, ty, missing_type=True)
+            if var.onnx_name != name:
+                raise RuntimeError(
+                    "Unable to add duplicated output '{}', '{}'. "
+                    "Output and input must have different names."
+                    "".format(var.onnx_name, name))
+            outputs.append(var)
 
-        for h, o in zip(res, outputs):
-            iop = scope.declare_local_operator('SklearnIdentity')
+        hidden_outputs = _parse_sklearn(
+            scope, model, inputs, custom_parsers=custom_parsers)
+
+        if len(hidden_outputs) != len(outputs):
+            raise RuntimeError(
+                "Number of declared outputs is unexpected, declared '{}' "
+                "found '{}'.".format(
+                    ", ".join(_.onnx_name for _ in outputs),
+                    ", ".join(_.onnx_name for _ in hidden_outputs)))
+        for h, o in zip(hidden_outputs, outputs):
+            if o.type is None:
+                iop = scope.declare_local_operator('SklearnIdentity')
+            else:
+                iop = scope.declare_local_operator('SklearnCast')
             iop.inputs = [h]
             iop.outputs = [o]
-
+            h.init_status(is_leaf=False)
+            o.init_status(is_leaf=True)
+            if o.type is None and h.type is not None:
+                o.type = h.type
         return outputs
 
+    res = _parse_sklearn(
+        scope, model, inputs, custom_parsers=custom_parsers)
+    for r in res:
+        r.init_status(is_leaf=True)
     return res
 
 
@@ -642,17 +615,13 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # In contrast to CoreML, one global scope
     # is enough for parsing scikit-learn models.
     scope = topology.declare_scope('__root__', options=options)
-
-    # Declare input variables. They should be the inputs of the scikit-learn
-    # model you want to convert into ONNX.
-    inputs = []
-    for var_name, initial_type in initial_types:
-        inputs.append(scope.declare_local_variable(var_name, initial_type))
+    inputs = scope.input_variables
 
     # The object raw_model_container is a part of the topology
     # we're going to return. We use it to store the inputs of
     # the scikit-learn's computational graph.
     for variable in inputs:
+        variable.init_status(is_root=True)
         raw_model_container.add_input(variable)
 
     # Parse the input scikit-learn model as a Topology object.
@@ -663,9 +632,10 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     # The object raw_model_container is a part of the topology we're
     # going to return. We use it to store the outputs of the
     # scikit-learn's computational graph.
-    for variable in outputs:
-        raw_model_container.add_output(variable)
-
+    if final_types is not None and len(final_types) != len(outputs):
+        raise RuntimeError(
+            "Unexpected number of outputs, expected %d, got %d "
+            "after parsing." % (len(final_types), len(outputs)))
     return topology
 
 
