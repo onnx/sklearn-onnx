@@ -345,13 +345,15 @@ def dump_data_and_model(
 
     dest = os.path.join(folder, basename + ".model.pkl")
     names.append(dest)
+    load_pickle = True
     with open(dest, "wb") as f:
         try:
             pickle.dump(model, f)
         except AttributeError as e:
             print("[dump_data_and_model] cannot pickle model '{}'"
                   " due to {}.".format(dest, e))
-    if os.path.exists(dest):
+            load_pickle = False
+    if load_pickle and os.path.exists(dest):
         # Test unpickle works.
         with open(dest, "rb") as f:
             pickle.load(f)
