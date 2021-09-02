@@ -351,6 +351,10 @@ def dump_data_and_model(
         except AttributeError as e:
             print("[dump_data_and_model] cannot pickle model '{}'"
                   " due to {}.".format(dest, e))
+    if os.path.exists(dest):
+        # Test unpickle works.
+        with open(dest, "rb") as f:
+            pickle.load(f)
 
     if dump_error_log:
         error_dump = os.path.join(folder, basename + ".err")
@@ -894,6 +898,7 @@ def make_report_backend(folder, as_df=False):
     benched = 0
     files = os.listdir(folder)
     for name in files:
+        print(name)
         if name.endswith(".expected.pkl"):
             model = name.split(".")[0]
             if model not in res:

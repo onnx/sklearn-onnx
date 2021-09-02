@@ -103,8 +103,6 @@ class OnnxOperatorMixin:
         it can find.
         """
         def parser(scope=None, inputs=None):
-            if inputs:
-                self.parsed_inputs_ = inputs
             try:
                 op = self.to_onnx_operator(inputs=inputs, outputs=None)
             except NotImplementedError:
@@ -147,12 +145,8 @@ class OnnxOperatorMixin:
                 "Class '{}' should have an attribute 'op_version'.".format(
                     self.__class__.__name__))
 
-        inputs = getattr(self, "parsed_inputs_", None)
         try:
-            if inputs:
-                op = self.to_onnx_operator(inputs=inputs)
-            else:
-                op = self.to_onnx_operator()
+            op = self.to_onnx_operator()
         except NotImplementedError:
             parent = self._find_sklearn_parent()
             name = sklearn_operator_name_map.get(
