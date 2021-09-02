@@ -30,6 +30,10 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         by default, every interval is weights by 1,
         but it is possible to give them a different value,
         it does not apply on *passthrough* columns.
+    onehot : boolean
+        if true, the transform creates a column for each interval,
+        otherwise, every column sticks into one column but labels
+        should be distinct for each interval in the same column
 
     An interval is defined with four values `(a, b, False, True)`:
 
@@ -44,9 +48,10 @@ class WOETransformer(TransformerMixin, BaseEstimator):
     """
 
     @_deprecate_positional_args
-    def __init__(self, intervals=None, weights=None):
+    def __init__(self, intervals=None, weights=None, onehot=True):
         self.intervals = intervals
         self.weights = weights
+        self.onehot = onehot
 
     def fit(self, X, y=None, sample_weight=None):
         """
@@ -127,7 +132,9 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         col = X[:, column_index]
         intervals = self.intervals_[column_index]
         if intervals is None:
-            return col.reshape((-1, 1))
+            if self.onehot:
+                return col.reshape((-1, 1))
+            return col
         res = np.zeros((X.shape[0], len(intervals)), dtype=X.dtype)
         for i, interval in enumerate(intervals):
             if interval[2]:
@@ -140,16 +147,24 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 right = col < interval[1]
             res[:, i] = ((left * right).astype(X.dtype) *
                          self.weights_[column_index][i])
-        return res
+        if self.onehot:
+            return res
+        return res.sum(axis=1, keepdims=0)
 
     def transform(self, X, y=None):
         """
         Applies the transformation.
         """
-        res = np.zeros((X.shape[0], self.n_dims_), dtype=X.dtype)
+        if self.onehot:
+            res = np.zeros((X.shape[0], self.n_dims_), dtype=X.dtype)
+        else:
+            res = np.zeros(X.shape, dtype=X.dtype)
         for i in range(X.shape[1]):
             a, b = self.indices_[i]
-            res[:, a: b] = self._transform_column(X, i)
+            if self.onehot:
+                res[:, a: b] = self._transform_column(X, i)
+            else:
+                res[:, i] = self._transform_column(X, i)
         return res
 
     def get_feature_names(self):

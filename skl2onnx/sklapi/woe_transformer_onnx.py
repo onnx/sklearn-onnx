@@ -20,7 +20,8 @@ from .. import update_registered_converter
 from .._supported_operators import _get_sklearn_operator_name
 from ..algebra.onnx_ops import (
     OnnxIdentity, OnnxMatMul, OnnxGather, OnnxConcat, OnnxReshape,
-    OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast)
+    OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast,
+    OnnxLabelEncoder)
 from .woe_transformer import WOETransformer
 
 
@@ -407,30 +408,48 @@ def woe_converter(scope: Scope, operator: Operator,
         # encoding columns
         tree = digitize2tree(threshold)
         tree.update_feature(i)
-        cats = list(sorted(set(int(n.onnx_value)
-                               for n in tree.nodes if n.is_leaf)))
-        mapping = tree.mapping(op.intervals_[i])
-        mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], dtype)
-        if getattr(container, 'verbose', 0) > 1:
-            print("[woe_converter] mapping=%r" % mapping)
 
         atts = tree.onnx_attributes()
         node = OnnxTreeEnsembleRegressor(
             X, op_version=1, domain='ai.onnx.ml', **atts)
-        ohe = OnnxOneHotEncoder(
-            OnnxReshape(node, vector_shape, op_version=opv),
-            op_version=opv, cats_int64s=cats)
-        ren = OnnxMatMul(
-            OnnxCast(ohe, op_version=opv, to=proto_type),
-            mat_mapping, op_version=opv)
-        columns.append(ren)
+        mapping = tree.mapping(op.intervals_[i])
+
+        if op.onehot:
+            cats = list(sorted(set(int(n.onnx_value)
+                                   for n in tree.nodes if n.is_leaf)))
+            mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], dtype)
+            if getattr(container, 'verbose', 0) > 1:
+                print("[woe_converter] mapping=%r" % mapping)
+            ohe = OnnxOneHotEncoder(
+                OnnxReshape(node, vector_shape, op_version=opv),
+                op_version=opv, cats_int64s=cats)
+            ren = OnnxMatMul(
+                OnnxCast(ohe, op_version=opv, to=proto_type),
+                mat_mapping, op_version=opv)
+            columns.append(ren)
+        else:
+            key_floats = []
+            value_floats = []
+            for k, v in sorted(mapping.items()):
+                if len(v) == 0:
+                    continue
+                key_floats.append(float(k))
+                if len(v) != 1:
+                    raise RuntimeError(
+                        'Intervals overlops in columns %d.' % i)
+                value = list(v)[0]
+                value_floats.append(float(op.weights_[i][value]))
+            lab = OnnxLabelEncoder(
+                node, keys_floats=key_floats, values_floats=value_floats,
+                op_version=2)
+            columns.append(lab)
 
     conc = OnnxConcat(*columns, op_version=opv, axis=1)
     final = OnnxIdentity(conc, output_names=[output], op_version=opv)
     final.add_to(scope, container)
 
 
-def woe_transformer_to_onnx(op):
+def woe_transformer_to_onnx(op, opset=None):
 
     """
     ONNX Converter for WOETransformer.
@@ -439,6 +458,9 @@ def woe_transformer_to_onnx(op):
     by the following picture:
 
     .. image:: images/woe.png
+
+    The converter only adds *opset* in the ONNX graph.
+    It does not change the conversion depending on the opset value.
     """
     C = 0
     for ext in op.intervals_:
@@ -475,27 +497,46 @@ def woe_transformer_to_onnx(op):
         # encoding columns
         tree = digitize2tree(threshold)
         tree.update_feature(i)
-        cats = list(sorted(set(int(n.onnx_value)
-                               for n in tree.nodes if n.is_leaf)))
         mapping = tree.mapping(op.intervals_[i])
-        mat_mapping = _mapping2matrix(
-            mapping, cats, op.weights_[i], np.float32)
 
         atts = tree.onnx_attributes()
         nodes.append(make_node(
             'TreeEnsembleRegressor', ['X'], ['rf%d' % i],
             domain='ai.onnx.ml', **atts))
-        nodes.append(make_node(
-            'Reshape', ['rf%d' % i, 'vector_shape'], ['resh%d' % i]))
-        nodes.append(make_node(
-            'OneHotEncoder', ['resh%d' % i], ['ohe%d' % i],
-            domain='ai.onnx.ml', cats_int64s=cats))
-        nodes.append(make_node(
-            'Cast', ['ohe%d' % i], ['cast%d' % i], to=TensorProto.FLOAT))
-        inits.append(from_array(mat_mapping, 'mat_map%i' % i))
-        nodes.append(make_node(
-            'MatMul', ['cast%d' % i, 'mat_map%i' % i], ["mul%d" % i]))
-        columns.append("mul%d" % i)
+
+        if op.onehot:
+            cats = list(sorted(set(int(n.onnx_value)
+                                   for n in tree.nodes if n.is_leaf)))
+            mat_mapping = _mapping2matrix(
+                mapping, cats, op.weights_[i], np.float32)
+            nodes.append(make_node(
+                'Reshape', ['rf%d' % i, 'vector_shape'], ['resh%d' % i]))
+            nodes.append(make_node(
+                'OneHotEncoder', ['resh%d' % i], ['ohe%d' % i],
+                domain='ai.onnx.ml', cats_int64s=cats))
+            nodes.append(make_node(
+                'Cast', ['ohe%d' % i], ['cast%d' % i], to=TensorProto.FLOAT))
+            inits.append(from_array(mat_mapping, 'mat_map%i' % i))
+            nodes.append(make_node(
+                'MatMul', ['cast%d' % i, 'mat_map%i' % i], ["mul%d" % i]))
+            columns.append("mul%d" % i)
+        else:
+            key_floats = []
+            value_floats = []
+            for k, v in sorted(mapping.items()):
+                if len(v) == 0:
+                    continue
+                key_floats.append(float(k))
+                if len(v) != 1:
+                    raise RuntimeError(
+                        'Intervals overlops in columns %d.' % i)
+                value = list(v)[0]
+                value_floats.append(float(op.weights_[i][value]))
+            nodes.append(make_node(
+                'LabelEncoder', ['rf%d' % i], ["lab%d" % i],
+                keys_floats=key_floats, values_floats=value_floats,
+                domain='ai.onnx.ml'))
+            columns.append("lab%d" % i)
 
     nodes.append(make_node(
         'Concat', columns, ['Y'], axis=1))
@@ -503,6 +544,14 @@ def woe_transformer_to_onnx(op):
     # final graph
     graph_def = make_graph(nodes, 't1', [X], [Y], inits)
     model_def = make_model(graph_def, producer_name='skl2onnx')
+
+    if opset is not None:
+        op_set = model_def.opset_import.add()
+        op_set.domain = ''
+        op_set.version = opset
+        op_set = model_def.opset_import.add()
+        op_set.domain = 'ai.onnx.ml'
+        op_set.version = 2
     return model_def
 
 

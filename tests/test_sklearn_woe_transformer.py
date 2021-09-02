@@ -161,7 +161,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         woe.fit(x)
         expected = woe.transform(x)
 
-        onnx_model = woe_transformer_to_onnx(woe)
+        onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
 
         # with open("debug.onnx", "wb") as f:
         #     f.write(onnx_model.SerializeToString())
@@ -169,6 +169,35 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         sess = InferenceSession(onnx_model.SerializeToString())
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
+
+    def test_woe_transformer_conv_weights_onnx_noonehot(self):
+        x = numpy.array(
+            [[0.2, 0.7, 0.9],
+             [0.51, 0.71, 0.91],
+             [0.7, 1.5, 0.92]],
+            dtype=numpy.float32)
+        woe = WOETransformer(
+            intervals=[[(0.4, 0.6, False, True)],
+                       [(0.9, numpy.inf), (-numpy.inf, 0.9)]],
+            weights=[[2.7], [3.5, 6.7]],
+            onehot=False)
+        woe.fit(x)
+        expected = woe.transform(x)
+        manual = numpy.array([[0., 6.7, 0.9],
+                              [2.7, 6.7, 0.91],
+                              [0., 3.5, 0.92]], dtype=numpy.float32)
+        assert_almost_equal(manual, expected)
+
+        with self.subTest(way='skl2onnx'):
+            onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
+            sess = InferenceSession(onnx_model.SerializeToString())
+            got = sess.run(None, {'X': x})[0]
+            assert_almost_equal(expected, got)
+        with self.subTest(way='onnx'):
+            onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
+            sess = InferenceSession(onnx_model.SerializeToString())
+            got = sess.run(None, {'X': x})[0]
+            assert_almost_equal(expected, got)
 
 
 if __name__ == "__main__":
