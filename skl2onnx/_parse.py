@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 import numpy as np
 
 from sklearn import pipeline
@@ -107,7 +108,17 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     if hasattr(model, 'onnx_parser'):
         parser_names = model.onnx_parser()
         if parser_names is not None:
-            names = parser_names(scope=scope, inputs=inputs)
+            try:
+                names = parser_names(scope=scope, inputs=inputs)
+            except TypeError as e:
+                warnings.warn(
+                    "Calling parser %r for model type %r failed due to %r. "
+                    "This warnings will become an exception in version 1.11. "
+                    "The parser signature should parser(scope=None, "
+                    "inputs=None)." % (
+                        parser_names, e, type(model)),
+                    DeprecationWarning)
+                names = parser_names()
             if names is not None:
                 for name in names:
                     var = scope.declare_local_variable(
