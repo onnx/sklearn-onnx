@@ -75,6 +75,8 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         # from mlprodict.onnxrt import OnnxInference
         # oinf = OnnxInference(onnx_model)
         # oinf.run({"X": x}, verbose=10, fLOG=print)
+        with open("debug.onnx", "wb") as f:
+            f.write(onnx_model.SerializeToString())
 
         sess = InferenceSession(onnx_model.SerializeToString())
         got = sess.run(None, {'X': x})[0]

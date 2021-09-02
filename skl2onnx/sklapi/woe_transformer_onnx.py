@@ -344,7 +344,13 @@ def digitize2tree(bins, right=False):
 
 def woe_converter(scope: Scope, operator: Operator,
                   container: ModelComponentContainer):
-    "ONNX Converter for WOETransformer."
+    """
+    ONNX Converter for WOETransformer.
+    The logic behind the converter is summarized
+    by the following picture:
+
+    .. image:: images/woe.png
+    "
     def mapping2matrix(mapping, value_mapping):
         rev = {v: k for k, v in enumerate(value_mapping)}
         rows = int(max(rev[k] for k in mapping)) + 1
