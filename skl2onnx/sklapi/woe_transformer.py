@@ -26,36 +26,47 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         every tuple is an interval, one list per column,
         a list can be replaced with constant `'passthrough'`
         which leaves the features untouched.
+    weights : list of if list of numerical values
+        by default, every interval is weights by 1,
+        but it is possible to give them a different value,
+        it does not apply on *passthrough* columns.
 
     An interval is defined with four values `(a, b, False, True)`:
+
     * `(a, b, False, False)` means `]a, b[`
     * `(a, b, False, True)` means `]a, b]`
     * `(a, b, True, False)` means `[a, b[`
     * `(a, b, True, True)` means `[a, b]`
+
     Boolean defines if the extremity belongs to the interval or not.
     By default `(a, b)` is equivalent to `(a, b, False, True)`.
+    Method fit adds attributes `intervals_` and `weights_`.
     """
 
     @_deprecate_positional_args
-    def __init__(self, intervals=None):
+    def __init__(self, intervals=None, weights=None):
         self.intervals = intervals
+        self.weights = weights
 
     def fit(self, X, y=None, sample_weight=None):
         """
         Does nothing except checking *dtype* may be applied.
         """
         self.intervals_ = []
+        self.weights_ = []
         dim = 0
         self.indices_ = []
         for i in range(X.shape[1]):
             if i >= len(self.intervals):
                 self.intervals_.append(None)
+                self.weights_.append(None)
                 self.indices_.append((dim, dim + 1))
                 dim += 1
                 continue
             intervals = self.intervals[i]
             if intervals == 'passthrough':
                 self.intervals_.append(None)
+                self.weights_.append(None)
                 self.indices_.append((dim, dim + 1))
                 dim += 1
                 continue
@@ -64,6 +75,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                     "Intervals for column %d must be a list not %r."
                     "" % (i, intervals))
             inlist = []
+            inweight = []
             for index, interval in enumerate(intervals):
                 if not isinstance(interval, tuple):
                     raise TypeError(
@@ -97,17 +109,23 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 else:
                     res.append(True)
                 inlist.append(tuple(res))
+                if (self.weights is None or i >= len(self.weights) or
+                        index >= len(self.weights[i])):
+                    inweight.append(1)
+                else:
+                    inweight.append(self.weights[i][index])
 
             self.intervals_.append(inlist)
+            self.weights_.append(inweight)
             self.indices_.append((dim, dim + len(inlist)))
             dim += len(inlist)
 
         self.n_dims_ = dim
         return self
 
-    def _transform_column(self, X, i):
-        col = X[:, i]
-        intervals = self.intervals_[i]
+    def _transform_column(self, X, column_index):
+        col = X[:, column_index]
+        intervals = self.intervals_[column_index]
         if intervals is None:
             return col.reshape((-1, 1))
         res = np.zeros((X.shape[0], len(intervals)), dtype=X.dtype)
@@ -120,7 +138,8 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 right = col <= interval[1]
             else:
                 right = col < interval[1]
-            res[:, i] = (left * right).astype(X.dtype)
+            res[:, i] = ((left * right).astype(X.dtype) *
+                         self.weights_[column_index][i])
         return res
 
     def transform(self, X, y=None):

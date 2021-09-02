@@ -12,6 +12,7 @@ try:
 except ImportError:
     ColumnTransformer = None
 from skl2onnx.sklapi import WOETransformer
+from skl2onnx.sklapi.woe_transformer_onnx import woe_transformer_to_onnx
 import skl2onnx.sklapi.register  # noqa
 from skl2onnx import to_onnx
 from test_utils import TARGET_OPSET
@@ -41,6 +42,8 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
             [(0.9, numpy.inf, False, True),
              (-numpy.inf, 0.9, False, True)],
             None])
+        self.assertEqual(woe.weights_, [
+            [1, 1, 1, 1], [1, 1], None])
         names = woe.get_feature_names()
         self.assertEqual(
             names,
@@ -106,7 +109,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
-    def _test_woe_transformer_conv(self):
+    def test_woe_transformer_conv(self):
         x = numpy.array(
             [[0.2, 0.7, 0.9],
              [0.51, 0.71, 0.91],
@@ -122,6 +125,46 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
 
         with open("debug.onnx", "wb") as f:
             f.write(onnx_model.SerializeToString())
+
+        sess = InferenceSession(onnx_model.SerializeToString())
+        got = sess.run(None, {'X': x})[0]
+        assert_almost_equal(expected, got)
+
+    def test_woe_transformer_conv_weights(self):
+        x = numpy.array(
+            [[0.2, 0.7, 0.9],
+             [0.51, 0.71, 0.91],
+             [0.7, 1.5, 0.92]],
+            dtype=numpy.float32)
+        woe = WOETransformer(
+            intervals=[[(0.4, 0.6, False, True)],
+                       [(0.9, numpy.inf), (-numpy.inf, 0.9)]],
+            weights=[[2.7], [3.5, 6.7]])
+        woe.fit(x)
+        expected = woe.transform(x)
+
+        onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
+        sess = InferenceSession(onnx_model.SerializeToString())
+        got = sess.run(None, {'X': x})[0]
+        assert_almost_equal(expected, got)
+
+    def test_woe_transformer_conv_weights_onnx(self):
+        x = numpy.array(
+            [[0.2, 0.7, 0.9],
+             [0.51, 0.71, 0.91],
+             [0.7, 1.5, 0.92]],
+            dtype=numpy.float32)
+        woe = WOETransformer(
+            intervals=[[(0.4, 0.6, False, True)],
+                       [(0.9, numpy.inf), (-numpy.inf, 0.9)]],
+            weights=[[2.7], [3.5, 6.7]])
+        woe.fit(x)
+        expected = woe.transform(x)
+
+        onnx_model = woe_transformer_to_onnx(woe)
+
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(onnx_model.SerializeToString())
 
         sess = InferenceSession(onnx_model.SerializeToString())
         got = sess.run(None, {'X': x})[0]

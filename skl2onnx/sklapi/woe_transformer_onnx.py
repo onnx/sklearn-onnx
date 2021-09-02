@@ -3,10 +3,14 @@
 import warnings
 from typing import List
 import numpy as np
-from onnx import TensorProto
+from onnx.helper import (
+    make_node, make_graph, make_model, make_tensor_value_info,
+    TensorProto)
+from onnx.numpy_helper import from_array
 from sklearn.base import BaseEstimator
 from ..common.data_types import (
-    Int64TensorType, FloatTensorType, DoubleTensorType)
+    Int64TensorType, FloatTensorType, DoubleTensorType,
+    guess_numpy_type, guess_proto_type)
 from ..common._topology import Scope, Operator, Variable
 from ..common._container import ModelComponentContainer
 from ..common.utils import (
@@ -353,34 +357,38 @@ def digitize2tree(bins, right=False):
     return tree
 
 
+def _mapping2matrix(mapping, value_mapping, weights, dtype):
+    rev = {v: k for k, v in enumerate(value_mapping)}
+    rows = int(max(rev[k] for k in mapping)) + 1
+    cols = max(max(v) if v else 0 for v in mapping.values()) + 1
+    mat = np.zeros((rows, cols), dtype=dtype)
+    for k, intervals in mapping.items():
+        for idx in intervals:
+            mat[rev[k], idx] = weights[idx]
+
+    # Remove all empty columns.
+    total = mat.sum(axis=0, keepdims=0)
+    return mat[:, total > 0].copy()
+
+
 def woe_converter(scope: Scope, operator: Operator,
                   container: ModelComponentContainer):
     """
     ONNX Converter for WOETransformer.
+    It follows *skl2onnx* API.
     The logic behind the converter is summarized
     by the following picture:
 
     .. image:: images/woe.png
     """
-    def mapping2matrix(mapping, value_mapping):
-        rev = {v: k for k, v in enumerate(value_mapping)}
-        rows = int(max(rev[k] for k in mapping)) + 1
-        cols = max(max(v) if v else 0 for v in mapping.values()) + 1
-        mat = np.zeros((rows, cols), dtype=np.int64)
-        for k, intervals in mapping.items():
-            for idx in intervals:
-                mat[rev[k], idx] = 1
-
-        # Remove all empty columns.
-        total = mat.sum(axis=0, keepdims=0)
-        return mat[:, total > 0].copy()
-
     op = operator.raw_operator
     X = operator.inputs[0]
     output = operator.outputs[0]
     opv = container.target_opset
     new_shape = np.array([-1, 1], dtype=np.int64)
     vector_shape = np.array([-1], dtype=np.int64)
+    dtype = guess_numpy_type(X.type)
+    proto_type = guess_proto_type(X.type)
 
     columns = []
 
@@ -402,7 +410,7 @@ def woe_converter(scope: Scope, operator: Operator,
         cats = list(sorted(set(int(n.onnx_value)
                                for n in tree.nodes if n.is_leaf)))
         mapping = tree.mapping(op.intervals_[i])
-        mat_mapping = mapping2matrix(mapping, cats)
+        mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], dtype)
         if getattr(container, 'verbose', 0) > 1:
             print("[woe_converter] mapping=%r" % mapping)
 
@@ -413,14 +421,89 @@ def woe_converter(scope: Scope, operator: Operator,
             OnnxReshape(node, vector_shape, op_version=opv),
             op_version=opv, cats_int64s=cats)
         ren = OnnxMatMul(
-            OnnxCast(ohe, op_version=opv, to=TensorProto.INT64),
+            OnnxCast(ohe, op_version=opv, to=proto_type),
             mat_mapping, op_version=opv)
-        cast = OnnxCast(ren, op_version=opv, to=TensorProto.FLOAT)
-        columns.append(cast)
+        columns.append(ren)
 
     conc = OnnxConcat(*columns, op_version=opv, axis=1)
     final = OnnxIdentity(conc, output_names=[output], op_version=opv)
     final.add_to(scope, container)
+
+
+def woe_transformer_to_onnx(op):
+
+    """
+    ONNX Converter for WOETransformer.
+    It uses ONNX API.
+    The logic behind the converter is summarized
+    by the following picture:
+
+    .. image:: images/woe.png
+    """
+    C = 0
+    for ext in op.intervals_:
+        if ext is None:
+            C += 1
+        else:
+            C += len(ext)
+
+    # inputs
+    X = make_tensor_value_info(
+        'X', TensorProto.FLOAT, [None, len(op.intervals_)])
+    Y = make_tensor_value_info(
+        'Y', TensorProto.FLOAT, [None, C])
+
+    # nodes
+    nodes = []
+    columns = []
+    inits = [from_array(np.array([-1, 1], dtype=np.int64), name='new_shape'),
+             from_array(np.array([-1], dtype=np.int64), name='vector_shape')]
+    thresholds = op._decision_thresholds(add_index=False)
+
+    for i, threshold in enumerate(thresholds):
+        if threshold is None:
+            # Passthrough columns
+            inits.append(from_array(
+                np.array([i], dtype=np.int64), name='index%d' % i))
+            nodes.append(make_node(
+                'Gather', ['X', 'index%d' % i], ['col%d' % i], axis=1))
+            nodes.append(make_node(
+                'Reshape', ['col%d' % i, 'new_shape'], ['reshr%d' % i]))
+            columns.append('reshr%d' % i)
+            continue
+
+        # encoding columns
+        tree = digitize2tree(threshold)
+        tree.update_feature(i)
+        cats = list(sorted(set(int(n.onnx_value)
+                               for n in tree.nodes if n.is_leaf)))
+        mapping = tree.mapping(op.intervals_[i])
+        mat_mapping = _mapping2matrix(
+            mapping, cats, op.weights_[i], np.float32)
+
+        atts = tree.onnx_attributes()
+        nodes.append(make_node(
+            'TreeEnsembleRegressor', ['X'], ['rf%d' % i],
+            domain='ai.onnx.ml', **atts))
+        nodes.append(make_node(
+            'Reshape', ['rf%d' % i, 'vector_shape'], ['resh%d' % i]))
+        nodes.append(make_node(
+            'OneHotEncoder', ['resh%d' % i], ['ohe%d' % i],
+            domain='ai.onnx.ml', cats_int64s=cats))
+        nodes.append(make_node(
+            'Cast', ['ohe%d' % i], ['cast%d' % i], to=TensorProto.FLOAT))
+        inits.append(from_array(mat_mapping, 'mat_map%i' % i))
+        nodes.append(make_node(
+            'MatMul', ['cast%d' % i, 'mat_map%i' % i], ["mul%d" % i]))
+        columns.append("mul%d" % i)
+
+    nodes.append(make_node(
+        'Concat', columns, ['Y'], axis=1))
+
+    # final graph
+    graph_def = make_graph(nodes, 't1', [X], [Y], inits)
+    model_def = make_model(graph_def, producer_name='skl2onnx')
+    return model_def
 
 
 def register():
