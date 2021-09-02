@@ -9,7 +9,7 @@ from ..common.data_types import guess_numpy_type
 
 def convert_quantile_transformer(scope: Scope, operator: Operator,
                                  container: ModelComponentContainer):
-    """Converter for PowerTransformer"""
+    """Converter for QuantileTransformer"""
     # op_in = operator.inputs[0]
     # op_out = operator.outputs[0].full_name
     op = operator.raw_operator
