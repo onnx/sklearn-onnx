@@ -69,6 +69,14 @@ class OnnxOperatorItem:
             raise IndexError("Can only return the first item.")
         return self.onx_op.get_output_name(self.index)
 
+    def get_output(self, i=0):
+        """
+        Returns the output.
+        """
+        if i != 0:
+            raise IndexError("Can only return the first item.")
+        return self.onx_op.get_output(self.index)
+
     @property
     def outputs(self):
         """
@@ -482,6 +490,18 @@ class OnnxOperator:
             return self.output_names_[i]
         self._set_output_names_(getattr(self, 'scope', None) or scope, None)
         return self.output_names_[i]
+
+    def get_output(self, i, scope=None):
+        "Returns name of output *i*."
+        if self.state is not None:
+            return self.state.computed_outputs_[i]
+        if self.output_names_ is not None:
+            res = self.output_names_[i]
+            if not isinstance(res, (tuple, Variable)):
+                raise RuntimeError(
+                        "Unable to retrieve output %r from %r."
+                        "" % (i, self))
+            return res
 
     def _set_output_names_(self, scope, operator):
         "Called by add_to."
