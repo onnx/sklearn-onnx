@@ -21,16 +21,29 @@ import skl2onnx
 import onnxruntime
 import onnx
 import sklearn
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
 import numpy
 from onnxruntime import get_device
 import numpy as np
-from onnxruntime import datasets
 import onnxruntime.backend as backend
-from onnx import load
 
-name = datasets.get_example("logreg_iris.onnx")
-model = load(name)
 
+#######################################
+# Let's create an ONNX graph first.
+
+data = load_iris()
+X, Y = data.data, data.target
+logreg = LogisticRegression(C=1e5).fit(X, Y)
+model = skl2onnx.to_onnx(logreg, X.astype(np.float32))
+name = "logreg_iris.onnx"
+with open(name, "wb") as f:
+    f.write(model.SerializeToString())
+
+#######################################
+# Let's use ONNX backend API to test it.
+
+model = onnx.load(name)
 rep = backend.prepare(model, 'CPU')
 x = np.array([[-1.0, -2.0, 5.0, 6.0],
               [-1.0, -2.0, -3.0, -4.0],

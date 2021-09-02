@@ -27,8 +27,9 @@ class OnnxRuntimeAssertionError(AssertionError):
     """
 
     def __init__(self, msg):
-        new_msg = "{}\nonnx=={} onnxruntime=={}".format(
-            msg, onnx.__version__, onnxruntime.__version__)
+        from . import TARGET_OPSET
+        new_msg = "{}\nonnx=={} onnxruntime=={} TARGET_OPSET={}".format(
+            msg, onnx.__version__, onnxruntime.__version__, TARGET_OPSET)
         AssertionError.__init__(self, new_msg)
 
 

@@ -31,6 +31,7 @@ from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
 from . import multilayer_perceptron
+from . import multioutput
 from . import multiply_op
 from . import naive_bayes
 from . import nearest_neighbours
@@ -38,6 +39,7 @@ from . import normaliser
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
+from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import quantile_transformer
@@ -85,6 +87,7 @@ __all__ = [
     linear_classifier,
     linear_regressor,
     multilayer_perceptron,
+    multioutput,
     multiply_op,
     naive_bayes,
     nearest_neighbours,
@@ -92,6 +95,7 @@ __all__ = [
     one_hot_encoder,
     one_vs_rest_classifier,
     ordinal_encoder,
+    pipelines,
     polynomial_features,
     power_transformer,
     quantile_transformer,

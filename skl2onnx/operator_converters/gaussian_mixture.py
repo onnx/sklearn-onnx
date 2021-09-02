@@ -253,7 +253,7 @@ def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
                 axes=[1], op_version=opv),
             op_version=opv)
         log_prob_norm = OnnxAdd(log_prob_norm_demax, max_weight,
-                                op_version=opv, output_names=out[2:3])
+                                op_version=opv, output_names=outnames)
     else:
         log_prob_norm = OnnxReduceLogSumExp(
             weighted_log_prob, axes=[1], op_version=opv,

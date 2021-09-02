@@ -6,6 +6,7 @@ import re
 import sys
 import traceback
 import warnings
+from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
 from onnx.defs import onnx_opset_version, get_all_schemas_with_history
@@ -22,8 +23,10 @@ except ImportError:
     # onnx is too old.
     SparseTensorProto = None
     make_sparse_tensor = None
-from .interface import ModelContainer
 from .utils import get_domain
+
+
+logger = getLogger('skl2onnx')
 
 
 def _get_operation_list():
@@ -197,7 +200,7 @@ class SklearnModelContainerNode(RawModelContainerNode):
             self._outputs.append(variable)
 
 
-class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
+class ModelComponentContainer(_WhiteBlackContainer):
     """
     In the conversion phase, this class is used to collect all materials
     required to build an *ONNX* *GraphProto*, which is encapsulated in a
@@ -340,6 +343,7 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                         or a float array).
         :return: created tensor
         """
+        logger.debug("[Init] %r, %r, %r" % (name, onnx_type, shape))
         sparse_tensor = None
         tensor = None
 
@@ -504,6 +508,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             inputs = [inputs]
         if isinstance(outputs, str):
             outputs = [outputs]
+        logger.debug("[Node] %r - %r -> %r (name=%r)" % (
+            op_type, ",".join(inputs), ",".join(outputs), name))
         try:
             common = set(inputs) & set(outputs)
         except TypeError as e:
@@ -696,6 +702,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
         can only be an input for a node later in this list).
         The function raises an exception if a cycle is detected.
         """
+        if len(self.inputs) == 0:
+            raise RuntimeError("No input is defined.")
         order = {}
         for inp in self.inputs:
             name = inp.name
@@ -730,8 +738,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
                     if name in order:
                         raise RuntimeError(
                             "Unable to sort a node (cycle). An output was "
-                            "already ordered %r (iteration=%r)." % (
-                                name, n_iter))
+                            "already ordered with name %r (iteration=%r)."
+                            "" % (name, n_iter))
                     order[name] = maxi
             if len(missing_names) == 0:
                 continue
@@ -750,8 +758,8 @@ class ModelComponentContainer(ModelContainer, _WhiteBlackContainer):
             rows.append("--")
             rows.append("--all-nodes--")
             rows.append("--")
-            rows.extend("%s(%s) -> [%s]" % (
-                n.name or n.op_type,
+            rows.extend("%s|%s(%s) -> [%s]" % (
+                n.op_type, n.name or n.op_type,
                 ', '.join(map(nstr, n.input)),
                 ', '.join(n.output))
                 for n in self.nodes)

@@ -238,7 +238,7 @@ def collect_intermediate_steps(model, *args, **kwargs):
         raise
 
     steps = []
-    for operator in topology.topological_operator_iterator():
+    for operator in topology.unordered_operator_iterator():
         if operator.raw_operator is None:
             continue
         _alter_model_for_debugging(operator.raw_operator)

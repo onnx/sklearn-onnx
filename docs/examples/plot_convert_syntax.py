@@ -106,6 +106,7 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def __init__(self):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
+        self.op_version = 12
 
     def fit(self, X, y=None):
         self.W_ = np.mean(X, axis=0)
@@ -120,16 +121,18 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
             operator.outputs[0].type = operator.inputs[0].type
         return shape_calculator
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
+                         target_opset=None, **kwargs):
         if inputs is None:
             raise RuntimeError("Parameter inputs should contain at least "
                                "one name.")
+        opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
         W = self.W_.astype(np.float32)
         S = self.S_.astype(np.float32)
         return OnnxDiv(OnnxSub(i0, W, op_version=12), S,
                        output_names=outputs,
-                       op_version=12)
+                       op_version=opv)
 
 #############################
 # Way 1

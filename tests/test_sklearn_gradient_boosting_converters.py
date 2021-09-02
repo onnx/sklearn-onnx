@@ -2,7 +2,6 @@
 
 
 from distutils.version import StrictVersion
-from logging import getLogger
 import unittest
 import numpy as np
 from pandas import DataFrame
@@ -28,10 +27,6 @@ THRESHOLD = "0.2.1"
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
-
-    def setUp(self):
-        log = getLogger('skl2onnx')
-        log.disabled = True
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")

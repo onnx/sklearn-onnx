@@ -25,7 +25,8 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxReduceSumSquare, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
-    OnnxPad, OnnxBatchNormalization)
+    OnnxPad, OnnxBatchNormalization,
+    OnnxConstantOfShape)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -64,14 +65,14 @@ class TestOnnxOperators(unittest.TestCase):
             nin = list(op.enumerate_initial_types())
             nno = list(op.enumerate_nodes())
             nva = list(op.enumerate_variables())
-            assert len(nin) == 1
-            assert nin[0][0] == 'input'
-            assert nin[0][1].shape == [None, 2]
-            assert len(nno) == 1
-            assert nno[0].output_names == ['variable']
-            assert len(nva) == 1
+            self.assertEqual(len(nin), 1)
+            self.assertEqual(nin[0][0], 'input')
+            self.assertEqual(nin[0][1].shape, [None, 2])
+            self.assertEqual(len(nno), 1)
+            self.assertEqual(nno[0].output_names[0].onnx_name, 'variable')
+            self.assertEqual(len(nva), 1)
             assert isinstance(nva[0], tuple)
-            assert nva[0][1] == 0
+            self.assertEqual(nva[0][1], 0)
 
         def shape(operator):
             N = operator.inputs[0].type.shape[0]
@@ -202,6 +203,49 @@ class TestOnnxOperators(unittest.TestCase):
     def test_constant(self):
         cst = OnnxOperator.ConstantVariable("a")
         self.assertEqual(cst.value, "a")
+
+    def test_constant_of_shape(self):
+        for opset in [TARGET_OPSET, 14, 13, 12, 11, 10, 9]:
+            for value in [np.array([5], dtype=np.float32),
+                          np.array(5, dtype=np.float32)]:
+                if opset > TARGET_OPSET:
+                    continue
+                with self.subTest(opset=opset, value=value):
+                    tensor_value = onnx.helper.make_tensor(
+                        "value", onnx.TensorProto.FLOAT,
+                        [1], [5])
+
+                    cst = OnnxConstantOfShape(
+                        'X', value=tensor_value, op_version=opset,
+                        output_names=['Y'])
+                    shape = np.array([3, 4], dtype=np.int64)
+                    onx = cst.to_onnx(
+                        {'X': shape}, target_opset=opset,
+                        outputs=[('Y', FloatTensorType())])
+                    sess = InferenceSession(onx.SerializeToString())
+                    res = sess.run(None, {'X': shape})
+                    assert_almost_equal(
+                        res[0], np.full(tuple(shape), 5, dtype=np.float32))
+
+                    cst = OnnxConstantOfShape(
+                        'X', value=value, op_version=opset,
+                        output_names=['Y'])
+                    shape = np.array([3, 4], dtype=np.int64)
+                    onx = cst.to_onnx(
+                        {'X': shape}, target_opset=opset,
+                        outputs=[('Y', FloatTensorType())])
+                    sess = InferenceSession(onx.SerializeToString())
+                    res = sess.run(None, {'X': shape})
+                    assert_almost_equal(
+                        res[0], np.full(tuple(shape), 5, dtype=np.float32))
+
+        for opset in [TARGET_OPSET]:
+            for value in [5, np.float32(5)]:
+                with self.subTest(opset=opset, value=value):
+                    with self.assertRaises(TypeError):
+                        OnnxConstantOfShape(
+                            'X', value=value, op_version=opset,
+                            output_names=['Y'])
 
     @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
                      reason="only available for opset >= 10")

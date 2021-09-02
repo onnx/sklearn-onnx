@@ -96,7 +96,11 @@ def get_column_index(i, inputs):
         for ind, inp in enumerate(inputs):
             if inp.onnx_name == i:
                 return ind, 0
-        raise RuntimeError("Unable to find column name '{0}'".format(i))
+        raise RuntimeError(
+            "Unable to find column name %r among names %r. "
+            "Make sure the input names specified with parameter "
+            "initial_types fits the column names specified in the "
+            "pipeline to convert." % (i, [n.onnx_name for n in inputs]))
 
 
 def get_column_indices(indices, inputs, multiple):

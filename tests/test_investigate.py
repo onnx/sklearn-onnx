@@ -50,8 +50,8 @@ class TestInvestigate(unittest.TestCase):
             assert len(steps) == 2
             assert len(all_models) == 3
 
-            expected = 'opset_import{domain:""version:%d}' % opset
-            expected1 = 'opset_import{domain:""version:1}'
+            expected = 'version:%d}' % opset
+            expected1 = 'version:1}'
             model.transform(data)
             for step in steps:
                 onnx_step = step['onnx_step']

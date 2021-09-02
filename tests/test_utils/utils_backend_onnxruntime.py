@@ -482,10 +482,6 @@ def _compare_expected(expected,
                 output = output[:1]
                 del kwargs['Out0']
             elif 'Out1' in kwargs:
-                print('----------')
-                print(expected)
-                print(output)
-                print('----------')
                 expected = expected[1:2]
                 output = output[1:2]
                 del kwargs['Out1']

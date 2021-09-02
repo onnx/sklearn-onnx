@@ -23,13 +23,15 @@ from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
 from . import mixture
+from . import multioutput
 from . import nearest_neighbours
 from . import one_hot_encoder
 from . import ordinal_encoder
 from . import one_vs_rest_classifier
-from . import quantile_transformer
+from . import pipelines
 from . import polynomial_features
 from . import power_transformer
+from . import quantile_transformer
 from . import random_projection
 from . import replace_op
 from . import scaler
@@ -62,10 +64,12 @@ __all__ = [
     linear_classifier,
     linear_regressor,
     mixture,
+    multioutput,
     nearest_neighbours,
     one_hot_encoder,
     ordinal_encoder,
     one_vs_rest_classifier,
+    pipelines,
     polynomial_features,
     power_transformer,
     quantile_transformer,

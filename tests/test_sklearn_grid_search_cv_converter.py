@@ -9,6 +9,7 @@ from onnxruntime import __version__ as ort_version
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import Lasso, LassoLars, LogisticRegression
 from sklearn.model_selection import GridSearchCV
+from sklearn.cluster import KMeans
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_iris
@@ -18,6 +19,7 @@ from skl2onnx.common.data_types import (
 from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model, fit_classification_model,
+    fit_clustering_model,
     fit_regression_model, TARGET_OPSET)
 
 
@@ -219,6 +221,22 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
         dump_data_and_model(
             x_test.astype(np.float32), model, model_onnx,
             basename="SklearnGridSearchSVC-Out0")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_grid_search_binary_kmeans(self):
+        tuned_parameters = [{'n_clusters': [2, 3]}]
+        clf = GridSearchCV(KMeans(), tuned_parameters, cv=5)
+        model, X = fit_clustering_model(clf, n_classes=2)
+        X = X.astype(np.float32)
+        model_onnx = convert_sklearn(
+            model, "GridSearchCV",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model.best_estimator_, model_onnx,
+            basename="SklearnGridSearchKMeans")
 
 
 if __name__ == "__main__":

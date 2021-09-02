@@ -7,14 +7,14 @@ from ..proto import TensorProto
 from ..common.data_types import (
     _guess_type_proto_str, _guess_type_proto_str_inv)
 from ..common._topology import (
-    Variable, Scope, _update_domain_version,
+    Variable, VariableStr, Scope, _update_domain_version, Operator,
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
-from ..proto.onnx_helper_modified import make_graph, make_model
+from ..proto.onnx_helper_modified import make_graph, make_model, from_array
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
@@ -68,6 +68,14 @@ class OnnxOperatorItem:
         if i != 0:
             raise IndexError("Can only return the first item.")
         return self.onx_op.get_output_name(self.index)
+
+    def get_output(self, i=0):
+        """
+        Returns the output.
+        """
+        if i != 0:
+            raise IndexError("Can only return the first item.")
+        return self.onx_op.get_output(self.index)
 
     @property
     def outputs(self):
@@ -218,13 +226,40 @@ class OnnxOperator:
                  domain=None, **kwargs):
 
         if (output_names is None and
-                self.__class__.__name__ in {"OnnxScan"}):
+                self.__class__.__name__.startswith("OnnxScan")):
             raise NotImplementedError(
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
                 ".".format(self.__class__.__name__))
-        if isinstance(output_names, str):
+        if isinstance(output_names, (str, Variable)):
             output_names = [output_names]
+            if isinstance(output_names[0], str):
+                output_names[0] = VariableStr(output_names[0])
+        elif isinstance(output_names, Operator):
+            if len(output_names.outputs) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % output_names)
+            output_names = output_names.outputs.copy()
+        elif isinstance(output_names, Operator.OperatorList):
+            if len(output_names) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % self.__class__.__name__)
+            output_names = output_names.copy()
+        elif isinstance(output_names, list):
+            if len(output_names) == 0:
+                raise ValueError(
+                    "output_names cannot be empty (operator %r)."
+                    "" % self.__class__.__name__)
+            output_names = output_names.copy()
+            for i in range(len(output_names)):
+                if isinstance(output_names[i], str):
+                    output_names[i] = VariableStr(output_names[i])
+        elif output_names is not None:
+            raise TypeError(
+                "output_names must be a string or a list not %r."
+                "" % type(output_names))
 
         if op_version is None:
             if domain == '':
@@ -325,27 +360,24 @@ class OnnxOperator:
                         len(self.inputs), op_version, self.op_version))
 
         # check output
-        if (hasattr(output_names, 'outputs') and
-                output_names.outputs is not None):
-            self.output_names = [out.onnx_name
-                                 for out in output_names.outputs]
-            self.output_variables = output_names
-        else:
-            self.output_names = output_names
-            self.output_variables = None
+        self.output_names = output_names
+        self.output_variables = None
 
-        if self.output_names:
+        if self.output_names is not None:
+            if len(self.output_names) == 0:
+                raise ValueError(
+                    "output_names can be None but cannot be empty for "
+                    "operator %r." % self)
             if self.output_variables is None:
                 self.output_variables = [None for o in self.output_names]
             for i in range(len(self.output_names)):
                 name = self.output_names[i]
                 if isinstance(name, Variable):
-                    self.output_names[i] = name.onnx_name
                     self.output_variables[i] = name
-                elif not isinstance(name, str):
+                else:
                     raise TypeError("output_names must be a list of strings "
-                                    "and element {} is {}".format(
-                                        i, type(name)))
+                                    "and element %r is %r (%r)" % (
+                                        i, type(name), name))
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
 
@@ -381,6 +413,33 @@ class OnnxOperator:
                 self.expected_inputs.append(inp)
 
         self.output_names_ = None
+        self._post_process_attributes()
+
+    def _post_process_attributes(self):
+        """
+        Walks through attributes and replaces them by ONNX
+        values.
+        """
+        if (self.__class__.__name__.startswith("OnnxConstantOfShape") and
+                "value" in self.kwargs):
+            value = self.kwargs['value']
+            if isinstance(value, TensorProto):
+                return
+            if isinstance(value, np.ndarray):
+                if value.shape == (1, ):
+                    val = value[0]
+                elif len(value.shape) == 0:
+                    val = value
+                else:
+                    raise RuntimeError(
+                        "Unexpected shape %r for value, it must be an array "
+                        "of one element." % value.shape)
+                self.kwargs['value'] = from_array(
+                    np.array([val], dtype=value.dtype))
+                return
+            raise TypeError(
+                "Unexpected type %r for value. It should be an array "
+                "of one element." % type(value))
 
     def __str__(self):
         """
@@ -432,6 +491,18 @@ class OnnxOperator:
         self._set_output_names_(getattr(self, 'scope', None) or scope, None)
         return self.output_names_[i]
 
+    def get_output(self, i, scope=None):
+        "Returns name of output *i*."
+        if self.state is not None:
+            return self.state.computed_outputs_[i]
+        if self.output_names_ is not None:
+            res = self.output_names_[i]
+            if not isinstance(res, (tuple, Variable)):
+                raise RuntimeError(
+                        "Unable to retrieve output %r from %r."
+                        "" % (i, self))
+            return res
+
     def _set_output_names_(self, scope, operator):
         "Called by add_to."
         if operator is not None:
@@ -465,6 +536,11 @@ class OnnxOperator:
                     name = oout.onnx_name
                 outputs.append(name)
             self.output_names_ = outputs
+        elif self.expected_outputs is None:
+            raise AttributeError(
+                "expected_outputs is None for operator=%r, output_names=%r, "
+                "output_variables=%r, operator=%r" % (
+                    self, self.output_names, self.output_variables, operator))
         else:
             if scope is None:
                 raise RuntimeError("scope must not be None.")
@@ -776,10 +852,11 @@ class OnnxOperator:
             shapes = infer_outputs(container, container.inputs,
                                    initializer=container.initializers,
                                    target_opset=target_opset)
-
             if self.output_names:
+                set_names = set(v.onnx_name if hasattr(v, 'onnx_name') else v
+                                for v in self.output_names)
                 shapes = [shape for shape in shapes
-                          if shape.onnx_name in self.output_names]
+                          if shape.onnx_name in set_names]
 
         # add the output to the container
         for shape in shapes:
@@ -903,6 +980,8 @@ class OnnxSubEstimator(OnnxOperator):
 
             if self.output_names_ is not None:
                 pass
+            elif operator is not None:
+                self.output_names_ = operator.outputs
             elif self.output_names:
                 if not isinstance(self.output_names, (list, tuple)):
                     louts = [self.output_names]
@@ -910,8 +989,18 @@ class OnnxSubEstimator(OnnxOperator):
                     louts = self.output_names
                 outputs = []
                 for name in louts:
-                    if name.startswith('u(') and name[-1] == ')':
-                        name = scope.get_unique_variable_name(name[2:-1])
+                    if (isinstance(name, str) and name.startswith('u(') and
+                            name[-1] == ')'):
+                        name = VariableStr(
+                            scope.get_unique_variable_name(name[2:-1]),
+                            scope=scope)
+                    if (isinstance(name, Variable) and
+                            name.raw_name.startswith('u(') and
+                            name.raw_name[-1] == ')'):
+                        name = VariableStr(
+                            scope.get_unique_variable_name(
+                                name.raw_name[2:-1]),
+                            scope=scope, type=name.type)
                     outputs.append(name)
                 self.output_names_ = outputs
             else:
@@ -960,6 +1049,6 @@ class OnnxSubOperator(OnnxSubEstimator):
 
     def __init__(self, *args, **kwargs):
         OnnxSubEstimator.__init__(self, *args, **kwargs)
-        warnings.warn(("Class OnnxSubOperator will be removed in 1.9. "
+        warnings.warn(("Class OnnxSubOperator will be removed in 1.10. "
                        "It should be replaced by OnnxSubEstimator."),
                       DeprecationWarning)

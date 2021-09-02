@@ -25,7 +25,8 @@ def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc, alias):
                      'input_range': [1, 1e9],
                      'output_range': [1, 1e9],
                      'op_version': None,
-                     'alias': alias})
+                     'alias': alias,
+                     '__module__': __name__})
     return newclass
 
 

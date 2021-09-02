@@ -32,7 +32,8 @@ def calculate_linear_classifier_output_shapes(operator):
 
 
 def _calculate_linear_classifier_output_shapes(
-        operator, decision_path=False, decision_leaf=False):
+        operator, decision_path=False, decision_leaf=False,
+        enable_type_checking=True):
     n_out = 0
     if decision_path:
         n_out += 1
@@ -41,9 +42,10 @@ def _calculate_linear_classifier_output_shapes(
     out_range = [2, 2 + n_out]
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=out_range)
-    check_input_and_output_types(operator, good_input_types=[
-        BooleanTensorType, DoubleTensorType,
-        FloatTensorType, Int64TensorType])
+    if enable_type_checking:
+        check_input_and_output_types(operator, good_input_types=[
+            BooleanTensorType, DoubleTensorType,
+            FloatTensorType, Int64TensorType])
 
     N = operator.inputs[0].get_first_dimension()
     op = operator.raw_operator
@@ -57,7 +59,7 @@ def _calculate_linear_classifier_output_shapes(
                  if (getattr(op, 'multilabel_', False) or (
                      isinstance(op.classes_, list) and
                      isinstance(op.classes_[0], np.ndarray))) else [N])
-        operator.outputs[0].type = StringTensorType(shape=shape)
+        operator.outputs[0].set_type(StringTensorType(shape=shape))
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]
                      if isinstance(op.classes_, list)
@@ -74,7 +76,7 @@ def _calculate_linear_classifier_output_shapes(
                  if (getattr(op, 'multilabel_', False) or (
                      isinstance(op.classes_, list) and
                      isinstance(op.classes_[0], np.ndarray))) else [N])
-        operator.outputs[0].type = Int64TensorType(shape=shape)
+        operator.outputs[0].set_type(Int64TensorType(shape=shape))
         if number_of_classes > 2 or operator.type != 'SklearnLinearSVC':
             shape = ([len(op.classes_), N, max([len(x) for x in op.classes_])]
                      if isinstance(op.classes_, list)
@@ -102,11 +104,17 @@ def calculate_linear_regressor_output_shapes(operator):
     batch. If the input batch size is N, the output shape may be
     [N, 1].
     """
+    _calculate_linear_regressor_output_shapes(operator)
+
+
+def _calculate_linear_regressor_output_shapes(
+        operator, enable_type_checking=True):
     check_input_and_output_numbers(operator, input_count_range=1,
                                    output_count_range=1)
-    check_input_and_output_types(operator, good_input_types=[
-        BooleanTensorType, DoubleTensorType,
-        FloatTensorType, Int64TensorType])
+    if enable_type_checking:
+        check_input_and_output_types(operator, good_input_types=[
+            BooleanTensorType, DoubleTensorType,
+            FloatTensorType, Int64TensorType])
 
     inp0 = operator.inputs[0].type
     if isinstance(inp0, (FloatTensorType, DoubleTensorType)):
@@ -117,10 +125,10 @@ def calculate_linear_regressor_output_shapes(operator):
     N = operator.inputs[0].get_first_dimension()
     if (hasattr(operator.raw_operator, 'coef_') and
             len(operator.raw_operator.coef_.shape) > 1):
-        operator.outputs[0].type = cls_type([
-            N, operator.raw_operator.coef_.shape[0]])
+        operator.outputs[0].set_type(cls_type([
+            N, operator.raw_operator.coef_.shape[0]]))
     else:
-        operator.outputs[0].type = cls_type([N, 1])
+        operator.outputs[0].set_type(cls_type([N, 1]))
 
     # decision_path, decision_leaf
     for n in range(1, len(operator.outputs)):
