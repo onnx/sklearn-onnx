@@ -150,7 +150,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 names.append("".join(name))
         return names
 
-    def _decision_thresholds(self):
+    def _decision_thresholds(self, add_index=False):
         "Returns all decision thresholds."
         extremities = []
         for intervals in self.intervals_:
@@ -158,8 +158,12 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 extremities.append(None)
                 continue
             thresholds = []
-            for interval in intervals:
-                thresholds.append((interval[0], not interval[2]))
-                thresholds.append((interval[1], interval[3]))
+            for index, interval in enumerate(intervals):
+                if add_index:
+                    thresholds.append((interval[0], not interval[2], index))
+                    thresholds.append((interval[1], interval[3], index))
+                else:
+                    thresholds.append((interval[0], not interval[2]))
+                    thresholds.append((interval[1], interval[3]))
             extremities.append(list(sorted(set(thresholds))))
         return extremities

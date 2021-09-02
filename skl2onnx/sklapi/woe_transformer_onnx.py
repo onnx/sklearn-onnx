@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
 from typing import List
 import numpy as np
 from onnx import TensorProto
@@ -98,9 +99,8 @@ class Tree:
                 return 'BRANCH_LEQ'
             return 'BRANCH_LT'
 
-        def is_on_left_side(self, x, leq):
-            th = self.threshold[0]
-            kind = self.onnx_mode
+        @staticmethod
+        def _is_on_left_side(th, kind, x, leq, left_right_extremity):
             if kind not in ('BRANCH_LEQ', 'BRANCH_LT'):
                 raise NotImplementedError(
                     "Not implemented for mode %r." % kind)
@@ -108,11 +108,22 @@ class Tree:
                 return False
             if x > th:
                 return True
+            if not left_right_extremity and not leq:
+                return True
+            if left_right_extremity and not leq:
+                return False
             if kind == 'BRANCH_LEQ' and leq:
                 return False
             if kind == 'BRANCH_LT' and not leq:
                 return False
             return True
+
+        def is_on_left_side(self, x, leq, left_right_extremity):
+            th = self.threshold[0]
+            kind = self.onnx_mode
+            res = Tree.Node._is_on_left_side(
+                th, kind, x, leq, left_right_extremity)
+            return res
 
     def __init__(self):
         self.nodes = []
@@ -185,7 +196,7 @@ class Tree:
             nodes_falsenodeids=nodes_falsenodeids,
             nodes_truenodeids=nodes_truenodeids))
         if len(atts['target_weights']) != len(set(atts['target_weights'])):
-            raise RuntimeError(
+            warnings.warn(
                 "All targets should be unique %r." % atts['target_weights'])
         return atts
 
@@ -216,8 +227,8 @@ class Tree:
             left = {}
             right = {}
             for k, v in node.intervals_.items():
-                deca = node.is_on_left_side(v[0], v[2])
-                decb = node.is_on_left_side(v[1], v[3])
+                deca = node.is_on_left_side(v[0], v[2], False)
+                decb = node.is_on_left_side(v[1], v[3], True)
                 if not decb:
                     assert not deca
                     left[k] = v
@@ -318,7 +329,7 @@ def digitize2tree(bins, right=False):
             if i + 1 == j:
                 # leaf
                 values.append(j)
-                n = tree.add_node(parent, is_left, True, 0, 0, value=j+1)
+                n = tree.add_node(parent, is_left, True, 0, 0, value=j+2)
                 n_nodes.append(n)
                 return n
             if i + 1 < j:
@@ -350,7 +361,7 @@ def woe_converter(scope: Scope, operator: Operator,
     by the following picture:
 
     .. image:: images/woe.png
-    "
+    """
     def mapping2matrix(mapping, value_mapping):
         rev = {v: k for k, v in enumerate(value_mapping)}
         rows = int(max(rev[k] for k in mapping)) + 1
@@ -373,7 +384,7 @@ def woe_converter(scope: Scope, operator: Operator,
 
     columns = []
 
-    thresholds = op._decision_thresholds()
+    thresholds = op._decision_thresholds(add_index=False)
     conc = None
     for i, threshold in enumerate(thresholds):
         if threshold is None:
@@ -392,12 +403,8 @@ def woe_converter(scope: Scope, operator: Operator,
                                for n in tree.nodes if n.is_leaf)))
         mapping = tree.mapping(op.intervals_[i])
         mat_mapping = mapping2matrix(mapping, cats)
-        # print("***********", i, threshold)
-        # print(tree)
-        # import pprint
-        # pprint.pprint(mapping)
-        # print("cats", cats)
-        # print(mat_mapping)
+        if getattr(container, 'verbose', 0) > 1:
+            print("[woe_converter] mapping=%r" % mapping)
 
         atts = tree.onnx_attributes()
         node = OnnxTreeEnsembleRegressor(
