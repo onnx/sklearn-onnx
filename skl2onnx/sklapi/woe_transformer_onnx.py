@@ -20,8 +20,7 @@ from .. import update_registered_converter
 from .._supported_operators import _get_sklearn_operator_name
 from ..algebra.onnx_ops import (
     OnnxIdentity, OnnxMatMul, OnnxGather, OnnxConcat, OnnxReshape,
-    OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast,
-    OnnxLabelEncoder)
+    OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast)
 from .woe_transformer import WOETransformer
 
 
@@ -372,6 +371,19 @@ def _mapping2matrix(mapping, value_mapping, weights, dtype):
     return mat[:, total > 0].copy()
 
 
+def _mapping_to_key_value(mapping, weights):
+    key_value = {}
+    for k, v in sorted(mapping.items()):
+        if len(v) == 0:
+            continue
+        if len(v) != 1:
+            raise RuntimeError(
+                'Intervals overlops in mapping %r.' % mapping)
+        value = list(v)[0]
+        key_value[float(k)] = float(weights[value])
+    return key_value
+
+
 def woe_converter(scope: Scope, operator: Operator,
                   container: ModelComponentContainer):
     """
@@ -390,6 +402,7 @@ def woe_converter(scope: Scope, operator: Operator,
     vector_shape = np.array([-1], dtype=np.int64)
     dtype = guess_numpy_type(X.type)
     proto_type = guess_proto_type(X.type)
+    verbose = getattr(container, 'verbose', 0)
 
     columns = []
 
@@ -410,15 +423,15 @@ def woe_converter(scope: Scope, operator: Operator,
         tree.update_feature(i)
 
         atts = tree.onnx_attributes()
-        node = OnnxTreeEnsembleRegressor(
-            X, op_version=1, domain='ai.onnx.ml', **atts)
         mapping = tree.mapping(op.intervals_[i])
 
         if op.onehot:
+            node = OnnxTreeEnsembleRegressor(
+                X, op_version=1, domain='ai.onnx.ml', **atts)
             cats = list(sorted(set(int(n.onnx_value)
                                    for n in tree.nodes if n.is_leaf)))
             mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], dtype)
-            if getattr(container, 'verbose', 0) > 1:
+            if verbose > 1:
                 print("[woe_converter] mapping=%r" % mapping)
             ohe = OnnxOneHotEncoder(
                 OnnxReshape(node, vector_shape, op_version=opv),
@@ -428,20 +441,15 @@ def woe_converter(scope: Scope, operator: Operator,
                 mat_mapping, op_version=opv)
             columns.append(ren)
         else:
-            key_floats = []
-            value_floats = []
-            for k, v in sorted(mapping.items()):
-                if len(v) == 0:
-                    continue
-                key_floats.append(float(k))
-                if len(v) != 1:
-                    raise RuntimeError(
-                        'Intervals overlops in columns %d.' % i)
-                value = list(v)[0]
-                value_floats.append(float(op.weights_[i][value]))
-            lab = OnnxLabelEncoder(
-                node, keys_floats=key_floats, values_floats=value_floats,
-                op_version=2)
+            key_value = _mapping_to_key_value(mapping, op.weights_[i])
+            atts['target_weights'] = [
+                key_value.get(v, 0.) for v in atts['target_weights']]
+            if verbose > 1:
+                print("[woe_converter] mapping=%r" % mapping)
+                print("[woe_converter] key_value=%r" % key_value)
+            node = OnnxTreeEnsembleRegressor(
+                X, op_version=1, domain='ai.onnx.ml', **atts)
+            lab = OnnxReshape(node, new_shape, op_version=opv)
             columns.append(lab)
 
     conc = OnnxConcat(*columns, op_version=opv, axis=1)
@@ -500,11 +508,11 @@ def woe_transformer_to_onnx(op, opset=None):
         mapping = tree.mapping(op.intervals_[i])
 
         atts = tree.onnx_attributes()
-        nodes.append(make_node(
-            'TreeEnsembleRegressor', ['X'], ['rf%d' % i],
-            domain='ai.onnx.ml', **atts))
 
         if op.onehot:
+            nodes.append(make_node(
+                'TreeEnsembleRegressor', ['X'], ['rf%d' % i],
+                domain='ai.onnx.ml', **atts))
             cats = list(sorted(set(int(n.onnx_value)
                                    for n in tree.nodes if n.is_leaf)))
             mat_mapping = _mapping2matrix(
@@ -521,21 +529,14 @@ def woe_transformer_to_onnx(op, opset=None):
                 'MatMul', ['cast%d' % i, 'mat_map%i' % i], ["mul%d" % i]))
             columns.append("mul%d" % i)
         else:
-            key_floats = []
-            value_floats = []
-            for k, v in sorted(mapping.items()):
-                if len(v) == 0:
-                    continue
-                key_floats.append(float(k))
-                if len(v) != 1:
-                    raise RuntimeError(
-                        'Intervals overlops in columns %d.' % i)
-                value = list(v)[0]
-                value_floats.append(float(op.weights_[i][value]))
+            key_value = _mapping_to_key_value(mapping, op.weights_[i])
+            atts['target_weights'] = [
+                key_value.get(v, 0.) for v in atts['target_weights']]
             nodes.append(make_node(
-                'LabelEncoder', ['rf%d' % i], ["lab%d" % i],
-                keys_floats=key_floats, values_floats=value_floats,
-                domain='ai.onnx.ml'))
+                'TreeEnsembleRegressor', ['X'], ['rf%d' % i],
+                domain='ai.onnx.ml', **atts))
+            nodes.append(make_node(
+                'Reshape', ['rf%d' % i, 'new_shape'], ['lab%d' % i]))
             columns.append("lab%d" % i)
 
     nodes.append(make_node(

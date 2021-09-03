@@ -189,7 +189,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         assert_almost_equal(manual, expected)
 
         with self.subTest(way='skl2onnx'):
-            onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
+            onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET, verbose=0)
             sess = InferenceSession(onnx_model.SerializeToString())
             got = sess.run(None, {'X': x})[0]
             assert_almost_equal(expected, got)
