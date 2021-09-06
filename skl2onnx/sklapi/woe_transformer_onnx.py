@@ -7,15 +7,18 @@ from onnx.helper import (
     make_node, make_graph, make_model, make_tensor_value_info,
     TensorProto)
 from onnx.numpy_helper import from_array
+from onnx import onnx_pb as onnx_proto
 from sklearn.base import BaseEstimator
 from ..common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType,
     guess_numpy_type, guess_proto_type)
-from ..common._topology import Scope, Operator, Variable
+from ..common._topology import Scope, Operator, Variable, OPSET_TO_IR_VERSION
 from ..common._container import ModelComponentContainer
 from ..common.utils import (
     check_input_and_output_types,
-    check_input_and_output_numbers)
+    check_input_and_output_numbers,
+    get_producer, get_producer_version,
+    get_domain, get_model_version)
 from .. import update_registered_converter
 from .._supported_operators import _get_sklearn_operator_name
 from ..algebra.onnx_ops import (
@@ -552,6 +555,14 @@ def woe_transformer_to_onnx(op, opset=None):
     # final graph
     graph_def = make_graph(nodes, 't1', [X], [Y], inits)
     model_def = make_model(graph_def, producer_name='skl2onnx')
+
+    irv = OPSET_TO_IR_VERSION.get(opset, onnx_proto.IR_VERSION)
+    model_def.ir_version = irv
+    model_def.producer_name = get_producer()
+    model_def.producer_version = get_producer_version()
+    model_def.domain = get_domain()
+    model_def.model_version = get_model_version()
+    model_def.doc_string = "WOETransformer"
 
     if opset is not None:
         op_set = model_def.opset_import.add()
