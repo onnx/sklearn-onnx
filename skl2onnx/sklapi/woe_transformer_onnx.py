@@ -556,21 +556,22 @@ def woe_transformer_to_onnx(op, opset=None):
     graph_def = make_graph(nodes, 't1', [X], [Y], inits)
     model_def = make_model(graph_def, producer_name='skl2onnx')
 
-    irv = OPSET_TO_IR_VERSION.get(opset, onnx_proto.IR_VERSION)
-    model_def.ir_version = irv
+    if opset is not None:
+        op_set = model_def.opset_import.add()
+        op_set.domain = ''
+        op_set.version = opset
+        if op.onehot:
+            op_set = model_def.opset_import.add()
+            op_set.domain = 'ai.onnx.ml'
+            op_set.version = 2
+        irv = OPSET_TO_IR_VERSION.get(opset, onnx_proto.IR_VERSION)
+        model_def.ir_version = irv
+
     model_def.producer_name = get_producer()
     model_def.producer_version = get_producer_version()
     model_def.domain = get_domain()
     model_def.model_version = get_model_version()
     model_def.doc_string = "WOETransformer"
-
-    if opset is not None:
-        op_set = model_def.opset_import.add()
-        op_set.domain = ''
-        op_set.version = opset
-        op_set = model_def.opset_import.add()
-        op_set.domain = 'ai.onnx.ml'
-        op_set.version = 2
     return model_def
 
 

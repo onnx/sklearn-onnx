@@ -209,7 +209,11 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
             assert_almost_equal(expected, got)
         with self.subTest(way='onnx'):
             onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
-            sess = InferenceSession(onnx_model.SerializeToString())
+            try:
+                sess = InferenceSession(onnx_model.SerializeToString())
+            except InvalidArgument as e:
+                raise AssertionError(
+                    "Cannot load model:\n%s" % str(onnx_model)) from e
             got = sess.run(None, {'X': x})[0]
             assert_almost_equal(expected, got)
 
