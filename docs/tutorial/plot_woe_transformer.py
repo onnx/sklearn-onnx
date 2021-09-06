@@ -33,7 +33,8 @@ from onnxruntime import InferenceSession
 import matplotlib.pyplot as plt
 from skl2onnx import to_onnx
 from skl2onnx.sklapi import WOETransformer
-import skl2onnx.sklapi.register  # automatically registers the converter
+# automatically registers the converter for WOETransformer
+import skl2onnx.sklapi.register  # noqa
 
 X = np.arange(10).astype(np.float32).reshape((-1, 1))
 
