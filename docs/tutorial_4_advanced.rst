@@ -11,3 +11,4 @@ with issues and resolved issues.
     :maxdepth: 1
 
     auto_tutorial/plot_usparse_xgboost
+    auto_tutorial/plot_woe_transformer

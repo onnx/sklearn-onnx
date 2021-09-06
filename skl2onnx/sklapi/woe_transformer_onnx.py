@@ -46,13 +46,17 @@ def woe_shape_calculator(operator: Operator):
     op = operator.raw_operator
     x = operator.inputs[0]
     N = x.get_first_dimension()
-    C = 0
-    for ext in op.intervals_:
-        if ext is None:
-            C += 1
-        else:
-            C += len(ext)
-    operator.outputs[0].type.shape = [N, C]
+    if op.onehot:
+        C = 0
+        for ext in op.intervals_:
+            if ext is None:
+                C += 1
+            else:
+                C += len(ext)
+        operator.outputs[0].type.shape = [N, C]
+    else:
+        C = len(op.intervals_)
+        operator.outputs[0].type.shape = [N, C]
 
 
 class Tree:
@@ -470,12 +474,15 @@ def woe_transformer_to_onnx(op, opset=None):
     The converter only adds *opset* in the ONNX graph.
     It does not change the conversion depending on the opset value.
     """
-    C = 0
-    for ext in op.intervals_:
-        if ext is None:
-            C += 1
-        else:
-            C += len(ext)
+    if op.onehot:
+        C = 0
+        for ext in op.intervals_:
+            if ext is None:
+                C += 1
+            else:
+                C += len(ext)
+    else:
+        C = len(op.intervals_)
 
     # inputs
     X = make_tensor_value_info(
