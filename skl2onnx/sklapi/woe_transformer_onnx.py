@@ -557,6 +557,7 @@ def woe_transformer_to_onnx(op, opset=None):
     model_def = make_model(graph_def, producer_name='skl2onnx')
 
     if opset is not None:
+        del model_def.opset_import[:]
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = opset
