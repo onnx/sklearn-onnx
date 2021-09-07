@@ -6,7 +6,7 @@
 Converter for WOE
 =================
 
-WOE means Weights of Interest. It consists in checking that
+WOE means Weights of Evidence. It consists in checking that
 a feature X belongs to a series of regions - intervals -.
 The results is the label of every intervals containing the feature.
 
