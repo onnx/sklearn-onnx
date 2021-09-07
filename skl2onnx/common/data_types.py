@@ -288,9 +288,9 @@ def _guess_numpy_type(data_type, dims):
         if data_type == np.complex128:
             return Complex128TensorType(dims)
     raise NotImplementedError(
-        "Unsupported data_type '{}'. You may raise an issue "
+        "Unsupported data_type %r (type=%r). You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
+        "" % (data_type, type(data_type)))
 
 
 def guess_data_type(type_, shape=None):

@@ -446,7 +446,7 @@ class OnnxOperator:
         if self.__class__.__name__ == "OnnxCast":
             if "to" in self.kwargs:
                 value = self.kwargs['to']
-                if isinstance(value, TensorProto):
+                if isinstance(value, int):
                     return
                 to = guess_proto_type(_guess_numpy_type(value, None))
                 self.kwargs['to'] = to
