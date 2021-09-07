@@ -25,7 +25,7 @@ class GraphState:
                  options=None, expected_inputs=None,
                  expected_outputs=None, input_range=None,
                  output_range=None, operator=None,
-                 run_converters=False, **attrs):
+                 run_converters=False, input_types=None, **attrs):
 
         self.inputs = inputs
         self._output_names = output_names
@@ -54,6 +54,7 @@ class GraphState:
         self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
         self.options = options
+        self.input_types = input_types
 
         for att in ['inputs', '_expected_inputs',
                     '_expected_outputs', 'computed_inputs_',
@@ -299,7 +300,8 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(output), output))
 
     @staticmethod
-    def _update_inputs(inputs, names, scope, expected_inputs, input_range):
+    def _update_inputs(inputs, names, scope, expected_inputs,
+                       input_range, input_types=None):
         new_inputs = []
         for inp in inputs:
             if isinstance(inp, (Variable, tuple, GraphStateVar)):
@@ -358,6 +360,15 @@ class GraphState:
                                     new_inputs[j].type.__class__())
                                 break
 
+        # Overwrite types if input_types is specified.
+        if input_types is not None:
+            for i in range(len(new_inputs)):
+                if i >= len(input_types):
+                    raise RuntimeError(
+                        "Mismatch between computed inputs=%r and overwritten "
+                        "inputs=%r." % (new_inputs, self.input_types))
+                if input_types[i] is not None:
+                    new_inputs[i].type = input_types[i]
         return new_inputs
 
     @staticmethod
@@ -422,7 +433,8 @@ class GraphState:
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
                 expected_inputs=self._expected_inputs,
-                input_range=self._input_range)
+                input_range=self._input_range,
+                input_types=self.input_types)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -437,8 +449,15 @@ class GraphState:
                 from .._parse import _parse_sklearn
                 self.scope.add_options(
                     id(self.operator_instance), self.options)
-                sub_outputs = _parse_sklearn(
-                    self.scope, self.operator_instance, sub_op_inputs)
+                try:
+                    sub_outputs = _parse_sklearn(
+                        self.scope, self.operator_instance, sub_op_inputs)
+                except RuntimeError as e:
+                    raise RuntimeError(
+                        "Unable to run parser for model type %r, inputs=%r "
+                        "(input_types=%r)." % (
+                            type(self.operator_instance), sub_op_inputs,
+                            self.input_types)) from e
                 set_input_names = set(v.onnx_name for v in sub_op_inputs)
                 sub_op = None
                 for op in self.scope.operators.values():

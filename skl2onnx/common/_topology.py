@@ -635,7 +635,8 @@ class Scope:
         variable will hide all other variables created using *raw_name*.
         """
         if type is None and not missing_type:
-            raise RuntimeError("Unknown type for %r." % raw_name)
+            raise RuntimeError(
+                "Unknown type for %r (type=%r)." % (raw_name, type))
         # Get unique ID for the new variable
         onnx_name = self.get_unique_variable_name(raw_name)
 
@@ -1089,9 +1090,6 @@ class Topology:
                     operator.init_status(is_evaluated=True)
                     self._propagate_status(operator, container, fed_variables)
                     changes += 1
-
-                    if verbose > 0:
-                        print('[convert_operators] yield %r.' % operator)
 
             if verbose > 0:
                 print("[convert_operators] end iteration")

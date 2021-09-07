@@ -11,6 +11,7 @@ from ..common._topology import (
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from ..common.data_types import guess_proto_type, _guess_numpy_type
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
@@ -420,26 +421,36 @@ class OnnxOperator:
         Walks through attributes and replaces them by ONNX
         values.
         """
-        if (self.__class__.__name__.startswith("OnnxConstantOfShape") and
-                "value" in self.kwargs):
-            value = self.kwargs['value']
-            if isinstance(value, TensorProto):
-                return
-            if isinstance(value, np.ndarray):
-                if value.shape == (1, ):
-                    val = value[0]
-                elif len(value.shape) == 0:
-                    val = value
-                else:
-                    raise RuntimeError(
-                        "Unexpected shape %r for value, it must be an array "
-                        "of one element." % value.shape)
-                self.kwargs['value'] = from_array(
-                    np.array([val], dtype=value.dtype))
-                return
-            raise TypeError(
-                "Unexpected type %r for value. It should be an array "
-                "of one element." % type(value))
+        if self.__class__.__name__ == "OnnxConstantOfShape":
+            if "value" in self.kwargs:
+                value = self.kwargs['value']
+                if isinstance(value, TensorProto):
+                    return
+                if isinstance(value, np.ndarray):
+                    if value.shape == (1, ):
+                        val = value[0]
+                    elif len(value.shape) == 0:
+                        val = value
+                    else:
+                        raise RuntimeError(
+                            "Unexpected shape %r for value, it must be "
+                            "an array of one element." % value.shape)
+                    self.kwargs['value'] = from_array(
+                        np.array([val], dtype=value.dtype))
+                    return
+                raise TypeError(
+                    "Unexpected type %r for value. It should be an array "
+                    "of one element." % type(value))
+            return
+
+        if self.__class__.__name__ == "OnnxCast":
+            if "to" in self.kwargs:
+                value = self.kwargs['to']
+                if isinstance(value, TensorProto):
+                    return
+                to = guess_proto_type(_guess_numpy_type(value, None))
+                self.kwargs['to'] = to
+            return
 
     def __str__(self):
         """
@@ -948,12 +959,16 @@ class OnnxSubEstimator(OnnxOperator):
 
     def __init__(self, skl_op, *inputs, op_version=None,
                  output_names=None, domain=None, options=None,
-                 **kwargs):
+                 input_types=None, **kwargs):
         OnnxOperator.__init__(
             self, *inputs, op_version=op_version,
             output_names=output_names, domain=domain, **kwargs)
         self.operator_instance = skl_op
         self.options = options
+        if skl_op is None and input_types is not None:
+            raise RuntimeError(
+                "input_types is only used when a sub-operator is defined.")
+        self.input_types = input_types
 
     def __repr__(self):
         return "%s(%r, %s, op_version=%r, output_names=%r)" % (
@@ -1036,7 +1051,8 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                options=self.options, run_converters=run_converters, **kwargs)
+                options=self.options, run_converters=run_converters,
+                input_types=self.input_types, **kwargs)
             self.state.run()
 
 

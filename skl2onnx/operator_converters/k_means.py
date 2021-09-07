@@ -9,7 +9,6 @@ from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
     OnnxReduceSumSquare, OnnxGemm, OnnxMatMul,
     OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul)
-from ..proto import onnx_proto
 
 
 def convert_sklearn_kmeans(scope: Scope, operator: Operator,
@@ -77,7 +76,7 @@ def convert_sklearn_kmeans(scope: Scope, operator: Operator,
         dtype = np.float32
 
     if type(X.type) == Int64TensorType:
-        x_cast = OnnxCast(X, to=onnx_proto.TensorProto.FLOAT, op_version=opv)
+        x_cast = OnnxCast(X, to=np.float32, op_version=opv)
         input_name = x_cast
 
     C2 = row_norms(C, squared=True).astype(dtype)

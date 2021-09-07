@@ -61,7 +61,8 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         self.weights_ = []
         dim = 0
         self.indices_ = []
-        for i in range(X.shape[1]):
+        n_cols = X.shape[1] if X is not None else len(self.intervals)
+        for i in range(n_cols):
             if i >= len(self.intervals):
                 self.intervals_.append(None)
                 self.weights_.append(None)
