@@ -365,12 +365,11 @@ class GraphState:
             for i in range(len(new_inputs)):
                 if i >= len(input_types):
                     raise RuntimeError(
-                        "Mismatch between computed inputs=%r and overwritten "
-                        "inputs=%r." % (new_inputs, input_types))
+                        "Mismatch between computed inputs[%d]=%r and "
+                        "overwritten input_types[%d]=%r." % (
+                            i, new_inputs, i, input_types))
                 if input_types[i] is not None:
-                    print("****", i, input_types[i], new_inputs[i])
                     new_inputs[i].type = input_types[i]
-                    print("    ", i, input_types[i], new_inputs[i])
         return new_inputs
 
     @staticmethod

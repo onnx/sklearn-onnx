@@ -13,7 +13,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from skl2onnx import update_registered_converter, to_onnx, get_model_alias
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.utils import check_input_and_output_numbers
-from skl2onnx.algebra.onnx_ops import OnnxCast
+from skl2onnx.algebra.onnx_ops import OnnxCast, OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.sklapi import WOETransformer
 import skl2onnx.sklapi.register  # noqa
@@ -77,9 +77,9 @@ def ordwoe_encoder_converter(scope, operator, container):
     sub = OnnxSubEstimator(op.encoder_, X, op_version=opv)
     cast = OnnxCast(sub, op_version=opv, to=np.float32)
     cat = OnnxSubEstimator(op.woe_, cast, op_version=opv,
-                           output_names=operator.outputs[:1],
                            input_types=[Int64TensorType()])
-    cat.add_to(scope, container)
+    idcat = OnnxIdentity(cat, output_names=operator.outputs[:1])
+    idcat.add_to(scope, container)
 
 
 class TestCustomTransformerOrdWOE(unittest.TestCase):
@@ -101,7 +101,7 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         ordwoe.fit(X, y)
         expected = ordwoe.transform(X)
 
-        onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET)
+        onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET, verbose=2)
         sess = InferenceSession(onx.SerializeToString())
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)

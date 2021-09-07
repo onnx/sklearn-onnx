@@ -140,6 +140,10 @@ class Variable:
                         "" % (dim, dim.__class__))
         logger.debug('[Var] +%s' % self)
 
+        # links to operators using those variables
+        self.operators_outputs_ = []
+        self.operators_inputs_ = []
+
     @property
     def raw_name(self):
         return self._raw_name
@@ -305,6 +309,13 @@ class Variable:
             return self.type
         raise IndexError("Unreachable element at index %d." % index)
 
+    def add_operator(self, op, in_or_out):
+        "Add a link to an operator, True for output, False for input."
+        if in_or_out:
+            self.operators_outputs_.append(op)
+        else:
+            self.operators_inputs_.append(op)
+
 
 class VariableStr(Variable):
     """
@@ -350,6 +361,13 @@ class Operator:
                 v.set_parent(self.parent)
             super(Operator.OperatorList, self).append(v)
             logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
+            if self.kind == 'In':
+                v.add_operator(self.parent, False)
+            elif self.kind == "Out":
+                v.add_operator(self.parent, True)
+            else:
+                raise RuntimeError(
+                    "Unexpected value for kind=%r." % self.kind)
 
         def extend(self, vs):
             for v in vs:
@@ -1017,7 +1035,17 @@ class Topology:
                     "One output is not a Variable for operator %r - %r."
                     "" % (type(operator.raw_operator), operator))
 
-        def _check_variable_(variable, operator):
+        def _check_variable_in_(variable, operator):
+            idop = id(operator)
+            ids = set(id(op) for op in variable.operators_inputs_)
+            if idop not in ids:
+                raise RuntimeError(
+                    "Operator %r not registered in the list of operators "
+                    "of %r taking it as an input [\n%s]." % (
+                        operator, variable,
+                        "\n".join(map(str, variable.operators_inputs_))))
+
+        def _check_variable_out_(variable, operator):
             if variable.is_fed:
                 add = ["", "--DEBUG-INFO--"]
                 add.append("self.variable_name_set=%s" % (
@@ -1062,11 +1090,15 @@ class Topology:
         self._initialize_graph_status_for_traversing()
         fed_variables = {i.name: i for i in container.initializers}
         changes = 1
+        n_iter = 0
         while changes > 0:
+            n_iter += 1
             changes = 0
-            if verbose > 0:
-                print("[convert_operators] new iteration")
             ops = list(self.unordered_operator_iterator())
+            if verbose > 0:
+                print("[convert_operators] iteration %d - n_vars=%d "
+                      "n_ops=%d" % (
+                        n_iter, len(fed_variables), len(ops)))
             for operator in ops:
                 _check_operator_(operator)
                 for var in operator.inputs:
@@ -1075,24 +1107,31 @@ class Topology:
                 if (all(variable.is_fed for variable in operator.inputs) and
                         not operator.is_evaluated):
 
+                    for variable in operator.inputs:
+                        _check_variable_in_(variable, operator)
                     for variable in operator.outputs:
-                        _check_variable_(variable, operator)
-                        variable.init_status(is_fed=True)
+                        _check_variable_out_(variable, operator)
 
                     self.call_shape_calculator(operator)
                     self.call_converter(operator, container, verbose=verbose)
 
+                    # If an operator contains a sequence of operators,
+                    # output variables are not necessarily known at this stage.
                     for variable in operator.outputs:
-                        variable.init_status(is_fed=True)
-                        fed_variables[variable.onnx_name] = variable
+                        if all(op.is_evaluated
+                               for op in variable.operators_outputs_):
+                            variable.init_status(is_fed=True)
+                            fed_variables[variable.onnx_name] = variable
                     fed_variables.update(
-                        {i.name: i for i in container.initializers})
+                        {i.name: i for i in container.initializers
+                         if i.name not in fed_variables})
                     operator.init_status(is_evaluated=True)
                     self._propagate_status(operator, container, fed_variables)
                     changes += 1
 
             if verbose > 0:
-                print("[convert_operators] end iteration")
+                print("[convert_operators] end iter: %d - n_vars=%d" % (
+                    n_iter, len(fed_variables)))
         if verbose > 0:
             print("[convert_operators] end.")
 
