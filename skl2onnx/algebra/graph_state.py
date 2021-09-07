@@ -318,9 +318,14 @@ class GraphState:
         for i in range(0, len(new_inputs)):
             inp = new_inputs[i]
             if isinstance(inp, tuple) and len(inp) == 2:
-                stype = None if isinstance(inp[1], str) else inp[1]
+                if input_types is not None and i < len(input_types):
+                    stype = input_types[i]
+                else:
+                    stype = None if isinstance(inp[1], str) else inp[1]
                 new_inputs[i] = Variable(
                     inp[0], inp[0], type=stype, scope=scope)
+                if scope is not None:
+                    scope.register_variable(new_inputs[i])
                 inp = new_inputs[i]
             elif isinstance(inp, GraphStateVar):
                 new_inputs[i] = inp.as_variable(scope)
@@ -445,6 +450,16 @@ class GraphState:
 
                 # a model is converted into a subgraph
                 sub_op_inputs = self.computed_inputs_
+                for v in sub_op_inputs:
+                    if not isinstance(v, Variable):
+                        raise TypeError(
+                            "Every input variable must be a Variable not %r,"
+                            " v=%r." % (type(v), v))
+                    scope = v.scope
+                    if hasattr(scope, 'variables'):
+                        if v.onnx_name not in scope.variables:
+                            raise RuntimeError(
+                                "Variable %r missing from scope." % (v, ))
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn

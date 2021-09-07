@@ -229,6 +229,12 @@ class Variable:
             return None
         return self.type.shape[0]
 
+    def get_second_dimension(self):
+        if (self.type is None or self.type.shape is None or
+                len(self.type.shape) < 2):
+            return None
+        return self.type.shape[1]
+
     @property
     def full_name(self):
         """
@@ -451,6 +457,8 @@ class Operator:
     def __repr__(self):
         try:
             textop = repr(self.raw_operator)
+        except AttributeError:
+            textop = "MISSING OP"
         except KeyError:
             # The line above fails for python 3.7
             textop = type(self.raw_operator)
@@ -478,6 +486,9 @@ class Operator:
             if not isinstance(value, Operator.OperatorList):
                 raise TypeError(
                     "inputs or outputs must be of type Operator.OperatorList.")
+            ioo = name == 'outputs'
+            for v in value:
+                v.add_operator(self, ioo)
         self.__dict__[name] = value
 
     @property
@@ -660,17 +671,26 @@ class Scope:
 
         # Create the variable
         variable = Variable(raw_name, onnx_name, self.name, type)
-        self.variables[onnx_name] = variable
+        self.register_variable(variable, prepend=prepend)
+        return variable
 
-        if raw_name in self.variable_name_mapping:
+    def register_variable(self, var, prepend=False):
+        "Adds a variable to the scope."
+        if var.onnx_name in self.variables:
+            raise RuntimeError(
+                "Variable %r already registered." % var)
+
+        if var.raw_name in self.variable_name_mapping:
             # Hide existing variables with the same raw_name
             if not prepend:
-                self.variable_name_mapping[raw_name].append(onnx_name)
+                self.variable_name_mapping[var.raw_name].append(var.onnx_name)
             else:
-                self.variable_name_mapping[raw_name].insert(0, onnx_name)
+                self.variable_name_mapping[var.raw_name].insert(
+                    0, var.onnx_name)
         else:
-            self.variable_name_mapping[raw_name] = [onnx_name]
-        return variable
+            self.variable_name_mapping[var.raw_name] = [var.onnx_name]
+
+        self.variables[var.onnx_name] = var
 
     def declare_local_input(self, raw_name, type=None, prepend=False):
         """
@@ -1117,6 +1137,7 @@ class Topology:
 
                     # If an operator contains a sequence of operators,
                     # output variables are not necessarily known at this stage.
+                    operator.init_status(is_evaluated=True)
                     for variable in operator.outputs:
                         if all(op.is_evaluated
                                for op in variable.operators_outputs_):
@@ -1125,8 +1146,21 @@ class Topology:
                     fed_variables.update(
                         {i.name: i for i in container.initializers
                          if i.name not in fed_variables})
-                    operator.init_status(is_evaluated=True)
                     self._propagate_status(operator, container, fed_variables)
+                    # unfed some variables (it happens when a node
+                    # shares an output with another node)
+                    rem = []
+                    for n, var in fed_variables.items():
+                        if not hasattr(var, 'operators_outputs_'):
+                            # initializer
+                            continue
+                        if any(not o.is_evaluated
+                               for o in var.operators_outputs_):
+                            rem.append(n)
+                    for r in rem:
+                        v = fed_variables[r]
+                        v.init_status(is_fed=False)
+                        del fed_variables[v]
                     changes += 1
 
             if verbose > 0:
@@ -1149,6 +1183,10 @@ class Topology:
             rows.append("---OPERATORS---")
             for op in self.unordered_operator_iterator():
                 rows.append("is_eval=%r - %r" % (op.is_evaluated, op))
+            rows.append("---NODES---")
+            for node in container.nodes:
+                rows.append("%s: %r -> %r" % (
+                    node.op_type, node.input, node.output))
             raise RuntimeError(
                 "Not all operators have been evaluated. A variable name "
                 "is probably misspelled.\n%s"

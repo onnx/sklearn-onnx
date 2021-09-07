@@ -145,7 +145,10 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = "ov%s" % self.name
-            return Variable(name, name, scope=scope, type=None)
+            var = Variable(name, name, scope=scope, type=None)
+            if scope is not None:
+                scope.register_variable(var)
+            return var
 
         def __repr__(self):
             return "OnnxOperatorVariable('%s')" % self.name
@@ -160,7 +163,10 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = self.name
-            return Variable(name, name, scope=scope, type=None)
+            var = Variable(name, name, scope=scope, type=None)
+            if scope is not None:
+                scope.register_variable(var)
+            return var
 
         def __eq__(self, name):
             if isinstance(name, str):
@@ -184,8 +190,11 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = "id%d" % id(self)
-            return Variable(name, name, scope=scope,
-                            type=_guess_type(self.value))
+            var = Variable(name, name, scope=scope,
+                           type=_guess_type(self.value))
+            if scope is not None:
+                scope.register_variable(var)
+            return var
 
         @property
         def ConstantValue(self):
@@ -1041,9 +1050,11 @@ class OnnxSubEstimator(OnnxOperator):
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
                 elif isinstance(input, tuple) and len(input) == 2:
-                    inputs.append(
-                        Variable(
-                            input[0], input[0], scope=scope, type=input[1]))
+                    var = Variable(input[0], input[0], scope=scope,
+                                   type=input[1])
+                    if scope is not None:
+                        scope.register_variable(var)
+                    inputs.append(var)
                 else:
                     inputs.append(input)
 

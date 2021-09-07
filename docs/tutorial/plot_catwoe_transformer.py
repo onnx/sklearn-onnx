@@ -33,7 +33,7 @@ from sklearn.datasets import load_iris
 from sklearn.preprocessing import OrdinalEncoder as SklOrdinalEncoder
 from category_encoders import WOEEncoder, OrdinalEncoder
 from skl2onnx import update_registered_converter, to_onnx, get_model_alias
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.utils import check_input_and_output_numbers
 from skl2onnx.algebra.onnx_ops import OnnxCast
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
@@ -163,8 +163,8 @@ def woeenc_to_sklearn(op_mapping):
                 continue
             intervals.append((float(ind - 1), float(ind), False, True))
             weights.append(mapping.iloc[i])
-        cats.append(intervals)
-        ws.append(weights)
+        cats[col] = intervals
+        ws[col] = weights
 
     skl = WOETransformer(intervals=cats, weights=ws, onehot=False)
     skl.fit(None)
@@ -190,11 +190,10 @@ def woe_encoder_parser(
 def woe_encoder_shape_calculator(operator):
     check_input_and_output_numbers(
         operator, input_count_range=1, output_count_range=1)
-    input_type = operator.inputs[0].type.__class__
     input_dim = operator.inputs[0].get_first_dimension()
     shape = operator.inputs[0].type.shape
     second_dim = None if len(shape) != 2 else shape[1]
-    output_type = input_type([input_dim, second_dim])
+    output_type = FloatTensorType([input_dim, second_dim])
     operator.outputs[0].type = output_type
 
 
@@ -209,7 +208,7 @@ def woe_encoder_converter(scope, operator, container):
     skl_ord = woeenc_to_sklearn(op.mapping)
     cat = OnnxSubEstimator(skl_ord, cast, op_version=opv,
                            output_names=operator.outputs[:1],
-                           input_types=[Int64TensorType()])
+                           input_types=[FloatTensorType()])
     cat.add_to(scope, container)
 
 
@@ -232,7 +231,5 @@ print(woe.transform(X[:5]))
 
 
 woe_onx = to_onnx(woe, X[:1], target_opset=14)
-with open("woe_onnx.onnx", "wb") as f:
-    f.write(woe_onx.SerializeToString())
 sess = InferenceSession(woe_onx.SerializeToString())
 print(sess.run(None, {'X': X[:5]})[0])

@@ -9,7 +9,8 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler, MaxAbsScaler
 from skl2onnx import update_registered_converter, to_onnx, get_model_alias
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx.common.utils import check_input_and_output_numbers
@@ -61,11 +62,10 @@ def ordwoe_encoder_parser(
 def ordwoe_encoder_shape_calculator(operator):
     check_input_and_output_numbers(
         operator, input_count_range=1, output_count_range=1)
-    input_type = operator.inputs[0].type.__class__
     input_dim = operator.inputs[0].get_first_dimension()
     shape = operator.inputs[0].type.shape
     second_dim = None if len(shape) != 2 else shape[1]
-    output_type = input_type([input_dim, second_dim])
+    output_type = FloatTensorType([input_dim, second_dim])
     operator.outputs[0].type = output_type
 
 
@@ -84,6 +84,17 @@ def ordwoe_encoder_converter(scope, operator, container):
 
 class TestCustomTransformerOrdWOE(unittest.TestCase):
 
+    def test_pipeline(self):
+        data = load_iris()
+        X = data.data.astype(np.float32)
+        pipe = make_pipeline(StandardScaler(), MaxAbsScaler())
+        pipe.fit(X)
+        expected = pipe.transform(X)
+        onx = to_onnx(pipe, X, target_opset=TARGET_OPSET)
+        sess = InferenceSession(onx.SerializeToString())
+        got = sess.run(None, {'X': X})[0]
+        assert_almost_equal(expected, got)
+
     def test_custom_ordinal_woe(self):
 
         update_registered_converter(
@@ -101,7 +112,7 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         ordwoe.fit(X, y)
         expected = ordwoe.transform(X)
 
-        onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET, verbose=2)
+        onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET)
         sess = InferenceSession(onx.SerializeToString())
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)

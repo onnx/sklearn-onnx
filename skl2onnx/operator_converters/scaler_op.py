@@ -32,6 +32,10 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     if isinstance(op, StandardScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
+        if C is None:
+            raise RuntimeError(
+                "Unable to guess the number of columns for operator %r"
+                "." % operator)
         attrs['offset'] = (
             op.mean_ if op.with_mean else
             np.array([0.0] * C, dtype=np.float32))
@@ -42,6 +46,10 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     elif isinstance(op, RobustScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
+        if C is None:
+            raise RuntimeError(
+                "Unable to guess the number of columns for operator %r"
+                "." % operator)
         attrs['offset'] = (
             op.center_ if op.with_centering else
             np.array([0.0] * C, dtype=np.float32))
@@ -57,6 +65,10 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     elif isinstance(op, MaxAbsScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
+        if C is None:
+            raise RuntimeError(
+                "Unable to guess the number of columns for operator %r"
+                "." % operator)
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = np.array([0.] * C, dtype=np.float32)
         inv_scale = op.scale_
