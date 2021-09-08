@@ -2,6 +2,8 @@
 
 import pprint
 from collections import OrderedDict
+import hashlib
+from onnx.numpy_helper import from_array
 from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed  # noqa
 from onnxconverter_common.utils import is_numeric_type, is_string_type  # noqa
 from onnxconverter_common.utils import cast_list, convert_to_python_value  # noqa
@@ -139,3 +141,11 @@ def get_column_indices(indices, inputs, multiple):
                     "multiple variables ({0}). You should think about merging "
                     "initial types.".format(cols))
         return onnx_var, onnx_is
+
+
+def hash_array(value, length=15):
+    "Computes a hash identifying the value."
+    onx = from_array(value)
+    m = hashlib.sha256()
+    m.update(onx.SerializeToString())
+    return m.hexdigest()[:length]

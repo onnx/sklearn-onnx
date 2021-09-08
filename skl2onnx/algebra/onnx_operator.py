@@ -145,9 +145,13 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = "ov%s" % self.name
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
             var = Variable(name, name, scope=scope, type=None)
             if scope is not None:
                 scope.register_variable(var)
+            self.variable_ = var
             return var
 
         def __repr__(self):
@@ -163,9 +167,16 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = self.name
-            var = Variable(name, name, scope=scope, type=None)
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
             if scope is not None:
+                onnx_name = scope.get_unique_variable_name(name)
+                var = Variable(name, onnx_name, scope=scope, type=None)
                 scope.register_variable(var)
+                self.variable_ = var
+            else:
+                var = Variable(name, name, scope=scope, type=None)
             return var
 
         def __eq__(self, name):
@@ -189,11 +200,18 @@ class OnnxOperator:
             self.value = value
 
         def as_variable(self, scope):
-            name = "id%d" % id(self)
-            var = Variable(name, name, scope=scope,
-                           type=_guess_type(self.value))
+            ha = utils.hash_array(self.value)
+            name = "CST%s" % ha
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
             if scope is not None:
-                scope.register_variable(var)
+                var = scope.declare_local_variable(
+                    name, type=_guess_type(self.value))
+            else:
+                var = Variable(name, name, scope=scope,
+                               type=_guess_type(self.value))
+            self.variable_ = var
             return var
 
         @property

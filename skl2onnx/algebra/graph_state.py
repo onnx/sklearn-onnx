@@ -322,10 +322,13 @@ class GraphState:
                     stype = input_types[i]
                 else:
                     stype = None if isinstance(inp[1], str) else inp[1]
-                new_inputs[i] = Variable(
-                    inp[0], inp[0], type=stype, scope=scope)
                 if scope is not None:
-                    scope.register_variable(new_inputs[i])
+                    onnx_name = scope.get_unique_variable_name(inp[0])
+                    var = Variable(inp[0], onnx_name, type=stype, scope=scope)
+                    scope.register_variable(var)
+                else:
+                    var = Variable(inp[0], inp[0], type=stype, scope=scope)
+                new_inputs[i] = var
                 inp = new_inputs[i]
             elif isinstance(inp, GraphStateVar):
                 new_inputs[i] = inp.as_variable(scope)

@@ -678,7 +678,8 @@ class Scope:
         "Adds a variable to the scope."
         if var.onnx_name in self.variables:
             raise RuntimeError(
-                "Variable %r already registered." % var)
+                "Variable %r already registered (other=%r)." % (
+                    var, self.variables[var.onnx_name]))
 
         if var.raw_name in self.variable_name_mapping:
             # Hide existing variables with the same raw_name
@@ -1160,7 +1161,7 @@ class Topology:
                     for r in rem:
                         v = fed_variables[r]
                         v.init_status(is_fed=False)
-                        del fed_variables[v]
+                        del fed_variables[v.onnx_name]
                     changes += 1
 
             if verbose > 0:
