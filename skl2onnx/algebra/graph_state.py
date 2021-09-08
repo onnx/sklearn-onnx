@@ -316,7 +316,6 @@ class GraphState:
                 "." % (inp, type(inp)))
 
         for i in range(0, len(new_inputs)):
-
             inp = new_inputs[i]
             if isinstance(inp, tuple) and len(inp) == 2:
                 if input_types is not None and i < len(input_types):
@@ -324,9 +323,15 @@ class GraphState:
                 else:
                     stype = None if isinstance(inp[1], str) else inp[1]
                 if scope is not None:
-                    onnx_name = scope.get_unique_variable_name(inp[0])
-                    var = Variable(inp[0], onnx_name, type=stype, scope=scope)
-                    scope.register_variable(var)
+                    if inp[0] in scope.variables:
+                        var = scope.variables[inp[0]]
+                        if stype is not None:
+                            var.check_compatible_type(stype)
+                    else:
+                        onnx_name = scope.get_unique_variable_name(inp[0])
+                        var = Variable(
+                            inp[0], onnx_name, type=stype, scope=scope)
+                        scope.register_variable(var)
                 else:
                     var = Variable(inp[0], inp[0], type=stype, scope=scope)
                 new_inputs[i] = var

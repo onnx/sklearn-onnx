@@ -557,20 +557,12 @@ class Scope:
     provides functions to create a unique unused name.
     """
 
-    def __init__(self, name, parent_scopes=None, variable_name_set=None,
-                 operator_name_set=None, target_opset=None,
+    def __init__(self, name, target_opset=None,
                  custom_shape_calculators=None, options=None,
                  registered_models=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
-        :param parent_scopes: A list of Scope objects. The last element
-                              should be the direct parent scope (i.e.,
-                              where this scope is declared).
-        :param variable_name_set: A set of strings serving as the name
-                                  pool of variables
-        :param operator_name_set: A set of strings serving as the name
-                                  pool of operators
         :param target_opset: The target opset number for the converted
                              model.
         :param custom_conversion_functions: a dictionary for specifying
@@ -581,11 +573,8 @@ class Scope:
         :param registered_models: registered models
         """
         self.name = name
-        self.parent_scopes = parent_scopes if parent_scopes else list()
-        self.onnx_variable_names = (
-            variable_name_set if variable_name_set is not None else set())
-        self.onnx_operator_names = (
-            operator_name_set if operator_name_set is not None else set())
+        self.onnx_variable_names = set()
+        self.onnx_operator_names = set()
         self.target_opset = target_opset
         self.custom_shape_calculators = custom_shape_calculators
 
@@ -614,18 +603,6 @@ class Scope:
     def get(self, var_name, default_value):
         "Returns variable with 'name' or default value is not found."
         return self.variables.get(var_name, default_value)
-
-    def temp(self):
-        """
-        Creates a new Scope with the same options but no names.
-        """
-        scope = Scope(
-            'temp', parent_scopes=self.parent_scopes,
-            target_opset=self.target_opset,
-            custom_shape_calculators=self.custom_shape_calculators,
-            options=self.options,
-            registered_models=self.registered_models)
-        return scope
 
     def has_variable_name(self, name):
         """
@@ -913,8 +890,7 @@ class Topology:
             raise RuntimeError(
                 "Only one scope can be created.")
         scope = Scope(
-            self.get_unique_scope_name(seed), parent_scopes,
-            self.variable_name_set, self.operator_name_set, self.target_opset,
+            self.get_unique_scope_name(seed), target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
             options=options, registered_models=self.registered_models)
 
