@@ -201,13 +201,15 @@ class Variable:
             raise TypeError(
                 "Unexpected new type for variable %r, new_type=%r." % (
                     self, new_type))
-        logger.debug('[Var] update type= for %r' % self)
+        logger.debug('[Var] update type for %r' % self)
         self._type = new_type
 
     def set_onnx_name(self, onnx_name):
         if onnx_name != self._onnx_name:
             logger.debug('[Var] update onnx_name, from %r to %r in %r' % (
                 self.onnx_name, onnx_name, self))
+            if self.scope is not None and not isinstance(self.scope, str):
+                self.scope.rename_onnx_name(self._onnx_name, onnx_name)
             self._onnx_name = onnx_name
 
     def set_parent(self, operator):
@@ -692,6 +694,19 @@ class Scope:
             self.variable_name_mapping[var.raw_name] = [var.onnx_name]
 
         self.variables[var.onnx_name] = var
+
+    def rename_onnx_name(self, old_name, new_name):
+        if new_name in self.variables:
+            raise RuntimeError(
+                "Name %r already in variables (%r)." % (
+                    new_name, self.variables[new_name]))
+        if old_name not in self.variables:
+            raise RuntimeError(
+                "Unable to find name %r in variables." % old_name)
+        logger.debug('[Scope] update onnx_name, from %r to %r' % (
+            old_name, new_name))
+        self.variables[new_name] = self.variables[old_name]
+        del self.variables[old_name]
 
     def declare_local_input(self, raw_name, type=None, prepend=False):
         """

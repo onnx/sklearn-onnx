@@ -3,6 +3,7 @@
 import pprint
 from collections import OrderedDict
 import hashlib
+import numpy as np
 from onnx.numpy_helper import from_array
 from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed  # noqa
 from onnxconverter_common.utils import is_numeric_type, is_string_type  # noqa
@@ -145,7 +146,22 @@ def get_column_indices(indices, inputs, multiple):
 
 def hash_array(value, length=15):
     "Computes a hash identifying the value."
-    onx = from_array(value)
+    try:
+        onx = from_array(value)
+    except AttributeError as e:
+        # sparse matrix for example
+        if hasattr(value, 'tocoo'):
+            coo = value.tocoo()
+            arrs = [coo.data, coo.row, coo.col, np.array(coo.shape)]
+            m = hashlib.sha256()
+            for arr in arrs:
+                m.update(from_array(arr).SerializeToString())
+            return m.hexdigest()[:length]
+
+        raise ValueError(
+            "Unable to compute hash for type %r (value=%r)." % (
+                type(value), value)) from e
+
     m = hashlib.sha256()
     m.update(onx.SerializeToString())
     return m.hexdigest()[:length]

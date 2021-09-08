@@ -316,6 +316,7 @@ class GraphState:
                 "." % (inp, type(inp)))
 
         for i in range(0, len(new_inputs)):
+
             inp = new_inputs[i]
             if isinstance(inp, tuple) and len(inp) == 2:
                 if input_types is not None and i < len(input_types):
@@ -336,6 +337,7 @@ class GraphState:
             elif not isinstance(inp, Variable):
                 raise TypeError(
                     "Inputs %d - %r must be of type Variable." % (i, inp))
+
             if names is not None:
                 try:
                     onnx_name = (
@@ -461,8 +463,14 @@ class GraphState:
                     scope = v.scope
                     if hasattr(scope, 'variables'):
                         if v.onnx_name not in scope.variables:
+                            import pprint
+                            pprint.pprint(scope.variables)
                             raise RuntimeError(
-                                "Variable %r missing from scope." % (v, ))
+                                "Variable %r missing from scope "
+                                "(operator=%r, model=%r), list=%r." % (
+                                    v, self.operator,
+                                    type(self.operator_instance),
+                                    list(sorted(self.scope.variables))))
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn
