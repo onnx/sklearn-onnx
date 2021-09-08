@@ -463,8 +463,6 @@ class GraphState:
                     scope = v.scope
                     if hasattr(scope, 'variables'):
                         if v.onnx_name not in scope.variables:
-                            import pprint
-                            pprint.pprint(scope.variables)
                             raise RuntimeError(
                                 "Variable %r missing from scope "
                                 "(operator=%r, model=%r), list=%r." % (

@@ -171,9 +171,12 @@ class OnnxOperator:
                     self.variable_.onnx_name == name):
                 return self.variable_
             if scope is not None:
-                onnx_name = scope.get_unique_variable_name(name)
-                var = Variable(name, onnx_name, scope=scope, type=None)
-                scope.register_variable(var)
+                if name in scope.variables:
+                    var = scope.variables[name]
+                else:
+                    onnx_name = scope.get_unique_variable_name(name)
+                    var = Variable(name, onnx_name, scope=scope, type=None)
+                    scope.register_variable(var)
                 self.variable_ = var
             else:
                 var = Variable(name, name, scope=scope, type=None)
