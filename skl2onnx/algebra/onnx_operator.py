@@ -788,7 +788,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                target_opset=None, domain=None):
+                target_opset=None, domain=None, verbose=0):
         """
         Converts this operator into an ONNX graph.
 
@@ -801,6 +801,7 @@ class OnnxOperator:
         :param target_opset: dictionary with target opset per domain,
             None for the default one
         :param domain: domain of the operator
+        :param verbose: prints information
         """
         if isinstance(target_opset, dict):
             dom = self.domain or ''
@@ -859,11 +860,11 @@ class OnnxOperator:
 
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,
-                      variable_name_set=set(_[0] for _ in inputs),
                       registered_models=registered_models)
         for inp in inputs:
-            container.add_input(Variable(inp[0], inp[0],
-                                         scope=scope, type=inp[1]))
+            var = Variable(inp[0], inp[0], scope=scope, type=inp[1])
+            container.add_input(var)
+            scope.register_variable(var)
         self.add_to(scope, container, run_converters=True)
         if other_outputs is not None:
             for out in other_outputs:
@@ -890,6 +891,8 @@ class OnnxOperator:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
         else:
+            if verbose > 0:
+                print("[op.to_onnx] infer outputs")
             shapes = infer_outputs(container, container.inputs,
                                    initializer=container.initializers,
                                    target_opset=target_opset)
@@ -898,10 +901,19 @@ class OnnxOperator:
                                 for v in self.output_names)
                 shapes = [shape for shape in shapes
                           if shape.onnx_name in set_names]
+        if verbose > 0:
+            print("[op.to_onnx] shapes=%r" % shapes)
 
         # add the output to the container
         for shape in shapes:
             container.add_output(shape)
+
+        container.ensure_topological_order()
+        if verbose >= 2:
+            print("---NODES---")
+            for node in container.nodes:
+                print("  %s - %s: %r -> %r" % (
+                    node.op_type, node.name, node.input, node.output))
 
         # convert the graph
         graph = make_graph(
