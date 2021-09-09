@@ -220,9 +220,8 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
     @unittest.skipIf(InvalidArgument is None,
                      reason='onnxruntime is too old')
     @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
-    @unittest.skipIf(True, reason='OneHotEncoder')
     def test_woe_transformer_bigger(self):
-        x = numpy.array([[-0, 1, 2, 3, 4, 5, 6, -1]], dtype=numpy.float32).T
+        x = numpy.array([[0, 1, 2, 3, 4, 5, 6, -1]], dtype=numpy.float32).T
         intervals = [[(0.0, 1.0, False, True), (1.0, 2.0, False, True),
                       (2.0, 3.0, False, True), (3.0, 4.0, False, True)]]
         weights = [[-1.4057124469769924, -1.7241661780955269,
@@ -231,7 +230,17 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
                              onehot=False)
         woe.fit(x)
         expected = woe.transform(x)
+
         onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
+        try:
+            sess = InferenceSession(onnx_model.SerializeToString())
+        except InvalidArgument as e:
+            raise AssertionError(
+                "Cannot load model:\n%s" % str(onnx_model)) from e
+        got = sess.run(None, {'X': x})[0]
+        assert_almost_equal(expected, got)
+
+        onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
         try:
             sess = InferenceSession(onnx_model.SerializeToString())
         except InvalidArgument as e:

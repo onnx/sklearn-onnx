@@ -78,7 +78,8 @@ def ordwoe_encoder_converter(scope, operator, container):
     cast = OnnxCast(sub, op_version=opv, to=np.float32)
     cat = OnnxSubEstimator(op.woe_, cast, op_version=opv,
                            input_types=[Int64TensorType()])
-    idcat = OnnxIdentity(cat, output_names=operator.outputs[:1])
+    idcat = OnnxIdentity(cat, output_names=operator.outputs[:1],
+                         op_version=opv)
     idcat.add_to(scope, container)
 
 
