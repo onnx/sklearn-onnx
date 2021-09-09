@@ -324,6 +324,24 @@ class Variable:
         else:
             self.operators_inputs_.append(op)
 
+    def check_compatible_type(self, other_type):
+
+        def empty_shape(shape):
+            return shape is None or len(shape) == 0
+
+        if self.type is None:
+            if other_type is None:
+                return
+        elif other_type is not None:
+            if type(self.type) == type(other_type):
+                if self.type.shape == other_type.shape:
+                    return
+                if empty_shape(other_type.shape):
+                    return
+        raise TypeError(
+            "Incompatible type for variable %r and type %r." % (
+                self, other_type))
+
 
 class VariableStr(Variable):
     """
