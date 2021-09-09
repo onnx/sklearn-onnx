@@ -150,7 +150,7 @@ class Variable:
             for k in self.type.shape:
                 if k is None:
                     continue
-                if not isinstance(k, (int, np.int64)):
+                if not isinstance(k, (int, np.int64, np.intc)):
                     raise ValueError(
                         "Unexpected type %r for shape %r."
                         "" % (type(k), self))
@@ -577,11 +577,13 @@ class Operator:
             raise MissingShapeCalculator(
                 "Unexpected shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
-        logger.debug("[Shape0] %r fed %r - %r" % (
+        logger.debug("[Shape-a] %r fed %r - %r" % (
             self,
             "".join(str(i.is_fed) for i in self.inputs),
             "".join(str(i.is_fed) for i in self.outputs)))
         shape_calc(self)
+        logger.debug("[Shape-b] %r inputs=%r - outputs=%r" % (
+            self, self.inputs, self.outputs))
 
 
 class Scope:
@@ -1005,8 +1007,8 @@ class Topology:
         if shape_calc is not None:
             logger.debug("[Shape1] %r fed %r - %r (source=%r)" % (
                 operator,
-                "".join(str(i.is_fed) for i in operator.inputs),
-                "".join(str(i.is_fed) for i in operator.outputs),
+                ",".join(str(i.is_fed) for i in operator.inputs),
+                ",".join(str(i.is_fed) for i in operator.outputs),
                 source))
             shape_calc(operator)
         else:
