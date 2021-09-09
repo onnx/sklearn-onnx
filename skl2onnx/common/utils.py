@@ -161,6 +161,16 @@ def hash_array(value, length=15):
         raise ValueError(
             "Unable to compute hash for type %r (value=%r)." % (
                 type(value), value)) from e
+    except RuntimeError as ee:
+        # cannot be serialized
+        if isinstance(value, (np.ndarray, list)):
+            b = str(value).encode('utf-8')
+            m = hashlib.sha256()
+            m.update(b)
+            return m.hexdigest()[:length]
+        raise RuntimeError(
+            "Unable to convert value type %r, (value=%r)." % (
+                type(value), value)) from ee
 
     m = hashlib.sha256()
     m.update(onx.SerializeToString())
