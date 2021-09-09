@@ -96,6 +96,7 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 
+    @unittest.skipIf(TARGET_OPSET < 11, reason="opset>=11 is required")
     def test_custom_ordinal_woe(self):
 
         update_registered_converter(
