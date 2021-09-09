@@ -1083,10 +1083,13 @@ class OnnxSubEstimator(OnnxOperator):
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
                 elif isinstance(input, tuple) and len(input) == 2:
-                    var = Variable(input[0], input[0], scope=scope,
-                                   type=input[1])
-                    if scope is not None:
-                        scope.register_variable(var)
+                    if scope is not None and input[0] in scope.variables:
+                        var = scope.variables[input[0]]
+                    else:
+                        var = Variable(input[0], input[0], scope=scope,
+                                       type=input[1])
+                        if scope is not None:
+                            scope.register_variable(var)
                     inputs.append(var)
                 else:
                     inputs.append(input)
