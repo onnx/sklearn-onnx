@@ -51,6 +51,9 @@ def register_converter(operator_name, conversion_function, overwrite=False,
     :param options: supported options for this converter
         (dictionary {name: supported values or None})
     """
+    if conversion_function is None:
+        raise ValueError(
+            "A converter cannot be None for %r." % operator_name)
     if not overwrite and operator_name in _converter_pool:
         raise ValueError('We do not overwrite registered converter '
                          'by default')
@@ -82,6 +85,9 @@ def register_shape_calculator(operator_name, calculator_function,
                       (i.e., calculator_function). Set this flag to True
                       to enable overwriting.
     """
+    if calculator_function is None:
+        raise ValueError(
+            "A shape calculator cannot be None for %r." % operator_name)
     if not overwrite and operator_name in _shape_calculator_pool:
         raise ValueError('We do not overwrite registrated shape calculator '
                          'by default')

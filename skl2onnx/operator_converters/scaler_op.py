@@ -32,10 +32,19 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     if isinstance(op, StandardScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
-        if C is None:
+        model_C = None
+        if op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if model_C is None and op.mean_ is not None:
+            model_C = op.mean_.shape[0]
+        if model_C is None and op.var_ is not None:
+            model_C = op.var_.shape[0]
+        if C is not None and C != model_C:
             raise RuntimeError(
-                "Unable to guess the number of columns for operator %r"
-                "." % operator)
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.inputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['offset'] = (
             op.mean_ if op.with_mean else
             np.array([0.0] * C, dtype=np.float32))
@@ -46,10 +55,17 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     elif isinstance(op, RobustScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
-        if C is None:
+        model_C = None
+        if op.center_ is not None:
+            model_C = op.center_.shape[0]
+        if model_C is None and op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if C is not None and C != model_C:
             raise RuntimeError(
-                "Unable to guess the number of columns for operator %r"
-                "." % operator)
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.inputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['offset'] = (
             op.center_ if op.with_centering else
             np.array([0.0] * C, dtype=np.float32))
@@ -65,10 +81,17 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     elif isinstance(op, MaxAbsScaler):
         C = (operator.inputs[0].type.shape[1]
              if len(operator.inputs[0].type.shape) == 2 else 1)
-        if C is None:
+        model_C = None
+        if op.max_abs_ is not None:
+            model_C = op.max_abs_.shape[0]
+        if model_C is None and op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if C is not None and C != model_C:
             raise RuntimeError(
-                "Unable to guess the number of columns for operator %r"
-                "." % operator)
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.inputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = np.array([0.] * C, dtype=np.float32)
         inv_scale = op.scale_

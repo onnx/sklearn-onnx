@@ -143,6 +143,17 @@ class Variable:
         # links to operators using those variables
         self.operators_outputs_ = []
         self.operators_inputs_ = []
+        self._check()
+
+    def _check(self):
+        if self.type is not None and self.type.shape is not None:
+            for k in self.type.shape:
+                if k is None:
+                    continue
+                if not isinstance(k, (int, np.int64)):
+                    raise ValueError(
+                        "Unexpected type %r for shape %r."
+                        "" % (type(k), self))
 
     @property
     def raw_name(self):
@@ -203,6 +214,7 @@ class Variable:
                     self, new_type))
         logger.debug('[Var] update type for %r' % self)
         self._type = new_type
+        self._check()
 
     def set_onnx_name(self, onnx_name):
         if onnx_name != self._onnx_name:
@@ -561,6 +573,10 @@ class Operator:
             raise MissingShapeCalculator(
                 "Unable to find a shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
+        if shape_calc is None:
+            raise MissingShapeCalculator(
+                "Unexpected shape calculator for alias '{}' "
+                "and type '{}'.".format(self.type, type(self.raw_operator)))
         logger.debug("[Shape0] %r fed %r - %r" % (
             self,
             "".join(str(i.is_fed) for i in self.inputs),
@@ -863,6 +879,13 @@ class Topology:
         if registered_models is None:
             raise AssertionError()
         self.registered_models = registered_models
+
+    @property
+    def scope(self):
+        if len(self.scopes) != 1:
+            raise RuntimeError(
+                "Only one scope is allowed not %d." % len(self.scopes))
+        return self.scopes[0]
 
     @staticmethod
     def _generate_unique_name(seed, existing_names):
@@ -1212,6 +1235,31 @@ class Topology:
             container.add_input(i)
         outputs = [v for v in self.unordered_variable_iterator()
                    if v.is_leaf]
+
+        # The function checks that for output variable,
+        # raw_name equal onnx_name. It swaps names if it is not the case.
+        to_swap = []
+        for out in outputs:
+            if out.raw_name != out.onnx_name:
+                to_swap.append(out)
+        if len(to_swap) != 0:
+            swaped = set()
+            for var in to_swap:
+                if var.raw_name in swaped:
+                    continue
+                swaped.add(var.raw_name)
+                if verbose > 1:
+                    print("[convert_operators] %r <-> %r." % (
+                        var.raw_name, var.onnx_name))
+                old_name = var.onnx_name
+                new_name = var.raw_name
+                for v in self.unordered_variable_iterator():
+                    if v.onnx_name == var.onnx_name:
+                        v.set_onnx_name(var.raw_name)
+                    elif v.onnx_name == var.raw_name:
+                        v.set_onnx_name(var.onnx_name)
+                container.swap_names(old_name, new_name)
+
         for o in outputs:
             container.add_output(o)
 
