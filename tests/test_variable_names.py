@@ -54,7 +54,8 @@ def converter(scope, operator, container):
 
 class TestVariableNames(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         update_registered_converter(
             Passthrough, "Passthrough",
             shape_calculator, converter,
@@ -69,7 +70,8 @@ class TestVariableNames(unittest.TestCase):
         self.assertIn('Identity', str(model_onnx))
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(model_onnx.SerializeToString())
-        got = sess.run(None, {'input': x})
+        name = sess.get_inputs()[0].name
+        got = sess.run(None, {name: x})
         assert_almost_equal(x, got[0])
 
     def test_variable_names_distinct(self):

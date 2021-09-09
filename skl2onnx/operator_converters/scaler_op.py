@@ -38,11 +38,17 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
             model_C = op.mean_.shape[0]
         if model_C is None and op.var_ is not None:
             model_C = op.var_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
         if C is not None and C != model_C:
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (
-                    operator.inputs[0].type.shape, model_C, operator))
+                    operator.outputs[0].type.shape, model_C, operator))
         C = model_C
         attrs['offset'] = (
             op.mean_ if op.with_mean else
@@ -57,11 +63,17 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
             model_C = op.center_.shape[0]
         if model_C is None and op.scale_ is not None:
             model_C = op.scale_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
         if C is not None and C != model_C:
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (
-                    operator.inputs[0].type.shape, model_C, operator))
+                    operator.outputs[0].type.shape, model_C, operator))
         C = model_C
         attrs['offset'] = (
             op.center_ if op.with_centering else
@@ -81,11 +93,17 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
             model_C = op.max_abs_.shape[0]
         if model_C is None and op.scale_ is not None:
             model_C = op.scale_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
         if C is not None and C != model_C:
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (
-                    operator.inputs[0].type.shape, model_C, operator))
+                    operator.outputs[0].type.shape, model_C, operator))
         C = model_C
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = np.array([0.] * C, dtype=np.float32)

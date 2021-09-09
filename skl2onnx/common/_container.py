@@ -260,6 +260,15 @@ class ModelComponentContainer(_WhiteBlackContainer):
         :param new_name: new name
         :return: list of impacted objects
         """
+        exc_list = {'Scan', 'Loop', 'If'}
+        for node in self.nodes:
+            if node.op_type not in exc_list:
+                continue
+            if (old_name in node.input or old_name in node.output or
+                    new_name in node.input or new_name in node.output):
+                raise NotImplementedError(
+                    "Unable to handle subgraphs for node type %r."
+                    "(%r, %r)" % (node.op_type, old_name, new_name))
         res = []
 
         for inp in self.inputs:
@@ -307,7 +316,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     modified = True
                 new_output.append(name)
             if modified:
-                if node.op_type in {'Scan', 'Loop', 'If'}:
+                if node.op_type in exc_list:
                     raise NotImplementedError(
                         "Unable to handle subgraphs for node type %r."
                         "" % node.op_type)

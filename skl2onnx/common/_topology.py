@@ -1255,12 +1255,20 @@ class Topology:
                         var.raw_name, var.onnx_name))
                 old_name = var.onnx_name
                 new_name = var.raw_name
+
+                try:
+                    container.swap_names(old_name, new_name)
+                except NotImplementedError as e:
+                    logger.debug(
+                        '[Topo] unable to swap %r and %r (%r).' % (
+                            old_name, new_name, e))
+                    continue
+
                 for v in self.unordered_variable_iterator():
-                    if v.onnx_name == var.onnx_name:
-                        v.set_onnx_name(var.raw_name)
-                    elif v.onnx_name == var.raw_name:
-                        v.set_onnx_name(var.onnx_name)
-                container.swap_names(old_name, new_name)
+                    if v.onnx_name == old_name:
+                        v.set_onnx_name(new_name)
+                    elif v.onnx_name == new_name:
+                        v.set_onnx_name(old_name)
 
         for o in outputs:
             container.add_output(o)
