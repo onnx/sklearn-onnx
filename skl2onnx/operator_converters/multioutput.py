@@ -4,7 +4,8 @@ import numpy as np
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..algebra.onnx_ops import OnnxConcat, OnnxReshape, OnnxIdentity
+from ..algebra.onnx_ops import (
+    OnnxConcat, OnnxReshape, OnnxIdentity, OnnxSequenceConstruct)
 from ..algebra.onnx_operator import OnnxSubEstimator
 
 
@@ -59,10 +60,8 @@ def convert_multi_output_classifier_converter(
     proba_list = [OnnxIdentity(y[1], op_version=op_version)
                   for y in y_list]
 
-    proba = OnnxReshape(
-        OnnxConcat(*proba_list, axis=1, op_version=op_version),
-        np.array([-1, len(op.estimators_), 2], dtype=np.int64),
-        op_version=op_version,
+    proba = OnnxSequenceConstruct(
+        *proba_list, op_version=op_version,
         output_names=[operator.outputs[1]])
     proba.add_to(scope=scope, container=container)
 

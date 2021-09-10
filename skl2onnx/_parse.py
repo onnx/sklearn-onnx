@@ -445,6 +445,19 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     return zipmap_operator.outputs
 
 
+def _parse_sklearn_multi_output_classifier(scope, model, inputs,
+                                           custom_parsers=None):
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
+    this_operator.inputs = inputs
+    label = scope.declare_local_variable("label", Int64TensorType())
+    proba = scope.declare_local_variable(
+        "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
+    this_operator.outputs.append(label)
+    this_operator.outputs.append(proba)
+    return this_operator.outputs
+
+
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(
         model, dict(return_cov=False, return_std=False))
@@ -669,7 +682,7 @@ def build_sklearn_parsers_map():
         BayesianRidge: _parse_sklearn_bayesian_ridge,
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
         GridSearchCV: _parse_sklearn_grid_search_cv,
-        MultiOutputClassifier: _parse_sklearn_simple_model,
+        MultiOutputClassifier: _parse_sklearn_multi_output_classifier,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer
