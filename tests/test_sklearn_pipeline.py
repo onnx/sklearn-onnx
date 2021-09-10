@@ -749,7 +749,7 @@ class TestSklearnPipeline(unittest.TestCase):
         inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
                   'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
                   'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
-        onx = to_onnx(rf_clf, dfx)
+        onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
         sess = InferenceSession(onx.SerializeToString())
 
         got = sess.run(None, inputs)
