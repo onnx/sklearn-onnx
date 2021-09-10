@@ -42,6 +42,10 @@ def convert_sklearn_ordinal_encoder(scope: Scope, operator: Operator,
 
         apply_concat(scope, input_names,
                      concatenated_input_name, container, axis=1)
+    if len(ordinal_op.categories_) == 0:
+        raise RuntimeError(
+            "No categories found in type=%r, encoder=%r." % (
+                type(ordinal_op), ordinal_op))
     for index, categories in enumerate(ordinal_op.categories_):
         attrs = {'name': scope.get_unique_operator_name('LabelEncoder')}
         if len(categories) > 0:

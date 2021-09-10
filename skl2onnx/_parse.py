@@ -121,9 +121,21 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                 names = parser_names()
             if names is not None:
                 for name in names:
-                    var = scope.declare_local_variable(
-                        name, guess_tensor_type(inputs[0].type))
-                    this_operator.outputs.append(var)
+                    if isinstance(name, Variable):
+                        this_operator.outputs.append(name)
+                    elif isinstance(name, str):
+                        var = scope.declare_local_variable(
+                            name, guess_tensor_type(inputs[0].type))
+                        this_operator.outputs.append(var)
+                    elif isinstance(name, tuple) and len(name) == 2:
+                        var = scope.declare_local_variable(
+                            name[0], guess_tensor_type(name[1]))
+                        this_operator.outputs.append(var)
+                    else:
+                        raise RuntimeError(
+                            "Unexpected output type %r (value=%r) for "
+                            "operator %r." % (
+                                type(name), name, type(model)))
                 return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list

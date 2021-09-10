@@ -12,6 +12,12 @@ except ImportError:
     InvalidGraph = RuntimeError
     InvalidArgument = RuntimeError
     Fail = RuntimeError
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx.algebra.onnx_ops import (
@@ -25,6 +31,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_ml(self):
         def generate_onnx_graph(opv):
             node = OnnxAdd(('X1', FloatTensorType()),
@@ -157,6 +164,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple(self):
         self.common_test_sub_graph(
             ('X1', FloatTensorType()), LinearRegression)
@@ -166,6 +174,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_double(self):
         self.common_test_sub_graph(
             ('X1', DoubleTensorType()), LinearRegression,
@@ -173,6 +182,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str(self):
         self.common_test_sub_graph('X1', LinearRegression)
 
@@ -181,12 +191,14 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.4.0"),
         reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str_double(self):
         self.common_test_sub_graph('X1', LinearRegression,
                                    cls_type=DoubleTensorType)
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_cls(self):
         self.common_test_sub_graph(
             ('X1', FloatTensorType()), LogisticRegression,
@@ -200,6 +212,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.10.0"),
         reason="ArgMax not available for double")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_cls_double(self):
         self.common_test_sub_graph(
             ('X1', DoubleTensorType()), LogisticRegression,
@@ -219,6 +232,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("1.10.0"),
         reason="ArgMax not available for double")
+    @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str_cls_double(self):
         self.common_test_sub_graph(
             'X1', LogisticRegression, options={'zipmap': False},

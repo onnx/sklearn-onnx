@@ -32,6 +32,7 @@ def _calculate_proba(scope, operator, container, model):
         if container.has_options(estimator, 'raw_scores'):
             container.add_options(
                 id(estimator), {'raw_scores': use_raw_scores})
+            scope.add_options(id(estimator), {'raw_scores': use_raw_scores})
 
         label_name = scope.declare_local_variable(
             'label_%d' % index, Int64TensorType())

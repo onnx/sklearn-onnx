@@ -32,22 +32,23 @@ class TestAlgebraComplex(unittest.TestCase):
             for opv in (10, 11, 12, 13, TARGET_OPSET):
                 if opv > TARGET_OPSET:
                     continue
-                out = OnnxAdd('X', np.array([1+2j]), output_names=['Y'],
-                              op_version=opv)
-                onx = out.to_onnx([('X', var((None, 2)))],
-                                  outputs=[('Y', var())],
-                                  target_opset=opv)
-                self.assertIn('elem_type: %d' % pr, str(onx))
+                with self.subTest(dt=dt, opset=opv):
+                    out = OnnxAdd('X', np.array([1+2j], dtype=dt),
+                                  output_names=['Y'], op_version=opv)
+                    onx = out.to_onnx([('X', var((None, 2)))],
+                                      outputs=[('Y', var())],
+                                      target_opset=opv)
+                    self.assertIn('elem_type: %d' % pr, str(onx))
 
-                try:
-                    ort = InferenceSession(onx.SerializeToString())
-                except InvalidGraph as e:
-                    if "Type Error: Type 'tensor(complex" in str(e):
-                        continue
-                    raise e
-                assert ort is not None
-                got = ort.run(None, {'X': X})[0]
-                assert_almost_equal(X + np.array([1+2j]), got)
+                    try:
+                        ort = InferenceSession(onx.SerializeToString())
+                    except InvalidGraph as e:
+                        if "Type Error: Type 'tensor(complex" in str(e):
+                            continue
+                        raise e
+                    assert ort is not None
+                    got = ort.run(None, {'X': X})[0]
+                    assert_almost_equal(X + np.array([1+2j]), got)
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common._topology import Variable
 from skl2onnx.common.data_types import (
-    FloatTensorType, guess_numpy_type, DoubleTensorType)
+    FloatTensorType, guess_numpy_type)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshapeApi13,
@@ -254,17 +254,15 @@ class TestOnnxOperators(unittest.TestCase):
         idi2 = np.identity(2) * 2
 
         onx = OnnxAdd(
-            OnnxAdd('X', idi, op_version=TARGET_OPSET),
-            idi2, output_names=['Y'],
+            OnnxAdd('X', idi.astype(np.float32), op_version=TARGET_OPSET),
+            idi2.astype(np.float32), output_names=['Y'],
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         self.assertEqual(len(model_def.graph.output), 1)
         onx = OnnxAdd(
-            idi2,
-            OnnxAdd(
-                'X', idi, op_version=TARGET_OPSET),
-            output_names=['Y'],
-            op_version=TARGET_OPSET)
+            idi2.astype(np.float32),
+            OnnxAdd('X', idi.astype(np.float32), op_version=TARGET_OPSET),
+            output_names=['Y'], op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
         self.assertIsInstance(onx.outputs, list)
@@ -272,9 +270,9 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertIsInstance(onx.outputs[0], (Variable, tuple))
         if isinstance(onx.outputs[0], tuple):
             self.assertEqual(len(onx.outputs[0]), 2)
-            self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
+            self.assertIsInstance(onx.outputs[0][1], FloatTensorType)
         else:
-            self.assertIsInstance(onx.outputs[0].type, DoubleTensorType)
+            self.assertIsInstance(onx.outputs[0].type, FloatTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))

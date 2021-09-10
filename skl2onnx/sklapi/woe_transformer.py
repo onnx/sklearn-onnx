@@ -61,7 +61,8 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         self.weights_ = []
         dim = 0
         self.indices_ = []
-        for i in range(X.shape[1]):
+        n_cols = X.shape[1] if X is not None else len(self.intervals)
+        for i in range(n_cols):
             if i >= len(self.intervals):
                 self.intervals_.append(None)
                 self.weights_.append(None)
@@ -91,12 +92,13 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                         "%r." % interval)
                 res = []
                 for j in range(0, 2):
-                    if not isinstance(interval[j], float):
+                    try:
+                        fv = float(interval[j])
+                    except (TypeError, ValueError) as e:
                         raise TypeError(
-                            "Value at index %i in %r must be a float."
-                            "" % (
-                                j, interval))
-                    res.append(interval[j])
+                            "Value at index %d in %r must be a float."
+                            "" % (j, interval)) from e
+                    res.append(fv)
                 if len(interval) >= 3:
                     if not isinstance(interval[2], bool):
                         raise TypeError(

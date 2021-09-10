@@ -252,6 +252,79 @@ class ModelComponentContainer(_WhiteBlackContainer):
         # All registered models.
         self.registered_models = registered_models
 
+    def swap_names(self, old_name, new_name):
+        """
+        Swaps variables names.
+
+        :param old_name: old name
+        :param new_name: new name
+        :return: list of impacted objects
+        """
+        exc_list = {'Scan', 'Loop', 'If'}
+        for node in self.nodes:
+            if node.op_type not in exc_list:
+                continue
+            if (old_name in node.input or old_name in node.output or
+                    new_name in node.input or new_name in node.output):
+                raise NotImplementedError(
+                    "Unable to handle subgraphs for node type %r."
+                    "(%r, %r)" % (node.op_type, old_name, new_name))
+        res = []
+
+        for inp in self.inputs:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('Io', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('In', inp))
+
+        for inp in self.outputs:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('Oo', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('On', inp))
+
+        for inp in self.initializers:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('-o', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('-n', inp))
+
+        for node in self.nodes:
+            modified = False
+            new_input = []
+            for name in node.input:
+                if name == old_name:
+                    name = new_name
+                    modified = True
+                elif name == new_name:
+                    name = old_name
+                    modified = True
+                new_input.append(name)
+            new_output = []
+            for name in node.output:
+                if name == old_name:
+                    name = new_name
+                    modified = True
+                elif name == new_name:
+                    name = old_name
+                    modified = True
+                new_output.append(name)
+            if modified:
+                if node.op_type in exc_list:
+                    raise NotImplementedError(
+                        "Unable to handle subgraphs for node type %r."
+                        "" % node.op_type)
+                node.input[:] = new_input[:]
+                node.output[:] = new_output[:]
+                res.append(("n-", node))
+        return res
+
     def __str__(self):
         """
         Shows internal information.
@@ -702,8 +775,6 @@ class ModelComponentContainer(_WhiteBlackContainer):
         can only be an input for a node later in this list).
         The function raises an exception if a cycle is detected.
         """
-        if len(self.inputs) == 0:
-            raise RuntimeError("No input is defined.")
         order = {}
         for inp in self.inputs:
             name = inp.name

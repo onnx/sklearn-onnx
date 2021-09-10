@@ -11,6 +11,7 @@ from ..common._topology import (
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from ..common.data_types import guess_proto_type, _guess_numpy_type
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
@@ -144,7 +145,14 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = "ov%s" % self.name
-            return Variable(name, name, scope=scope, type=None)
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            var = Variable(name, name, scope=scope, type=None)
+            if scope is not None:
+                scope.register_variable(var)
+            self.variable_ = var
+            return var
 
         def __repr__(self):
             return "OnnxOperatorVariable('%s')" % self.name
@@ -159,7 +167,20 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = self.name
-            return Variable(name, name, scope=scope, type=None)
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            if scope is not None:
+                if name in scope.variables:
+                    var = scope.variables[name]
+                else:
+                    onnx_name = scope.get_unique_variable_name(name)
+                    var = Variable(name, onnx_name, scope=scope, type=None)
+                    scope.register_variable(var)
+                self.variable_ = var
+            else:
+                var = Variable(name, name, scope=scope, type=None)
+            return var
 
         def __eq__(self, name):
             if isinstance(name, str):
@@ -182,9 +203,19 @@ class OnnxOperator:
             self.value = value
 
         def as_variable(self, scope):
-            name = "id%d" % id(self)
-            return Variable(name, name, scope=scope,
-                            type=_guess_type(self.value))
+            ha = utils.hash_array(self.value)
+            name = "CST%s" % ha
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            if scope is not None:
+                var = scope.declare_local_variable(
+                    name, type=_guess_type(self.value))
+            else:
+                var = Variable(name, name, scope=scope,
+                               type=_guess_type(self.value))
+            self.variable_ = var
+            return var
 
         @property
         def ConstantValue(self):
@@ -420,26 +451,36 @@ class OnnxOperator:
         Walks through attributes and replaces them by ONNX
         values.
         """
-        if (self.__class__.__name__.startswith("OnnxConstantOfShape") and
-                "value" in self.kwargs):
-            value = self.kwargs['value']
-            if isinstance(value, TensorProto):
-                return
-            if isinstance(value, np.ndarray):
-                if value.shape == (1, ):
-                    val = value[0]
-                elif len(value.shape) == 0:
-                    val = value
-                else:
-                    raise RuntimeError(
-                        "Unexpected shape %r for value, it must be an array "
-                        "of one element." % value.shape)
-                self.kwargs['value'] = from_array(
-                    np.array([val], dtype=value.dtype))
-                return
-            raise TypeError(
-                "Unexpected type %r for value. It should be an array "
-                "of one element." % type(value))
+        if self.__class__.__name__ == "OnnxConstantOfShape":
+            if "value" in self.kwargs:
+                value = self.kwargs['value']
+                if isinstance(value, TensorProto):
+                    return
+                if isinstance(value, np.ndarray):
+                    if value.shape == (1, ):
+                        val = value[0]
+                    elif len(value.shape) == 0:
+                        val = value
+                    else:
+                        raise RuntimeError(
+                            "Unexpected shape %r for value, it must be "
+                            "an array of one element." % value.shape)
+                    self.kwargs['value'] = from_array(
+                        np.array([val], dtype=value.dtype))
+                    return
+                raise TypeError(
+                    "Unexpected type %r for value. It should be an array "
+                    "of one element." % type(value))
+            return
+
+        if self.__class__.__name__ == "OnnxCast":
+            if "to" in self.kwargs:
+                value = self.kwargs['to']
+                if isinstance(value, int):
+                    return
+                to = guess_proto_type(_guess_numpy_type(value, None))
+                self.kwargs['to'] = to
+            return
 
     def __str__(self):
         """
@@ -747,7 +788,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                target_opset=None, domain=None):
+                target_opset=None, domain=None, verbose=0):
         """
         Converts this operator into an ONNX graph.
 
@@ -760,6 +801,7 @@ class OnnxOperator:
         :param target_opset: dictionary with target opset per domain,
             None for the default one
         :param domain: domain of the operator
+        :param verbose: prints information
         """
         if isinstance(target_opset, dict):
             dom = self.domain or ''
@@ -818,11 +860,11 @@ class OnnxOperator:
 
         model_name = self.__class__.__name__
         scope = Scope(model_name, target_opset=target_opset,
-                      variable_name_set=set(_[0] for _ in inputs),
                       registered_models=registered_models)
         for inp in inputs:
-            container.add_input(Variable(inp[0], inp[0],
-                                         scope=scope, type=inp[1]))
+            var = Variable(inp[0], inp[0], scope=scope, type=inp[1])
+            container.add_input(var)
+            scope.register_variable(var)
         self.add_to(scope, container, run_converters=True)
         if other_outputs is not None:
             for out in other_outputs:
@@ -849,6 +891,8 @@ class OnnxOperator:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
         else:
+            if verbose > 0:
+                print("[op.to_onnx] infer outputs")
             shapes = infer_outputs(container, container.inputs,
                                    initializer=container.initializers,
                                    target_opset=target_opset)
@@ -857,10 +901,19 @@ class OnnxOperator:
                                 for v in self.output_names)
                 shapes = [shape for shape in shapes
                           if shape.onnx_name in set_names]
+        if verbose > 0:
+            print("[op.to_onnx] shapes=%r" % shapes)
 
         # add the output to the container
         for shape in shapes:
             container.add_output(shape)
+
+        container.ensure_topological_order()
+        if verbose >= 2:
+            print("---NODES---")
+            for node in container.nodes:
+                print("  %s - %s: %r -> %r" % (
+                    node.op_type, node.name, node.input, node.output))
 
         # convert the graph
         graph = make_graph(
@@ -948,12 +1001,16 @@ class OnnxSubEstimator(OnnxOperator):
 
     def __init__(self, skl_op, *inputs, op_version=None,
                  output_names=None, domain=None, options=None,
-                 **kwargs):
+                 input_types=None, **kwargs):
         OnnxOperator.__init__(
             self, *inputs, op_version=op_version,
             output_names=output_names, domain=domain, **kwargs)
         self.operator_instance = skl_op
         self.options = options
+        if skl_op is None and input_types is not None:
+            raise RuntimeError(
+                "input_types is only used when a sub-operator is defined.")
+        self.input_types = input_types
 
     def __repr__(self):
         return "%s(%r, %s, op_version=%r, output_names=%r)" % (
@@ -1026,9 +1083,14 @@ class OnnxSubEstimator(OnnxOperator):
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
                 elif isinstance(input, tuple) and len(input) == 2:
-                    inputs.append(
-                        Variable(
-                            input[0], input[0], scope=scope, type=input[1]))
+                    if scope is not None and input[0] in scope.variables:
+                        var = scope.variables[input[0]]
+                    else:
+                        var = Variable(input[0], input[0], scope=scope,
+                                       type=input[1])
+                        if scope is not None:
+                            scope.register_variable(var)
+                    inputs.append(var)
                 else:
                     inputs.append(input)
 
@@ -1036,7 +1098,8 @@ class OnnxSubEstimator(OnnxOperator):
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                options=self.options, run_converters=run_converters, **kwargs)
+                options=self.options, run_converters=run_converters,
+                input_types=self.input_types, **kwargs)
             self.state.run()
 
 

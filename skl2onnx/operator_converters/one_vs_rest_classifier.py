@@ -51,6 +51,8 @@ def convert_one_vs_rest_classifier(scope: Scope, operator: Operator,
             if container.has_options(estimator, 'raw_scores'):
                 container.add_options(
                     id(estimator), {'raw_scores': use_raw_scores})
+                scope.add_options(
+                    id(estimator), {'raw_scores': use_raw_scores})
             label_name = scope.declare_local_variable(
                 'label_%d' % i, Int64TensorType())
             prob_name = scope.declare_local_variable(

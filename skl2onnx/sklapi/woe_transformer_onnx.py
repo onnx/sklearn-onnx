@@ -67,28 +67,31 @@ class Tree:
     class Node:
 
         def __init__(self, parent, is_left, is_leaf, feature,
-                     threshold, value):
+                     threshold, value, index=-1):
             self.parent = parent
             self.is_left = is_left
             self.is_leaf = is_leaf
             self.feature = feature
             self.threshold = threshold
             self.value = value
+            self.index = index
 
         def __str__(self):
-            return "Node(%s, %r, %r, %r, %r, %r)%s" % (
-                self.parent if isinstance(self.parent, int)
-                else "id%r" % id(self.parent),
-                self.is_left, self.is_leaf, self.feature,
-                self.threshold, self.value,
-                "  # %s %r -> %r%s%s%s" % (
-                    self.onnx_mode, self.onnx_threshold, self.onnx_value,
-                    " -- %r" % self.intervals_
-                    if hasattr(self, 'intervals_') else '',
-                    " LL %r" % self.intervals_left_
-                    if hasattr(self, 'intervals_left_') else '',
-                    " RR %r" % self.intervals_right_
-                    if hasattr(self, 'intervals_right_') else ''))
+            return (
+                "Node(%s, is_left=%r, is_leaf=%r, feature=%r, "
+                "threshold=%r, value=%r, index=%r)%s" % (
+                    self.parent if isinstance(self.parent, int)
+                    else "id%r" % id(self.parent),
+                    self.is_left, self.is_leaf, self.feature,
+                    self.threshold, self.value, self.index,
+                    "  # %s %r -> %r%s%s%s" % (
+                        self.onnx_mode, self.onnx_threshold, self.onnx_value,
+                        " -- %r" % self.intervals_
+                        if hasattr(self, 'intervals_') else '',
+                        " LL %r" % self.intervals_left_
+                        if hasattr(self, 'intervals_left_') else '',
+                        " RR %r" % self.intervals_right_
+                        if hasattr(self, 'intervals_right_') else '')))
 
         @property
         def onnx_value(self):
@@ -138,6 +141,7 @@ class Tree:
 
     def __init__(self):
         self.nodes = []
+        self.leave_values = set()
 
     def __str__(self):
         mapping = {}
@@ -152,16 +156,24 @@ class Tree:
         return res
 
     def add_node(self, parent, is_left, is_leaf, feature, threshold,
-                 value=None):
+                 value=None, index=-1):
         if is_leaf and value is None:
             raise ValueError("value must be specified when is_leaf=True.")
         if not is_leaf and value is not None:
             raise ValueError("value must not be specified when is_leaf=False.")
-        node = Tree.Node(parent, is_left, is_leaf, feature, threshold, value)
+        node = Tree.Node(parent, is_left, is_leaf, feature, threshold,
+                         value, index=index)
         self.nodes.append(node)
+        if is_leaf:
+            if value in self.leave_values:
+                raise RuntimeError(
+                    "The tree must contain unique tree value, %r "
+                    "already in %r.\n%s" % (
+                        value, self.leave_values, str(self)))
+            self.leave_values.add(value)
         return node
 
-    def update_feature(self, feature):
+    def _update_feature(self, feature):
         "Change the feature index."
         for node in self.nodes:
             node.feature = feature
@@ -276,12 +288,12 @@ class Tree:
         return mapping
 
 
-def digitize2tree(bins, right=False):
+def digitize2tree(bins, right=False, feature=0):
     ascending = len(bins) <= 1 or bins[0] < bins[1]
 
     if not ascending:
         bins2 = bins[::-1]
-        cl = digitize2tree(bins2, right=right)
+        cl = digitize2tree(bins2, right=right, feature=feature)
         n = len(bins)
         for i in range(cl.tree_.value.shape[0]):
             cl.tree_.value[i, 0, 0] = n - cl.tree_.value[i, 0, 0]
@@ -312,7 +324,9 @@ def digitize2tree(bins, right=False):
             # it means j is the parent split
             if i == j:
                 # leaf
-                n = tree.add_node(parent, is_left, True, 0, 0, value=i)
+                value = parent.index * 2
+                n = tree.add_node(
+                    parent, is_left, True, 0, 0, value=value, index=i)
                 n_nodes.append(n)
                 values.append(i)
                 return n
@@ -320,17 +334,17 @@ def digitize2tree(bins, right=False):
                 # split
                 values.append(UNUSED)
                 th = bins[i]
-                n = tree.add_node(parent, is_left, False, 0, th)
+                n = tree.add_node(parent, is_left, False, 0, th, index=i)
                 n_nodes.append(n)
                 add_nodes(n, i, i, True)
                 add_nodes(n, i, j, False)
                 return n
-            if i + 1 < j:
+            if i < j:
                 # split
                 values.append(UNUSED)
                 index = (i + j) // 2
                 th = bins[index]
-                n = tree.add_node(parent, is_left, False, 0, th)
+                n = tree.add_node(parent, is_left, False, 0, th, index=index)
                 n_nodes.append(n)
                 add_nodes(n, i, index, True)
                 add_nodes(n, index, j, False)
@@ -339,8 +353,10 @@ def digitize2tree(bins, right=False):
             # it means i is the parent split
             if i + 1 == j:
                 # leaf
+                value = parent.index * 2 + 1
                 values.append(j)
-                n = tree.add_node(parent, is_left, True, 0, 0, value=j+2)
+                n = tree.add_node(
+                    parent, is_left, True, 0, 0, value=value, index=j)
                 n_nodes.append(n)
                 return n
             if i + 1 < j:
@@ -348,7 +364,7 @@ def digitize2tree(bins, right=False):
                 values.append(UNUSED)
                 index = (i + j) // 2
                 th = bins[index]
-                n = tree.add_node(parent, is_left, False, 0, th)
+                n = tree.add_node(parent, is_left, False, 0, th, index=index)
                 n_nodes.append(n)
                 add_nodes(n, i, index, True)
                 add_nodes(n, index, j, False)
@@ -361,6 +377,7 @@ def digitize2tree(bins, right=False):
     root = add_root(index)
     add_nodes(root, 0, index, True)
     add_nodes(root, index, len(bins), False)
+    tree._update_feature(feature)
     return tree
 
 
@@ -426,8 +443,7 @@ def woe_converter(scope: Scope, operator: Operator,
             continue
 
         # encoding columns
-        tree = digitize2tree(threshold)
-        tree.update_feature(i)
+        tree = digitize2tree(threshold, feature=i)
 
         atts = tree.onnx_attributes()
         mapping = tree.mapping(op.intervals_[i])
@@ -513,8 +529,7 @@ def woe_transformer_to_onnx(op, opset=None):
             continue
 
         # encoding columns
-        tree = digitize2tree(threshold)
-        tree.update_feature(i)
+        tree = digitize2tree(threshold, feature=i)
         mapping = tree.mapping(op.intervals_[i])
 
         atts = tree.onnx_attributes()

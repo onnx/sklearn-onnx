@@ -24,7 +24,7 @@ from test_utils import TARGET_OPSET
 
 class TestSklearnWOETransformerConverter(unittest.TestCase):
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer(self):
         x = numpy.array(
             [[0.5, 0.7, 0.9], [0.51, 0.71, 0.91], [0.7, 0.5, 0.92]],
@@ -62,7 +62,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
             dtype=numpy.float32)
         assert_almost_equal(expected, x2)
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv_ext(self):
         x = numpy.array(
             [[0.4, 1.4, 2.4, 3.4],
@@ -82,7 +82,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv_ext2(self):
         for inca, incb in [(False, False), (True, True),
                            (False, True), (True, False)]:
@@ -98,7 +98,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
                 got = sess.run(None, {'X': x})[0]
                 assert_almost_equal(expected, got)
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv_ext3(self):
         x = numpy.array(
             [[0.4, 1.4, 2.4, 3.4],
@@ -117,7 +117,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv(self):
         x = numpy.array(
             [[0.2, 0.7, 0.9],
@@ -139,7 +139,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv_weights(self):
         x = numpy.array(
             [[0.2, 0.7, 0.9],
@@ -160,7 +160,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
 
     @unittest.skipIf(InvalidArgument is None,
                      reason='onnxruntime is too old')
-    @unittest.skipIf(TARGET_OPSET >= 12, reason='OneHotEncoder')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
     def test_woe_transformer_conv_weights_onnx(self):
         x = numpy.array(
             [[0.2, 0.7, 0.9],
@@ -216,6 +216,38 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
                     "Cannot load model:\n%s" % str(onnx_model)) from e
             got = sess.run(None, {'X': x})[0]
             assert_almost_equal(expected, got)
+
+    @unittest.skipIf(InvalidArgument is None,
+                     reason='onnxruntime is too old')
+    @unittest.skipIf(TARGET_OPSET < 12, reason='OneHotEncoder')
+    def test_woe_transformer_bigger(self):
+        x = numpy.array([[0, 1, 2, 3, 4, 5, 6, -1]], dtype=numpy.float32).T
+        intervals = [[(0.0, 1.0, False, True), (1.0, 2.0, False, True),
+                      (2.0, 3.0, False, True), (3.0, 4.0, False, True)]]
+        weights = [[-1.4057124469769924, -1.7241661780955269,
+                    2.545531271604435, 0.9614111671546247]]
+        woe = WOETransformer(intervals=intervals, weights=weights,
+                             onehot=False)
+        woe.fit(x)
+        expected = woe.transform(x)
+
+        onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
+        try:
+            sess = InferenceSession(onnx_model.SerializeToString())
+        except InvalidArgument as e:
+            raise AssertionError(
+                "Cannot load model:\n%s" % str(onnx_model)) from e
+        got = sess.run(None, {'X': x})[0]
+        assert_almost_equal(expected, got)
+
+        onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
+        try:
+            sess = InferenceSession(onnx_model.SerializeToString())
+        except InvalidArgument as e:
+            raise AssertionError(
+                "Cannot load model:\n%s" % str(onnx_model)) from e
+        got = sess.run(None, {'X': x})[0]
+        assert_almost_equal(expected, got)
 
 
 if __name__ == "__main__":

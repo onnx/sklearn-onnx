@@ -25,7 +25,7 @@ class GraphState:
                  options=None, expected_inputs=None,
                  expected_outputs=None, input_range=None,
                  output_range=None, operator=None,
-                 run_converters=False, **attrs):
+                 run_converters=False, input_types=None, **attrs):
 
         self.inputs = inputs
         self._output_names = output_names
@@ -54,6 +54,7 @@ class GraphState:
         self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
         self.options = options
+        self.input_types = input_types
 
         for att in ['inputs', '_expected_inputs',
                     '_expected_outputs', 'computed_inputs_',
@@ -299,7 +300,8 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(output), output))
 
     @staticmethod
-    def _update_inputs(inputs, names, scope, expected_inputs, input_range):
+    def _update_inputs(inputs, names, scope, expected_inputs,
+                       input_range, input_types=None):
         new_inputs = []
         for inp in inputs:
             if isinstance(inp, (Variable, tuple, GraphStateVar)):
@@ -316,9 +318,23 @@ class GraphState:
         for i in range(0, len(new_inputs)):
             inp = new_inputs[i]
             if isinstance(inp, tuple) and len(inp) == 2:
-                stype = None if isinstance(inp[1], str) else inp[1]
-                new_inputs[i] = Variable(
-                    inp[0], inp[0], type=stype, scope=scope)
+                if input_types is not None and i < len(input_types):
+                    stype = input_types[i]
+                else:
+                    stype = None if isinstance(inp[1], str) else inp[1]
+                if scope is not None:
+                    if inp[0] in scope.variables:
+                        var = scope.variables[inp[0]]
+                        if stype is not None:
+                            var.check_compatible_type(stype)
+                    else:
+                        onnx_name = scope.get_unique_variable_name(inp[0])
+                        var = Variable(
+                            inp[0], onnx_name, type=stype, scope=scope)
+                        scope.register_variable(var)
+                else:
+                    var = Variable(inp[0], inp[0], type=stype, scope=scope)
+                new_inputs[i] = var
                 inp = new_inputs[i]
             elif isinstance(inp, GraphStateVar):
                 new_inputs[i] = inp.as_variable(scope)
@@ -326,6 +342,7 @@ class GraphState:
             elif not isinstance(inp, Variable):
                 raise TypeError(
                     "Inputs %d - %r must be of type Variable." % (i, inp))
+
             if names is not None:
                 try:
                     onnx_name = (
@@ -358,6 +375,16 @@ class GraphState:
                                     new_inputs[j].type.__class__())
                                 break
 
+        # Overwrite types if input_types is specified.
+        if input_types is not None:
+            for i in range(len(new_inputs)):
+                if i >= len(input_types):
+                    raise RuntimeError(
+                        "Mismatch between computed inputs[%d]=%r and "
+                        "overwritten input_types[%d]=%r." % (
+                            i, new_inputs, i, input_types))
+                if input_types[i] is not None:
+                    new_inputs[i].type = input_types[i]
         return new_inputs
 
     @staticmethod
@@ -422,7 +449,8 @@ class GraphState:
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
                 expected_inputs=self._expected_inputs,
-                input_range=self._input_range)
+                input_range=self._input_range,
+                input_types=self.input_types)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -432,13 +460,34 @@ class GraphState:
 
                 # a model is converted into a subgraph
                 sub_op_inputs = self.computed_inputs_
+                for v in sub_op_inputs:
+                    if not isinstance(v, Variable):
+                        raise TypeError(
+                            "Every input variable must be a Variable not %r,"
+                            " v=%r." % (type(v), v))
+                    scope = v.scope
+                    if hasattr(scope, 'variables'):
+                        if v.onnx_name not in scope.variables:
+                            raise RuntimeError(
+                                "Variable %r missing from scope "
+                                "(operator=%r, model=%r), list=%r." % (
+                                    v, self.operator,
+                                    type(self.operator_instance),
+                                    list(sorted(self.scope.variables))))
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn
                 self.scope.add_options(
                     id(self.operator_instance), self.options)
-                sub_outputs = _parse_sklearn(
-                    self.scope, self.operator_instance, sub_op_inputs)
+                try:
+                    sub_outputs = _parse_sklearn(
+                        self.scope, self.operator_instance, sub_op_inputs)
+                except RuntimeError as e:
+                    raise RuntimeError(
+                        "Unable to run parser for model type %r, inputs=%r "
+                        "(input_types=%r)." % (
+                            type(self.operator_instance), sub_op_inputs,
+                            self.input_types)) from e
                 set_input_names = set(v.onnx_name for v in sub_op_inputs)
                 sub_op = None
                 for op in self.scope.operators.values():

@@ -250,6 +250,22 @@ def custom_transformer_converter1w(scope, operator, container):
     final.add_to(scope, container)
 
 
+class Custom2OpTransformer1ww(Custom2OpTransformer1):
+    pass
+
+
+def custom_transformer_converter1ww(scope, operator, container):
+    i0 = operator.inputs[0]
+    outputs = operator.outputs
+    op = operator.raw_operator
+    opv = container.target_opset
+    idin = OnnxIdentity(i0, op_version=opv)
+    out = OnnxSubEstimator(op.norm_, idin, op_version=opv)
+    final = OnnxIdentity(out, op_version=opv,
+                         output_names=outputs)
+    final.add_to(scope, container)
+
+
 class Custom2OpTransformer2(Custom2OpTransformer1):
     pass
 
@@ -421,6 +437,16 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
             custom_transformer_converter1w)
         X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
         tr = Custom2OpTransformer1w()
+        tr.fit(X)
+        self.check_transform(tr, X)
+
+    def test_custom_scaler_1ww_classic(self):
+        update_registered_converter(
+            Custom2OpTransformer1ww, 'Custom2OpTransformer1ww',
+            custom_shape_calculator,
+            custom_transformer_converter1ww)
+        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        tr = Custom2OpTransformer1ww()
         tr.fit(X)
         self.check_transform(tr, X)
 

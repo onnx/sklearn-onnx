@@ -24,14 +24,32 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
         feature_name = concatenate_variables(scope, operator.inputs, container)
     else:
         feature_name = operator.inputs[0].full_name
+    C = operator.outputs[0].get_second_dimension()
 
     op = operator.raw_operator
     op_type = 'Scaler'
     attrs = {'name': scope.get_unique_operator_name(op_type)}
 
     if isinstance(op, StandardScaler):
-        C = (operator.inputs[0].type.shape[1]
-             if len(operator.inputs[0].type.shape) == 2 else 1)
+        model_C = None
+        if op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if model_C is None and op.mean_ is not None:
+            model_C = op.mean_.shape[0]
+        if model_C is None and op.var_ is not None:
+            model_C = op.var_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
+        if C is not None and C != model_C:
+            raise RuntimeError(
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.outputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['offset'] = (
             op.mean_ if op.with_mean else
             np.array([0.0] * C, dtype=np.float32))
@@ -40,8 +58,23 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
             np.array([1.0] * C, dtype=np.float32))
         inv_scale = op.scale_ if op.with_std else None
     elif isinstance(op, RobustScaler):
-        C = (operator.inputs[0].type.shape[1]
-             if len(operator.inputs[0].type.shape) == 2 else 1)
+        model_C = None
+        if op.center_ is not None:
+            model_C = op.center_.shape[0]
+        if model_C is None and op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
+        if C is not None and C != model_C:
+            raise RuntimeError(
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.outputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['offset'] = (
             op.center_ if op.with_centering else
             np.array([0.0] * C, dtype=np.float32))
@@ -55,8 +88,23 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
         attrs['offset'] = -op.min_ / (op.scale_ + 1e-8)
         inv_scale = None
     elif isinstance(op, MaxAbsScaler):
-        C = (operator.inputs[0].type.shape[1]
-             if len(operator.inputs[0].type.shape) == 2 else 1)
+        model_C = None
+        if op.max_abs_ is not None:
+            model_C = op.max_abs_.shape[0]
+        if model_C is None and op.scale_ is not None:
+            model_C = op.scale_.shape[0]
+        if model_C is None:
+            # Identity
+            container.add_node(
+                'Identity', feature_name,
+                operator.outputs[0].full_name)
+            return
+        if C is not None and C != model_C:
+            raise RuntimeError(
+                "Unable Mismatch between expected shape %r and model (., %r)"
+                " in operator %r." % (
+                    operator.outputs[0].type.shape, model_C, operator))
+        C = model_C
         attrs['scale'] = 1.0 / op.scale_
         attrs['offset'] = np.array([0.] * C, dtype=np.float32)
         inv_scale = op.scale_
