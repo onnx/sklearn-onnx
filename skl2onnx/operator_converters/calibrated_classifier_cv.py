@@ -261,6 +261,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     this_operator = scope.declare_local_operator(op_type, base_model)
     if container.has_options(base_model, 'raw_scores'):
         container.add_options(id(base_model), {'raw_scores': True})
+        scope.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label', Int64TensorType())
     df_name = scope.declare_local_variable(

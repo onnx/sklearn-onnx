@@ -850,8 +850,6 @@ class Topology:
         self.scopes = []
         self.raw_model = model
         self.scope_names = set()
-        self.variable_name_set = set()
-        self.operator_name_set = set()
         self.initial_types = initial_types if initial_types else list()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
@@ -1103,10 +1101,6 @@ class Topology:
         def _check_variable_out_(variable, operator):
             if variable.is_fed:
                 add = ["", "--DEBUG-INFO--"]
-                add.append("self.variable_name_set=%s" % (
-                    pprint.pformat(self.variable_name_set)))
-                add.append("self.operator_name_set=%s" % (
-                    pprint.pformat(self.operator_name_set)))
                 for scope in self.scopes:
                     add.append('---')
                     add.append(pprint.pformat(
@@ -1126,6 +1120,9 @@ class Topology:
                     add.append(" inputs={}".format(v))
                 for v in operator.outputs:
                     add.append(" outputs={}".format(v))
+                add.append('--- operator producing this variable--')
+                for op in variable.operators_outputs_:
+                    add.append(str(op))
                 raise RuntimeError(
                     "A variable is already assigned ({}) "
                     "for operator '{}' (name='{}'). "
