@@ -121,7 +121,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                 names = parser_names()
             if names is not None:
                 for name in names:
-                    if isintance(name, Variable):
+                    if isinstance(name, Variable):
                         this_operator.outputs.append(name)
                     elif isinstance(name, str):
                         var = scope.declare_local_variable(
