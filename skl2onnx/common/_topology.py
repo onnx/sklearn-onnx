@@ -1113,8 +1113,10 @@ class Topology:
                         scope.variable_name_mapping))
                     add.append('---')
                     for var in scope.variables.values():
-                        add.append("   is_fed=%s %s" % (
-                            getattr(var, 'is_fed', '?'), var))
+                        add.append("   is_fed=%s %s - n_in=%d n_out=%d" % (
+                            getattr(var, 'is_fed', '?'), var,
+                            len(var.operators_inputs_),
+                            len(var.operators_outputs_)))
                     add.append('---')
                     for op in scope.operators.values():
                         add.append("   is_evaluated=%s %s" % (
@@ -1213,8 +1215,10 @@ class Topology:
             rows = ["---VARS---"]
             for var in self.unordered_variable_iterator():
                 rows.append(
-                    "is_fed=%r is_leaf=%r is_root=%r - %r"
-                    "" % (var.is_fed, var.is_leaf, var.is_root, var))
+                    "is_fed=%r is_leaf=%r is_root=%r - %r - n_in=%d n_out=%d"
+                    "" % (var.is_fed, var.is_leaf, var.is_root, var,
+                          len(var.operators_inputs_),
+                          len(var.operators_outputs_)))
             rows.append("---OPERATORS---")
             for op in self.unordered_operator_iterator():
                 rows.append("is_eval=%r - %r" % (op.is_evaluated, op))

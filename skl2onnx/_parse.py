@@ -133,8 +133,9 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                         this_operator.outputs.append(var)
                     else:
                         raise RuntimeError(
-                            "Unexpected output type %r (value=%r) for operator "
-                            "%r." % (type(name), name, type(model))) 
+                            "Unexpected output type %r (value=%r) for "
+                            "operator %r." % (
+                                type(name), name, type(model)))
                 return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list
