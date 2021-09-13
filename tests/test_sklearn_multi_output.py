@@ -31,6 +31,8 @@ class TestMultiOutputConverter(unittest.TestCase):
             X.astype(numpy.float32), clf, onx,
             basename="SklearnMultiOutputRegressor")
 
+    @unittest.skipIf(TARGET_OPSET<11,
+                     reason="SequenceConstruct not available.")
     def test_multi_output_classifier(self):
         X, y = make_multilabel_classification(n_classes=3, random_state=0)
         X = X.astype(numpy.float32)
