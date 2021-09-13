@@ -13,6 +13,15 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
+      Py39-Onnx1101-Rt190-Skl0242:
+        python.version: '3.9'
+        onnx.version: 'onnx==1.10.1'  # -i https://test.pypi.org/simple/ onnx'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        sklearn.version: '>=0.24.2'
       Py39-Onnx1101-Rt181-Skl0242:
         python.version: '3.9'
         onnx.version: 'onnx==1.10.1'  # -i https://test.pypi.org/simple/ onnx'
