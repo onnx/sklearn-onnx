@@ -386,7 +386,7 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
             raise AssertionError(
                 "Issue %r with\n%s" % (e, str(onx))) from e
         got = sess.run(None, {'X': X})[0]
-        assert_almost_equal(expected, got)
+        assert_almost_equal(expected, got, decimal=5)
 
     def check_classifier(self, obj, X):
         self.log.debug("[check_classifier------] type(obj)=%r" % type(obj))
