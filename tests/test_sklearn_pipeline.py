@@ -673,6 +673,8 @@ class TestSklearnPipeline(unittest.TestCase):
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_pipeline_rf(self):
         cat_feat = ['A', 'B']
@@ -719,6 +721,8 @@ class TestSklearnPipeline(unittest.TestCase):
             assert_almost_equal(e, g, decimal=5)
         assert_almost_equal(expected_label, got[0])
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
     def test_issue_712(self):
         dfx = pandas.DataFrame(
             {'CAT1': ['985332', '985333', '985334', '985335', '985336'],
