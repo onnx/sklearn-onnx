@@ -24,6 +24,7 @@ from . import grid_search_cv
 from . import id_op
 from . import imputer_op
 from . import isolation_forest
+from . import kernel_pca
 from . import k_bins_discretiser
 from . import k_means
 from . import label_binariser
@@ -79,6 +80,7 @@ __all__ = [
     id_op,
     imputer_op,
     isolation_forest,
+    kernel_pca,
     k_bins_discretiser,
     k_means,
     label_binariser,
