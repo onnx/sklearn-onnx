@@ -4,8 +4,8 @@
 """
 .. _example-lightgbm:
 
-Convert a pipeline with a LightGBM model
-========================================
+Convert a pipeline with a LightGBM classifier
+=============================================
 
 .. index:: LightGBM
 
