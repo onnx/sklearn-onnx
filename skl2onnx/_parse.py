@@ -13,6 +13,7 @@ except ImportError:
     class OutlierMixin:
         pass
 
+from sklearn.ensemble import IsolationForest
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
@@ -165,8 +166,21 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
+    elif type(model) == IsolationForest:
+        label_variable = scope.declare_local_variable(
+            'label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable(
+            'scores', guess_tensor_type(inputs[0].type))
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
+        options = scope.get_options(model, dict(score_samples=False))
+        if options['score_samples']:
+            scores_var = scope.declare_local_variable(
+                'score_samples', guess_tensor_type(inputs[0].type))
+            this_operator.outputs.append(scores_var)
+
     elif type(model) in outlier_list or isinstance(model, OutlierMixin):
-        # For clustering, we may have two outputs, one for label and
+        # For outliers, we may have two outputs, one for label and
         # the other one for scores.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())

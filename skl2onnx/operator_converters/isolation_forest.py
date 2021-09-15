@@ -28,6 +28,7 @@ def convert_sklearn_isolation_forest(
     outputs = operator.outputs
     opv = container.target_opset
     opvml = container.target_opset_any_domain('ai.onnx.ml')
+    options = container.get_options(op, dict(score_samples=None))
     if opvml < 2:
         raise RuntimeError(
             "This converter requires at least opset 2 for "
@@ -187,13 +188,15 @@ def convert_sklearn_isolation_forest(
                      op_version=opv)
 
     # decision_function
-    decision = OnnxAdd(
-        OnnxNeg(
+    output_names = outputs[2].full_name if options['score_samples'] else None
+    score_samples = OnnxNeg(
             OnnxPow(np.array([2], dtype=dtype),
                     OnnxNeg(depths, op_version=opv),
                     op_version=opv),
-            op_version=opv),
-        np.array([-op.offset_], dtype=dtype),
+            op_version=opv, output_names=output_names)
+
+    decision = OnnxAdd(
+        score_samples, np.array([-op.offset_], dtype=dtype),
         op_version=opv, output_names=outputs[1].full_name)
     decision.set_onnx_name_prefix('dec')
 
@@ -212,6 +215,8 @@ def convert_sklearn_isolation_forest(
 
     predict.add_to(scope, container)
     less.add_to(scope, container)
+    if options['score_samples']:
+        score_samples.add_to(scope, container)
 
 
 def _build_labels(tree, output):
@@ -251,4 +256,5 @@ def _build_labels(tree, output):
 
 
 register_converter('SklearnIsolationForest',
-                   convert_sklearn_isolation_forest)
+                   convert_sklearn_isolation_forest,
+                   options={'score_samples': [True, False]})
