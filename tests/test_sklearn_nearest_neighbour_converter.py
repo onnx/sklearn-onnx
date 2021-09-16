@@ -209,7 +209,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnRadiusNeighborsRegressor64")
         dump_data_and_model(
-            (X + 0.1).astype(numpy.float64)[:7],
+            (X + 10.).astype(numpy.float64)[:7],
             model, model_onnx,
             basename="SklearnRadiusNeighborsRegressor64")
 
