@@ -31,6 +31,8 @@ class TestMultiOutputConverter(unittest.TestCase):
             X.astype(numpy.float32), clf, onx,
             basename="SklearnMultiOutputRegressor")
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available.")
     def test_multi_output_classifier(self):
         X, y = make_multilabel_classification(n_classes=3, random_state=0)
         X = X.astype(numpy.float32)
@@ -44,9 +46,11 @@ class TestMultiOutputConverter(unittest.TestCase):
         sess = InferenceSession(onx.SerializeToString())
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
-        exp_prb = numpy.transpose(clf.predict_proba(X), (1, 0, 2))
+        exp_prb = clf.predict_proba(X)
         assert_almost_equal(exp_lab, res[0])
-        assert_almost_equal(exp_prb, res[1], decimal=5)
+        self.assertEqual(len(exp_prb), len(res[1]))
+        for e, g in zip(exp_prb, res[1]):
+            assert_almost_equal(e, g, decimal=5)
 
         # check option nocl=True
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
@@ -56,9 +60,11 @@ class TestMultiOutputConverter(unittest.TestCase):
         sess = InferenceSession(onx.SerializeToString())
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
-        exp_prb = numpy.transpose(clf.predict_proba(X), (1, 0, 2))
+        exp_prb = clf.predict_proba(X)
         assert_almost_equal(exp_lab, res[0])
-        assert_almost_equal(exp_prb, res[1], decimal=5)
+        self.assertEqual(len(exp_prb), len(res[1]))
+        for e, g in zip(exp_prb, res[1]):
+            assert_almost_equal(e, g, decimal=5)
 
         # check option nocl=False
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
@@ -68,9 +74,11 @@ class TestMultiOutputConverter(unittest.TestCase):
         sess = InferenceSession(onx.SerializeToString())
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
-        exp_prb = numpy.transpose(clf.predict_proba(X), (1, 0, 2))
+        exp_prb = clf.predict_proba(X)
         assert_almost_equal(exp_lab, res[0])
-        assert_almost_equal(exp_prb, res[1], decimal=5)
+        self.assertEqual(len(exp_prb), len(res[1]))
+        for e, g in zip(exp_prb, res[1]):
+            assert_almost_equal(e, g, decimal=5)
 
 
 if __name__ == "__main__":
