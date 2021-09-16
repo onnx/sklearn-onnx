@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from sklearn.metrics.pairwise import KERNEL_PARAMS  # , PAIRWISE_KERNEL_FUNCTIONS
+from sklearn.preprocessing import normalize
 from ..algebra.complex_functions import onnx_cdist
 from ..algebra.onnx_ops import (
     OnnxMatMul, OnnxTranspose, OnnxDiv, OnnxSub, OnnxAdd,
+    OnnxMul, OnnxPow, OnnxTanh, OnnxSqrt, OnnxExp,
     OnnxReduceSumApi11)
 from ..algebra.onnx_operator import OnnxSubEstimator
 from ..common._registration import register_converter
@@ -58,28 +59,66 @@ def kernel_pca_converter(scope: Scope, operator: Operator,
             "type=%r." % (op.kernel, type(op)))
 
     kernel = op.kernel
-    allowed_params = KERNEL_PARAMS[kernel]
     params = {"gamma": op.gamma, "degree": op.degree, "coef0": op.coef0}
-    kwargs = {k: v for k, v in params.items() if k in allowed_params}
 
-    Y = op.X_fit_.astype(dtype)
     if kernel == 'linear':
+        Y = op.X_fit_.astype(dtype)
         dist = OnnxMatMul(
             X, OnnxTranspose(Y, perm=[1, 0], op_version=op_version),
             op_version=op_version)
-    elif optim == 'cdist':
-        from skl2onnx.algebra.custom_ops import OnnxCDist
-        dist = OnnxCDist(X, Y, metric=kernel, op_version=op_version,
-                         **kwargs)
-    elif optim is None:
-        dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
-        dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
-        dist = onnx_cdist(X, Y, metric=kernel, dtype=dtype,
-                          op_version=op_version,
-                          dim_in=dim_in, dim_out=dim_out,
-                          **kwargs)
+    elif kernel == 'cosine':
+        yn = normalize(op.X_fit_, copy=True)
+        ynt = yn.astype(dtype)
+        norm = OnnxSqrt(
+            OnnxReduceSumApi11(
+                OnnxPow(X, np.array([2], dtype=np.int64),
+                        op_version=op_version),
+                axes=[1], op_version=op_version, keepdims=1),
+            op_version=op_version)
+        dist = OnnxMatMul(
+            OnnxDiv(X, norm, op_version=op_version),
+            OnnxTranspose(ynt, perm=[1, 0], op_version=op_version),
+            op_version=op_version)
+    elif kernel in ('poly', 'sigmoid'):
+        Y = op.X_fit_.astype(dtype)
+        dot = OnnxMatMul(
+            X, OnnxTranspose(Y, perm=[1, 0], op_version=op_version),
+            op_version=op_version)
+        if params['gamma'] is None:
+            gamma = np.array([1. / Y.shape[1]], dtype=dtype)
+        else:
+            gamma = np.array([params['gamma']], dtype=dtype)
+        dot_g = OnnxMul(dot, gamma, op_version=op_version)
+        dot_c = OnnxAdd(dot_g, np.array([params['coef0']], dtype=dtype),
+                        op_version=op_version)
+        if kernel == 'poly':
+            dist = OnnxPow(dot_c,
+                           np.array([params['degree']], dtype=np.int64),
+                           op_version=op_version)
+        else:
+            dist = OnnxTanh(dot_c, op_version=op_version)
+    elif kernel == 'rbf':
+        if optim == 'cdist':
+            from skl2onnx.algebra.custom_ops import OnnxCDist
+            Y = op.X_fit_.astype(dtype)
+            pair = OnnxCDist(X, Y, metric='sqeuclidean', op_version=op_version)
+        elif optim is None:
+            Y = op.X_fit_.astype(dtype)
+            dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
+            dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
+            pair = onnx_cdist(X, Y, metric='sqeuclidean', dtype=dtype,
+                              op_version=op_version,
+                              dim_in=dim_in, dim_out=dim_out)
+        else:
+            raise ValueError("Unknown optimisation '{}'.".format(optim))
+        if params['gamma'] is None:
+            gamma = np.array([-1. / Y.shape[1]], dtype=dtype)
+        else:
+            gamma = np.array([-params['gamma']], dtype=dtype)
+        pair_g = OnnxMul(pair, gamma, op_version=op_version)
+        dist = OnnxExp(pair_g, op_version=op_version)
     else:
-        raise ValueError("Unknown optimisation '{}'.".format(optim))
+        raise ValueError("Unknown kernel '{}'.".format(kernel))
 
     #  K = self._centerer.transform(self._get_kernel(X, self.X_fit_))
     K = OnnxSubEstimator(op._centerer, dist, op_version=op_version)
