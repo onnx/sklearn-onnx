@@ -6,6 +6,8 @@ Test scikit-learn's IsolationForest.
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
+from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 from sklearn import __version__ as sklv
 try:
     from sklearn.ensemble import IsolationForest
@@ -36,6 +38,28 @@ class TestSklearnIsolationForest(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="IsolationForest")
+
+    @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
+    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+                     reason="tree structure is different.")
+    def test_isolation_forest_score_samples(self):
+        isol = IsolationForest(n_estimators=3, random_state=0)
+        data = np.array([[-1.1, -1.2], [0.3, 0.2],
+                         [0.5, 0.4], [100., 99.]], dtype=np.float32)
+        model = isol.fit(data)
+        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET,
+                             options={'score_samples': True})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        names = [o.name for o in sess.get_outputs()]
+        self.assertEqual(names, ['label', 'scores', 'score_samples'])
+        got = sess.run(None, {'X': data})
+        self.assertEqual(len(got), 3)
+        expected_label = isol.predict(data)
+        expected_decif = isol.decision_function(data)
+        expected_score = isol.score_samples(data)
+        assert_almost_equal(expected_label, got[0].ravel())
+        assert_almost_equal(expected_decif, got[1].ravel())
+        assert_almost_equal(expected_score, got[2].ravel())
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),

@@ -38,7 +38,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
@@ -673,6 +673,8 @@ class TestSklearnPipeline(unittest.TestCase):
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_pipeline_rf(self):
         cat_feat = ['A', 'B']
@@ -714,9 +716,51 @@ class TestSklearnPipeline(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         got = sess.run(None, {'A': data[:, :1], 'B': data[:, 1:2],
                               'TEXT': data[:, 2:]})
-        assert_almost_equal(
-            numpy.transpose(expected_proba, (1, 0, 2)), got[1])
+        self.assertEqual(len(expected_proba), len(got[1]))
+        for e, g in zip(expected_proba, got[1]):
+            assert_almost_equal(e, g, decimal=5)
         assert_almost_equal(expected_label, got[0])
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    def test_issue_712(self):
+        dfx = pandas.DataFrame(
+            {'CAT1': ['985332', '985333', '985334', '985335', '985336'],
+             'CAT2': ['1985332', '1985333', '1985334', '1985335', '1985336'],
+             'TEXT': ["abc abc", "abc def", "def ghj", "abcdef", "abc ii"]})
+        dfy = pandas.DataFrame(
+            {'REAL': [5, 6, 7, 6, 5],
+             'CATY': [0, 1, 0, 1, 0]})
+
+        cat_features = ['CAT1', 'CAT2']
+        categorical_transformer = OneHotEncoder(handle_unknown='ignore')
+        textual_feature = 'TEXT'
+        count_vect_transformer = Pipeline(steps=[
+            ('count_vect', CountVectorizer(
+                max_df=0.8, min_df=0.05, max_features=1000))])
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('cat_transform', categorical_transformer, cat_features),
+                ('count_vector', count_vect_transformer, textual_feature)])
+        model_RF = RandomForestClassifier(random_state=42, max_depth=50)
+        rf_clf = Pipeline(steps=[
+            ('preprocessor', preprocessor),
+            ('classifier', MultiOutputClassifier(estimator=model_RF))])
+        rf_clf.fit(dfx, dfy)
+        expected_label = rf_clf.predict(dfx)
+        expected_proba = rf_clf.predict_proba(dfx)
+
+        inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                  'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                  'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+        onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
+        sess = InferenceSession(onx.SerializeToString())
+
+        got = sess.run(None, inputs)
+        assert_almost_equal(expected_label, got[0])
+        self.assertEqual(len(expected_proba), len(got[1]))
+        for e, g in zip(expected_proba, got[1]):
+            assert_almost_equal(e, g, decimal=5)
 
 
 if __name__ == "__main__":
@@ -724,5 +768,4 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnPipeline().test_pipeline_pipeline_rf()
     unittest.main()
