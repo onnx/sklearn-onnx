@@ -171,6 +171,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
                 assert_almost_equal(expected_decif, got[1].ravel(), decimal=4)
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
+    @unittest.skipIf(TARGET_OPSET < 13, reason="TopK")
     def test_local_outlier_factor_double(self):
         lof = LocalOutlierFactor(n_neighbors=2, novelty=True)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
