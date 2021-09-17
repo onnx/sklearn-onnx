@@ -62,7 +62,7 @@ def convert_sklearn_local_outlier_factor(
         axes=[2], op_version=opv)
     dist_k.set_onnx_name_prefix('dist_k')
     reach_dist_array = OnnxMax(
-        OnnxMul(dist, np.array([-1], dtype=dtype)),
+        OnnxMul(dist, np.array([-1], dtype=dtype), op_version=opv),
         dist_k, op_version=opv)
 
     # X_lrd=  return 1.0 / (np.mean(reach_dist_array, axis=1) + 1e-10)
@@ -71,7 +71,8 @@ def convert_sklearn_local_outlier_factor(
         OnnxAdd(
             OnnxReduceMean(reach_dist_array, axes=[1],
                            op_version=opv, keepdims=1),
-            np.array([1e-10], dtype=dtype), op_version=opv))
+            np.array([1e-10], dtype=dtype), op_version=opv),
+        op_version=opv)
     X_lrd.set_onnx_name_prefix('X_lrd')
 
     # lrd_ratios_array = self._lrd[neighbors_indices_X] / X_lrd[:, np.newaxis]
@@ -103,10 +104,8 @@ def convert_sklearn_local_outlier_factor(
             OnnxCast(
                 OnnxLess(final, np.array([0], dtype=dtype), op_version=opv),
                 to=TensorProto.INT64, op_version=opv),
-            np.array([-2], dtype=np.int64),
-            op_version=opv),
-        np.array([1], dtype=np.int64),
-        op_version=opv,
+            np.array([-2], dtype=np.int64), op_version=opv),
+        np.array([1], dtype=np.int64), op_version=opv,
         output_names=outputs[0].full_name)
     predict.set_onnx_name_prefix('predict')
 
