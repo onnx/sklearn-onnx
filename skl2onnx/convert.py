@@ -192,7 +192,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
             print("---OUTPUTS---")
             for inp in scope.output_variables:
                 print("  %r" % inp)
-            print("---VARIABLESS---")
+            print("---VARIABLES---")
             for k, v in sorted(scope.variables.items()):
                 print("  %r: is.fed=%r is_leaf=%r - %r" % (
                     k, v.is_fed, v.is_leaf, v))
