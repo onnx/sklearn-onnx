@@ -129,7 +129,10 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 # Operators for preprocessing and feature engineering
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import (
-    PCA, IncrementalPCA, TruncatedSVD,
+    KernelPCA,
+    IncrementalPCA,
+    PCA,
+    TruncatedSVD,
 )
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import (
@@ -173,10 +176,13 @@ except ImportError:
     # Not available in scikit-learn < 0.20.0
     OrdinalEncoder = None
 from sklearn.preprocessing import (
-    MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
-    PolynomialFeatures, RobustScaler,
-    StandardScaler,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
+    PolynomialFeatures,
+    RobustScaler,
+    StandardScaler
 )
 
 try:
@@ -322,6 +328,8 @@ def build_sklearn_operator_name_map():
         MultiOutputClassifier,
         MultiOutputRegressor,
         KBinsDiscretizer,
+        KernelCenterer,
+        KernelPCA,
         KNeighborsClassifier,
         KNeighborsRegressor,
         KNeighborsTransformer,
