@@ -274,20 +274,6 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         cur_k = k
         if n_classes == 2:
             cur_k += 1
-            # In case of binary classification, SVMs only return
-            # scores for the positive class. We concat the same
-            # column twice as we just use the second column.
-            if op_type in ('SklearnLinearSVC', 'SklearnSVC'):
-                df_input_name = scope.get_unique_variable_name('df_input')
-                merged_input_name = scope.get_unique_variable_name(
-                    'merged_input')
-
-                apply_reshape(scope, df_inp,
-                              df_input_name, container,
-                              desired_shape=(-1, 1))
-                apply_concat(scope, [df_input_name, df_input_name],
-                             merged_input_name, container, axis=1)
-                df_inp = merged_input_name
         k_name = scope.get_unique_variable_name('k')
         df_col_name = scope.get_unique_variable_name('transposed_df_col')
         prob_name[k] = scope.get_unique_variable_name('prob_{}'.format(k))

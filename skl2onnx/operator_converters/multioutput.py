@@ -5,7 +5,7 @@ from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
-    OnnxConcat, OnnxReshape, OnnxIdentity)
+    OnnxConcat, OnnxReshapeApi13, OnnxIdentity)
 try:
     from ..algebra.onnx_ops import OnnxSequenceConstruct
 except ImportError:
@@ -23,7 +23,7 @@ def convert_multi_output_regressor_converter(
     op = operator.raw_operator
     inp = operator.inputs[0]
     y_list = [
-        OnnxReshape(
+        OnnxReshapeApi13(
             OnnxSubEstimator(sub, inp, op_version=op_version),
             np.array([-1, 1], dtype=np.int64),
             op_version=op_version)
@@ -57,8 +57,8 @@ def convert_multi_output_classifier_converter(
               for sub in op.estimators_]
 
     # labels
-    label_list = [OnnxReshape(y[0], np.array([-1, 1], dtype=np.int64),
-                              op_version=op_version)
+    label_list = [OnnxReshapeApi13(y[0], np.array([-1, 1], dtype=np.int64),
+                                   op_version=op_version)
                   for y in y_list]
 
     label = OnnxConcat(*label_list, axis=1, op_version=op_version,

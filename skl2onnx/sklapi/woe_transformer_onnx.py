@@ -22,7 +22,7 @@ from ..common.utils import (
 from .. import update_registered_converter
 from .._supported_operators import _get_sklearn_operator_name
 from ..algebra.onnx_ops import (
-    OnnxIdentity, OnnxMatMul, OnnxGather, OnnxConcat, OnnxReshape,
+    OnnxIdentity, OnnxMatMul, OnnxGather, OnnxConcat, OnnxReshapeApi13,
     OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast)
 from .woe_transformer import WOETransformer
 
@@ -437,7 +437,7 @@ def woe_converter(scope: Scope, operator: Operator,
             # Passthrough columns
             index = np.array([i], dtype=np.int64)
             columns.append(
-                OnnxReshape(
+                OnnxReshapeApi13(
                     OnnxGather(X, index, op_version=opv, axis=1),
                     new_shape, op_version=opv))
             continue
@@ -457,7 +457,8 @@ def woe_converter(scope: Scope, operator: Operator,
             if verbose > 1:
                 print("[woe_converter] mapping=%r" % mapping)
             ohe = OnnxOneHotEncoder(
-                OnnxReshape(node, vector_shape, op_version=opv),
+                OnnxReshapeApi13(
+                    node, vector_shape, op_version=opv),
                 op_version=opv, cats_int64s=cats)
             ren = OnnxMatMul(
                 OnnxCast(ohe, op_version=opv, to=proto_type),
@@ -472,7 +473,7 @@ def woe_converter(scope: Scope, operator: Operator,
                 print("[woe_converter] key_value=%r" % key_value)
             node = OnnxTreeEnsembleRegressor(
                 X, op_version=1, domain='ai.onnx.ml', **atts)
-            lab = OnnxReshape(node, new_shape, op_version=opv)
+            lab = OnnxReshapeApi13(node, new_shape, op_version=opv)
             columns.append(lab)
 
     conc = OnnxConcat(*columns, op_version=opv, axis=1)
