@@ -25,6 +25,8 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
         model.fit(X_train)
         return model, X_test.astype(np.float32)
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="all needed operators not available")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_default_float(self):
         model, X_test = self._fit_model(
@@ -34,6 +36,8 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnKernelPCA32")
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="all needed operators not available")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_default_double(self):
         model, X_test = self._fit_model(
@@ -43,6 +47,8 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnKernelPCA64")
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="all needed operators not available")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_float(self):
         for kernel in ['rbf', 'cosine', 'sigmoid', 'poly', 'linear']:
@@ -55,6 +61,8 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
                     X_test, model, model_onnx,
                     basename="SklearnKernelPCA%s32" % kernel)
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="all needed operators not available")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_double(self):
         for kernel in ['linear', 'poly', 'rbf', 'sigmoid', 'cosine']:
@@ -68,6 +76,8 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
                     X_test, model, model_onnx,
                     basename="SklearnKernelPCA%s64" % kernel)
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="all needed operators not available")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_double_cdist(self):
         for kernel in ['linear', 'poly', 'rbf', 'sigmoid', 'cosine']:
