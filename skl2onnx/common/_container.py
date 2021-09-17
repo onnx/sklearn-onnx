@@ -782,7 +782,9 @@ class ModelComponentContainer(_WhiteBlackContainer):
         for inp in self.initializers:
             name = inp.name
             order[name] = 0
+
         n_iter = 0
+        missing_ops = []
         while n_iter < len(self.nodes) * 2:
             n_iter += 1
             missing_names = set()
