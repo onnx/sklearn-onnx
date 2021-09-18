@@ -285,13 +285,25 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         y = y[:90]
         self.assertEqual(len(set(y)), 2)
         model = CalibratedClassifierCV(
-            base_estimator=SVC(),
+            base_estimator=SVC(), cv=2,
             method='sigmoid').fit(X, y)
         model_onnx = convert_sklearn(
             model, "unused",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
             options={id(model): {'zipmap': False}})
+
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(model_onnx.SerializeToString())
+
+        # print(model.predict_proba(X[:5]))
+        # for m in model.calibrated_classifiers_:
+        #     print(m.predict_proba(X[:5]))
+        # print('--------------------------')
+        # from mlprodict.onnxrt import OnnxInference
+        # oinf = OnnxInference(model_onnx)
+        # oinf.run({'input': X[:5].astype(np.float32)}, verbose=10, fLOG=print)
+
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X[:5].astype(np.float32)})
         assert_almost_equal(model.predict_proba(X[:5]), res[1])
@@ -311,5 +323,5 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnCalibratedClassifierCVConverters().test_model_calibrated_classifier_cv_svc2()
+    TestSklearnCalibratedClassifierCVConverters().test_model_calibrated_classifier_cv_svc2()
     unittest.main()
