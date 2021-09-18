@@ -2,9 +2,11 @@
 
 
 from io import BytesIO
+import numpy as np
 import onnx  # noqa
-from onnx import shape_inference
+from onnx import shape_inference, TensorProto
 from onnx.numpy_helper import from_array
+from onnx.helper import make_tensor
 from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,
     make_model, ValueInfoProto
@@ -366,7 +368,18 @@ def add_output_initializer(model_onnx, name, value, suffix='_init'):
                 "Names %r or %r is already taken by an output: %r." % (
                     name_output, name_init, ", ".join(sorted(names))))
 
-        cst = from_array(value, name=name_init)
+        try:
+            cst = from_array(value, name=name_init)
+        except RuntimeError as e:
+            st = str(value.dtype).lower()
+            if st.startswith('u') or st.startswith("<u"):
+                cst_value = np.array([s.encode('utf-8') for s in value])
+                cst = make_tensor(
+                    name_init, data_type=TensorProto.STRING,
+                    dims=value.shape, vals=list(cst_value))
+            else:
+                raise e
+
         inits.append(cst)
 
         outputs.append(make_tensor_value_info(
