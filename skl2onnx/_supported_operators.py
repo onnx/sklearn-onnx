@@ -89,9 +89,12 @@ from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
 from sklearn.neighbors import (
-    KNeighborsClassifier, RadiusNeighborsClassifier,
-    KNeighborsRegressor, RadiusNeighborsRegressor,
+    KNeighborsClassifier,
+    KNeighborsRegressor,
+    LocalOutlierFactor,
     NearestNeighbors,
+    RadiusNeighborsClassifier,
+    RadiusNeighborsRegressor,
 )
 try:
     from sklearn.neighbors import (
@@ -268,7 +271,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM, IsolationForest]
+outlier_list = [IsolationForest, LocalOutlierFactor, OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -319,6 +322,7 @@ def build_sklearn_operator_name_map():
         LinearRegression,
         LinearSVC,
         LinearSVR,
+        LocalOutlierFactor,
         MaxAbsScaler,
         MiniBatchKMeans,
         MinMaxScaler,

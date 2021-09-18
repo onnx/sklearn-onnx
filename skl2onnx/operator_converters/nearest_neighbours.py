@@ -78,32 +78,34 @@ def onnx_nearest_neighbors_indices_k(X, Y, k, metric='euclidean', dtype=None,
     :param kwargs: additional parameters for function @see fn onnx_cdist
     :return: top indices, top distances
     """
+    kwargs_dist = {k: v for k, v in kwargs.items() if k == 'p'}
+    kwargs_topk = {k: v for k, v in kwargs.items() if k != 'p'}
     if optim == 'cdist':
         from skl2onnx.algebra.custom_ops import OnnxCDist
         dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
-                         **kwargs)
+                         **kwargs_dist)
     elif optim is None:
         dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
         dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
         dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
                           op_version=op_version,
                           dim_in=dim_in, dim_out=dim_out,
-                          **kwargs)
+                          **kwargs_dist)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
                            op_version=op_version)
-        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs)
+        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs_topk)
     elif op_version < 11:
         neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
                            op_version=op_version)
         node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
-                           op_version=10, **kwargs)
+                           op_version=10, **kwargs_topk)
     else:
         node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
                            largest=0, sorted=1,
-                           op_version=11, **kwargs)
+                           op_version=11, **kwargs_topk)
         if keep_distances:
             return (node[1], OnnxMul(
                 node[0], np.array([-1], dtype=dtype), op_version=op_version))
