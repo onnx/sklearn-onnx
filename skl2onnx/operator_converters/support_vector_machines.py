@@ -182,9 +182,11 @@ def convert_sklearn_svm_classifier(
         np.float32)
     svm_attrs['rho'] = svm_attrs['rho'].astype(np.float32)
 
+    options = container.get_options(op, dict(raw_scores=False))
+    use_raw_scores = options['raw_scores']
+
     if operator.type in ['SklearnSVC', 'SklearnNuSVC'] or isinstance(
             op, (SVC, NuSVC)):
-
         if len(op.probA_) > 0:
             svm_attrs['prob_a'] = op.probA_.astype(np.float32)
         else:
@@ -193,8 +195,11 @@ def convert_sklearn_svm_classifier(
             svm_attrs['prob_b'] = op.probB_.astype(np.float32)
 
         if (hasattr(op, 'decision_function_shape') and
-                op.decision_function_shape == 'ovr') and handles_ovr:
+                op.decision_function_shape == 'ovr' and handles_ovr and
+                len(op.classes_) > 2):
             output_name = scope.get_unique_variable_name('before_ovr')
+        elif len(op.classes_) == 2 and use_raw_scores:
+            output_name = scope.get_unique_variable_name('raw_scores')
         else:
             output_name = operator.outputs[1].full_name
 
@@ -221,12 +226,19 @@ def convert_sklearn_svm_classifier(
             op_domain=op_domain, op_version=op_version, **svm_attrs)
         apply_cast(scope, svm_out, probability_tensor_name,
                    container, to=proto_dtype)
+        if len(op.classes_) == 2 and use_raw_scores:
+            minus_one = scope.get_unique_variable_name('minus_one')
+            container.add_initializer(minus_one, proto_dtype, [], [-1])
+            container.add_node(
+                'Mul', [output_name, minus_one], operator.outputs[1].full_name,
+                name=scope.get_unique_operator_name('MulRawScores'))
     else:
         raise ValueError("Unknown support vector machine model type found "
                          "'{0}'.".format(operator.type))
 
     if (hasattr(op, 'decision_function_shape') and
-            op.decision_function_shape == 'ovr' and handles_ovr):
+            op.decision_function_shape == 'ovr' and handles_ovr and
+            len(op.classes_) > 2):
         # Applies _ovr_decision_function.
         # See https://github.com/scikit-learn/scikit-learn/blob/
         # master/sklearn/utils/multiclass.py#L407:
@@ -356,5 +368,6 @@ def convert_sklearn_svm_classifier(
 register_converter('SklearnOneClassSVM', convert_sklearn_svm_regressor)
 register_converter('SklearnSVC', convert_sklearn_svm_classifier,
                    options={'zipmap': [True, False, 'columns'],
-                            'nocl': [True, False]})
+                            'nocl': [True, False],
+                            'raw_scores': [True, False]})
 register_converter('SklearnSVR', convert_sklearn_svm_regressor)

@@ -156,7 +156,7 @@ def _transform_isotonic(scope, container, model, T, k, dtype):
 
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container,
-                                                 model):
+                                                 model, model_index):
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only
@@ -275,15 +275,18 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         if n_classes == 2:
             cur_k += 1
         k_name = scope.get_unique_variable_name('k')
-        df_col_name = scope.get_unique_variable_name('transposed_df_col')
-        prob_name[k] = scope.get_unique_variable_name('prob_{}'.format(k))
+        df_col_name = scope.get_unique_variable_name(
+            'tdf_col_%d_c%d' % (model_index, k))
+        prob_name[k] = scope.get_unique_variable_name(
+            'prob_{}_c{}'.format(model_index, k))
 
         container.add_initializer(k_name, onnx_proto.TensorProto.INT64,
                                   [], [cur_k])
 
         container.add_node(
             'ArrayFeatureExtractor', [df_inp, k_name], df_col_name,
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
+            name=scope.get_unique_operator_name(
+                'CaliAFE_%d_c%d' % (model_index, k)),
             op_domain='ai.onnx.ml')
         T = (_transform_sigmoid(scope, container, model, df_col_name, k)
              if model.method == 'sigmoid' else
@@ -295,10 +298,12 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
             break
 
     if n_classes == 2:
-        zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
-        merged_prob_name = scope.get_unique_variable_name('merged_prob')
+        zeroth_col_name = scope.get_unique_variable_name(
+            'zeroth_col%d' % model_index)
+        merged_prob_name = scope.get_unique_variable_name(
+            'merged_prob%d' % model_index)
         unit_float_tensor_name = scope.get_unique_variable_name(
-            'unit_float_tensor')
+            'unit_float_tensor%d' % model_index)
 
         container.add_initializer(unit_float_tensor_name,
                                   onnx_proto.TensorProto.FLOAT, [], [1.0])
@@ -306,7 +311,9 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         apply_sub(scope, [unit_float_tensor_name, prob_name[0]],
                   zeroth_col_name, container, broadcast=1)
         apply_concat(scope, [zeroth_col_name, prob_name[0]],
-                     merged_prob_name, container, axis=1)
+                     merged_prob_name, container, axis=1,
+                     operator_name=scope.get_unique_variable_name(
+                        'CaliConc%d' % model_index))
         class_prob_tensor_name = merged_prob_name
     else:
         concatenated_prob_name = scope.get_unique_variable_name(
@@ -332,7 +339,9 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         num, deno = _handle_zeros(scope, container, concatenated_prob_name,
                                   reduced_prob_name, n_classes)
         apply_div(scope, [num, deno],
-                  calc_prob_name, container, broadcast=1)
+                  calc_prob_name, container, broadcast=1,
+                  operator_name=scope.get_unique_variable_name(
+                    'CaliDiv%d' % model_index))
         class_prob_tensor_name = calc_prob_name
     return class_prob_tensor_name
 
@@ -411,9 +420,9 @@ def convert_sklearn_calibrated_classifier_cv(
     container.add_initializer(clf_length_name, onnx_proto.TensorProto.FLOAT,
                               [], [clf_length])
 
-    for clf in op.calibrated_classifiers_:
+    for clf_index, clf in enumerate(op.calibrated_classifiers_):
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
-            scope, operator, container, clf))
+            scope, operator, container, clf, clf_index))
 
     container.add_node('Sum', [s for s in prob_scores_name],
                        add_result_name, op_version=7,

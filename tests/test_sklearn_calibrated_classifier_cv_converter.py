@@ -278,50 +278,34 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
-    def test_model_calibrated_classifier_cv_svc2(self):
+    def test_model_calibrated_classifier_cv_svc2_binary(self):
         data = load_iris()
         X, y = data.data, data.target
         X = X[:90]
         y = y[:90]
         self.assertEqual(len(set(y)), 2)
-        model = CalibratedClassifierCV(
-            base_estimator=SVC(), cv=2,
-            method='sigmoid').fit(X, y)
-        model_onnx = convert_sklearn(
-            model, "unused",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-            options={id(model): {'zipmap': False}})
 
-        # with open("debug.onnx", "wb") as f:
-        #     f.write(model_onnx.SerializeToString())
+        for model_sub in [LogisticRegression(), SVC(probability=False)]:
+            model_sub.fit(X, y)
+            with self.subTest(model=model_sub):
+                model = CalibratedClassifierCV(
+                    base_estimator=model_sub, cv=2,
+                    method='sigmoid').fit(X, y)
+                model_onnx = convert_sklearn(
+                    model, "unused",
+                    [("input", FloatTensorType([None, X.shape[1]]))],
+                    target_opset=TARGET_OPSET,
+                    options={id(model): {'zipmap': False}})
 
-        # print(model.predict_proba(X[:5]))
-        # for m in model.calibrated_classifiers_:
-        #     print(m.predict_proba(X[:5]))
-        # print('--------------------------')
-        # from mlprodict.onnxrt import OnnxInference
-        # oinf = OnnxInference(model_onnx)
-        # oinf.run({'input': X[:5].astype(np.float32)}, verbose=10, fLOG=print)
+                sess = InferenceSession(model_onnx.SerializeToString())
+                res = sess.run(None, {'input': X[:5].astype(np.float32)})
+                assert_almost_equal(model.predict_proba(X[:5]), res[1])
+                assert_almost_equal(model.predict(X[:5]), res[0])
 
-        sess = InferenceSession(model_onnx.SerializeToString())
-        res = sess.run(None, {'input': X[:5].astype(np.float32)})
-        assert_almost_equal(model.predict_proba(X[:5]), res[1])
-        assert_almost_equal(model.predict(X[:5]), res[0])
-
-        # from mlprodict.onnxrt import OnnxInference
-        # oinf = OnnxInference(model_onnx)
-        # import pprint
-        # pprint.pprint(oinf.run(
-        #   {'input': X.astype(np.float32)[:5]}, verbose=1, fLOG=print))
-        # print(model.predict(X[:5]))
-        # print(model.predict_proba(X[:5]))
-
-        dump_data_and_model(
-            X.astype(np.float32)[:10], model, model_onnx,
-            basename="SklearnCalibratedClassifierSVC2")
+                dump_data_and_model(
+                    X.astype(np.float32)[:10], model, model_onnx,
+                    basename="SklearnCalibratedClassifierSVC2")
 
 
 if __name__ == "__main__":
-    TestSklearnCalibratedClassifierCVConverters().test_model_calibrated_classifier_cv_svc2()
     unittest.main()
