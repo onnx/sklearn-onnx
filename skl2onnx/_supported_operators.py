@@ -89,9 +89,12 @@ from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
 from sklearn.neighbors import (
-    KNeighborsClassifier, RadiusNeighborsClassifier,
-    KNeighborsRegressor, RadiusNeighborsRegressor,
+    KNeighborsClassifier,
+    KNeighborsRegressor,
+    LocalOutlierFactor,
     NearestNeighbors,
+    RadiusNeighborsClassifier,
+    RadiusNeighborsRegressor,
 )
 try:
     from sklearn.neighbors import (
@@ -129,7 +132,10 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 # Operators for preprocessing and feature engineering
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import (
-    PCA, IncrementalPCA, TruncatedSVD,
+    KernelPCA,
+    IncrementalPCA,
+    PCA,
+    TruncatedSVD,
 )
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import (
@@ -173,10 +179,13 @@ except ImportError:
     # Not available in scikit-learn < 0.20.0
     OrdinalEncoder = None
 from sklearn.preprocessing import (
-    MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
-    PolynomialFeatures, RobustScaler,
-    StandardScaler,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
+    PolynomialFeatures,
+    RobustScaler,
+    StandardScaler
 )
 
 try:
@@ -262,7 +271,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM, IsolationForest]
+outlier_list = [IsolationForest, LocalOutlierFactor, OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -313,6 +322,7 @@ def build_sklearn_operator_name_map():
         LinearRegression,
         LinearSVC,
         LinearSVR,
+        LocalOutlierFactor,
         MaxAbsScaler,
         MiniBatchKMeans,
         MinMaxScaler,
@@ -322,6 +332,8 @@ def build_sklearn_operator_name_map():
         MultiOutputClassifier,
         MultiOutputRegressor,
         KBinsDiscretizer,
+        KernelCenterer,
+        KernelPCA,
         KNeighborsClassifier,
         KNeighborsRegressor,
         KNeighborsTransformer,

@@ -16,12 +16,14 @@ from . import grid_search_cv
 from . import identity
 from . import imputer
 from . import isolation_forest
+from . import kernel_pca
 from . import k_bins_discretiser
 from . import k_means
 from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import local_outlier_factor
 from . import mixture
 from . import multioutput
 from . import nearest_neighbours
@@ -56,12 +58,14 @@ __all__ = [
     identity,
     imputer,
     isolation_forest,
+    kernel_pca,
     k_bins_discretiser,
     k_means,
     label_binariser,
     label_encoder,
     linear_classifier,
     linear_regressor,
+    local_outlier_factor,
     mixture,
     multioutput,
     nearest_neighbours,

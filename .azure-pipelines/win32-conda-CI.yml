@@ -101,7 +101,7 @@ jobs:
         numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.2.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
         sklearn.version: '==0.22.2'
       Py37-Onnx160-Rt110-Skl0221:
         python.version: '3.7'
@@ -110,7 +110,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.1.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
         sklearn.version: '==0.22.1'
       Py37-Onnx160-Rt100-Skl0213:
         python.version: '3.7'
@@ -119,7 +119,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.0.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
         sklearn.version: '==0.21.3'
       Py37-Onnx150-Rt050-Skl0213:
         python.version: '3.7'
@@ -128,7 +128,7 @@ jobs:
         numpy.version: 'numpy>=1.17.0'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==0.5.0'
-        onnxcc.version: 'onnxconverter-common==1.6.1'
+        onnxcc.version: 'onnxconverter-common==1.7.0'
         sklearn.version: '==0.21.3'
     maxParallel: 3
 

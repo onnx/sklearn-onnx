@@ -24,12 +24,14 @@ from . import grid_search_cv
 from . import id_op
 from . import imputer_op
 from . import isolation_forest
+from . import kernel_pca
 from . import k_bins_discretiser
 from . import k_means
 from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import local_outlier_factor
 from . import multilayer_perceptron
 from . import multioutput
 from . import multiply_op
@@ -79,12 +81,14 @@ __all__ = [
     id_op,
     imputer_op,
     isolation_forest,
+    kernel_pca,
     k_bins_discretiser,
     k_means,
     label_binariser,
     label_encoder,
     linear_classifier,
     linear_regressor,
+    local_outlier_factor,
     multilayer_perceptron,
     multioutput,
     multiply_op,

@@ -23,5 +23,6 @@ used in the ONNX graph.
     auto_tutorial/plot_dbegin_options_list
     auto_tutorial/plot_ebegin_float_double
     auto_tutorial/plot_fbegin_investigate
+    auto_tutorial/plot_gbegin_cst
     auto_tutorial/plot_gbegin_dataframe
     auto_tutorial/plot_gbegin_transfer_learning

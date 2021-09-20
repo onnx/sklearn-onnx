@@ -6,8 +6,10 @@ Tests scikit-linear converter.
 import unittest
 from distutils.version import StrictVersion
 import numpy
+from numpy.testing import assert_almost_equal
+from onnxruntime import InferenceSession
 from sklearn.datasets import load_iris
-from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
+from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM, LinearSVC
 try:
     from skl2onnx.common._apply_operation import apply_less
 except ImportError:
@@ -541,6 +543,137 @@ class TestSklearnSVM(unittest.TestCase):
             basename="SklearnBinOneClassSVM",
             allow_failure="StrictVersion(onnxruntime.__version__)"
                           " < StrictVersion('0.5.0')")
+
+    def test_model_linear_svc_binary_class(self):
+        model, X = self._fit_binary_classification(LinearSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1].ravel(), decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_linear_svc_multi_class(self):
+        model, X = self._fit_multi_classification(LinearSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_binary_class_false(self):
+        model, X = self._fit_binary_classification(SVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1][:, 0], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
+    def test_model_svc_multi_class_false(self):
+        model, X = self._fit_multi_classification(SVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_binary_class_true(self):
+        model, X = self._fit_binary_classification(
+            SVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_multi_class_true(self):
+        model, X = self._fit_multi_classification(
+            SVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_binary_class_false(self):
+        model, X = self._fit_binary_classification(NuSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1][:, 0], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
+    def test_model_nusvc_multi_class_false(self):
+        model, X = self._fit_multi_classification(
+            NuSVC(max_iter=10000, nu=0.1))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=4)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_binary_class_true(self):
+        model, X = self._fit_binary_classification(
+            NuSVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_multi_class_true(self):
+        model, X = self._fit_multi_classification(
+            NuSVC(max_iter=10000, probability=True, nu=0.1))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False})
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=3)
+        assert_almost_equal(label, res[0])
 
 
 if __name__ == "__main__":
