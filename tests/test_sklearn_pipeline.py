@@ -10,6 +10,7 @@ from numpy.testing import assert_almost_equal
 import pandas
 from sklearn import __version__ as sklearn_version
 from sklearn import datasets
+from sklearn.calibration import CalibratedClassifierCV
 
 try:
     # scikit-learn >= 0.22
@@ -37,7 +38,7 @@ from sklearn.preprocessing import (
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -761,6 +762,58 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertEqual(len(expected_proba), len(got[1]))
         for e, g in zip(expected_proba, got[1]):
             assert_almost_equal(e, g, decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    def test_issue_712_svc(self):
+        for sub_model in [LinearSVC(), SVC()]:
+            with self.subTest(sub_model=sub_model):
+                dfx = pandas.DataFrame(
+                    {'CAT1': ['985332', '985333', '985334', '985335',
+                              '985336', '985332', '985333', '985334',
+                              '985335', '985336', '985336'],
+                     'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                              '1985336', '1985332', '1985333', '1985334',
+                              '1985335', '1985336', '1985336'],
+                     'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                              "abc ii", "abc abc", "abc def", "def ghj",
+                              "abcdef", "abc ii", "abc abc"]})
+                dfy = pandas.DataFrame(
+                    {'REAL': [5, 6, 7, 6, 5, 5, 6, 7, 5, 6, 7],
+                     'CATY': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]})
+
+                cat_features = ['CAT1', 'CAT2']
+                categorical_transformer = OneHotEncoder(
+                    handle_unknown='ignore')
+                textual_feature = 'TEXT'
+                count_vect_transformer = Pipeline(steps=[
+                    ('count_vect', CountVectorizer(
+                        max_df=0.8, min_df=0.05, max_features=1000))])
+                preprocessor = ColumnTransformer(
+                    transformers=[
+                        ('cat_transform', categorical_transformer,
+                         cat_features),
+                        ('count_vector', count_vect_transformer,
+                         textual_feature)])
+                model_SVC = CalibratedClassifierCV(sub_model, cv=2)
+                rf_clf = Pipeline(steps=[
+                    ('preprocessor', preprocessor),
+                    ('classifier', MultiOutputClassifier(
+                        estimator=model_SVC))])
+                rf_clf.fit(dfx, dfy)
+                expected_label = rf_clf.predict(dfx)
+                expected_proba = rf_clf.predict_proba(dfx)
+
+                inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                          'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                          'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, inputs)
+                assert_almost_equal(expected_label, got[0])
+                self.assertEqual(len(expected_proba), len(got[1]))
+                for e, g in zip(expected_proba, got[1]):
+                    assert_almost_equal(e, g, decimal=5)
 
 
 if __name__ == "__main__":

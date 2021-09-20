@@ -53,7 +53,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnKernelPCA64")
 
-    @unittest.skipIf(TARGET_OPSET < 11,
+    @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
                      reason="discrepancies")
@@ -69,7 +69,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
                     X_test, model, model_onnx,
                     basename="SklearnKernelPCA%s32" % kernel)
 
-    @unittest.skipIf(TARGET_OPSET < 11,
+    @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
                      reason="discrepancies")
@@ -86,7 +86,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
                     X_test, model, model_onnx,
                     basename="SklearnKernelPCA%s64" % kernel)
 
-    @unittest.skipIf(TARGET_OPSET < 11,
+    @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
                      reason="discrepancies")
