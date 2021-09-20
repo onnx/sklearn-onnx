@@ -580,6 +580,7 @@ class TestSklearnSVM(unittest.TestCase):
         assert_almost_equal(proba, res[1][:, 0], decimal=5)
         assert_almost_equal(label, res[0])
 
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
     def test_model_svc_multi_class_false(self):
         model, X = self._fit_multi_classification(SVC(max_iter=10000))
         model_onnx = convert_sklearn(
@@ -632,6 +633,7 @@ class TestSklearnSVM(unittest.TestCase):
         assert_almost_equal(proba, res[1][:, 0], decimal=5)
         assert_almost_equal(label, res[0])
 
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
     def test_model_nusvc_multi_class_false(self):
         model, X = self._fit_multi_classification(
             NuSVC(max_iter=10000, nu=0.1))
