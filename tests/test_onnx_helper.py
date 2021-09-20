@@ -6,18 +6,20 @@ Tests on functions in *onnx_helper*.
 import unittest
 from distutils.version import StrictVersion
 import numpy
+from numpy.testing import assert_almost_equal
 import onnx
+from onnxruntime import InferenceSession
 from sklearn import __version__ as sklearn_version
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx.helpers.onnx_helper import (
     load_onnx_model,
     save_onnx_model,
     select_model_inputs_outputs,
-    change_onnx_domain
-)
+    change_onnx_domain,
+    add_output_initializer)
 from test_utils import TARGET_OPSET
 
 
@@ -111,11 +113,54 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         model_onnx = change_onnx_domain(
             model_onnx, {'Scaler': ('ScalerNew', 'ML2')})
         self.assertIn('domain: "ML2"', str(model_onnx))
         self.assertIn('op_type: "ScalerNew"', str(model_onnx))
+
+    def test_add_output_initializer(self):
+        model = make_pipeline(StandardScaler())
+        cst = numpy.array([0.5, 0.7, 0.8], dtype=numpy.int32)
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", DoubleTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
+        new_model_onnx = add_output_initializer(
+            model_onnx, "new_output", cst)
+
+        sess = InferenceSession(new_model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        self.assertEqual(len(res), 2)
+        assert_almost_equal(cst, res[1])
+        self.assertEqual(model_onnx.domain, new_model_onnx.domain)
+        names = [o.name for o in sess.get_outputs()]
+        self.assertEqual(['variable', 'new_output'], names)
+
+        new_model_onnx = add_output_initializer(
+            model_onnx, ["new_output1", "new_output2"], [cst, cst + 1])
+
+        sess = InferenceSession(new_model_onnx.SerializeToString())
+        res = sess.run(None, {'input': X})
+        self.assertEqual(len(res), 3)
+        assert_almost_equal(cst, res[1])
+        assert_almost_equal(cst + 1, res[2])
+        names = [o.name for o in sess.get_outputs()]
+        self.assertEqual(['variable', 'new_output1', 'new_output2'], names)
+
+        with self.assertRaises(ValueError):
+            add_output_initializer(model_onnx, "input", cst)
+        with self.assertRaises(ValueError):
+            add_output_initializer(model_onnx, "variable", cst)
+        new_model_onnx = add_output_initializer(model_onnx, "cst", cst)
+        with self.assertRaises(ValueError):
+            add_output_initializer(new_model_onnx, "cst", cst)
+        with self.assertRaises(ValueError):
+            add_output_initializer(new_model_onnx, "cst_init", cst)
+        with self.assertRaises(ValueError):
+            add_output_initializer(new_model_onnx, ["cst_init"], [cst, cst])
 
 
 if __name__ == "__main__":
