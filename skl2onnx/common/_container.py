@@ -645,9 +645,11 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
                 "Opset number {} is higher than targeted opsets {} for "
-                "node '{}' (domain: '{}').".format(
+                "node type '{}' name='{}' input={} "
+                "output={} (domain='{}').".format(
                     op_version, self.target_opset_all,
-                    node.op_type, op_domain))
+                    node.op_type, node.name,
+                    node.input, node.output, op_domain))
 
     def target_opset_any_domain(self, domain):
         target_opset = self.target_opset_all
@@ -782,7 +784,9 @@ class ModelComponentContainer(_WhiteBlackContainer):
         for inp in self.initializers:
             name = inp.name
             order[name] = 0
+
         n_iter = 0
+        missing_ops = []
         while n_iter < len(self.nodes) * 2:
             n_iter += 1
             missing_names = set()

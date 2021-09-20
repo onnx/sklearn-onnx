@@ -23,6 +23,7 @@ from . import label_binariser
 from . import label_encoder
 from . import linear_classifier
 from . import linear_regressor
+from . import local_outlier_factor
 from . import mixture
 from . import multioutput
 from . import nearest_neighbours
@@ -64,6 +65,7 @@ __all__ = [
     label_encoder,
     linear_classifier,
     linear_regressor,
+    local_outlier_factor,
     mixture,
     multioutput,
     nearest_neighbours,
