@@ -113,7 +113,8 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))])
+                                     [("input", FloatTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         model_onnx = change_onnx_domain(
             model_onnx, {'Scaler': ('ScalerNew', 'ML2')})
         self.assertIn('domain: "ML2"', str(model_onnx))
@@ -125,7 +126,8 @@ class TestOnnxHelper(unittest.TestCase):
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
         model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", DoubleTensorType([None, 2]))])
+                                     [("input", DoubleTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
         new_model_onnx = add_output_initializer(
             model_onnx, "new_output", cst)
 
