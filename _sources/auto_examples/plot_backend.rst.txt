@@ -32,7 +32,7 @@ to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-34
+.. GENERATED FROM PYTHON SOURCE LINES 20-32
 
 .. code-block:: default
 
@@ -45,9 +45,7 @@ of a simple logistic regression model.
     import numpy
     from onnxruntime import get_device
     import numpy as np
-    from onnxruntime import datasets
     import onnxruntime.backend as backend
-    from onnx import load
 
 
 
@@ -57,11 +55,11 @@ of a simple logistic regression model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-36
+.. GENERATED FROM PYTHON SOURCE LINES 33-34
 
 Let's create an ONNX graph first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-45
+.. GENERATED FROM PYTHON SOURCE LINES 34-43
 
 .. code-block:: default
 
@@ -81,11 +79,11 @@ Let's create an ONNX graph first.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-47
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
 
 Let's use ONNX backend API to test it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-58
+.. GENERATED FROM PYTHON SOURCE LINES 45-56
 
 .. code-block:: default
 
@@ -111,17 +109,17 @@ Let's use ONNX backend API to test it.
  .. code-block:: none
 
     label=[2 1 2]
-    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
+    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 57-59
 
 The device depends on how the package was compiled,
 GPU or CPU.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-63
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 .. code-block:: default
 
@@ -142,12 +140,12 @@ GPU or CPU.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
 The backend can also directly load the model
 without using *onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-76
+.. GENERATED FROM PYTHON SOURCE LINES 64-74
 
 .. code-block:: default
 
@@ -172,22 +170,22 @@ without using *onnx*.
  .. code-block:: none
 
     label=[1 1 1]
-    probabilities=[{0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}, {0: 0.0458628311753273, 1: 0.9541371464729309, 2: 0.0}]
+    probabilities=[{0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-80
+.. GENERATED FROM PYTHON SOURCE LINES 75-78
 
 The backend API is implemented by other frameworks
 and makes it easier to switch between multiple runtimes
 with the same API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-89
+.. GENERATED FROM PYTHON SOURCE LINES 81-87
 
 .. code-block:: default
 
@@ -207,11 +205,11 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -219,7 +217,7 @@ with the same API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.532 seconds)
+   **Total running time of the script:** ( 0 minutes  0.266 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
@@ -234,7 +232,7 @@ with the same API.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_backend.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_backend.ipynb
       :alt: Launch binder
       :width: 150 px
 

@@ -71,6 +71,8 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
+    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1038: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
+      warnings.warn(
 
     GaussianMixture()
 
@@ -107,12 +109,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-1.1393122  -1.28520738 -7.69402172 -4.84991894 -1.06034404]
-    [[-1.1393118]
-     [-1.2852073]
-     [-7.6940236]
-     [-4.849919 ]
-     [-1.0603442]]
+    [-4.70570805 -1.76338733 -1.40230502 -1.23316045 -2.09832825]
+    [[-4.7057085]
+     [-1.7633872]
+     [-1.4023051]
+     [-1.2331595]
+     [-2.098329 ]]
 
 
 
@@ -194,12 +196,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-1.1393122  -1.28520738 -7.69402172 -4.84991894 -1.06034404]
-    [[-1.1393118]
-     [-1.2852073]
-     [-7.6940236]
-     [-4.849919 ]
-     [-1.0603442]]
+    [-4.70570805 -1.76338733 -1.40230502 -1.23316045 -2.09832825]
+    [[-4.7057085]
+     [-1.7633872]
+     [-1.4023051]
+     [-1.2331595]
+     [-2.098329 ]]
 
 
 
@@ -272,8 +274,8 @@ Processing time
 
  .. code-block:: none
 
-    1.0554344999999898
-    1.1845239999999961
+    0.3937872999999996
+    0.4142893000000001
 
 
 
@@ -348,11 +350,11 @@ a blacklisted operator (or only whitelisted operators),
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -360,7 +362,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.521 seconds)
+   **Total running time of the script:** ( 0 minutes  15.234 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:
@@ -375,7 +377,7 @@ a blacklisted operator (or only whitelisted operators),
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_black_op.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_black_op.ipynb
       :alt: Launch binder
       :width: 150 px
 

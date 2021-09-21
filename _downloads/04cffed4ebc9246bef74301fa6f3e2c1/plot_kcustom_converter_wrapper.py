@@ -25,7 +25,7 @@ Custom model
 Let's implement a simple custom model using
 :epkg:`scikit-learn` API. The model is preprocessing
 which decorrelates correlated random variables.
-If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
+If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
 from mlprodict.onnxrt import OnnxInference

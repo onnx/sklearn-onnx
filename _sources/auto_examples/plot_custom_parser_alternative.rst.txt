@@ -147,7 +147,7 @@ a threshold.
 
  .. code-block:: none
 
-    [0 0 0 0 0 0 1 1 0 0 1 1 0 1 1 0 0 0 1 0 1 0 0 1 1 0 0 0 0 0 0 0 1 0 1 1 0
+    [0 0 0 1 0 0 0 1 0 1 1 0 0 1 1 0 0 0 1 0 0 1 1 1 1 0 1 0 1 0 0 1 0 1 1 1 1
      1]
 
 
@@ -455,22 +455,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [1 1 2 2 2]
-    onnx [1 1 2 2 2]
+    sklearn [2 2 2 1 1]
+    onnx [2 2 2 1 1]
     --probabilities--
-    sklearn [[9.61801756e-03 7.15341689e-01 2.75040293e-01]
-     [1.26531664e-02 5.30929767e-01 4.56417067e-01]
-     [5.10131955e-04 3.07302087e-01 6.92187781e-01]
-     [2.96283403e-02 4.57537311e-01 5.12834348e-01]
-     [2.33387977e-04 4.01247131e-01 5.98519481e-01]]
-    onnx [[9.6179992e-03 7.1534163e-01 2.7504036e-01]
-     [1.2653105e-02 5.3092986e-01 4.5641705e-01]
-     [5.1013770e-04 3.0730206e-01 6.9218779e-01]
-     [2.9628320e-02 4.5753729e-01 5.1283437e-01]
-     [2.3337257e-04 4.0124714e-01 5.9851944e-01]]
+    sklearn [[2.01215445e-03 2.59626019e-01 7.38361827e-01]
+     [2.13891156e-04 4.12552230e-01 5.87233879e-01]
+     [4.89390008e-04 3.07275586e-01 6.92235024e-01]
+     [7.08522508e-02 7.76483612e-01 1.52664138e-01]
+     [2.48882549e-02 7.06165137e-01 2.68946608e-01]]
+    onnx [[2.0121578e-03 2.5962597e-01 7.3836190e-01]
+     [2.1387449e-04 4.1255221e-01 5.8723384e-01]
+     [4.8939505e-04 3.0727553e-01 6.9223505e-01]
+     [7.0852265e-02 7.7648360e-01 1.5266415e-01]
+     [2.4888255e-02 7.0616513e-01 2.6894665e-01]]
     --validation--
-    sklearn [0 0 0 0 0]
-    onnx [0 0 0 0 0]
+    sklearn [0 0 0 1 0]
+    onnx [0 0 0 1 0]
 
 
 
@@ -543,11 +543,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -555,7 +555,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.868 seconds)
+   **Total running time of the script:** ( 0 minutes  1.621 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser_alternative.py:
@@ -570,7 +570,7 @@ Display the ONNX graph
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_custom_parser_alternative.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_custom_parser_alternative.ipynb
       :alt: Launch binder
       :width: 150 px
 

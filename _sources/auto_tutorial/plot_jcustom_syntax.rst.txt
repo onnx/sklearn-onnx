@@ -131,7 +131,7 @@ Conversion into ONNX
 
 The shape calculator does not change.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-101
+.. GENERATED FROM PYTHON SOURCE LINES 92-104
 
 .. code-block:: default
 
@@ -139,7 +139,10 @@ The shape calculator does not change.
     def decorrelate_transformer_shape_calculator(operator):
         op = operator.raw_operator
         input_type = operator.inputs[0].type.__class__
-        input_dim = operator.inputs[0].type.shape[0]
+        # The shape may be unknown. *get_first_dimension*
+        # returns the appropriate value, None in most cases
+        # meaning the transformer can process any batch of observations.
+        input_dim = operator.inputs[0].get_first_dimension()
         output_type = input_type([input_dim, op.coef_.shape[1]])
         operator.outputs[0].type = output_type
 
@@ -151,11 +154,11 @@ The shape calculator does not change.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-103
+.. GENERATED FROM PYTHON SOURCE LINES 105-106
 
 The converter is different.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-142
+.. GENERATED FROM PYTHON SOURCE LINES 106-145
 
 .. code-block:: default
 
@@ -205,11 +208,11 @@ The converter is different.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-144
+.. GENERATED FROM PYTHON SOURCE LINES 146-147
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-168
+.. GENERATED FROM PYTHON SOURCE LINES 147-171
 
 .. code-block:: default
 
@@ -247,16 +250,16 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (6.046576236373724e-07, 0.0002951417081357655)
+    (6.046576279672422e-07, 0.000295141707503972)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-170
+.. GENERATED FROM PYTHON SOURCE LINES 172-173
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-179
+.. GENERATED FROM PYTHON SOURCE LINES 173-182
 
 .. code-block:: default
 
@@ -279,19 +282,19 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (1.1102230246251565e-15, 3.4753904038774583e-13)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-181
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.200 seconds)
+   **Total running time of the script:** ( 0 minutes  0.069 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py:
@@ -306,7 +309,7 @@ The differences are smaller with double as expected.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_jcustom_syntax.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_jcustom_syntax.ipynb
       :alt: Launch binder
       :width: 150 px
 

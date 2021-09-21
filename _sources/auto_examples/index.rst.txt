@@ -98,6 +98,27 @@ Gallery of examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. I...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_logging_thumb.png
+     :alt: Logging, verbose
+
+     :ref:`sphx_glr_auto_examples_plot_logging.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_logging
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Train and deploy a model usually involves the three following steps:">
 
 .. only:: html

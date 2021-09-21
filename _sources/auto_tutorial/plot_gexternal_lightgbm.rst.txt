@@ -20,8 +20,8 @@
 
 .. _example-lightgbm:
 
-Convert a pipeline with a LightGBM model
-========================================
+Convert a pipeline with a LightGBM classifier
+=============================================
 
 .. index:: LightGBM
 
@@ -166,8 +166,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [0 1 0 0 0]
-    predict_proba [[0.52589117 0.23688316 0.23722567]]
+    predict [1 1 2 1 0]
+    predict_proba [[0.29926549 0.36018815 0.34054635]]
 
 
 
@@ -197,8 +197,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [0 1 0 0 0]
-    predict_proba [{0: 0.5258911848068237, 1: 0.23688316345214844, 2: 0.23722566664218903}]
+    predict [1 1 2 1 0]
+    predict_proba [{0: 0.2992655038833618, 1: 0.36018815636634827, 2: 0.3405463993549347}]
 
 
 
@@ -232,7 +232,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.199 seconds)
+   **Total running time of the script:** ( 0 minutes  0.605 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm.py:
@@ -247,7 +247,7 @@ Final graph
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_gexternal_lightgbm.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gexternal_lightgbm.ipynb
       :alt: Launch binder
       :width: 150 px
 

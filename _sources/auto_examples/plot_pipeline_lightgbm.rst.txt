@@ -185,8 +185,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [2 0 1 2 0]
-    predict_proba [[0.24494482 0.33989718 0.415158  ]]
+    predict [0 1 2 2 0]
+    predict_proba [[0.47202452 0.26421551 0.26375997]]
 
 
 
@@ -222,8 +222,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [2 0 1 2 0]
-    predict_proba [{0: 0.24494479596614838, 1: 0.33989718556404114, 2: 0.4151580035686493}]
+    predict [0 1 2 2 0]
+    predict_proba [{0: 0.47202450037002563, 1: 0.26421549916267395, 2: 0.26375991106033325}]
 
 
 
@@ -297,12 +297,12 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
-    onnxmltools:  1.8.0
+    skl2onnx:  1.9.3
+    onnxmltools:  1.9.1
     lightgbm:  3.2.1
 
 
@@ -311,7 +311,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.981 seconds)
+   **Total running time of the script:** ( 0 minutes  1.706 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_lightgbm.py:
@@ -326,7 +326,7 @@ Display the ONNX graph
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_pipeline_lightgbm.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_pipeline_lightgbm.ipynb
       :alt: Launch binder
       :width: 150 px
 

@@ -146,14 +146,6 @@ Function *to_onnx* does not handle dataframes.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Unsupported type '<class 'pandas.core.frame.DataFrame'>'. You may raise an issue at https://github.com/onnx/sklearn-onnx/issues.
-
 
 
 
@@ -238,7 +230,7 @@ Prediction with ONNX
     run(): incompatible function arguments. The following argument types are supported:
         1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -> List[object]
 
-    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x000001EFC50CD9F0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
+    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x00000264A9E8E8B0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
     0    a    c  0.50  0.60
     1    b    d  0.40  0.80
     2    a    d  0.50  0.56
@@ -301,18 +293,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.84 0.16]
+    [[0.85 0.15]
      [0.27 0.73]
-     [0.71 0.29]
-     [0.25 0.75]
-     [0.61 0.39]
-     [0.32 0.68]]
-    [[0.84000003 0.16      ]
+     [0.79 0.21]
+     [0.31 0.69]
+     [0.76 0.24]
+     [0.44 0.56]]
+    [[0.85       0.14999999]
      [0.2700001  0.7299999 ]
-     [0.71000004 0.29      ]
-     [0.25000012 0.7499999 ]
-     [0.61       0.39      ]
-     [0.3200001  0.6799999 ]]
+     [0.79       0.21      ]
+     [0.31000012 0.6899999 ]
+     [0.76       0.23999998]
+     [0.44000006 0.55999994]]
 
 
 
@@ -520,18 +512,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.84 0.16]
+    [[0.85 0.15]
      [0.27 0.73]
-     [0.71 0.29]
-     [0.25 0.75]
-     [0.61 0.39]
-     [0.32 0.68]]
-    [[0.84000003 0.16      ]
+     [0.79 0.21]
+     [0.31 0.69]
+     [0.76 0.24]
+     [0.44 0.56]]
+    [[0.85       0.14999999]
      [0.2700004  0.7299996 ]
-     [0.71000004 0.29      ]
-     [0.25000042 0.7499996 ]
-     [0.61000013 0.3899999 ]
-     [0.32000035 0.67999965]]
+     [0.78999996 0.21000002]
+     [0.31000036 0.68999964]
+     [0.76       0.24000004]
+     [0.44000024 0.55999976]]
 
 
 
@@ -539,7 +531,7 @@ And probilities.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.320 seconds)
+   **Total running time of the script:** ( 0 minutes  1.234 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py:
@@ -554,7 +546,7 @@ And probilities.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_gbegin_dataframe.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gbegin_dataframe.ipynb
       :alt: Launch binder
       :width: 150 px
 

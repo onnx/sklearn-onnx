@@ -26,9 +26,7 @@ from sklearn.linear_model import LogisticRegression
 import numpy
 from onnxruntime import get_device
 import numpy as np
-from onnxruntime import datasets
 import onnxruntime.backend as backend
-from onnx import load
 
 
 #######################################

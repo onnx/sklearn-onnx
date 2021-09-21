@@ -74,12 +74,33 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Once a model is converted it can be useful to store an array as a constant in the graph an retr...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_cst_thumb.png
+     :alt: Store arrays in one onnx graph
+
+     :ref:`sphx_glr_auto_tutorial_plot_gbegin_cst.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_gbegin_cst
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into *ONNX* but many libraries implement scikit-...">
 
 .. only:: html
 
  .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_lightgbm_thumb.png
-     :alt: Convert a pipeline with a LightGBM model
+     :alt: Convert a pipeline with a LightGBM classifier
 
      :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm.py`
 
@@ -137,6 +158,27 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="WOE means Weights of Evidence. It consists in checking that a feature X belongs to a series of ...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_woe_transformer_thumb.png
+     :alt: Converter for WOE
+
+     :ref:`sphx_glr_auto_tutorial_plot_woe_transformer.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_woe_transformer
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Example l-simple-deploy-1 converts a simple model. This example takes a similar example but on ...">
 
 .. only:: html
@@ -176,6 +218,27 @@ Examples
    :hidden:
 
    /auto_tutorial/plot_gbegin_dataframe
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The discrepancies observed when using float and TreeEnsemble operator (see l-example-discrepenc...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_lightgbm_reg_thumb.png
+     :alt: Convert a pipeline with a LightGBM regressor
+
+     :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm_reg.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_gexternal_lightgbm_reg
 
 .. raw:: html
 
@@ -242,27 +305,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is very verbose (see `ada_boost.py &lt;http...">
-
-.. only:: html
-
- .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_jcustom_syntax_thumb.png
-     :alt: Two ways to implement a converter
-
-     :ref:`sphx_glr_auto_tutorial_plot_jcustom_syntax.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_tutorial/plot_jcustom_syntax
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
 
 .. only:: html
@@ -281,6 +323,27 @@ Examples
    :hidden:
 
    /auto_tutorial/plot_gexternal_xgboost
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is very verbose (see `ada_boost.py &lt;http...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_jcustom_syntax_thumb.png
+     :alt: Two ways to implement a converter
+
+     :ref:`sphx_glr_auto_tutorial_plot_jcustom_syntax.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_jcustom_syntax
 
 .. raw:: html
 
@@ -326,6 +389,27 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Transfer learning is common with deep learning. A deep learning model is used as preprocessing ...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_transfer_learning_thumb.png
+     :alt: Transfer Learning with ONNX
+
+     :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_gbegin_transfer_learning
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a...">
 
 .. only:: html
@@ -368,14 +452,14 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Transfer learning is common with deep learning. A deep learning model is used as preprocessing ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="`WOEEncoder &lt;https://contrib.scikit-learn.org/category_encoders/woe.html&gt;`_ is a transformer im...">
 
 .. only:: html
 
- .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_transfer_learning_thumb.png
-     :alt: Transfer Learning with ONNX
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_catwoe_transformer_thumb.png
+     :alt: Converter for WOEEncoder from categorical_encoder
 
-     :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py`
+     :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py`
 
 .. raw:: html
 
@@ -385,7 +469,7 @@ Examples
 .. toctree::
    :hidden:
 
-   /auto_tutorial/plot_gbegin_transfer_learning
+   /auto_tutorial/plot_catwoe_transformer
 
 .. raw:: html
 

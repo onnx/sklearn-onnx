@@ -108,7 +108,7 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    [{0: 0.004209427163004875, 1: 0.7540565729141235, 2: 0.24173404276371002}, {0: 0.013408022932708263, 1: 0.7583109140396118, 2: 0.22828105092048645}]
+    [{0: 2.040417712123599e-05, 1: 0.03977595642209053, 2: 0.9602036476135254}, {0: 0.984612226486206, 1: 0.015387705527245998, 2: 6.260714968675529e-08}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
@@ -148,8 +148,8 @@ Let's remove the ZipMap operator.
 
  .. code-block:: none
 
-    [[0.00420943 0.7540566  0.24173404]
-     [0.01340802 0.7583109  0.22828105]]
+    [[2.04041771e-05 3.97759564e-02 9.60203648e-01]
+     [9.84612226e-01 1.53877055e-02 6.26071497e-08]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
@@ -191,10 +191,10 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[1 1]...
-    output: 'i0' shape=(38,) values=[0.00420943 0.01340802]...
-    output: 'i1' shape=(38,) values=[0.7540566 0.7583109]...
-    output: 'i2' shape=(38,) values=[0.24173404 0.22828105]...
+    output: 'output_label' shape=(38,) values=[2 0]...
+    output: 'i0' shape=(38,) values=[2.0404177e-05 9.8461223e-01]...
+    output: 'i1' shape=(38,) values=[0.03977596 0.01538771]...
+    output: 'i2' shape=(38,) values=[9.6020365e-01 6.2607150e-08]...
 
 
 
@@ -241,11 +241,11 @@ Let's compare prediction time
  .. code-block:: none
 
     Time with ZipMap:
-    [0.007948599999998862, 0.007180599999998094, 0.007393399999997996, 0.007285299999999495, 0.006962900000004879, 0.006900299999998083, 0.00702240000000387, 0.007052600000001519, 0.00695389999999918, 0.007114699999995366]
+    [0.0037140999999998314, 0.0036117999999980555, 0.003980999999999568, 0.0037299999999973465, 0.0034509000000007006, 0.003558500000000464, 0.0038393000000027655, 0.004004199999997127, 0.003699000000001007, 0.0034381999999979485]
     Time without ZipMap:
-    [0.002973999999994703, 0.0024812999999994645, 0.002518999999999494, 0.0025191999999947257, 0.0025430000000028485, 0.0025428000000005113, 0.002612800000001414, 0.002453400000000272, 0.0024796000000009144, 0.00270309999999796]
+    [0.002029199999999065, 0.0015669000000002598, 0.0016193999999991604, 0.0017084000000018307, 0.002067000000000263, 0.001499299999998982, 0.0015055000000003815, 0.0015135999999991157, 0.0015022999999985132, 0.001491500000000201]
     Time without ZipMap but with columns:
-    [0.006329399999998486, 0.008172100000003013, 0.00900630000000291, 0.01191270000000344, 0.012448100000000295, 0.012554799999996646, 0.011445599999994727, 0.011048999999999864, 0.010953700000001731, 0.008345800000000736]
+    [0.0029578999999984035, 0.002684799999997267, 0.0026781000000006827, 0.0027049000000012313, 0.002772999999997694, 0.0028994000000004405, 0.0028474000000002775, 0.002931300000000192, 0.0028734999999997513, 0.002754700000000554]
 
 
 
@@ -274,11 +274,11 @@ Let's compare prediction time
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -286,7 +286,7 @@ Let's compare prediction time
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.591 seconds)
+   **Total running time of the script:** ( 0 minutes  0.240 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_zipmap.py:
@@ -301,7 +301,7 @@ Let's compare prediction time
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_convert_zipmap.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_convert_zipmap.ipynb
       :alt: Launch binder
       :width: 150 px
 

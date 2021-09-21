@@ -278,14 +278,6 @@ Convert the pipeline into ONNX
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Isolated variables exist: {'boat', 'parch', 'cabin', 'sibsp', 'ticket', 'body', 'name', 'home_dest'}
-
 
 
 
@@ -371,9 +363,9 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 0 0 0 0]
-    predict_proba [[0.9173195  0.0826805 ]
-     [0.58413894 0.41586106]]
+    predict [1 1 1 1 0]
+    predict_proba [[0.28389157 0.71610843]
+     [0.41386237 0.58613763]]
 
 
 
@@ -433,8 +425,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 0 0 0 0]
-    predict_proba [{0: 0.9173195362091064, 1: 0.08268049359321594}, {0: 0.5841389298439026, 1: 0.4158610701560974}]
+    predict [1 1 1 1 0]
+    predict_proba [{0: 0.28389155864715576, 1: 0.7161084413528442}, {0: 0.41386234760284424, 1: 0.5861376523971558}]
 
 
 
@@ -471,9 +463,9 @@ an additional option zipmap.
 
  .. code-block:: none
 
-    predict [0 0 0 0 0]
-    predict_proba [[0.91731954 0.08268049]
-     [0.58413893 0.41586107]]
+    predict [1 1 1 1 0]
+    predict_proba [[0.28389156 0.71610844]
+     [0.41386235 0.58613765]]
 
 
 
@@ -539,7 +531,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 5875.5, 6812.5, -0.5)
+    (-0.5, 5924.5, 6812.5, -0.5)
 
 
 
@@ -567,11 +559,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -579,7 +571,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  15.737 seconds)
+   **Total running time of the script:** ( 0 minutes  6.552 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:
@@ -594,7 +586,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_complex_pipeline.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_complex_pipeline.ipynb
       :alt: Launch binder
       :width: 150 px
 
