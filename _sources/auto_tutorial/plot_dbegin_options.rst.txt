@@ -133,7 +133,7 @@ and which is not. So it is possible to specify options by id.
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\sklearn\linear_model\_logistic.py:763: ConvergenceWarning: lbfgs failed to converge (status=1):
+    C:\xadupre\github\scikit-learn\sklearn\linear_model\_logistic.py:814: ConvergenceWarning: lbfgs failed to converge (status=1):
     STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
 
     Increase the number of iterations (max_iter) or scale the data as shown in:
@@ -209,8 +209,8 @@ what it would give with operator *ZipMap*.
             # inputs
             X = dict_inputs['X']
             (label, probability_tensor, ) = n0_linearclassifier(X)
-            (probabilities, ) = n1_normalizer(probability_tensor)
-            (output_label, ) = n2_cast(label)
+            (output_label, ) = n1_cast(label)
+            (probabilities, ) = n2_normalizer(probability_tensor)
             (output_probability, ) = n3_zipmap(probabilities)
             return {
                 'output_label': output_label,
@@ -429,7 +429,7 @@ First, with probabilities:
            [0.7944385 , 0.19728662, 0.00827491],
            [0.85557765, 0.13792051, 0.00650185],
            [0.8262804 , 0.16634218, 0.00737738],
-           [0.9005015 , 0.09238803, 0.00711049]], dtype=float32)}
+           [0.90050155, 0.092388  , 0.00711049]], dtype=float32)}
 
 
 
@@ -464,7 +464,7 @@ Then with raw scores:
            [0.7944385 , 0.19728662, 0.00827491],
            [0.85557765, 0.13792051, 0.00650185],
            [0.8262804 , 0.16634218, 0.00737738],
-           [0.9005015 , 0.09238803, 0.00711049]], dtype=float32)}
+           [0.90050155, 0.092388  , 0.00711049]], dtype=float32)}
 
 
 
@@ -497,11 +497,11 @@ and not the whole pipeline.
 
  .. code-block:: none
 
-    {'label': array([0, 0, 0, 0, 0], dtype=int64), 'probabilities': array([[ 2.2707398 ,  0.18354762, -2.4542875 ],
+    {'label': array([0, 0, 0, 0, 0], dtype=int64), 'probabilities': array([[ 2.2707398 ,  0.18354774, -2.4542873 ],
            [ 1.9857951 ,  0.5928171 , -2.5786123 ],
            [ 2.2349298 ,  0.4098304 , -2.6447601 ],
            [ 2.1071343 ,  0.50424725, -2.6113815 ],
-           [ 2.3727784 ,  0.095824  , -2.4686024 ]], dtype=float32)}
+           [ 2.3727787 ,  0.095824  , -2.4686024 ]], dtype=float32)}
 
 
 
@@ -534,11 +534,11 @@ Strings are still easier to use.
 
  .. code-block:: none
 
-    {'label': array([0, 0, 0, 0, 0], dtype=int64), 'probabilities': array([[ 2.2707398 ,  0.18354762, -2.4542875 ],
+    {'label': array([0, 0, 0, 0, 0], dtype=int64), 'probabilities': array([[ 2.2707398 ,  0.18354774, -2.4542873 ],
            [ 1.9857951 ,  0.5928171 , -2.5786123 ],
            [ 2.2349298 ,  0.4098304 , -2.6447601 ],
            [ 2.1071343 ,  0.50424725, -2.6113815 ],
-           [ 2.3727784 ,  0.095824  , -2.4686024 ]], dtype=float32)}
+           [ 2.3727787 ,  0.095824  , -2.4686024 ]], dtype=float32)}
 
 
 
@@ -581,8 +581,8 @@ decision path. It can be enabled by option *decision_path*.
 
  .. code-block:: none
 
-    [[1 0 1 0 1 1 0 0 0 1 0 1]
-     [1 0 1 0 1 1 0 0 0 1 0 1]]
+    [[1 0 1 0 1 1 0 1 0 1]
+     [1 0 1 0 1 1 0 1 0 1]]
 
 
 
@@ -635,8 +635,8 @@ Let's display the last one.
 
  .. code-block:: none
 
-    [['10101' '1000101']
-     ['10101' '1000101']]
+    [['10101' '10101']
+     ['10101' '10101']]
 
 
 
@@ -677,6 +677,7 @@ supported options while running the conversion.
  .. code-block:: none
 
     LightGbmLGBMClassifier         {'nocl': [True, False], 'zipmap': [True, False, 'columns']}
+    LightGbmLGBMRegressor          {'split': None}
     AdaBoostClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     BaggingClassifier              {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     BayesianGaussianMixture        {'score_samples': [True, False]}
@@ -699,16 +700,20 @@ supported options while running the conversion.
     GradientBoostingClassifier     {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
     HistGradientBoostingClassifier {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
     HistGradientBoostingRegressor  {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
+    IsolationForest                {'score_samples': [True, False]}
     KMeans                         {'gemm': [True, False]}
     KNNImputer                     {'optim': [None, 'cdist']}
     KNeighborsClassifier           {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'optim': [None, 'cdist']}
     KNeighborsRegressor            {'optim': [None, 'cdist']}
     KNeighborsTransformer          {'optim': [None, 'cdist']}
+    KernelPCA                      {'optim': [None, 'cdist']}
     LinearClassifier               {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     LinearSVC                      {'nocl': [True, False], 'raw_scores': [True, False]}
+    LocalOutlierFactor             {'score_samples': [True, False], 'optim': [None, 'cdist']}
     MLPClassifier                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     MaxAbsScaler                   {'div': ['std', 'div', 'div_cast']}
     MiniBatchKMeans                {'gemm': [True, False]}
+    MultiOutputClassifier          {'nocl': [False, True]}
     MultinomialNB                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     NearestNeighbors               {'optim': [None, 'cdist']}
     OneVsRestClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
@@ -718,7 +723,7 @@ supported options while running the conversion.
     RandomForestRegressor          {'decision_path': [True, False], 'decision_leaf': [True, False]}
     RobustScaler                   {'div': ['std', 'div', 'div_cast']}
     SGDClassifier                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
-    SVC                            {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
+    SVC                            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     Scaler                         {'div': ['std', 'div', 'div_cast']}
     StackingClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     TfidfTransformer               {'nan': [True, False]}
@@ -737,6 +742,7 @@ supported options while running the conversion.
      'return_std',
      'score_samples',
      'separators',
+     'split',
      'tokenexp',
      'zipmap']
 
@@ -746,7 +752,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.880 seconds)
+   **Total running time of the script:** ( 0 minutes  1.566 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:
@@ -761,7 +767,7 @@ supported options while running the conversion.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_dbegin_options.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_dbegin_options.ipynb
       :alt: Launch binder
       :width: 150 px
 

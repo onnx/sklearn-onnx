@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx._supported_operators &#8212; sklearn-onnx 1.9.2 documentation</title>
+    <title>skl2onnx._supported_operators &#8212; sklearn-onnx 1.9.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx._supported_operators</a></li> 
@@ -129,14 +129,20 @@
 <span class="c1"># GridSearchCV</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
 
+<span class="c1"># MultiOutput</span>
+<span class="kn">from</span> <span class="nn">sklearn.multioutput</span> <span class="kn">import</span> <span class="n">MultiOutputClassifier</span><span class="p">,</span> <span class="n">MultiOutputRegressor</span>
+
 <span class="c1"># Support vector machines</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">NuSVR</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span>
 
 <span class="c1"># K-nearest neighbors</span>
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">KNeighborsClassifier</span><span class="p">,</span> <span class="n">RadiusNeighborsClassifier</span><span class="p">,</span>
-    <span class="n">KNeighborsRegressor</span><span class="p">,</span> <span class="n">RadiusNeighborsRegressor</span><span class="p">,</span>
+    <span class="n">KNeighborsClassifier</span><span class="p">,</span>
+    <span class="n">KNeighborsRegressor</span><span class="p">,</span>
+    <span class="n">LocalOutlierFactor</span><span class="p">,</span>
     <span class="n">NearestNeighbors</span><span class="p">,</span>
+    <span class="n">RadiusNeighborsClassifier</span><span class="p">,</span>
+    <span class="n">RadiusNeighborsRegressor</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="p">(</span>
@@ -174,7 +180,10 @@
 <span class="c1"># Operators for preprocessing and feature engineering</span>
 <span class="kn">from</span> <span class="nn">sklearn.cross_decomposition</span> <span class="kn">import</span> <span class="n">PLSRegression</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">PCA</span><span class="p">,</span> <span class="n">IncrementalPCA</span><span class="p">,</span> <span class="n">TruncatedSVD</span><span class="p">,</span>
+    <span class="n">KernelPCA</span><span class="p">,</span>
+    <span class="n">IncrementalPCA</span><span class="p">,</span>
+    <span class="n">PCA</span><span class="p">,</span>
+    <span class="n">TruncatedSVD</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="kn">import</span> <span class="n">DictVectorizer</span>
 <span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="p">(</span>
@@ -218,10 +227,13 @@
     <span class="c1"># Not available in scikit-learn &lt; 0.20.0</span>
     <span class="n">OrdinalEncoder</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">MaxAbsScaler</span><span class="p">,</span>
     <span class="n">FunctionTransformer</span><span class="p">,</span>
-    <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">RobustScaler</span><span class="p">,</span>
-    <span class="n">StandardScaler</span><span class="p">,</span>
+    <span class="n">KernelCenterer</span><span class="p">,</span>
+    <span class="n">MaxAbsScaler</span><span class="p">,</span>
+    <span class="n">MinMaxScaler</span><span class="p">,</span>
+    <span class="n">PolynomialFeatures</span><span class="p">,</span>
+    <span class="n">RobustScaler</span><span class="p">,</span>
+    <span class="n">StandardScaler</span>
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -248,6 +260,14 @@
         <span class="n">HistGradientBoostingClassifier</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.random_projection</span> <span class="kn">import</span> <span class="n">GaussianRandomProjection</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># ColumnTransformer was introduced in 0.20.</span>
+    <span class="n">ColumnTransformer</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
 
 <span class="c1"># Custom extension</span>
 <span class="kn">from</span> <span class="nn">.sklapi</span> <span class="kn">import</span> <span class="n">CastRegressor</span><span class="p">,</span> <span class="n">CastTransformer</span><span class="p">,</span> <span class="n">ReplaceTransformer</span>
@@ -299,7 +319,7 @@
 
 <span class="c1"># Outlier detection algorithms:</span>
 <span class="c1"># produces two outputs, label and scores</span>
-<span class="n">outlier_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">OneClassSVM</span><span class="p">,</span> <span class="n">IsolationForest</span><span class="p">]</span>
+<span class="n">outlier_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">IsolationForest</span><span class="p">,</span> <span class="n">LocalOutlierFactor</span><span class="p">,</span> <span class="n">OneClassSVM</span><span class="p">]</span>
 
 
 <span class="c1"># Associate scikit-learn types with our operator names. If two</span>
@@ -319,6 +339,7 @@
         <span class="n">CategoricalNB</span><span class="p">,</span>
         <span class="n">CastRegressor</span><span class="p">,</span>
         <span class="n">CastTransformer</span><span class="p">,</span>
+        <span class="n">ColumnTransformer</span><span class="p">,</span>
         <span class="n">ComplementNB</span><span class="p">,</span>
         <span class="n">CountVectorizer</span><span class="p">,</span>
         <span class="n">DictVectorizer</span><span class="p">,</span>
@@ -329,6 +350,7 @@
         <span class="n">ExtraTreeRegressor</span><span class="p">,</span>
         <span class="n">ExtraTreesClassifier</span><span class="p">,</span>
         <span class="n">ExtraTreesRegressor</span><span class="p">,</span>
+        <span class="n">FeatureUnion</span><span class="p">,</span>
         <span class="n">FunctionTransformer</span><span class="p">,</span>
         <span class="n">GaussianMixture</span><span class="p">,</span>
         <span class="n">GaussianProcessClassifier</span><span class="p">,</span>
@@ -348,13 +370,18 @@
         <span class="n">LinearRegression</span><span class="p">,</span>
         <span class="n">LinearSVC</span><span class="p">,</span>
         <span class="n">LinearSVR</span><span class="p">,</span>
+        <span class="n">LocalOutlierFactor</span><span class="p">,</span>
         <span class="n">MaxAbsScaler</span><span class="p">,</span>
         <span class="n">MiniBatchKMeans</span><span class="p">,</span>
         <span class="n">MinMaxScaler</span><span class="p">,</span>
         <span class="n">MLPClassifier</span><span class="p">,</span>
         <span class="n">MLPRegressor</span><span class="p">,</span>
         <span class="n">MultinomialNB</span><span class="p">,</span>
+        <span class="n">MultiOutputClassifier</span><span class="p">,</span>
+        <span class="n">MultiOutputRegressor</span><span class="p">,</span>
         <span class="n">KBinsDiscretizer</span><span class="p">,</span>
+        <span class="n">KernelCenterer</span><span class="p">,</span>
+        <span class="n">KernelPCA</span><span class="p">,</span>
         <span class="n">KNeighborsClassifier</span><span class="p">,</span>
         <span class="n">KNeighborsRegressor</span><span class="p">,</span>
         <span class="n">KNeighborsTransformer</span><span class="p">,</span>
@@ -368,6 +395,7 @@
         <span class="n">OrdinalEncoder</span><span class="p">,</span>
         <span class="n">PCA</span><span class="p">,</span>
         <span class="n">PLSRegression</span><span class="p">,</span>
+        <span class="n">Pipeline</span><span class="p">,</span>
         <span class="n">PolynomialFeatures</span><span class="p">,</span>
         <span class="n">PowerTransformer</span><span class="p">,</span>
         <span class="n">RadiusNeighborsClassifier</span><span class="p">,</span>
@@ -562,7 +590,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.
   </div>
   
   </body>

@@ -141,7 +141,7 @@ the discord areas.
  .. code-block:: none
 
 
-    <matplotlib.legend.Legend object at 0x000001EF8DAB6C40>
+    <matplotlib.legend.Legend object at 0x000002650777CA00>
 
 
 
@@ -238,7 +238,7 @@ look into the conversion.
 
  .. code-block:: none
 
-    (182.70036615564243, 2.716634958859278)
+    (129.34366796338884, 0.984129641690045)
 
 
 
@@ -337,7 +337,7 @@ The discrepencies.
 
  .. code-block:: none
 
-    (141.1630174317506, 2.716634958859278)
+    (90.81938137443404, 0.9841296416900434)
 
 
 
@@ -383,7 +383,7 @@ double in ONNX normalizer.
 
  .. code-block:: none
 
-    (1.5198719211184653e-05, 5.71819629972324e-08)
+    (1.525581166106349e-05, 5.72357277985552e-08)
 
 
 
@@ -439,7 +439,7 @@ class :epkg:`OnnxPipeline`.
 
 
     OnnxPipeline(steps=[('scaler',
-                         OnnxTransformer(onnx_bytes=b'\x08\x06\x12\x08skl2onnx\x1a\x051.9.2"\x07ai.onnx(\x002\x00:\xf4\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=\x0et\xda;=8\xd3\x17==\xa98{\xbc=HP|==@\x7f\xb4==$M\xa9==\x1f\xf4\xec>=I\xc2\xeb?=\xd6V\xac\xbf=\xa3H$@\xa0\x01\x06*<\n\x05scale=\x07\xb1\xb9?=\xae\x8...\x8b>=\xa0\n\x07>=\xa9\xa3\x83==\xe1\x04\x02==Y\xaa\x80<=\xda\x0e\x01<=\x01V\x80;=\xf8\x7f\xff:\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x16\n\x08variable\x12\n\n\x08\x08\x01\x12\x04\n\x00\n\x00B\x0e\n\nai.onnx.ml\x10\x01')),
+                         OnnxTransformer(onnx_bytes=b'\x08\x06\x12\x08skl2onnx\x1a\x051.9.3"\x07ai.onnx(\x002\x00:\xf6\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=\xb9!\xb3\xbb=\r*\x84<=o\x12\x83<=\xc0\x11\xca\xbc=>\xc3\xae:=\xb6\xa9\xa7>=\x8c%\xbf?=\x06\xa6\xc0>=\x08\xd1\xc7@=\xcc\xa4\xbb\xc0\xa0\x01\x06*<\n\x0...\xd8\x98\x8c>=\xdd\xce\x06>=\xd8\x91\x83==:V\x02==\x8bN\x81<=\xd1 \x02<=\xea"\x80;=.6\x00;\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x18\n\x08variable\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nB\x0e\n\nai.onnx.ml\x10\x01')),
                         ('dt', DecisionTreeRegressor(max_depth=10))])
 
 
@@ -448,12 +448,17 @@ class :epkg:`OnnxPipeline`.
 
 The conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-289
+.. GENERATED FROM PYTHON SOURCE LINES 279-294
 
 .. code-block:: default
 
 
-    onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
+    try:
+        onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
+    except ValueError as e:
+        print("Failing due to %r.\nYou need to update mlprodict." % e)
+        import sys
+        sys.exit(0)
 
     sess4 = InferenceSession(onx4.SerializeToString())
 
@@ -472,16 +477,16 @@ The conversion.
 
  .. code-block:: none
 
-    (1.5053630079364666e-05, 5.718196321286727e-08)
+    (1.5255811604220071e-05, 5.72357277985552e-08)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-291
+.. GENERATED FROM PYTHON SOURCE LINES 295-296
 
 It works too in a more simple way.
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-313
+.. GENERATED FROM PYTHON SOURCE LINES 298-318
 
 No discrepencies at all?
 ++++++++++++++++++++++++
@@ -504,7 +509,7 @@ and a custom ONNX node `TreeEnsembleRegressorDouble
 <http://www.xavierdupre.fr/app/mlprodict/helpsphinx/api/onnxrt_ops.html
 ?highlight=treeensembleregressordouble#treeensembleregressordouble>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 313-324
+.. GENERATED FROM PYTHON SOURCE LINES 318-329
 
 .. code-block:: default
 
@@ -541,11 +546,11 @@ and a custom ONNX node `TreeEnsembleRegressorDouble
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 325-326
+.. GENERATED FROM PYTHON SOURCE LINES 330-331
 
 Let's measure the discrepencies.
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-331
+.. GENERATED FROM PYTHON SOURCE LINES 331-336
 
 .. code-block:: default
 
@@ -561,11 +566,11 @@ Let's measure the discrepencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 332-333
+.. GENERATED FROM PYTHON SOURCE LINES 337-338
 
 Perfect, no discrepencies at all.
 
-.. GENERATED FROM PYTHON SOURCE LINES 333-336
+.. GENERATED FROM PYTHON SOURCE LINES 338-341
 
 .. code-block:: default
 
@@ -587,7 +592,7 @@ Perfect, no discrepencies at all.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 337-345
+.. GENERATED FROM PYTHON SOURCE LINES 342-350
 
 CastRegressor
 +++++++++++++
@@ -598,7 +603,7 @@ the predicted values explains the small differences between
 with the current ONNX. Another option is to cast the
 the predictions into floats in the :epkg:`scikit-learn` pipeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 345-359
+.. GENERATED FROM PYTHON SOURCE LINES 350-364
 
 .. code-block:: default
 
@@ -631,14 +636,14 @@ the predictions into floats in the :epkg:`scikit-learn` pipeline.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 360-361
+.. GENERATED FROM PYTHON SOURCE LINES 365-366
 
 Success!
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.862 seconds)
+   **Total running time of the script:** ( 0 minutes  1.004 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_ebegin_float_double.py:
@@ -653,7 +658,7 @@ Success!
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_ebegin_float_double.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_ebegin_float_double.ipynb
       :alt: Launch binder
       :width: 150 px
 

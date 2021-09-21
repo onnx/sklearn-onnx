@@ -277,7 +277,12 @@ model_onx.fit(Xi_train, yi_train)
 #############################################
 # The conversion.
 
-onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
+try:
+    onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
+except ValueError as e:
+    print("Failing due to %r.\nYou need to update mlprodict." % e)
+    import sys
+    sys.exit(0)
 
 sess4 = InferenceSession(onx4.SerializeToString())
 

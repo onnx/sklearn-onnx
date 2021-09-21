@@ -153,9 +153,9 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [18.22392789 12.36181694 14.44905692 21.06687952 12.26066134 18.12858287
-     18.67276881 22.79783243 21.27027007  8.12140694]
-    [17.84375]
+    [20.59965986 36.52000367 33.9555093  24.28237904 24.5780971  21.23128511
+     21.20370214 16.01961958 39.21099389 30.84580266]
+    [21.]
 
 
 
@@ -186,8 +186,8 @@ differences.
 
  .. code-block:: none
 
-    [3.50358287 3.68180672 3.72312952 3.72487823 4.08625223]
-    min(Y)-max(Y): 5.0 50.0
+    [3.97396383 4.20235645 5.01033445 6.07141991 6.08335987]
+    min(Y)-max(Y): 6.3 50.0
 
 
 
@@ -235,7 +235,7 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [18.22392789]
+    [20.59965986]
 
 
 
@@ -264,9 +264,9 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [1.40036924e-08 1.44893963e-08 1.74872739e-08 1.81212982e-08
-     1.89644425e-08]
-    min(Y)-max(Y): 5.0 50.0
+    [1.38297018e-08 1.40733398e-08 1.46739154e-08 1.61658669e-08
+     2.07812314e-08]
+    min(Y)-max(Y): 6.3 50.0
 
 
 
@@ -300,8 +300,8 @@ and not as floats anymore.
 
  .. code-block:: none
 
-    ONNX with floats: 42813
-    ONNX with doubles: 83817
+    ONNX with floats: 42819
+    ONNX with doubles: 83823
 
 
 
@@ -371,12 +371,12 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[18.22392789],
-           [12.36181693],
-           [14.44905691],
-           [21.06687952],
-           [12.26066134]]),
-     array([1.04877566, 1.03900854, 0.79804668, 1.10013053, 1.05316807])]
+    [array([[20.59965986],
+           [36.52000366],
+           [33.95550931],
+           [24.28237903],
+           [24.5780971 ]]),
+     array([0.7026525 , 0.83917611, 0.76896594, 0.970629  , 1.03341805])]
 
 
 
@@ -402,8 +402,8 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([18.22392789, 12.36181694, 14.44905692, 21.06687952, 12.26066133]),
-     array([1.04856997, 1.0386411 , 0.79800592, 1.10010125, 1.05296846]))
+    (array([20.59965986, 36.52000367, 33.9555093 , 24.28237904, 24.5780971 ]),
+     array([0.70285567, 0.83928832, 0.7689435 , 0.97122511, 1.03332869]))
 
 
 
@@ -436,7 +436,7 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [0.00066575 0.00069997 0.00073584 0.00075069 0.00095638]
+    [0.0005961  0.00059931 0.00069693 0.00077623 0.000785  ]
 
 
 
@@ -467,11 +467,11 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -479,7 +479,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.988 seconds)
+   **Total running time of the script:** ( 0 minutes  1.072 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:
@@ -494,7 +494,7 @@ There are some discrepencies but it seems reasonable.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_gpr.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_gpr.ipynb
       :alt: Launch binder
       :width: 150 px
 

@@ -98,7 +98,7 @@ The first way: :func:`convert_sklearn`.
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -211,7 +211,7 @@ Pipeline and a custom object
 
 This is a simple scaler.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-134
+.. GENERATED FROM PYTHON SOURCE LINES 101-137
 
 .. code-block:: default
 
@@ -223,6 +223,7 @@ This is a simple scaler.
         def __init__(self):
             BaseEstimator.__init__(self)
             TransformerMixin.__init__(self)
+            self.op_version = 12
 
         def fit(self, X, y=None):
             self.W_ = np.mean(X, axis=0)
@@ -237,16 +238,18 @@ This is a simple scaler.
                 operator.outputs[0].type = operator.inputs[0].type
             return shape_calculator
 
-        def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+        def to_onnx_operator(self, inputs=None, outputs=('Y', ),
+                             target_opset=None, **kwargs):
             if inputs is None:
                 raise RuntimeError("Parameter inputs should contain at least "
                                    "one name.")
+            opv = target_opset or self.op_version
             i0 = self.get_inputs(inputs, 0)
             W = self.W_.astype(np.float32)
             S = self.S_.astype(np.float32)
             return OnnxDiv(OnnxSub(i0, W, op_version=12), S,
                            output_names=outputs,
-                           op_version=12)
+                           op_version=opv)
 
 
 
@@ -255,11 +258,11 @@ This is a simple scaler.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-136
+.. GENERATED FROM PYTHON SOURCE LINES 138-139
 
 Way 1
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-147
+.. GENERATED FROM PYTHON SOURCE LINES 139-150
 
 .. code-block:: default
 
@@ -289,11 +292,11 @@ Way 1
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-149
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 Way 2
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-157
+.. GENERATED FROM PYTHON SOURCE LINES 152-160
 
 .. code-block:: default
 
@@ -315,16 +318,16 @@ Way 2
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-159
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 Way 3
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-169
+.. GENERATED FROM PYTHON SOURCE LINES 162-172
 
 .. code-block:: default
 
@@ -348,16 +351,16 @@ Way 3
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-171
+.. GENERATED FROM PYTHON SOURCE LINES 173-174
 
 Way 4
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-182
+.. GENERATED FROM PYTHON SOURCE LINES 174-185
 
 .. code-block:: default
 
@@ -387,14 +390,14 @@ Way 4
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-187
+.. GENERATED FROM PYTHON SOURCE LINES 186-190
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
 Finally, let's see the graph converted with *sklearn-onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-204
+.. GENERATED FROM PYTHON SOURCE LINES 190-207
 
 .. code-block:: default
 
@@ -434,11 +437,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-206
+.. GENERATED FROM PYTHON SOURCE LINES 208-209
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-214
+.. GENERATED FROM PYTHON SOURCE LINES 209-217
 
 .. code-block:: default
 
@@ -460,11 +463,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -472,7 +475,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.566 seconds)
+   **Total running time of the script:** ( 0 minutes  3.809 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_syntax.py:
@@ -487,7 +490,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_convert_syntax.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_convert_syntax.ipynb
       :alt: Launch binder
       :width: 150 px
 

@@ -41,10 +41,11 @@ Trains a model
 All imports. It also registered onnx converters for :epgk:`xgboost`
 and *lightgbm*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-58
+.. GENERATED FROM PYTHON SOURCE LINES 27-64
 
 .. code-block:: default
 
+    import sys
     import numpy as np
     import pandas as pd
     from onnxruntime import InferenceSession
@@ -57,23 +58,28 @@ and *lightgbm*.
         OnnxIdentity, OnnxMul, OnnxLess, OnnxConcat, OnnxCast, OnnxAdd,
         OnnxClip)
     from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
-    from pyod.models.iforest import IForest
+    try:
+        from pyod.models.iforest import IForest
+    except (ValueError, ImportError) as e:
+        print("Unable to import pyod:", e)
+        IForest = None
 
-    data1 = {'First':  [500, 500, 400, 100, 200, 300, 100],
-             'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
+    if IForest is not None:
+        data1 = {'First':  [500, 500, 400, 100, 200, 300, 100],
+                 'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
 
-    df1 = pd.DataFrame(data1, columns=['First', 'Second'])
-    dumdf1 = pd.get_dummies(df1)
-    scaler = MinMaxScaler()
-    scaler.partial_fit(dumdf1)
-    sc_data = scaler.transform(dumdf1)
-    model1 = IForest(n_estimators=10, bootstrap=True, behaviour='new',
-                     contamination=0.1, random_state=np.random.RandomState(42),
-                     verbose=1, n_jobs=-1).fit(sc_data)
-    feature_names2 = dumdf1.columns
+        df1 = pd.DataFrame(data1, columns=['First', 'Second'])
+        dumdf1 = pd.get_dummies(df1)
+        scaler = MinMaxScaler()
+        scaler.partial_fit(dumdf1)
+        sc_data = scaler.transform(dumdf1)
+        model1 = IForest(n_estimators=10, bootstrap=True, behaviour='new',
+                         contamination=0.1, random_state=np.random.RandomState(42),
+                         verbose=1, n_jobs=-1).fit(sc_data)
+        feature_names2 = dumdf1.columns
 
 
-    initial_type = [('float_input', FloatTensorType([None, len(feature_names2)]))]
+        initial_type = [('float_input', FloatTensorType([None, len(feature_names2)]))]
 
 
 
@@ -86,56 +92,35 @@ and *lightgbm*.
 
  .. code-block:: none
 
-    [Parallel(n_jobs=8)]: Using backend ThreadingBackend with 8 concurrent workers.
-    [Parallel(n_jobs=8)]: Done   2 out of   8 | elapsed:    0.0s remaining:    0.1s
-    [Parallel(n_jobs=8)]: Done   8 out of   8 | elapsed:    0.0s finished
+    Unable to import pyod: Sklearn version error
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-60
+.. GENERATED FROM PYTHON SOURCE LINES 65-66
 
 We check that the conversion fails as expected.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-67
+.. GENERATED FROM PYTHON SOURCE LINES 66-74
 
 .. code-block:: default
 
 
-    try:
-        to_onnx(model1, initial_types=initial_type)
-    except Exception as e:
-        print(e)
+    if IForest is not None:
+        try:
+            to_onnx(model1, initial_types=initial_type)
+        except Exception as e:
+            print(e)
 
 
 
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Unable to find a shape calculator for type '<class 'pyod.models.iforest.IForest'>'.
-    It usually means the pipeline being converted contains a
-    transformer or a predictor with no corresponding converter
-    implemented in sklearn-onnx. If the converted is implemented
-    in another library, you need to register
-    the converted so that it can be used by sklearn-onnx (function
-    update_registered_converter). If the model is not yet covered
-    by sklearn-onnx, you may raise an issue to
-    https://github.com/onnx/sklearn-onnx/issues
-    to get the converter implemented or even contribute to the
-    project. If the model is a custom model, a new converter must
-    be implemented. Examples can be found in the gallery.
 
 
 
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 68-74
+.. GENERATED FROM PYTHON SOURCE LINES 75-81
 
 Custom converter
 ++++++++++++++++
@@ -144,7 +129,7 @@ First the parser and the shape calculator.
 The parser defines the number of outputs and their type.
 The shape calculator defines their dimensions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-98
+.. GENERATED FROM PYTHON SOURCE LINES 81-105
 
 .. code-block:: default
 
@@ -179,11 +164,11 @@ The shape calculator defines their dimensions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-100
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 Then the converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-153
+.. GENERATED FROM PYTHON SOURCE LINES 107-160
 
 .. code-block:: default
 
@@ -247,21 +232,22 @@ Then the converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-155
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 Finally the registration.
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-163
+.. GENERATED FROM PYTHON SOURCE LINES 162-171
 
 .. code-block:: default
 
 
 
-    update_registered_converter(
-        IForest, "PyodIForest",
-        pyod_iforest_shape_calculator,
-        pyod_iforest_converter,
-        parser=pyod_iforest_parser)
+    if IForest is not None:
+        update_registered_converter(
+            IForest, "PyodIForest",
+            pyod_iforest_shape_calculator,
+            pyod_iforest_converter,
+            parser=pyod_iforest_parser)
 
 
 
@@ -270,86 +256,57 @@ Finally the registration.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 172-173
 
 And the conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-168
+.. GENERATED FROM PYTHON SOURCE LINES 173-177
 
 .. code-block:: default
 
 
-    onx = to_onnx(model1, initial_types=initial_type)
+    if IForest is not None:
+        onx = to_onnx(model1, initial_types=initial_type)
 
 
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    [0.75171798]
-    [13.95064645]
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 169-171
+.. GENERATED FROM PYTHON SOURCE LINES 178-180
 
 Checking discrepencies
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-190
+.. GENERATED FROM PYTHON SOURCE LINES 180-200
 
 .. code-block:: default
 
 
-    data = sc_data.astype(np.float32)
+    if IForest is not None:
+        data = sc_data.astype(np.float32)
 
-    expected_labels = model1.predict(data)
-    expected_proba = model1.predict_proba(data)
+        expected_labels = model1.predict(data)
+        expected_proba = model1.predict_proba(data)
 
-    sess = InferenceSession(onx.SerializeToString())
-    res = sess.run(None, {'float_input': data})
+        sess = InferenceSession(onx.SerializeToString())
+        res = sess.run(None, {'float_input': data})
 
-    onx_labels = res[0]
-    onx_proba = res[1]
+        onx_labels = res[0]
+        onx_proba = res[1]
 
-    diff_labels = np.abs(onx_labels.ravel() - expected_labels.ravel()).max()
-    diff_proba = np.abs(onx_proba.ravel() - expected_proba.ravel()).max()
+        diff_labels = np.abs(onx_labels.ravel() - expected_labels.ravel()).max()
+        diff_proba = np.abs(onx_proba.ravel() - expected_proba.ravel()).max()
 
-    print("dicrepencies:", diff_labels, diff_proba)
+        print("dicrepencies:", diff_labels, diff_proba)
 
-    print("ONNX labels", onx_labels)
-    print("ONNX probabilities", onx_proba)
-
-
+        print("ONNX labels", onx_labels)
+        print("ONNX probabilities", onx_proba)
 
 
-.. rst-class:: sphx-glr-script-out
 
- Out:
-
- .. code-block:: none
-
-    dicrepencies: 0 8.684300415451318e-07
-    ONNX labels [[0]
-     [0]
-     [0]
-     [0]
-     [0]
-     [0]
-     [1]]
-    ONNX probabilities [[1.         0.        ]
-     [0.809063   0.19093698]
-     [1.         0.        ]
-     [0.41380423 0.58619577]
-     [0.61369824 0.38630173]
-     [0.809063   0.19093698]
-     [0.         1.        ]]
 
 
 
@@ -357,7 +314,7 @@ Checking discrepencies
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.237 seconds)
+   **Total running time of the script:** ( 0 minutes  0.604 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_wext_pyod_forest.py:
@@ -372,7 +329,7 @@ Checking discrepencies
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_wext_pyod_forest.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_wext_pyod_forest.ipynb
       :alt: Launch binder
       :width: 150 px
 

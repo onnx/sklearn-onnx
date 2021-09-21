@@ -68,6 +68,8 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
+    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1038: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
+      warnings.warn(
 
     GaussianMixture()
 
@@ -104,12 +106,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-3.07600669 -2.07610084 -1.21975197 -1.0168128  -3.65084023]
-    [[-3.0760052]
-     [-2.076102 ]
-     [-1.2197521]
-     [-1.016813 ]
-     [-3.650841 ]]
+    [-3.34988961 -2.66249755 -1.33045977 -1.15054736 -2.84988933]
+    [[-3.3498898]
+     [-2.6624975]
+     [-1.3304601]
+     [-1.150548 ]
+     [-2.8498883]]
 
 
 
@@ -175,12 +177,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-3.07600669 -2.07610084 -1.21975197 -1.0168128  -3.65084023]
-    [[-3.0760052]
-     [-2.076102 ]
-     [-1.2197521]
-     [-1.016813 ]
-     [-3.6508405]]
+    [-3.34988961 -2.66249755 -1.33045977 -1.15054736 -2.84988933]
+    [[-3.3498898]
+     [-2.6624975]
+     [-1.3304601]
+     [-1.150548 ]
+     [-2.8498883]]
 
 
 
@@ -237,8 +239,8 @@ Processing time
 
  .. code-block:: none
 
-    1.1683917999999949
-    1.5455498000000034
+    0.3229076999999876
+    0.3634210999999965
 
 
 
@@ -288,7 +290,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.131 seconds)
+   **Total running time of the script:** ( 0 minutes  1.630 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_list.py:
@@ -303,7 +305,7 @@ a blacklisted operator (or only whitelisted operators),
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_dbegin_options_list.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_dbegin_options_list.ipynb
       :alt: Launch binder
       :width: 150 px
 

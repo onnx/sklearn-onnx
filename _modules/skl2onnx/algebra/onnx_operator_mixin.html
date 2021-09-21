@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.algebra.onnx_operator_mixin &#8212; sklearn-onnx 1.9.2 documentation</title>
+    <title>skl2onnx.algebra.onnx_operator_mixin &#8212; sklearn-onnx 1.9.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.algebra.onnx_operator_mixin</a></li> 
@@ -48,6 +48,7 @@
   <h1>Source code for skl2onnx.algebra.onnx_operator_mixin</h1><div class="highlight"><pre>
 <span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
 <span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">shape_inference</span>
 <span class="kn">from</span> <span class="nn">..common._topology</span> <span class="kn">import</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">Operator</span>
@@ -67,7 +68,7 @@
 
     <span class="k">def</span> <span class="nf">to_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the model in *ONNX* format.</span>
 <span class="sd">        It calls method *_to_onnx* which must be</span>
@@ -86,6 +87,8 @@
 <span class="sd">        :param final_types: a python list. Works the same way as initial_types</span>
 <span class="sd">            but not mandatory, it is used to overwrites the type</span>
 <span class="sd">            (if type is not None) and the name of every output.</span>
+<span class="sd">        :param target_opset: to overwrite `self.op_version`</span>
+<span class="sd">        :param verbose: displays information while converting</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -101,9 +104,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">convert_sklearn</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
-            <span class="n">target_opset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">op_version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
-            <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span>
-            <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">)</span>
+            <span class="n">target_opset</span><span class="o">=</span><span class="n">target_opset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">infer_initial_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -132,28 +135,28 @@
                            <span class="s2">&quot;BaseEstimator: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">))))</span>
 
-    <span class="k">def</span> <span class="nf">to_onnx_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_onnx_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function must be overloaded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">onnx_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">onnx_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a parser for this model.</span>
-<span class="sd">        If not overloaded, it fetches the parser</span>
+<span class="sd">        If not overloaded, it calls the converter to guess the number</span>
+<span class="sd">        of outputs. If it still fails, it fetches the parser</span>
 <span class="sd">        mapped to the first *scikit-learn* parent</span>
 <span class="sd">        it can find.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parsed_inputs_</span> <span class="o">=</span> <span class="n">inputs</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
-            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">def</span> <span class="nf">parser</span><span class="p">():</span>
             <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -161,6 +164,8 @@
                     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">break</span>
                     <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">return</span> <span class="n">names</span>
@@ -188,12 +193,8 @@
                 <span class="s2">&quot;Class &#39;</span><span class="si">{}</span><span class="s2">&#39; should have an attribute &#39;op_version&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
-        <span class="n">inputs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;parsed_inputs_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">()</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">sklearn_operator_name_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -213,7 +214,7 @@
                                        <span class="s2">&quot;infered. onnx_shape_calculator &quot;</span>
                                        <span class="s2">&quot;must be overriden and return &quot;</span>
                                        <span class="s2">&quot;a shape calculator.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-                <span class="n">o</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">shapes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+                <span class="n">o</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">shapes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">shape_calculator</span>
 
@@ -224,19 +225,45 @@
 <span class="sd">        mapped to the first *scikit-learn* parent</span>
 <span class="sd">        it can find.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;parsed_inputs_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">get_converter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
         <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">scope</span><span class="p">:</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Operator</span><span class="p">,</span>
                       <span class="n">container</span><span class="p">:</span> <span class="n">ModelComponentContainer</span><span class="p">):</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span>  <span class="c1"># getattr(self, &quot;parsed_inputs_&quot;, None)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span>  <span class="c1"># kwargs.get(&#39;outputs&#39;, None)</span>
+            <span class="n">op_version</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
+                    <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span>
+                        <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                        <span class="n">target_opset</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span>
+                        <span class="n">target_opset</span><span class="o">=</span><span class="n">op_version</span><span class="p">,</span>
+                        <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;Signature should be to_onnx_operator(self, inputs=None, &quot;</span>
+                    <span class="s2">&quot;outputs=None, target_opset=None, **kwargs). &quot;</span>
+                    <span class="s2">&quot;This will be the case in version 1.11, class=</span><span class="si">%r</span><span class="s2">.&quot;</span>
+                    <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
+                        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">(</span>
+                            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_onnx_operator</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                    <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+                    <span class="n">conv</span> <span class="o">=</span> <span class="n">get_converter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">conv</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_sklearn_parent</span><span class="p">()</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">sklearn_operator_name_map</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+                <span class="n">conv</span> <span class="o">=</span> <span class="n">get_converter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">conv</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+
             <span class="n">op</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">converter</span>
@@ -275,7 +302,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.
   </div>
   
   </body>

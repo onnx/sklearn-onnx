@@ -106,8 +106,8 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    skl [[9.71046420e-01 2.89534742e-02 1.06043091e-07]]
-    onnx [{0: 0.9710464477539062, 1: 0.028953460976481438, 2: 1.0604293976257395e-07}, {0: 0.000879956700373441, 1: 0.4618963897228241, 2: 0.5372236967086792}]
+    skl [[0.05979941 0.87835658 0.06184401]]
+    onnx [{0: 0.059799421578645706, 1: 0.8783565163612366, 2: 0.06184399500489235}, {0: 0.9817204475402832, 1: 0.01827952452003956, 2: 4.910286577342049e-08}]
 
 
 
@@ -143,8 +143,8 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    skl [[ 6.51424112  3.00155705 -9.51579818]]
-    onnx [{0: 6.514241695404053, 1: 3.0015571117401123, 2: -9.515798568725586}, {0: -4.225839614868164, 1: 2.037383556365967, 2: 2.188457489013672}]
+    skl [[-0.9068921   1.78016473 -0.87327263]]
+    onnx [{0: -0.9068918228149414, 1: 1.7801648378372192, 2: -0.8732728958129883}, {0: 6.9314751625061035, 1: 2.9479501247406006, 2: -9.879425048828125}]
 
 
 
@@ -173,11 +173,11 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -185,7 +185,7 @@ Raw scores and decision_function
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.884 seconds)
+   **Total running time of the script:** ( 0 minutes  0.101 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_decision_function.py:
@@ -200,7 +200,7 @@ Raw scores and decision_function
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_convert_decision_function.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_convert_decision_function.ipynb
       :alt: Launch binder
       :width: 150 px
 

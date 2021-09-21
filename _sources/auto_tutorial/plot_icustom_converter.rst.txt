@@ -251,7 +251,7 @@ First the shape calculator. We retrieve the input type
 add tells the output type has the same type,
 the same number of rows and a specific number of columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-164
+.. GENERATED FROM PYTHON SOURCE LINES 154-167
 
 .. code-block:: default
 
@@ -260,7 +260,10 @@ the same number of rows and a specific number of columns.
     def decorrelate_transformer_shape_calculator(operator):
         op = operator.raw_operator
         input_type = operator.inputs[0].type.__class__
-        input_dim = operator.inputs[0].type.shape[0]
+        # The shape may be unknown. *get_first_dimension*
+        # returns the appropriate value, None in most cases
+        # meaning the transformer can process any batch of observations.
+        input_dim = operator.inputs[0].get_first_dimension()
         output_type = input_type([input_dim, op.coef_.shape[1]])
         operator.outputs[0].type = output_type
 
@@ -272,14 +275,14 @@ the same number of rows and a specific number of columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-169
+.. GENERATED FROM PYTHON SOURCE LINES 168-172
 
 The converter. One thing we need to pay attention to
 is the target opset. This information is important
 to make sure that every node is defined following the
 specifications of that opset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-194
+.. GENERATED FROM PYTHON SOURCE LINES 172-197
 
 .. code-block:: default
 
@@ -315,11 +318,11 @@ specifications of that opset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-196
+.. GENERATED FROM PYTHON SOURCE LINES 198-199
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-221
+.. GENERATED FROM PYTHON SOURCE LINES 199-224
 
 .. code-block:: default
 
@@ -358,16 +361,16 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (6.046576236373724e-07, 0.0002951417081357655)
+    (6.046576279672422e-07, 0.000295141707503972)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-223
+.. GENERATED FROM PYTHON SOURCE LINES 225-226
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-232
+.. GENERATED FROM PYTHON SOURCE LINES 226-235
 
 .. code-block:: default
 
@@ -390,21 +393,21 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (1.1102230246251565e-15, 3.4753904038774583e-13)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-234
+.. GENERATED FROM PYTHON SOURCE LINES 236-237
 
 The differences are smaller with double as expected.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-238
+.. GENERATED FROM PYTHON SOURCE LINES 239-241
 
 Final graph
 +++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-243
+.. GENERATED FROM PYTHON SOURCE LINES 241-246
 
 .. code-block:: default
 
@@ -427,7 +430,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.017 seconds)
+   **Total running time of the script:** ( 0 minutes  0.424 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_icustom_converter.py:
@@ -442,7 +445,7 @@ Final graph
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_icustom_converter.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_icustom_converter.ipynb
       :alt: Launch binder
       :width: 150 px
 

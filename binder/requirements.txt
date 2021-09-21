@@ -1,4 +1,5 @@
 autopep8
+category_encoders
 codecov
 coverage
 flake8

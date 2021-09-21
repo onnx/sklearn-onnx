@@ -103,7 +103,7 @@ ONNX
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.9.2"
+    producer_version: "1.9.3"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -262,10 +262,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': 2.733374999999682e-05,
-     'deviation': 1.2159099110871633e-05,
-     'max_exec': 6.450499999992587e-05,
-     'min_exec': 1.9710000000117134e-05,
+    {'average': 6.1933000000058425e-06,
+     'deviation': 1.0297803697869683e-06,
+     'max_exec': 1.1300000000069587e-05,
+     'min_exec': 5.034999999953271e-06,
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -299,10 +299,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': 4.651885000001244e-05,
-     'deviation': 1.2024672362576826e-05,
-     'max_exec': 0.0001053100000000029,
-     'min_exec': 3.488500000017325e-05,
+    {'average': 1.4908350000006896e-05,
+     'deviation': 4.2408080040861415e-06,
+     'max_exec': 3.8464999999998636e-05,
+     'min_exec': 1.1304999999950382e-05,
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -358,12 +358,12 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|                                                                                            | 0/4 [00:00<?, ?it/s]     25%|#####################                                                               | 1/4 [00:00<00:00,  4.26it/s]     50%|##########################################                                          | 2/4 [00:00<00:00,  4.82it/s]     75%|###############################################################                     | 3/4 [00:00<00:00,  2.80it/s]    100%|####################################################################################| 4/4 [00:05<00:00,  1.82s/it]    100%|####################################################################################| 4/4 [00:05<00:00,  1.25s/it]
+      0%|                                                                                                                        | 0/4 [00:00<?, ?it/s]     50%|########################################################                                                        | 2/4 [00:00<00:00, 19.82it/s]    100%|################################################################################################################| 4/4 [00:02<00:00,  1.21it/s]    100%|################################################################################################################| 4/4 [00:02<00:00,  1.40it/s]
            N     scipy       ort  scipy/ort
-    0     10  0.000027  0.000088   0.310865
-    1    100  0.000053  0.000035   1.520588
-    2   1000  0.000200  0.000065   3.048115
-    3  10000  0.001651  0.000372   4.439147
+    0     10  0.000007  0.000014   0.522120
+    1    100  0.000014  0.000015   0.988577
+    2   1000  0.000104  0.000036   2.885691
+    3  10000  0.000956  0.000273   3.501073
 
 
 
@@ -391,10 +391,10 @@ Longer benchmark
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    onnx:  1.9.0
+    numpy: 1.21.2
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -402,7 +402,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.277 seconds)
+   **Total running time of the script:** ( 0 minutes  3.586 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:
@@ -417,7 +417,7 @@ Longer benchmark
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_benchmark_cdist.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_benchmark_cdist.ipynb
       :alt: Launch binder
       :width: 150 px
 

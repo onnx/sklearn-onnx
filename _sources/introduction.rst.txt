@@ -83,8 +83,8 @@ for this machine learning model.
 
 .. index:: initial types
 
-convet_sklearn, to_onnx, initial_types
-======================================
+convert_sklearn, to_onnx, initial_types
+=======================================
 
 The module implements two functions:
 :func:`convert_sklearn <skl2onnx.convert_sklearn>` and

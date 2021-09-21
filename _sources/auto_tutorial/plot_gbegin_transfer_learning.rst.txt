@@ -357,18 +357,18 @@ on a graph.
 
  .. code-block:: none
 
-    [[-676.5762   -203.35469 ]
-     [-570.6654   -208.09761 ]
-     [-339.81158   -86.3397  ]
-     [ -14.555643 -168.44814 ]
-     [ 357.2236   -157.61383 ]
-     [ 596.38605   -90.21025 ]
-     [ 918.8611    -26.339874]
-     [ 499.87164   128.27267 ]
-     [ 306.68555   156.42918 ]
-     [-125.912056  119.21854 ]
-     [-446.6046    342.4585  ]
-     [-504.90247   194.02522 ]]
+    [[-676.5762   -203.3542  ]
+     [-570.6653   -208.09763 ]
+     [-339.81152   -86.3398  ]
+     [ -14.555632 -168.44861 ]
+     [ 357.22357  -157.6142  ]
+     [ 596.3859    -90.21036 ]
+     [ 918.86115   -26.339485]
+     [ 499.87146   128.27269 ]
+     [ 306.68542   156.4288  ]
+     [-125.91204   119.21812 ]
+     [-446.60455   342.45862 ]
+     [-504.90234   194.02602 ]]
 
 
 
@@ -630,7 +630,7 @@ Graph again.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.086 seconds)
+   **Total running time of the script:** ( 0 minutes  8.612 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_transfer_learning.py:
@@ -645,7 +645,7 @@ Graph again.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_gbegin_transfer_learning.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gbegin_transfer_learning.ipynb
       :alt: Launch binder
       :width: 150 px
 

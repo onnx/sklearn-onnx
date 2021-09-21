@@ -42,7 +42,7 @@ Custom model
 Let's implement a simple custom model using
 :epkg:`scikit-learn` API. The model is preprocessing
 which decorrelates correlated random variables.
-If *X* is a matrix of features, :math:`V=rac{1}{n}X'X`
+If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-102
@@ -293,7 +293,7 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (3.56012595403854e-07, 0.0003158352648947649)
+    (3.560125949597648e-07, 0.0003158352651848217)
 
 
 
@@ -325,7 +325,7 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (4.440892098500626e-16, 4.0967351589255407e-13)
 
 
 
@@ -362,7 +362,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.230 seconds)
+   **Total running time of the script:** ( 0 minutes  1.402 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py:
@@ -377,7 +377,7 @@ Final graph
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_tutorial/plot_kcustom_converter_wrapper.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_kcustom_converter_wrapper.ipynb
       :alt: Launch binder
       :width: 150 px
 

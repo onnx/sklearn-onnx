@@ -127,8 +127,8 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [1 2 2 2 0 2 0 1 0 1 2 2 1 1 1 0 2 1 2 2 0 2 1 0 2 1 1 2 1 2 0 0 0 1 2 1 1
-     2]
+    [1 2 0 2 1 2 2 1 1 1 0 1 0 2 1 2 2 0 1 1 1 2 2 1 0 0 1 1 0 0 2 1 0 1 1 0 1
+     1]
 
 
 
@@ -168,8 +168,16 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    [1 2 2 2 0 2 0 1 0 1 2 2 1 1 1 0 2 1 2 2 0 2 1 0 2 1 1 2 1 2 0 0 0 1 2 1 1
-     2]
+    C:\xadupre\github\scikit-learn\sklearn\linear_model\_logistic.py:814: ConvergenceWarning: lbfgs failed to converge (status=1):
+    STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+    Increase the number of iterations (max_iter) or scale the data as shown in:
+        https://scikit-learn.org/stable/modules/preprocessing.html
+    Please also refer to the documentation for alternative solver options:
+        https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+      n_iter_i = _check_optimize_result(
+    [1 2 0 2 1 2 2 1 1 1 0 2 0 2 1 2 2 0 1 1 1 2 2 1 0 0 1 1 0 0 2 1 0 1 1 0 1
+     1]
 
 
 
@@ -198,11 +206,11 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    numpy: 1.21.1
-    scikit-learn: 0.24.2
-    onnx:  1.9.0
+    numpy: 1.21.2
+    scikit-learn: 1.1.dev0
+    onnx:  1.10.1
     onnxruntime:  1.8.1
-    skl2onnx:  1.9.2
+    skl2onnx:  1.9.3
 
 
 
@@ -210,7 +218,7 @@ Full example with a logistic regression
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.516 seconds)
+   **Total running time of the script:** ( 0 minutes  0.254 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:
@@ -225,7 +233,7 @@ Full example with a logistic regression
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/onnx/sklearn-onnx/master?filepath=notebooks/auto_examples/plot_convert_model.ipynb
+      :target: https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_examples/plot_convert_model.ipynb
       :alt: Launch binder
       :width: 150 px
 
