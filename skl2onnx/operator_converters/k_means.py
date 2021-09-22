@@ -83,14 +83,13 @@ def convert_sklearn_kmeans(scope: Scope, operator: Operator,
     C = C.astype(dtype)
     rs = OnnxReduceSumSquare(input_name, axes=[1], keepdims=1, op_version=opv)
 
-    N = X.get_first_dimension()
-    if isinstance(N, int):
-        zeros = np.zeros((N, ), dtype=dtype)
-    else:
-        zeros = OnnxMul(rs, np.array([0], dtype=dtype),
-                        op_version=opv)
-
     if options['gemm']:
+        N = X.get_first_dimension()
+        if isinstance(N, int):
+            zeros = np.zeros((N, ), dtype=dtype)
+        else:
+            zeros = OnnxMul(rs, np.array([0], dtype=dtype),
+                            op_version=opv)
         gemm_out = OnnxGemm(input_name, C, zeros, alpha=-2.,
                             transB=1, op_version=opv)
     else:
