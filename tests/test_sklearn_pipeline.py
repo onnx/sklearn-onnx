@@ -814,7 +814,7 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
-    def test_issue_712_svc_binary(self):
+    def test_issue_712_svc_binary0(self):
         for sub_model in [LinearSVC(), SVC()]:
             for method in ["sigmoid", "isotonic"]:
                 with self.subTest(sub_model=sub_model, method=method):
@@ -913,7 +913,8 @@ class TestSklearnPipeline(unittest.TestCase):
                     assert_almost_equal(expected_label, got[0])
                     if method == "isotonic":
                         # float/double issues
-                        assert_almost_equal(expected_proba[2:4], got[1][2:4], decimal=3)
+                        assert_almost_equal(
+                            expected_proba[2:4], got[1][2:4], decimal=3)
                     else:
                         assert_almost_equal(expected_proba, got[1], decimal=5)
 
