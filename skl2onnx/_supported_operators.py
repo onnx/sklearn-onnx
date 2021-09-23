@@ -31,12 +31,16 @@ from sklearn.linear_model import (
     MultiTaskLasso, MultiTaskLassoCV,
     OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
     PassiveAggressiveRegressor, PoissonRegressor,
-    QuantileRegressor,
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
     TheilSenRegressor, TweedieRegressor
 )
+try:
+    from sklearn.linear_model import QuantileRegressor
+except ImportError:
+    # available since sklearn>=1.0
+    QuantileRegressor = None
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
