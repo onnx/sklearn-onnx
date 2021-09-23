@@ -205,11 +205,11 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertEqual(cst.value, "a")
 
     def test_constant_of_shape(self):
-        for opset in [TARGET_OPSET, 14, 13, 12, 11, 10, 9]:
+        for opset in range(20, 8, -1):
+            if opset > TARGET_OPSET:
+                continue
             for value in [np.array([5], dtype=np.float32),
                           np.array(5, dtype=np.float32)]:
-                if opset > TARGET_OPSET:
-                    continue
                 with self.subTest(opset=opset, value=value):
                     tensor_value = onnx.helper.make_tensor(
                         "value", onnx.TensorProto.FLOAT,

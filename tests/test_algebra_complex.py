@@ -29,7 +29,7 @@ class TestAlgebraComplex(unittest.TestCase):
             X = np.array([[1-2j, -12j],
                           [-1-2j, 1+2j]]).astype(dt)
 
-            for opv in (10, 11, 12, 13, TARGET_OPSET):
+            for opv in range(10, 20):
                 if opv > TARGET_OPSET:
                     continue
                 with self.subTest(dt=dt, opset=opv):

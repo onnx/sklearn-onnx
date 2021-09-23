@@ -48,11 +48,11 @@ def _default_OPSET_TO_IR_VERSION():
 
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-    assert OPSET_TO_IR_VERSION[14] is not None
+    assert OPSET_TO_IR_VERSION[15] is not None
 except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = _default_OPSET_TO_IR_VERSION()
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 14}
+OPSET_ML_TO_OPSET = {1: 11, 2: 15}
 
 logger = getLogger('skl2onnx')
 
