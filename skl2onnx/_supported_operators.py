@@ -30,11 +30,12 @@ from sklearn.linear_model import (
     MultiTaskElasticNet, MultiTaskElasticNetCV,
     MultiTaskLasso, MultiTaskLassoCV,
     OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
-    PassiveAggressiveRegressor,
+    PassiveAggressiveRegressor, PoissonRegressor,
+    QuantileRegressor,
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
-    TheilSenRegressor,
+    TheilSenRegressor, TweedieRegressor
 )
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -348,6 +349,7 @@ def build_sklearn_operator_name_map():
         PCA,
         PLSRegression,
         Pipeline,
+        PoissonRegressor,
         PolynomialFeatures,
         PowerTransformer,
         RadiusNeighborsClassifier,
@@ -374,6 +376,7 @@ def build_sklearn_operator_name_map():
         TfidfVectorizer,
         TfidfTransformer,
         TruncatedSVD,
+        TweedieRegressor,
         VarianceThreshold,
         VotingClassifier,
         VotingRegressor,
@@ -406,6 +409,7 @@ def build_sklearn_operator_name_map():
         PassiveAggressiveClassifier: 'SklearnSGDClassifier',
         PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
+        QuantileRegressor: 'SklearnLinearRegressor',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
         RidgeClassifier: 'SklearnLinearClassifier',
