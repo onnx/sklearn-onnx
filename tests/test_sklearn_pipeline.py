@@ -256,11 +256,7 @@ class TestSklearnPipeline(unittest.TestCase):
 
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipeliner",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipeliner")
 
         if __name__ == "__main__":
             from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
@@ -424,9 +420,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerWeights-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerWeights-Dec4")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -448,9 +442,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerDrop",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerDrop")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -473,9 +465,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerPassthrough",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerPassthrough")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -497,9 +487,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerPassthroughNoWeights",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerPassthroughNoWeights")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -724,7 +712,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
-    def test_issue_712(self):
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_multio(self):
         dfx = pandas.DataFrame(
             {'CAT1': ['985332', '985333', '985334', '985335', '985336'],
              'CAT2': ['1985332', '1985333', '1985334', '1985335', '1985336'],
@@ -765,55 +754,169 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
-    def test_issue_712_svc(self):
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_multio(self):
         for sub_model in [LinearSVC(), SVC()]:
-            with self.subTest(sub_model=sub_model):
-                dfx = pandas.DataFrame(
-                    {'CAT1': ['985332', '985333', '985334', '985335',
-                              '985336', '985332', '985333', '985334',
-                              '985335', '985336', '985336'],
-                     'CAT2': ['1985332', '1985333', '1985334', '1985335',
-                              '1985336', '1985332', '1985333', '1985334',
-                              '1985335', '1985336', '1985336'],
-                     'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
-                              "abc ii", "abc abc", "abc def", "def ghj",
-                              "abcdef", "abc ii", "abc abc"]})
-                dfy = pandas.DataFrame(
-                    {'REAL': [5, 6, 7, 6, 5, 5, 6, 7, 5, 6, 7],
-                     'CATY': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]})
+            for method in ["sigmoid", "isotonic"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = pandas.DataFrame(
+                        {'REAL': [5, 6, 7, 6, 5, 5, 6, 7, 5, 6, 7],
+                         'CATY': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]})
 
-                cat_features = ['CAT1', 'CAT2']
-                categorical_transformer = OneHotEncoder(
-                    handle_unknown='ignore')
-                textual_feature = 'TEXT'
-                count_vect_transformer = Pipeline(steps=[
-                    ('count_vect', CountVectorizer(
-                        max_df=0.8, min_df=0.05, max_features=1000))])
-                preprocessor = ColumnTransformer(
-                    transformers=[
-                        ('cat_transform', categorical_transformer,
-                         cat_features),
-                        ('count_vector', count_vect_transformer,
-                         textual_feature)])
-                model_SVC = CalibratedClassifierCV(sub_model, cv=2)
-                rf_clf = Pipeline(steps=[
-                    ('preprocessor', preprocessor),
-                    ('classifier', MultiOutputClassifier(
-                        estimator=model_SVC))])
-                rf_clf.fit(dfx, dfy)
-                expected_label = rf_clf.predict(dfx)
-                expected_proba = rf_clf.predict_proba(dfx)
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', MultiOutputClassifier(
+                            estimator=model_SVC))])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
 
-                inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
-                          'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
-                          'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
-                onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
-                sess = InferenceSession(onx.SerializeToString())
-                got = sess.run(None, inputs)
-                assert_almost_equal(expected_label, got[0])
-                self.assertEqual(len(expected_proba), len(got[1]))
-                for e, g in zip(expected_proba, got[1]):
-                    assert_almost_equal(e, g, decimal=5)
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    self.assertEqual(len(expected_proba), len(got[1]))
+                    for e, g in zip(expected_proba, got[1]):
+                        if method == "isotonic" and isinstance(sub_model, SVC):
+                            # float/double issues
+                            assert_almost_equal(e[2:4], g[2:4], decimal=3)
+                        else:
+                            assert_almost_equal(e, g, decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_binary0(self):
+        for sub_model in [LinearSVC(), SVC()]:
+            for method in ["sigmoid", "isotonic"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = numpy.array([0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', model_SVC)])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
+
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                                  options={'zipmap': False})
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    assert_almost_equal(expected_proba, got[1], decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_multi(self):
+        for sub_model in [SVC(), LinearSVC()]:
+            for method in ["isotonic", "sigmoid"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = numpy.array([5, 6, 7, 6, 5, 5, 8, 7, 5, 6, 8])
+
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', model_SVC)])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
+
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                                  options={'zipmap': False})
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    if method == "isotonic":
+                        # float/double issues
+                        assert_almost_equal(
+                            expected_proba[2:4], got[1][2:4], decimal=3)
+                    else:
+                        assert_almost_equal(expected_proba, got[1], decimal=5)
 
 
 if __name__ == "__main__":
