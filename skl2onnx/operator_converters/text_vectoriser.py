@@ -2,14 +2,16 @@
 
 
 import warnings
+from collections import OrderedDict
 import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_reshape, apply_identity)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_proto_type
+from ..common.data_types import guess_proto_type, StringTensorType
 from ..proto import onnx_proto
+from ..algebra.onnx_ops import OnnxStringNormalizer
 
 
 def _intelligent_split(text, op, tokenizer, existing):
@@ -173,8 +175,9 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     options = container.get_options(
         op, dict(separators="DEFAULT",
                  tokenexp=None,
-                 nan=False))
-    if set(options) != {'separators', 'tokenexp', 'nan'}:
+                 nan=False,
+                 keep_empty_string=False))
+    if set(options) != {'separators', 'tokenexp', 'nan', 'keep_empty_string'}:
         raise RuntimeError("Unknown option {} for {}".format(
             set(options) - {'separators'}, type(op)))
 
@@ -230,10 +233,6 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
         if len(operator.input_full_names) != 1:
             raise RuntimeError("Only one input is allowed, found {}.".format(
                 operator.input_full_names))
-        flatten = scope.get_unique_variable_name('flattened')
-        apply_reshape(scope, operator.input_full_names[0],
-                      flatten, container,
-                      desired_shape=(-1, ))
 
         # StringNormalizer
         op_type = 'StringNormalizer'
@@ -253,13 +252,34 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             })
             op_version = 9
             domain = 'com.microsoft'
-
+        opvs = 1 if domain == 'com.microsoft' else op_version
         if stop_words:
             attrs['stopwords'] = list(sorted(stop_words))
-        opvs = 1 if domain == 'com.microsoft' else op_version
-        container.add_node(op_type, flatten,
-                           normalized, op_version=opvs,
-                           op_domain=domain, **attrs)
+
+        if options['keep_empty_string']:
+            del attrs['name']
+            op_norm = OnnxStringNormalizer(
+                'text_in', op_version=container.target_opset,
+                output_names=['text_out'], **attrs)
+            scan_body = op_norm.to_onnx(
+                OrderedDict([('text_in', StringTensorType())]),
+                outputs=[('text_out', StringTensorType())],
+                target_opset=op_version)
+
+            vector = scope.get_unique_variable_name('vector')
+            apply_reshape(scope, operator.input_full_names[0],
+                          vector, container,
+                          desired_shape=(-1, 1))
+            container.add_node('Scan', vector, normalized,
+                               body=scan_body.graph, num_scan_inputs=1)
+        else:
+            flatten = scope.get_unique_variable_name('flattened')
+            apply_reshape(scope, operator.input_full_names[0],
+                          flatten, container,
+                          desired_shape=(-1, ))
+            container.add_node(op_type, flatten,
+                               normalized, op_version=opvs,
+                               op_domain=domain, **attrs)
     else:
         normalized = operator.input_full_names
 
@@ -398,4 +418,5 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
                    options={'tokenexp': None, 'separators': None,
-                            'nan': [True, False]})
+                            'nan': [True, False],
+                            'keep_empty_string': [True, False]})

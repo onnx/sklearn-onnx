@@ -24,7 +24,6 @@ Trains a model
 All imports. It also registered onnx converters for :epgk:`xgboost`
 and *lightgbm*.
 """
-import sys
 import numpy as np
 import pandas as pd
 from onnxruntime import InferenceSession
@@ -57,8 +56,8 @@ if IForest is not None:
                      verbose=1, n_jobs=-1).fit(sc_data)
     feature_names2 = dumdf1.columns
 
-
-    initial_type = [('float_input', FloatTensorType([None, len(feature_names2)]))]
+    initial_type = [('float_input',
+                     FloatTensorType([None, len(feature_names2)]))]
 
 
 #############################################
