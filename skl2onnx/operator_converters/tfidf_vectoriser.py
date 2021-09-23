@@ -17,7 +17,6 @@ def convert_sklearn_tfidf_vectoriser(scope: Scope, operator: Operator,
     Converter for scikit-learn's TfidfVectoriser.
     """
     tfidf_op = operator.raw_operator
-
     op_type = sklearn_operator_name_map[CountVectorizer]
     cv_operator = scope.declare_local_operator(op_type, tfidf_op)
     cv_operator.inputs = operator.inputs
@@ -49,4 +48,5 @@ def convert_sklearn_tfidf_vectoriser(scope: Scope, operator: Operator,
 
 register_converter('SklearnTfidfVectorizer', convert_sklearn_tfidf_vectoriser,
                    options={'tokenexp': None, 'separators': None,
-                            'nan': [True, False]})
+                            'nan': [True, False],
+                            'keep_empty_string': [True, False]})
