@@ -12,7 +12,8 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul, OnnxSigmoid)
+    OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul,
+    OnnxReshape, OnnxSigmoid)
 
 
 def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
@@ -150,16 +151,19 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
 
     from sklearn.linear_model._glm.link import IdentityLink, LogLink, LogitLink
     if isinstance(op._link_instance, IdentityLink):
-        Y = OnnxIdentity(eta, op_version=opv, output_names=out[:1])
+        Y = OnnxIdentity(eta, op_version=opv)
     elif isinstance(op._link_instance, LogLink):
-        Y = OnnxExp(eta, op_version=opv, output_names=out[:1])
+        Y = OnnxExp(eta, op_version=opv)
     elif isinstance(op._link_instance, LogitLink):
-        Y = OnnxSigmoid(eta, op_version=opv, output_names=out[:1])
+        Y = OnnxSigmoid(eta, op_version=opv)
     else:
         raise RuntimeError(
             "Unexpected type %r for _link_instance in operator type %r."
             "" % (type(op._link_instance), type(op)))
-    Y.add_to(scope, container)
+    last_dim = 1 if len(op.coef_.shape) == 1 else op.coef_.shape[-1]
+    final = OnnxReshape(Y, np.array([-1, last_dim], dtype=np.int64),
+                        op_version=opv, output_names=out[:1])
+    final.add_to(scope, container)
 
 
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)

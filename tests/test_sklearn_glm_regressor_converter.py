@@ -653,6 +653,19 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X, model, model_onnx, verbose=False,
             basename="SklearnOrthogonalMatchingPursuitCV-Dec4")
 
+    def check_model(self, model, X, name='input'):
+        try:
+            sess = InferenceSession(model.SerializeToString())
+        except Exception as e:
+            raise AssertionError(
+                "Unable to load model\n%s" % str(model)) from e
+        try:
+            return sess.run(None, {input: X[:7]})
+        except Exception as e:
+            raise AssertionError(
+                "Unable to run model X.shape=%r X.dtype=%r\n%s" % (
+                    X[:7].shape, X.dtype, str(model))) from e
+
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_poisson_regressor(self):
         X, y = make_regression(
@@ -665,6 +678,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model, "linear regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
+        self.check_model(model_onnx, X.astype(numpy.float32))
         dump_data_and_model(
             X.astype(numpy.float32), model, model_onnx,
             basename="SklearnPoissonRegressor-Dec4")
@@ -690,6 +704,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
                     model, "linear regression",
                     [("input", FloatTensorType([None, X.shape[1]]))],
                     target_opset=TARGET_OPSET)
+                self.check_model(model_onnx, X.astype(numpy.float32))
                 dump_data_and_model(
                     X.astype(numpy.float32), model, model_onnx,
                     basename="SklearnTweedieRegressor%d-Dec4" % power)
@@ -701,6 +716,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
                     X.astype(numpy.float64), model, model_onnx,
                     basename="SklearnTweedieRegressor64%d" % power)
 
+    @unittest.skipIf(QuantileRegressor is not None,
+                     reason="scikit-learn<1.0")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_quantile_regressor(self):
         X, y = make_regression(
@@ -708,11 +725,12 @@ class TestGLMRegressorConverter(unittest.TestCase):
             n_informative=3)
         y = numpy.abs(y)
         y = y / y.max() + 1e-5
-        model = linear_model.TweedieRegressor().fit(X, y)
+        model = linear_model.QuantileRegressor().fit(X, y)
         model_onnx = convert_sklearn(
             model, "linear regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
+        self.check_model(model_onnx, X.astype(numpy.float32))
         dump_data_and_model(
             X.astype(numpy.float32), model, model_onnx,
             basename="SklearnQuantileRegressor-Dec4")
