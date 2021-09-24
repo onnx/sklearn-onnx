@@ -13,7 +13,7 @@ except ImportError:
     class OutlierMixin:
         pass
 
-from sklearn.ensemble import IsolationForest
+from sklearn.ensemble import IsolationForest, RandomTreesEmbedding
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
@@ -83,7 +83,8 @@ def _fetch_input_slice(scope, inputs, column_indices):
     return array_feature_extractor_operator.outputs
 
 
-def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
+def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
+                                alias=None):
     """
     This function handles all non-pipeline models.
 
@@ -91,6 +92,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     :param model: A scikit-learn object (e.g., *OneHotEncoder*
         or *LogisticRegression*)
     :param inputs: A list of variables
+    :param custom_parsers: dictionary of custom parsers
+    :param alias: use this alias instead of the one based on the class name
     :return: A list of output variables which will be passed to next
         stage
     """
@@ -102,7 +105,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         raise TypeError(
             "One input is not a Variable for model %r - %r."
             "" % (model, inputs))
-    alias = _get_sklearn_operator_name(type(model))
+    if alias is None:
+        alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
 
@@ -397,6 +401,18 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     return res
 
 
+def _parse_sklearn_random_trees_embedding(scope, model, inputs,
+                                          custom_parsers=None):
+    res = parse_sklearn(scope, model.base_estimator_, inputs,
+                        custom_parsers=custom_parsers)
+    if len(res) != 1:
+        raise RuntimeError(
+            "A regressor only produces one output not %r." % res)
+    scope.replace_raw_operator(
+        model.base_estimator_, model, "SklearnRandomTreesEmbedding")
+    return res
+
+
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model, dict(zipmap=True))
     no_zipmap = (
@@ -512,7 +528,7 @@ def _parse_sklearn_bayesian_ridge(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
-def _parse_sklearn(scope, model, inputs, custom_parsers=None):
+def _parse_sklearn(scope, model, inputs, custom_parsers=None, alias=None):
     """
     This is a delegate function. It does nothing but invokes the
     correct parsing function according to the input model's type.
@@ -526,6 +542,7 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None):
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
         model, inputs, custom_parsers=None) }``
+    :param alias: alias of the model (None if based on the model class)
     :return: The output variables produced by the input model
     """
     for i, inp in enumerate(inputs):
@@ -533,6 +550,12 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None):
             raise TypeError(
                 "Unexpected input type %r for input %r: %r." % (
                     type(inp), i, inp))
+
+    if alias is not None:
+        outputs = _parse_sklearn_simple_model(scope, model, inputs,
+                                              custom_parsers=custom_parsers,
+                                              alias=alias)
+        return outputs
 
     tmodel = type(model)
     if custom_parsers is not None and tmodel in custom_parsers:
@@ -697,6 +720,7 @@ def build_sklearn_parsers_map():
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
         GridSearchCV: _parse_sklearn_grid_search_cv,
         MultiOutputClassifier: _parse_sklearn_multi_output_classifier,
+        RandomTreesEmbedding: _parse_sklearn_random_trees_embedding,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer

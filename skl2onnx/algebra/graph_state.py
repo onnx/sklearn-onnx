@@ -39,6 +39,10 @@ class GraphState:
             self.operator_instance = operator_name
             self.is_model = True
             self.operator_name = get_model_alias(type(operator_name))
+        elif operator_name.__class__.__name__ == "WrappedModelAlias":
+            self.operator_instance = operator_name.model
+            self.is_model = True
+            self.operator_name = operator_name.alias
         else:
             self.operator_name = operator_name
             self.is_model = False
@@ -481,7 +485,8 @@ class GraphState:
                     id(self.operator_instance), self.options)
                 try:
                     sub_outputs = _parse_sklearn(
-                        self.scope, self.operator_instance, sub_op_inputs)
+                        self.scope, self.operator_instance, sub_op_inputs,
+                        alias=self.operator_name)
                 except RuntimeError as e:
                     raise RuntimeError(
                         "Unable to run parser for model type %r, inputs=%r "
