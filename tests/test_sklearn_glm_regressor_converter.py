@@ -20,7 +20,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
 try:
     from sklearn.linear_model import QuantileRegressor
-except ImportError:
+except (ImportError, AttributeError):
     # available since sklearn>=1.0
     QuantileRegressor = None
 from skl2onnx import convert_sklearn
