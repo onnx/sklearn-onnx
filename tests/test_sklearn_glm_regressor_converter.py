@@ -18,6 +18,11 @@ from sklearn.datasets import make_regression
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
+try:
+    from sklearn.linear_model import QuantileRegressor
+except ImportError:
+    # available since sklearn>=1.0
+    QuantileRegressor = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -640,7 +645,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X, model, model_onnx, verbose=False,
             basename="SklearnMultiTaskElasticNetCV-Dec4")
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
     def test_model_orthogonal_matching_pursuit_cv(self):
         model, X = fit_regression_model(
             linear_model.OrthogonalMatchingPursuitCV())
@@ -660,13 +666,14 @@ class TestGLMRegressorConverter(unittest.TestCase):
             raise AssertionError(
                 "Unable to load model\n%s" % str(model)) from e
         try:
-            return sess.run(None, {input: X[:7]})
+            return sess.run(None, {name: X[:7]})
         except Exception as e:
             raise AssertionError(
                 "Unable to run model X.shape=%r X.dtype=%r\n%s" % (
                     X[:7].shape, X.dtype, str(model))) from e
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
     def test_model_poisson_regressor(self):
         X, y = make_regression(
             n_features=5, n_samples=100, n_targets=1, random_state=42,
@@ -690,7 +697,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X.astype(numpy.float64), model, model_onnx,
             basename="SklearnPoissonRegressor64")
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
     def test_model_tweedie_regressor(self):
         X, y = make_regression(
             n_features=5, n_samples=100, n_targets=1, random_state=42,
@@ -718,7 +726,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
 
     @unittest.skipIf(QuantileRegressor is not None,
                      reason="scikit-learn<1.0")
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
     def test_model_quantile_regressor(self):
         X, y = make_regression(
             n_features=5, n_samples=100, n_targets=1, random_state=42,
