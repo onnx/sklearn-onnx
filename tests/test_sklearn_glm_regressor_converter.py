@@ -724,7 +724,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
                     X.astype(numpy.float64), model, model_onnx,
                     basename="SklearnTweedieRegressor64%d" % power)
 
-    @unittest.skipIf(QuantileRegressor is not None,
+    @unittest.skipIf(QuantileRegressor is None,
                      reason="scikit-learn<1.0")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
