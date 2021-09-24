@@ -8,13 +8,14 @@ from ..common._apply_operation import (
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type, Int64TensorType
+from ..common.data_types import (
+    guess_numpy_type, Int64TensorType, guess_proto_type)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 
 
 def _handle_zeros(scope, container, concatenated_prob_name,
-                  reduced_prob_name, n_classes):
+                  reduced_prob_name, n_classes, proto_type):
     """
     This function replaces 0s in concatenated_prob_name with 1s and
     0s in reduced_prob_name with n_classes.
@@ -31,7 +32,7 @@ def _handle_zeros(scope, container, concatenated_prob_name,
     masked_reduced_prob_name = scope.get_unique_variable_name(
         'masked_reduced_prob')
 
-    container.add_initializer(n_classes_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(n_classes_name, proto_type,
                               [], [n_classes])
 
     apply_cast(scope, reduced_prob_name, cast_prob_name, container,
@@ -40,7 +41,7 @@ def _handle_zeros(scope, container, concatenated_prob_name,
                        bool_not_cast_prob_name,
                        name=scope.get_unique_operator_name('Not'))
     apply_cast(scope, bool_not_cast_prob_name, mask_name, container,
-               to=onnx_proto.TensorProto.FLOAT)
+               to=proto_type)
     apply_add(scope, [concatenated_prob_name, mask_name],
               masked_concatenated_prob_name, container, broadcast=1)
     apply_mul(scope, [mask_name, n_classes_name], reduced_prob_mask_name,
@@ -50,7 +51,7 @@ def _handle_zeros(scope, container, concatenated_prob_name,
     return masked_concatenated_prob_name, masked_reduced_prob_name
 
 
-def _transform_sigmoid(scope, container, model, df_col_name, k):
+def _transform_sigmoid(scope, container, model, df_col_name, k, proto_type):
     """
     Sigmoid Calibration method
     """
@@ -65,11 +66,11 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     sigmoid_predict_result_name = scope.get_unique_variable_name(
         'sigmoid_predict_result')
 
-    container.add_initializer(a_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(a_name, proto_type,
                               [], [model.calibrators_[k].a_])
-    container.add_initializer(b_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(b_name, proto_type,
                               [], [model.calibrators_[k].b_])
-    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(unity_name, proto_type,
                               [], [1])
 
     apply_mul(scope, [a_name, df_col_name], a_df_prod_name, container,
@@ -84,7 +85,7 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     return sigmoid_predict_result_name
 
 
-def _transform_isotonic(scope, container, model, T, k, dtype):
+def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
     """
     Isotonic calibration method
     This function can only handle one instance at a time because
@@ -125,11 +126,11 @@ def _transform_isotonic(scope, container, model, T, k, dtype):
                       pprint.pformat(dir(model.calibrators_[k]))))
 
     container.add_initializer(
-        calibrator_x_name, onnx_proto.TensorProto.FLOAT,
+        calibrator_x_name, proto_type,
         [len(getattr(model.calibrators_[k], atX))],
         getattr(model.calibrators_[k], atX))
     container.add_initializer(
-        calibrator_y_name, onnx_proto.TensorProto.FLOAT,
+        calibrator_y_name, proto_type,
         [len(getattr(model.calibrators_[k], atY))],
         getattr(model.calibrators_[k], atY))
 
@@ -248,6 +249,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
+    proto_type = guess_proto_type(operator.inputs[0].type)
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
@@ -288,10 +290,12 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
             name=scope.get_unique_operator_name(
                 'CaliAFE_%d_c%d' % (model_index, k)),
             op_domain='ai.onnx.ml')
-        T = (_transform_sigmoid(scope, container, model, df_col_name, k)
-             if model.method == 'sigmoid' else
-             _transform_isotonic(
-            scope, container, model, df_col_name, k, dtype))
+        T = (
+            _transform_sigmoid(scope, container, model, df_col_name, k,
+                               proto_type)
+            if model.method == 'sigmoid' else
+            _transform_isotonic(scope, container, model, df_col_name,
+                                k, dtype, proto_type))
 
         prob_name[k] = T
         if n_classes == 2:
@@ -306,7 +310,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
             'unit_float_tensor%d' % model_index)
 
         container.add_initializer(unit_float_tensor_name,
-                                  onnx_proto.TensorProto.FLOAT, [], [1.0])
+                                  proto_type, [], [1.0])
 
         apply_sub(scope, [unit_float_tensor_name, prob_name[0]],
                   zeroth_col_name, container, broadcast=1)
@@ -337,7 +341,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                 reduced_prob_name,
                 name=scope.get_unique_operator_name('ReduceSum'))
         num, deno = _handle_zeros(scope, container, concatenated_prob_name,
-                                  reduced_prob_name, n_classes)
+                                  reduced_prob_name, n_classes, proto_type)
         apply_div(scope, [num, deno],
                   calc_prob_name, container, broadcast=1,
                   operator_name=scope.get_unique_variable_name(
@@ -396,6 +400,7 @@ def convert_sklearn_calibrated_classifier_cv(
     classes = op.classes_
     output_shape = (-1,)
     class_type = onnx_proto.TensorProto.STRING
+    proto_type = guess_proto_type(operator.inputs[0].type)
 
     if np.issubdtype(op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
@@ -417,7 +422,7 @@ def convert_sklearn_calibrated_classifier_cv(
     add_result_name = scope.get_unique_variable_name('add_result')
 
     container.add_initializer(classes_name, class_type, classes.shape, classes)
-    container.add_initializer(clf_length_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(clf_length_name, proto_type,
                               [], [clf_length])
 
     for clf_index, clf in enumerate(op.calibrated_classifiers_):

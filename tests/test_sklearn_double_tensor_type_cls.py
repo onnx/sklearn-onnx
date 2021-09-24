@@ -3,6 +3,7 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.ensemble import BaggingClassifier
 # Requires PR #488.
@@ -41,6 +42,7 @@ from test_utils import (
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
+ort_version = ort_version.split('+')[0]
 ORT_VERSION = '1.7.0'
 
 
@@ -326,6 +328,38 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                 ('a', LogisticRegression()),
                 ('b', LogisticRegression())])],
             "StackingClassifier")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Sigmoid are missing")
+    @unittest.skipIf(
+        StrictVersion(onnx_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Tanh are missing")
+    @unittest.skipIf(
+        StackingClassifier is None, reason="scikit-learn too old")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_calibration_sigmoid_64(self):
+        self._common_classifier(
+            [lambda: CalibratedClassifierCV(
+                base_estimator=LogisticRegression(), method='sigmoid')],
+            "CalibratedClassifierCV",
+            raw_scores=False)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Sigmoid are missing")
+    @unittest.skipIf(
+        StrictVersion(onnx_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Tanh are missing")
+    @unittest.skipIf(
+        StackingClassifier is None, reason="scikit-learn too old")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_calibration_isotonic_64(self):
+        self._common_classifier(
+            [lambda: CalibratedClassifierCV(
+                base_estimator=LogisticRegression(), method='isotonic')],
+            "CalibratedClassifierCV",
+            raw_scores=False)
 
 
 if __name__ == "__main__":
