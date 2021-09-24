@@ -40,6 +40,9 @@ from test_utils import (
     dump_data_and_model, fit_regression_model, TARGET_OPSET)
 
 
+ort_version = ort_version.split('+')[0]
+
+
 class TestUtilsSklearn(unittest.TestCase):
 
     @unittest.skipIf(VotingRegressor is None,
@@ -165,7 +168,7 @@ class TestUtilsSklearn(unittest.TestCase):
             'precprocessor__cat__onehot__categories___0',
             'precprocessor__cat__onehot__categories___1',
             'precprocessor__cat__tsvd', 'classifier']
-        self.assertEqual(simple2, exp)
+        self.assertEqual(simple2[:len(exp) - 2], exp[:-2])
 
         initial_type = [
             ("numfeat", FloatTensorType([None, 3])),
@@ -174,11 +177,7 @@ class TestUtilsSklearn(unittest.TestCase):
                                      target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipelinerOptions1",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipelinerOptions1")
 
         options = {'classifier': {'zipmap': False}}
         new_options = _process_options(model, options)
@@ -191,11 +190,7 @@ class TestUtilsSklearn(unittest.TestCase):
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipelinerOptions2",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipelinerOptions2")
 
         options = {'classifier__zipmap': False}
         new_options = _process_options(model, options)
@@ -207,11 +202,7 @@ class TestUtilsSklearn(unittest.TestCase):
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipelinerOptions2",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipelinerOptions2")
 
         options = {id(model): {'zipmap': False}}
         new_options = _process_pipeline_options(model, options)
@@ -223,11 +214,7 @@ class TestUtilsSklearn(unittest.TestCase):
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipelinerOptions2",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipelinerOptions2")
 
 
 if __name__ == "__main__":
