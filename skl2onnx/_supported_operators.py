@@ -34,8 +34,23 @@ from sklearn.linear_model import (
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
-    TheilSenRegressor,
+    TheilSenRegressor
 )
+try:
+    from sklearn.linear_model import QuantileRegressor
+except ImportError:
+    # available since sklearn>=1.0
+    QuantileRegressor = None
+try:
+    from sklearn.linear_model import PoissonRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    PoissonRegressor = None
+try:
+    from sklearn.linear_model import TweedieRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    TweedieRegressor = None
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
@@ -348,6 +363,7 @@ def build_sklearn_operator_name_map():
         PCA,
         PLSRegression,
         Pipeline,
+        PoissonRegressor,
         PolynomialFeatures,
         PowerTransformer,
         RadiusNeighborsClassifier,
@@ -375,6 +391,7 @@ def build_sklearn_operator_name_map():
         TfidfVectorizer,
         TfidfTransformer,
         TruncatedSVD,
+        TweedieRegressor,
         VarianceThreshold,
         VotingClassifier,
         VotingRegressor,
@@ -407,6 +424,7 @@ def build_sklearn_operator_name_map():
         PassiveAggressiveClassifier: 'SklearnSGDClassifier',
         PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
+        QuantileRegressor: 'SklearnLinearRegressor',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
         RidgeClassifier: 'SklearnLinearClassifier',
