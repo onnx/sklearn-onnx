@@ -259,7 +259,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model,model_onnx,
+            X, model, model_onnx,
             basename="SklearnExtraTreesClassifierBool")
 
     @ignore_warnings(category=FutureWarning)
@@ -628,7 +628,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True}},
             target_opset=TARGET_OPSET)
-        
+
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
