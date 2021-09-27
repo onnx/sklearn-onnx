@@ -281,7 +281,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label', Int64TensorType())
     df_name = scope.declare_local_variable(
-        'probability_tensor', operator.inputs[0].type.__class__())
+        'uncal_probability', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name
