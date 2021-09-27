@@ -61,7 +61,6 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
 
         model_def = node.to_onnx(
             {'X': X}, outputs=[('Y', FloatTensorType())])
-        print(model_def)
 
         try:
             sess = InferenceSession(model_def.SerializeToString())

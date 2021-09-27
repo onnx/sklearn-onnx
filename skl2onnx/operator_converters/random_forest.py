@@ -328,7 +328,6 @@ def convert_sklearn_random_forest_classifier(
 def convert_sklearn_random_forest_regressor_converter(
         scope, operator, container, op_type='TreeEnsembleRegressor',
         op_domain='ai.onnx.ml', op_version=1):
-    print(operator)
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
@@ -412,7 +411,7 @@ def convert_sklearn_random_forest_regressor_converter(
             op, dict(decision_path=False, decision_leaf=False))
 
     if (not options.get('decision_path', False) and
-            options.get('decision_leaf', False)):
+            not options.get('decision_leaf', False)):
         return
 
     # decision_path
