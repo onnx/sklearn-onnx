@@ -2,21 +2,26 @@
 
 import unittest
 from distutils.version import StrictVersion
+import numpy
 import onnx
+import onnxruntime as rt
+from onnxruntime import __version__ as ort_version
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-import onnxruntime as rt
-import numpy
+from test_utils import TARGET_OPSET
+
+
+ort_version = ort_version.split('+')[0]
 
 
 class TestShapes(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
                      reason="not available")
-    @unittest.skipIf(StrictVersion(rt.__version__) < StrictVersion("1.0.0"),
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.0.0"),
                      reason="not available")
     def test_onnxruntime_shapes_reg(self):
         iris = load_iris()
@@ -25,7 +30,8 @@ class TestShapes(unittest.TestCase):
         clr = RandomForestRegressor(max_depth=1)
         clr.fit(X_train, y_train)
         initial_type = [('float_input', FloatTensorType([None, 4]))]
-        onx = convert_sklearn(clr, initial_types=initial_type)
+        onx = convert_sklearn(clr, initial_types=initial_type,
+                              target_opset=TARGET_OPSET)
         sess = rt.InferenceSession(onx.SerializeToString())
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
@@ -41,7 +47,7 @@ class TestShapes(unittest.TestCase):
 
     @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"),
                      reason="not available")
-    @unittest.skipIf(StrictVersion(rt.__version__) <= StrictVersion("1.0.0"),
+    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("1.0.0"),
                      reason="not available")
     def test_onnxruntime_shapes_clr(self):
         iris = load_iris()
@@ -51,7 +57,8 @@ class TestShapes(unittest.TestCase):
         clr.fit(X_train, y_train)
         initial_type = [('float_input', FloatTensorType([None, 4]))]
         onx = convert_sklearn(clr, initial_types=initial_type,
-                              options={id(clr): {'zipmap': False}})
+                              options={id(clr): {'zipmap': False}},
+                              target_opset=TARGET_OPSET)
         sess = rt.InferenceSession(onx.SerializeToString())
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})

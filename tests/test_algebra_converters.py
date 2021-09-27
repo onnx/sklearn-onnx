@@ -13,7 +13,6 @@ try:
     from skl2onnx.algebra.sklearn_ops import OnnxSklearnStandardScaler
     from skl2onnx import wrap_as_onnx_mixin
 except (ImportError, KeyError):
-    warnings.warn('Unable to test OnnxSklearnScaler.')
     OnnxSklearnStandardScaler = None
 from test_utils import TARGET_OPSET
 
@@ -29,7 +28,7 @@ class TestAlgebraConverters(unittest.TestCase):
         X = numpy.array([[1, 2], [2, 3]])
         op = OnnxSklearnStandardScaler()
         op.fit(X)
-        onx = op.to_onnx(X.astype(numpy.float32))
+        onx = op.to_onnx(X.astype(numpy.float32), target_opset=TARGET_OPSET)
         assert onx is not None
 
         import onnxruntime as ort

@@ -113,7 +113,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             node = OnnxScaler(i1, offset=i2, scale=scale, output_names=['Y'],
                               op_version=opv)
             onx = node.to_onnx([(input_name, FloatTensorType((None, dim)))],
-                               outputs=[('Y', FloatTensorType((None, dim)))])
+                               outputs=[('Y', FloatTensorType((None, dim)))],
+                               target_opset=TARGET_OPSET)
             return onx
 
         exp = [np.zeros((1, 5)),
