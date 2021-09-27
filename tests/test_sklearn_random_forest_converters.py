@@ -161,8 +161,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             RandomForestClassifier(random_state=42),
             2, label_string=True)
         model_onnx = convert_sklearn(
-            model,
-            "multi-class nocl",
+            model, "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'nocl': True, 'zipmap': False}})
         self.assertIsNotNone(model_onnx)

@@ -396,8 +396,8 @@ def dump_data_and_model(
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
                     intermediate_steps=intermediate_steps,
-                    disable_optimisation=disable_optimisation
-                )
+                    disable_optimisation=disable_optimisation,
+                    classes=classes)
             else:
                 try:
                     output, lambda_onnx = compare_backend(
