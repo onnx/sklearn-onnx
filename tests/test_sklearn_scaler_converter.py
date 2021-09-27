@@ -9,7 +9,7 @@ from sklearn.preprocessing import (
     StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler)
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnScalerConverter(unittest.TestCase):
@@ -18,14 +18,13 @@ class TestSklearnScalerConverter(unittest.TestCase):
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", Int64TensorType([None, 3]))])
+                                     [("input", Int64TensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.int64),
-            model,
-            model_onnx,
-            basename="SklearnStandardScalerInt64",
-        )
+            model, model_onnx,
+            basename="SklearnStandardScalerInt64")
 
     def test_standard_scaler_floats(self):
         model = StandardScaler()
@@ -37,13 +36,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnStandardScalerFloat32",
-        )
+            model, basename="SklearnStandardScalerFloat32")
 
     def test_standard_scaler_floats_div(self):
         model = StandardScaler()
@@ -74,7 +72,8 @@ class TestSklearnScalerConverter(unittest.TestCase):
         model.fit(data)
         model_onnx = convert_sklearn(
             model, "cast", [("input", FloatTensorType([None, 3]))],
-            options={id(model): {'div': 'div_cast'}})
+            options={id(model): {'div': 'div_cast'}},
+            target_opset=TARGET_OPSET)
         assert 'op_type: "Div"' in str(model_onnx)
         assert 'caler"' not in str(model_onnx)
         assert "double_data:" in str(model_onnx)
@@ -93,13 +92,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnStandardScalerFloat32NoStd",
-        )
+            model, basename="SklearnStandardScalerFloat32NoStd")
 
     def test_standard_scaler_floats_no_mean(self):
         model = StandardScaler(with_mean=False)
@@ -111,13 +109,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnStandardScalerFloat32NoMean",
-        )
+            model, basename="SklearnStandardScalerFloat32NoMean")
 
     def test_standard_scaler_floats_no_mean_std(self):
         model = StandardScaler(with_mean=False, with_std=False)
@@ -129,13 +126,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnStandardScalerFloat32NoMeanStd",
-        )
+            model, basename="SklearnStandardScalerFloat32NoMeanStd")
 
     def test_robust_scaler_floats(self):
         model = RobustScaler()
@@ -147,13 +143,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnRobustScalerFloat32",
-        )
+            model, basename="SklearnRobustScalerFloat32")
 
     def test_robust_scaler_floats_no_bias(self):
         model = RobustScaler(with_centering=False)
@@ -165,13 +160,13 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
             model,
-            basename="SklearnRobustScalerWithCenteringFloat32",
-        )
+            basename="SklearnRobustScalerWithCenteringFloat32")
 
     def test_robust_scaler_floats_no_scaling(self):
         model = RobustScaler(with_scaling=False)
@@ -183,13 +178,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnRobustScalerNoScalingFloat32",
-        )
+            model, basename="SklearnRobustScalerNoScalingFloat32")
 
     def test_robust_scaler_floats_no_centering_scaling(self):
         model = RobustScaler(with_centering=False, with_scaling=False)
@@ -201,13 +195,13 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
             model,
-            basename="SklearnRobustScalerNoCenteringScalingFloat32",
-        )
+            basename="SklearnRobustScalerNoCenteringScalingFloat32")
 
     def test_min_max_scaler(self):
         model = MinMaxScaler()
@@ -219,13 +213,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnMinMaxScaler",
-        )
+            model, basename="SklearnMinMaxScaler")
 
     def test_max_abs_scaler(self):
         model = MaxAbsScaler()
@@ -237,12 +230,12 @@ class TestSklearnScalerConverter(unittest.TestCase):
         ]
         model.fit(data)
         model_onnx = convert_sklearn(model, "scaler",
-                                     [("input", FloatTensorType([None, 3]))])
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model,
-            basename="SklearnMaxAbsScaler")
+            model, basename="SklearnMaxAbsScaler")
 
 
 if __name__ == "__main__":

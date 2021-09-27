@@ -161,7 +161,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         st.fit(X)
         exp = st.transform(X)
 
-        for opv in (1, 2, 10, 11, 12, onnx_opset_version()):
+        for opv in [1, 2] + list(range(10, onnx_opset_version() + 1)):
             if opv > get_latest_tested_opset_version():
                 continue
             try:
@@ -185,9 +185,10 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             res = res_out[0]
             assert_almost_equal(exp, res)
 
-        for opv in (1, 2, 10, 11, 12, onnx_opset_version()):
+        for opv in [1, 2] + list(range(10, onnx_opset_version() + 1)):
             onx = to_onnx(st, X.astype(np.float32),
-                          target_opset={'ai.onnx.ml': opv})
+                          target_opset={'ai.onnx.ml': opv,
+                                        '': TARGET_OPSET})
             as_string = onx.SerializeToString()
             try:
                 ort = InferenceSession(as_string)

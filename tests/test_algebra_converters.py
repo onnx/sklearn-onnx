@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-import warnings
 from distutils.version import StrictVersion
 import onnx
 import numpy
@@ -48,7 +47,7 @@ class TestAlgebraConverters(unittest.TestCase):
         op = wrap_as_onnx_mixin(StandardScaler())
         op = OnnxSklearnStandardScaler()
         op.fit(X)
-        onx = op.to_onnx(X.astype(numpy.float32))
+        onx = op.to_onnx(X.astype(numpy.float32), target_opset=TARGET_OPSET)
         onx2 = str(onx)
         assert 'domain: "ai.onnx.ml"' in onx1
         assert 'domain: "ai.onnx.ml"' in onx2
