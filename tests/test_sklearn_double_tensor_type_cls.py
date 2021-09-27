@@ -90,12 +90,6 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 # onnxruntime does not support sigmoid for
                                 # DoubleTensorType
                                 continue
-                            if verbose:
-                                from mlprodict.onnxrt import OnnxInference
-                                oinf = OnnxInference(model_onnx, inplace=False)
-                                new_onnx = oinf.run2onnx({'input': X.astype(np.float64)[:7]})
-                                with open("debugcal.onnx", "wb") as f:
-                                    f.write(new_onnx[1].SerializeToString())
                             dump_data_and_model(
                                 X.astype(np.float64)[:7], model, model_onnx,
                                 methods=methods, verbose=verbose,
@@ -367,7 +361,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             [lambda: CalibratedClassifierCV(
                 base_estimator=LogisticRegression(), method='isotonic')],
             "CalibratedClassifierCV",
-            raw_scores=False, verbose=True)
+            raw_scores=False, verbose=False)
 
 
 if __name__ == "__main__":

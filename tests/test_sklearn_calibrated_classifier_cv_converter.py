@@ -23,7 +23,6 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-import onnxruntime
 try:
     from skl2onnx.common._apply_operation import apply_less
 except ImportError:
