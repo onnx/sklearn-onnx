@@ -23,6 +23,11 @@ try:
 except (ImportError, AttributeError):
     # available since sklearn>=1.0
     QuantileRegressor = None
+try:
+    from sklearn.linear_model import PoissonRegressor
+except (ImportError, AttributeError):
+    # available since sklearn>=0.23
+    PoissonRegressor = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -674,6 +679,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
+    @unittest.skipIf(PoissonRegressor is None,
+                     reason="scikit-learn too old")
     def test_model_poisson_regressor(self):
         X, y = make_regression(
             n_features=5, n_samples=100, n_targets=1, random_state=42,

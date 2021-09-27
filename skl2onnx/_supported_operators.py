@@ -30,7 +30,7 @@ from sklearn.linear_model import (
     MultiTaskElasticNet, MultiTaskElasticNetCV,
     MultiTaskLasso, MultiTaskLassoCV,
     OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
-    PassiveAggressiveRegressor, PoissonRegressor,
+    PassiveAggressiveRegressor,
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
@@ -41,6 +41,11 @@ try:
 except ImportError:
     # available since sklearn>=1.0
     QuantileRegressor = None
+try:
+    from sklearn.linear_model import PoissonRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    PoissonRegressor = None
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
