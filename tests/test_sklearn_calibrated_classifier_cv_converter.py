@@ -8,7 +8,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import RandomForestClassifier
@@ -23,7 +23,6 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-import onnxruntime
 try:
     from skl2onnx.common._apply_operation import apply_less
 except ImportError:
@@ -33,6 +32,9 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, onnx_built_with_ml)
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+ort_version = ort_version.split('+')[0]
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
@@ -71,14 +73,12 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,
-            basename="SklearnCalibratedClassifierCVFloatNoZipMap",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnCalibratedClassifierCVFloatNoZipMap")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
-    def test_model_calibrated_classifier_cv_int(self):
+    def test_model_calibrated_classifier_cv_sigmoid_int(self):
         data = load_digits()
         X, y = data.data, data.target
         clf = MultinomialNB().fit(X, y)
@@ -95,7 +95,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -138,7 +138,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -160,7 +160,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -181,7 +181,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -205,7 +205,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -227,7 +227,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -249,7 +249,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -273,7 +273,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
