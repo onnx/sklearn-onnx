@@ -28,6 +28,11 @@ try:
 except (ImportError, AttributeError):
     # available since sklearn>=0.23
     PoissonRegressor = None
+try:
+    from sklearn.linear_model import TweedieRegressor
+except (ImportError, AttributeError):
+    # available since sklearn>=0.23
+    TweedieRegressor = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -706,6 +711,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
+    @unittest.skipIf(TweedieRegressor is None,
+                     reason="scikti-learn too old")
     def test_model_tweedie_regressor(self):
         X, y = make_regression(
             n_features=5, n_samples=100, n_targets=1, random_state=42,

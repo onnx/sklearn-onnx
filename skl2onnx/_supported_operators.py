@@ -34,7 +34,7 @@ from sklearn.linear_model import (
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
-    TheilSenRegressor, TweedieRegressor
+    TheilSenRegressor
 )
 try:
     from sklearn.linear_model import QuantileRegressor
@@ -46,6 +46,11 @@ try:
 except ImportError:
     # available since sklearn>=0.23
     PoissonRegressor = None
+try:
+    from sklearn.linear_model import TweedieRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    TweedieRegressor = None
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
