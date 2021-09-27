@@ -277,7 +277,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.fit(X_train, y_train)
 
         model_onnx = convert_sklearn(
-            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         X_test = X_test.astype(numpy.float32)[:5]
         dump_data_and_model(
@@ -315,7 +316,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.fit(X_train, y_train)
 
         model_onnx = convert_sklearn(
-            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         X_test = X_test.astype(numpy.float32)[:5]
 

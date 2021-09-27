@@ -162,46 +162,48 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         exp = st.transform(X)
 
         for opv in [1, 2] + list(range(10, onnx_opset_version() + 1)):
-            if opv > get_latest_tested_opset_version():
+            if opv > TARGET_OPSET:
                 continue
-            try:
-                onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
-            except RuntimeError as e:
-                if ("is higher than the number of the "
-                        "installed onnx package") in str(e):
-                    continue
-                raise e
-            as_string = onx.SerializeToString()
-            try:
-                ort = InferenceSession(as_string)
-            except InvalidGraph as e:
-                if opv > onnx_opset_version():
-                    continue
-                raise AssertionError(
-                    "Unable to load opv={}\n---\n{}\n---".format(
-                        opv, onx)) from e
-            res_out = ort.run(None, {'X': X.astype(np.float32)})
-            assert len(res_out) == 1
-            res = res_out[0]
-            assert_almost_equal(exp, res)
+            with self.subTest(opv=opv):
+                try:
+                    onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
+                except RuntimeError as e:
+                    if ("is higher than the number of the "
+                            "installed onnx package") in str(e):
+                        continue
+                    raise e
+                as_string = onx.SerializeToString()
+                try:
+                    ort = InferenceSession(as_string)
+                except InvalidGraph as e:
+                    if opv > onnx_opset_version():
+                        continue
+                    raise AssertionError(
+                        "Unable to load opv={}\n---\n{}\n---".format(
+                            opv, onx)) from e
+                res_out = ort.run(None, {'X': X.astype(np.float32)})
+                assert len(res_out) == 1
+                res = res_out[0]
+                assert_almost_equal(exp, res)
 
         for opv in [1, 2] + list(range(10, onnx_opset_version() + 1)):
-            onx = to_onnx(st, X.astype(np.float32),
-                          target_opset={'ai.onnx.ml': opv,
-                                        '': TARGET_OPSET})
-            as_string = onx.SerializeToString()
-            try:
-                ort = InferenceSession(as_string)
-            except InvalidGraph as e:
-                if opv > onnx_opset_version():
-                    continue
-                raise AssertionError(
-                    "Unable to load opv={}\n---\n{}\n---".format(
-                        opv, onx)) from e
-            res_out = ort.run(None, {'X': X.astype(np.float32)})
-            assert len(res_out) == 1
-            res = res_out[0]
-            assert_almost_equal(exp, res)
+            with self.subTest(opvml=opv):
+                onx = to_onnx(st, X.astype(np.float32),
+                              target_opset={'ai.onnx.ml': opv,
+                                            '': TARGET_OPSET})
+                as_string = onx.SerializeToString()
+                try:
+                    ort = InferenceSession(as_string)
+                except InvalidGraph as e:
+                    if opv > onnx_opset_version():
+                        continue
+                    raise AssertionError(
+                        "Unable to load opv={}\n---\n{}\n---".format(
+                            opv, onx)) from e
+                res_out = ort.run(None, {'X': X.astype(np.float32)})
+                assert len(res_out) == 1
+                res = res_out[0]
+                assert_almost_equal(exp, res)
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="not available")
