@@ -57,7 +57,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         model = PolynomialFeatures(degree=3).fit(X)
         model_onnx = convert_sklearn(
             model, "scikit-learn polynomial features",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,
@@ -92,7 +93,8 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         model = PolynomialFeatures(degree=4).fit(X)
         model_onnx = convert_sklearn(
             model, "scikit-learn polynomial features",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,

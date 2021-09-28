@@ -5,7 +5,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 import sklearn
 from sklearn.datasets import (
     load_iris, make_regression, make_classification,
@@ -292,6 +292,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+                     reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
@@ -300,6 +302,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+                     reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
