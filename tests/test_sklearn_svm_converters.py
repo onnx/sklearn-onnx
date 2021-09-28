@@ -547,7 +547,8 @@ class TestSklearnSVM(unittest.TestCase):
         model, X = self._fit_binary_classification(NuSVC(max_iter=10000))
         model_onnx = convert_sklearn(
             model, "linear SVC",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X})
         label = model.predict(X)

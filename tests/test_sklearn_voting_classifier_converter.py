@@ -57,24 +57,17 @@ class TestVotingClassifierConverter(unittest.TestCase):
         Xd = numpy.array([[1, 2], [3, 4], [4, 5]])
 
         model_onnx = convert_sklearn(
-            model,
-            "CustomTransform",
+            model, "CustomTransform",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
             custom_shape_calculators={
                 CustomTransform: custom_transform_shape_calculator
             },
             custom_conversion_functions={
                 CustomTransform: custom_tranform_converter
-            },
-        )
+            }, target_opset=TARGET_OPSET)
         dump_data_and_model(
-            Xd.astype(numpy.float32),
-            model,
-            model_onnx,
-            basename="CustomTransformerMul",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            Xd.astype(numpy.float32), model, model_onnx,
+            basename="CustomTransformerMul")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -91,13 +84,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
-            model,
-            suffix="Hard",
-            comparable_outputs=[0],
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Hard", comparable_outputs=[0],
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -115,13 +103,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
-            model,
-            suffix="WeightsHard",
-            comparable_outputs=[0],
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="WeightsHard", comparable_outputs=[0],
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -135,13 +118,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_binary_classification(
-            model,
-            suffix="Soft",
-            comparable_outputs=[0, 1],
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Soft", comparable_outputs=[0, 1],
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -156,12 +134,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_binary_classification(
-            model,
-            suffix="WeightedSoft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="WeightedSoft",
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -178,13 +152,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="Hard",
-            comparable_outputs=[0],
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Hard", comparable_outputs=[0],
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -202,13 +171,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="WeightedHard",
-            comparable_outputs=[0],
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.5.0')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="WeightedHard", comparable_outputs=[0],
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -222,12 +186,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="Soft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Soft", target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -241,12 +200,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, label_string=True,
-            suffix="Soft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, label_string=True, suffix="Soft",
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -261,12 +216,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="WeightedSoft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="WeightedSoft",
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -283,12 +234,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="Weighted4Soft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Weighted4Soft",
+            target_opset=TARGET_OPSET)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -305,12 +252,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model,
-            suffix="Weighted42Soft",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, suffix="Weighted42Soft",
+            target_opset=TARGET_OPSET)
 
 
 if __name__ == "__main__":

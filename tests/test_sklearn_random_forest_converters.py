@@ -86,7 +86,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'binary classifier',
                                            [('input',
-                                             FloatTensorType([None, 2]))])
+                                             FloatTensorType([None, 2]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Bin" +
                             model.__class__.__name__ +
@@ -106,7 +107,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         clr.fit(X, y)
         model_onnx, prefix = convert_model(clr, 'reg',
                                            [('input',
-                                             FloatTensorType([None, 4]))])
+                                             FloatTensorType([None, 4]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X_test, clr, model_onnx,
                             basename=prefix + "RegMis" +
                             clr.__class__.__name__ +
@@ -132,7 +134,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'single regressor',
                                            [('input',
-                                             FloatTensorType([None, 2]))])
+                                             FloatTensorType([None, 2]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Reg" +
                             model.__class__.__name__ +
@@ -228,8 +231,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "extra trees classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
@@ -332,7 +334,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model_onnx = convert_sklearn(
                 model, "unused",
                 [("input", FloatTensorType([None, X.shape[1]]))],
-                options={model.__class__: {'raw_scores': True}})
+                options={model.__class__: {'raw_scores': True}},
+                target_opset=TARGET_OPSET)
             self.assertIsNotNone(model_onnx)
             X_test = X_test.astype(numpy.float32)[:5]
 
