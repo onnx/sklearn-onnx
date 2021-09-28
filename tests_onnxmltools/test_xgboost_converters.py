@@ -65,9 +65,10 @@ class TestXGBoostModels(unittest.TestCase):
         xgb = XGBRegressor()
         xgb.fit(X, y)
         conv_model = convert_sklearn(
-            xgb, initial_types=[
+            xgb,
+            initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-                target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         dump_single_regression(xgb, suffix="-Dec4")
 
@@ -96,9 +97,10 @@ class TestXGBoostModels(unittest.TestCase):
         xgb = XGBClassifier()
         xgb.fit(X, y)
         conv_model = convert_sklearn(
-            xgb, initial_types=[
+            xgb,
+            initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-                target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         dump_multiple_classification(
             xgb, allow_failure="StrictVersion(onnx.__version__) "
