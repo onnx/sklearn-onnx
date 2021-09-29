@@ -1388,11 +1388,18 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model = make_model(graph)
 
     # Update domain version
-    _update_domain_version(container, onnx_model)
-
-    # Add extra information
     opv = min(onnx_target_opset,
               _get_main_opset_version(onnx_model) or onnx_target_opset)
+    if not _update_domain_version(container, onnx_model, verbose=verbose):
+        # Main opset was not added. Doing it here.
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = ''
+        op_set.version = opv
+        if verbose > 0:
+            print('[convert_topology] +opset: name=%r, version=%s' % (
+                '', opv))
+
+    # Add extra information
     irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
     onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
@@ -1412,7 +1419,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     return onnx_model
 
 
-def _update_domain_version(container, onnx_model):
+def _update_domain_version(container, onnx_model, verbose=0):
     # Merge operator sets for the same domain, the largest version
     # number would be kept
     purified_operator_set = dict()
@@ -1435,6 +1442,9 @@ def _update_domain_version(container, onnx_model):
         else:
             # Just create one ONNX element in opset_import
             op_set = onnx_model.opset_import.add()
+        if verbose > 0:
+            print('[_update_domain_version] +opset %d: name=%r, version=%s' % (
+                i, op_domain, op_version))
         op_set.domain = op_domain
         op_set.version = op_version
         i += 1
@@ -1445,6 +1455,7 @@ def _update_domain_version(container, onnx_model):
                 '%d.' % (
                     container.target_opset_any_domain(op_domain),
                     op_version))
+    return '' in purified_operator_set
 
 
 def _get_main_opset_version(model):

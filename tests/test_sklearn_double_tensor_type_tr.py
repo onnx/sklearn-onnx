@@ -460,7 +460,8 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         model, X_test = _fit_model_pca(PCA(random_state=42))
         model_onnx = convert_sklearn(
             model, initial_types=[
-                ("input", DoubleTensorType([None, X_test.shape[1]]))])
+                ("input", DoubleTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, model_onnx,
             basename="SklearnPCADoubleDefault")

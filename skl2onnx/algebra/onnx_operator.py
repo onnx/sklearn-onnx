@@ -1103,6 +1103,13 @@ class OnnxSubEstimator(OnnxOperator):
             self.state.run()
 
 
+class WrappedModelAlias:
+
+    def __init__(self, model, alias):
+        self.model = model
+        self.alias = alias
+
+
 class OnnxSubOperator(OnnxSubEstimator):
     """
     This class is deprecated and will be removed in version 1.9.

@@ -3,6 +3,7 @@
 
 import numbers
 import numpy as np
+from sklearn.ensemble import RandomTreesEmbedding
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
@@ -247,11 +248,6 @@ def convert_sklearn_random_forest_classifier(
                              'base_values'):
                         attrs[k] = np.array(attrs[k], dtype=dtype)
 
-            dpath = scope.get_unique_variable_name("dpath%d" % i)
-            container.add_node(
-                op_type.replace("Classifier", "Regressor"), input_name, dpath,
-                op_domain=op_domain, op_version=op_version, **attrs)
-
             if options['decision_path']:
                 # decision_path
                 tree_paths.append(
@@ -403,8 +399,15 @@ def convert_sklearn_random_forest_regressor_converter(
     if hasattr(op, 'n_trees_per_iteration_'):
         # HistGradientBoostingRegressor does not implement decision_path.
         return
-    options = scope.get_options(
-        op, dict(decision_path=False, decision_leaf=False))
+    if isinstance(op, RandomTreesEmbedding):
+        options = scope.get_options(op)
+    else:
+        options = scope.get_options(
+            op, dict(decision_path=False, decision_leaf=False))
+
+    if (not options.get('decision_path', False) and
+            not options.get('decision_leaf', False)):
+        return
 
     # decision_path
     tree_paths = []
@@ -429,12 +432,7 @@ def convert_sklearn_random_forest_regressor_converter(
                          'base_values'):
                     attrs[k] = np.array(attrs[k], dtype=dtype)
 
-        dpath = scope.get_unique_variable_name("dpath%d" % i)
-        container.add_node(
-            op_type, input_name, dpath,
-            op_domain=op_domain, op_version=op_version, **attrs)
-
-        if options['decision_path']:
+        if options.get('decision_path', False):
             # decision_path
             tree_paths.append(
                 _append_decision_output(
@@ -443,7 +441,7 @@ def convert_sklearn_random_forest_regressor_converter(
                     op_type=op_type, op_domain=op_domain,
                     op_version=op_version, regression=True,
                     overwrite_tree=tree.tree_))
-        if options['decision_leaf']:
+        if options.get('decision_leaf', False):
             # decision_path
             tree_leaves.append(
                 _append_decision_output(
@@ -454,13 +452,13 @@ def convert_sklearn_random_forest_regressor_converter(
 
     # merges everything
     n_out = 1
-    if options['decision_path']:
+    if options.get('decision_path', False):
         apply_concat(
             scope, tree_paths, operator.outputs[n_out].full_name, container,
             axis=1, operator_name=scope.get_unique_operator_name('concat'))
         n_out += 1
 
-    if options['decision_leaf']:
+    if options.get('decision_leaf', False):
         # decision_path
         apply_concat(
             scope, tree_leaves, operator.outputs[n_out].full_name, container,

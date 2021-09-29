@@ -69,7 +69,7 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     IsolationForest,
-    RandomForestClassifier, RandomForestRegressor,
+    RandomForestClassifier, RandomForestRegressor, RandomTreesEmbedding,
     VotingClassifier
 )
 try:
@@ -370,6 +370,7 @@ def build_sklearn_operator_name_map():
         RadiusNeighborsRegressor,
         RandomForestClassifier,
         RandomForestRegressor,
+        RandomTreesEmbedding,
         RANSACRegressor,
         ReplaceTransformer,
         RFE,

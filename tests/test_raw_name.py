@@ -7,6 +7,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
+from test_utils import TARGET_OPSET
 
 
 class RawNameTest(unittest.TestCase):
@@ -51,10 +52,11 @@ class RawNameTest(unittest.TestCase):
             with self.subTest(raw_name=raw_name):
                 clr_onnx = convert_sklearn(
                     clr,
-                    initial_types=self._get_initial_types(X, raw_name)
-                )
+                    initial_types=self._get_initial_types(X, raw_name),
+                    target_opset=TARGET_OPSET)
                 pred_onnx = self._predict(clr_onnx, X)
-                assert_almost_equal(
-                    pred,
-                    pred_onnx
-                )
+                assert_almost_equal(pred, pred_onnx)
+
+
+if __name__ == "__main__":
+    unittest.main()

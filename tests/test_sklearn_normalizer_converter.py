@@ -9,7 +9,7 @@ from sklearn.preprocessing import Normalizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType)
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnNormalizerConverter(unittest.TestCase):
@@ -17,7 +17,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l2")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", Int64TensorType([None, 1]))])
+            [("input", Int64TensorType([None, 1]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
 
@@ -25,7 +26,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l1")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", FloatTensorType([None, 3]))])
+            [("input", FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
         dump_data_and_model(
@@ -37,7 +39,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l2")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", FloatTensorType([None, 3]))])
+            [("input", FloatTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
         dump_data_and_model(
@@ -49,7 +52,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l1")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", DoubleTensorType([None, 3]))])
+            [("input", DoubleTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array([[1, -1, 3], [3, 1, 2]], dtype=numpy.float64),
@@ -60,7 +64,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l2")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", DoubleTensorType([None, 3]))])
+            [("input", DoubleTensorType([None, 3]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             numpy.array([[1, -1, 3], [3, 1, 2]], dtype=numpy.float64),
@@ -71,7 +76,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
         model = Normalizer(norm="l2")
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
-            [("input", FloatTensorType([]))])
+            [("input", FloatTensorType([]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.assertTrue(len(model_onnx.graph.node) == 1)
         dump_data_and_model(

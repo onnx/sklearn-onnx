@@ -10,7 +10,7 @@ import onnx
 from sklearn.preprocessing import PolynomialFeatures
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnPolynomialFeatures(unittest.TestCase):
@@ -22,19 +22,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                       [0, 3.2, 4.7, -8.9]])
         model = PolynomialFeatures(degree=2).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", FloatTensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesFloatDegree2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnPolynomialFeaturesFloatDegree2")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="ConstantOfShape not available")
@@ -48,19 +42,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         ])
         model = PolynomialFeatures(degree=2).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", Int64TensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesIntDegree2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnPolynomialFeaturesIntDegree2")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="ConstantOfShape not available")
@@ -68,19 +56,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         X = np.array([[1.2, 3.2, 1.2], [4.3, 3.2, 4.5], [3.2, 4.7, 1.1]])
         model = PolynomialFeatures(degree=3).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", FloatTensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesFloatDegree3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnPolynomialFeaturesFloatDegree3")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="ConstantOfShape not available")
@@ -95,19 +77,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         ])
         model = PolynomialFeatures(degree=3).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", Int64TensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesIntDegree3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnPolynomialFeaturesIntDegree3")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="ConstantOfShape not available")
@@ -116,19 +92,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
                       [3.2, 4.7, 5.4, 7.1]])
         model = PolynomialFeatures(degree=4).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", FloatTensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesFloatDegree4-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnPolynomialFeaturesFloatDegree4-Dec4")
 
     @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
                      reason="ConstantOfShape not available")
@@ -136,19 +106,13 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
         X = np.array([[1, 3, 4, 1], [3, 7, 3, 5], [1, 0, 5, 4]])
         model = PolynomialFeatures(degree=4).fit(X)
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn polynomial features",
+            model, "scikit-learn polynomial features",
             [("input", Int64TensorType([None, X.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnPolynomialFeaturesIntDegree4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnPolynomialFeaturesIntDegree4")
 
 
 if __name__ == "__main__":
