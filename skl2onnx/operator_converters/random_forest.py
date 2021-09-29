@@ -248,11 +248,6 @@ def convert_sklearn_random_forest_classifier(
                              'base_values'):
                         attrs[k] = np.array(attrs[k], dtype=dtype)
 
-            # dpath = scope.get_unique_variable_name("dpath%d" % i)
-            # container.add_node(
-            #    op_type.replace("Classifier", "Regressor"), input_name, dpath,
-            #    op_domain=op_domain, op_version=op_version, **attrs)
-
             if options['decision_path']:
                 # decision_path
                 tree_paths.append(
@@ -436,11 +431,6 @@ def convert_sklearn_random_forest_regressor_converter(
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
                     attrs[k] = np.array(attrs[k], dtype=dtype)
-
-        # dpath = scope.get_unique_variable_name("dpath%d" % i)
-        # container.add_node(
-        #     op_type, input_name, dpath,
-        #     op_domain=op_domain, op_version=op_version, **attrs)
 
         if options.get('decision_path', False):
             # decision_path
