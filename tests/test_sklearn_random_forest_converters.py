@@ -356,6 +356,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+                     reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
@@ -364,6 +366,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+                     reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
@@ -372,6 +376,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+                     reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
