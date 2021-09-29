@@ -34,6 +34,7 @@ from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import random_projection
+from . import random_trees_embedding
 from . import replace_op
 from . import scaler
 from . import svd
@@ -76,6 +77,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     random_projection,
+    random_trees_embedding,
     replace_op,
     scaler,
     svd,

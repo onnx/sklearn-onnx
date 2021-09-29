@@ -46,6 +46,7 @@ from . import polynomial_features
 from . import power_transformer
 from . import random_forest
 from . import random_projection
+from . import random_trees_embedding
 from . import ransac_regressor
 from . import replace_op
 from . import scaler_op
@@ -103,6 +104,7 @@ __all__ = [
     power_transformer,
     random_forest,
     random_projection,
+    random_trees_embedding,
     ransac_regressor,
     replace_op,
     scaler_op,

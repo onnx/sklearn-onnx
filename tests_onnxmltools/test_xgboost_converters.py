@@ -28,7 +28,7 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
-from test_utils import dump_multiple_classification
+from test_utils import dump_multiple_classification, TARGET_OPSET
 
 
 class TestXGBoostModels(unittest.TestCase):
@@ -65,8 +65,10 @@ class TestXGBoostModels(unittest.TestCase):
         xgb = XGBRegressor()
         xgb.fit(X, y)
         conv_model = convert_sklearn(
-            xgb, initial_types=[
-                ('input', FloatTensorType(shape=[None, X.shape[1]]))])
+            xgb,
+            initial_types=[
+                ('input', FloatTensorType(shape=[None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         dump_single_regression(xgb, suffix="-Dec4")
 
@@ -80,7 +82,8 @@ class TestXGBoostModels(unittest.TestCase):
         conv_model = convert_sklearn(
             xgb, initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-            options={id(xgb): {'zipmap': False}})
+            options={id(xgb): {'zipmap': False}},
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(conv_model.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(xgb.predict_proba(X), res[1])
@@ -94,8 +97,10 @@ class TestXGBoostModels(unittest.TestCase):
         xgb = XGBClassifier()
         xgb.fit(X, y)
         conv_model = convert_sklearn(
-            xgb, initial_types=[
-                ('input', FloatTensorType(shape=[None, X.shape[1]]))])
+            xgb,
+            initial_types=[
+                ('input', FloatTensorType(shape=[None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         dump_multiple_classification(
             xgb, allow_failure="StrictVersion(onnx.__version__) "
@@ -110,7 +115,8 @@ class TestXGBoostModels(unittest.TestCase):
         xgb.fit(X, y)
         conv_model = convert_sklearn(
             xgb, initial_types=[
-                ('input', FloatTensorType(shape=[None, X.shape[1]]))])
+                ('input', FloatTensorType(shape=[None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         dump_multiple_classification(
             xgb, suffix="RegLog",
@@ -127,7 +133,8 @@ class TestXGBoostModels(unittest.TestCase):
         conv_model = convert_sklearn(
             xgb, initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-            options={id(xgb): {'zipmap': False}})
+            options={id(xgb): {'zipmap': False}},
+            target_opset=TARGET_OPSET)
         self.assertTrue(conv_model is not None)
         sess = InferenceSession(conv_model.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})

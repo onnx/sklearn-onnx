@@ -122,7 +122,7 @@ class TestConvert(unittest.TestCase):
                 if j == 1:
                     raise AssertionError("It should fail for opset.ml == 1")
                 dom = get_domain_opset(model_onnx)
-                self.assertEqual(len(dom), 1)
+                self.assertEqual(len(dom), 2)
                 self.assertEqual(dom['ai.onnx.ml'], 2)
 
     def test_warnings(self):

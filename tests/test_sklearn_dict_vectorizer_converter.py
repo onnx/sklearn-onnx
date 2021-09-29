@@ -12,7 +12,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnDictVectorizerConverter(unittest.TestCase):
@@ -27,15 +27,11 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
             [(
                 "input",
                 DictionaryType(StringTensorType([1]), FloatTensorType([1])),
-            )])
+            )], target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data, model, model_onnx,
-            basename="SklearnDictVectorizer-OneOff-SkipDim1",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.1.3') or "
-                          "StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3.0')")
+            basename="SklearnDictVectorizer-OneOff-SkipDim1")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -49,19 +45,11 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
             [(
                 "input",
                 DictionaryType(Int64TensorType([1]), FloatTensorType([1])),
-            )],
-        )
+            )], target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            basename="SklearnDictVectorizerSortFalse-OneOff-SkipDim1",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.1.3') or "
-                          "StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3.0')",
-        )
+            data, model, model_onnx,
+            basename="SklearnDictVectorizerSortFalse-OneOff-SkipDim1")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -73,7 +61,8 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
             convert_sklearn(
                 model, 'dv',
                 [("input", DictionaryType(Int64TensorType([1]),
-                  StringTensorType([1])))])
+                  StringTensorType([1])))],
+                target_opset=TARGET_OPSET)
 
 
 if __name__ == "__main__":

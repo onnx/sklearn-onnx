@@ -12,7 +12,10 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+ort_version = ort_version.split('+')[0]
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
@@ -29,11 +32,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                               ('minmax', MinMaxScaler())]).fit(X_train)
         model_onnx = convert_sklearn(
             model, 'feature union',
-            [('input', FloatTensorType([None, X_test.shape[1]]))])
+            [('input', FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X_test,
-                            model,
-                            model_onnx,
+        dump_data_and_model(X_test, model, model_onnx,
                             basename="SklearnFeatureUnionDefault")
 
     @unittest.skipIf(
@@ -51,11 +53,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              ).fit(X_train)
         model_onnx = convert_sklearn(
             model, 'feature union',
-            [('input', FloatTensorType([None, X_test.shape[1]]))])
+            [('input', FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(X_test,
-                            model,
-                            model_onnx,
+        dump_data_and_model(X_test, model, model_onnx,
                             basename="SklearnFeatureUnionTransformerWeights0")
 
     def test_feature_union_transformer_weights_1(self):
@@ -70,17 +71,12 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              ).fit(X_train)
         model_onnx = convert_sklearn(
             model, 'feature union',
-            [('input', Int64TensorType([None, X_test.shape[1]]))])
+            [('input', Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnFeatureUnionTransformerWeights1-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnFeatureUnionTransformerWeights1-Dec4")
 
     def test_feature_union_transformer_weights_2(self):
         data = load_digits()
@@ -94,17 +90,12 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                              ).fit(X_train)
         model_onnx = convert_sklearn(
             model, 'feature union',
-            [('input', FloatTensorType([None, X_test.shape[1]]))])
+            [('input', FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnFeatureUnionTransformerWeights2-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnFeatureUnionTransformerWeights2-Dec4")
 
 
 if __name__ == "__main__":

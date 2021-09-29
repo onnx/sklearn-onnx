@@ -3,6 +3,7 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.ensemble import BaggingClassifier
 # Requires PR #488.
@@ -41,6 +42,7 @@ from test_utils import (
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
+ort_version = ort_version.split('+')[0]
 ORT_VERSION = '1.7.0'
 
 
@@ -50,7 +52,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             self, model_cls_set, name_root=None, debug=False,
             raw_scores=True, pos_features=False, is_int=False,
             comparable_outputs=None, n_features=4,
-            n_repeated=None, n_redundant=None):
+            n_repeated=None, n_redundant=None, verbose=False):
         for model_cls in model_cls_set:
             if name_root is None:
                 name = model_cls.__name__
@@ -90,7 +92,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                                 continue
                             dump_data_and_model(
                                 X.astype(np.float64)[:7], model, model_onnx,
-                                methods=methods,
+                                methods=methods, verbose=verbose,
                                 comparable_outputs=comparable_outputs,
                                 basename="Sklearn{}Double2RAW{}"
                                          "ZIP{}CL{}".format(
@@ -326,6 +328,40 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
                 ('a', LogisticRegression()),
                 ('b', LogisticRegression())])],
             "StackingClassifier")
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Sigmoid are missing")
+    @unittest.skipIf(
+        StrictVersion(onnx_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Tanh are missing")
+    @unittest.skipIf(
+        StackingClassifier is None, reason="scikit-learn too old")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_calibration_sigmoid_64(self):
+        self._common_classifier(
+            [lambda: CalibratedClassifierCV(
+                base_estimator=LogisticRegression(), method='sigmoid')],
+            "CalibratedClassifierCV",
+            raw_scores=False)
+
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Sigmoid are missing")
+    @unittest.skipIf(
+        StrictVersion(onnx_version) < StrictVersion(ORT_VERSION),
+        reason="ArgMax, Tanh are missing")
+    @unittest.skipIf(
+        StackingClassifier is None, reason="scikit-learn too old")
+    @unittest.skipIf(
+        True, reason="Converter does not call IsotonicRegression")
+    @ignore_warnings(category=warnings_to_skip)
+    def test_calibration_isotonic_64(self):
+        self._common_classifier(
+            [lambda: CalibratedClassifierCV(
+                base_estimator=LogisticRegression(), method='isotonic')],
+            "CalibratedClassifierCV",
+            raw_scores=False, verbose=False)
 
 
 if __name__ == "__main__":

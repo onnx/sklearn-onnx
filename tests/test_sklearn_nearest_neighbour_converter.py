@@ -563,19 +563,12 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model,
             "scikit-learn KNN Classifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnKNNClassifierMultiLabel-Out0",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnKNNClassifierMultiLabel-Out0")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -650,11 +643,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         assert 'cl0' not in sonx
         dump_data_and_model(
             X, model, model_onnx, classes=model.classes_,
-            basename="SklearnKNNMultiNoCl", verbose=False,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+            basename="SklearnKNNMultiNoCl", verbose=False)
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.5.0"),
@@ -707,17 +696,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         model, X_test = fit_classification_model(
             NeighborhoodComponentsAnalysis(random_state=42), 3)
         model_onnx = convert_sklearn(
-            model,
-            "NCA",
+            model, "NCA",
             [("input", FloatTensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnNCADefault",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnNCADefault")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
@@ -727,17 +712,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             NeighborhoodComponentsAnalysis(
                 init='identity', max_iter=4, random_state=42), 3)
         model_onnx = convert_sklearn(
-            model,
-            "NCA",
+            model, "NCA",
             [("input", FloatTensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnNCAIdentity",
-        )
+            X_test, model,
+            model_onnx, basename="SklearnNCAIdentity")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
@@ -748,17 +729,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 n_components=2, max_iter=4, random_state=42), 3)
         X_test = X_test.astype(numpy.float64)
         model_onnx = convert_sklearn(
-            model,
-            "NCA",
+            model, "NCA",
             [("input", DoubleTensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnNCADouble",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnNCADouble")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None,
                      reason="new in 0.22")
@@ -768,17 +745,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             NeighborhoodComponentsAnalysis(
                 init='pca', max_iter=4, random_state=42), 3, is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "NCA",
+            model, "NCA",
             [("input", Int64TensorType((None, X_test.shape[1])))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnNCAInt",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnNCAInt")
 
     @unittest.skipIf(KNeighborsTransformer is None,
                      reason="new in 0.22")
@@ -788,17 +761,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             KNeighborsTransformer(
                 n_neighbors=4, mode='distance'), 2)
         model_onnx = convert_sklearn(
-            model,
-            "KNN transformer",
+            model, "KNN transformer",
             [("input", FloatTensorType((None, X_test.shape[1])))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnKNNTransformerDistance",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnKNNTransformerDistance")
 
     @unittest.skipIf(KNeighborsTransformer is None,
                      reason="new in 0.22")
@@ -808,17 +777,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             KNeighborsTransformer(
                 n_neighbors=3, mode='connectivity'), 3)
         model_onnx = convert_sklearn(
-            model,
-            "KNN transformer",
+            model, "KNN transformer",
             [("input", FloatTensorType((None, X_test.shape[1])))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnKNNTransformerConnectivity",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnKNNTransformerConnectivity")
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")

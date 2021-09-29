@@ -11,6 +11,9 @@ from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
+from ..algebra.onnx_ops import (
+    OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul,
+    OnnxReshape, OnnxSigmoid)
 
 
 def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
@@ -125,7 +128,49 @@ def convert_sklearn_bayesian_ridge(scope: Scope, operator: Operator,
     apply_sqrt(scope, std0, operator.outputs[1].full_name, container)
 
 
+def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
+                                      container: ModelComponentContainer):
+    X = operator.inputs[0]
+    out = operator.outputs
+    op = operator.raw_operator
+    opv = container.target_opset
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
+
+    if type(X.type) == Int64TensorType:
+        input_var = OnnxCast(X, to=np.float32, op_version=opv)
+    else:
+        input_var = X
+
+    intercept = (op.intercept_.astype(dtype) if len(op.intercept_.shape) > 0
+                 else np.array([op.intercept_], dtype=dtype))
+    eta = OnnxAdd(
+        OnnxMatMul(input_var, op.coef_.astype(dtype), op_version=opv),
+        intercept, op_version=opv)
+
+    from sklearn.linear_model._glm.link import IdentityLink, LogLink, LogitLink
+    if isinstance(op._link_instance, IdentityLink):
+        Y = OnnxIdentity(eta, op_version=opv)
+    elif isinstance(op._link_instance, LogLink):
+        Y = OnnxExp(eta, op_version=opv)
+    elif isinstance(op._link_instance, LogitLink):
+        Y = OnnxSigmoid(eta, op_version=opv)
+    else:
+        raise RuntimeError(
+            "Unexpected type %r for _link_instance in operator type %r."
+            "" % (type(op._link_instance), type(op)))
+    last_dim = 1 if len(op.coef_.shape) == 1 else op.coef_.shape[-1]
+    final = OnnxReshape(Y, np.array([-1, last_dim], dtype=np.int64),
+                        op_version=opv, output_names=out[:1])
+    final.add_to(scope, container)
+
+
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
 register_converter('SklearnBayesianRidge', convert_sklearn_bayesian_ridge,
                    options={'return_std': [True, False]})
+register_converter('SklearnPoissonRegressor',
+                   convert_sklearn_poisson_regressor)
+register_converter('SklearnTweedieRegressor',
+                   convert_sklearn_poisson_regressor)

@@ -396,8 +396,8 @@ def dump_data_and_model(
                     verbose=verbose,
                     comparable_outputs=comparable_outputs,
                     intermediate_steps=intermediate_steps,
-                    disable_optimisation=disable_optimisation
-                )
+                    disable_optimisation=disable_optimisation,
+                    classes=classes)
             else:
                 try:
                     output, lambda_onnx = compare_backend(
@@ -883,13 +883,14 @@ def stat_model_onnx(model):
     return {"nb_onnx_nodes": len(gr.graph.node)}
 
 
-def make_report_backend(folder, as_df=False):
+def make_report_backend(folder, as_df=False, verbose=0):
     """
     Looks into a folder for dumped files after
     the unit tests.
 
     :param folder: dump folder, it should contain files *.bench*
     :param as_df: returns a dataframe instread of a list of dictionary
+    :param verbose: display progress
     :return: time execution
     """
     import onnx
@@ -900,7 +901,8 @@ def make_report_backend(folder, as_df=False):
     benched = 0
     files = os.listdir(folder)
     for name in files:
-        print(name)
+        if verbose:
+            print("[make_report_backend] name=%r" % name)
         if name.endswith(".expected.pkl"):
             model = name.split(".")[0]
             if model not in res:

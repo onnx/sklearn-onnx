@@ -101,7 +101,8 @@ class TestInvestigate(unittest.TestCase):
             data_in = step_model._debug.inputs['transform']
             t = guess_data_type(data_in)
             try:
-                onnx_step = convert_sklearn(step_model, initial_types=t)
+                onnx_step = convert_sklearn(step_model, initial_types=t,
+                                            target_opset=TARGET_OPSET)
             except MissingShapeCalculator as e:
                 if "MyScaler" in str(e):
                     continue
