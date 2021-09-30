@@ -127,7 +127,8 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
         if isinstance(v, np.ndarray) and v.dtype != dtype:
             attrs[k] = v.astype(dtype)
 
-    if dtype == np.float64:
+    use_scaler_op = container.is_allowed({'Scaler'})
+    if not use_scaler_op or dtype == np.float64:
         opv = container.target_opset
         sub = OnnxSub(
             feature_name, attrs['offset'].astype(dtype),

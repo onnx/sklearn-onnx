@@ -57,6 +57,28 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
+    def test_model_logistic_regression_binary_class_blacklist(self):
+        model, X = fit_classification_model(
+            linear_model.LogisticRegression(max_iter=100), 2)
+        model_onnx = convert_sklearn(
+            model, "logistic regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            black_op={'LinearClassifier'})
+        self.assertNotIn('LinearClassifier', str(model_onnx))
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnLogitisticRegressionBinaryBlackList")
+        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+            sess = InferenceSession(model_onnx.SerializeToString())
+            out = sess.get_outputs()
+            lb = out[0].type
+            sh = out[0].shape
+            self.assertEqual(str(lb), "tensor(int64)")
+            self.assertEqual(sh, [None])
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_string(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2,

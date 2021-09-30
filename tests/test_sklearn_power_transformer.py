@@ -86,6 +86,20 @@ class TestSklearnPowerTransformer(unittest.TestCase):
                             basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
+    def test_powertransformer_with_scaler_blacklist(self):
+        pt = PowerTransformer()
+        data = np.array([[1, 2], [3, 2], [4, 5]], dtype=np.float32)
+        model = pt.fit(data)
+        model_onnx = convert_sklearn(model, "scikit-learn PowerTransformer",
+                                     [("input_float",
+                                       FloatTensorType([None, None]))],
+                                     target_opset=TARGET_OPSET,
+                                     black_op={'Scaler'})
+        self.assertNotIn("Scaler", str(model_onnx))
+        dump_data_and_model(data, model, model_onnx,
+                            basename="PowerTransformerBlackList")
+
+    @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_negative_with_scaler(self):
         pt = PowerTransformer()
         data = np.array([[-1, -2], [-3, -2], [-4, -5]], dtype=np.float32)
