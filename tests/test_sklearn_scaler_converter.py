@@ -26,6 +26,21 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model, model_onnx,
             basename="SklearnStandardScalerInt64")
 
+    def test_standard_scaler_blacklist(self):
+        model = StandardScaler()
+        data = numpy.array([[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]],
+                           dtype=numpy.float32)
+        model.fit(data)
+        model_onnx = convert_sklearn(model, "scaler",
+                                     [("input", FloatTensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET,
+                                     black_op={'Normalizer', 'Scaler'})
+        self.assertNotIn('Normalizer', str(model_onnx))
+        self.assertNotIn('Scaler', str(model_onnx))
+        dump_data_and_model(
+            data, model, model_onnx,
+            basename="SklearnStandardScalerBlackList")
+
     def test_standard_scaler_floats(self):
         model = StandardScaler()
         data = [

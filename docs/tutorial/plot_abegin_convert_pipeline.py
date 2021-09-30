@@ -39,8 +39,8 @@ X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 # Train classifiers
-reg1 = GradientBoostingRegressor(random_state=1)
-reg2 = RandomForestRegressor(random_state=1)
+reg1 = GradientBoostingRegressor(random_state=1, n_estimators=5)
+reg2 = RandomForestRegressor(random_state=1, n_estimators=5)
 reg3 = LinearRegression()
 
 ereg = Pipeline(steps=[

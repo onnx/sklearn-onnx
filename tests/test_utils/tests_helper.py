@@ -450,8 +450,7 @@ def convert_model(model, name, input_types, target_opset=None):
     """
     Runs the appropriate conversion method.
 
-    :param model: model, *scikit-learn*, *keras*,
-         or *coremltools* object
+    :param model: model created with *scikit-learn*
     :return: *onnx* model
     """
     from skl2onnx import convert_sklearn

@@ -19,8 +19,10 @@ from ..algebra.onnx_ops import (
 def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
                                      container: ModelComponentContainer):
     op = operator.raw_operator
+    use_linear_op = container.is_allowed({'LinearRegressor'})
 
-    if type(operator.inputs[0].type) in (DoubleTensorType, ):
+    if (not use_linear_op or
+            type(operator.inputs[0].type) in (DoubleTensorType, )):
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name('coef')
         model_coef = op.coef_.T

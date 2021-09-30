@@ -595,7 +595,7 @@ class Scope:
 
     def __init__(self, name, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 registered_models=None):
+                 registered_models=None, naming=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
@@ -606,7 +606,15 @@ class Scope:
         :param custom_shape_calculators: a dictionary for specifying
                                 the user customized shape calculator
         :param options: see :ref:`l-conv-options`
+        :param naming: the user may want to change the way intermediate
+            are named, this parameter can be a string (a prefix) or a
+            function, which signature is the following:
+            `get_name(name, existing_names)`, the library will then
+            check this name is unique and modify it if not
         :param registered_models: registered models
+
+        .. versionchanged:: 1.10.0
+            Parameter *naming* was added.
         """
         self.name = name
         self.onnx_variable_names = set()
@@ -635,6 +643,21 @@ class Scope:
 
         # Registered models
         self.registered_models = registered_models
+        self.naming = naming
+
+        if naming is None:
+            self._naming = Topology._generate_unique_name
+        elif isinstance(naming, str):
+            self._naming = (
+                lambda seed, names: Topology._generate_unique_name(
+                    self.naming + seed, names))
+        elif callable(self.naming):
+            self._naming = (
+                lambda seed, names: Topology._generate_unique_name(
+                    self.naming(seed, names), names))
+        else:
+            raise TypeError(
+                "Unexpected type for parameter naming: %r." % type(naming))
 
     def get(self, var_name, default_value):
         "Returns variable with 'name' or default value is not found."
@@ -655,24 +678,28 @@ class Scope:
         """
         return self.custom_shape_calculators.get(model_type, None)
 
-    def get_unique_variable_name(self, seed):
+    def get_unique_variable_name(self, seed, rename=True):
         """
         Creates a unique variable ID based on the given seed.
         """
         if not isinstance(seed, str):
             raise TypeError("Parameter seed must be a string not {}."
                             "".format(type(seed)))
-        name = Topology._generate_unique_name(seed, self.onnx_variable_names)
+        if rename:
+            name = self._naming(seed, self.onnx_variable_names)
+        else:
+            name = Topology._generate_unique_name(
+                seed, self.onnx_variable_names)
         return name
 
     def get_unique_operator_name(self, seed):
         """
         Creates a unique operator ID based on the given seed.
         """
-        return Topology._generate_unique_name(seed, self.onnx_operator_names)
+        return self._naming(seed, self.onnx_operator_names)
 
     def declare_local_variable(self, raw_name, type=None, prepend=False,
-                               missing_type=False):
+                               missing_type=False, rename=True):
         """
         This function may create a new variable in this scope. If
         *raw_name* has been used to create other variables, the new
@@ -682,7 +709,7 @@ class Scope:
             raise RuntimeError(
                 "Unknown type for %r (type=%r)." % (raw_name, type))
         # Get unique ID for the new variable
-        onnx_name = self.get_unique_variable_name(raw_name)
+        onnx_name = self.get_unique_variable_name(raw_name, rename=rename)
 
         # Create the variable
         variable = Variable(raw_name, onnx_name, self.name, type)
@@ -721,13 +748,14 @@ class Scope:
         self.variables[new_name] = self.variables[old_name]
         del self.variables[old_name]
 
-    def declare_local_input(self, raw_name, type=None, prepend=False):
+    def declare_local_input(self, raw_name, type=None, prepend=False,
+                            rename=True):
         """
         Calls `declare_local_variable`. Registers this variable
         as an input.
         """
         var = self.declare_local_variable(
-            raw_name, type=type, prepend=prepend)
+            raw_name, type=type, prepend=prepend, rename=rename)
         self.input_variables.append(var)
         return var
 
@@ -922,7 +950,8 @@ class Topology:
     def get_unique_scope_name(self, seed):
         return Topology._generate_unique_name(seed, self.scope_names)
 
-    def declare_scope(self, seed, parent_scopes=None, options=None):
+    def declare_scope(self, seed, parent_scopes=None, options=None,
+                      naming=None):
         """
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
@@ -933,13 +962,14 @@ class Topology:
         scope = Scope(
             self.get_unique_scope_name(seed), target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options, registered_models=self.registered_models)
+            options=options, registered_models=self.registered_models,
+            naming=naming)
 
         # Declare input variables.
         # They should be the inputs of the scikit-learn
         # model you want to convert into ONNX.
         for var_name, initial_type in self.initial_types:
-            scope.declare_local_input(var_name, initial_type)
+            scope.declare_local_input(var_name, initial_type, rename=False)
         self.scopes.append(scope)
         return scope
 

@@ -61,6 +61,19 @@ class TestGLMRegressorConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearRegression-Dec4")
 
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    def test_model_linear_regression_blacklist(self):
+        model, X = fit_regression_model(linear_model.LinearRegression())
+        model_onnx = convert_sklearn(
+            model, "linear regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            black_op={'LinearRegressor'})
+        self.assertNotIn('LinearRegressor', str(model_onnx))
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnLinearRegressionBlackOp-Dec4")
+
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="old onnxruntime does not support double")
