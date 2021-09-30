@@ -128,3 +128,28 @@ image = plt.imread("woe2.dot.png")
 fig, ax = plt.subplots(figsize=(10, 10))
 ax.imshow(image)
 ax.axis('off')
+
+########################################
+# Half-line
+# +++++++++
+#
+# An interval may have only one extremity defined and the other
+# can be infinite.
+
+intervals = [
+    [(-np.inf, 3., True, True),
+     (5., np.inf, True, True)]]
+weights = [[55, 107]]
+
+woe1 = WOETransformer(intervals, onehot=False, weights=weights)
+woe1.fit(X)
+prd = woe1.transform(X)
+df = pd.DataFrame({'X': X.ravel(), 'woe': prd.ravel()})
+df
+
+#################################
+# And the conversion to ONNX using the same instruction.
+
+onxinf = to_onnx(woe1, X)
+sess = InferenceSession(onxinf.SerializeToString())
+print(sess.run(None, {'X': X})[0])
