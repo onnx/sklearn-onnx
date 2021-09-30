@@ -637,7 +637,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_shape_calculators=None,
                         custom_parsers=None,
                         options=None, white_op=None,
-                        black_op=None, final_types=None):
+                        black_op=None, final_types=None,
+                        naming=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -666,7 +667,15 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
+    :param naming: the user may want to change the way intermediate
+        are named, this parameter can be a string (a prefix) or a
+        function, which signature is the following:
+        `get_name(name, existing_names)`, the library will then
+        check this name is unique and modify it if not
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
+
+    .. versionchanged:: 1.10.0
+        Parameter *naming* was added.
     """
     options = _process_options(model, options)
 
@@ -685,9 +694,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
             aliases=sklearn_operator_name_map))
 
     # Declare an object to provide variables' and operators' naming mechanism.
-    # In contrast to CoreML, one global scope
-    # is enough for parsing scikit-learn models.
-    scope = topology.declare_scope('__root__', options=options)
+    scope = topology.declare_scope('__root__', options=options, naming=naming)
     inputs = scope.input_variables
 
     # The object raw_model_container is a part of the topology

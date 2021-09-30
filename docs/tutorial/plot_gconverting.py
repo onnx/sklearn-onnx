@@ -74,3 +74,30 @@ input_names = [i.name for i in sess.get_inputs()]
 output_names = [o.name for o in sess.get_outputs()]
 print("inputs=%r, outputs=%r" % (input_names, output_names))
 print(sess.run(None, {input_names[0]: X_test[:2]}))
+
+####################################
+# Renaming intermediate results
+# +++++++++++++++++++++++++++++
+#
+# It is possible to rename intermediate results by using a prefix
+# or by using a function. The result will be post-processed in order
+# to unique names. It does not impact the graph inputs or outputs.
+
+
+def rename_results(proposed_name, existing_names):
+    result = "_" + proposed_name.upper()
+    while result in existing_names:
+        result += "A"
+    print("changed %r into %r." % (proposed_name, result))
+    return result
+
+
+onx = to_onnx(clr, X, options={'zipmap': False},
+              naming=rename_results)
+
+sess = InferenceSession(onx.SerializeToString())
+input_names = [i.name for i in sess.get_inputs()]
+output_names = [o.name for o in sess.get_outputs()]
+print("inputs=%r, outputs=%r" % (input_names, output_names))
+print(sess.run(None, {input_names[0]: X_test[:2]}))
+
