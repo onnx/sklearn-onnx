@@ -14,8 +14,9 @@ def apply_normalizer(scope, inputs, outputs, container,
     """
     input = inputs[0] if isinstance(inputs, list) else inputs
     output = outputs[0] if isinstance(outputs, list) else outputs
+    use_normalizer = container.is_allowed({'Normalizer'})
 
-    if use_float:
+    if use_normalizer and use_float:
         container.add_node(
             'Normalizer', input, output,
             op_domain='ai.onnx.ml', norm=norm,
