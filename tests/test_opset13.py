@@ -18,7 +18,7 @@ class TestOpset13(unittest.TestCase):
     def test_reduce_sum(self):
         X = numpy.array([[2, 1], [0, 1]], dtype=numpy.float32)
 
-        for opset in (10, 11, 12, 13):
+        for opset in range(10, 20):
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
@@ -62,7 +62,7 @@ class TestOpset13(unittest.TestCase):
     def test_squeeze(self):
         x = numpy.random.randn(20, 1).astype(numpy.float32)
         y = numpy.squeeze(x)
-        for opset in (10, 11, 12, 13):
+        for opset in range(10, 20):
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):

@@ -171,7 +171,8 @@ if IForest is not None:
 # And the conversion.
 
 if IForest is not None:
-    onx = to_onnx(model1, initial_types=initial_type)
+    onx = to_onnx(model1, initial_types=initial_type,
+                  target_opset=14)
 
 ###############################################
 # Checking discrepencies
