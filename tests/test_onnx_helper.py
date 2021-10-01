@@ -19,7 +19,9 @@ from skl2onnx.helpers.onnx_helper import (
     save_onnx_model,
     select_model_inputs_outputs,
     change_onnx_domain,
-    add_output_initializer)
+    add_output_initializer,
+    get_initializers,
+    update_onnx_initializers)
 from test_utils import TARGET_OPSET
 
 
@@ -161,6 +163,35 @@ class TestOnnxHelper(unittest.TestCase):
             add_output_initializer(new_model_onnx, "cst_init", cst)
         with self.assertRaises(ValueError):
             add_output_initializer(new_model_onnx, ["cst_init"], [cst, cst])
+
+    def test_get_initializers(self):
+        model = make_pipeline(StandardScaler())
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", DoubleTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
+        init = get_initializers(model_onnx)
+        self.assertEqual(len(init), 2)
+        assert_almost_equal(init['Di_Divcst'],
+                            numpy.array([0.10897247, 0.51173724]))
+        assert_almost_equal(init['Su_Subcst'], numpy.array([0.225, 1.975]))
+
+    def test_update_onnx_initializers(self):
+        model = make_pipeline(StandardScaler())
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
+        model.fit(X)
+        model_onnx = convert_sklearn(model, "pipe3",
+                                     [("input", DoubleTensorType([None, 2]))],
+                                     target_opset=TARGET_OPSET)
+        init = get_initializers(model_onnx)
+        self.assertEqual(len(init), 2)
+        for v in init.values():
+            v[:] = 1.5
+        update_onnx_initializers(model_onnx, init)
+        init = get_initializers(model_onnx)
+        assert_almost_equal(init['Di_Divcst'], numpy.array([1.5, 1.5]))
+        assert_almost_equal(init['Su_Subcst'], numpy.array([1.5, 1.5]))
 
 
 if __name__ == "__main__":
