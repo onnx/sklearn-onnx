@@ -395,7 +395,8 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
         model = Binarizer(threshold=0.5)
         model_onnx = convert_sklearn(
             model, "scikit-learn binarizer",
-            [("input", DoubleTensorType(data.shape))])
+            [("input", DoubleTensorType(data.shape))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data, model, model_onnx,

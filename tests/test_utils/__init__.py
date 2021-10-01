@@ -36,6 +36,8 @@ def create_tensor(N, C, H=None, W=None):
 
 
 def _get_ir_version(opv):
+    if opv >= 15:
+        return 8
     if opv >= 12:
         return 7
     if opv >= 11:
@@ -55,7 +57,9 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/
     master/docs/Versioning.md>`_.
     """
-    vi = StrictVersion(ort_version.split("+")[0])
+    vi = StrictVersion(ort_version.split('+')[0])
+    if vi >= StrictVersion("1.9.0"):
+        return 15
     if vi >= StrictVersion("1.8.0"):
         return 14
     if vi >= StrictVersion("1.6.0"):
