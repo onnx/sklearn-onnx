@@ -100,4 +100,3 @@ input_names = [i.name for i in sess.get_inputs()]
 output_names = [o.name for o in sess.get_outputs()]
 print("inputs=%r, outputs=%r" % (input_names, output_names))
 print(sess.run(None, {input_names[0]: X_test[:2]}))
-
