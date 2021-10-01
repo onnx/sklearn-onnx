@@ -5,7 +5,7 @@ from io import BytesIO
 import numpy as np
 import onnx  # noqa
 from onnx import shape_inference, TensorProto
-from onnx.numpy_helper import from_array
+from onnx.numpy_helper import from_array, to_array
 from onnx.helper import make_tensor
 from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,
@@ -413,3 +413,37 @@ def add_output_initializer(model_onnx, name, value, suffix='_init'):
         op_set.domain = oimp.domain
         op_set.version = oimp.version
     return onnx_model
+
+
+def get_initializers(model_onnx):
+    """
+    Retrieves the list of initializers in a model in a
+    dictionary `{ name: value }`.
+    """
+    res = {}
+    for init in model_onnx.graph.initializer:
+        res[init.name] = to_array(init)
+    return res
+
+
+def update_onnx_initializers(model_onnx, new_inits):
+    """
+    Updates initializer in a ONNX model.
+
+    :param model_onnx: ONNX model
+    :param new_inits: new initializers
+    :return: list of updated initializers
+    """
+    updated = []
+    replace_weights = []
+    replace_indices = []
+    for i, w in enumerate(model_onnx.graph.initializer):
+        if w.name in new_inits:
+            replace_weights.append(from_array(new_inits[w.name], w.name))
+            replace_indices.append(i)
+            updated.append(w.name)
+    replace_indices.sort(reverse=True)
+    for w_i in replace_indices:
+        del model_onnx.graph.initializer[w_i]
+    model_onnx.graph.initializer.extend(replace_weights)
+    return updated
