@@ -230,7 +230,7 @@ Prediction with ONNX
     run(): incompatible function arguments. The following argument types are supported:
         1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -> List[object]
 
-    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x00000264A9E8E8B0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
+    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x00000288697C1970>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
     0    a    c  0.50  0.60
     1    b    d  0.40  0.80
     2    a    d  0.50  0.56
@@ -293,18 +293,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.85 0.15]
-     [0.27 0.73]
-     [0.79 0.21]
-     [0.31 0.69]
-     [0.76 0.24]
-     [0.44 0.56]]
-    [[0.85       0.14999999]
-     [0.2700001  0.7299999 ]
-     [0.79       0.21      ]
-     [0.31000012 0.6899999 ]
-     [0.76       0.23999998]
-     [0.44000006 0.55999994]]
+    [[0.79 0.21]
+     [0.26 0.74]
+     [0.71 0.29]
+     [0.25 0.75]
+     [0.77 0.23]
+     [0.39 0.61]]
+    [[0.79       0.20999998]
+     [0.2600001  0.7399999 ]
+     [0.71000004 0.28999996]
+     [0.25000006 0.74999994]
+     [0.77       0.23      ]
+     [0.39000005 0.60999995]]
 
 
 
@@ -512,18 +512,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.85 0.15]
-     [0.27 0.73]
-     [0.79 0.21]
-     [0.31 0.69]
-     [0.76 0.24]
-     [0.44 0.56]]
-    [[0.85       0.14999999]
-     [0.2700004  0.7299996 ]
-     [0.78999996 0.21000002]
-     [0.31000036 0.68999964]
-     [0.76       0.24000004]
-     [0.44000024 0.55999976]]
+    [[0.79 0.21]
+     [0.26 0.74]
+     [0.71 0.29]
+     [0.25 0.75]
+     [0.77 0.23]
+     [0.39 0.61]]
+    [[0.78999996 0.21000002]
+     [0.2600004  0.7399996 ]
+     [0.71000004 0.29      ]
+     [0.25000042 0.7499996 ]
+     [0.77       0.23000003]
+     [0.39000028 0.6099997 ]]
 
 
 
@@ -531,7 +531,7 @@ And probilities.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.234 seconds)
+   **Total running time of the script:** ( 0 minutes  1.588 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py:

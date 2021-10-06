@@ -106,8 +106,8 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    skl [[0.05979941 0.87835658 0.06184401]]
-    onnx [{0: 0.059799421578645706, 1: 0.8783565163612366, 2: 0.06184399500489235}, {0: 0.9817204475402832, 1: 0.01827952452003956, 2: 4.910286577342049e-08}]
+    skl [[9.68611448e-01 3.13883535e-02 1.98860984e-07]]
+    onnx [{0: 0.968611478805542, 1: 0.03138835355639458, 2: 1.9886111601863377e-07}, {0: 0.977778434753418, 1: 0.02222135104238987, 2: 2.4517507313248643e-07}]
 
 
 
@@ -143,8 +143,8 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    skl [[-0.9068921   1.78016473 -0.87327263]]
-    onnx [{0: -0.9068918228149414, 1: 1.7801648378372192, 2: -0.8732728958129883}, {0: 6.9314751625061035, 1: 2.9479501247406006, 2: -9.879425048828125}]
+    skl [[ 6.27606491  2.84663828 -9.12270319]]
+    onnx [{0: 6.276064872741699, 1: 2.8466382026672363, 2: -9.122702598571777}, {0: 6.327683448791504, 1: 2.5434539318084717, 2: -8.871137619018555}]
 
 
 
@@ -176,8 +176,8 @@ Raw scores and decision_function
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -185,7 +185,7 @@ Raw scores and decision_function
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.101 seconds)
+   **Total running time of the script:** ( 0 minutes  0.144 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_decision_function.py:

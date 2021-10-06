@@ -158,6 +158,27 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to change the default ONNX graph such as renaming the inputs or outputs ...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_gconverting_thumb.png
+     :alt: Modify the ONNX graph
+
+     :ref:`sphx_glr_auto_tutorial_plot_gconverting.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_gconverting
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="WOE means Weights of Evidence. It consists in checking that a feature X belongs to a series of ...">
 
 .. only:: html

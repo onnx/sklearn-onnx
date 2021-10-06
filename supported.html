@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Supported scikit-learn Models &#8212; sklearn-onnx 1.9.3 documentation</title>
+    <title>Supported scikit-learn Models &#8212; sklearn-onnx 1.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="parameterized.html" title="Converters with options"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Supported scikit-learn Models</a></li> 
       </ul>
     </div>  
@@ -604,7 +604,7 @@ implements <em>to_onnx</em> methods.</p>
 </tr>
 <tr class="row-even"><td><p>PoissonRegressor</p></td>
 <td><p>linear_model</p></td>
-<td></td>
+<td><p>Yes</p></td>
 </tr>
 <tr class="row-odd"><td><p>PolynomialCountSketch</p></td>
 <td><p>kernel_approximation</p></td>
@@ -624,7 +624,7 @@ implements <em>to_onnx</em> methods.</p>
 </tr>
 <tr class="row-odd"><td><p>QuantileRegressor</p></td>
 <td><p>linear_model</p></td>
-<td></td>
+<td><p>Yes</p></td>
 </tr>
 <tr class="row-even"><td><p>QuantileTransformer</p></td>
 <td><p>preprocessing</p></td>
@@ -668,7 +668,7 @@ implements <em>to_onnx</em> methods.</p>
 </tr>
 <tr class="row-even"><td><p>RandomTreesEmbedding</p></td>
 <td><p>ensemble</p></td>
-<td></td>
+<td><p>Yes</p></td>
 </tr>
 <tr class="row-odd"><td><p>RandomizedSearchCV</p></td>
 <td><p>model_selection</p></td>
@@ -816,7 +816,7 @@ implements <em>to_onnx</em> methods.</p>
 </tr>
 <tr class="row-odd"><td><p>TweedieRegressor</p></td>
 <td><p>linear_model</p></td>
-<td></td>
+<td><p>Yes</p></td>
 </tr>
 <tr class="row-even"><td><p>VarianceThreshold</p></td>
 <td><p>feature_selection</p></td>
@@ -833,7 +833,7 @@ implements <em>to_onnx</em> methods.</p>
 </tbody>
 </table>
 <p>scikit-learn’s version is <strong>1.1.dev0</strong>.
-121/187 models are covered.</p>
+125/187 models are covered.</p>
 </div>
 </div>
 </div>
@@ -845,187 +845,220 @@ implements <em>to_onnx</em> methods.</p>
 <colgroup>
 <col style="width: 34%" />
 <col style="width: 34%" />
-<col style="width: 32%" />
+<col style="width: 31%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxcastregressor"><span class="std std-ref">OnnxCastRegressor</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxbooster"><span class="std std-ref">OnnxBooster</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnknnimputer"><span class="std std-ref">OnnxSklearnKNNImputer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnorthogonalmatchingpursuitcv"><span class="std std-ref">OnnxSklearnOrthogonalMatchingPursuitCV</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxcasttransformer"><span class="std std-ref">OnnxCastTransformer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborsclassifier"><span class="std std-ref">OnnxSklearnKNeighborsClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpca"><span class="std std-ref">OnnxSklearnPCA</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxreplacetransformer"><span class="std std-ref">OnnxReplaceTransformer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborsregressor"><span class="std std-ref">OnnxSklearnKNeighborsRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnplsregression"><span class="std std-ref">OnnxSklearnPLSRegression</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnardregression"><span class="std std-ref">OnnxSklearnARDRegression</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborstransformer"><span class="std std-ref">OnnxSklearnKNeighborsTransformer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpassiveaggressiveclassifier"><span class="std std-ref">OnnxSklearnPassiveAggressiveClassifier</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnadaboostclassifier"><span class="std std-ref">OnnxSklearnAdaBoostClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkernelcenterer"><span class="std std-ref">OnnxSklearnKernelCenterer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpassiveaggressiveregressor"><span class="std std-ref">OnnxSklearnPassiveAggressiveRegressor</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnadaboostregressor"><span class="std std-ref">OnnxSklearnAdaBoostRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkernelpca"><span class="std std-ref">OnnxSklearnKernelPCA</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnperceptron"><span class="std std-ref">OnnxSklearnPerceptron</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbaggingclassifier"><span class="std std-ref">OnnxSklearnBaggingClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlabelbinarizer"><span class="std std-ref">OnnxSklearnLabelBinarizer</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxcastregressor"><span class="std std-ref">OnnxCastRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborsclassifier"><span class="std std-ref">OnnxSklearnKNeighborsClassifier</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnpipeline"><span class="std std-ref">OnnxSklearnPipeline</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbaggingregressor"><span class="std std-ref">OnnxSklearnBaggingRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlabelencoder"><span class="std std-ref">OnnxSklearnLabelEncoder</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxcasttransformer"><span class="std std-ref">OnnxCastTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborsregressor"><span class="std std-ref">OnnxSklearnKNeighborsRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpoissonregressor"><span class="std std-ref">OnnxSklearnPoissonRegressor</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxcustomscorertransform"><span class="std std-ref">OnnxCustomScorerTransform</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkneighborstransformer"><span class="std std-ref">OnnxSklearnKNeighborsTransformer</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnpolynomialfeatures"><span class="std std-ref">OnnxSklearnPolynomialFeatures</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbayesiangaussianmixture"><span class="std std-ref">OnnxSklearnBayesianGaussianMixture</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlars"><span class="std std-ref">OnnxSklearnLars</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxdecorrelatetransformer"><span class="std std-ref">OnnxDecorrelateTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkernelcenterer"><span class="std std-ref">OnnxSklearnKernelCenterer</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnpowertransformer"><span class="std std-ref">OnnxSklearnPowerTransformer</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbayesianridge"><span class="std std-ref">OnnxSklearnBayesianRidge</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlarscv"><span class="std std-ref">OnnxSklearnLarsCV</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxlivedecorrelatetransformer"><span class="std std-ref">OnnxLiveDecorrelateTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnkernelpca"><span class="std std-ref">OnnxSklearnKernelPCA</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnquantileregressor"><span class="std std-ref">OnnxSklearnQuantileRegressor</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxmockwrappedlightgbmboosterclassifier"><span class="std std-ref">OnnxMockWrappedLightGbmBoosterClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlgbmclassifier"><span class="std std-ref">OnnxSklearnLGBMClassifier</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnransacregressor"><span class="std std-ref">OnnxSklearnRANSACRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbernoullinb"><span class="std std-ref">OnnxSklearnBernoulliNB</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlasso"><span class="std std-ref">OnnxSklearnLasso</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxordinalencoder"><span class="std std-ref">OnnxOrdinalEncoder</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlgbmregressor"><span class="std std-ref">OnnxSklearnLGBMRegressor</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnrfe"><span class="std std-ref">OnnxSklearnRFE</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbinarizer"><span class="std std-ref">OnnxSklearnBinarizer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassocv"><span class="std std-ref">OnnxSklearnLassoCV</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxpredictabletsne"><span class="std std-ref">OnnxPredictableTSNE</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlabelbinarizer"><span class="std std-ref">OnnxSklearnLabelBinarizer</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnrfecv"><span class="std std-ref">OnnxSklearnRFECV</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncalibratedclassifiercv"><span class="std std-ref">OnnxSklearnCalibratedClassifierCV</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolars"><span class="std std-ref">OnnxSklearnLassoLars</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxreplacetransformer"><span class="std std-ref">OnnxReplaceTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlabelencoder"><span class="std std-ref">OnnxSklearnLabelEncoder</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnradiusneighborsclassifier"><span class="std std-ref">OnnxSklearnRadiusNeighborsClassifier</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncategoricalnb"><span class="std std-ref">OnnxSklearnCategoricalNB</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolarscv"><span class="std std-ref">OnnxSklearnLassoLarsCV</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnardregression"><span class="std std-ref">OnnxSklearnARDRegression</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlars"><span class="std std-ref">OnnxSklearnLars</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnradiusneighborsregressor"><span class="std std-ref">OnnxSklearnRadiusNeighborsRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncolumntransformer"><span class="std std-ref">OnnxSklearnColumnTransformer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolarsic"><span class="std std-ref">OnnxSklearnLassoLarsIC</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnadaboostclassifier"><span class="std std-ref">OnnxSklearnAdaBoostClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlarscv"><span class="std std-ref">OnnxSklearnLarsCV</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnrandomforestclassifier"><span class="std std-ref">OnnxSklearnRandomForestClassifier</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncomplementnb"><span class="std std-ref">OnnxSklearnComplementNB</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlineardiscriminantanalysis"><span class="std std-ref">OnnxSklearnLinearDiscriminantAnalysis</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnadaboostregressor"><span class="std std-ref">OnnxSklearnAdaBoostRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlasso"><span class="std std-ref">OnnxSklearnLasso</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnrandomforestregressor"><span class="std std-ref">OnnxSklearnRandomForestRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncountvectorizer"><span class="std std-ref">OnnxSklearnCountVectorizer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearregression"><span class="std std-ref">OnnxSklearnLinearRegression</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbaggingclassifier"><span class="std std-ref">OnnxSklearnBaggingClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassocv"><span class="std std-ref">OnnxSklearnLassoCV</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnrandomtreesembedding"><span class="std std-ref">OnnxSklearnRandomTreesEmbedding</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbaggingregressor"><span class="std std-ref">OnnxSklearnBaggingRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolars"><span class="std std-ref">OnnxSklearnLassoLars</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnridge"><span class="std std-ref">OnnxSklearnRidge</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndecisiontreeclassifier"><span class="std std-ref">OnnxSklearnDecisionTreeClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearsvc"><span class="std std-ref">OnnxSklearnLinearSVC</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbayesiangaussianmixture"><span class="std std-ref">OnnxSklearnBayesianGaussianMixture</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolarscv"><span class="std std-ref">OnnxSklearnLassoLarsCV</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnridgecv"><span class="std std-ref">OnnxSklearnRidgeCV</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndecisiontreeregressor"><span class="std std-ref">OnnxSklearnDecisionTreeRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearsvr"><span class="std std-ref">OnnxSklearnLinearSVR</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbayesianridge"><span class="std std-ref">OnnxSklearnBayesianRidge</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlassolarsic"><span class="std std-ref">OnnxSklearnLassoLarsIC</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnridgeclassifier"><span class="std std-ref">OnnxSklearnRidgeClassifier</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndictvectorizer"><span class="std std-ref">OnnxSklearnDictVectorizer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlocaloutlierfactor"><span class="std std-ref">OnnxSklearnLocalOutlierFactor</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbernoullinb"><span class="std std-ref">OnnxSklearnBernoulliNB</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlineardiscriminantanalysis"><span class="std std-ref">OnnxSklearnLinearDiscriminantAnalysis</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnridgeclassifiercv"><span class="std std-ref">OnnxSklearnRidgeClassifierCV</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnelasticnet"><span class="std std-ref">OnnxSklearnElasticNet</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlogisticregression"><span class="std std-ref">OnnxSklearnLogisticRegression</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnbinarizer"><span class="std std-ref">OnnxSklearnBinarizer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearregression"><span class="std std-ref">OnnxSklearnLinearRegression</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnrobustscaler"><span class="std std-ref">OnnxSklearnRobustScaler</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnelasticnetcv"><span class="std std-ref">OnnxSklearnElasticNetCV</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlogisticregressioncv"><span class="std std-ref">OnnxSklearnLogisticRegressionCV</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncalibratedclassifiercv"><span class="std std-ref">OnnxSklearnCalibratedClassifierCV</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearsvc"><span class="std std-ref">OnnxSklearnLinearSVC</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnsgdclassifier"><span class="std std-ref">OnnxSklearnSGDClassifier</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreeclassifier"><span class="std std-ref">OnnxSklearnExtraTreeClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmlpclassifier"><span class="std std-ref">OnnxSklearnMLPClassifier</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncategoricalnb"><span class="std std-ref">OnnxSklearnCategoricalNB</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlinearsvr"><span class="std std-ref">OnnxSklearnLinearSVR</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnsgdregressor"><span class="std std-ref">OnnxSklearnSGDRegressor</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreeregressor"><span class="std std-ref">OnnxSklearnExtraTreeRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmlpregressor"><span class="std std-ref">OnnxSklearnMLPRegressor</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncolumntransformer"><span class="std std-ref">OnnxSklearnColumnTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlocaloutlierfactor"><span class="std std-ref">OnnxSklearnLocalOutlierFactor</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnsvc"><span class="std std-ref">OnnxSklearnSVC</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreesclassifier"><span class="std std-ref">OnnxSklearnExtraTreesClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmaxabsscaler"><span class="std std-ref">OnnxSklearnMaxAbsScaler</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncomplementnb"><span class="std std-ref">OnnxSklearnComplementNB</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlogisticregression"><span class="std std-ref">OnnxSklearnLogisticRegression</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnsvr"><span class="std std-ref">OnnxSklearnSVR</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreesregressor"><span class="std std-ref">OnnxSklearnExtraTreesRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnminmaxscaler"><span class="std std-ref">OnnxSklearnMinMaxScaler</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearncountvectorizer"><span class="std std-ref">OnnxSklearnCountVectorizer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnlogisticregressioncv"><span class="std std-ref">OnnxSklearnLogisticRegressionCV</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectfdr"><span class="std std-ref">OnnxSklearnSelectFdr</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnfeatureunion"><span class="std std-ref">OnnxSklearnFeatureUnion</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnminibatchkmeans"><span class="std std-ref">OnnxSklearnMiniBatchKMeans</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndecisiontreeclassifier"><span class="std std-ref">OnnxSklearnDecisionTreeClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmlpclassifier"><span class="std std-ref">OnnxSklearnMLPClassifier</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectfpr"><span class="std std-ref">OnnxSklearnSelectFpr</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnfunctiontransformer"><span class="std std-ref">OnnxSklearnFunctionTransformer</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultioutputclassifier"><span class="std std-ref">OnnxSklearnMultiOutputClassifier</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndecisiontreeregressor"><span class="std std-ref">OnnxSklearnDecisionTreeRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmlpregressor"><span class="std std-ref">OnnxSklearnMLPRegressor</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectfrommodel"><span class="std std-ref">OnnxSklearnSelectFromModel</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianmixture"><span class="std std-ref">OnnxSklearnGaussianMixture</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultioutputregressor"><span class="std std-ref">OnnxSklearnMultiOutputRegressor</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearndictvectorizer"><span class="std std-ref">OnnxSklearnDictVectorizer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmaxabsscaler"><span class="std std-ref">OnnxSklearnMaxAbsScaler</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectfwe"><span class="std std-ref">OnnxSklearnSelectFwe</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussiannb"><span class="std std-ref">OnnxSklearnGaussianNB</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitaskelasticnet"><span class="std std-ref">OnnxSklearnMultiTaskElasticNet</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnelasticnet"><span class="std std-ref">OnnxSklearnElasticNet</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnminmaxscaler"><span class="std std-ref">OnnxSklearnMinMaxScaler</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectkbest"><span class="std std-ref">OnnxSklearnSelectKBest</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianprocessclassifier"><span class="std std-ref">OnnxSklearnGaussianProcessClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitaskelasticnetcv"><span class="std std-ref">OnnxSklearnMultiTaskElasticNetCV</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnelasticnetcv"><span class="std std-ref">OnnxSklearnElasticNetCV</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnminibatchkmeans"><span class="std std-ref">OnnxSklearnMiniBatchKMeans</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnselectpercentile"><span class="std std-ref">OnnxSklearnSelectPercentile</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianprocessregressor"><span class="std std-ref">OnnxSklearnGaussianProcessRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitasklasso"><span class="std std-ref">OnnxSklearnMultiTaskLasso</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreeclassifier"><span class="std std-ref">OnnxSklearnExtraTreeClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultioutputclassifier"><span class="std std-ref">OnnxSklearnMultiOutputClassifier</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnsimpleimputer"><span class="std std-ref">OnnxSklearnSimpleImputer</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianrandomprojection"><span class="std std-ref">OnnxSklearnGaussianRandomProjection</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitasklassocv"><span class="std std-ref">OnnxSklearnMultiTaskLassoCV</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreeregressor"><span class="std std-ref">OnnxSklearnExtraTreeRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultioutputregressor"><span class="std std-ref">OnnxSklearnMultiOutputRegressor</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnstackingclassifier"><span class="std std-ref">OnnxSklearnStackingClassifier</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngenericunivariateselect"><span class="std std-ref">OnnxSklearnGenericUnivariateSelect</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultinomialnb"><span class="std std-ref">OnnxSklearnMultinomialNB</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreesclassifier"><span class="std std-ref">OnnxSklearnExtraTreesClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitaskelasticnet"><span class="std std-ref">OnnxSklearnMultiTaskElasticNet</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnstackingregressor"><span class="std std-ref">OnnxSklearnStackingRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngradientboostingclassifier"><span class="std std-ref">OnnxSklearnGradientBoostingClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnearestneighbors"><span class="std std-ref">OnnxSklearnNearestNeighbors</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnextratreesregressor"><span class="std std-ref">OnnxSklearnExtraTreesRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitaskelasticnetcv"><span class="std std-ref">OnnxSklearnMultiTaskElasticNetCV</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnstandardscaler"><span class="std std-ref">OnnxSklearnStandardScaler</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngradientboostingregressor"><span class="std std-ref">OnnxSklearnGradientBoostingRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnneighborhoodcomponentsanalysis"><span class="std std-ref">OnnxSklearnNeighborhoodComponentsAnalysis</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnfeatureunion"><span class="std std-ref">OnnxSklearnFeatureUnion</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitasklasso"><span class="std std-ref">OnnxSklearnMultiTaskLasso</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearntfidftransformer"><span class="std std-ref">OnnxSklearnTfidfTransformer</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngridsearchcv"><span class="std std-ref">OnnxSklearnGridSearchCV</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnormalizer"><span class="std std-ref">OnnxSklearnNormalizer</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnfunctiontransformer"><span class="std std-ref">OnnxSklearnFunctionTransformer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultitasklassocv"><span class="std std-ref">OnnxSklearnMultiTaskLassoCV</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearntfidfvectorizer"><span class="std std-ref">OnnxSklearnTfidfVectorizer</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhistgradientboostingclassifier"><span class="std std-ref">OnnxSklearnHistGradientBoostingClassifier</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnusvc"><span class="std std-ref">OnnxSklearnNuSVC</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianmixture"><span class="std std-ref">OnnxSklearnGaussianMixture</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnmultinomialnb"><span class="std std-ref">OnnxSklearnMultinomialNB</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearntheilsenregressor"><span class="std std-ref">OnnxSklearnTheilSenRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhistgradientboostingregressor"><span class="std std-ref">OnnxSklearnHistGradientBoostingRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnusvr"><span class="std std-ref">OnnxSklearnNuSVR</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussiannb"><span class="std std-ref">OnnxSklearnGaussianNB</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnearestneighbors"><span class="std std-ref">OnnxSklearnNearestNeighbors</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearntruncatedsvd"><span class="std std-ref">OnnxSklearnTruncatedSVD</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhuberregressor"><span class="std std-ref">OnnxSklearnHuberRegressor</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnoneclasssvm"><span class="std std-ref">OnnxSklearnOneClassSVM</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianprocessclassifier"><span class="std std-ref">OnnxSklearnGaussianProcessClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnneighborhoodcomponentsanalysis"><span class="std std-ref">OnnxSklearnNeighborhoodComponentsAnalysis</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearntweedieregressor"><span class="std std-ref">OnnxSklearnTweedieRegressor</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianprocessregressor"><span class="std std-ref">OnnxSklearnGaussianProcessRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnormalizer"><span class="std std-ref">OnnxSklearnNormalizer</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnvariancethreshold"><span class="std std-ref">OnnxSklearnVarianceThreshold</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnincrementalpca"><span class="std std-ref">OnnxSklearnIncrementalPCA</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnonehotencoder"><span class="std std-ref">OnnxSklearnOneHotEncoder</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngaussianrandomprojection"><span class="std std-ref">OnnxSklearnGaussianRandomProjection</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnusvc"><span class="std std-ref">OnnxSklearnNuSVC</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnvotingclassifier"><span class="std std-ref">OnnxSklearnVotingClassifier</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnisolationforest"><span class="std std-ref">OnnxSklearnIsolationForest</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnonevsrestclassifier"><span class="std std-ref">OnnxSklearnOneVsRestClassifier</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngenericunivariateselect"><span class="std std-ref">OnnxSklearnGenericUnivariateSelect</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnnusvr"><span class="std std-ref">OnnxSklearnNuSVR</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnvotingregressor"><span class="std std-ref">OnnxSklearnVotingRegressor</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnkbinsdiscretizer"><span class="std std-ref">OnnxSklearnKBinsDiscretizer</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngradientboostingclassifier"><span class="std std-ref">OnnxSklearnGradientBoostingClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnoneclasssvm"><span class="std std-ref">OnnxSklearnOneClassSVM</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnxgbclassifier"><span class="std std-ref">OnnxSklearnXGBClassifier</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngradientboostingregressor"><span class="std std-ref">OnnxSklearnGradientBoostingRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnonehotencoder"><span class="std std-ref">OnnxSklearnOneHotEncoder</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnxgbregressor"><span class="std std-ref">OnnxSklearnXGBRegressor</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearngridsearchcv"><span class="std std-ref">OnnxSklearnGridSearchCV</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnonevsrestclassifier"><span class="std std-ref">OnnxSklearnOneVsRestClassifier</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxtransfertransformer"><span class="std std-ref">OnnxTransferTransformer</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhistgradientboostingclassifier"><span class="std std-ref">OnnxSklearnHistGradientBoostingClassifier</span></a></p></td>
 <td><p><a class="reference internal" href="#l-sklops-onnxsklearnordinalencoder"><span class="std std-ref">OnnxSklearnOrdinalEncoder</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxvalidatorclassifier"><span class="std std-ref">OnnxValidatorClassifier</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhistgradientboostingregressor"><span class="std std-ref">OnnxSklearnHistGradientBoostingRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnorthogonalmatchingpursuit"><span class="std std-ref">OnnxSklearnOrthogonalMatchingPursuit</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxwoeencoder"><span class="std std-ref">OnnxWOEEncoder</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnhuberregressor"><span class="std std-ref">OnnxSklearnHuberRegressor</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnorthogonalmatchingpursuitcv"><span class="std std-ref">OnnxSklearnOrthogonalMatchingPursuitCV</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxwoetransformer"><span class="std std-ref">OnnxWOETransformer</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnincrementalpca"><span class="std std-ref">OnnxSklearnIncrementalPCA</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpca"><span class="std std-ref">OnnxSklearnPCA</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxwrappedlightgbmbooster"><span class="std std-ref">OnnxWrappedLightGbmBooster</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnisolationforest"><span class="std std-ref">OnnxSklearnIsolationForest</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnplsregression"><span class="std std-ref">OnnxSklearnPLSRegression</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxwrappedlightgbmboosterclassifier"><span class="std std-ref">OnnxWrappedLightGbmBoosterClassifier</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnkbinsdiscretizer"><span class="std std-ref">OnnxSklearnKBinsDiscretizer</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpassiveaggressiveclassifier"><span class="std std-ref">OnnxSklearnPassiveAggressiveClassifier</span></a></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnkmeans"><span class="std std-ref">OnnxSklearnKMeans</span></a></p></td>
-<td><p><a class="reference internal" href="#l-sklops-onnxsklearnorthogonalmatchingpursuit"><span class="std std-ref">OnnxSklearnOrthogonalMatchingPursuit</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l-sklops-onnxsklearnkmeans"><span class="std std-ref">OnnxSklearnKMeans</span></a></p></td>
+<td><p><a class="reference internal" href="#l-sklops-onnxsklearnpassiveaggressiveregressor"><span class="std std-ref">OnnxSklearnPassiveAggressiveRegressor</span></a></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxbooster">
+<span id="l-sklops-onnxbooster"></span><h3>OnnxBooster<a class="headerlink" href="#onnxbooster" title="Permalink to this headline">¶</a></h3>
+</div>
 </div>
 <div class="docutils container">
 <div class="section" id="onnxcastregressor">
@@ -1047,6 +1080,36 @@ implements <em>to_onnx</em> methods.</p>
 <dd><p>OnnxOperatorMixin for <strong>CastTransformer</strong></p>
 </dd></dl>
 
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxcustomscorertransform">
+<span id="l-sklops-onnxcustomscorertransform"></span><h3>OnnxCustomScorerTransform<a class="headerlink" href="#onnxcustomscorertransform" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxdecorrelatetransformer">
+<span id="l-sklops-onnxdecorrelatetransformer"></span><h3>OnnxDecorrelateTransformer<a class="headerlink" href="#onnxdecorrelatetransformer" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxlivedecorrelatetransformer">
+<span id="l-sklops-onnxlivedecorrelatetransformer"></span><h3>OnnxLiveDecorrelateTransformer<a class="headerlink" href="#onnxlivedecorrelatetransformer" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxmockwrappedlightgbmboosterclassifier">
+<span id="l-sklops-onnxmockwrappedlightgbmboosterclassifier"></span><h3>OnnxMockWrappedLightGbmBoosterClassifier<a class="headerlink" href="#onnxmockwrappedlightgbmboosterclassifier" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxordinalencoder">
+<span id="l-sklops-onnxordinalencoder"></span><h3>OnnxOrdinalEncoder<a class="headerlink" href="#onnxordinalencoder" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxpredictabletsne">
+<span id="l-sklops-onnxpredictabletsne"></span><h3>OnnxPredictableTSNE<a class="headerlink" href="#onnxpredictabletsne" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 <div class="docutils container">
@@ -1186,7 +1249,7 @@ implements <em>to_onnx</em> methods.</p>
 <span id="l-sklops-onnxsklearncolumntransformer"></span><h3>OnnxSklearnColumnTransformer<a class="headerlink" href="#onnxsklearncolumntransformer" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnColumnTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remainder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_feature_names_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/algebra/sklearn_ops.html#OnnxSklearnColumnTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnColumnTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remainder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_feature_names_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/algebra/sklearn_ops.html#OnnxSklearnColumnTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>OnnxOperatorMixin for <strong>ColumnTransformer</strong></p>
 </dd></dl>
 
@@ -1575,6 +1638,16 @@ implements <em>to_onnx</em> methods.</p>
 <dd><p>OnnxOperatorMixin for <strong>KernelPCA</strong></p>
 </dd></dl>
 
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnlgbmclassifier">
+<span id="l-sklops-onnxsklearnlgbmclassifier"></span><h3>OnnxSklearnLGBMClassifier<a class="headerlink" href="#onnxsklearnlgbmclassifier" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnlgbmregressor">
+<span id="l-sklops-onnxsklearnlgbmregressor"></span><h3>OnnxSklearnLGBMRegressor<a class="headerlink" href="#onnxsklearnlgbmregressor" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 <div class="docutils container">
@@ -2073,6 +2146,17 @@ implements <em>to_onnx</em> methods.</p>
 </div>
 </div>
 <div class="docutils container">
+<div class="section" id="onnxsklearnpoissonregressor">
+<span id="l-sklops-onnxsklearnpoissonregressor"></span><h3>OnnxSklearnPoissonRegressor<a class="headerlink" href="#onnxsklearnpoissonregressor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnPoissonRegressor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnPoissonRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnPoissonRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>OnnxOperatorMixin for <strong>PoissonRegressor</strong></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="docutils container">
 <div class="section" id="onnxsklearnpolynomialfeatures">
 <span id="l-sklops-onnxsklearnpolynomialfeatures"></span><h3>OnnxSklearnPolynomialFeatures<a class="headerlink" href="#onnxsklearnpolynomialfeatures" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
@@ -2090,6 +2174,17 @@ implements <em>to_onnx</em> methods.</p>
 <dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnPowerTransformer">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnPowerTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yeo-johnson'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnPowerTransformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>OnnxOperatorMixin for <strong>PowerTransformer</strong></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnquantileregressor">
+<span id="l-sklops-onnxsklearnquantileregressor"></span><h3>OnnxSklearnQuantileRegressor<a class="headerlink" href="#onnxsklearnquantileregressor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnQuantileRegressor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnQuantileRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interior-point'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnQuantileRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>OnnxOperatorMixin for <strong>QuantileRegressor</strong></p>
 </dd></dl>
 
 </div>
@@ -2167,6 +2262,17 @@ implements <em>to_onnx</em> methods.</p>
 <dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomForestRegressor">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnRandomForestRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'squared_error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight_fraction_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_leaf_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_impurity_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccp_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomForestRegressor" title="Permalink to this definition">¶</a></dt>
 <dd><p>OnnxOperatorMixin for <strong>RandomForestRegressor</strong></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnrandomtreesembedding">
+<span id="l-sklops-onnxsklearnrandomtreesembedding"></span><h3>OnnxSklearnRandomTreesEmbedding<a class="headerlink" href="#onnxsklearnrandomtreesembedding" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomTreesEmbedding">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnRandomTreesEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight_fraction_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_leaf_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_impurity_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomTreesEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>OnnxOperatorMixin for <strong>RandomTreesEmbedding</strong></p>
 </dd></dl>
 
 </div>
@@ -2425,6 +2531,17 @@ implements <em>to_onnx</em> methods.</p>
 </div>
 </div>
 <div class="docutils container">
+<div class="section" id="onnxsklearntweedieregressor">
+<span id="l-sklops-onnxsklearntweedieregressor"></span><h3>OnnxSklearnTweedieRegressor<a class="headerlink" href="#onnxsklearntweedieregressor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnTweedieRegressor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnTweedieRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#skl2onnx.algebra.sklearn_ops.OnnxSklearnTweedieRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>OnnxOperatorMixin for <strong>TweedieRegressor</strong></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="docutils container">
 <div class="section" id="onnxsklearnvariancethreshold">
 <span id="l-sklops-onnxsklearnvariancethreshold"></span><h3>OnnxSklearnVarianceThreshold<a class="headerlink" href="#onnxsklearnvariancethreshold" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
@@ -2455,6 +2572,46 @@ implements <em>to_onnx</em> methods.</p>
 <dd><p>OnnxOperatorMixin for <strong>VotingRegressor</strong></p>
 </dd></dl>
 
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnxgbclassifier">
+<span id="l-sklops-onnxsklearnxgbclassifier"></span><h3>OnnxSklearnXGBClassifier<a class="headerlink" href="#onnxsklearnxgbclassifier" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxsklearnxgbregressor">
+<span id="l-sklops-onnxsklearnxgbregressor"></span><h3>OnnxSklearnXGBRegressor<a class="headerlink" href="#onnxsklearnxgbregressor" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxtransfertransformer">
+<span id="l-sklops-onnxtransfertransformer"></span><h3>OnnxTransferTransformer<a class="headerlink" href="#onnxtransfertransformer" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxvalidatorclassifier">
+<span id="l-sklops-onnxvalidatorclassifier"></span><h3>OnnxValidatorClassifier<a class="headerlink" href="#onnxvalidatorclassifier" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxwoeencoder">
+<span id="l-sklops-onnxwoeencoder"></span><h3>OnnxWOEEncoder<a class="headerlink" href="#onnxwoeencoder" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxwoetransformer">
+<span id="l-sklops-onnxwoetransformer"></span><h3>OnnxWOETransformer<a class="headerlink" href="#onnxwoetransformer" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxwrappedlightgbmbooster">
+<span id="l-sklops-onnxwrappedlightgbmbooster"></span><h3>OnnxWrappedLightGbmBooster<a class="headerlink" href="#onnxwrappedlightgbmbooster" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="docutils container">
+<div class="section" id="onnxwrappedlightgbmboosterclassifier">
+<span id="l-sklops-onnxwrappedlightgbmboosterclassifier"></span><h3>OnnxWrappedLightGbmBoosterClassifier<a class="headerlink" href="#onnxwrappedlightgbmboosterclassifier" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>
@@ -2532,7 +2689,7 @@ but not mandatory, it is used to overwrites the type
 
 <dl class="py class">
 <dt class="sig sig-object py" id="id1">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnColumnTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remainder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_feature_names_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/algebra/sklearn_ops.html#OnnxSklearnColumnTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">skl2onnx.algebra.sklearn_ops.</span></span><span class="sig-name descname"><span class="pre">OnnxSklearnColumnTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remainder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_feature_names_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/algebra/sklearn_ops.html#OnnxSklearnColumnTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
 <dd><p>OnnxOperatorMixin for <strong>ColumnTransformer</strong></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.onnx_converter">

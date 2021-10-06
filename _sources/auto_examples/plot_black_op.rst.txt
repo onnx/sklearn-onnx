@@ -109,12 +109,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-4.70570805 -1.76338733 -1.40230502 -1.23316045 -2.09832825]
-    [[-4.7057085]
-     [-1.7633872]
-     [-1.4023051]
-     [-1.2331595]
-     [-2.098329 ]]
+    [-1.80718178 -0.62177922 -1.2319368  -1.99045534 -1.34742024]
+    [[-1.8071811 ]
+     [-0.62177896]
+     [-1.2319357 ]
+     [-1.9904559 ]
+     [-1.3474205 ]]
 
 
 
@@ -157,7 +157,7 @@ Display the ONNX graph.
  .. code-block:: none
 
 
-    (-0.5, 4522.5, 8425.5, -0.5)
+    (-0.5, 4122.5, 8425.5, -0.5)
 
 
 
@@ -196,12 +196,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-4.70570805 -1.76338733 -1.40230502 -1.23316045 -2.09832825]
-    [[-4.7057085]
-     [-1.7633872]
-     [-1.4023051]
-     [-1.2331595]
-     [-2.098329 ]]
+    [-1.80718178 -0.62177922 -1.2319368  -1.99045534 -1.34742024]
+    [[-1.8071811 ]
+     [-0.62177896]
+     [-1.2319357 ]
+     [-1.9904559 ]
+     [-1.3474205 ]]
 
 
 
@@ -274,8 +274,8 @@ Processing time
 
  .. code-block:: none
 
-    0.3937872999999996
-    0.4142893000000001
+    0.37278230000000434
+    0.4418660999999986
 
 
 
@@ -353,8 +353,8 @@ a blacklisted operator (or only whitelisted operators),
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -362,7 +362,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  15.234 seconds)
+   **Total running time of the script:** ( 0 minutes  17.553 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:

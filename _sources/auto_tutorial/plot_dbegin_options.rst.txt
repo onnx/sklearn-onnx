@@ -209,8 +209,8 @@ what it would give with operator *ZipMap*.
             # inputs
             X = dict_inputs['X']
             (label, probability_tensor, ) = n0_linearclassifier(X)
-            (output_label, ) = n1_cast(label)
-            (probabilities, ) = n2_normalizer(probability_tensor)
+            (probabilities, ) = n1_normalizer(probability_tensor)
+            (output_label, ) = n2_cast(label)
             (output_probability, ) = n3_zipmap(probabilities)
             return {
                 'output_label': output_label,
@@ -686,7 +686,7 @@ supported options while running the conversion.
     CalibratedClassifierCV         {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     CategoricalNB                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     ComplementNB                   {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
-    CountVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False]}
+    CountVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False]}
     DecisionTreeClassifier         {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     DecisionTreeRegressor          {'decision_path': [True, False], 'decision_leaf': [True, False]}
     ExtraTreeClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
@@ -727,13 +727,14 @@ supported options while running the conversion.
     Scaler                         {'div': ['std', 'div', 'div_cast']}
     StackingClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
     TfidfTransformer               {'nan': [True, False]}
-    TfidfVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False]}
+    TfidfVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False]}
     VotingClassifier               {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     XGBoostXGBClassifier           {'nocl': [True, False], 'zipmap': [True, False, 'columns']}
     all options: ['decision_leaf',
      'decision_path',
      'div',
      'gemm',
+     'keep_empty_string',
      'nan',
      'nocl',
      'optim',
@@ -752,7 +753,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.566 seconds)
+   **Total running time of the script:** ( 0 minutes  2.410 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:

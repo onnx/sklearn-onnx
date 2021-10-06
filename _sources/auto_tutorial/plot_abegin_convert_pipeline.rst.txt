@@ -60,8 +60,8 @@ Training a pipeline
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
     # Train classifiers
-    reg1 = GradientBoostingRegressor(random_state=1)
-    reg2 = RandomForestRegressor(random_state=1)
+    reg1 = GradientBoostingRegressor(random_state=1, n_estimators=5)
+    reg2 = RandomForestRegressor(random_state=1, n_estimators=5)
     reg3 = LinearRegression()
 
     ereg = Pipeline(steps=[
@@ -82,9 +82,11 @@ Training a pipeline
 
     Pipeline(steps=[('voting',
                      VotingRegressor(estimators=[('gb',
-                                                  GradientBoostingRegressor(random_state=1)),
+                                                  GradientBoostingRegressor(n_estimators=5,
+                                                                            random_state=1)),
                                                  ('rf',
-                                                  RandomForestRegressor(random_state=1)),
+                                                  RandomForestRegressor(n_estimators=5,
+                                                                        random_state=1)),
                                                  ('lr', LinearRegression())]))])
 
 
@@ -145,12 +147,12 @@ The first example uses :epkg:`onnxruntime`.
  .. code-block:: none
 
 
-    (array([[166.29504],
-           [253.76959],
-           [169.9362 ],
-           [ 96.37031],
-           [168.69316]], dtype=float32), array([166.2950229 , 253.7695932 , 169.93619023,  96.37029936,
-           168.69315915]))
+    (array([[132.24834],
+           [102.03706],
+           [120.67598],
+           [129.68037],
+           [132.29285]], dtype=float32), array([132.24832785, 102.03706361, 120.67597103, 129.68036793,
+           132.29285035]))
 
 
 
@@ -189,7 +191,7 @@ Before deploying, we need to compare that both
 
  .. code-block:: none
 
-    (2.7174775595995015e-05, 1.2652636611296413e-07)
+    (2.590069337315981e-05, 1.9681231178107178e-07)
 
 
 
@@ -237,116 +239,16 @@ It uses module :epkg:`mlprodict`.
             # init: w0 (w0)
             # inputs
             X = dict_inputs['X']
-            (dpath10, ) = n0_treeensembleregressor(X)
-            (dpath15, ) = n1_treeensembleregressor(X)
-            (dpath11, ) = n2_treeensembleregressor(X)
-            (dpath14, ) = n3_treeensembleregressor(X)
-            (dpath12, ) = n4_treeensembleregressor(X)
-            (dpath13, ) = n5_treeensembleregressor(X)
-            (dpath19, ) = n6_treeensembleregressor(X)
-            (dpath17, ) = n7_treeensembleregressor(X)
-            (dpath16, ) = n8_treeensembleregressor(X)
-            (dpath23, ) = n9_treeensembleregressor(X)
-            (dpath18, ) = n10_treeensembleregressor(X)
-            (dpath21, ) = n11_treeensembleregressor(X)
-            (dpath20, ) = n12_treeensembleregressor(X)
-            (dpath22, ) = n13_treeensembleregressor(X)
-            (dpath27, ) = n14_treeensembleregressor(X)
-            (dpath24, ) = n15_treeensembleregressor(X)
-            (dpath26, ) = n16_treeensembleregressor(X)
-            (dpath25, ) = n17_treeensembleregressor(X)
-            (dpath28, ) = n18_treeensembleregressor(X)
-            (dpath36, ) = n19_treeensembleregressor(X)
-            (dpath29, ) = n20_treeensembleregressor(X)
-            (dpath32, ) = n21_treeensembleregressor(X)
-            (dpath30, ) = n22_treeensembleregressor(X)
-            (dpath31, ) = n23_treeensembleregressor(X)
-            (dpath38, ) = n24_treeensembleregressor(X)
-            (dpath33, ) = n25_treeensembleregressor(X)
-            (dpath34, ) = n26_treeensembleregressor(X)
-            (dpath35, ) = n27_treeensembleregressor(X)
-            (dpath43, ) = n28_treeensembleregressor(X)
-            (dpath37, ) = n29_treeensembleregressor(X)
-            (dpath39, ) = n30_treeensembleregressor(X)
-            (dpath40, ) = n31_treeensembleregressor(X)
-            (dpath42, ) = n32_treeensembleregressor(X)
-            (dpath41, ) = n33_treeensembleregressor(X)
-            (dpath45, ) = n34_treeensembleregressor(X)
-            (dpath44, ) = n35_treeensembleregressor(X)
-            (dpath47, ) = n36_treeensembleregressor(X)
-            (dpath48, ) = n37_treeensembleregressor(X)
-            (dpath46, ) = n38_treeensembleregressor(X)
-            (dpath92, ) = n39_treeensembleregressor(X)
-            (dpath49, ) = n40_treeensembleregressor(X)
-            (dpath94, ) = n41_treeensembleregressor(X)
-            (dpath96, ) = n42_treeensembleregressor(X)
-            (dpath95, ) = n43_treeensembleregressor(X)
-            (dpath98, ) = n44_treeensembleregressor(X)
-            (dpath99, ) = n45_treeensembleregressor(X)
-            (dpath97, ) = n46_treeensembleregressor(X)
-            (var_2, ) = n47_linearregressor(X)
-            (dpath52, ) = n48_treeensembleregressor(X)
-            (dpath53, ) = n49_treeensembleregressor(X)
-            (dpath54, ) = n50_treeensembleregressor(X)
-            (dpath60, ) = n51_treeensembleregressor(X)
-            (dpath56, ) = n52_treeensembleregressor(X)
-            (dpath55, ) = n53_treeensembleregressor(X)
-            (dpath61, ) = n54_treeensembleregressor(X)
-            (dpath57, ) = n55_treeensembleregressor(X)
-            (dpath58, ) = n56_treeensembleregressor(X)
-            (dpath59, ) = n57_treeensembleregressor(X)
-            (dpath62, ) = n58_treeensembleregressor(X)
-            (dpath70, ) = n59_treeensembleregressor(X)
-            (dpath68, ) = n60_treeensembleregressor(X)
-            (dpath63, ) = n61_treeensembleregressor(X)
-            (dpath64, ) = n62_treeensembleregressor(X)
-            (dpath65, ) = n63_treeensembleregressor(X)
-            (dpath66, ) = n64_treeensembleregressor(X)
-            (dpath67, ) = n65_treeensembleregressor(X)
-            (dpath69, ) = n66_treeensembleregressor(X)
-            (dpath72, ) = n67_treeensembleregressor(X)
-            (dpath71, ) = n68_treeensembleregressor(X)
-            (dpath74, ) = n69_treeensembleregressor(X)
-            (dpath75, ) = n70_treeensembleregressor(X)
-            (dpath73, ) = n71_treeensembleregressor(X)
-            (dpath79, ) = n72_treeensembleregressor(X)
-            (dpath78, ) = n73_treeensembleregressor(X)
-            (dpath76, ) = n74_treeensembleregressor(X)
-            (dpath77, ) = n75_treeensembleregressor(X)
-            (dpath84, ) = n76_treeensembleregressor(X)
-            (dpath80, ) = n77_treeensembleregressor(X)
-            (dpath82, ) = n78_treeensembleregressor(X)
-            (dpath81, ) = n79_treeensembleregressor(X)
-            (dpath86, ) = n80_treeensembleregressor(X)
-            (dpath83, ) = n81_treeensembleregressor(X)
-            (dpath88, ) = n82_treeensembleregressor(X)
-            (dpath85, ) = n83_treeensembleregressor(X)
-            (dpath87, ) = n84_treeensembleregressor(X)
-            (dpath89, ) = n85_treeensembleregressor(X)
-            (dpath90, ) = n86_treeensembleregressor(X)
-            (dpath91, ) = n87_treeensembleregressor(X)
-            (dpath1, ) = n88_treeensembleregressor(X)
-            (dpath2, ) = n89_treeensembleregressor(X)
-            (dpath6, ) = n90_treeensembleregressor(X)
-            (var_0, ) = n91_treeensembleregressor(X)
-            (dpath5, ) = n92_treeensembleregressor(X)
-            (var_1, ) = n93_treeensembleregressor(X)
-            (dpath0, ) = n94_treeensembleregressor(X)
-            (dpath3, ) = n95_treeensembleregressor(X)
-            (dpath7, ) = n96_treeensembleregressor(X)
-            (dpath93, ) = n97_treeensembleregressor(X)
-            (dpath9, ) = n98_treeensembleregressor(X)
-            (dpath4, ) = n99_treeensembleregressor(X)
-            (dpath8, ) = n100_treeensembleregressor(X)
-            (dpath50, ) = n101_treeensembleregressor(X)
-            (dpath51, ) = n102_treeensembleregressor(X)
-            (wvar_1, ) = n103_mul(var_1, w0)
-            (wvar_2, ) = n104_mul(var_2, w0)
-            (wvar_0, ) = n105_mul(var_0, w0)
-            (fvar_1, ) = n106_flatten(wvar_1)
-            (fvar_2, ) = n107_flatten(wvar_2)
-            (fvar_0, ) = n108_flatten(wvar_0)
-            (variable, ) = n109_sum(fvar_0, fvar_1, fvar_2)
+            (var_1, ) = n0_treeensembleregressor(X)
+            (var_2, ) = n1_linearregressor(X)
+            (var_0, ) = n2_treeensembleregressor(X)
+            (wvar_2, ) = n3_mul(var_2, w0)
+            (wvar_1, ) = n4_mul(var_1, w0)
+            (wvar_0, ) = n5_mul(var_0, w0)
+            (fvar_1, ) = n6_flatten(wvar_1)
+            (fvar_2, ) = n7_flatten(wvar_2)
+            (fvar_0, ) = n8_flatten(wvar_0)
+            (variable, ) = n9_sum(fvar_0, fvar_1, fvar_2)
             return {
                 'variable': variable,
             }
@@ -376,7 +278,7 @@ It works almost the same way.
 
  .. code-block:: none
 
-    (3.142323558336102e-05, 2.545409433600614e-07)
+    (2.590069337315981e-05, 1.8310987248532274e-07)
 
 
 
@@ -408,7 +310,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.335 seconds)
+   **Total running time of the script:** ( 0 minutes  2.432 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_abegin_convert_pipeline.py:

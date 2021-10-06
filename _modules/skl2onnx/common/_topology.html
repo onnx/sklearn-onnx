@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.9.3 documentation</title>
+    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.common._topology</a></li> 
@@ -96,11 +96,11 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">onnxconverter_common.topology</span> <span class="kn">import</span> <span class="n">OPSET_TO_IR_VERSION</span>
-    <span class="k">assert</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
     <span class="n">OPSET_TO_IR_VERSION</span> <span class="o">=</span> <span class="n">_default_OPSET_TO_IR_VERSION</span><span class="p">()</span>
 
-<span class="n">OPSET_ML_TO_OPSET</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">14</span><span class="p">}</span>
+<span class="n">OPSET_ML_TO_OPSET</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;skl2onnx&#39;</span><span class="p">)</span>
 
@@ -643,7 +643,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">naming</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param name: A string, the unique ID of this scope in a</span>
 <span class="sd">                     Topology object</span>
@@ -654,7 +654,15 @@
 <span class="sd">        :param custom_shape_calculators: a dictionary for specifying</span>
 <span class="sd">                                the user customized shape calculator</span>
 <span class="sd">        :param options: see :ref:`l-conv-options`</span>
+<span class="sd">        :param naming: the user may want to change the way intermediate</span>
+<span class="sd">            are named, this parameter can be a string (a prefix) or a</span>
+<span class="sd">            function, which signature is the following:</span>
+<span class="sd">            `get_name(name, existing_names)`, the library will then</span>
+<span class="sd">            check this name is unique and modify it if not</span>
 <span class="sd">        :param registered_models: registered models</span>
+
+<span class="sd">        .. versionchanged:: 1.10.0</span>
+<span class="sd">            Parameter *naming* was added.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -683,6 +691,21 @@
 
         <span class="c1"># Registered models</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="o">=</span> <span class="n">registered_models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">naming</span> <span class="o">=</span> <span class="n">naming</span>
+
+        <span class="k">if</span> <span class="n">naming</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_naming</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">naming</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_naming</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">seed</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">naming</span> <span class="o">+</span> <span class="n">seed</span><span class="p">,</span> <span class="n">names</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">naming</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_naming</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">seed</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">naming</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">names</span><span class="p">),</span> <span class="n">names</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Unexpected type for parameter naming: </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">naming</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
         <span class="s2">&quot;Returns variable with &#39;name&#39; or default value is not found.&quot;</span>
@@ -703,24 +726,28 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_shape_calculators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Scope.get_unique_variable_name"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Scope.get_unique_variable_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<div class="viewcode-block" id="Scope.get_unique_variable_name"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Scope.get_unique_variable_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a unique variable ID based on the given seed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Parameter seed must be a string not </span><span class="si">{}</span><span class="s2">.&quot;</span>
                             <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">seed</span><span class="p">)))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_naming</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span>
+                <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_variable_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">name</span></div>
 
 <div class="viewcode-block" id="Scope.get_unique_operator_name"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Scope.get_unique_operator_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_operator_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a unique operator ID based on the given seed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_operator_names</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_naming</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_operator_names</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">declare_local_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                               <span class="n">missing_type</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                               <span class="n">missing_type</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function may create a new variable in this scope. If</span>
 <span class="sd">        *raw_name* has been used to create other variables, the new</span>
@@ -730,7 +757,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Unknown type for </span><span class="si">%r</span><span class="s2"> (type=</span><span class="si">%r</span><span class="s2">).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
         <span class="c1"># Get unique ID for the new variable</span>
-        <span class="n">onnx_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="n">raw_name</span><span class="p">)</span>
+        <span class="n">onnx_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_variable_name</span><span class="p">(</span><span class="n">raw_name</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="n">rename</span><span class="p">)</span>
 
         <span class="c1"># Create the variable</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">raw_name</span><span class="p">,</span> <span class="n">onnx_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
@@ -769,13 +796,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">declare_local_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">declare_local_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls `declare_local_variable`. Registers this variable</span>
 <span class="sd">        as an input.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
-            <span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">prepend</span><span class="p">)</span>
+            <span class="n">raw_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="n">prepend</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="n">rename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">var</span>
 
@@ -970,7 +998,8 @@
     <span class="k">def</span> <span class="nf">get_unique_scope_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Topology</span><span class="o">.</span><span class="n">_generate_unique_name</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope_names</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">declare_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">declare_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">parent_scopes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">naming</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new :class:`Scope &lt;skl2onnx.common._topology.Scope&gt;`</span>
 <span class="sd">        and appends it to the list of existing scopes.</span>
@@ -981,13 +1010,14 @@
         <span class="n">scope</span> <span class="o">=</span> <span class="n">Scope</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_unique_scope_name</span><span class="p">(</span><span class="n">seed</span><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
             <span class="n">custom_shape_calculators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_shape_calculators</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">registered_models</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">)</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">registered_models</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">,</span>
+            <span class="n">naming</span><span class="o">=</span><span class="n">naming</span><span class="p">)</span>
 
         <span class="c1"># Declare input variables.</span>
         <span class="c1"># They should be the inputs of the scikit-learn</span>
         <span class="c1"># model you want to convert into ONNX.</span>
         <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">initial_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_types</span><span class="p">:</span>
-            <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_input</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">initial_type</span><span class="p">)</span>
+            <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_input</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">initial_type</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scope</span>
 
@@ -1436,11 +1466,18 @@
     <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 
     <span class="c1"># Update domain version</span>
-    <span class="n">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">)</span>
-
-    <span class="c1"># Add extra information</span>
     <span class="n">opv</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">onnx_target_opset</span><span class="p">,</span>
               <span class="n">_get_main_opset_version</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span> <span class="ow">or</span> <span class="n">onnx_target_opset</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">):</span>
+        <span class="c1"># Main opset was not added. Doing it here.</span>
+        <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">opv</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[convert_topology] +opset: name=</span><span class="si">%r</span><span class="s1">, version=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opv</span><span class="p">))</span>
+
+    <span class="c1"># Add extra information</span>
     <span class="n">irv</span> <span class="o">=</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">IR_VERSION</span><span class="p">)</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">irv</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer</span><span class="p">()</span>
@@ -1460,7 +1497,7 @@
     <span class="k">return</span> <span class="n">onnx_model</span></div>
 
 
-<span class="k">def</span> <span class="nf">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="c1"># Merge operator sets for the same domain, the largest version</span>
     <span class="c1"># number would be kept</span>
     <span class="n">purified_operator_set</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -1483,6 +1520,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Just create one ONNX element in opset_import</span>
             <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[_update_domain_version] +opset </span><span class="si">%d</span><span class="s1">: name=</span><span class="si">%r</span><span class="s1">, version=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">op_domain</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">op_version</span>
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1493,6 +1533,7 @@
                 <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">container</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">),</span>
                     <span class="n">op_version</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span> <span class="ow">in</span> <span class="n">purified_operator_set</span>
 
 
 <span class="k">def</span> <span class="nf">_get_main_opset_version</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
@@ -1543,7 +1584,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.
   </div>
   
   </body>

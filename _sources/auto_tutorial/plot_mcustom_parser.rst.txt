@@ -224,12 +224,13 @@ The registration needs to declare the parser as well.
 
 And conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-181
+.. GENERATED FROM PYTHON SOURCE LINES 159-182
 
 .. code-block:: default
 
 
-    onx = to_onnx(dec, X.astype(numpy.float32))
+    onx = to_onnx(dec, X.astype(numpy.float32),
+                  target_opset=14)
 
     sess = InferenceSession(onx.SerializeToString())
 
@@ -266,11 +267,11 @@ And conversion.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-183
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 It works. The final looks like the following.
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-187
+.. GENERATED FROM PYTHON SOURCE LINES 184-188
 
 .. code-block:: default
 
@@ -306,12 +307,12 @@ It works. The final looks like the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-190
+.. GENERATED FROM PYTHON SOURCE LINES 189-191
 
 Final graph
 +++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-194
+.. GENERATED FROM PYTHON SOURCE LINES 191-195
 
 .. code-block:: default
 
@@ -333,7 +334,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.436 seconds)
+   **Total running time of the script:** ( 0 minutes  0.652 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:

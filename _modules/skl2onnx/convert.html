@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.convert &#8212; sklearn-onnx 1.9.3 documentation</title>
+    <title>skl2onnx.convert &#8212; sklearn-onnx 1.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx.convert</a></li> 
@@ -66,7 +66,7 @@
                     <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">naming</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function produces an equivalent</span>
 <span class="sd">    ONNX model of the given scikit-learn model.</span>
@@ -107,7 +107,7 @@
 <span class="sd">    :param options: specific options given to converters</span>
 <span class="sd">        (see :ref:`l-conv-options`)</span>
 <span class="sd">    :param intermediate: if True, the function returns the</span>
-<span class="sd">        converted model and , and :class:`Topology`,</span>
+<span class="sd">        converted model and the instance of :class:`Topology` used,</span>
 <span class="sd">        it returns the converted model otherwise</span>
 <span class="sd">    :param white_op: white list of ONNX nodes allowed</span>
 <span class="sd">        while converting a pipeline,</span>
@@ -122,6 +122,11 @@
 <span class="sd">        now inferred from input types,</span>
 <span class="sd">        converters may add operators Cast to switch</span>
 <span class="sd">        to double when it is necessary</span>
+<span class="sd">    :param naming: the user may want to change the way intermediate</span>
+<span class="sd">        are named, this parameter can be a string (a prefix) or a</span>
+<span class="sd">        function, which signature is the following:</span>
+<span class="sd">        `get_name(name, existing_names)`, the library will then</span>
+<span class="sd">        check this name is unique and modify it if not</span>
 <span class="sd">    :param verbose: display progress while converting a model</span>
 <span class="sd">    :return: An ONNX model (type: ModelProto) which is</span>
 <span class="sd">        equivalent to the input scikit-learn model</span>
@@ -190,11 +195,8 @@
 
 <span class="sd">    It is used in example :ref:`l-example-tfidfvectorizer`.</span>
 
-<span class="sd">    .. versionchanged:: 1.7</span>
-<span class="sd">        Parameter `target_opset`, if not specified, is now set to</span>
-<span class="sd">        the latest tested opset returned by</span>
-<span class="sd">        :py:func:`skl2onnx.get_latest_tested_opset_version` and</span>
-<span class="sd">        not the version of the *onnx* package.</span>
+<span class="sd">    .. versionchanged:: 1.10.0</span>
+<span class="sd">        Parameter *naming* was added.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">initial_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;infer_initial_types&#39;</span><span class="p">):</span>
@@ -221,7 +223,7 @@
         <span class="n">model</span><span class="p">,</span> <span class="n">initial_types</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">,</span> <span class="n">custom_conversion_functions</span><span class="p">,</span>
         <span class="n">custom_shape_calculators</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
         <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span>
-        <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">)</span>
+        <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">,</span> <span class="n">naming</span><span class="o">=</span><span class="n">naming</span><span class="p">)</span>
 
     <span class="c1"># Convert our Topology object into ONNX. The outcome is an ONNX model.</span>
     <span class="n">options</span> <span class="o">=</span> <span class="n">_process_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
@@ -240,7 +242,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---OUTPUTS---&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">scope</span><span class="o">.</span><span class="n">output_variables</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">inp</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---VARIABLESS---&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---VARIABLES---&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%r</span><span class="s2">: is.fed=</span><span class="si">%r</span><span class="s2"> is_leaf=</span><span class="si">%r</span><span class="s2"> - </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">is_fed</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
@@ -255,7 +257,7 @@
 <div class="viewcode-block" id="to_onnx"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.to_onnx">[docs]</a><span class="k">def</span> <span class="nf">to_onnx</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">naming</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calls :func:`convert_sklearn` with simplified parameters.</span>
 
@@ -278,12 +280,20 @@
 <span class="sd">    :param dtype: removed in version 1.7.5, dtype is now inferred from</span>
 <span class="sd">        input types, converters may add operators Cast to switch to</span>
 <span class="sd">        double when it is necessary</span>
+<span class="sd">    :param naming: the user may want to change the way intermediate</span>
+<span class="sd">        are named, this parameter can be a string (a prefix) or a</span>
+<span class="sd">        function, which signature is the following:</span>
+<span class="sd">        `get_name(name, existing_names)`, the library will then</span>
+<span class="sd">        check this name is unique and modify it if not</span>
 <span class="sd">    :param verbose: display progress while converting a model</span>
 <span class="sd">    :return: converted model</span>
 
 <span class="sd">    This function checks if the model inherits from class</span>
 <span class="sd">    :class:`OnnxOperatorMixin`, it calls method *to_onnx*</span>
 <span class="sd">    in that case otherwise it calls :func:`convert_sklearn`.</span>
+
+<span class="sd">    .. versionchanged:: 1.10.0</span>
+<span class="sd">        Parameter *naming* was added.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">.algebra.onnx_operator_mixin</span> <span class="kn">import</span> <span class="n">OnnxOperatorMixin</span>
     <span class="kn">from</span> <span class="nn">.algebra.type_helper</span> <span class="kn">import</span> <span class="n">guess_initial_types</span>
@@ -301,7 +311,7 @@
                            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
                            <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span>
                            <span class="n">final_types</span><span class="o">=</span><span class="n">final_types</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                           <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+                           <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">naming</span><span class="o">=</span><span class="n">naming</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">wrap_as_onnx_mixin</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -354,7 +364,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.
   </div>
   
   </body>

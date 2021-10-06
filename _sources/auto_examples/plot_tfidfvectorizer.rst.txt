@@ -301,7 +301,7 @@ Predictions with onnxruntime.
     --- [" Re: Jews can't hide from keith@cco."
      'Deletions...\n\nSo, you consider the german poster\'s remark anti-semitic?  Perhaps you\nimply that anyone in Germany who doesn\'t agree with israely policy in a\nnazi?  Pray tell, how does it even qualify as "casual anti-semitism"? \nIf the term doesn\'t apply, why then bring it up?\n\nYour own bigotry is shining through.  \n-- ']
     predict [1]
-    predict_proba [{0: 0.44015905261039734, 1: 0.559840977191925}]
+    predict_proba [{0: 0.44127386808395386, 1: 0.5587261319160461}]
 
 
 
@@ -328,7 +328,7 @@ With *scikit-learn*:
  .. code-block:: none
 
     [0]
-    [[0.71316215 0.28683785]]
+    [[0.72029994 0.27970006]]
 
 
 
@@ -387,7 +387,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.369 seconds)
+   **Total running time of the script:** ( 0 minutes  11.452 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tfidfvectorizer.py:

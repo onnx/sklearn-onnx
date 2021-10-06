@@ -193,9 +193,9 @@ Benchmarks
  .. code-block:: none
 
     scikit-learn
-    1.8055763999999996
+    1.3538506000000012
     onnxruntime
-    0.23826789999999676
+    0.26353360000000237
 
 
 
@@ -257,14 +257,14 @@ an smaller ONNX graph for every operator.
 
     benchmark <class 'sklearn.decomposition._pca.PCA'>
     scikit-learn
-    0.4197664000000003
+    0.47544010000000014
     onnxruntime
-    0.16810600000000164
+    0.16953529999999972
     benchmark <class 'sklearn.linear_model._logistic.LogisticRegression'>
     scikit-learn
-    0.654744700000002
+    0.7435674000000034
     onnxruntime
-    0.30042100000000005
+    0.21799099999999783
 
 
 
@@ -296,8 +296,8 @@ an smaller ONNX graph for every operator.
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -305,7 +305,7 @@ an smaller ONNX graph for every operator.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.975 seconds)
+   **Total running time of the script:** ( 0 minutes  3.669 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_pipeline.py:
