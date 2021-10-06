@@ -363,9 +363,9 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [1 1 1 1 0]
-    predict_proba [[0.28389157 0.71610843]
-     [0.41386237 0.58613763]]
+    predict [0 1 0 0 0]
+    predict_proba [[0.61651047 0.38348953]
+     [0.19828404 0.80171596]]
 
 
 
@@ -425,8 +425,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [1 1 1 1 0]
-    predict_proba [{0: 0.28389155864715576, 1: 0.7161084413528442}, {0: 0.41386234760284424, 1: 0.5861376523971558}]
+    predict [0 1 0 0 0]
+    predict_proba [{0: 0.6165104508399963, 1: 0.38348954916000366}, {0: 0.1982840597629547, 1: 0.8017159700393677}]
 
 
 
@@ -463,9 +463,9 @@ an additional option zipmap.
 
  .. code-block:: none
 
-    predict [1 1 1 1 0]
-    predict_proba [[0.28389156 0.71610844]
-     [0.41386235 0.58613765]]
+    predict [0 1 0 0 0]
+    predict_proba [[0.61651045 0.38348955]
+     [0.19828406 0.80171597]]
 
 
 
@@ -531,7 +531,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 5924.5, 6812.5, -0.5)
+    (-0.5, 5891.5, 6812.5, -0.5)
 
 
 
@@ -562,8 +562,8 @@ Finally, let's see the graph converted with *sklearn-onnx*.
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -571,7 +571,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.552 seconds)
+   **Total running time of the script:** ( 0 minutes  12.106 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:

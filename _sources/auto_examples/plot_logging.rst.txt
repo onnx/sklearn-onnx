@@ -109,7 +109,7 @@ Convert a model into ONNX
 
  .. code-block:: none
 
-    [2 2 1 2 2 0 2 1 0 1 0 0 0 0 2 2 0 2 0 2 1 0 2 2 0 1 2 0 2 2 1 1 2 1 1 2 2
+    [0 0 2 0 0 2 1 0 1 1 0 2 2 1 1 1 0 2 2 1 1 0 0 0 0 2 1 2 0 2 1 1 2 1 1 1 0
      2]
 
 
@@ -152,11 +152,13 @@ is reserved for information within converters.
     [convert_operators] iteration 2 - n_vars=5 n_ops=2
     [convert_operators] end iter: 2 - n_vars=5
     [convert_operators] end.
+    [_update_domain_version] +opset 0: name='ai.onnx.ml', version=1
+    [_update_domain_version] +opset 1: name='', version=9
     [convert_sklearn] end
 
-    ir_version: 4
+    ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.9.3"
+    producer_version: "1.10.0"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -181,6 +183,21 @@ is reserved for information within converters.
           ints: 0
           ints: 1
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
           type: INTS
         }
         attribute {
@@ -191,16 +208,46 @@ is reserved for information within converters.
           ints: 4
           ints: 4
           ints: 4
-          ints: 5
-          ints: 5
-          ints: 5
           ints: 6
           ints: 6
           ints: 6
+          ints: 7
+          ints: 7
+          ints: 7
+          ints: 10
+          ints: 10
+          ints: 10
+          ints: 13
+          ints: 13
+          ints: 13
+          ints: 14
+          ints: 14
+          ints: 14
+          ints: 15
+          ints: 15
+          ints: 15
+          ints: 16
+          ints: 16
+          ints: 16
           type: INTS
         }
         attribute {
           name: "class_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -224,6 +271,21 @@ is reserved for information within converters.
           floats: 1.0
           floats: 0.0
           floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
           floats: 0.0
           floats: 1.0
           floats: 0.0
@@ -242,8 +304,18 @@ is reserved for information within converters.
           name: "nodes_falsenodeids"
           ints: 2
           ints: 0
-          ints: 6
+          ints: 8
           ints: 5
+          ints: 0
+          ints: 7
+          ints: 0
+          ints: 0
+          ints: 16
+          ints: 11
+          ints: 0
+          ints: 15
+          ints: 14
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -253,8 +325,18 @@ is reserved for information within converters.
           name: "nodes_featureids"
           ints: 3
           ints: 0
+          ints: 2
+          ints: 3
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 3
           ints: 2
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -262,6 +344,16 @@ is reserved for information within converters.
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
           floats: 1.0
           floats: 1.0
           floats: 1.0
@@ -280,6 +372,16 @@ is reserved for information within converters.
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
@@ -288,6 +390,16 @@ is reserved for information within converters.
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
@@ -302,10 +414,30 @@ is reserved for information within converters.
           ints: 4
           ints: 5
           ints: 6
+          ints: 7
+          ints: 8
+          ints: 9
+          ints: 10
+          ints: 11
+          ints: 12
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -322,16 +454,36 @@ is reserved for information within converters.
           ints: 3
           ints: 4
           ints: 0
+          ints: 6
+          ints: 0
+          ints: 0
+          ints: 9
+          ints: 10
+          ints: 0
+          ints: 12
+          ints: 13
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_values"
-          floats: 0.800000011920929
+          floats: 0.75
           floats: 0.0
-          floats: 1.649999976158142
-          floats: 5.0
+          floats: 4.849999904632568
+          floats: 1.6999999284744263
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 0.0
+          floats: 0.0
+          floats: 1.6999999284744263
+          floats: 4.949999809265137
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 2.450000047683716
+          floats: 0.0
           floats: 0.0
           floats: 0.0
           floats: 0.0
@@ -370,7 +522,7 @@ is reserved for information within converters.
         }
         domain: ""
       }
-      name: "74db031649f54fb8b5b0b8b0aef98c8e"
+      name: "caef12e66e7d4567a58c890d06079e42"
       input {
         name: "float_input"
         type {
@@ -417,12 +569,12 @@ is reserved for information within converters.
       }
     }
     opset_import {
-      domain: ""
-      version: 9
-    }
-    opset_import {
       domain: "ai.onnx.ml"
       version: 1
+    }
+    opset_import {
+      domain: ""
+      version: 9
     }
 
 
@@ -508,9 +660,9 @@ implemented.
     DEBUG:skl2onnx:[Var] update is_fed=True for Variable('output_label', 'output_label', type=Int64TensorType(shape=[None])), parent=Operator(type='SklearnZipMap', onnx_name='SklearnZipMap', inputs='label,probabilities', outputs='output_label,output_probability', raw_operator=None)
     DEBUG:skl2onnx:[Var] update is_fed=True for Variable('output_probability', 'output_probability', type=SequenceType(element_type=DictionaryType(key_type=Int64TensorType(shape=[None]), value_type=FloatTensorType(shape=[])))), parent=Operator(type='SklearnZipMap', onnx_name='SklearnZipMap', inputs='label,probabilities', outputs='output_label,output_probability', raw_operator=None)
 
-    ir_version: 4
+    ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.9.3"
+    producer_version: "1.10.0"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -535,6 +687,21 @@ implemented.
           ints: 0
           ints: 1
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
           type: INTS
         }
         attribute {
@@ -545,16 +712,46 @@ implemented.
           ints: 4
           ints: 4
           ints: 4
-          ints: 5
-          ints: 5
-          ints: 5
           ints: 6
           ints: 6
           ints: 6
+          ints: 7
+          ints: 7
+          ints: 7
+          ints: 10
+          ints: 10
+          ints: 10
+          ints: 13
+          ints: 13
+          ints: 13
+          ints: 14
+          ints: 14
+          ints: 14
+          ints: 15
+          ints: 15
+          ints: 15
+          ints: 16
+          ints: 16
+          ints: 16
           type: INTS
         }
         attribute {
           name: "class_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -578,6 +775,21 @@ implemented.
           floats: 1.0
           floats: 0.0
           floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
           floats: 0.0
           floats: 1.0
           floats: 0.0
@@ -596,8 +808,18 @@ implemented.
           name: "nodes_falsenodeids"
           ints: 2
           ints: 0
-          ints: 6
+          ints: 8
           ints: 5
+          ints: 0
+          ints: 7
+          ints: 0
+          ints: 0
+          ints: 16
+          ints: 11
+          ints: 0
+          ints: 15
+          ints: 14
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -607,8 +829,18 @@ implemented.
           name: "nodes_featureids"
           ints: 3
           ints: 0
+          ints: 2
+          ints: 3
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 3
           ints: 2
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -616,6 +848,16 @@ implemented.
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
           floats: 1.0
           floats: 1.0
           floats: 1.0
@@ -634,6 +876,16 @@ implemented.
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
@@ -642,6 +894,16 @@ implemented.
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
@@ -656,10 +918,30 @@ implemented.
           ints: 4
           ints: 5
           ints: 6
+          ints: 7
+          ints: 8
+          ints: 9
+          ints: 10
+          ints: 11
+          ints: 12
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -676,16 +958,36 @@ implemented.
           ints: 3
           ints: 4
           ints: 0
+          ints: 6
+          ints: 0
+          ints: 0
+          ints: 9
+          ints: 10
+          ints: 0
+          ints: 12
+          ints: 13
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_values"
-          floats: 0.800000011920929
+          floats: 0.75
           floats: 0.0
-          floats: 1.649999976158142
-          floats: 5.0
+          floats: 4.849999904632568
+          floats: 1.6999999284744263
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 0.0
+          floats: 0.0
+          floats: 1.6999999284744263
+          floats: 4.949999809265137
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 2.450000047683716
+          floats: 0.0
           floats: 0.0
           floats: 0.0
           floats: 0.0
@@ -695,20 +997,6 @@ implemented.
           name: "post_transform"
           s: "NONE"
           type: STRING
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "probabilities"
-        output: "output_probability"
-        name: "ZipMap"
-        op_type: "ZipMap"
-        attribute {
-          name: "classlabels_int64s"
-          ints: 0
-          ints: 1
-          ints: 2
-          type: INTS
         }
         domain: "ai.onnx.ml"
       }
@@ -724,7 +1012,21 @@ implemented.
         }
         domain: ""
       }
-      name: "ae8f198d30014bed883d6e4ddc37203a"
+      node {
+        input: "probabilities"
+        output: "output_probability"
+        name: "ZipMap"
+        op_type: "ZipMap"
+        attribute {
+          name: "classlabels_int64s"
+          ints: 0
+          ints: 1
+          ints: 2
+          type: INTS
+        }
+        domain: "ai.onnx.ml"
+      }
+      name: "3b60dfd0f083491d9eb99cda58668d04"
       input {
         name: "float_input"
         type {
@@ -771,12 +1073,12 @@ implemented.
       }
     }
     opset_import {
-      domain: ""
-      version: 9
-    }
-    opset_import {
       domain: "ai.onnx.ml"
       version: 1
+    }
+    opset_import {
+      domain: ""
+      version: 9
     }
 
 
@@ -808,9 +1110,9 @@ And to disable it.
  .. code-block:: none
 
 
-    ir_version: 4
+    ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.9.3"
+    producer_version: "1.10.0"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -835,6 +1137,21 @@ And to disable it.
           ints: 0
           ints: 1
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
           type: INTS
         }
         attribute {
@@ -845,16 +1162,46 @@ And to disable it.
           ints: 4
           ints: 4
           ints: 4
-          ints: 5
-          ints: 5
-          ints: 5
           ints: 6
           ints: 6
           ints: 6
+          ints: 7
+          ints: 7
+          ints: 7
+          ints: 10
+          ints: 10
+          ints: 10
+          ints: 13
+          ints: 13
+          ints: 13
+          ints: 14
+          ints: 14
+          ints: 14
+          ints: 15
+          ints: 15
+          ints: 15
+          ints: 16
+          ints: 16
+          ints: 16
           type: INTS
         }
         attribute {
           name: "class_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -878,6 +1225,21 @@ And to disable it.
           floats: 1.0
           floats: 0.0
           floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 1.0
+          floats: 0.0
+          floats: 0.0
           floats: 0.0
           floats: 1.0
           floats: 0.0
@@ -896,8 +1258,18 @@ And to disable it.
           name: "nodes_falsenodeids"
           ints: 2
           ints: 0
-          ints: 6
+          ints: 8
           ints: 5
+          ints: 0
+          ints: 7
+          ints: 0
+          ints: 0
+          ints: 16
+          ints: 11
+          ints: 0
+          ints: 15
+          ints: 14
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -907,8 +1279,18 @@ And to disable it.
           name: "nodes_featureids"
           ints: 3
           ints: 0
+          ints: 2
+          ints: 3
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 3
           ints: 2
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -916,6 +1298,16 @@ And to disable it.
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
+          floats: 1.0
           floats: 1.0
           floats: 1.0
           floats: 1.0
@@ -934,6 +1326,16 @@ And to disable it.
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
@@ -942,6 +1344,16 @@ And to disable it.
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
@@ -956,10 +1368,30 @@ And to disable it.
           ints: 4
           ints: 5
           ints: 6
+          ints: 7
+          ints: 8
+          ints: 9
+          ints: 10
+          ints: 11
+          ints: 12
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -976,16 +1408,36 @@ And to disable it.
           ints: 3
           ints: 4
           ints: 0
+          ints: 6
+          ints: 0
+          ints: 0
+          ints: 9
+          ints: 10
+          ints: 0
+          ints: 12
+          ints: 13
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_values"
-          floats: 0.800000011920929
+          floats: 0.75
           floats: 0.0
-          floats: 1.649999976158142
-          floats: 5.0
+          floats: 4.849999904632568
+          floats: 1.6999999284744263
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 0.0
+          floats: 0.0
+          floats: 1.6999999284744263
+          floats: 4.949999809265137
+          floats: 0.0
+          floats: 6.049999713897705
+          floats: 2.450000047683716
+          floats: 0.0
           floats: 0.0
           floats: 0.0
           floats: 0.0
@@ -995,20 +1447,6 @@ And to disable it.
           name: "post_transform"
           s: "NONE"
           type: STRING
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "probabilities"
-        output: "output_probability"
-        name: "ZipMap"
-        op_type: "ZipMap"
-        attribute {
-          name: "classlabels_int64s"
-          ints: 0
-          ints: 1
-          ints: 2
-          type: INTS
         }
         domain: "ai.onnx.ml"
       }
@@ -1024,7 +1462,21 @@ And to disable it.
         }
         domain: ""
       }
-      name: "ab92d469529b43a691d8c9f2018fa7b9"
+      node {
+        input: "probabilities"
+        output: "output_probability"
+        name: "ZipMap"
+        op_type: "ZipMap"
+        attribute {
+          name: "classlabels_int64s"
+          ints: 0
+          ints: 1
+          ints: 2
+          type: INTS
+        }
+        domain: "ai.onnx.ml"
+      }
+      name: "a8c75161144d462086d565d05a9e4e44"
       input {
         name: "float_input"
         type {
@@ -1071,12 +1523,12 @@ And to disable it.
       }
     }
     opset_import {
-      domain: ""
-      version: 9
-    }
-    opset_import {
       domain: "ai.onnx.ml"
       version: 1
+    }
+    opset_import {
+      domain: ""
+      version: 9
     }
 
 
@@ -1109,8 +1561,8 @@ And to disable it.
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -1118,7 +1570,7 @@ And to disable it.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.173 seconds)
+   **Total running time of the script:** ( 0 minutes  0.250 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_logging.py:

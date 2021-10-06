@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx._supported_operators &#8212; sklearn-onnx 1.9.3 documentation</title>
+    <title>skl2onnx._supported_operators &#8212; sklearn-onnx 1.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/readable.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.9.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../skl2onnx.html" accesskey="U">skl2onnx</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">skl2onnx._supported_operators</a></li> 
@@ -82,8 +82,23 @@
     <span class="n">RANSACRegressor</span><span class="p">,</span>
     <span class="n">Ridge</span><span class="p">,</span> <span class="n">RidgeCV</span><span class="p">,</span>
     <span class="n">SGDRegressor</span><span class="p">,</span>
-    <span class="n">TheilSenRegressor</span><span class="p">,</span>
+    <span class="n">TheilSenRegressor</span>
 <span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">QuantileRegressor</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># available since sklearn&gt;=1.0</span>
+    <span class="n">QuantileRegressor</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">PoissonRegressor</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># available since sklearn&gt;=0.23</span>
+    <span class="n">PoissonRegressor</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">TweedieRegressor</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># available since sklearn&gt;=0.23</span>
+    <span class="n">TweedieRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVR</span>
 <span class="kn">from</span> <span class="nn">sklearn.discriminant_analysis</span> <span class="kn">import</span> <span class="n">LinearDiscriminantAnalysis</span>
 
@@ -102,7 +117,7 @@
     <span class="n">ExtraTreesClassifier</span><span class="p">,</span> <span class="n">ExtraTreesRegressor</span><span class="p">,</span>
     <span class="n">GradientBoostingClassifier</span><span class="p">,</span> <span class="n">GradientBoostingRegressor</span><span class="p">,</span>
     <span class="n">IsolationForest</span><span class="p">,</span>
-    <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">,</span>
+    <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">,</span> <span class="n">RandomTreesEmbedding</span><span class="p">,</span>
     <span class="n">VotingClassifier</span>
 <span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
@@ -396,12 +411,14 @@
         <span class="n">PCA</span><span class="p">,</span>
         <span class="n">PLSRegression</span><span class="p">,</span>
         <span class="n">Pipeline</span><span class="p">,</span>
+        <span class="n">PoissonRegressor</span><span class="p">,</span>
         <span class="n">PolynomialFeatures</span><span class="p">,</span>
         <span class="n">PowerTransformer</span><span class="p">,</span>
         <span class="n">RadiusNeighborsClassifier</span><span class="p">,</span>
         <span class="n">RadiusNeighborsRegressor</span><span class="p">,</span>
         <span class="n">RandomForestClassifier</span><span class="p">,</span>
         <span class="n">RandomForestRegressor</span><span class="p">,</span>
+        <span class="n">RandomTreesEmbedding</span><span class="p">,</span>
         <span class="n">RANSACRegressor</span><span class="p">,</span>
         <span class="n">ReplaceTransformer</span><span class="p">,</span>
         <span class="n">RFE</span><span class="p">,</span>
@@ -422,6 +439,7 @@
         <span class="n">TfidfVectorizer</span><span class="p">,</span>
         <span class="n">TfidfTransformer</span><span class="p">,</span>
         <span class="n">TruncatedSVD</span><span class="p">,</span>
+        <span class="n">TweedieRegressor</span><span class="p">,</span>
         <span class="n">VarianceThreshold</span><span class="p">,</span>
         <span class="n">VotingClassifier</span><span class="p">,</span>
         <span class="n">VotingRegressor</span><span class="p">,</span>
@@ -454,6 +472,7 @@
         <span class="n">PassiveAggressiveClassifier</span><span class="p">:</span> <span class="s1">&#39;SklearnSGDClassifier&#39;</span><span class="p">,</span>
         <span class="n">PassiveAggressiveRegressor</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
         <span class="n">Perceptron</span><span class="p">:</span> <span class="s1">&#39;SklearnSGDClassifier&#39;</span><span class="p">,</span>
+        <span class="n">QuantileRegressor</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
         <span class="n">Ridge</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
         <span class="n">RidgeCV</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearRegressor&#39;</span><span class="p">,</span>
         <span class="n">RidgeClassifier</span><span class="p">:</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
@@ -590,7 +609,7 @@
     </div>
   <div class="footer">
     &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.
   </div>
   
   </body>

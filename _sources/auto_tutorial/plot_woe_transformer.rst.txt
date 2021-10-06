@@ -521,7 +521,7 @@ onehot=False
 
 onehot=True
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-131
+.. GENERATED FROM PYTHON SOURCE LINES 118-132
 
 .. code-block:: default
 
@@ -541,6 +541,7 @@ onehot=True
 
 
 
+
 .. image:: /auto_tutorial/images/sphx_glr_plot_woe_transformer_002.png
     :alt: plot woe transformer
     :class: sphx-glr-single-img
@@ -557,10 +558,158 @@ onehot=True
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 133-138
+
+Half-line
++++++++++
+
+An interval may have only one extremity defined and the other
+can be infinite.
+
+.. GENERATED FROM PYTHON SOURCE LINES 138-150
+
+.. code-block:: default
+
+
+    intervals = [
+        [(-np.inf, 3., True, True),
+         (5., np.inf, True, True)]]
+    weights = [[55, 107]]
+
+    woe1 = WOETransformer(intervals, onehot=False, weights=weights)
+    woe1.fit(X)
+    prd = woe1.transform(X)
+    df = pd.DataFrame({'X': X.ravel(), 'woe': prd.ravel()})
+    df
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X</th>
+          <th>woe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.0</td>
+          <td>55.0</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1.0</td>
+          <td>55.0</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>2.0</td>
+          <td>55.0</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>3.0</td>
+          <td>55.0</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>4.0</td>
+          <td>0.0</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>5.0</td>
+          <td>107.0</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>6.0</td>
+          <td>107.0</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>7.0</td>
+          <td>107.0</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>8.0</td>
+          <td>107.0</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>9.0</td>
+          <td>107.0</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
+
+And the conversion to ONNX using the same instruction.
+
+.. GENERATED FROM PYTHON SOURCE LINES 152-156
+
+.. code-block:: default
+
+
+    onxinf = to_onnx(woe1, X)
+    sess = InferenceSession(onxinf.SerializeToString())
+    print(sess.run(None, {'X': X})[0])
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[ 55.]
+     [ 55.]
+     [ 55.]
+     [ 55.]
+     [  0.]
+     [107.]
+     [107.]
+     [107.]
+     [107.]
+     [107.]]
+
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.808 seconds)
+   **Total running time of the script:** ( 0 minutes  4.471 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_woe_transformer.py:

@@ -384,8 +384,8 @@ needed to *replay* the prediction of the model.
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -393,7 +393,7 @@ needed to *replay* the prediction of the model.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.435 seconds)
+   **Total running time of the script:** ( 0 minutes  0.559 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_investigate_pipeline.py:

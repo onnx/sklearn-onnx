@@ -323,8 +323,8 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 0 1 0 0]
-    predict_proba [[0.60693515 0.39306485]]
+    predict [0 0 0 1 1]
+    predict_proba [[0.58055198 0.41944802]]
 
 
 
@@ -385,8 +385,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 0 1 0 0]
-    predict_proba [{0: 0.6179035902023315, 1: 0.38209637999534607}]
+    predict [0 0 0 1 1]
+    predict_proba [{0: 0.7925621271133423, 1: 0.20743787288665771}]
 
 
 
@@ -420,17 +420,17 @@ Let's see first the list of intermediate output.
 
  .. code-block:: none
 
+    age_cast
     embarkedout
     pclassout
     sexout
     fare_cast
-    age_cast
-    concat_result
     merged_columns
+    concat_result
     variable
     variable2
-    variable1
     variable2_cast
+    variable1
     variable1_cast
     transformed_column
     label
@@ -470,7 +470,7 @@ Let's look into the numerical pipeline first.
  .. code-block:: none
 
 
-    b'\x08\x06\x12\x08skl2onnx\x1a\x051.9.3"\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=\x95\x12\xeaA=e\xe8\x08B\xa0\x01\x06*\x14\n\x05scale=\xee0\xa0==\xe94\x97<\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01'
+    b'\x08\x07\x12\x08skl2onnx\x1a\x061.10.0"\x07ai.onnx(\x002\x00:\xae\x04\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=\x9c\xce\xe7A=\xcd\xd6\x03B\xa0\x01\x06*\x14\n\x05scale=\xb55\x9f==\xa2\x7f\xa0<\xa0\x01\x06:\nai.onnx.ml\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xdcA=gDgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\nD\n\x08age_cast\n\tfare_cast\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n+\n\x04fare\x12\tfare_cast\x1a\x05Cast1"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\n(\n\x03age\x12\x08age_cast\x1a\x04Cast"\x04Cast*\t\n\x02to\x18\x01\xa0\x01\x02:\x00\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x0e\n\nai.onnx.ml\x10\x01B\x04\n\x00\x10\x0b'
 
 
 
@@ -497,7 +497,7 @@ Let's compute the numerical features.
 
  .. code-block:: none
 
-    numerical features [[-2.2103775   0.08810027]]
+    numerical features [[-0.6977776 -0.5041984]]
 
 
 
@@ -528,13 +528,25 @@ We do the same for the textual features.
 
  .. code-block:: none
 
-    ir_version: 6
+    ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.9.3"
+    producer_version: "1.10.0"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
     graph {
+      node {
+        input: "age"
+        output: "age_cast"
+        name: "Cast"
+        op_type: "Cast"
+        attribute {
+          name: "to"
+          i: 1
+          type: INT
+        }
+        domain: ""
+      }
       node {
         input: "embarked"
         output: "embarkedout"
@@ -605,12 +617,13 @@ We do the same for the textual features.
         domain: ""
       }
       node {
-        input: "age"
-        output: "age_cast"
-        name: "Cast"
-        op_type: "Cast"
+        input: "age_cast"
+        input: "fare_cast"
+        output: "merged_columns"
+        name: "Concat"
+        op_type: "Concat"
         attribute {
-          name: "to"
+          name: "axis"
           i: 1
           type: INT
         }
@@ -631,26 +644,13 @@ We do the same for the textual features.
         domain: ""
       }
       node {
-        input: "age_cast"
-        input: "fare_cast"
-        output: "merged_columns"
-        name: "Concat"
-        op_type: "Concat"
-        attribute {
-          name: "axis"
-          i: 1
-          type: INT
-        }
-        domain: ""
-      }
-      node {
         input: "merged_columns"
         output: "variable"
         name: "Imputer"
         op_type: "Imputer"
         attribute {
           name: "imputed_value_floats"
-          floats: 28.0
+          floats: 27.5
           floats: 14.45419979095459
           type: FLOATS
         }
@@ -670,25 +670,6 @@ We do the same for the textual features.
         domain: ""
       }
       node {
-        input: "variable"
-        output: "variable1"
-        name: "Scaler"
-        op_type: "Scaler"
-        attribute {
-          name: "offset"
-          floats: 29.25907325744629
-          floats: 34.22694778442383
-          type: FLOATS
-        }
-        attribute {
-          name: "scale"
-          floats: 0.07821832597255707
-          floats: 0.018457846716046333
-          type: FLOATS
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
         input: "variable2"
         output: "variable2_cast"
         name: "Cast3"
@@ -699,6 +680,25 @@ We do the same for the textual features.
           type: INT
         }
         domain: ""
+      }
+      node {
+        input: "variable"
+        output: "variable1"
+        name: "Scaler"
+        op_type: "Scaler"
+        attribute {
+          name: "offset"
+          floats: 28.97588348388672
+          floats: 32.95976638793945
+          type: FLOATS
+        }
+        attribute {
+          name: "scale"
+          floats: 0.0777391567826271
+          floats: 0.019592110067605972
+          type: FLOATS
+        }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "variable1"
@@ -739,34 +739,34 @@ We do the same for the textual features.
         }
         attribute {
           name: "coefficients"
-          floats: 0.4346252679824829
-          floats: -0.010903283953666687
-          floats: -0.2816266715526581
-          floats: 0.19434137642383575
-          floats: 0.34873485565185547
-          floats: -0.26131996512413025
-          floats: -1.1926000118255615
-          floats: 1.1927295923233032
-          floats: -1.0484074354171753
-          floats: 0.04621226713061333
-          floats: 1.0023247003555298
-          floats: -0.4346252679824829
-          floats: 0.010903283953666687
-          floats: 0.2816266715526581
-          floats: -0.19434137642383575
-          floats: -0.34873485565185547
-          floats: 0.26131996512413025
-          floats: 1.1926000118255615
-          floats: -1.1927295923233032
-          floats: 1.0484074354171753
-          floats: -0.04621226713061333
-          floats: -1.0023247003555298
+          floats: 0.4215720295906067
+          floats: 0.0034971386194229126
+          floats: -0.31418120861053467
+          floats: 0.10256028920412064
+          floats: 0.38042089343070984
+          floats: -0.16871343553066254
+          floats: -1.2190604209899902
+          floats: 1.219146966934204
+          floats: -1.0180697441101074
+          floats: 0.0027568077202886343
+          floats: 1.01539945602417
+          floats: -0.4215720295906067
+          floats: -0.0034971386194229126
+          floats: 0.31418120861053467
+          floats: -0.10256028920412064
+          floats: -0.38042089343070984
+          floats: 0.16871343553066254
+          floats: 1.2190604209899902
+          floats: -1.219146966934204
+          floats: 1.0180697441101074
+          floats: -0.0027568077202886343
+          floats: -1.01539945602417
           type: FLOATS
         }
         attribute {
           name: "intercepts"
-          floats: -0.14537061750888824
-          floats: 0.14537061750888824
+          floats: -0.2839992642402649
+          floats: 0.2839992642402649
           type: FLOATS
         }
         attribute {
@@ -932,15 +932,15 @@ We do the same for the textual features.
       }
     }
     opset_import {
-      domain: ""
-      version: 11
-    }
-    opset_import {
       domain: "ai.onnx.ml"
       version: 1
     }
+    opset_import {
+      domain: ""
+      version: 11
+    }
 
-    textual features [[0. 0. 1. 0. 0. 1. 0. 1. 0.]]
+    textual features [[1. 0. 0. 0. 0. 1. 0. 0. 1.]]
 
 
 
@@ -1057,8 +1057,8 @@ Then textual pipeline.
     numpy: 1.21.2
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
-    onnxruntime:  1.8.1
-    skl2onnx:  1.9.3
+    onnxruntime:  1.10.0+cpu
+    skl2onnx:  1.10.0
 
 
 
@@ -1066,7 +1066,7 @@ Then textual pipeline.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.637 seconds)
+   **Total running time of the script:** ( 0 minutes  13.396 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_intermediate_outputs.py:
