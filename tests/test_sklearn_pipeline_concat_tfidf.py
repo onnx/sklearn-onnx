@@ -104,7 +104,7 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
         textual_feature = 'TEXT'
         count_vect_transformer = Pipeline(steps=[
             ('count_vect', CountVectorizer(
-                max_df=1.8, min_df=0.02, max_features=1000))])
+                max_df=0.8, min_df=0.02, max_features=1000))])
         preprocessor = ColumnTransformer(
             transformers=[
                 ('cat_transform', categorical_transformer,
