@@ -226,8 +226,10 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
-    stop_words = op.stop_words_ | (
-        set(op.stop_words) if op.stop_words else set())
+    if hasattr(op, "stop_words_"):
+        stop_words = op.stop_words_ | (set(op.stop_words) if op.stop_words else set())
+    else:
+        stop_words = set()
 
     if op.lowercase or stop_words:
         if len(operator.input_full_names) != 1:
