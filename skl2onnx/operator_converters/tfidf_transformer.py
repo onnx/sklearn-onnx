@@ -27,15 +27,15 @@ def convert_sklearn_tfidf_transformer(scope: Scope, operator: Operator,
     output_name = scope.get_unique_variable_name('tfidftr_output')
 
     if op.sublinear_tf:
-        addones = scope.get_unique_variable_name("addones")
+        plus1 = scope.get_unique_variable_name("plus1")
         C = operator.inputs[0].type.shape[1]
         ones = scope.get_unique_variable_name("ones")
         cst = np.ones((C,), dtype=float_type)
         container.add_initializer(ones, proto_dtype, [C], cst.flatten())
-        apply_add(scope, data + [ones], addones, container, broadcast=1)
-        logged = scope.get_unique_variable_name("logged")
-        apply_log(scope, addones, logged, container)
-        data = [logged]
+        apply_add(scope, data + [ones], plus1, container, broadcast=1)
+        plus1logged = scope.get_unique_variable_name("plus1logged")
+        apply_log(scope, plus1, plus1logged, container)
+        data = [plus1logged]
 
     if op.use_idf:
         cst = op.idf_.astype(float_type)
