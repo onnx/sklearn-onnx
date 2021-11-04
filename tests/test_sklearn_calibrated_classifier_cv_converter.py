@@ -15,7 +15,7 @@ from sklearn.ensemble import (
     RandomForestClassifier, GradientBoostingClassifier)
 try:
     from sklearn.ensemble import HistGradientBoostingClassifier
-except ImportError as e:
+except ImportError:
     HistGradientBoostingClassifier = None
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
