@@ -11,11 +11,17 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import (
+    RandomForestClassifier, GradientBoostingClassifier)
+try:
+    from sklearn.ensemble import HistGradientBoostingClassifier
+except ImportError as e:
+    HistGradientBoostingClassifier = None
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import ConvergenceWarning
 try:
     # scikit-learn >= 0.22
@@ -192,15 +198,81 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         model = CalibratedClassifierCV(
             base_estimator=RandomForestClassifier(n_estimators=2),
             method='sigmoid').fit(X, y)
-        try:
-            convert_sklearn(
-                model, "unused",
-                [("input", FloatTensorType([None, X.shape[1]]))],
-                target_opset=TARGET_OPSET)
-            raise AssertionError(
-                "RandomForestClassifier has no decision_function")
-        except RuntimeError as e:
-            assert "cannot implement decision_function" in str(e)
+        model_onnx = convert_sklearn(
+            model, "clarf",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnCalibratedClassifierRF")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="not available")
+    @ignore_warnings(
+        category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    def test_model_calibrated_classifier_cv_gbt(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        y[y > 1] = 1
+        model = CalibratedClassifierCV(
+            base_estimator=GradientBoostingClassifier(n_estimators=2),
+            method='sigmoid').fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "clarf",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnCalibratedClassifierGBT")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        HistGradientBoostingClassifier is None, reason="not available")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="not available")
+    @ignore_warnings(
+        category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    def test_model_calibrated_classifier_cv_hgbt(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        y[y > 1] = 1
+        model = CalibratedClassifierCV(
+            base_estimator=HistGradientBoostingClassifier(max_iter=4),
+            method='sigmoid').fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "clarf",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnCalibratedClassifierHGBT")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(
+        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        reason="not available")
+    @ignore_warnings(
+        category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    def test_model_calibrated_classifier_cv_tree(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        y[y > 1] = 1
+        model = CalibratedClassifierCV(
+            base_estimator=DecisionTreeClassifier(),
+            method='sigmoid').fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "clarf",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnCalibratedClassifierDT")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")

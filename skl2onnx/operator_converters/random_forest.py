@@ -191,7 +191,7 @@ def convert_sklearn_random_forest_classifier(
         elif use_raw_scores:
             raise RuntimeError(
                 "The converter cannot implement decision_function for "
-                "'{}'.".format(type(op)))
+                "'{}' and loss '{}'.".format(type(op), loss))
 
         input_name = operator.input_full_names
         if type(operator.inputs[0].type) == BooleanTensorType:
