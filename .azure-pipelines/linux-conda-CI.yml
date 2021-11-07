@@ -40,7 +40,7 @@ jobs:
         onnx.version: '==1.10.1'  # 'test'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.8.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '>=0.24.2'
+        sklearn.version: '>=0.24.2 lightgbm==3.2.0'
         onnxcc.version: '>=1.8.1'  # git
         run.example: '0'
       Py39-Onnx190-Rt180-Skl0242:
