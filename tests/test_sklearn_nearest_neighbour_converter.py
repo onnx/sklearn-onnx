@@ -11,7 +11,6 @@ from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
-import onnxruntime
 from onnxruntime import InferenceSession, __version__ as ort_version
 from pandas import DataFrame
 try:
