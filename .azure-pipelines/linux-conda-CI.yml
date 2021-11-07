@@ -26,7 +26,7 @@ jobs:
       Py39-Onnx1101-Rt190-Skl0242:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.10.1'  # 'test'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.9.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -36,7 +36,7 @@ jobs:
       Py39-Onnx1101-Rt181-Skl0242:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.10.1'  # 'test'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.8.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -46,7 +46,7 @@ jobs:
       Py39-Onnx190-Rt180-Skl0242:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.9.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime>=1.8.1'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -56,7 +56,7 @@ jobs:
       Py39-Onnx190-Rt170-Skl0242:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.9.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.7.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -66,7 +66,7 @@ jobs:
       Py38-Onnx181-Rt170-Skl0242:
         do.bench: '0'
         python.version: '3.8'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.8.1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.7.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -76,7 +76,7 @@ jobs:
       Py38-Onnx181-Rt170-Skl0241:
         do.bench: '0'
         python.version: '3.8'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.8.1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.7.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -86,7 +86,7 @@ jobs:
       Py38-Onnx181-Rt160-Skl0240:
         do.bench: '0'
         python.version: '3.8'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.8.1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.6.0'
@@ -96,7 +96,7 @@ jobs:
       Py38-Onnx170-Rt160-Skl0240:
         do.bench: '0'
         python.version: '3.8'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.6.0'
@@ -106,7 +106,7 @@ jobs:
       Py37-Onnx170-Rt151-Skl0232:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.5.1'
@@ -116,7 +116,7 @@ jobs:
       Py37-Onnx170-Rt140-Skl0232:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.4.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
@@ -126,7 +126,7 @@ jobs:
       Py37-Onnx170-Rt130-Skl0231:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.7.0'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.3.0'
@@ -136,7 +136,7 @@ jobs:
       Py37-Onnx170-Rt120-Skl0230-Op11:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.7.0'
         onnx.target_opset: '11'
         onnxrt.version: 'onnxruntime==1.2.0'
@@ -146,7 +146,7 @@ jobs:
       Py37-Onnx160-Rt120-Skl0230:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.6.0'
         onnx.target_opset: ''
         onnxcc.version: '==1.7.0'
@@ -156,7 +156,7 @@ jobs:
       Py37-Onnx160-Rt111-Skl0222:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '>=1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.6.0'
         onnx.target_opset: ''
         onnxcc.version: '==1.7.0'
@@ -166,7 +166,7 @@ jobs:
       Py37-Onnx160-Rt100-Skl0213:
         do.bench: '0'
         python.version: '3.7'
-        numpy.version: '==1.18.1'
+        numpy.version: '<1.21.0'
         onnx.version: '==1.6.0'
         onnx.target_opset: ''
         onnxcc.version: '==1.7.0'
