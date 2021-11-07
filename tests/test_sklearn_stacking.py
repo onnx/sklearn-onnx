@@ -49,15 +49,9 @@ class TestStackingConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnStackingRegressor-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            comparable_outputs=[0]
-        )
+            comparable_outputs=[0])
 
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
@@ -70,15 +64,9 @@ class TestStackingConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnStackingClassifier",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            comparable_outputs=[0]
-        )
+            comparable_outputs=[0])
 
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
@@ -94,9 +82,6 @@ class TestStackingConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnStackingClassifierNoZipMap",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
             comparable_outputs=[0])
 
 

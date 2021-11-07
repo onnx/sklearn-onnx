@@ -18,6 +18,9 @@ from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     def _fit_model(self, model, dtype=np.float32):
@@ -47,7 +50,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_default_double(self):
         model, X_test = self._fit_model(
-            KernelPCA(random_state=42), dtype=np.float64)
+            KernelPCA(random_state=42, n_components=2), dtype=np.float64)
         model_onnx = to_onnx(model, X_test, target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, model_onnx,
