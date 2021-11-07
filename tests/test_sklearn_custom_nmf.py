@@ -21,10 +21,10 @@ class TestSklearnCustomNMF(unittest.TestCase):
     def test_custom_nmf(self):
 
         mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
-                        [1, 0, 0, 0], [1, 0, 0, 0]], dtype=np.float64)
+                        [1, 0, 0, 0], [0, 0, 0, 1]], dtype=np.float64)
         mat[:mat.shape[1], :] += np.identity(mat.shape[1])
 
-        mod = NMF(n_components=2)
+        mod = NMF(n_components=2, max_iter=2)
         W = mod.fit_transform(mat)
         H = mod.components_
 
