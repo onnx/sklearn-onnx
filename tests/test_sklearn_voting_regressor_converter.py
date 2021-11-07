@@ -40,14 +40,9 @@ class TestVotingRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(numpy.float32),
-            model,
-            model_onnx,
+            model, model_onnx,
             basename="SklearnVotingRegressor-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            comparable_outputs=[0]
-        )
+            comparable_outputs=[0])
 
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression_int(self):
@@ -58,15 +53,9 @@ class TestVotingRegressorConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnVotingRegressorInt-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            comparable_outputs=[0]
-        )
+            comparable_outputs=[0])
 
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression_bool(self):
@@ -77,15 +66,9 @@ class TestVotingRegressorConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnVotingRegressorBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            comparable_outputs=[0]
-        )
+            comparable_outputs=[0])
 
 
 if __name__ == "__main__":

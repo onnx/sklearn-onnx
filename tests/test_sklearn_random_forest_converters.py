@@ -63,6 +63,9 @@ def _sklearn_version():
     return StrictVersion(v)
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -469,7 +472,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, random_state=0)
         pipe = Pipeline([
-            ('acp', PCA(n_components=7)),
+            ('acp', PCA(n_components=3)),
             ('rf', RandomForestRegressor())])
         pipe.fit(X_train, y_train)
         X32 = X_test.astype(numpy.float32)
