@@ -129,7 +129,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
         X_test = np.array([[-0.8, -1], [-2, -1]], dtype=np.float32)
-        model = LinearDiscriminantAnalysis().fit(X, y)
+        model = LinearDiscriminantAnalysis(n_components=1).fit(X, y)
         model_onnx = convert_sklearn(
             model, "linear model",
             [("input", FloatTensorType([None, X_test.shape[1]]))],

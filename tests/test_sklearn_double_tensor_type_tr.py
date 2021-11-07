@@ -33,6 +33,7 @@ warnings_to_skip = (
 
 ORT_VERSION = "1.7.0"
 OPSET_VERSION = 11
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
@@ -458,7 +459,7 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             model.fit(X_train)
             return model, X_test.astype(np.float64)
 
-        model, X_test = _fit_model_pca(PCA(random_state=42))
+        model, X_test = _fit_model_pca(PCA(random_state=42, n_components=2))
         model_onnx = convert_sklearn(
             model, initial_types=[
                 ("input", DoubleTensorType([None, X_test.shape[1]]))],
