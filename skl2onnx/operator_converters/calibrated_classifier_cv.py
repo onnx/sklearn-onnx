@@ -12,6 +12,7 @@ from ..common.data_types import (
     guess_numpy_type, Int64TensorType, guess_proto_type)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
+from sklearn.ensemble import RandomForestClassifier
 
 
 def _handle_zeros(scope, container, concatenated_prob_name,
@@ -256,6 +257,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     #                           |                        |
     #                           V                        |
     #                        class_prob_tensor [M, C] <--'
+    model_proba = {RandomForestClassifier}
+
     if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
@@ -275,7 +278,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type, base_model)
-    if container.has_options(base_model, 'raw_scores'):
+    if (container.has_options(base_model, 'raw_scores') and
+            not type(base_model) in model_proba):
         container.add_options(id(base_model), {'raw_scores': True})
         scope.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
