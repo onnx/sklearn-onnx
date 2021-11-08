@@ -52,6 +52,9 @@ from test_utils import (
 from onnxruntime import __version__ as ort_version, InferenceSession
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 def check_scikit_version():
     # StrictVersion does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
@@ -699,7 +702,8 @@ class TestSklearnPipeline(unittest.TestCase):
                 ('A', StringTensorType([None, 1])),
                 ('B', StringTensorType([None, 1])),
                 ('TEXT', StringTensorType([None, 1]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+            options={MultiOutputClassifier: {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
         sess = InferenceSession(model_onnx.SerializeToString())
@@ -743,7 +747,8 @@ class TestSklearnPipeline(unittest.TestCase):
         inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
                   'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
                   'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
-        onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
+        onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                      options={MultiOutputClassifier: {'zipmap': False}})
         sess = InferenceSession(onx.SerializeToString())
 
         got = sess.run(None, inputs)
@@ -799,7 +804,9 @@ class TestSklearnPipeline(unittest.TestCase):
                     inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
                               'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
                               'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
-                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET)
+                    onx = to_onnx(
+                        rf_clf, dfx, target_opset=TARGET_OPSET,
+                        options={MultiOutputClassifier: {'zipmap': False}})
                     sess = InferenceSession(onx.SerializeToString())
                     got = sess.run(None, inputs)
                     assert_almost_equal(expected_label, got[0])
