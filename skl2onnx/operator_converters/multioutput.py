@@ -61,13 +61,12 @@ def convert_multi_output_classifier_converter(
                                    op_version=op_version)
                   for y in y_list]
 
-    label = OnnxConcat(*label_list, axis=1, op_version=op_version,
-                       output_names=[operator.outputs[0]])
-    label.add_to(scope=scope, container=container)
-
     # probabilities
     proba_list = [OnnxIdentity(y[1], op_version=op_version)
                   for y in y_list]
+    label = OnnxConcat(*label_list, axis=1, op_version=op_version,
+                       output_names=[operator.outputs[0]])
+    label.add_to(scope=scope, container=container)
 
     proba = OnnxSequenceConstruct(
         *proba_list, op_version=op_version,
@@ -79,4 +78,5 @@ register_converter('SklearnMultiOutputRegressor',
                    convert_multi_output_regressor_converter)
 register_converter('SklearnMultiOutputClassifier',
                    convert_multi_output_classifier_converter,
-                   options={'nocl': [False, True]})
+                   options={'nocl': [False, True],
+                            'zipmap': [False, True]})

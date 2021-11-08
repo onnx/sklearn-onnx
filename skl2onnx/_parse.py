@@ -480,12 +480,21 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
-    label = scope.declare_local_variable("label", Int64TensorType())
-    proba = scope.declare_local_variable(
-        "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
-    this_operator.outputs.append(label)
-    this_operator.outputs.append(proba)
-    return this_operator.outputs
+
+    options = scope.get_options(model, dict(zipmap=True))
+    no_zipmap = isinstance(options['zipmap'], bool) and not options['zipmap']
+    if no_zipmap:
+        label = scope.declare_local_variable("label", Int64TensorType())
+        proba = scope.declare_local_variable(
+            "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
+        this_operator.outputs.append(label)
+        this_operator.outputs.append(proba)
+        return this_operator.outputs
+
+    zipmap = options.get('zipmap', False)
+    raise RuntimeError(
+        "Unable to convert model %r with option zipmap=%r." % (
+            model.__class__.__name__, zipmap))
 
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
