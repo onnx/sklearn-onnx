@@ -164,16 +164,23 @@ class TestConvertOptions(unittest.TestCase):
         y[0, :] = 1
         X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-        for zipmap in [False]:  # [False, True, 'columns']:
+        for zipmap in [True, False, 'columns']:
             for cls in TestConvertOptions.get_model_multi_label():
                 with self.subTest(cls=cls.__class__, zipmap=zipmap):
                     cls.fit(X_train, y_train)
                     expected_label = cls.predict(X_test)
                     expected_proba = cls.predict_proba(X_test)
 
+                    if zipmap == 'columns':
+                        # Not implemented.
+                        with self.assertRaises(ValueError):
+                            to_onnx(cls, X[:1], options={'zipmap': zipmap},
+                                    target_opset=TARGET_OPSET)
+                        continue
+
                     onx = to_onnx(cls, X[:1], options={'zipmap': zipmap},
                                   target_opset=TARGET_OPSET)
-                    with open("debug.onnx", "wb") as f:
+                    with open("debug2.onnx", "wb") as f:
                         f.write(onx.SerializeToString())
                     sess = InferenceSession(onx.SerializeToString())
                     got = sess.run(None, {'X': X_test})
@@ -198,4 +205,9 @@ class TestConvertOptions(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # import logging
+    # log = logging.getLogger('skl2onnx')
+    # log.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
+    # TestConvertOptions().test_multi_label_option_zipmap()
     unittest.main()
