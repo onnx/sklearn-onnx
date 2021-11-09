@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
 from onnxruntime import InferenceSession
+from sklearn import __version__ as sklver
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -17,6 +19,9 @@ except ImportError:
     from sklearn.utils.testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 from test_utils import TARGET_OPSET
+
+
+sklver = '.'.join(sklver.split('.')[:2])
 
 
 class TestConvertOptions(unittest.TestCase):
@@ -79,6 +84,8 @@ class TestConvertOptions(unittest.TestCase):
             proba = probas[0]
             assert_almost_equal(expected_proba, proba, decimal=decimal)
 
+    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+                     reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
     def test_classifier_option_zipmap(self):
@@ -145,6 +152,8 @@ class TestConvertOptions(unittest.TestCase):
             proba = probas[0]
             assert_almost_equal(expected_proba, proba, decimal=decimal)
 
+    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+                     reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
     def test_multi_label_option_zipmap(self):
