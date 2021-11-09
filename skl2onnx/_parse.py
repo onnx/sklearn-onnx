@@ -500,6 +500,13 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
         this_operator.outputs.append(proba)
         return this_operator.outputs
 
+    warnings.warn(
+        "The current converter for class %r "
+        "creates a sequence of maps as an output."
+        "This is not allowed in standards ONNX specifications."
+        "" % model.__class__.__name__,
+        RuntimeWarning)
+
     this_operator.outputs.append(label)
     proba = scope.declare_local_variable(
         "output_probabilities", SequenceType(guessed_output_type))
