@@ -414,14 +414,39 @@ def _parse_sklearn_random_trees_embedding(scope, model, inputs,
 
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
-    options = scope.get_options(model, dict(zipmap=True))
+    options = scope.get_options(
+        model, dict(zipmap=True, output_class_labels=False))
     no_zipmap = (
         (isinstance(options['zipmap'], bool) and not options['zipmap']) or
         (model.__class__ in [NuSVC, SVC] and not model.probability))
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers)
+
     if no_zipmap:
+        if options['output_class_labels']:
+            if not hasattr(model, "classes_"):
+                raise RuntimeError(
+                    "Model type %r has no attribute 'classes_'. "
+                    "Option 'output_class_labels' is invalid or a new parser "
+                    "must be used." % model.__class__.__name__)
+
+            clout = scope.declare_local_operator('SklearnClassLabels')
+            clout.classes = get_label_classes(scope, model)
+            clout.inputs.append(probability_tensor[0])
+            label_type = probability_tensor[0].type.__class__(
+                clout.classes.shape)
+            class_labels = scope.declare_local_variable(
+                'class_labels', label_type)
+            clout.outputs.append(class_labels)
+            outputs = list(probability_tensor)
+            outputs.append(class_labels)
+            return outputs
         return probability_tensor
+
+    if options['output_class_labels']:
+        raise RuntimeError(
+            "Option 'output_class_labels' is not compatible with option "
+            "'zipmap'.")
 
     if options['zipmap'] == 'columns':
         zipmap_operator = scope.declare_local_operator('SklearnZipMapColumns')

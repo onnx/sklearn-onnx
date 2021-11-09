@@ -5,6 +5,7 @@
 # import associated modules here.
 from . import array_feature_extractor
 from . import cast_op
+from . import class_labels
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
@@ -48,6 +49,7 @@ from . import zip_map
 __all__ = [
     array_feature_extractor,
     cast_op,
+    class_labels,
     concat,
     cross_decomposition,
     dict_vectorizer,

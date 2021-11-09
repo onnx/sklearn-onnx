@@ -754,12 +754,14 @@ register_converter(
     options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
+             'output_class_labels': [False, True],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnRadiusNeighborsClassifier', convert_nearest_neighbors_classifier,
     options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
+             'output_class_labels': [False, True],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,

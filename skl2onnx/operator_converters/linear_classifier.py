@@ -232,7 +232,9 @@ register_converter('SklearnLinearClassifier',
                    convert_sklearn_linear_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier,
                    options={'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
