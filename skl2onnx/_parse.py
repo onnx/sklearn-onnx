@@ -415,7 +415,7 @@ def _parse_sklearn_random_trees_embedding(scope, model, inputs,
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(
-        model, dict(zipmap=True, output_class_labels=False))
+        model, dict(zipmap=True))
     no_zipmap = (
         (isinstance(options['zipmap'], bool) and not options['zipmap']) or
         (model.__class__ in [NuSVC, SVC] and not model.probability))
@@ -423,7 +423,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         scope, model, inputs, custom_parsers=custom_parsers)
 
     if no_zipmap:
-        if options['output_class_labels']:
+        if options.get('output_class_labels', False):
             if not hasattr(model, "classes_"):
                 raise RuntimeError(
                     "Model type %r has no attribute 'classes_'. "
@@ -443,7 +443,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
             return outputs
         return probability_tensor
 
-    if options['output_class_labels']:
+    if options.get('output_class_labels', False):
         raise RuntimeError(
             "Option 'output_class_labels' is not compatible with option "
             "'zipmap'.")

@@ -16,14 +16,10 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
         container.add_initializer(
             name, onnx_proto.TensorProto.INT64, list(classes.shape),
             classes.tolist())
-    elif classes.dtype in (np.str_, str, np.object):
+    else:
         container.add_initializer(
             name, onnx_proto.TensorProto.STRING, list(classes.shape),
-            classes.tolist())
-    else:
-        raise TypeError(
-            "Unexpected type %r for class labels (labels=%r)"
-            "." % (classes.dtype, operator.classes))
+            list(map(str, classes)))
 
     container.add_node(
         'Identity', name, operator.outputs[0].full_name)
