@@ -106,7 +106,8 @@ class TestConvertOptions(unittest.TestCase):
         if use_string:
             y = ['cl%d' % _ for _ in y]
         X = X.astype(numpy.float32)
-        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, random_state=42)
 
         for zipmap, addcl in [(False, True), (False, False)]:
             for cls in TestConvertOptions.get_model_classifiers():
