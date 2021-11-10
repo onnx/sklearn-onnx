@@ -70,9 +70,29 @@ class TestSupportedConverters(unittest.TestCase):
                              options={'d__zipmap': False})
         assert "zipmap" not in str(model_onnx).lower()
 
-        model_onnx = to_onnx(pipe, X.astype(np.float32),
-                             options={'zipmap': False,
-                                      'output_class_labels': True})
+        model_onnx = to_onnx(
+            pipe, X.astype(np.float32),
+            options={DummyClassifier: {'zipmap': False,
+                                       'output_class_labels': True}})
+        assert "zipmap" not in str(model_onnx).lower()
+        self.assertEqual(3, len(model_onnx.graph.output))
+
+        model_onnx = to_onnx(
+            pipe, X.astype(np.float32),
+            options={id(pipe.steps[-1][-1]): {
+                'zipmap': False, 'output_class_labels': True}})
+        assert "zipmap" not in str(model_onnx).lower()
+        self.assertEqual(3, len(model_onnx.graph.output))
+
+        model_onnx = to_onnx(
+            pipe, X.astype(np.float32),
+            options={'d__zipmap': False, 'd__output_class_labels': True})
+        assert "zipmap" not in str(model_onnx).lower()
+        self.assertEqual(3, len(model_onnx.graph.output))
+
+        model_onnx = to_onnx(
+            pipe, X.astype(np.float32),
+            options={'zipmap': False, 'output_class_labels': True})
         assert "zipmap" not in str(model_onnx).lower()
         self.assertEqual(3, len(model_onnx.graph.output))
 

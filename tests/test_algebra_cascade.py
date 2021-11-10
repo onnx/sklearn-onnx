@@ -214,35 +214,36 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         for opv in (1, 2, 7, 8, 9, 10, 11, 12, 13, onnx_opset_version()):
             if opv is not None and opv > TARGET_OPSET:
                 continue
-            try:
-                onx = convert_sklearn(
-                    model, "scikit-learn MLPRegressor",
-                    [("input", FloatTensorType([None, X_test.shape[1]]))],
-                    target_opset=opv)
-            except RuntimeError as e:
-                if ("is higher than the number of the "
-                        "installed onnx package") in str(e):
-                    continue
-                raise e
-            as_string = onx.SerializeToString()
-            try:
-                ort = InferenceSession(as_string)
-            except (RuntimeError, InvalidGraph, Fail) as e:
-                if opv in (None, 1, 2):
-                    continue
-                if opv >= onnx_opset_version():
-                    continue
-                if ("No suitable kernel definition found for "
-                        "op Cast(9)") in str(e):
-                    # too old onnxruntime
-                    continue
-                raise AssertionError(
-                    "Unable to load opv={}\n---\n{}\n---".format(
-                        opv, onx)) from e
-            res_out = ort.run(None, {'input': X_test})
-            assert len(res_out) == 1
-            res = res_out[0]
-            assert_almost_equal(exp.ravel(), res.ravel(), decimal=4)
+            with self.subTest(opv=opv):
+                try:
+                    onx = convert_sklearn(
+                        model, "scikit-learn MLPRegressor",
+                        [("input", FloatTensorType([None, X_test.shape[1]]))],
+                        target_opset=opv)
+                except RuntimeError as e:
+                    if ("is higher than the number of the "
+                            "installed onnx package") in str(e):
+                        continue
+                    raise e
+                as_string = onx.SerializeToString()
+                try:
+                    ort = InferenceSession(as_string)
+                except (RuntimeError, InvalidGraph, Fail) as e:
+                    if opv in (None, 1, 2):
+                        continue
+                    if opv >= onnx_opset_version():
+                        continue
+                    if ("No suitable kernel definition found for "
+                            "op Cast(9)") in str(e):
+                        # too old onnxruntime
+                        continue
+                    raise AssertionError(
+                        "Unable to load opv={}\n---\n{}\n---".format(
+                            opv, onx)) from e
+                res_out = ort.run(None, {'input': X_test})
+                assert len(res_out) == 1
+                res = res_out[0]
+                assert_almost_equal(exp.ravel(), res.ravel(), decimal=4)
 
 
 if __name__ == "__main__":

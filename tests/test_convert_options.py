@@ -11,6 +11,7 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.multioutput import MultiOutputClassifier
 from sklearn.tree import DecisionTreeClassifier
 from skl2onnx import to_onnx
 try:
@@ -140,6 +141,87 @@ class TestConvertOptions(unittest.TestCase):
                                DeprecationWarning))
     def test_classifier_option_output_class_labels_str(self):
         self.classifier_option_output_class_labels(True)
+
+    @staticmethod
+    def get_model_multi_label():
+        models = [
+            MultiOutputClassifier(DecisionTreeClassifier(max_depth=2)),
+        ]
+        return models
+
+    @staticmethod
+    def almost_equal_multi(expected_label, expected_proba, label, *probas,
+                           zipmap=False, decimal=5):
+        assert_almost_equal(expected_label, label)
+        if zipmap == 'columns':
+            for row, pr in zip(expected_proba.T, probas):
+                assert_almost_equal(
+                    row.ravel(), pr.ravel(), decimal=decimal)
+
+        elif zipmap:
+            for expected, proba in zip(expected_proba, probas):
+                assert_almost_equal(
+                    expected_proba,
+                    TestConvertOptions.dict_to_array(proba),
+                    decimal=decimal)
+        else:
+            proba = probas[0]
+            assert_almost_equal(expected_proba, proba, decimal=decimal)
+
+    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+                     reason="known issue with string")
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
+    def test_multi_label_option_zipmap(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        X = X.astype(numpy.float32)
+        y = numpy.vstack([y, 1 - y]).T
+        y[0, :] = 1
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+        for zipmap in [False, True, 'columns']:
+            for cls in TestConvertOptions.get_model_multi_label():
+                with self.subTest(cls=cls.__class__, zipmap=zipmap):
+                    cls.fit(X_train, y_train)
+                    expected_label = cls.predict(X_test)
+                    expected_proba = cls.predict_proba(X_test)
+
+                    if zipmap == 'columns':
+                        # Not implemented.
+                        with self.assertRaises(ValueError):
+                            to_onnx(cls, X[:1], options={'zipmap': zipmap},
+                                    target_opset=TARGET_OPSET)
+                        continue
+
+                    onx = to_onnx(cls, X[:1], options={'zipmap': zipmap},
+                                  target_opset=TARGET_OPSET)
+
+                    if zipmap:
+                        # The converter works but SequenceConstruct
+                        # does not support Sequence of Maps.
+                        continue
+
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, {'X': X_test})
+                    TestConvertOptions.almost_equal_multi(
+                        expected_label, expected_proba, *got, zipmap=zipmap)
+
+                    onx = to_onnx(
+                        cls, X[:1],
+                        options={cls.__class__: {'zipmap': zipmap}},
+                        target_opset=TARGET_OPSET)
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, {'X': X_test})
+                    assert_almost_equal(expected_label, got[0])
+
+                    onx = to_onnx(
+                        cls, X[:1],
+                        options={id(cls): {'zipmap': zipmap}},
+                        target_opset=TARGET_OPSET)
+                    sess = InferenceSession(onx.SerializeToString())
+                    got = sess.run(None, {'X': X_test})
+                    assert_almost_equal(expected_label, got[0])
 
 
 if __name__ == "__main__":

@@ -115,8 +115,8 @@ def _process_options(model, options):
 def _process_pipeline_options(model, options):
     """
     Tells the final classifier of a pipeline that
-    options 'zipmap' or 'nocl' were attached to
-    the pipeline.
+    options 'zipmap', 'nocl' or 'output_class_labels'
+    were attached to the pipeline.
     """
     new_options = None
     names = dict(enumerate_model_names(model))
@@ -126,7 +126,7 @@ def _process_pipeline_options(model, options):
             last = v.steps[-1][1]
             key = id(last)
             for opt, val in opts.items():
-                if opt not in {'zipmap', 'nocl'}:
+                if opt not in {'zipmap', 'nocl', 'output_class_labels'}:
                     continue
                 if new_options is None:
                     new_options = copy.deepcopy(options)
