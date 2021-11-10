@@ -17,9 +17,18 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
             name, onnx_proto.TensorProto.INT64, list(classes.shape),
             classes.tolist())
     else:
+        clids = np.arange(len(classes), dtype=np.int64)
         container.add_initializer(
-            name, onnx_proto.TensorProto.STRING, list(classes.shape),
-            list(map(lambda x: str(x).encode('utf-8'), classes)))
+            name, onnx_proto.TensorProto.INT64, list(clids.shape),
+            clids.tolist())
+        namele = scope.get_unique_variable_name(
+            operator.outputs[0].full_name + '_le')
+        container.add_node(
+            'LabelEncoder', name, namele, op_domain='ai.onnx.ml', op_version=2,
+            default_string='0', keys_int64s=clids,
+            values_strings=classes.tolist(),
+            name=scope.get_unique_operator_name('class_labels_le'))
+        name = namele
 
     container.add_node(
         'Identity', name, operator.outputs[0].full_name)

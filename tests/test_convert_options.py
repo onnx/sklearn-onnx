@@ -70,7 +70,11 @@ class TestConvertOptions(unittest.TestCase):
     def almost_equal(
             expected_label, expected_proba,
             label, probas, zipmap=False, decimal=5):
-        assert_almost_equal(expected_label, label)
+        if expected_label.tolist() != label.tolist():
+            raise AssertionError(
+                "Label mismatch %r (expected) != %r." % (
+                    expected_label.tolist(),
+                    label.tolist()))
         if zipmap:
             raise AssertionError(
                 "zipmap should be False, not %r." % zipmap)
@@ -81,8 +85,16 @@ class TestConvertOptions(unittest.TestCase):
             expected_label, expected_proba, expected_class_labels,
             label, probas, class_labels,
             zipmap=False, decimal=5):
-        assert_almost_equal(expected_class_labels, class_labels)
-        assert_almost_equal(expected_label, label)
+        if expected_class_labels.tolist() != class_labels.tolist():
+            raise AssertionError(
+                "Class labels mismatch %r (expected) != %r." % (
+                    expected_class_labels.tolist(),
+                    class_labels.tolist()))
+        if expected_label.tolist() != label.tolist():
+            raise AssertionError(
+                "Label mismatch %r (expected) != %r." % (
+                    expected_label.tolist(),
+                    label.tolist()))
         if zipmap:
             raise AssertionError(
                 "zipmap should be False, not %r." % zipmap)
