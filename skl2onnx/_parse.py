@@ -486,9 +486,11 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 
             clout = scope.declare_local_operator('SklearnClassLabels')
             clout.classes = get_label_classes(scope, model)
-            clout.inputs.append(probability_tensor[0])
-            label_type = probability_tensor[0].type.__class__(
-                clout.classes.shape)
+            if model.classes_.dtype in (np.int32, np.int64):
+                ctype = Int64TensorType
+            else:
+                ctype = StringTensorType
+            label_type = ctype(clout.classes.shape)
             class_labels = scope.declare_local_variable(
                 'class_labels', label_type)
             clout.outputs.append(class_labels)

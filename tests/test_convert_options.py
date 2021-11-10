@@ -67,6 +67,16 @@ class TestConvertOptions(unittest.TestCase):
         return df.values
 
     @staticmethod
+    def almost_equal(
+            expected_label, expected_proba,
+            label, probas, zipmap=False, decimal=5):
+        assert_almost_equal(expected_label, label)
+        if zipmap:
+            raise AssertionError(
+                "zipmap should be False, not %r." % zipmap)
+        assert_almost_equal(expected_proba, probas, decimal=decimal)
+
+    @staticmethod
     def almost_equal_class_labels(
             expected_label, expected_proba, expected_class_labels,
             label, probas, class_labels,
@@ -76,8 +86,7 @@ class TestConvertOptions(unittest.TestCase):
         if zipmap:
             raise AssertionError(
                 "zipmap should be False, not %r." % zipmap)
-        proba = probas[0]
-        assert_almost_equal(expected_proba, proba, decimal=decimal)
+        assert_almost_equal(expected_proba, probas, decimal=decimal)
 
     def classifier_option_output_class_labels(self, use_string):
         data = load_iris()
@@ -99,12 +108,16 @@ class TestConvertOptions(unittest.TestCase):
                         cls, X[:1], options={
                             'zipmap': zipmap, 'output_class_labels': addcl},
                         target_opset=TARGET_OPSET)
-
                     sess = InferenceSession(onx.SerializeToString())
                     got = sess.run(None, {'X': X_test})
-                    TestConvertOptions.almost_equal_class_labels(
-                        expected_label, expected_proba, cls.classes_,
-                        *got, zipmap=zipmap)
+                    if addcl:
+                        TestConvertOptions.almost_equal_class_labels(
+                            expected_label, expected_proba, cls.classes_,
+                            *got, zipmap=zipmap)
+                    else:
+                        TestConvertOptions.almost_equal(
+                            expected_label, expected_proba,
+                            *got, zipmap=zipmap)
 
                     onx = to_onnx(
                         cls, X[:1],
@@ -113,9 +126,14 @@ class TestConvertOptions(unittest.TestCase):
                         target_opset=TARGET_OPSET)
                     sess = InferenceSession(onx.SerializeToString())
                     got = sess.run(None, {'X': X_test})
-                    TestConvertOptions.almost_equal_class_labels(
-                        expected_label, expected_proba, cls.classes_,
-                        *got, zipmap=zipmap)
+                    if addcl:
+                        TestConvertOptions.almost_equal_class_labels(
+                            expected_label, expected_proba, cls.classes_,
+                            *got, zipmap=zipmap)
+                    else:
+                        TestConvertOptions.almost_equal(
+                            expected_label, expected_proba,
+                            *got, zipmap=zipmap)
 
                     onx = to_onnx(
                         cls, X[:1],
@@ -124,9 +142,14 @@ class TestConvertOptions(unittest.TestCase):
                         target_opset=TARGET_OPSET)
                     sess = InferenceSession(onx.SerializeToString())
                     got = sess.run(None, {'X': X_test})
-                    TestConvertOptions.almost_equal_class_labels(
-                        expected_label, expected_proba, cls.classes_,
-                        *got, zipmap=zipmap)
+                    if addcl:
+                        TestConvertOptions.almost_equal_class_labels(
+                            expected_label, expected_proba, cls.classes_,
+                            *got, zipmap=zipmap)
+                    else:
+                        TestConvertOptions.almost_equal(
+                            expected_label, expected_proba,
+                            *got, zipmap=zipmap)
 
     @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
                      reason="known issue with string")
@@ -229,5 +252,5 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestConvertOptions().test_multi_label_option_zipmap()
+    # TestConvertOptions().test_classifier_option_output_class_labels_str()
     unittest.main()

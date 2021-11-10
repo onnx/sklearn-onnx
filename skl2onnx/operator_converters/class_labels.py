@@ -11,7 +11,7 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
     classes = np.array(operator.classes)
 
     name = scope.get_unique_variable_name(
-        operator.outputs[0].full_name + 'cst')
+        operator.outputs[0].full_name + '_cst')
     if classes.dtype in (np.int64, np.int32):
         container.add_initializer(
             name, onnx_proto.TensorProto.INT64, list(classes.shape),
@@ -19,7 +19,7 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
     else:
         container.add_initializer(
             name, onnx_proto.TensorProto.STRING, list(classes.shape),
-            list(map(str, classes)))
+            list(map(lambda x: str(x).encode('utf-8'), classes)))
 
     container.add_node(
         'Identity', name, operator.outputs[0].full_name)

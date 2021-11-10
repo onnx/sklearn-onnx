@@ -489,7 +489,7 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
     elif (options is not None and
-            ('zipmap' in options or 'output_class_labels')):
+            ('zipmap' in options or 'output_class_labels' in options)):
         from ._parse import (
             _parse_sklearn_classifier, update_registered_parser)
         update_registered_parser(model, _parse_sklearn_classifier)
