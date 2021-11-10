@@ -257,6 +257,8 @@ jobs:
       echo "---------------"
       pip show numpy
       echo "---------------"
+      pip show scipy
+      echo "---------------"
       pip show pandas
       echo "---------------"
       pip show onnx

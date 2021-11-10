@@ -37,6 +37,7 @@ from . import random_projection
 from . import random_trees_embedding
 from . import replace_op
 from . import scaler
+from . import sequence
 from . import svd
 from . import support_vector_machines
 from . import text_vectorizer
@@ -80,6 +81,7 @@ __all__ = [
     random_trees_embedding,
     replace_op,
     scaler,
+    sequence,
     svd,
     support_vector_machines,
     text_vectorizer,

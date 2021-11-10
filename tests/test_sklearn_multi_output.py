@@ -8,6 +8,10 @@ from onnxruntime import InferenceSession
 from sklearn.datasets import load_linnerud, make_multilabel_classification
 from sklearn.multioutput import MultiOutputRegressor, MultiOutputClassifier
 from sklearn.linear_model import Ridge, LogisticRegression
+try:
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
@@ -33,14 +37,14 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available.")
+    @ignore_warnings(category=(FutureWarning,
+                               DeprecationWarning))
     def test_multi_output_classifier(self):
         X, y = make_multilabel_classification(n_classes=3, random_state=0)
         X = X.astype(numpy.float32)
         clf = MultiOutputClassifier(LogisticRegression()).fit(X, y)
-        with self.assertRaises(NameError):
-            to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
-                    options={id(clf): {'zipmap': False}})
-        onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET)
+        onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
+                      options={'zipmap': False})
         self.assertNotIn("ZipMap", str(onx))
 
         sess = InferenceSession(onx.SerializeToString())
@@ -54,7 +58,7 @@ class TestMultiOutputConverter(unittest.TestCase):
 
         # check option nocl=True
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
-                      options={id(clf): {'nocl': True}})
+                      options={id(clf): {'nocl': True, 'zipmap': False}})
         self.assertNotIn("ZipMap", str(onx))
 
         sess = InferenceSession(onx.SerializeToString())
@@ -68,7 +72,7 @@ class TestMultiOutputConverter(unittest.TestCase):
 
         # check option nocl=False
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
-                      options={id(clf): {'nocl': False}})
+                      options={id(clf): {'nocl': False, 'zipmap': False}})
         self.assertNotIn("ZipMap", str(onx))
 
         sess = InferenceSession(onx.SerializeToString())

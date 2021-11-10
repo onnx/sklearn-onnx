@@ -50,6 +50,7 @@ from . import random_trees_embedding
 from . import ransac_regressor
 from . import replace_op
 from . import scaler_op
+from . import sequence
 from . import sgd_classifier
 from . import stacking
 from . import support_vector_machines
@@ -108,6 +109,7 @@ __all__ = [
     ransac_regressor,
     replace_op,
     scaler_op,
+    sequence,
     sgd_classifier,
     stacking,
     support_vector_machines,
