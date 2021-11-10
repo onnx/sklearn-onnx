@@ -30,9 +30,24 @@ def _common_convert_sklearn_zipmap(scope: Scope, operator: Operator,
 
 def convert_sklearn_zipmap(scope: Scope, operator: Operator,
                            container: ModelComponentContainer):
-    zipmap_attrs = _common_convert_sklearn_zipmap(scope, operator, container)
-    container.add_node('ZipMap', operator.inputs[1].full_name,
-                       operator.outputs[1].full_name,
+    if len(operator.inputs) == 2:
+        zipmap_attrs = _common_convert_sklearn_zipmap(
+            scope, operator, container)
+        container.add_node('ZipMap', operator.inputs[1].full_name,
+                           operator.outputs[1].full_name,
+                           op_domain='ai.onnx.ml', **zipmap_attrs)
+        return
+
+    if hasattr(operator, 'classlabels_int64s'):
+        zipmap_attrs = dict(classlabels_int64s=operator.classlabels_int64s)
+    elif hasattr(operator, 'classlabels_strings'):
+        zipmap_attrs = dict(classlabels_strings=operator.classlabels_strings)
+    else:
+        raise RuntimeError(
+            "operator should have attribute 'classlabels_int64s' or "
+            "'classlabels_strings'.")
+    container.add_node('ZipMap', operator.inputs[0].full_name,
+                       operator.outputs[0].full_name,
                        op_domain='ai.onnx.ml', **zipmap_attrs)
 
 
