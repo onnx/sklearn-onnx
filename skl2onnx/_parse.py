@@ -513,7 +513,18 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
-    label = scope.declare_local_variable("label", Int64TensorType())
+
+    classes = [get_label_classes(scope, m) for m in model.estimators_]
+    if len(set(cl.dtype for cl in classes)) != 1:
+        raise RuntimeError(
+            "Class labels may have only one type %r."
+            "" % set(cl.dtype for cl in classes))
+    if classes[0].dtype in (np.int32, np.int64):
+        ctype = Int64TensorType
+    else:
+        ctype = StringTensorType
+
+    label = scope.declare_local_variable("label", ctype())
     proba = scope.declare_local_variable(
         "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
     this_operator.outputs.append(label)
@@ -523,16 +534,7 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
     if options.get('output_class_labels', False):
         clout = scope.declare_local_operator('SklearnClassLabels')
         clout.is_multi_output = True
-        clout.classes = [get_label_classes(scope, m)
-                         for m in model.estimators_]
-        if len(set(cl.dtype for cl in clout.classes)) != 1:
-            raise RuntimeError(
-                "Class labels may have only one type %r."
-                "" % set(cl.dtype for cl in clout.classes))
-        if clout.classes[0].dtype in (np.int32, np.int64):
-            ctype = Int64TensorType
-        else:
-            ctype = StringTensorType
+        clout.classes = classes
         class_labels = scope.declare_local_variable(
             "class_labels",
             SequenceType(ctype()))

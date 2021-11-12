@@ -346,6 +346,8 @@ class TestConvertOptions(unittest.TestCase):
 
                 onx = to_onnx(cls, X[:1], options=opts,
                               target_opset=TARGET_OPSET)
+                # with open("debugmo2.onnx", "wb") as f:
+                #     f.write(onx.SerializeToString())
                 sess = InferenceSession(onx.SerializeToString())
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
