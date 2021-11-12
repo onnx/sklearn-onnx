@@ -24,7 +24,7 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
             for i, cl in enumerate(classes):
                 name = scope.get_unique_variable_name(
                     operator.outputs[0].full_name + '_cst_%d' % i)
-                clids = np.arange(len(classes), dtype=np.int64)
+                clids = np.arange(len(cl), dtype=np.int64)
                 container.add_initializer(
                     name, onnx_proto.TensorProto.INT64, list(clids.shape),
                     clids.tolist())

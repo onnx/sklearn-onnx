@@ -263,13 +263,16 @@ class TestConvertOptions(unittest.TestCase):
     def almost_equal_multi_labels(
             expected_label, expected_proba, expected_class_labels,
             *probas, decimal=5):
-        assert_almost_equal(expected_label, probas[0])
+        if expected_label.tolist() != probas[0].tolist():
+            raise AssertionError(
+                "Labels mismatched %r != %r." % (
+                    expected_label.tolist(), probas[0].tolist()))
         for pr1, pr2 in zip(expected_proba, probas[1]):
             assert_almost_equal(pr1, pr2, decimal=decimal)
         for la1, la2 in zip(expected_class_labels, probas[2]):
             if la1.tolist() != la2.tolist():
                 raise AssertionError(
-                    "Labels mismatched %r != %r." % (
+                    "Class labels mismatched %r != %r." % (
                         la1.tolist(), la2.tolist()))
 
     @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
@@ -282,6 +285,7 @@ class TestConvertOptions(unittest.TestCase):
         X = X.astype(numpy.float32)
         y = numpy.vstack([y, 1 - y]).T
         y[0, :] = 1
+        y[:10, 1] = 3
         X_train, X_test, y_train, y_test = train_test_split(X, y)
 
         for cls in TestConvertOptions.get_model_multi_label():
@@ -332,6 +336,7 @@ class TestConvertOptions(unittest.TestCase):
         X = X.astype(numpy.float32)
         y = numpy.vstack([y, 1 - y]).T
         y[0, :] = 1
+        y[:10, 1] = 3
         y = numpy.array(list(map(
             lambda s: "cl%d" % s, y.ravel()))).reshape(y.shape)
         X_train, X_test, y_train, y_test = train_test_split(X, y)
