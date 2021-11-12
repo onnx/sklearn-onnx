@@ -27,15 +27,39 @@ def convert_sklearn_tfidf_transformer(scope: Scope, operator: Operator,
     output_name = scope.get_unique_variable_name('tfidftr_output')
 
     if op.sublinear_tf:
-        plus1 = scope.get_unique_variable_name("plus1")
-        C = operator.inputs[0].type.shape[1]
-        ones = scope.get_unique_variable_name("ones")
-        cst = np.ones((C,), dtype=float_type)
-        container.add_initializer(ones, proto_dtype, [C], cst.flatten())
-        apply_add(scope, data + [ones], plus1, container, broadcast=1)
-        plus1logged = scope.get_unique_variable_name("plus1logged")
-        apply_log(scope, plus1, plus1logged, container)
-        data = [plus1logged]
+        # code scikit-learn
+        # np.log(X.data, X.data) --> does not apply on null coefficient
+        # X.data += 1
+        # ONNX does not support sparse tensors before opset < 11
+        # approximated by X.data += 1 --> np.log(X.data, X.data)
+        if operator.target_opset < 11:
+            plus1 = scope.get_unique_variable_name("plus1")
+            C = operator.inputs[0].type.shape[1]
+            ones = scope.get_unique_variable_name("ones")
+            cst = np.ones((C,), dtype=float_type)
+            container.add_initializer(ones, proto_dtype, [C], cst.flatten())
+            apply_add(scope, data + [ones], plus1, container, broadcast=1)
+            plus1logged = scope.get_unique_variable_name("plus1logged")
+            apply_log(scope, plus1, plus1logged, container)
+            data = [plus1logged]
+        else:
+            # sparse containers are not implemented yet.
+            raise RuntimeError(
+                "ONNX does not support sparse tensors before opset < 11, "
+                "sublinear_tf must be False.")
+            # In case sparse is enabled.
+            # C = operator.inputs[0].type.shape[1]
+            # logged = scope.get_unique_variable_name('logged')
+            # apply_log(scope, data, logged, container)
+            # if not op.use_idf and op.norm is None:
+            #     loggedplus1 = final
+            # else:
+            #     loggedplus1 = scope.get_unique_variable_name('loggedplus1')
+            # ones = scope.get_unique_variable_name('ones')
+            # cst = np.ones((C,), dtype=float_type)
+            # container.add_initializer(ones, proto_dtype, [C], cst.flatten())
+            # apply_add(scope, [logged, ones], loggedplus1, container, broadcast=1)
+            # data = [loggedplus1]
 
     if op.use_idf:
         cst = op.idf_.astype(float_type)
