@@ -518,6 +518,27 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
         "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
     this_operator.outputs.append(label)
     this_operator.outputs.append(proba)
+
+    options = scope.get_options(model)
+    if options.get('output_class_labels', False):
+        clout = scope.declare_local_operator('SklearnClassLabels')
+        clout.is_multi_output = True
+        clout.classes = [get_label_classes(scope, m)
+                         for m in model.estimators_]
+        if len(set(cl.dtype for cl in clout.classes)) != 1:
+            raise RuntimeError(
+                "Class labels may have only one type %r."
+                "" % set(cl.dtype for cl in clout.classes))
+        if clout.classes[0].dtype in (np.int32, np.int64):
+            ctype = Int64TensorType
+        else:
+            ctype = StringTensorType
+        class_labels = scope.declare_local_variable(
+            "class_labels",
+            SequenceType(ctype()))
+        clout.outputs.append(class_labels)
+        return list(this_operator.outputs) + [class_labels]
+
     return this_operator.outputs
 
 

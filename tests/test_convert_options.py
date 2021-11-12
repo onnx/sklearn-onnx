@@ -259,6 +259,120 @@ class TestConvertOptions(unittest.TestCase):
                     got = sess.run(None, {'X': X_test})
                     assert_almost_equal(expected_label, got[0])
 
+    @staticmethod
+    def almost_equal_multi_labels(
+            expected_label, expected_proba, expected_class_labels,
+            *probas, decimal=5):
+        assert_almost_equal(expected_label, probas[0])
+        for pr1, pr2 in zip(expected_proba, probas[1]):
+            assert_almost_equal(pr1, pr2, decimal=decimal)
+        for la1, la2 in zip(expected_class_labels, probas[2]):
+            if la1.tolist() != la2.tolist():
+                raise AssertionError(
+                    "Labels mismatched %r != %r." % (
+                        la1.tolist(), la2.tolist()))
+
+    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+                     reason="known issue with string")
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
+    def test_multi_label_option_zipmap_class_labels(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        X = X.astype(numpy.float32)
+        y = numpy.vstack([y, 1 - y]).T
+        y[0, :] = 1
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+        for cls in TestConvertOptions.get_model_multi_label():
+            with self.subTest(cls=cls.__class__):
+                cls.fit(X_train, y_train)
+                expected_label = cls.predict(X_test)
+                expected_proba = cls.predict_proba(X_test)
+                expected_class_labels = [c.classes_ for c in cls.estimators_]
+                opts = {'zipmap': False, 'output_class_labels': True}
+
+                onx = to_onnx(cls, X[:1], options=opts,
+                              target_opset=TARGET_OPSET)
+
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
+                onx = to_onnx(
+                    cls, X[:1], options={cls.__class__: opts},
+                    target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
+                onx = to_onnx(
+                    cls, X[:1], options={id(cls): opts},
+                    target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
+    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+                     reason="known issue with string")
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
+                               DeprecationWarning))
+    def test_multi_label_option_zipmap_class_labels_string(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        X = X.astype(numpy.float32)
+        y = numpy.vstack([y, 1 - y]).T
+        y[0, :] = 1
+        y = numpy.array(list(map(
+            lambda s: "cl%d" % s, y.ravel()))).reshape(y.shape)
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+        for cls in TestConvertOptions.get_model_multi_label():
+            with self.subTest(cls=cls.__class__):
+                cls.fit(X_train, y_train)
+                expected_label = cls.predict(X_test)
+                expected_proba = cls.predict_proba(X_test)
+                expected_class_labels = [c.classes_ for c in cls.estimators_]
+                opts = {'zipmap': False, 'output_class_labels': True}
+
+                onx = to_onnx(cls, X[:1], options=opts,
+                              target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
+                onx = to_onnx(
+                    cls, X[:1], options={cls.__class__: opts},
+                    target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
+                onx = to_onnx(
+                    cls, X[:1], options={id(cls): opts},
+                    target_opset=TARGET_OPSET)
+                sess = InferenceSession(onx.SerializeToString())
+                got = sess.run(None, {'X': X_test})
+                self.assertEqual(len(got), 3)
+                TestConvertOptions.almost_equal_multi_labels(
+                    expected_label, expected_proba, expected_class_labels,
+                    *got)
+
 
 if __name__ == "__main__":
     # import logging

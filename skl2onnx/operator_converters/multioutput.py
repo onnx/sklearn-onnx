@@ -51,6 +51,7 @@ def convert_multi_output_classifier_converter(
         options = options.copy()
     else:
         options = {}
+
     options.update({'zipmap': False})
     y_list = [OnnxSubEstimator(sub, inp, op_version=op_version,
                                options=options)
@@ -79,4 +80,5 @@ register_converter('SklearnMultiOutputRegressor',
 register_converter('SklearnMultiOutputClassifier',
                    convert_multi_output_classifier_converter,
                    options={'nocl': [False, True],
+                            'output_class_labels': [False, True],
                             'zipmap': [False, True]})
