@@ -577,6 +577,34 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         assert res.shape == (4, 9)
         assert numpy.isnan(res[0, 0])
 
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        reason="Requires opset 9.")
+    def test_model_tfidf_vectorizer11_custom_vocabulary(self):
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+        ]).reshape((4, 1))
+        vc = ["first", "second", "third", "document", "this"]
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, vocabulary=vc)
+        vect.fit(corpus.ravel())
+        self.assertFalse(hasattr(vect, "stop_words_"))
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                     [("input", StringTensorType())],
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11CustomVocab-OneOff-SklCol",
+            allow_failure="StrictVersion(onnxruntime.__version__)"
+                          " <= StrictVersion('0.4.0')",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

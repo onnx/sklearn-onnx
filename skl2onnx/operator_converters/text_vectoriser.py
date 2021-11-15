@@ -228,7 +228,7 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
 
     if hasattr(op, "stop_words_"):
         stop_words = op.stop_words_ | (
-        set(op.stop_words) if op.stop_words else set())
+            set(op.stop_words) if op.stop_words else set())
     else:
         stop_words = set()
 
