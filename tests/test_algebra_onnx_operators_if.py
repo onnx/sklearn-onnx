@@ -259,5 +259,4 @@ class TestOnnxOperatorsIf(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestOnnxOperatorsIf().test_onnx_if_algebra_indirect_unnamed()
     unittest.main()
