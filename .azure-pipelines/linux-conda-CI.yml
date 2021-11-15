@@ -227,7 +227,7 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
-      conda install "numpy$(numpy.version)" "scipy$(numpy.version)"
+      conda install "numpy$(numpy.version)" "scipy$(scipy.version)"
     displayName: 'install numpy, scipy'
 
   - script: |
