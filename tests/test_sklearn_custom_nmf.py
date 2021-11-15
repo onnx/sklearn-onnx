@@ -20,7 +20,8 @@ class TestSklearnCustomNMF(unittest.TestCase):
                      reason="not available")
     def test_custom_nmf(self):
 
-        mat = np.random.random((100, 4)).astype(dtype=np.float64)
+        mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
+                        [1, 0, 0, 0], [0, 0, 1, 0]], dtype=np.float64)
         mat[:mat.shape[1], :] += np.identity(mat.shape[1])
 
         mod = NMF(n_components=2, max_iter=2)
