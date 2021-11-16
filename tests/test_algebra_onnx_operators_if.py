@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 import onnx.helper
 from onnx import TensorProto
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -16,13 +17,18 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxIf, OnnxGreater,
-    OnnxReduceSum, OnnxMul)
+    OnnxReduceSum, OnnxMul, OnnxReduceMin)
 from test_utils import TARGET_OPSET, TARGET_IR
+
+
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestOnnxOperatorsIf(unittest.TestCase):
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.5.0'),
+                     reason="too old onnxruntime")
     def test_onnx_if_test1(self):
 
         then_out = onnx.helper.make_tensor_value_info(
@@ -68,6 +74,8 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         assert_almost_equal(expected, res[0])
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.5.0'),
+                     reason="too old onnxruntime")
     def test_onnx_if_test2(self):
 
         then_out = onnx.helper.make_tensor_value_info(
@@ -252,6 +260,54 @@ class TestOnnxOperatorsIf(unittest.TestCase):
                         global_context={'xy': node_xy},
                         clear_subgraph_inputs=True)
         model_def = ifnode.to_onnx(
+            {'x1': x1, 'x2': x2}, target_opset=opv,
+            outputs=[('y', FloatTensorType())])
+
+        sess = InferenceSession(model_def.SerializeToString())
+        res = sess.run(None, {'x1': x1, 'x2': x2})
+        assert_almost_equal(x1 + x1 * x2, res[0])
+
+    @ignore_warnings(category=DeprecationWarning)
+    def test_onnx_if_algebra_indirect_unnamed_clear_input_recursive(self):
+
+        opv = TARGET_OPSET
+        x1 = np.array([[0, 3], [7, 0]], dtype=np.float32)
+        x2 = np.array([[1, 0], [2, 0]], dtype=np.float32)
+
+        node_xy = OnnxMul('x1', 'x2', op_version=opv)
+        node_then = OnnxAdd(
+            'x1', 'xy', output_names=['absxythen'], op_version=opv)
+        then_body = node_then.to_onnx(
+            {'x1': x1, 'xy': x2}, target_opset=opv,
+            outputs=[('absxythen', FloatTensorType())])
+        node_else = OnnxSub(
+            'x1', 'x2', output_names=['absxyelse'], op_version=opv)
+        else_body = node_else.to_onnx(
+            {'x1': x1, 'x2': x2}, target_opset=opv,
+            outputs=[('absxyelse', FloatTensorType())])
+
+        cond = OnnxGreater(
+            OnnxReduceSum('x1', op_version=opv),
+            OnnxReduceSum('x2', op_version=opv),
+            op_version=opv)
+        ifnode = OnnxIf(cond, then_branch=then_body.graph,
+                        else_branch=else_body.graph,
+                        op_version=opv, output_names=['yt'],
+                        clear_subgraph_inputs=True)
+        subgraph = ifnode.to_onnx(
+            {'x1': x1, 'x2': x2}, target_opset=opv,
+            outputs=[('yt', FloatTensorType())])
+
+        cond2 = OnnxGreater(
+            OnnxReduceMin('x1', op_version=opv),
+            OnnxReduceMin('x2', op_version=opv),
+            op_version=opv)
+        ifnode2 = OnnxIf(cond2, then_branch=then_body.graph,
+                         else_branch=subgraph.graph,
+                         op_version=opv, output_names=['y'],
+                         global_context={'xy': node_xy},
+                         clear_subgraph_inputs=True)
+        model_def = ifnode2.to_onnx(
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
