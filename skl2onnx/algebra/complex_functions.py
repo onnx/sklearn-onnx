@@ -102,17 +102,18 @@ def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
 
 
 def _onnx_cdist_begin(op_version):
-    diff = OnnxSub('next_in', 'next', output_names=[
-                   'diff'], op_version=op_version)
-    id_next = OnnxIdentity('next_in', output_names=[
-                           'next_out'], op_version=op_version)
+    diff = OnnxSub('next_in', 'next', output_names=['diff'],
+                   op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=['next_out'],
+                           op_version=op_version)
     return diff, id_next
 
 
 def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                     dim_in=None, dim_out=None, **kwargs):
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistd')
+    id_next.set_onnx_name_prefix('cdistd_%d' % id(id_next))
+    flat.set_onnx_name_prefix('cdistdf_%d' % id(id_next))
     shape_in = (tensor_type() if dim_in is None
                 else tensor_type([None, dim_in]))
     scan_body = id_next.to_onnx(

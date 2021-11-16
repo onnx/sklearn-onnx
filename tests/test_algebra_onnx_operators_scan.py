@@ -36,6 +36,7 @@ _TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
 
 THRESHOLD = "0.4.0"
 THRESHOLD2 = "0.5.0"
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
@@ -91,6 +92,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         )
 
         model_def = helper.make_model(graph_def, producer_name='onnx-example')
+        del model_def.opset_import[:]
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = TARGET_OPSET

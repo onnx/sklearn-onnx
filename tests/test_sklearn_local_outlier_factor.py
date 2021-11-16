@@ -25,6 +25,9 @@ except ImportError:
     NotImplemented = RuntimeError
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 class TestSklearnLocalOutlierForest(unittest.TestCase):
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
