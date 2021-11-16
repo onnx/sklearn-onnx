@@ -496,7 +496,7 @@ class OnnxOperator:
         if len(graph_algebra) > 0:
             self.kwargs.update(updates)
             self.graph_algebra = graph_algebra
-        
+
         if clear_subgraph_inputs:
             for k, v in self.kwargs.items():
                 if isinstance(v, GraphProto):
