@@ -746,13 +746,15 @@ class Scope:
                     continue
                 if self.has_variable_name(name):
                     raise NameError(
-                        "Result name %r is already taken (node=%r)." % (
-                            name, node))
+                        "Result name %r is already taken (outputs=%r) "
+                        "(node=%r)." % (
+                            name, output_name, node))
                 self.onnx_variable_names.add(name)
             if node.name in self.onnx_operator_names:
                 raise NameError(
-                    "Operator name %r is already taken (node=%r)." % (
-                        name, node))
+                    "Operator name %r is already taken "
+                    "(node=%r)." % (
+                        node.name, node))
             self.onnx_operator_names.add(node.name)
 
     def rename_onnx_name(self, old_name, new_name):

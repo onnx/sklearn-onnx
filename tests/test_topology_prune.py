@@ -9,6 +9,12 @@ from onnxruntime import InferenceSession
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import make_pipeline
 from sklearn import datasets
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity, OnnxAdd
@@ -51,6 +57,7 @@ def dummy_converter(scope, operator, container):
 
 class TestTopologyPrune(unittest.TestCase):
 
+    @ignore_warnings(category=DeprecationWarning)
     def test_dummy_identity(self):
 
         digits = datasets.load_digits(n_class=6)
@@ -75,6 +82,7 @@ class TestTopologyPrune(unittest.TestCase):
                   if node.op_type == "Identity"]
         self.assertEqual(len(idnode), 1)
 
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_subgraphs1(self):
         x = numpy.array([1, 2, 4, 5, 5, 4]).astype(
             numpy.float32).reshape((3, 2))
@@ -94,6 +102,7 @@ class TestTopologyPrune(unittest.TestCase):
         res = sess.run(None, {'input': x})
         self.assertEqual(len(res), 1)
 
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_subgraphs2(self):
         x = numpy.array([1, 2, 4, 5, 5, 4]).astype(
             numpy.float32).reshape((3, 2))

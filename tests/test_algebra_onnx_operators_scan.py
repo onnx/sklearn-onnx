@@ -10,6 +10,12 @@ from scipy.spatial.distance import pdist, squareform, cdist as scipy_cdist
 import onnx
 from onnx.onnx_cpp2py_export.checker import ValidationError
 from onnxruntime import InferenceSession, __version__ as ort_version
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
@@ -22,12 +28,9 @@ except ImportError:
     # onnx is too old
     OnnxConstantOfShape = None
 from onnx import (
-    helper, TensorProto,
-    __version__ as onnx__version__
-)
+    helper, TensorProto, __version__ as onnx__version__)
 from skl2onnx.algebra.complex_functions import (
-    onnx_squareform_pdist, onnx_cdist
-)
+    onnx_squareform_pdist, onnx_cdist)
 from skl2onnx.proto import get_latest_tested_opset_version
 from test_utils import TARGET_OPSET, TARGET_IR
 
@@ -45,6 +48,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
             'sum_in', onnx.TensorProto.FLOAT, [2])
@@ -122,6 +126,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -158,6 +163,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -212,6 +218,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist_in(self):
         opv = _TARGET_OPSET_
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -249,6 +256,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
     @unittest.skipIf((OnnxConstantOfShape is None or
                       StrictVersion(ort_version) <= StrictVersion(THRESHOLD)),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -280,6 +288,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
@@ -329,6 +338,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_mink(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
@@ -381,6 +391,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
                      reason="only available for opset >= 10")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_custom_ops(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
