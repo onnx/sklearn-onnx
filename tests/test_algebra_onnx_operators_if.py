@@ -55,6 +55,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         Z = onnx.helper.make_tensor_value_info('Z', TensorProto.FLOAT, [None])
         graph_def = onnx.helper.make_graph([if_node], 'example', [cond], [Z])
         model_def = onnx.helper.make_model(graph_def, producer_name='skl2onnx')
+        del model_def.opset_import[:]
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = TARGET_OPSET
@@ -100,6 +101,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         graph_def = onnx.helper.make_graph(
             [if_node], 'example', [cond, Y], [Z])
         model_def = onnx.helper.make_model(graph_def, producer_name='skl2onnx')
+        del model_def.opset_import[:]
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = TARGET_OPSET
