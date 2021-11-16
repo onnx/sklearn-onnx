@@ -10,6 +10,10 @@ def convert_sklearn_class_labels(scope: Scope, operator: Operator,
                                  container: ModelComponentContainer):
     if getattr(operator, 'is_multi_output', False):
         classes = operator.classes
+        if not isinstance(classes, list):
+            raise RuntimeError(
+                "classes must be a list of numpy arrays but is %r."
+                "" % type(classes))
         names = []
         if classes[0].dtype in (np.int64, np.int32):
             for i, cl in enumerate(classes):

@@ -521,7 +521,10 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
 
-    classes = [get_label_classes(scope, m) for m in model.estimators_]
+    if hasattr(model, 'classes_'):
+        classes = model.classes_
+    else:
+        classes = [get_label_classes(scope, m) for m in model.estimators_]
     if len(set(cl.dtype for cl in classes)) != 1:
         raise RuntimeError(
             "Class labels may have only one type %r."
