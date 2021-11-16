@@ -510,6 +510,13 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 
 def _parse_sklearn_multi_output_classifier(scope, model, inputs,
                                            custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    if options['zipmap']:
+        warnings.warn(
+            "Option zipmap is ignored for model %r. "
+            "Set option zipmap to False to "
+            "remove this message." % type(model),
+            UserWarning)
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
