@@ -572,7 +572,7 @@ class OnnxOperator:
         Returns an accessor to one of the output
         of this node.
         """
-        return OnnxOperatorItem(self, index)
+        return OnnxOperatorItem(self, index, self.op_version)
 
     def get_output_name(self, i, scope=None):
         "Returns name of output *i*."

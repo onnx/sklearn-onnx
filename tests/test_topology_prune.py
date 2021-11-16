@@ -111,8 +111,11 @@ class TestTopologyPrune(unittest.TestCase):
             'input', op_version=TARGET_OPSET)
         cdist = onnx_squareform_pdist(
             cop, dtype=numpy.float32, op_version=TARGET_OPSET)
+        id1 = [id(a) for a in cdist.onx_op.graph_algebra['body']]
         cdist2 = onnx_squareform_pdist(
             cop, dtype=numpy.float32, op_version=TARGET_OPSET)
+        id2 = [id(a) for a in cdist2.onx_op.graph_algebra['body']]
+        self.assertNotEqual(id1, id2)
         cop2 = OnnxAdd(cdist, cdist2, output_names=['cdist'],
                        op_version=TARGET_OPSET)
 
