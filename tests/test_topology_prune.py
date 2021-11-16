@@ -130,6 +130,5 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestTopologyPrune().test_onnx_subgraphs1()
     # TestTopologyPrune().test_onnx_subgraphs2()
     unittest.main()
