@@ -38,7 +38,6 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
                            op_version=op_version)
     norm = OnnxReduceSumSquare(diff, axes=[1], op_version=op_version)
-    norm.set_onnx_name_prefix("norm_%d" % id(norm))
     flat = OnnxSqueezeApi11(norm, output_names=['scan_out'], axes=[1],
                             op_version=op_version)
     flat.set_onnx_name_prefix('cflat_%d' % id(flat))
@@ -53,7 +52,7 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
         target_opset=op_version)
 
     node = OnnxScan(X, X, output_names=['u(scan0)', 'u(scan1)'],
-                    num_scan_inputs=1, body=scan_body.graph,
+                    num_scan_inputs=1, body=(scan_body.graph, id_next),
                     op_version=op_version, **kwargs)
     return node[1]
 
@@ -126,7 +125,7 @@ def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
         target_opset=op_version)
 
     node = OnnxScan(XA, XB, output_names=['u(scan0)', 'u(scan1)'],
-                    num_scan_inputs=1, body=scan_body.graph,
+                    num_scan_inputs=1, body=(scan_body.graph, id_next),
                     op_version=op_version)
     return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
                          **kwargs)

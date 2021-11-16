@@ -482,6 +482,21 @@ class OnnxOperator:
         Walks through attributes and replaces them by ONNX
         values.
         """
+        # Looks into attributes if there is any tuple
+        # (GraphProto, OnnxOperator). In that case, the function
+        # replaces the tuple by the graph proto and keeps
+        # in attributes graph_algebra the OnnxOperator
+        # which is the source of it.
+        updates = {}
+        graph_algebra = {}
+        for k, v in self.kwargs.items():
+            if isinstance(v, tuple) and isinstance(v[0], GraphProto):
+                updates[k] = v[0]
+                graph_algebra[k] = v[1]
+        if len(graph_algebra) > 0:
+            self.kwargs.update(updates)
+            self.graph_algebra = graph_algebra
+        
         if clear_subgraph_inputs:
             for k, v in self.kwargs.items():
                 if isinstance(v, GraphProto):
