@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from distutils.version import StrictVersion
 from logging import getLogger
 import numpy
 from numpy.testing import assert_almost_equal
@@ -12,8 +13,12 @@ try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
     from sklearn.utils.testing import ignore_warnings
+from sklearn import __version__ as skl_ver
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+skl_ver = ".".join(skl_ver.split('.')[:2])
 
 
 class TestMultiOutputConverter(unittest.TestCase):
@@ -86,6 +91,8 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available.")
+    @unittest.skipIf(StrictVersion(skl_ver) < StrictVersion("0.22"),
+                     reason="classes_ attribute is missing")
     @ignore_warnings(category=(FutureWarning,
                                DeprecationWarning))
     def test_multi_output_classifier_exc(self):
@@ -99,6 +106,8 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available.")
+    @unittest.skipIf(StrictVersion(skl_ver) < StrictVersion("0.22"),
+                     reason="classes_ attribute is missing")
     @ignore_warnings(category=(FutureWarning,
                                DeprecationWarning))
     def test_multi_output_classifier_fallback(self):
