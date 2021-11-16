@@ -35,7 +35,6 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
     """
     diff = OnnxSub('next_in', 'next',
                    op_version=op_version)
-    diff.set_onnx_name_prefix("pdiff_%d" % id(diff))
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
                            op_version=op_version)
     norm = OnnxReduceSumSquare(diff, axes=[1], op_version=op_version)
@@ -106,7 +105,6 @@ def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
 def _onnx_cdist_begin(op_version):
     diff = OnnxSub('next_in', 'next',
                    op_version=op_version)
-    diff.set_onnx_name_prefix("cdiff_%d" % id(diff))
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
                            op_version=op_version)
     return diff, id_next
