@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
+from logging import getLogger
 from io import BytesIO
 import numpy as np
 import onnx  # noqa
@@ -178,6 +178,9 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
     """
     Infers outputs type and shapes given an ONNX operator.
     """
+    logger = getLogger('skl2onnx')
+    logger.debug('[infer_outputs] op_type=%r inputs=%r outputs=%r' % (
+        op_type, [x.name for x in inputs], outputs))
     if isinstance(op_type, str):
         required_outputs = []
         if outputs:
@@ -259,6 +262,7 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
         raise RuntimeError("Shape inference fails.\n"
                            "*Inputs*\n{}\n*Model*\n{}'".format(
                                onnx_inputs, original_model))
+    logger.debug('[infer_outputs] shapes=%r' % (shapes, ))
     return shapes
 
 

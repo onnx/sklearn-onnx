@@ -28,6 +28,8 @@ class GraphState:
                  output_range=None, operator=None,
                  run_converters=False, input_types=None, **attrs):
 
+        logger.debug("[State] +%s n_inputs=%r n_outputs=%r" % (
+            operator_name, len(inputs), len(output_names)))
         self.inputs = inputs
         self._output_names = output_names
         self._input_range = input_range.copy() if input_range else [1, 1e9]
@@ -461,6 +463,12 @@ class GraphState:
                 else:
                     expected_outputs = None
 
+            logger.debug(
+                "[State.run] id=%d op_name=%r is_model=%r "
+                "expected_outputs=%r" % (
+                    id(self), self.operator_name, self.is_model,
+                    expected_outputs))
+
             inputs = []
             for i in self.inputs:
                 v = self._get_var_name(i, False, index=None)
@@ -471,6 +479,10 @@ class GraphState:
                 expected_inputs=self._expected_inputs,
                 input_range=self._input_range,
                 input_types=self.input_types)
+
+            logger.debug(
+                "[State.run] id=%d op_name=%r computed_inputs_=%r" % (
+                    id(self), self.operator_name, self.computed_inputs_))
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -640,3 +652,5 @@ class GraphState:
                         var.set_onnx_name(name)
                         var.init_status(is_fed=True)
                         self.computed_outputs_.append(var)
+
+            logger.debug('[State.run] end id=%d' % id(self))

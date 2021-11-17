@@ -26,7 +26,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
     OnnxPad, OnnxBatchNormalization,
-    OnnxConstantOfShape)
+    OnnxConstantOfShape, OnnxMatMul, OnnxSoftmax)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -448,6 +448,39 @@ class TestOnnxOperators(unittest.TestCase):
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 
+    def test_softmax(self):
+        X = np.random.randn(100, 4).astype(np.float32)
+        y = X.sum(axis=1) + np.random.randn(100) / 10
+        y = y.astype(np.float32)
+        self.assertEqual(y.shape, (100, ))
+        weight = np.random.randn(4, 1).astype(np.float32)
+        intercept = np.random.randn(1).astype(np.float32)
+
+        node = OnnxAdd(
+                OnnxMatMul('X', weight, op_version=TARGET_OPSET),
+                intercept, op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        with open("debug_ort_add.onnx", "wb") as f:
+            f.write(nn_onnx.SerializeToString())
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
+        node = OnnxMatMul('X', weight, op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
+        node = OnnxSoftmax(
+            OnnxAdd(
+                OnnxMatMul('X', weight, op_version=TARGET_OPSET),
+                intercept, op_version=TARGET_OPSET),
+            op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
 
 if __name__ == "__main__":
+    import logging
+    logger = logging.getLogger('skl2onnx')
+    logger.setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
+    TestOnnxOperators().test_softmax()
     unittest.main()
