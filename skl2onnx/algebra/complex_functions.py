@@ -33,16 +33,16 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric='sqeuclidean'))``.
     """
-    diff = OnnxSub('next_in', 'next', output_names=['diff'],
+    diff = OnnxSub('next_in', 'next',
                    op_version=op_version)
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
                            op_version=op_version)
-    norm = OnnxReduceSumSquare(diff, output_names=['norm'], axes=[1],
-                               op_version=op_version)
+    norm = OnnxReduceSumSquare(diff, axes=[1], op_version=op_version)
     flat = OnnxSqueezeApi11(norm, output_names=['scan_out'], axes=[1],
                             op_version=op_version)
+    flat.set_onnx_name_prefix('cflat_%d' % id(flat))
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('pdistsqe')
+    id_next.set_onnx_name_prefix('pdistsqe_%d' % id(id_next))
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', tensor_type()),
                      ('next', tensor_type())]),
@@ -52,7 +52,8 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
         target_opset=op_version)
 
     node = OnnxScan(X, X, output_names=['u(scan0)', 'u(scan1)'],
-                    num_scan_inputs=1, body=scan_body.graph,
+                    num_scan_inputs=1,
+                    body=(scan_body.graph, [id_next, flat]),
                     op_version=op_version, **kwargs)
     return node[1]
 
@@ -102,17 +103,18 @@ def onnx_cdist(XA, XB, metric='sqeuclidean', dtype=None,
 
 
 def _onnx_cdist_begin(op_version):
-    diff = OnnxSub('next_in', 'next', output_names=[
-                   'diff'], op_version=op_version)
-    id_next = OnnxIdentity('next_in', output_names=[
-                           'next_out'], op_version=op_version)
+    diff = OnnxSub('next_in', 'next',
+                   op_version=op_version)
+    id_next = OnnxIdentity('next_in', output_names=['next_out'],
+                           op_version=op_version)
     return diff, id_next
 
 
 def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                     dim_in=None, dim_out=None, **kwargs):
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistd')
+    id_next.set_onnx_name_prefix('cdistd_%d' % id(id_next))
+    flat.set_onnx_name_prefix('cdistdf_%d' % id(id_next))
     shape_in = (tensor_type() if dim_in is None
                 else tensor_type([None, dim_in]))
     scan_body = id_next.to_onnx(
@@ -124,7 +126,8 @@ def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
         target_opset=op_version)
 
     node = OnnxScan(XA, XB, output_names=['u(scan0)', 'u(scan1)'],
-                    num_scan_inputs=1, body=scan_body.graph,
+                    num_scan_inputs=1,
+                    body=(scan_body.graph, [id_next, flat]),
                     op_version=op_version)
     return OnnxTranspose(node[1], perm=[1, 0], op_version=op_version,
                          **kwargs)
@@ -138,8 +141,7 @@ def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None,
     """
     diff, id_next = _onnx_cdist_begin(op_version)
     norm = OnnxReduceSumSquare(
-        diff, output_names=['norm'], axes=[1],
-        keepdims=0, op_version=op_version)
+        diff, axes=[1], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)
@@ -155,8 +157,8 @@ def _onnx_cdist_minkowski(XA, XB, dtype=None, op_version=None, p=2,
     diff_pow = OnnxPow(OnnxAbs(diff, op_version=op_version),
                        np.array([p], dtype=dtype), op_version=op_version)
     norm = OnnxReduceSumApi11(
-        diff_pow, axes=[1], output_names=['norm'],
-        keepdims=0, op_version=op_version)
+        diff_pow, axes=[1], keepdims=0, op_version=op_version)
+    norm.set_onnx_name_prefix("norm_%d" % id(norm))
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)
@@ -170,8 +172,9 @@ def _onnx_cdist_manhattan(XA, XB, dtype=None, op_version=None,
     """
     diff, id_next = _onnx_cdist_begin(op_version)
     diff_pow = OnnxAbs(diff, op_version=op_version)
-    norm = OnnxReduceSumApi11(diff_pow, axes=[1], output_names=[
-        'norm'], keepdims=0, op_version=op_version)
+    norm = OnnxReduceSumApi11(
+        diff_pow, axes=[1], keepdims=0, op_version=op_version)
+    norm.set_onnx_name_prefix("norm_%d" % id(norm))
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                            dim_in=dim_in, dim_out=dim_out, **kwargs)

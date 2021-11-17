@@ -3,6 +3,7 @@
 from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
+from onnx import GraphProto
 from ..proto import onnx_proto, TensorProto
 from ..common.data_types import (
     guess_proto_type, _guess_numpy_type, _guess_type_proto_str,
@@ -431,6 +432,21 @@ class GraphState:
 
     def run(self):
         if self.computed_outputs_ is None:
+
+            # We need to register all names in subgraphs and raise
+            # an exception if the names are already taken.
+            for k, v in self.attrs.items():
+                if isinstance(v, GraphProto):
+                    try:
+                        self.scope.declare_existing_subgraph_name(v)
+                    except NameError as e:
+                        raise RuntimeError(
+                            "A name exists both in the subgraph and "
+                            "in the main graph. Use set_onnx_name_prefix to "
+                            "to rename one of them, attribute=%r, "
+                            "op_type=%r." % (
+                                k, self.operator_name)) from e
+
             if self.operator is not None:
                 expected_outputs = self.operator.outputs
             else:
@@ -602,6 +618,7 @@ class GraphState:
                 self.container.add_node(
                     self.operator_name, input_names, output_names,
                     name=name, **self.attrs)
+
                 computed_outputs = [
                     (name, ct[1]) for name, ct in zip(
                         output_names, self._expected_outputs)]

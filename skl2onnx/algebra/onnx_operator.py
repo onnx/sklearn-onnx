@@ -2,6 +2,7 @@
 
 import warnings
 import numpy as np
+from onnx import GraphProto
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
 from ..common.data_types import (
@@ -135,7 +136,21 @@ class OnnxOperator:
     :param op_version: to select a specific version of the operator
     :param output_names: used defined names for the outputs
     :param domain: to overwrite the default domain
+    :param global_context: operator *If* executes one subgraph
+        whose nodes may use one existing output in the current
+        context. If not used in the main graph, these operators
+        are not linked to the output and cannot be retrieved.
+        *global_context* is a dictionary mapped the subgraph input
+        names to these operators.
+    :param clear_subgraph_inputs: clears subgraphs outputs.
+        Operator *If* does take subgraphs as attribute,
+        there are subgraphs with no inputs and
+        global variable as hidden inputs.
     :param kwargs: additional parameters of the operator
+
+    .. versionchanged:: 1.10.1
+        Parameter *global_context*, *clear_subgraph_inputs*
+        were added.
     """
     class OnnxOperatorVariable(GraphStateVar):
 
@@ -254,7 +269,8 @@ class OnnxOperator:
         return found
 
     def __init__(self, *inputs, op_version=None, output_names=None,
-                 domain=None, **kwargs):
+                 domain=None, global_context=None,
+                 clear_subgraph_inputs=False, **kwargs):
 
         if (output_names is None and
                 self.__class__.__name__.startswith("OnnxScan")):
@@ -389,6 +405,20 @@ class OnnxOperator:
                     "class opset={})".format(
                         self.operator_name, *self.input_range,
                         len(self.inputs), op_version, self.op_version))
+        # global context
+        if global_context is None:
+            self.global_context = None
+        else:
+            if not isinstance(global_context, dict):
+                raise TypeError(
+                    "global_context must be a dictionary not %r."
+                    "" % type(global_context))
+            for k, v in global_context.items():
+                if not isinstance(v, (OnnxOperator, OnnxOperatorItem)):
+                    raise TypeError(
+                        "Value %r in must be an OnnxOperator or an "
+                        "OnnxOperatorItem not %r." % (k, type(v)))
+            self.global_context = global_context
 
         # check output
         self.output_names = output_names
@@ -444,13 +474,34 @@ class OnnxOperator:
                 self.expected_inputs.append(inp)
 
         self.output_names_ = None
-        self._post_process_attributes()
+        self._post_process_attributes(
+            clear_subgraph_inputs=clear_subgraph_inputs)
 
-    def _post_process_attributes(self):
+    def _post_process_attributes(self, clear_subgraph_inputs=False):
         """
         Walks through attributes and replaces them by ONNX
         values.
         """
+        # Looks into attributes if there is any tuple
+        # (GraphProto, OnnxOperator). In that case, the function
+        # replaces the tuple by the graph proto and keeps
+        # in attributes graph_algebra the OnnxOperator
+        # which is the source of it.
+        updates = {}
+        graph_algebra = {}
+        for k, v in self.kwargs.items():
+            if isinstance(v, tuple) and isinstance(v[0], GraphProto):
+                updates[k] = v[0]
+                graph_algebra[k] = v[1]
+        if len(graph_algebra) > 0:
+            self.kwargs.update(updates)
+            self.graph_algebra = graph_algebra
+
+        if clear_subgraph_inputs:
+            for k, v in self.kwargs.items():
+                if isinstance(v, GraphProto):
+                    del v.input[:]
+
         if self.__class__.__name__ == "OnnxConstantOfShape":
             if "value" in self.kwargs:
                 value = self.kwargs['value']
@@ -521,7 +572,7 @@ class OnnxOperator:
         Returns an accessor to one of the output
         of this node.
         """
-        return OnnxOperatorItem(self, index)
+        return OnnxOperatorItem(self, index, self.op_version)
 
     def get_output_name(self, i, scope=None):
         "Returns name of output *i*."
@@ -866,12 +917,26 @@ class OnnxOperator:
             container.add_input(var)
             scope.register_variable(var)
         self.add_to(scope, container, run_converters=True)
+
+        extra_outputs = []
         if other_outputs is not None:
-            for out in other_outputs:
-                if not hasattr(out, 'add_to'):
-                    raise RuntimeError(
-                        "Extra outputs must have method 'add_to'.")
-                out.add_to(scope, container, run_converters=True)
+            extra_outputs.extend(other_outputs)
+        if self.global_context is not None:
+            for name, var in self.global_context.items():
+                if var.output_names is None:
+                    # The variable name is likely to be different.
+                    from .onnx_ops import OnnxIdentity
+                    var2 = OnnxIdentity(
+                        var, op_version=var.op_version,
+                        output_names=[name])
+                else:
+                    var2 = var
+                extra_outputs.append(var2)
+        for out in extra_outputs:
+            if not hasattr(out, 'add_to'):
+                raise RuntimeError(
+                    "Extra outputs must have method 'add_to'.")
+            out.add_to(scope, container, run_converters=True)
 
         # infer shapes
         if outputs:

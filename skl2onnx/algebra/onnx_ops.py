@@ -73,7 +73,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                 "op_version={} does not refer to the same opset as the class "
                 "name ('{}').".format(op_version, self.__class__.__name__))
         for key in kwargs:
-            if key in {'output_names', 'op_version', 'domain', 'ir_version'}:
+            if key in {'output_names', 'op_version', 'domain', 'ir_version',
+                       'global_context', 'clear_subgraph_inputs'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s' opset=%s."
