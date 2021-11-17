@@ -735,6 +735,28 @@ class Scope:
 
         self.variables[var.onnx_name] = var
 
+    def declare_existing_subgraph_name(self, graph_proto):
+        """
+        Declare all name from a subgraph in order to avoid being picked twice.
+        """
+        output_name = {o.name for o in graph_proto.output}
+        for node in graph_proto.node:
+            for name in node.output:
+                if name in output_name:
+                    continue
+                if self.has_variable_name(name):
+                    raise NameError(
+                        "Result name %r is already taken (outputs=%r) "
+                        "(node=%r)." % (
+                            name, output_name, node))
+                self.onnx_variable_names.add(name)
+            if node.name in self.onnx_operator_names:
+                raise NameError(
+                    "Operator name %r is already taken "
+                    "(node=%r)." % (
+                        node.name, node))
+            self.onnx_operator_names.add(node.name)
+
     def rename_onnx_name(self, old_name, new_name):
         if new_name in self.variables:
             raise RuntimeError(

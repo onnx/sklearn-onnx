@@ -132,8 +132,9 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         reason="ArgMax, Reciprocal are missing")
     @ignore_warnings(category=warnings_to_skip)
     def test_modelsgdlog_64(self):
-        self._common_classifier([lambda: SGDClassifier(loss='log')],
-                                "SGDClassifierLog")
+        self._common_classifier(
+            [lambda: SGDClassifier(loss='log', random_state=32)],
+            "SGDClassifierLog")
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion(ORT_VERSION),
