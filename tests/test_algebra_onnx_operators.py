@@ -478,9 +478,9 @@ class TestOnnxOperators(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import logging
-    logger = logging.getLogger('skl2onnx')
-    logger.setLevel(logging.DEBUG)
-    logging.basicConfig(level=logging.DEBUG)
-    TestOnnxOperators().test_softmax()
+    # import logging
+    # logger = logging.getLogger('skl2onnx')
+    # logger.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
+    # TestOnnxOperators().test_softmax()
     unittest.main()

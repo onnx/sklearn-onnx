@@ -28,8 +28,10 @@ class GraphState:
                  output_range=None, operator=None,
                  run_converters=False, input_types=None, **attrs):
 
-        logger.debug("[State] +%s n_inputs=%r n_outputs=%r" % (
-            operator_name, len(inputs), len(output_names)))
+        logger.debug(
+            "[State] +%s n_inputs=%r n_outputs=%r",
+            operator_name, -1 if inputs is None else len(inputs),
+            -1 if output_names is None else len(output_names))
         self.inputs = inputs
         self._output_names = output_names
         self._input_range = input_range.copy() if input_range else [1, 1e9]
@@ -465,9 +467,8 @@ class GraphState:
 
             logger.debug(
                 "[State.run] id=%d op_name=%r is_model=%r "
-                "expected_outputs=%r" % (
-                    id(self), self.operator_name, self.is_model,
-                    expected_outputs))
+                "expected_outputs=%r",
+                id(self), self.operator_name, self.is_model, expected_outputs)
 
             inputs = []
             for i in self.inputs:
@@ -481,8 +482,8 @@ class GraphState:
                 input_types=self.input_types)
 
             logger.debug(
-                "[State.run] id=%d op_name=%r computed_inputs_=%r" % (
-                    id(self), self.operator_name, self.computed_inputs_))
+                "[State.run] id=%d op_name=%r computed_inputs_=%r",
+                id(self), self.operator_name, self.computed_inputs_)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -542,12 +543,12 @@ class GraphState:
                 sub_op.outputs = sub_outputs
 
                 shape_calc = get_shape_calculator(self.operator_name)
-                logger.debug("[StateShape] call %r fed %r - %r" % (
-                    sub_op,
+                logger.debug(
+                    "[StateShape] call %r fed %r - %r", sub_op,
                     "".join(str(i.is_fed) for i in sub_op.inputs),
-                    "".join(str(i.is_fed) for i in sub_op.outputs)))
+                    "".join(str(i.is_fed) for i in sub_op.outputs))
                 shape_calc(sub_op)
-                logger.debug("[StateShape] end - %r" % sub_op)
+                logger.debug("[StateShape] end - %r", sub_op)
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
@@ -586,12 +587,12 @@ class GraphState:
                     # The parser was run on sub-operators but not the
                     # converter.
                     conv = get_converter(self.operator_name)
-                    logger.debug("[StateConv] %r fed %r - %r" % (
-                        sub_op,
+                    logger.debug(
+                        "[StateConv] %r fed %r - %r", sub_op,
                         "".join(str(i.is_fed) for i in sub_op.inputs),
-                        "".join(str(i.is_fed) for i in sub_op.outputs)))
+                        "".join(str(i.is_fed) for i in sub_op.outputs))
                     conv(self.scope, sub_op, self.container)
-                    logger.debug("[StateConv] %r - end." % sub_op)
+                    logger.debug("[StateConv] %r - end.", sub_op)
                 else:
                     if (expected_outputs is not None and
                             len(sub_op.outputs) == len(expected_outputs)):
@@ -653,4 +654,4 @@ class GraphState:
                         var.init_status(is_fed=True)
                         self.computed_outputs_.append(var)
 
-            logger.debug('[State.run] end id=%d' % id(self))
+            logger.debug('[State.run] end id=%d', id(self))

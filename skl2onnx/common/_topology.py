@@ -93,8 +93,8 @@ class Variable:
                 else:
                     onnx_name = scope.get_unique_variable_name("U")
                 logger.debug(
-                    '[Var] rename raw_name=%r, onnx_name=%r into %r' % (
-                        raw_name, onnx_name0, onnx_name))
+                    '[Var] rename raw_name=%r, onnx_name=%r into %r',
+                    raw_name, onnx_name0, onnx_name)
             else:
                 raise TypeError(
                     "onnx_name must be a string not %r." % onnx_name)
@@ -138,7 +138,7 @@ class Variable:
                     raise TypeError(
                         "shape must contains integers not %r (type=%r)."
                         "" % (dim, dim.__class__))
-        logger.debug('[Var] +%s' % self)
+        logger.debug('[Var] +%s', self)
 
         # links to operators using those variables
         self.operators_outputs_ = []
@@ -185,14 +185,15 @@ class Variable:
 
     def init_status(self, is_fed=None, is_root=None, is_leaf=None):
         if is_fed is not None and is_fed != self.is_fed:
-            logger.debug('[Var] update is_fed=%r for %r, parent=%r' % (
-                is_fed, self, self._parent))
+            logger.debug(
+                '[Var] update is_fed=%r for %r, parent=%r',
+                is_fed, self, self._parent)
             self._is_fed = is_fed
         if is_root is not None and is_root != self.is_root:
-            logger.debug('[Var] update is_root=%r for %r' % (is_root, self))
+            logger.debug('[Var] update is_root=%r for %r', is_root, self)
             self._is_root = is_root
         if is_leaf is not None and is_leaf != self.is_leaf:
-            logger.debug('[Var] update is_leaf=%r for %r' % (is_leaf, self))
+            logger.debug('[Var] update is_leaf=%r for %r', is_leaf, self)
             self._is_leaf = is_leaf
 
     def __setattr__(self, name, value):
@@ -212,14 +213,15 @@ class Variable:
             raise TypeError(
                 "Unexpected new type for variable %r, new_type=%r." % (
                     self, new_type))
-        logger.debug('[Var] update type for %r' % self)
+        logger.debug('[Var] update type for %r', self)
         self._type = new_type
         self._check()
 
     def set_onnx_name(self, onnx_name):
         if onnx_name != self._onnx_name:
-            logger.debug('[Var] update onnx_name, from %r to %r in %r' % (
-                self.onnx_name, onnx_name, self))
+            logger.debug(
+                '[Var] update onnx_name, from %r to %r in %r',
+                self.onnx_name, onnx_name, self)
             if self.scope is not None and not isinstance(self.scope, str):
                 self.scope.rename_onnx_name(self._onnx_name, onnx_name)
             self._onnx_name = onnx_name
@@ -229,8 +231,8 @@ class Variable:
             raise RuntimeError(
                 "This variable is already the output of operator %r. "
                 "It cannot be the output of %r." % (self._parent, operator))
-        logger.debug('[Var] set parent for %r, parent=%r' % (
-            self, operator))
+        logger.debug(
+            '[Var] set parent for %r, parent=%r', self, operator)
         self._parent = operator
 
     def get_first_dimension(self):
@@ -398,7 +400,7 @@ class Operator:
             if self.kind == 'Out':
                 v.set_parent(self.parent)
             super(Operator.OperatorList, self).append(v)
-            logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
+            logger.debug("[Op] add %s %r to %r", self.kind, v, self.parent)
             if self.kind == 'In':
                 v.add_operator(self.parent, False)
             elif self.kind == "Out":
@@ -427,8 +429,9 @@ class Operator:
             if not isinstance(v, Variable):
                 raise TypeError(
                     "Value v must be a Variable not %r." % type(v))
-            logger.debug("[Op] %s-change element %d from %r to %r in %r" % (
-                self.kind, i, self[i], v, self.parent))
+            logger.debug(
+                "[Op] %s-change element %d from %r to %r in %r",
+                self.kind, i, self[i], v, self.parent)
             list.__setitem__(self, i, v)
 
         def to_string(self):
@@ -472,7 +475,7 @@ class Operator:
         self._is_evaluated = None
         self.target_opset = target_opset
         self.scope_inst = scope_inst
-        logger.debug('[Op] +%r' % self)
+        logger.debug('[Op] +%r', self)
 
     def new_raw_operator(self, raw_operator, alias):
         """
@@ -529,8 +532,9 @@ class Operator:
 
     def init_status(self, is_evaluated=None):
         if is_evaluated is not None and is_evaluated != self.is_evaluated:
-            logger.debug('[Op] update is_evaluated=%r for %r' % (
-                is_evaluated, self))
+            logger.debug(
+                '[Op] update is_evaluated=%r for %r',
+                is_evaluated, self)
             self._is_evaluated = is_evaluated
 
     @property
@@ -577,13 +581,14 @@ class Operator:
             raise MissingShapeCalculator(
                 "Unexpected shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
-        logger.debug("[Shape-a] %r fed %r - %r" % (
-            self,
+        logger.debug(
+            "[Shape-a] %r fed %r - %r", self,
             "".join(str(i.is_fed) for i in self.inputs),
-            "".join(str(i.is_fed) for i in self.outputs)))
+            "".join(str(i.is_fed) for i in self.outputs))
         shape_calc(self)
-        logger.debug("[Shape-b] %r inputs=%r - outputs=%r" % (
-            self, self.inputs, self.outputs))
+        logger.debug(
+            "[Shape-b] %r inputs=%r - outputs=%r",
+            self, self.inputs, self.outputs)
 
 
 class Scope:
@@ -765,8 +770,9 @@ class Scope:
         if old_name not in self.variables:
             raise RuntimeError(
                 "Unable to find name %r in variables." % old_name)
-        logger.debug('[Scope] update onnx_name, from %r to %r' % (
-            old_name, new_name))
+        logger.debug(
+            '[Scope] update onnx_name, from %r to %r',
+            old_name, new_name)
         self.variables[new_name] = self.variables[old_name]
         del self.variables[old_name]
 
@@ -861,8 +867,9 @@ class Scope:
         """
         for v in self.operators.values():
             if id(v.raw_operator) == id(op1):
-                logger.debug('[Scope] replace %d by %d in %r.' % (
-                    id(v.raw_operator), id(op1), v))
+                logger.debug(
+                    '[Scope] replace %d by %d in %r.',
+                    id(v.raw_operator), id(op1), v)
                 v.raw_operator = op2
                 v.type = alias
 
@@ -1030,12 +1037,12 @@ class Topology:
         container.validate_options(operator)
         if verbose > 0:
             print("[call_converter] call converter for %r." % operator.type)
-        logger.debug("[Conv] call %r fed %r - %r" % (
-            operator,
+        logger.debug(
+            "[Conv] call %r fed %r - %r", operator,
             "".join(str(i.is_fed) for i in operator.inputs),
-            "".join(str(i.is_fed) for i in operator.outputs)))
+            "".join(str(i.is_fed) for i in operator.outputs))
         conv(self.scopes[0], operator, container)
-        logger.debug("[Conv] end - %r" % operator)
+        logger.debug("[Conv] end - %r", operator)
 
     def call_shape_calculator(self, operator):
         "Calls shape_calculator for operator *operator*."
@@ -1055,14 +1062,14 @@ class Topology:
             shape_calc = None
 
         if shape_calc is not None:
-            logger.debug("[Shape1] %r fed %r - %r (source=%r)" % (
-                operator,
+            logger.debug(
+                "[Shape1] %r fed %r - %r (source=%r)", operator,
                 ",".join(str(i.is_fed) for i in operator.inputs),
                 ",".join(str(i.is_fed) for i in operator.outputs),
-                source))
+                source)
             shape_calc(operator)
         else:
-            logger.debug('[Shape2] call infer_types for %r' % operator)
+            logger.debug('[Shape2] call infer_types for %r', operator)
             operator.infer_types()
 
     def _initialize_graph_status_for_traversing(self):
@@ -1313,8 +1320,8 @@ class Topology:
                     container.swap_names(old_name, new_name)
                 except NotImplementedError as e:
                     logger.debug(
-                        '[Topo] unable to swap %r and %r (%r).' % (
-                            old_name, new_name, e))
+                        '[Topo] unable to swap %r and %r (%r).',
+                        old_name, new_name, e)
                     continue
 
                 for v in self.unordered_variable_iterator():

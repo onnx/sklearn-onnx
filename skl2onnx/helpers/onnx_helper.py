@@ -179,8 +179,9 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
     Infers outputs type and shapes given an ONNX operator.
     """
     logger = getLogger('skl2onnx')
-    logger.debug('[infer_outputs] op_type=%r inputs=%r outputs=%r' % (
-        op_type, [x.name for x in inputs], outputs))
+    logger.debug(
+        '[infer_outputs] op_type=%r inputs=%r outputs=%r',
+        op_type, [x.name for x in inputs], outputs)
     if isinstance(op_type, str):
         required_outputs = []
         if outputs:
@@ -257,12 +258,17 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
         raise RuntimeError(
             "Unable to infer shape of node '{}'\n{}".format(
                 op_type, original_model)) from e
-    shapes = Variable.from_pb(inferred_model.graph.value_info)
+    all_shapes = Variable.from_pb(inferred_model.graph.value_info)
+    used = set()
+    for node in graph.node:
+        for name in node.input:
+            used.add(name)
+    shapes = [shape for shape in all_shapes if shape.onnx_name not in used]
     if len(shapes) == 0:
         raise RuntimeError("Shape inference fails.\n"
                            "*Inputs*\n{}\n*Model*\n{}'".format(
                                onnx_inputs, original_model))
-    logger.debug('[infer_outputs] shapes=%r' % (shapes, ))
+    logger.debug('[infer_outputs] shapes=%r', shapes)
     return shapes
 
 
