@@ -14,6 +14,15 @@ from onnxconverter_common.utils import check_input_and_output_numbers  # noqa
 from onnxconverter_common.utils import check_input_and_output_types  # noqa
 from .data_types import TensorType
 
+_unique_index = {'subgraph': 0}
+
+
+def get_unique_subgraph():
+    "Returns a unique identifier integer for subgraph."
+    global _unique_index
+    _unique_index['subgraph'] += 1
+    return _unique_index['subgraph']
+
 
 def get_producer():
     """
