@@ -5,10 +5,14 @@ Optimization of :epkg:`ONNX` graphs.
 Functions in *onnxconverter-common* do not support
 opset < 9.
 """
+from logging import getLogger
 from onnx.helper import make_graph
 from ._onnx_optimisation_common import (
     _rename_node_input, _rename_node_output,
     _apply_optimisation_on_graph, _apply_remove_node_fct_node)
+
+
+logger = getLogger('skl2onnx')
 
 
 def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
@@ -74,27 +78,39 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                         continue
                     if out in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], out, inp)
+                        logger.debug(
+                            '[VarId-a] rename node input %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
+                logger.debug('[NodeId-a] remove %r' % nodes[i])
                 nodes[i] = None
                 rem += 1
                 continue
-            if not restart and inp not in inputs and inp not in outputs:
+            if (not restart and inp not in inputs and inp not in outputs and
+                    out not in outputs):
                 # We cannot change an input name or an output name.
                 for j in range(len(nodes)):
                     if nodes[j] is None:
                         continue
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
+                        logger.debug(
+                            '[Var] rename node output %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
                     if inp in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], inp, out)
+                        logger.debug(
+                            '[VarId-b] rename node input %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
+                logger.debug('[NodeId-b] remove %r' % nodes[i])
                 nodes[i] = None
                 rem += 1
 

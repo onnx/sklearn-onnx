@@ -168,6 +168,7 @@ register_converter('SklearnStackingClassifier',
                    convert_sklearn_stacking_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnStackingRegressor',
                    convert_sklearn_stacking_regressor)

@@ -464,11 +464,13 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
         from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
         from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
         from skl2onnx import update_registered_converter
-        update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
-                                    calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier,
-                                    options={'zipmap': [True, False, 'columns'],
-                                             'raw_scores': [True, False]})
+        update_registered_converter(
+                SGDClassifier, 'SklearnLinearClassifier',
+                calculate_linear_classifier_output_shapes,
+                convert_sklearn_random_forest_classifier,
+                options={'zipmap': [True, False, 'columns'],
+                         'output_class_labels': [False, True],
+                         'raw_scores': [True, False]})
 
     The function does not update the parser if not specified except if
     option `'zipmap'` is added to the list. Every classifier
@@ -486,7 +488,8 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
-    elif options is not None and 'zipmap' in options:
+    elif (options is not None and
+            ('zipmap' in options or 'output_class_labels' in options)):
         from ._parse import (
             _parse_sklearn_classifier, update_registered_parser)
         update_registered_parser(model, _parse_sklearn_classifier)

@@ -475,70 +475,83 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
         (model.__class__ in [NuSVC, SVC] and not model.probability))
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers)
+
     if no_zipmap:
+        if options.get('output_class_labels', False):
+            if not hasattr(model, "classes_"):
+                raise RuntimeError(
+                    "Model type %r has no attribute 'classes_'. "
+                    "Option 'output_class_labels' is invalid or a new parser "
+                    "must be used." % model.__class__.__name__)
+
+            clout = scope.declare_local_operator('SklearnClassLabels')
+            clout.classes = get_label_classes(scope, model)
+            if model.classes_.dtype in (np.int32, np.int64):
+                ctype = Int64TensorType
+            else:
+                ctype = StringTensorType
+            label_type = ctype(clout.classes.shape)
+            class_labels = scope.declare_local_variable(
+                'class_labels', label_type)
+            clout.outputs.append(class_labels)
+            outputs = list(probability_tensor)
+            outputs.append(class_labels)
+            return outputs
         return probability_tensor
+
+    if options.get('output_class_labels', False):
+        raise RuntimeError(
+            "Option 'output_class_labels' is not compatible with option "
+            "'zipmap'.")
+
     return _apply_zipmap(
         options['zipmap'], scope, model, inputs[0].type, probability_tensor)
 
 
 def _parse_sklearn_multi_output_classifier(scope, model, inputs,
                                            custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    if options['zipmap']:
+        warnings.warn(
+            "Option zipmap is ignored for model %r. "
+            "Set option zipmap to False to "
+            "remove this message." % type(model),
+            UserWarning)
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
-    guessed_output_type = guess_tensor_type(inputs[0].type)
-    label_type = Int64TensorType()
-    label = scope.declare_local_variable("label", label_type)
 
-    options = scope.get_options(model, dict(zipmap=True))
-    no_zipmap = isinstance(options['zipmap'], bool) and not options['zipmap']
+    if hasattr(model, 'classes_'):
+        classes = model.classes_
+    else:
+        classes = [get_label_classes(scope, m) for m in model.estimators_]
+    if len(set(cl.dtype for cl in classes)) != 1:
+        raise RuntimeError(
+            "Class labels may have only one type %r."
+            "" % set(cl.dtype for cl in classes))
+    if classes[0].dtype in (np.int32, np.int64):
+        ctype = Int64TensorType
+    else:
+        ctype = StringTensorType
 
-    if no_zipmap:
-        proba = scope.declare_local_variable(
-            "probabilities", SequenceType(guessed_output_type))
-        this_operator.outputs.append(label)
-        this_operator.outputs.append(proba)
-        return this_operator.outputs
-
-    warnings.warn(
-        "The current converter for class %r "
-        "creates a sequence of maps as an output."
-        "This is not allowed in standards ONNX specifications."
-        "" % model.__class__.__name__,
-        RuntimeWarning)
-
-    this_operator.outputs.append(label)
+    label = scope.declare_local_variable("label", ctype())
     proba = scope.declare_local_variable(
-        "output_probabilities", SequenceType(guessed_output_type))
+        "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
+    this_operator.outputs.append(label)
     this_operator.outputs.append(proba)
 
-    zipmap = options.get('zipmap', False)
-    if zipmap == 'columns':
-        raise RuntimeError(
-            "Unable to convert model %r with option zipmap=%r." % (
-                model.__class__.__name__, zipmap))
+    options = scope.get_options(model)
+    if options.get('output_class_labels', False):
+        clout = scope.declare_local_operator('SklearnClassLabels')
+        clout.is_multi_output = True
+        clout.classes = classes
+        class_labels = scope.declare_local_variable(
+            "class_labels",
+            SequenceType(ctype()))
+        clout.outputs.append(class_labels)
+        return list(this_operator.outputs) + [class_labels]
 
-    # zipmap is True
-    zipped = []
-    for i in range(len(model.estimators_)):
-        output_name = scope.declare_local_variable(
-            "multi_output_%d" % i, guessed_output_type)
-        sequence_at = scope.declare_local_operator('SklearnSequenceAt')
-        sequence_at.inputs.append(proba)
-        sequence_at.outputs.append(output_name)
-        sequence_at.index = i
-        zipped.extend(
-            _apply_zipmap(
-                zipmap, scope, model.estimators_[i],
-                guessed_output_type, sequence_at.outputs))
-
-    sequence_build = scope.declare_local_operator('SklearnSequenceConstruct')
-    sequence_build.inputs.extend(zipped)
-    proba_zipped = scope.declare_local_variable(
-        "probabilities",
-        SequenceType(DictionaryType(label_type, guessed_output_type)))
-    sequence_build.outputs.append(proba_zipped)
-    return sequence_build.outputs
+    return this_operator.outputs
 
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):

@@ -499,4 +499,5 @@ def convert_sklearn_calibrated_classifier_cv(
 register_converter('SklearnCalibratedClassifierCV',
                    convert_sklearn_calibrated_classifier_cv,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})

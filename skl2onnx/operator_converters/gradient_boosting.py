@@ -161,6 +161,7 @@ register_converter('SklearnGradientBoostingClassifier',
                    convert_sklearn_gradient_boosting_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnGradientBoostingRegressor',
                    convert_sklearn_gradient_boosting_regressor)

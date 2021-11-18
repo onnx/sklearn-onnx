@@ -369,5 +369,6 @@ register_converter('SklearnOneClassSVM', convert_sklearn_svm_regressor)
 register_converter('SklearnSVC', convert_sklearn_svm_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnSVR', convert_sklearn_svm_regressor)
