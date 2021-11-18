@@ -958,7 +958,7 @@ class Topology:
 
         # Make the seed meet C-style naming convention
         # Only alphabets and numbers are allowed
-        seed = re.sub('[^0-9a-zA-Z]', '_', seed)
+        seed = re.sub('[^\\w+]', '_', seed)
         # The first symbol cannot be a number
         if re.match('^[0-9]', seed):
             seed = '_' + seed
