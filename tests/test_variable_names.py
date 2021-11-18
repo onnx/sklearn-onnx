@@ -172,7 +172,8 @@ class TestVariableNames(unittest.TestCase):
                         ('embarked', StringTensorType(shape=[None, 1]))]
 
         onnx_object = convert_sklearn(
-            preprocessor, initial_types=initial_type)
+            preprocessor, initial_types=initial_type,
+            target_opset=TARGET_OPSET)
         sess = InferenceSession(onnx_object.SerializeToString())
         self.assertTrue(sess is not None)
         # Invalid Feed Input Name:\u5e74\u9f62
