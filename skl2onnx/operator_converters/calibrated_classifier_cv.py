@@ -75,10 +75,22 @@ def _transform_sigmoid(scope, container, model, df_col_name, k, proto_type):
     if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
         proto_type2 = TensorProto.FLOAT
 
+    if hasattr(model, 'calibrators_'):
+        # scikit-learn<1.1
+        calibrators = model.calibrators_
+    elif hasattr(model, 'calibrators'):
+        # scikit-learn>=1.1
+        calibrators = model.calibrators
+    else:
+        raise AttributeError(
+            "Unable to find attribute calibrators_ or "
+            "calibrators, check the model was trained, "
+            "type=%r." % type(model))
+
     container.add_initializer(a_name, proto_type2,
-                              [], [model.calibrators_[k].a_])
+                              [], [calibrators[k].a_])
     container.add_initializer(b_name, proto_type2,
-                              [], [model.calibrators_[k].b_])
+                              [], [calibrators[k].b_])
     container.add_initializer(unity_name, proto_type2, [], [1])
 
     apply_mul(scope, [a_name, df_col_name], a_df_prod_name, container,
@@ -100,14 +112,24 @@ def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
     ArrayFeatureExtractor can only extract based on the last axis,
     so we can't fetch different columns for different rows.
     """
-    if model.calibrators_[k].out_of_bounds == 'clip':
+    if hasattr(model, 'calibrators_'):
+        # scikit-learn<1.1
+        calibrators = model.calibrators_
+    elif hasattr(model, 'calibrators'):
+        # scikit-learn>=1.1
+        calibrators = model.calibrators
+    else:
+        raise AttributeError(
+            "Unable to find attribute calibrators_ or "
+            "calibrators, check the model was trained, "
+            "type=%r." % type(model))
+
+    if calibrators[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
         apply_clip(scope, T, clipped_df_name, container,
                    operator_name=scope.get_unique_operator_name('Clip'),
-                   max=np.array(model.calibrators_[k].X_max_,
-                                dtype=dtype),
-                   min=np.array(model.calibrators_[k].X_min_,
-                                dtype=dtype))
+                   max=np.array(calibrators[k].X_max_, dtype=dtype),
+                   min=np.array(calibrators[k].X_min_, dtype=dtype))
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
@@ -120,18 +142,18 @@ def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
         'nearest_x_index')
     nearest_y_name = scope.get_unique_variable_name('nearest_y')
 
-    if hasattr(model.calibrators_[k], '_X_'):
+    if hasattr(calibrators[k], '_X_'):
         atX, atY = '_X_', '_y_'
-    elif hasattr(model.calibrators_[k], '_necessary_X_'):
+    elif hasattr(calibrators[k], '_necessary_X_'):
         atX, atY = '_necessary_X_', '_necessary_y_'
-    elif hasattr(model.calibrators_[k], 'X_thresholds_'):
+    elif hasattr(calibrators[k], 'X_thresholds_'):
         atX, atY = 'X_thresholds_', 'y_thresholds_'
     else:
         raise AttributeError(
             "Unable to find attribute '_X_' or '_necessary_X_' "
             "for type {}\n{}."
-            "".format(type(model.calibrators_[k]),
-                      pprint.pformat(dir(model.calibrators_[k]))))
+            "".format(type(calibrators[k]),
+                      pprint.pformat(dir(calibrators[k]))))
 
     proto_type2 = proto_type
     if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
@@ -139,12 +161,12 @@ def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
 
     container.add_initializer(
         calibrator_x_name, proto_type2,
-        [len(getattr(model.calibrators_[k], atX))],
-        getattr(model.calibrators_[k], atX))
+        [len(getattr(calibrators[k], atX))],
+        getattr(calibrators[k], atX))
     container.add_initializer(
         calibrator_y_name, proto_type2,
-        [len(getattr(model.calibrators_[k], atY))],
-        getattr(model.calibrators_[k], atY))
+        [len(getattr(calibrators[k], atY))],
+        getattr(calibrators[k], atY))
 
     apply_reshape(scope, T, reshaped_df_name, container,
                   desired_shape=(-1, 1))

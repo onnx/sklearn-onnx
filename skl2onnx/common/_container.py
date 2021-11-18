@@ -416,7 +416,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                         or a float array).
         :return: created tensor
         """
-        logger.debug("[Init] %r, %r, %r" % (name, onnx_type, shape))
+        logger.debug("[Init] %r, %r, %r", name, onnx_type, shape)
         sparse_tensor = None
         tensor = None
 
@@ -581,8 +581,9 @@ class ModelComponentContainer(_WhiteBlackContainer):
             inputs = [inputs]
         if isinstance(outputs, str):
             outputs = [outputs]
-        logger.debug("[Node] %r - %r -> %r (name=%r)" % (
-            op_type, ",".join(inputs), ",".join(outputs), name))
+        logger.debug(
+            "[Node] %r - %r -> %r (name=%r)",
+            op_type, ",".join(inputs), ",".join(outputs), name)
         try:
             common = set(inputs) & set(outputs)
         except TypeError as e:

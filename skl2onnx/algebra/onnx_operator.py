@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import warnings
+from logging import getLogger
 import numpy as np
 from onnx import GraphProto
 from scipy.sparse import coo_matrix
@@ -20,6 +21,9 @@ from ..proto.onnx_helper_modified import make_graph, make_model, from_array
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
+
+
+logger = getLogger('skl2onnx')
 
 
 class OnnxOperatorItem:
@@ -476,6 +480,9 @@ class OnnxOperator:
         self.output_names_ = None
         self._post_process_attributes(
             clear_subgraph_inputs=clear_subgraph_inputs)
+        logger.debug(
+            '[Ops] +%s-%d (%s) id=%d',
+            self.__class__.__name__, self.op_version, self.domain, id(self))
 
     def _post_process_attributes(self, clear_subgraph_inputs=False):
         """
@@ -705,6 +712,7 @@ class OnnxOperator:
                 domain = self.__class__.domain
             inputs = self._add_to_inputs(operator)
 
+            logger.debug("[Ops.add_to] state id=%d", id(self))
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_name,
                 scope, container, None, op_version=self.op_version,
@@ -910,6 +918,9 @@ class OnnxOperator:
             target_opset, registered_models=registered_models)
 
         model_name = self.__class__.__name__
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d",
+            self.__class__.__name__, id(self))
         scope = Scope(model_name, target_opset=target_opset,
                       registered_models=registered_models)
         for inp in inputs:
@@ -937,6 +948,9 @@ class OnnxOperator:
                 raise RuntimeError(
                     "Extra outputs must have method 'add_to'.")
             out.add_to(scope, container, run_converters=True)
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d extra_outputs=%r",
+            self.__class__.__name__, id(self), extra_outputs)
 
         # infer shapes
         if outputs:
@@ -955,6 +969,9 @@ class OnnxOperator:
                 else:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
+            logger.debug(
+                "[Ops.to_onnx] %s id=%d outputs=%r",
+                self.__class__.__name__, id(self), outputs)
         else:
             if verbose > 0:
                 print("[op.to_onnx] infer outputs")
@@ -966,6 +983,10 @@ class OnnxOperator:
                                 for v in self.output_names)
                 shapes = [shape for shape in shapes
                           if shape.onnx_name in set_names]
+
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d shapes=%r",
+            self.__class__.__name__, id(self), shapes)
         if verbose > 0:
             print("[op.to_onnx] shapes=%r" % shapes)
 
@@ -1159,6 +1180,7 @@ class OnnxSubEstimator(OnnxOperator):
                 else:
                     inputs.append(input)
 
+            logger.debug("[SubOps.add_to] state id=%d", id(self))
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,

@@ -3,11 +3,11 @@
 from collections import OrderedDict
 import numpy as np
 from ..common.data_types import FloatTensorType, DoubleTensorType
+from ..common.utils import get_unique_subgraph
 from .onnx_ops import (
     OnnxIdentity, OnnxScan, OnnxTranspose,
     OnnxSub, OnnxReduceSumSquare, OnnxSqueezeApi11,
-    OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSumApi11
-)
+    OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSumApi11)
 
 
 def onnx_squareform_pdist(X, metric='sqeuclidean', dtype=None,
@@ -33,6 +33,7 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
     Returns the ONNX graph which computes
     ``squareform(pdist(X, metric='sqeuclidean'))``.
     """
+    unique = get_unique_subgraph()
     diff = OnnxSub('next_in', 'next',
                    op_version=op_version)
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
@@ -40,9 +41,9 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
     norm = OnnxReduceSumSquare(diff, axes=[1], op_version=op_version)
     flat = OnnxSqueezeApi11(norm, output_names=['scan_out'], axes=[1],
                             op_version=op_version)
-    flat.set_onnx_name_prefix('cflat_%d' % id(flat))
+    flat.set_onnx_name_prefix('cflat_%d' % unique)
+    id_next.set_onnx_name_prefix('pdistsqe_%d' % unique)
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('pdistsqe_%d' % id(id_next))
     scan_body = id_next.to_onnx(
         OrderedDict([('next_in', tensor_type()),
                      ('next', tensor_type())]),
@@ -112,9 +113,10 @@ def _onnx_cdist_begin(op_version):
 
 def _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,
                     dim_in=None, dim_out=None, **kwargs):
+    unique = get_unique_subgraph()
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
-    id_next.set_onnx_name_prefix('cdistd_%d' % id(id_next))
-    flat.set_onnx_name_prefix('cdistdf_%d' % id(id_next))
+    id_next.set_onnx_name_prefix('cdistd_%d' % unique)
+    flat.set_onnx_name_prefix('cdistdf_%d' % unique)
     shape_in = (tensor_type() if dim_in is None
                 else tensor_type([None, dim_in]))
     scan_body = id_next.to_onnx(
