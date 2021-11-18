@@ -602,6 +602,7 @@ register_converter('SklearnAdaBoostClassifier',
                    convert_sklearn_ada_boost_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnAdaBoostRegressor',
                    convert_sklearn_ada_boost_regressor)

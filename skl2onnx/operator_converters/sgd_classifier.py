@@ -261,4 +261,5 @@ register_converter('SklearnSGDClassifier',
                    convert_sklearn_sgd_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})

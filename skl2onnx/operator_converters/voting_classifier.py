@@ -132,4 +132,5 @@ def convert_voting_classifier(scope: Scope, operator: Operator,
 register_converter('SklearnVotingClassifier',
                    convert_voting_classifier,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})

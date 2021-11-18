@@ -9,6 +9,7 @@ from . import bagging
 from . import binariser
 from . import calibrated_classifier_cv
 from . import cast_op
+from . import class_labels
 from . import concat_op
 from . import cross_decomposition
 from . import decision_tree
@@ -68,6 +69,7 @@ __all__ = [
     binariser,
     calibrated_classifier_cv,
     cast_op,
+    class_labels,
     concat_op,
     cross_decomposition,
     decision_tree,
