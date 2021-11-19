@@ -297,9 +297,10 @@ Let's fit t-SNE...
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_custom_model_001.png
-    :alt: t-SNE embedding of the digits
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_custom_model_001.png
+   :alt: t-SNE embedding of the digits
+   :srcset: /auto_examples/images/sphx_glr_plot_custom_model_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -337,9 +338,10 @@ Just to check it is working.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_custom_model_002.png
-    :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_custom_model_002.png
+   :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
+   :srcset: /auto_examples/images/sphx_glr_plot_custom_model_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -372,9 +374,10 @@ We check on test set.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_custom_model_003.png
-    :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_custom_model_003.png
+   :alt: Predictable t-SNE of the digits StandardScaler+KNeighborsRegressor
+   :srcset: /auto_examples/images/sphx_glr_plot_custom_model_003.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -558,8 +561,8 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[0.9677509  0.5791822 ]
-     [0.67111844 0.69628817]]
+     [[-0.6355032  -0.58680344]
+     [-0.55640924  1.2110656 ]]
 
 
 
@@ -588,7 +591,7 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[0.9677509 0.5791822]]
+    transform [[-0.6355032  -0.58680344]]
 
 
 
@@ -617,7 +620,7 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[0.67111844 0.69628817]]
+    transform [[-0.5564093  1.2110656]]
 
 
 
@@ -648,9 +651,10 @@ Display the ONNX graph
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_custom_model_004.png
-    :alt: plot custom model
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_custom_model_004.png
+   :alt: plot custom model
+   :srcset: /auto_examples/images/sphx_glr_plot_custom_model_004.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -688,11 +692,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -700,7 +704,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.415 seconds)
+   **Total running time of the script:** ( 0 minutes  18.396 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:

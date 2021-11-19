@@ -109,7 +109,7 @@ Let's use ONNX backend API to test it.
  .. code-block:: none
 
     label=[2 1 2]
-    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
+    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.04611102491617203, 1: 0.9538889527320862, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
 
 
 
@@ -170,7 +170,7 @@ without using *onnx*.
  .. code-block:: none
 
     label=[1 1 1]
-    probabilities=[{0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}, {0: 0.04703227058053017, 1: 0.9529677033424377, 2: 0.0}]
+    probabilities=[{0: 0.04611102491617203, 1: 0.9538889527320862, 2: 0.0}, {0: 0.04611102491617203, 1: 0.9538889527320862, 2: 0.0}, {0: 0.04611102491617203, 1: 0.9538889527320862, 2: 0.0}]
 
 
 
@@ -205,11 +205,11 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -217,7 +217,7 @@ with the same API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.266 seconds)
+   **Total running time of the script:** ( 0 minutes  0.371 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:

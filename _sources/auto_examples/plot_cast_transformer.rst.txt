@@ -205,9 +205,10 @@ The graph.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_cast_transformer_001.png
-    :alt: plot cast transformer
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_cast_transformer_001.png
+   :alt: plot cast transformer
+   :srcset: /auto_examples/images/sphx_glr_plot_cast_transformer_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -272,7 +273,7 @@ Cast.
 
  .. code-block:: none
 
-    2.9884569130445016e-05
+    2.9884569016758178e-05
 
 
 
@@ -302,9 +303,10 @@ The graph.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_cast_transformer_002.png
-    :alt: plot cast transformer
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_cast_transformer_002.png
+   :alt: plot cast transformer
+   :srcset: /auto_examples/images/sphx_glr_plot_cast_transformer_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -344,11 +346,11 @@ The graph.
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -356,7 +358,7 @@ The graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.629 seconds)
+   **Total running time of the script:** ( 0 minutes  6.609 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_cast_transformer.py:

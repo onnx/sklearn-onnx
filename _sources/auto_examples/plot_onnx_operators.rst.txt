@@ -216,7 +216,7 @@ onnx package.
     The model is:
     ir_version: 5
     producer_name: "skl2onnx"
-    producer_version: "1.10.0"
+    producer_version: "1.10.2"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -405,14 +405,7 @@ Let's the output with onnxruntime
 
  .. code-block:: none
 
-    {'Tr_transposed01': array([[[ 0.,  1.,  2.,  3.],
-            [12., 13., 14., 15.]],
-
-           [[ 4.,  5.,  6.,  7.],
-            [16., 17., 18., 19.]],
-
-           [[ 8.,  9., 10., 11.],
-            [20., 21., 22., 23.]]], dtype=float32), 'Tr_transposed0': array([[[ 0.,  1.,  2.,  3.],
+    {'Tr_transposed0': array([[[ 0.,  1.,  2.,  3.],
             [ 4.,  5.,  6.,  7.],
             [ 8.,  9., 10., 11.]],
 
@@ -449,9 +442,10 @@ Display the ONNX graph
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_onnx_operators_001.png
-    :alt: plot onnx operators
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_onnx_operators_001.png
+   :alt: plot onnx operators
+   :srcset: /auto_examples/images/sphx_glr_plot_onnx_operators_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -491,11 +485,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -503,7 +497,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.141 seconds)
+   **Total running time of the script:** ( 0 minutes  1.703 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_onnx_operators.py:

@@ -71,8 +71,8 @@ Basic example
  .. code-block:: none
 
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([2, 1], dtype=int64), array([[2.4076033e-04, 4.5055544e-01, 5.4920375e-01],
-           [3.2111816e-02, 8.4362978e-01, 1.2425841e-01]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[4.8036575e-02, 5.2532315e-01, 4.2664030e-01],
+           [3.9889180e-04, 2.8210199e-01, 7.1749908e-01]], dtype=float32)]
 
 
 
@@ -112,8 +112,8 @@ types as well.
  .. code-block:: none
 
     inputs=['X56'], outputs=['label', 'probabilities']
-    [array([2, 1], dtype=int64), array([[2.4076033e-04, 4.5055544e-01, 5.4920375e-01],
-           [3.2111816e-02, 8.4362978e-01, 1.2425841e-01]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[4.8036575e-02, 5.2532315e-01, 4.2664030e-01],
+           [3.9889180e-04, 2.8210199e-01, 7.1749908e-01]], dtype=float32)]
 
 
 
@@ -152,8 +152,8 @@ parameter *final_types*.
  .. code-block:: none
 
     inputs=['X'], outputs=['L', 'P']
-    [array([2, 1], dtype=int64), array([[2.4076033e-04, 4.5055544e-01, 5.4920375e-01],
-           [3.2111816e-02, 8.4362978e-01, 1.2425841e-01]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[4.8036575e-02, 5.2532315e-01, 4.2664030e-01],
+           [3.9889180e-04, 2.8210199e-01, 7.1749908e-01]], dtype=float32)]
 
 
 
@@ -206,8 +206,8 @@ to unique names. It does not impact the graph inputs or outputs.
     changed 'probability_tensor' into '_PROBABILITY_TENSOR'.
     changed 'Normalizer' into '_NORMALIZER'.
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([2, 1], dtype=int64), array([[2.4076033e-04, 4.5055544e-01, 5.4920375e-01],
-           [3.2111816e-02, 8.4362978e-01, 1.2425841e-01]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[4.8036575e-02, 5.2532315e-01, 4.2664030e-01],
+           [3.9889180e-04, 2.8210199e-01, 7.1749908e-01]], dtype=float32)]
 
 
 
@@ -215,7 +215,7 @@ to unique names. It does not impact the graph inputs or outputs.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.400 seconds)
+   **Total running time of the script:** ( 0 minutes  0.186 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gconverting.py:

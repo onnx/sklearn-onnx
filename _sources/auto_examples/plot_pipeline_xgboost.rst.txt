@@ -32,17 +32,13 @@ a pipeline including a *XGBoost* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *XGBClassifier*. Let's see how to do it.
 
-A couple of errors might happen while trying to convert
-your own pipeline, some of them are described
-and explained in :ref:`errors-pipeline`.
-
 .. contents::
     :local:
 
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-79
+.. GENERATED FROM PYTHON SOURCE LINES 25-75
 
 .. code-block:: default
 
@@ -106,9 +102,9 @@ Train a XGBoost classifier
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\xgboost\sklearn.py:1146: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
+    C:\Python395_x64\lib\site-packages\xgboost\sklearn.py:1224: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
       warnings.warn(label_encoder_deprecation_msg, UserWarning)
-    [19:43:48] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    [13:03:13] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
     Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
     It usually means the pipeline being converted contains a
     transformer or a predictor with no corresponding converter
@@ -126,7 +122,7 @@ Train a XGBoost classifier
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-91
+.. GENERATED FROM PYTHON SOURCE LINES 76-87
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -140,15 +136,15 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 Then we import the converter and shape calculator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-97
+.. GENERATED FROM PYTHON SOURCE LINES 92-93
 
 Let's register the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-102
+.. GENERATED FROM PYTHON SOURCE LINES 93-98
 
 .. code-block:: default
 
@@ -164,12 +160,12 @@ Let's register the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-105
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-115
+.. GENERATED FROM PYTHON SOURCE LINES 101-111
 
 .. code-block:: default
 
@@ -190,14 +186,14 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-120
+.. GENERATED FROM PYTHON SOURCE LINES 112-116
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-124
+.. GENERATED FROM PYTHON SOURCE LINES 116-120
 
 .. code-block:: default
 
@@ -215,17 +211,17 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 0 0 0 2]
-    predict_proba [[0.15765548 0.66164124 0.18070325]]
+    predict [1 0 0 1 0]
+    predict_proba [[0.14671634 0.48657113 0.36671248]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-126
+.. GENERATED FROM PYTHON SOURCE LINES 121-122
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-132
+.. GENERATED FROM PYTHON SOURCE LINES 122-128
 
 .. code-block:: default
 
@@ -245,18 +241,18 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 0 0 0 2]
-    predict_proba [{0: 0.1576554775238037, 1: 0.6616412997245789, 2: 0.180703267455101}]
+    predict [1 0 0 1 0]
+    predict_proba [{0: 0.14671637117862701, 1: 0.48657119274139404, 2: 0.3667125403881073}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-135
+.. GENERATED FROM PYTHON SOURCE LINES 129-131
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-150
+.. GENERATED FROM PYTHON SOURCE LINES 131-146
 
 .. code-block:: default
 
@@ -278,9 +274,10 @@ Display the ONNX graph
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_pipeline_xgboost_001.png
-    :alt: plot pipeline xgboost
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_pipeline_xgboost_001.png
+   :alt: plot pipeline xgboost
+   :srcset: /auto_examples/images/sphx_glr_plot_pipeline_xgboost_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -294,11 +291,11 @@ Display the ONNX graph
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 147-148
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-160
+.. GENERATED FROM PYTHON SOURCE LINES 148-156
 
 .. code-block:: default
 
@@ -320,13 +317,13 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
     onnxmltools:  1.10.0
-    xgboost:  1.4.2
+    xgboost:  1.5.0
 
 
 
@@ -334,7 +331,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.551 seconds)
+   **Total running time of the script:** ( 0 minutes  4.265 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:

@@ -153,9 +153,9 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [22.73670355 16.21735183 30.20044468 19.8166     43.01290762 14.43924319
-     22.60354331 24.0796474  22.88450763 21.14025972]
-    [22.15625]
+    [-4.91758287 17.43658023 14.3947336  23.71513409 16.30006512 27.77302137
+      8.92252991 27.96534794 23.24953979 36.47872789]
+    [-8.953125]
 
 
 
@@ -186,8 +186,8 @@ differences.
 
  .. code-block:: none
 
-    [3.31382682 3.59966503 3.75167062 4.19920445 4.48239966]
-    min(Y)-max(Y): 6.3 48.8
+    [3.83836483 4.03554213 4.69149636 5.56448985 6.54781312]
+    min(Y)-max(Y): 5.0 50.0
 
 
 
@@ -235,7 +235,7 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [22.73670355]
+    [-4.91758285]
 
 
 
@@ -264,9 +264,9 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [1.54274442e-08 1.57912403e-08 1.86444140e-08 1.91904963e-08
-     2.34016184e-08]
-    min(Y)-max(Y): 6.3 48.8
+    [1.86024733e-08 1.88124218e-08 2.22077006e-08 2.31996715e-08
+     2.36310491e-08]
+    min(Y)-max(Y): 5.0 50.0
 
 
 
@@ -300,8 +300,8 @@ and not as floats anymore.
 
  .. code-block:: none
 
-    ONNX with floats: 42820
-    ONNX with doubles: 83824
+    ONNX with floats: 42926
+    ONNX with doubles: 83930
 
 
 
@@ -371,12 +371,12 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[22.73670355],
-           [16.21735183],
-           [30.20044468],
-           [19.8166    ],
-           [43.01290762]]),
-     array([1.02350627, 1.05732557, 0.83201009, 0.80278612, 0.71429034])]
+    [array([[-4.91758285],
+           [17.43658023],
+           [14.3947336 ],
+           [23.71513409],
+           [16.30006513]]),
+     array([1.11998946, 1.02351137, 1.1230732 , 0.61165487, 1.02688236])]
 
 
 
@@ -402,8 +402,8 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([22.73670355, 16.21735183, 30.20044468, 19.8166    , 43.01290762]),
-     array([1.02315896, 1.05721381, 0.8318539 , 0.80225014, 0.71377539]))
+    (array([-4.91758287, 17.43658023, 14.3947336 , 23.71513408, 16.30006512]),
+     array([1.11956441, 1.02273231, 1.12259769, 0.61126315, 1.02665558]))
 
 
 
@@ -436,7 +436,7 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [0.00119111 0.00119731 0.00129692 0.00130138 0.00182142]
+    [0.00082488 0.00088833 0.00095088 0.00174261 0.0018797 ]
 
 
 
@@ -467,11 +467,11 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -479,7 +479,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.015 seconds)
+   **Total running time of the script:** ( 0 minutes  1.273 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:

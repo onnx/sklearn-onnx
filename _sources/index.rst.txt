@@ -53,6 +53,12 @@ The ONNX model has one opset number for every operator domain,
 this value is the maximum opset number among all
 onnx nodes.
 
+.. runpython::
+    :showcode:
+    
+    from skl2onnx import __max_supported_opset__
+    print("Last supported opset:", __max_supported_opset__)
+
 **Backend**
 
 *sklearn-onnx* converts models in ONNX format which

@@ -147,7 +147,7 @@ a threshold.
 
  .. code-block:: none
 
-    [0 0 1 1 0 0 1 0 1 0 0 1 0 0 0 0 1 1 1 0 1 1 0 1 1 1 1 0 1 0 1 0 1 1 1 1 0
+    [0 0 1 1 0 0 1 0 0 1 1 1 1 0 0 0 0 0 0 1 0 1 1 0 0 0 0 1 0 1 1 1 1 1 0 0 0
      0]
 
 
@@ -455,19 +455,19 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [1 1 0 1 1]
-    onnx [1 1 0 1 1]
+    sklearn [2 2 2 0 1]
+    onnx [2 2 2 0 1]
     --probabilities--
-    sklearn [[5.74573219e-03 5.34779642e-01 4.59474626e-01]
-     [3.63755702e-02 6.56452431e-01 3.07171998e-01]
-     [8.53289663e-01 1.46603981e-01 1.06356477e-04]
-     [3.92970074e-02 8.16033542e-01 1.44669451e-01]
-     [4.30257658e-02 6.02910468e-01 3.54063766e-01]]
-    onnx [[5.74576296e-03 5.34779787e-01 4.59474415e-01]
-     [3.63756716e-02 6.56452537e-01 3.07171881e-01]
-     [8.53289723e-01 1.46603972e-01 1.06352905e-04]
-     [3.92970555e-02 8.16033602e-01 1.44669339e-01]
-     [4.30258289e-02 6.02910519e-01 3.54063570e-01]]
+    sklearn [[2.91056748e-03 2.94039087e-01 7.03050345e-01]
+     [2.10275580e-03 3.23268538e-01 6.74628706e-01]
+     [3.01157317e-04 1.57233602e-01 8.42465241e-01]
+     [8.56689521e-01 1.43266329e-01 4.41497682e-05]
+     [4.13279915e-03 6.19222795e-01 3.76644406e-01]]
+    onnx [[2.9105782e-03 2.9403901e-01 7.0305037e-01]
+     [2.1027566e-03 3.2326844e-01 6.7462873e-01]
+     [3.0118655e-04 1.5723361e-01 8.4246528e-01]
+     [8.5668957e-01 1.4326632e-01 4.4145989e-05]
+     [4.1328012e-03 6.1922276e-01 3.7664440e-01]]
     --validation--
     sklearn [0 0 1 1 0]
     onnx [0 0 1 1 0]
@@ -503,9 +503,10 @@ Display the ONNX graph
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_custom_parser_alternative_001.png
-    :alt: plot custom parser alternative
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_custom_parser_alternative_001.png
+   :alt: plot custom parser alternative
+   :srcset: /auto_examples/images/sphx_glr_plot_custom_parser_alternative_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -515,7 +516,7 @@ Display the ONNX graph
  .. code-block:: none
 
 
-    (-0.5, 1685.5, 4171.5, -0.5)
+    (-0.5, 2762.5, 4934.5, -0.5)
 
 
 
@@ -543,11 +544,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -555,7 +556,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.163 seconds)
+   **Total running time of the script:** ( 0 minutes  4.029 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser_alternative.py:

@@ -25,7 +25,7 @@ Probabilities as a vector or as a ZipMap
 
 A classifier usually returns a matrix of probabilities.
 By default, *sklearn-onnx* converts that matrix
-into a list of dictionaries where each probabilies is mapped
+into a list of dictionaries where each probabily is mapped
 to its class id or name. That mechanism retains the class names.
 This conversion increases the prediction time and is not
 always needed. Let's see how to deactivate this behaviour
@@ -108,7 +108,7 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    [{0: 0.9451966285705566, 1: 0.054803021252155304, 2: 3.5732168157665e-07}, {0: 4.52548601970193e-06, 1: 0.018125707283616066, 2: 0.9818697571754456}]
+    [{0: 0.9557897448539734, 1: 0.044209904968738556, 2: 3.543578657172475e-07}, {0: 0.9812383055686951, 1: 0.018761640414595604, 2: 1.1206234518112979e-07}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
@@ -148,8 +148,8 @@ Let's remove the ZipMap operator.
 
  .. code-block:: none
 
-    [[9.4519663e-01 5.4803021e-02 3.5732168e-07]
-     [4.5254860e-06 1.8125707e-02 9.8186976e-01]]
+    [[9.55789745e-01 4.42099050e-02 3.54357866e-07]
+     [9.81238306e-01 1.87616404e-02 1.12062345e-07]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
@@ -191,10 +191,10 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[0 2]...
-    output: 'i0' shape=(38,) values=[9.451966e-01 4.525486e-06]...
-    output: 'i1' shape=(38,) values=[0.05480302 0.01812571]...
-    output: 'i2' shape=(38,) values=[3.5732168e-07 9.8186976e-01]...
+    output: 'output_label' shape=(38,) values=[0 0]...
+    output: 'i0' shape=(38,) values=[0.95578974 0.9812383 ]...
+    output: 'i1' shape=(38,) values=[0.0442099  0.01876164]...
+    output: 'i2' shape=(38,) values=[3.54357866e-07 1.12062345e-07]...
 
 
 
@@ -241,11 +241,11 @@ Let's compare prediction time
  .. code-block:: none
 
     Time with ZipMap:
-    [0.005371399999997806, 0.00524459999999749, 0.004495999999999611, 0.005181000000000324, 0.003930199999999218, 0.003721799999997444, 0.0037201000000024464, 0.004590300000000269, 0.0056108000000030245, 0.00424860000000038]
+    [0.012896500000000088, 0.009675800000000123, 0.007875899999998381, 0.010810700000000395, 0.00949099999999703, 0.010507899999996795, 0.009987600000002317, 0.00820979999999949, 0.009294800000002823, 0.00803589999999943]
     Time without ZipMap:
-    [0.004482599999999337, 0.0019622000000012463, 0.0016662999999965677, 0.0020054999999992162, 0.0018943999999976313, 0.002418699999999774, 0.0015748000000002094, 0.0016746000000011918, 0.0020280000000028053, 0.0016731999999990421]
+    [0.0037999999999982492, 0.0034046000000031995, 0.003412299999997259, 0.002986700000001008, 0.003288600000001196, 0.0029442000000017288, 0.0026802999999979704, 0.0026802999999979704, 0.003123200000000992, 0.003012199999997023]
     Time without ZipMap but with columns:
-    [0.0032612000000007413, 0.003633799999999354, 0.0033071999999982893, 0.0037948000000014304, 0.0030220999999990283, 0.003039000000001124, 0.004288299999998912, 0.002978999999999843, 0.003382200000000779, 0.0031381999999986476]
+    [0.007993299999998982, 0.009035300000000746, 0.009291199999999833, 0.014354400000001988, 0.014578600000000108, 0.011297899999998862, 0.013504400000002192, 0.018242199999999542, 0.017789999999997974, 0.018567899999997195]
 
 
 
@@ -274,11 +274,11 @@ Let's compare prediction time
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -286,7 +286,7 @@ Let's compare prediction time
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.280 seconds)
+   **Total running time of the script:** ( 0 minutes  0.499 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_zipmap.py:

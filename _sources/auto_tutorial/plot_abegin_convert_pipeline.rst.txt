@@ -147,12 +147,12 @@ The first example uses :epkg:`onnxruntime`.
  .. code-block:: none
 
 
-    (array([[132.24834],
-           [102.03706],
-           [120.67598],
-           [129.68037],
-           [132.29285]], dtype=float32), array([132.24832785, 102.03706361, 120.67597103, 129.68036793,
-           132.29285035]))
+    (array([[184.09239 ],
+           [167.5086  ],
+           [104.603264],
+           [150.87987 ],
+           [129.05017 ]], dtype=float32), array([184.09239003, 167.50859408, 104.60326166, 150.87986812,
+           129.05017143]))
 
 
 
@@ -191,7 +191,7 @@ Before deploying, we need to compare that both
 
  .. code-block:: none
 
-    (2.590069337315981e-05, 1.9681231178107178e-07)
+    (2.1348326640691084e-05, 1.5198509802361613e-07)
 
 
 
@@ -239,15 +239,15 @@ It uses module :epkg:`mlprodict`.
             # init: w0 (w0)
             # inputs
             X = dict_inputs['X']
-            (var_1, ) = n0_treeensembleregressor(X)
-            (var_2, ) = n1_linearregressor(X)
-            (var_0, ) = n2_treeensembleregressor(X)
-            (wvar_2, ) = n3_mul(var_2, w0)
-            (wvar_1, ) = n4_mul(var_1, w0)
-            (wvar_0, ) = n5_mul(var_0, w0)
-            (fvar_1, ) = n6_flatten(wvar_1)
+            (var_0, ) = n0_treeensembleregressor(X)
+            (var_1, ) = n1_treeensembleregressor(X)
+            (var_2, ) = n2_linearregressor(X)
+            (wvar_0, ) = n3_mul(var_0, w0)
+            (wvar_2, ) = n4_mul(var_2, w0)
+            (wvar_1, ) = n5_mul(var_1, w0)
+            (fvar_0, ) = n6_flatten(wvar_0)
             (fvar_2, ) = n7_flatten(wvar_2)
-            (fvar_0, ) = n8_flatten(wvar_0)
+            (fvar_1, ) = n8_flatten(wvar_1)
             (variable, ) = n9_sum(fvar_0, fvar_1, fvar_2)
             return {
                 'variable': variable,
@@ -278,7 +278,7 @@ It works almost the same way.
 
  .. code-block:: none
 
-    (2.590069337315981e-05, 1.8310987248532274e-07)
+    (2.1348326640691084e-05, 1.5198509802361613e-07)
 
 
 
@@ -299,9 +299,10 @@ Final graph
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_abegin_convert_pipeline_001.png
-    :alt: plot abegin convert pipeline
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_abegin_convert_pipeline_001.png
+   :alt: plot abegin convert pipeline
+   :srcset: /auto_tutorial/images/sphx_glr_plot_abegin_convert_pipeline_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -310,7 +311,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.432 seconds)
+   **Total running time of the script:** ( 0 minutes  1.972 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_abegin_convert_pipeline.py:

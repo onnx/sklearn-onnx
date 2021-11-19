@@ -71,7 +71,7 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1038: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
+    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1036: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
       warnings.warn(
 
     GaussianMixture()
@@ -109,12 +109,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-1.80718178 -0.62177922 -1.2319368  -1.99045534 -1.34742024]
-    [[-1.8071811 ]
-     [-0.62177896]
-     [-1.2319357 ]
-     [-1.9904559 ]
-     [-1.3474205 ]]
+    [-1.5455792  -1.40587209 -1.28135778 -1.22965555 -1.39791611]
+    [[-1.545579 ]
+     [-1.4058709]
+     [-1.2813582]
+     [-1.2296562]
+     [-1.3979163]]
 
 
 
@@ -145,9 +145,10 @@ Display the ONNX graph.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_black_op_001.png
-    :alt: plot black op
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_black_op_001.png
+   :alt: plot black op
+   :srcset: /auto_examples/images/sphx_glr_plot_black_op_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -157,7 +158,7 @@ Display the ONNX graph.
  .. code-block:: none
 
 
-    (-0.5, 4122.5, 8425.5, -0.5)
+    (-0.5, 4522.5, 8425.5, -0.5)
 
 
 
@@ -196,12 +197,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-1.80718178 -0.62177922 -1.2319368  -1.99045534 -1.34742024]
-    [[-1.8071811 ]
-     [-0.62177896]
-     [-1.2319357 ]
-     [-1.9904559 ]
-     [-1.3474205 ]]
+    [-1.5455792  -1.40587209 -1.28135778 -1.22965555 -1.39791611]
+    [[-1.545579 ]
+     [-1.4058709]
+     [-1.2813582]
+     [-1.2296562]
+     [-1.3979163]]
 
 
 
@@ -232,9 +233,10 @@ Display the ONNX graph.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_black_op_002.png
-    :alt: plot black op
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_black_op_002.png
+   :alt: plot black op
+   :srcset: /auto_examples/images/sphx_glr_plot_black_op_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -244,7 +246,7 @@ Display the ONNX graph.
  .. code-block:: none
 
 
-    (-0.5, 4305.5, 13264.5, -0.5)
+    (-0.5, 4239.5, 13264.5, -0.5)
 
 
 
@@ -274,8 +276,8 @@ Processing time
 
  .. code-block:: none
 
-    0.37278230000000434
-    0.4418660999999986
+    0.8677382999999992
+    0.7461350000000024
 
 
 
@@ -350,11 +352,11 @@ a blacklisted operator (or only whitelisted operators),
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -362,7 +364,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.553 seconds)
+   **Total running time of the script:** ( 0 minutes  33.046 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:
