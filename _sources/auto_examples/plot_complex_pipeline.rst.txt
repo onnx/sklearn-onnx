@@ -363,9 +363,9 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 1 0 0 0]
-    predict_proba [[0.61651047 0.38348953]
-     [0.19828404 0.80171596]]
+    predict [0 1 0 1 1]
+    predict_proba [[0.91572574 0.08427426]
+     [0.44091329 0.55908671]]
 
 
 
@@ -425,8 +425,8 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 1 0 0 0]
-    predict_proba [{0: 0.6165104508399963, 1: 0.38348954916000366}, {0: 0.1982840597629547, 1: 0.8017159700393677}]
+    predict [0 1 0 1 1]
+    predict_proba [{0: 0.9157257080078125, 1: 0.08427432179450989}, {0: 0.44091328978538513, 1: 0.5590867400169373}]
 
 
 
@@ -463,9 +463,9 @@ an additional option zipmap.
 
  .. code-block:: none
 
-    predict [0 1 0 0 0]
-    predict_proba [[0.61651045 0.38348955]
-     [0.19828406 0.80171597]]
+    predict [0 1 0 1 1]
+    predict_proba [[0.9157257  0.08427432]
+     [0.4409133  0.55908674]]
 
 
 
@@ -519,9 +519,10 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_complex_pipeline_001.png
-    :alt: plot complex pipeline
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_complex_pipeline_001.png
+   :alt: plot complex pipeline
+   :srcset: /auto_examples/images/sphx_glr_plot_complex_pipeline_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -531,7 +532,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 5891.5, 6812.5, -0.5)
+    (-0.5, 5875.5, 6812.5, -0.5)
 
 
 
@@ -559,11 +560,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -571,7 +572,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.106 seconds)
+   **Total running time of the script:** ( 0 minutes  9.744 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:

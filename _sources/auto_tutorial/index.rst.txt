@@ -284,6 +284,27 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="A scikit-learn classifier usually returns a matrix of probabilities. By default, *sklearn-onnx*...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_zipmap_thumb.png
+     :alt: Choose appropriate output of a classifier
+
+     :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_zipmap.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_dbegin_options_zipmap
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer versio...">
 
 .. only:: html

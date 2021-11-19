@@ -501,9 +501,10 @@ onehot=False
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_woe_transformer_001.png
-    :alt: plot woe transformer
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_woe_transformer_001.png
+   :alt: plot woe transformer
+   :srcset: /auto_tutorial/images/sphx_glr_plot_woe_transformer_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -513,7 +514,7 @@ onehot=False
  .. code-block:: none
 
 
-    (-0.5, 2129.5, 2558.5, -0.5)
+    (-0.5, 2129.5, 3321.5, -0.5)
 
 
 
@@ -542,9 +543,10 @@ onehot=True
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_woe_transformer_002.png
-    :alt: plot woe transformer
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_woe_transformer_002.png
+   :alt: plot woe transformer
+   :srcset: /auto_tutorial/images/sphx_glr_plot_woe_transformer_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -554,7 +556,7 @@ onehot=True
  .. code-block:: none
 
 
-    (-0.5, 2272.5, 4934.5, -0.5)
+    (-0.5, 2272.5, 5696.5, -0.5)
 
 
 
@@ -709,7 +711,7 @@ And the conversion to ONNX using the same instruction.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.471 seconds)
+   **Total running time of the script:** ( 0 minutes  5.249 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_woe_transformer.py:

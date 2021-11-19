@@ -2,7 +2,7 @@
 
 
 """
-.. _example-lightgbm:
+.. _example-lightgbm-pipe:
 
 Convert a pipeline with a LightGbm model
 ========================================
@@ -15,10 +15,6 @@ can be included in a *scikit-learn* pipeline. This example considers
 a pipeline including a *LightGbm* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *LGBMClassifier*. Let's see how to do it.
-
-A couple of errors might happen while trying to convert
-your own pipeline, some of them are described
-and explained in :ref:`errors-pipeline`.
 
 .. contents::
     :local:

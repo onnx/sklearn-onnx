@@ -98,7 +98,7 @@ The first way: :func:`convert_sklearn`.
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -131,7 +131,7 @@ The second way: :func:`to_onnx`: no need to play with
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -199,7 +199,7 @@ before fitting the model.
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
@@ -385,7 +385,7 @@ Way 4
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -421,9 +421,10 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_convert_syntax_001.png
-    :alt: plot convert syntax
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_convert_syntax_001.png
+   :alt: plot convert syntax
+   :srcset: /auto_examples/images/sphx_glr_plot_convert_syntax_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -463,11 +464,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -475,7 +476,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.857 seconds)
+   **Total running time of the script:** ( 0 minutes  5.508 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_syntax.py:

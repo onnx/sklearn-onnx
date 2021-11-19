@@ -60,7 +60,7 @@ print(pred_onx)
 
 ########################################
 # Conversion with parameter verbose
-# ++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++
 #
 # verbose is a parameter which prints messages on the standard output.
 # It tells which converter is called. `verbose=1` usually means what *skl2onnx*
@@ -71,7 +71,7 @@ convert_sklearn(clr, initial_types=initial_type, target_opset=12, verbose=1)
 
 ########################################
 # Conversion with logging
-# +++++++++++++++++
+# +++++++++++++++++++++++
 #
 # This is very detailed logging. It which operators or variables
 # (output of converters) is processed, which node is created...

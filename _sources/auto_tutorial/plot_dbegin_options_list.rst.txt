@@ -68,7 +68,7 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1038: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
+    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1036: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
       warnings.warn(
 
     GaussianMixture()
@@ -106,12 +106,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-4.26290165 -1.90885406 -7.21659878 -1.98987784 -1.33883095]
-    [[-4.262906 ]
-     [-1.9088542]
-     [-7.2166004]
-     [-1.9898775]
-     [-1.3388312]]
+    [-1.13327203 -1.19008857 -0.93442657 -2.32109469 -4.15079963]
+    [[-1.1332726]
+     [-1.1900887]
+     [-0.9344268]
+     [-2.321094 ]
+     [-4.1507974]]
 
 
 
@@ -134,9 +134,10 @@ Display the ONNX graph.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_001.png
-    :alt: plot dbegin options list
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_001.png
+   :alt: plot dbegin options list
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -177,12 +178,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-4.26290165 -1.90885406 -7.21659878 -1.98987784 -1.33883095]
-    [[-4.262906 ]
-     [-1.9088542]
-     [-7.2166004]
-     [-1.9898775]
-     [-1.3388312]]
+    [-1.13327203 -1.19008857 -0.93442657 -2.32109469 -4.15079963]
+    [[-1.1332726]
+     [-1.1900887]
+     [-0.9344268]
+     [-2.321094 ]
+     [-4.1507974]]
 
 
 
@@ -205,9 +206,10 @@ Display the ONNX graph.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_002.png
-    :alt: plot dbegin options list
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_002.png
+   :alt: plot dbegin options list
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_list_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -239,8 +241,8 @@ Processing time
 
  .. code-block:: none
 
-    0.4323641000000009
-    0.5853366999999992
+    0.8738519000000053
+    0.8517731999999967
 
 
 
@@ -290,7 +292,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.639 seconds)
+   **Total running time of the script:** ( 0 minutes  3.424 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_list.py:

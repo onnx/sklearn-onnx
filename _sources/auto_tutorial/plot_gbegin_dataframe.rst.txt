@@ -116,9 +116,10 @@ Display.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_001.png
-    :alt: plot gbegin dataframe
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_001.png
+   :alt: plot gbegin dataframe
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -190,9 +191,10 @@ Graph
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_002.png
-    :alt: plot gbegin dataframe
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_002.png
+   :alt: plot gbegin dataframe
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gbegin_dataframe_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -230,7 +232,7 @@ Prediction with ONNX
     run(): incompatible function arguments. The following argument types are supported:
         1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -> List[object]
 
-    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x00000288697C1970>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
+    Invoked with: <onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x00000152A4FA9CF0>, ['label', 'probabilities'],   CAT1 CAT2  num1  num2
     0    a    c  0.50  0.60
     1    b    d  0.40  0.80
     2    a    d  0.50  0.56
@@ -293,18 +295,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.79 0.21]
-     [0.26 0.74]
-     [0.71 0.29]
-     [0.25 0.75]
-     [0.77 0.23]
-     [0.39 0.61]]
-    [[0.79       0.20999998]
-     [0.2600001  0.7399999 ]
-     [0.71000004 0.28999996]
-     [0.25000006 0.74999994]
-     [0.77       0.23      ]
-     [0.39000005 0.60999995]]
+    [[0.82 0.18]
+     [0.31 0.69]
+     [0.73 0.27]
+     [0.33 0.67]
+     [0.79 0.21]
+     [0.33 0.67]]
+    [[0.82000005 0.17999998]
+     [0.31000012 0.6899999 ]
+     [0.73       0.26999998]
+     [0.3300001  0.6699999 ]
+     [0.79       0.20999998]
+     [0.3300001  0.6699999 ]]
 
 
 
@@ -512,18 +514,18 @@ And probilities.
 
  .. code-block:: none
 
-    [[0.79 0.21]
-     [0.26 0.74]
-     [0.71 0.29]
-     [0.25 0.75]
-     [0.77 0.23]
-     [0.39 0.61]]
-    [[0.78999996 0.21000002]
-     [0.2600004  0.7399996 ]
-     [0.71000004 0.29      ]
-     [0.25000042 0.7499996 ]
-     [0.77       0.23000003]
-     [0.39000028 0.6099997 ]]
+    [[0.82 0.18]
+     [0.31 0.69]
+     [0.73 0.27]
+     [0.33 0.67]
+     [0.79 0.21]
+     [0.33 0.67]]
+    [[0.82       0.18      ]
+     [0.31000036 0.68999964]
+     [0.73       0.27      ]
+     [0.33000034 0.66999966]
+     [0.78999996 0.21000002]
+     [0.33000034 0.66999966]]
 
 
 
@@ -531,7 +533,7 @@ And probilities.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.588 seconds)
+   **Total running time of the script:** ( 0 minutes  3.820 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_dataframe.py:

@@ -103,8 +103,7 @@ could be trained and produced by another converter library.
 
  .. code-block:: none
 
-    download 'https://github.com/onnx/models/raw/master/vision/classification/squeezenet/model/squeezenet1.1-7.onnx'
-    downloaded 4956208 bytes.
+    'squeezenet1.1-7.onnx' already downloaded
 
 
 
@@ -172,8 +171,7 @@ Classifying an image
 
  .. code-block:: none
 
-    download 'https://upload.wikimedia.org/wikipedia/commons/d/d2/East_Coker_elm%2C_2.jpg'
-    downloaded 712230 bytes.
+    'East_Coker_elm.jpg' already downloaded
 
 
 
@@ -285,9 +283,10 @@ the answer is changing.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_001.png
-    :alt: plot gbegin transfer learning
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_001.png
+   :alt: plot gbegin transfer learning
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -357,18 +356,18 @@ on a graph.
 
  .. code-block:: none
 
-    [[-676.5764   -203.35458 ]
-     [-570.6654   -208.09773 ]
-     [-339.8116    -86.33981 ]
-     [ -14.555644 -168.44836 ]
-     [ 357.22363  -157.61395 ]
-     [ 596.3861    -90.21018 ]
-     [ 918.8614    -26.339594]
-     [ 499.8716    128.27277 ]
-     [ 306.68555   156.42905 ]
-     [-125.91206   119.21828 ]
-     [-446.6046    342.45853 ]
-     [-504.9024    194.02559 ]]
+    [[-676.5762    -203.35452  ]
+     [-570.6653    -208.09772  ]
+     [-339.81155    -86.33981  ]
+     [ -14.5556345 -168.44846  ]
+     [ 357.22357   -157.61404  ]
+     [ 596.386      -90.210236 ]
+     [ 918.86115    -26.339563 ]
+     [ 499.87152    128.2728   ]
+     [ 306.68546    156.42905  ]
+     [-125.91206    119.218285 ]
+     [-446.60458    342.4586   ]
+     [-504.90234    194.02565  ]]
 
 
 
@@ -397,9 +396,10 @@ Graph for the PCA
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_002.png
-    :alt: Projection of classification probabilities
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_002.png
+   :alt: Projection of classification probabilities
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -619,9 +619,10 @@ Graph again.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_003.png
-    :alt: Second projection of classification probabilities
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_003.png
+   :alt: Second projection of classification probabilities
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gbegin_transfer_learning_003.png
+   :class: sphx-glr-single-img
 
 
 
@@ -630,7 +631,7 @@ Graph again.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.481 seconds)
+   **Total running time of the script:** ( 0 minutes  5.106 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_transfer_learning.py:

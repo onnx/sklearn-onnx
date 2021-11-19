@@ -5,15 +5,34 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fast design with a python runtime &#8212; sklearn-onnx 1.10.0 documentation</title>
+    <title>Fast design with a python runtime &#8212; sklearn-onnx 1.10.2 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/readable.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -22,37 +41,399 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Fast runtime with onnxruntime" href="plot_qextend_onnxruntime.html" />
     <link rel="prev" title="Extend ONNX, extend runtime" href="../tutorial_3_new_operator.html" />
-   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
 
-  </head><body>
-  
-  
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="plot_qextend_onnxruntime.html" title="Fast runtime with onnxruntime"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="../tutorial_3_new_operator.html" title="Extend ONNX, extend runtime"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../tutorial_3_new_operator.html" accesskey="U">Extend ONNX, extend runtime</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Fast design with a python runtime</a></li> 
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo_main.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index_tutorial.html">
+  Tutorial
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_summary.html">
+  API Summary
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Gallery of examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../pipeline.html">
+  Convert a pipeline
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../parameterized.html">
+  Converters with options
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../supported.html">
+  Supported scikit-learn Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
       </ul>
-    </div>  
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+    <div class="container-xl">
+      <div class="row">
+          
             
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_1_simple.html">
+   The easy case
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_abegin_convert_pipeline.html">
+     Train and deploy a scikit-learn pipeline
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_bbegin_measure_time.html">
+     Benchmark ONNX conversion
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_cbegin_opset.html">
+     What is the opset number?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options.html">
+     One model, many possible conversions with options
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options_zipmap.html">
+     Choose appropriate output of a classifier
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options_list.html">
+     Black list operators when converting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_ebegin_float_double.html">
+     Issues when switching to float
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_fbegin_investigate.html">
+     Intermediate results and investigation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_cst.html">
+     Store arrays in one onnx graph
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_dataframe.html">
+     Dataframe as an input
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gconverting.html">
+     Modify the ONNX graph
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_transfer_learning.html">
+     Transfer Learning with ONNX
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_1-5_external.html">
+   Using converters from other libraries
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_lightgbm.html">
+     Convert a pipeline with a LightGBM classifier
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_lightgbm_reg.html">
+     Convert a pipeline with a LightGBM regressor
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_xgboost.html">
+     Convert a pipeline with a XGBoost model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_2_new_converter.html">
+   A custom converter for a custom model
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_icustom_converter.html">
+     Implement a new converter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_jcustom_syntax.html">
+     Two ways to implement a converter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_kcustom_converter_wrapper.html">
+     Implement a new converter using other converters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_lcustom_options.html">
+     A new converter with options
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_mcustom_parser.html">
+     Change the number of outputs by adding a parser
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../tutorial_3_new_operator.html">
+   Extend ONNX, extend runtime
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Fast design with a python runtime
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_qextend_onnxruntime.html">
+     Fast runtime with onnxruntime
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_4_advanced.html">
+   Advanced scenarios
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_usparse_xgboost.html">
+     TfIdf and sparse matrices
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_woe_transformer.html">
+     Converter for WOE
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_2-5_extlib.html">
+   Write converters for other libraries
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_wext_pyod_forest.html">
+     Converter for pyod.models.iforest.IForest
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-transformer-which-decorrelates-variables">
+   A transformer which decorrelates variables
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#extend-onnx">
+   Extend ONNX
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#new-onnx-operator">
+     New ONNX operator
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#shape-calculator">
+     shape calculator
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#converter">
+     converter
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#runtime-for-eig">
+     Runtime for Eig
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#registration">
+     Registration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#final-example">
+   Final example
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#final-graph">
+   Final graph
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-pextend-python-runtime-py"><span class="std std-ref">here</span></a>
@@ -97,18 +478,18 @@ training time but at prediction time.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlprodict.onnxrt.shape_object</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/shape_object.html#mlprodict.onnxrt.shape_object.ShapeObject" title="mlprodict.onnxrt.shape_object.ShapeObject" class="sphx-glr-backref-module-mlprodict-onnxrt-shape_object sphx-glr-backref-type-py-class"><span class="n">ShapeObject</span></a>
 <span class="kn">from</span> <span class="nn">mlprodict.onnxrt.ops_cpu</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/ops_cpu/_op.html#mlprodict.onnxrt.ops_cpu._op.OpRunCustom" title="mlprodict.onnxrt.ops_cpu._op.OpRunCustom" class="sphx-glr-backref-module-mlprodict-onnxrt-ops_cpu-_op sphx-glr-backref-type-py-class"><span class="n">OpRunCustom</span></a><span class="p">,</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/ops_cpu/__init__.html#mlprodict.onnxrt.ops_cpu.register_operator" title="mlprodict.onnxrt.ops_cpu.register_operator" class="sphx-glr-backref-module-mlprodict-onnxrt-ops_cpu sphx-glr-backref-type-py-function"><span class="n">register_operator</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_ops</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">OnnxAdd</span><span class="p">,</span>
-    <span class="n">OnnxCast</span><span class="p">,</span>
-    <span class="n">OnnxDiv</span><span class="p">,</span>
-    <span class="n">OnnxGatherElements</span><span class="p">,</span>
-    <span class="n">OnnxEyeLike</span><span class="p">,</span>
-    <span class="n">OnnxMatMul</span><span class="p">,</span>
-    <span class="n">OnnxMul</span><span class="p">,</span>
-    <span class="n">OnnxPow</span><span class="p">,</span>
-    <span class="n">OnnxReduceMean</span><span class="p">,</span>
-    <span class="n">OnnxShape</span><span class="p">,</span>
-    <span class="n">OnnxSub</span><span class="p">,</span>
-    <span class="n">OnnxTranspose</span><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd" title="skl2onnx.algebra.onnx_ops.OnnxAdd" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxAdd</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxCast" title="skl2onnx.algebra.onnx_ops.OnnxCast" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxCast</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv" title="skl2onnx.algebra.onnx_ops.OnnxDiv" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxDiv</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherElements" title="skl2onnx.algebra.onnx_ops.OnnxGatherElements" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxGatherElements</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxEyeLike" title="skl2onnx.algebra.onnx_ops.OnnxEyeLike" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxEyeLike</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul" title="skl2onnx.algebra.onnx_ops.OnnxMatMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMatMul</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMul" title="skl2onnx.algebra.onnx_ops.OnnxMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMul</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxPow" title="skl2onnx.algebra.onnx_ops.OnnxPow" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxPow</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean" title="skl2onnx.algebra.onnx_ops.OnnxReduceMean" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxReduceMean</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxShape" title="skl2onnx.algebra.onnx_ops.OnnxShape" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxShape</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxSub" title="skl2onnx.algebra.onnx_ops.OnnxSub" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxSub</span></a><span class="p">,</span>
+    <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose" title="skl2onnx.algebra.onnx_ops.OnnxTranspose" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxTranspose</span></a><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra</span> <span class="kn">import</span> <span class="n">OnnxOperator</span>
 <span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a>
@@ -117,14 +498,14 @@ training time but at prediction time.</p>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class"><span class="n">BytesIO</span></a>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html#numpy.testing.assert_almost_equal" title="numpy.testing.assert_almost_equal" class="sphx-glr-backref-module-numpy-testing sphx-glr-backref-type-py-function"><span class="n">assert_almost_equal</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">TransformerMixin</span></a><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="sklearn.base.BaseEstimator" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">BaseEstimator</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">guess_numpy_type</span><span class="p">,</span> <span class="n">guess_proto_type</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">update_registered_converter</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">update_registered_converter</span></a>
 
 
-<span class="k">class</span> <span class="nc">LiveDecorrelateTransformer</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">TransformerMixin</span></a><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="sklearn.base.BaseEstimator" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">BaseEstimator</span></a><span class="p">):</span>
+<span class="k">class</span> <span class="nc">LiveDecorrelateTransformer</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorrelates correlated gaussian features.</span>
 
@@ -137,8 +518,8 @@ training time but at prediction time.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
-        <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="sklearn.base.BaseEstimator" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">BaseEstimator</span></a><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">TransformerMixin</span></a><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">BaseEstimator</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">TransformerMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -163,17 +544,17 @@ training time but at prediction time.</p>
 
 
 <span class="k">def</span> <span class="nf">test_live_decorrelate_transformer</span><span class="p">():</span>
-    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-function"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a>
 
-    <span class="n">dec</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LiveDecorrelateTransformer</span></a><span class="p">()</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">LiveDecorrelateTransformer</span><span class="p">()</span>
     <span class="n">dec</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
     <span class="n">pred</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
     <span class="n">cov</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pred</span>
     <span class="n">cov</span> <span class="o">/=</span> <span class="n">cov</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html#numpy.testing.assert_almost_equal" title="numpy.testing.assert_almost_equal" class="sphx-glr-backref-module-numpy-testing sphx-glr-backref-type-py-function"><span class="n">assert_almost_equal</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.identity.html#numpy.identity" title="numpy.identity" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">identity</span></a><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">cov</span><span class="p">)</span>
 
-    <span class="n">dec</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LiveDecorrelateTransformer</span></a><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">LiveDecorrelateTransformer</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span>
     <span class="n">dec</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
     <span class="n">pred</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
     <span class="n">cov</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pred</span>
@@ -286,7 +667,7 @@ more complex too.</p>
     <span class="c1"># Lines in comment specify the numpy computation</span>
     <span class="c1"># the ONNX code implements.</span>
     <span class="c1"># mean_ = numpy.mean(X, axis=0, keepdims=True)</span>
-    <span class="n">mean</span> <span class="o">=</span> <span class="n">OnnxReduceMean</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">keepdims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean" title="skl2onnx.algebra.onnx_ops.OnnxReduceMean" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxReduceMean</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">keepdims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
 
     <span class="c1"># This is trick I often use. The converter automatically</span>
     <span class="c1"># chooses a name for every output. In big graph,</span>
@@ -297,26 +678,26 @@ more complex too.</p>
     <span class="n">mean</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 
     <span class="c1"># X2 = X - mean_</span>
-    <span class="n">X2</span> <span class="o">=</span> <span class="n">OnnxSub</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxSub" title="skl2onnx.algebra.onnx_ops.OnnxSub" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxSub</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
 
     <span class="c1"># V = X2.T @ X2 / X2.shape[0]</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">OnnxGatherElements</span><span class="p">(</span>
-        <span class="n">OnnxShape</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
+    <span class="n">N</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherElements" title="skl2onnx.algebra.onnx_ops.OnnxGatherElements" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxGatherElements</span></a><span class="p">(</span>
+        <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxShape" title="skl2onnx.algebra.onnx_ops.OnnxShape" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxShape</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
         <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span></a><span class="p">),</span>
         <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
-    <span class="n">Nf</span> <span class="o">=</span> <span class="n">OnnxCast</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">proto_dtype</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">Nf</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxCast" title="skl2onnx.algebra.onnx_ops.OnnxCast" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxCast</span></a><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">proto_dtype</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
 
     <span class="c1"># Every output involved in N and Nf is prefixed by &#39;N&#39;.</span>
     <span class="n">Nf</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">)</span>
 
-    <span class="n">V</span> <span class="o">=</span> <span class="n">OnnxDiv</span><span class="p">(</span>
-        <span class="n">OnnxMatMul</span><span class="p">(</span><span class="n">OnnxTranspose</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
+    <span class="n">V</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv" title="skl2onnx.algebra.onnx_ops.OnnxDiv" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxDiv</span></a><span class="p">(</span>
+        <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul" title="skl2onnx.algebra.onnx_ops.OnnxMatMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMatMul</span></a><span class="p">(</span><a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose" title="skl2onnx.algebra.onnx_ops.OnnxTranspose" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxTranspose</span></a><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
                    <span class="n">X2</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
         <span class="n">Nf</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">V</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;V1&#39;</span><span class="p">)</span>
 
     <span class="c1"># V += numpy.identity(V.shape[0]) * self.alpha</span>
-    <span class="n">V</span> <span class="o">=</span> <span class="n">OnnxAdd</span><span class="p">(</span><span class="n">V</span><span class="p">,</span>
+    <span class="n">V</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd" title="skl2onnx.algebra.onnx_ops.OnnxAdd" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxAdd</span></a><span class="p">(</span><span class="n">V</span><span class="p">,</span>
                 <span class="n">op</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.identity.html#numpy.identity" title="numpy.identity" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">identity</span></a><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">nf_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
                 <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">V</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;V2&#39;</span><span class="p">)</span>
@@ -329,27 +710,27 @@ more complex too.</p>
     <span class="c1"># Notation LP[0] means OnnxPow is taking the first output</span>
     <span class="c1"># of operator OnnxEig, LP[1] would mean the second one</span>
     <span class="c1"># LP is not allowed as it is ambiguous</span>
-    <span class="n">Linv</span> <span class="o">=</span> <span class="n">OnnxPow</span><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+    <span class="n">Linv</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxPow" title="skl2onnx.algebra.onnx_ops.OnnxPow" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxPow</span></a><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
                    <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">Linv</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;Linv&#39;</span><span class="p">)</span>
 
     <span class="c1"># diag = numpy.diag(Linv)</span>
-    <span class="n">diag</span> <span class="o">=</span> <span class="n">OnnxMul</span><span class="p">(</span>
-        <span class="n">OnnxEyeLike</span><span class="p">(</span>
+    <span class="n">diag</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMul" title="skl2onnx.algebra.onnx_ops.OnnxMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMul</span></a><span class="p">(</span>
+        <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxEyeLike" title="skl2onnx.algebra.onnx_ops.OnnxEyeLike" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxEyeLike</span></a><span class="p">(</span>
             <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">nf_</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">nf_</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span></a><span class="p">),</span>
             <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">),</span>
         <span class="n">Linv</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">diag</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;diag&#39;</span><span class="p">)</span>
 
     <span class="c1"># root = P @ diag @ P.transpose()</span>
-    <span class="n">trv</span> <span class="o">=</span> <span class="n">OnnxTranspose</span><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
-    <span class="n">coef_left</span> <span class="o">=</span> <span class="n">OnnxMatMul</span><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">diag</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">trv</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose" title="skl2onnx.algebra.onnx_ops.OnnxTranspose" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxTranspose</span></a><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">coef_left</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul" title="skl2onnx.algebra.onnx_ops.OnnxMatMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMatMul</span></a><span class="p">(</span><span class="n">LP</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">diag</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">coef_left</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;coef_left&#39;</span><span class="p">)</span>
-    <span class="n">coef</span> <span class="o">=</span> <span class="n">OnnxMatMul</span><span class="p">(</span><span class="n">coef_left</span><span class="p">,</span> <span class="n">trv</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">coef</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul" title="skl2onnx.algebra.onnx_ops.OnnxMatMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMatMul</span></a><span class="p">(</span><span class="n">coef_left</span><span class="p">,</span> <span class="n">trv</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
     <span class="n">coef</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;coef&#39;</span><span class="p">)</span>
 
     <span class="c1"># Same part as before.</span>
-    <span class="n">Y</span> <span class="o">=</span> <span class="n">OnnxMatMul</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">out</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">Y</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul" title="skl2onnx.algebra.onnx_ops.OnnxMatMul" class="sphx-glr-backref-module-skl2onnx-algebra-onnx_ops sphx-glr-backref-type-py-class"><span class="n">OnnxMatMul</span></a><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">out</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">Y</span><span class="o">.</span><span class="n">set_onnx_name_prefix</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
 
     <span class="c1"># The last line specifies the final output.</span>
@@ -405,8 +786,8 @@ by reducing allocation for example.</p>
 </div>
 <div class="section" id="registration">
 <h3><a class="toc-backref" href="#id7">Registration</a><a class="headerlink" href="#registration" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">update_registered_converter</span><span class="p">(</span>
-    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LiveDecorrelateTransformer</span></a><span class="p">,</span> <span class="s2">&quot;SklearnLiveDecorrelateTransformer&quot;</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">update_registered_converter</span></a><span class="p">(</span>
+    <span class="n">LiveDecorrelateTransformer</span><span class="p">,</span> <span class="s2">&quot;SklearnLiveDecorrelateTransformer&quot;</span><span class="p">,</span>
     <span class="n">live_decorrelate_transformer_shape_calculator</span><span class="p">,</span>
     <span class="n">live_decorrelate_transformer_converter</span><span class="p">)</span>
 </pre></div>
@@ -415,13 +796,13 @@ by reducing allocation for example.</p>
 </div>
 <div class="section" id="final-example">
 <h2><a class="toc-backref" href="#id8">Final example</a><a class="headerlink" href="#final-example" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-function"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a>
 
-<span class="n">dec</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LiveDecorrelateTransformer</span></a><span class="p">()</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">LiveDecorrelateTransformer</span><span class="p">()</span>
 <span class="n">dec</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 
-<span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
+<span class="n">onx</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
 
 <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/ops_cpu/__init__.html#mlprodict.onnxrt.ops_cpu.register_operator" title="mlprodict.onnxrt.ops_cpu.register_operator" class="sphx-glr-backref-module-mlprodict-onnxrt-ops_cpu sphx-glr-backref-type-py-function"><span class="n">register_operator</span></a><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/ops_cpu/_op.html#mlprodict.onnxrt.ops_cpu._op.OpRunCustom" title="mlprodict.onnxrt.ops_cpu._op.OpRunCustom" class="sphx-glr-backref-module-mlprodict-onnxrt-ops_cpu-_op sphx-glr-backref-type-py-class"><span class="n">OpEig</span></a><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Eig&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -455,8 +836,7 @@ by reducing allocation for example.</p>
 <a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="plot pextend python runtime" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_pextend_python_runtime_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.427 seconds)</p>
+<img src="../_images/sphx_glr_plot_pextend_python_runtime_001.png" srcset="../_images/sphx_glr_plot_pextend_python_runtime_001.png" alt="plot pextend python runtime" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.442 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-pextend-python-runtime-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_pextend_python_runtime.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -473,68 +853,50 @@ by reducing allocation for example.</p>
 </div>
 
 
-            <div class="clearer"></div>
-          </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../tutorial_3_new_operator.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Extend ONNX, extend runtime</p>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
-            </a></p>
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Fast design with a python runtime</a><ul>
-<li><a class="reference internal" href="#a-transformer-which-decorrelates-variables">A transformer which decorrelates variables</a></li>
-<li><a class="reference internal" href="#extend-onnx">Extend ONNX</a><ul>
-<li><a class="reference internal" href="#new-onnx-operator">New ONNX operator</a></li>
-<li><a class="reference internal" href="#shape-calculator">shape calculator</a></li>
-<li><a class="reference internal" href="#converter">converter</a></li>
-<li><a class="reference internal" href="#runtime-for-eig">Runtime for Eig</a></li>
-<li><a class="reference internal" href="#registration">Registration</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#final-example">Final example</a></li>
-<li><a class="reference internal" href="#final-graph">Final graph</a></li>
-</ul>
-</li>
-</ul>
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation index</a><ul>
-  <li><a href="../index_tutorial.html">Tutorial</a><ul>
-  <li><a href="../tutorial_3_new_operator.html">Extend ONNX, extend runtime</a><ul>
-      <li>Previous: <a href="../tutorial_3_new_operator.html" title="previous chapter">Extend ONNX, extend runtime</a></li>
-      <li>Next: <a href="plot_qextend_onnxruntime.html" title="next chapter">Fast runtime with onnxruntime</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/auto_tutorial/plot_pextend_python_runtime.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
+    </a>
+    <a class='right-next' id="next-link" href="plot_qextend_onnxruntime.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Fast runtime with onnxruntime</p>
     </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-  <div class="footer">
-    &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.
-  </div>
   
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018-2021, Microsoft.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
   </body>
 </html>

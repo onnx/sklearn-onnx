@@ -246,12 +246,12 @@ sparse matrices to be converted into dense matrices.
 
  .. code-block:: none
 
-      0%|                                                                                                                                                 | 0/4 [00:00<?, ?it/s]     25%|##################################2                                                                                                      | 1/4 [00:00<00:00,  8.62it/s][19:48:22] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
-     75%|######################################################################################################7                                  | 3/4 [00:00<00:00,  9.12it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  8.32it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  8.42it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:00<00:00,  7.29it/s][13:08:27] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+     75%|#######5  | 3/4 [00:00<00:00,  8.48it/s]    100%|##########| 4/4 [00:00<00:00,  7.11it/s]    100%|##########| 4/4 [00:00<00:00,  7.36it/s]
                                 model  discrepencies
-    0          RandomForestClassifier       0.000005
+    0          RandomForestClassifier       0.337505
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier      17.104321
+    2                   XGBClassifier      13.951313
     3                  LGBMClassifier       0.000009
 
 
@@ -285,7 +285,7 @@ sparse matrices to be converted into dense matrices.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.000005</td>
+          <td>0.337505</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -297,7 +297,7 @@ sparse matrices to be converted into dense matrices.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>17.104321</td>
+          <td>13.951313</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -344,8 +344,8 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
 
  .. code-block:: none
 
-      0%|                                                                                                                                                 | 0/4 [00:00<?, ?it/s]     25%|##################################2                                                                                                      | 1/4 [00:00<00:00,  9.35it/s]     50%|####################################################################5                                                                    | 2/4 [00:00<00:00,  7.99it/s][19:48:23] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
-     75%|######################################################################################################7                                  | 3/4 [00:00<00:00,  6.56it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  7.00it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  7.13it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:00<00:00,  6.95it/s]     50%|#####     | 2/4 [00:00<00:00,  4.83it/s][13:08:28] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+     75%|#######5  | 3/4 [00:00<00:00,  4.38it/s]    100%|##########| 4/4 [00:00<00:00,  4.88it/s]    100%|##########| 4/4 [00:00<00:00,  4.89it/s]
 
 
 .. raw:: html
@@ -377,7 +377,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.000005</td>
+          <td>0.249185</td>
         </tr>
         <tr>
           <th>1</th>
@@ -387,7 +387,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000005</td>
+          <td>0.000004</td>
         </tr>
         <tr>
           <th>3</th>
@@ -488,12 +488,12 @@ replace null values by nan in the onnx graph.
 
  .. code-block:: none
 
-      0%|                                                                                                                                                 | 0/4 [00:00<?, ?it/s]     25%|##################################2                                                                                                      | 1/4 [00:00<00:00,  9.90it/s][19:48:23] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
-     75%|######################################################################################################7                                  | 3/4 [00:00<00:00, 10.64it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  9.34it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:00<00:00,  6.14it/s][13:08:29] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+     75%|#######5  | 3/4 [00:00<00:00,  7.56it/s]    100%|##########| 4/4 [00:00<00:00,  6.79it/s]    100%|##########| 4/4 [00:00<00:00,  6.88it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      36.249148
+    0          RandomForestClassifier      35.803524
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       0.000005
+    2                   XGBClassifier       0.000004
     3                  LGBMClassifier       0.000009
 
 
@@ -527,7 +527,7 @@ replace null values by nan in the onnx graph.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>36.249148</td>
+          <td>35.803524</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -539,7 +539,7 @@ replace null values by nan in the onnx graph.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000005</td>
+          <td>0.000004</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -589,12 +589,12 @@ more explicit.
 
  .. code-block:: none
 
-      0%|                                                                                                                                                 | 0/4 [00:00<?, ?it/s]     25%|##################################2                                                                                                      | 1/4 [00:00<00:00,  7.57it/s][19:48:24] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
-     75%|######################################################################################################7                                  | 3/4 [00:00<00:00,  8.98it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  7.89it/s]    100%|#########################################################################################################################################| 4/4 [00:00<00:00,  8.01it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:00<00:00,  6.30it/s][13:08:29] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+     75%|#######5  | 3/4 [00:00<00:00,  8.14it/s]    100%|##########| 4/4 [00:00<00:00,  7.32it/s]    100%|##########| 4/4 [00:00<00:00,  7.38it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      76.418323
+    0          RandomForestClassifier      47.957443
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       0.000005
+    2                   XGBClassifier       0.000004
     3                  LGBMClassifier       0.000009
 
 
@@ -628,7 +628,7 @@ more explicit.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>76.418323</td>
+          <td>47.957443</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -640,7 +640,7 @@ more explicit.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000005</td>
+          <td>0.000004</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -668,7 +668,7 @@ tuned depending on the model which follows the TfIdf preprocessing.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.077 seconds)
+   **Total running time of the script:** ( 0 minutes  2.608 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_usparse_xgboost.py:

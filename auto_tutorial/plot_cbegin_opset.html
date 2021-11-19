@@ -5,15 +5,34 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>What is the opset number? &#8212; sklearn-onnx 1.10.0 documentation</title>
+    <title>What is the opset number? &#8212; sklearn-onnx 1.10.2 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/readable.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -22,37 +41,372 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="One model, many possible conversions with options" href="plot_dbegin_options.html" />
     <link rel="prev" title="Benchmark ONNX conversion" href="plot_bbegin_measure_time.html" />
-   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
 
-  </head><body>
-  
-  
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="plot_dbegin_options.html" title="One model, many possible conversions with options"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="plot_bbegin_measure_time.html" title="Benchmark ONNX conversion"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sklearn-onnx 1.10.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index_tutorial.html" >Tutorial</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../tutorial_1_simple.html" accesskey="U">The easy case</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">What is the opset number?</a></li> 
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo_main.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index_tutorial.html">
+  Tutorial
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_summary.html">
+  API Summary
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Gallery of examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../pipeline.html">
+  Convert a pipeline
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../parameterized.html">
+  Converters with options
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../supported.html">
+  Supported scikit-learn Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
       </ul>
-    </div>  
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+    <div class="container-xl">
+      <div class="row">
+          
             
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../tutorial_1_simple.html">
+   The easy case
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_abegin_convert_pipeline.html">
+     Train and deploy a scikit-learn pipeline
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_bbegin_measure_time.html">
+     Benchmark ONNX conversion
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     What is the opset number?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options.html">
+     One model, many possible conversions with options
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options_zipmap.html">
+     Choose appropriate output of a classifier
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_dbegin_options_list.html">
+     Black list operators when converting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_ebegin_float_double.html">
+     Issues when switching to float
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_fbegin_investigate.html">
+     Intermediate results and investigation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_cst.html">
+     Store arrays in one onnx graph
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_dataframe.html">
+     Dataframe as an input
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gconverting.html">
+     Modify the ONNX graph
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gbegin_transfer_learning.html">
+     Transfer Learning with ONNX
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_1-5_external.html">
+   Using converters from other libraries
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_lightgbm.html">
+     Convert a pipeline with a LightGBM classifier
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_lightgbm_reg.html">
+     Convert a pipeline with a LightGBM regressor
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_gexternal_xgboost.html">
+     Convert a pipeline with a XGBoost model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_2_new_converter.html">
+   A custom converter for a custom model
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_icustom_converter.html">
+     Implement a new converter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_jcustom_syntax.html">
+     Two ways to implement a converter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_kcustom_converter_wrapper.html">
+     Implement a new converter using other converters
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_lcustom_options.html">
+     A new converter with options
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_mcustom_parser.html">
+     Change the number of outputs by adding a parser
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_3_new_operator.html">
+   Extend ONNX, extend runtime
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_pextend_python_runtime.html">
+     Fast design with a python runtime
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_qextend_onnxruntime.html">
+     Fast runtime with onnxruntime
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_4_advanced.html">
+   Advanced scenarios
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_usparse_xgboost.html">
+     TfIdf and sparse matrices
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_woe_transformer.html">
+     Converter for WOE
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../tutorial_2-5_extlib.html">
+   Write converters for other libraries
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="plot_wext_pyod_forest.html">
+     Converter for pyod.models.iforest.IForest
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data">
+   Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#onnx">
+   ONNX
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#onnx-and-opset">
+   ONNX and opset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#other-opsets">
+   Other opsets
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-cbegin-opset-py"><span class="std std-ref">here</span></a>
@@ -89,17 +443,17 @@ targeted opset.</p>
 <h2><a class="toc-backref" href="#id1">Data</a><a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
 <p>A simple example.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">onnx.defs</span> <span class="kn">import</span> <span class="n">onnx_opset_version</span>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">IsolationForest</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs" title="sklearn.datasets.make_blobs" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">make_blobs</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">IsolationForest</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
 
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs" title="sklearn.datasets.make_blobs" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">make_blobs</span></a><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">IsolationForest</span></a><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest.fit" title="sklearn.ensemble.IsolationForest.fit" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-method"><span class="n">model</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">labels</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest.predict" title="sklearn.ensemble.IsolationForest.predict" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-method"><span class="n">model</span><span class="o">.</span><span class="n">predict</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">IsolationForest</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">labels</span></a> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 
 <a href="https://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
@@ -107,18 +461,17 @@ targeted opset.</p>
 <a href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s2">&quot;Sample&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="Sample" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_cbegin_opset_001.png" />
-</div>
+<img src="../_images/sphx_glr_plot_cbegin_opset_001.png" srcset="../_images/sphx_glr_plot_cbegin_opset_001.png" alt="Sample" class = "sphx-glr-single-img"/></div>
 <div class="section" id="onnx">
 <h2><a class="toc-backref" href="#id2">ONNX</a><a class="headerlink" href="#onnx" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a><span class="p">(</span><span class="n">model</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">onx</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ir_version: 8
 producer_name: &quot;skl2onnx&quot;
-producer_version: &quot;1.10.0&quot;
+producer_version: &quot;1.10.2&quot;
 domain: &quot;ai.onnx&quot;
 model_version: 0
 doc_string: &quot;&quot;
@@ -150,880 +503,6 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;node_sample0_output0&quot;
-    output: &quot;node_sample0_Y0&quot;
-    name: &quot;node_sample0_TreeEnsembleRegressor&quot;
-    op_type: &quot;TreeEnsembleRegressor&quot;
-    attribute {
-      name: &quot;n_targets&quot;
-      i: 1
-      type: INT
-    }
-    attribute {
-      name: &quot;nodes_falsenodeids&quot;
-      ints: 30
-      ints: 3
-      ints: 0
-      ints: 7
-      ints: 6
-      ints: 0
-      ints: 0
-      ints: 21
-      ints: 14
-      ints: 13
-      ints: 12
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 18
-      ints: 17
-      ints: 0
-      ints: 0
-      ints: 20
-      ints: 0
-      ints: 0
-      ints: 27
-      ints: 26
-      ints: 25
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 29
-      ints: 0
-      ints: 0
-      ints: 72
-      ints: 59
-      ints: 46
-      ints: 39
-      ints: 38
-      ints: 37
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 43
-      ints: 42
-      ints: 0
-      ints: 0
-      ints: 45
-      ints: 0
-      ints: 0
-      ints: 52
-      ints: 49
-      ints: 0
-      ints: 51
-      ints: 0
-      ints: 0
-      ints: 56
-      ints: 55
-      ints: 0
-      ints: 0
-      ints: 58
-      ints: 0
-      ints: 0
-      ints: 67
-      ints: 64
-      ints: 63
-      ints: 0
-      ints: 0
-      ints: 66
-      ints: 0
-      ints: 0
-      ints: 71
-      ints: 70
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_featureids&quot;
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_hitrates&quot;
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      type: FLOATS
-    }
-    attribute {
-      name: &quot;nodes_missing_value_tracks_true&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_modes&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      type: STRINGS
-    }
-    attribute {
-      name: &quot;nodes_nodeids&quot;
-      ints: 0
-      ints: 1
-      ints: 2
-      ints: 3
-      ints: 4
-      ints: 5
-      ints: 6
-      ints: 7
-      ints: 8
-      ints: 9
-      ints: 10
-      ints: 11
-      ints: 12
-      ints: 13
-      ints: 14
-      ints: 15
-      ints: 16
-      ints: 17
-      ints: 18
-      ints: 19
-      ints: 20
-      ints: 21
-      ints: 22
-      ints: 23
-      ints: 24
-      ints: 25
-      ints: 26
-      ints: 27
-      ints: 28
-      ints: 29
-      ints: 30
-      ints: 31
-      ints: 32
-      ints: 33
-      ints: 34
-      ints: 35
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 39
-      ints: 40
-      ints: 41
-      ints: 42
-      ints: 43
-      ints: 44
-      ints: 45
-      ints: 46
-      ints: 47
-      ints: 48
-      ints: 49
-      ints: 50
-      ints: 51
-      ints: 52
-      ints: 53
-      ints: 54
-      ints: 55
-      ints: 56
-      ints: 57
-      ints: 58
-      ints: 59
-      ints: 60
-      ints: 61
-      ints: 62
-      ints: 63
-      ints: 64
-      ints: 65
-      ints: 66
-      ints: 67
-      ints: 68
-      ints: 69
-      ints: 70
-      ints: 71
-      ints: 72
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_treeids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_truenodeids&quot;
-      ints: 1
-      ints: 2
-      ints: 0
-      ints: 4
-      ints: 5
-      ints: 0
-      ints: 0
-      ints: 8
-      ints: 9
-      ints: 10
-      ints: 11
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 15
-      ints: 16
-      ints: 0
-      ints: 0
-      ints: 19
-      ints: 0
-      ints: 0
-      ints: 22
-      ints: 23
-      ints: 24
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 28
-      ints: 0
-      ints: 0
-      ints: 31
-      ints: 32
-      ints: 33
-      ints: 34
-      ints: 35
-      ints: 36
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 40
-      ints: 41
-      ints: 0
-      ints: 0
-      ints: 44
-      ints: 0
-      ints: 0
-      ints: 47
-      ints: 48
-      ints: 0
-      ints: 50
-      ints: 0
-      ints: 0
-      ints: 53
-      ints: 54
-      ints: 0
-      ints: 0
-      ints: 57
-      ints: 0
-      ints: 0
-      ints: 60
-      ints: 61
-      ints: 62
-      ints: 0
-      ints: 0
-      ints: 65
-      ints: 0
-      ints: 0
-      ints: 68
-      ints: 69
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_values&quot;
-      floats: -1.4346637725830078
-      floats: -5.918731689453125
-      floats: 0.0
-      floats: -3.96079683303833
-      floats: -4.475343704223633
-      floats: 0.0
-      floats: 0.0
-      floats: 6.7187700271606445
-      floats: 5.466217517852783
-      floats: 5.257072448730469
-      floats: -1.4653818607330322
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 6.087196350097656
-      floats: -2.1033151149749756
-      floats: 0.0
-      floats: 0.0
-      floats: 6.294923782348633
-      floats: 0.0
-      floats: 0.0
-      floats: 7.038532733917236
-      floats: 6.967172622680664
-      floats: 6.868208408355713
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 7.291744232177734
-      floats: 0.0
-      floats: 0.0
-      floats: 7.190858840942383
-      floats: 0.6675953269004822
-      floats: 4.435150146484375
-      floats: -7.771726131439209
-      floats: -7.848217487335205
-      floats: -8.726143836975098
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 1.7834553718566895
-      floats: 1.206250786781311
-      floats: 0.0
-      floats: 0.0
-      floats: 2.2031328678131104
-      floats: 0.0
-      floats: 0.0
-      floats: -1.4747395515441895
-      floats: -2.040213108062744
-      floats: 0.0
-      floats: 9.37690544128418
-      floats: 0.0
-      floats: 0.0
-      floats: 8.81982707977295
-      floats: 7.612739086151123
-      floats: 0.0
-      floats: 0.0
-      floats: -0.2136491984128952
-      floats: 0.0
-      floats: 0.0
-      floats: 9.733541488647461
-      floats: 4.0938615798950195
-      floats: 6.299746990203857
-      floats: 0.0
-      floats: 0.0
-      floats: 1.0473707914352417
-      floats: 0.0
-      floats: 0.0
-      floats: 9.979286193847656
-      floats: 9.819235801696777
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      type: FLOATS
-    }
-    attribute {
-      name: &quot;post_transform&quot;
-      s: &quot;NONE&quot;
-      type: STRING
-    }
-    attribute {
-      name: &quot;target_ids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_nodeids&quot;
-      ints: 2
-      ints: 5
-      ints: 6
-      ints: 11
-      ints: 12
-      ints: 13
-      ints: 16
-      ints: 17
-      ints: 19
-      ints: 20
-      ints: 24
-      ints: 25
-      ints: 26
-      ints: 28
-      ints: 29
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 41
-      ints: 42
-      ints: 44
-      ints: 45
-      ints: 48
-      ints: 50
-      ints: 51
-      ints: 54
-      ints: 55
-      ints: 57
-      ints: 58
-      ints: 62
-      ints: 63
-      ints: 65
-      ints: 66
-      ints: 69
-      ints: 70
-      ints: 71
-      ints: 72
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_treeids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_weights&quot;
-      floats: 2.0
-      floats: 5.0
-      floats: 6.0
-      floats: 11.0
-      floats: 12.0
-      floats: 13.0
-      floats: 16.0
-      floats: 17.0
-      floats: 19.0
-      floats: 20.0
-      floats: 24.0
-      floats: 25.0
-      floats: 26.0
-      floats: 28.0
-      floats: 29.0
-      floats: 36.0
-      floats: 37.0
-      floats: 38.0
-      floats: 41.0
-      floats: 42.0
-      floats: 44.0
-      floats: 45.0
-      floats: 48.0
-      floats: 50.0
-      floats: 51.0
-      floats: 54.0
-      floats: 55.0
-      floats: 57.0
-      floats: 58.0
-      floats: 62.0
-      floats: 63.0
-      floats: 65.0
-      floats: 66.0
-      floats: 69.0
-      floats: 70.0
-      floats: 71.0
-      floats: 72.0
-      type: FLOATS
-    }
-    domain: &quot;ai.onnx.ml&quot;
-  }
-  node {
     input: &quot;X&quot;
     input: &quot;node_sample0_Gathercst&quot;
     output: &quot;node_sample1_output0&quot;
@@ -1037,6 +516,924 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;node_sample0_output0&quot;
+    output: &quot;node_sample0_Y0&quot;
+    name: &quot;node_sample0_TreeEnsembleRegressor&quot;
+    op_type: &quot;TreeEnsembleRegressor&quot;
+    attribute {
+      name: &quot;n_targets&quot;
+      i: 1
+      type: INT
+    }
+    attribute {
+      name: &quot;nodes_falsenodeids&quot;
+      ints: 40
+      ints: 35
+      ints: 30
+      ints: 17
+      ints: 10
+      ints: 9
+      ints: 8
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 14
+      ints: 13
+      ints: 0
+      ints: 0
+      ints: 16
+      ints: 0
+      ints: 0
+      ints: 25
+      ints: 22
+      ints: 21
+      ints: 0
+      ints: 0
+      ints: 24
+      ints: 0
+      ints: 0
+      ints: 27
+      ints: 0
+      ints: 29
+      ints: 0
+      ints: 0
+      ints: 32
+      ints: 0
+      ints: 34
+      ints: 0
+      ints: 0
+      ints: 37
+      ints: 0
+      ints: 39
+      ints: 0
+      ints: 0
+      ints: 68
+      ints: 43
+      ints: 0
+      ints: 57
+      ints: 50
+      ints: 47
+      ints: 0
+      ints: 49
+      ints: 0
+      ints: 0
+      ints: 54
+      ints: 53
+      ints: 0
+      ints: 0
+      ints: 56
+      ints: 0
+      ints: 0
+      ints: 61
+      ints: 60
+      ints: 0
+      ints: 0
+      ints: 65
+      ints: 64
+      ints: 0
+      ints: 0
+      ints: 67
+      ints: 0
+      ints: 0
+      ints: 72
+      ints: 71
+      ints: 0
+      ints: 0
+      ints: 74
+      ints: 0
+      ints: 76
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_featureids&quot;
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_hitrates&quot;
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      type: FLOATS
+    }
+    attribute {
+      name: &quot;nodes_missing_value_tracks_true&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_modes&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      type: STRINGS
+    }
+    attribute {
+      name: &quot;nodes_nodeids&quot;
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 3
+      ints: 4
+      ints: 5
+      ints: 6
+      ints: 7
+      ints: 8
+      ints: 9
+      ints: 10
+      ints: 11
+      ints: 12
+      ints: 13
+      ints: 14
+      ints: 15
+      ints: 16
+      ints: 17
+      ints: 18
+      ints: 19
+      ints: 20
+      ints: 21
+      ints: 22
+      ints: 23
+      ints: 24
+      ints: 25
+      ints: 26
+      ints: 27
+      ints: 28
+      ints: 29
+      ints: 30
+      ints: 31
+      ints: 32
+      ints: 33
+      ints: 34
+      ints: 35
+      ints: 36
+      ints: 37
+      ints: 38
+      ints: 39
+      ints: 40
+      ints: 41
+      ints: 42
+      ints: 43
+      ints: 44
+      ints: 45
+      ints: 46
+      ints: 47
+      ints: 48
+      ints: 49
+      ints: 50
+      ints: 51
+      ints: 52
+      ints: 53
+      ints: 54
+      ints: 55
+      ints: 56
+      ints: 57
+      ints: 58
+      ints: 59
+      ints: 60
+      ints: 61
+      ints: 62
+      ints: 63
+      ints: 64
+      ints: 65
+      ints: 66
+      ints: 67
+      ints: 68
+      ints: 69
+      ints: 70
+      ints: 71
+      ints: 72
+      ints: 73
+      ints: 74
+      ints: 75
+      ints: 76
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_truenodeids&quot;
+      ints: 1
+      ints: 2
+      ints: 3
+      ints: 4
+      ints: 5
+      ints: 6
+      ints: 7
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 11
+      ints: 12
+      ints: 0
+      ints: 0
+      ints: 15
+      ints: 0
+      ints: 0
+      ints: 18
+      ints: 19
+      ints: 20
+      ints: 0
+      ints: 0
+      ints: 23
+      ints: 0
+      ints: 0
+      ints: 26
+      ints: 0
+      ints: 28
+      ints: 0
+      ints: 0
+      ints: 31
+      ints: 0
+      ints: 33
+      ints: 0
+      ints: 0
+      ints: 36
+      ints: 0
+      ints: 38
+      ints: 0
+      ints: 0
+      ints: 41
+      ints: 42
+      ints: 0
+      ints: 44
+      ints: 45
+      ints: 46
+      ints: 0
+      ints: 48
+      ints: 0
+      ints: 0
+      ints: 51
+      ints: 52
+      ints: 0
+      ints: 0
+      ints: 55
+      ints: 0
+      ints: 0
+      ints: 58
+      ints: 59
+      ints: 0
+      ints: 0
+      ints: 62
+      ints: 63
+      ints: 0
+      ints: 0
+      ints: 66
+      ints: 0
+      ints: 0
+      ints: 69
+      ints: 70
+      ints: 0
+      ints: 0
+      ints: 73
+      ints: 0
+      ints: 75
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_values&quot;
+      floats: 4.341736316680908
+      floats: 7.607781410217285
+      floats: 6.984288215637207
+      floats: 2.381354331970215
+      floats: 6.515793323516846
+      floats: 2.247825860977173
+      floats: 2.235666036605835
+      floats: 0.0
+      floats: 0.0
+      floats: 0.0
+      floats: 1.807502269744873
+      floats: 6.652608394622803
+      floats: 0.0
+      floats: 0.0
+      floats: 2.3162474632263184
+      floats: 0.0
+      floats: 0.0
+      floats: 3.797947406768799
+      floats: 2.9554407596588135
+      floats: 2.7926626205444336
+      floats: 0.0
+      floats: 0.0
+      floats: 5.451823711395264
+      floats: 0.0
+      floats: 0.0
+      floats: 3.8675129413604736
+      floats: 0.0
+      floats: 6.029608249664307
+      floats: 0.0
+      floats: 0.0
+      floats: 3.2922816276550293
+      floats: 0.0
+      floats: 7.198117256164551
+      floats: 0.0
+      floats: 0.0
+      floats: 8.09844970703125
+      floats: 0.0
+      floats: 8.627727508544922
+      floats: 0.0
+      floats: 0.0
+      floats: 6.744438171386719
+      floats: -0.21875588595867157
+      floats: 0.0
+      floats: 1.8473337888717651
+      floats: 6.298000335693359
+      floats: 0.8317039012908936
+      floats: 0.0
+      floats: 5.447201728820801
+      floats: 0.0
+      floats: 0.0
+      floats: 1.7205214500427246
+      floats: 0.24642705917358398
+      floats: 0.0
+      floats: 0.0
+      floats: 7.476565837860107
+      floats: 0.0
+      floats: 0.0
+      floats: 4.5576372146606445
+      floats: 4.267696380615234
+      floats: 0.0
+      floats: 0.0
+      floats: 2.1666996479034424
+      floats: 7.799339771270752
+      floats: 0.0
+      floats: 0.0
+      floats: 6.117908954620361
+      floats: 0.0
+      floats: 0.0
+      floats: 7.483673572540283
+      floats: 7.199759006500244
+      floats: 0.0
+      floats: 0.0
+      floats: 7.71779203414917
+      floats: 0.0
+      floats: 4.981865406036377
+      floats: 0.0
+      floats: 0.0
+      type: FLOATS
+    }
+    attribute {
+      name: &quot;post_transform&quot;
+      s: &quot;NONE&quot;
+      type: STRING
+    }
+    attribute {
+      name: &quot;target_ids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_nodeids&quot;
+      ints: 7
+      ints: 8
+      ints: 9
+      ints: 12
+      ints: 13
+      ints: 15
+      ints: 16
+      ints: 20
+      ints: 21
+      ints: 23
+      ints: 24
+      ints: 26
+      ints: 28
+      ints: 29
+      ints: 31
+      ints: 33
+      ints: 34
+      ints: 36
+      ints: 38
+      ints: 39
+      ints: 42
+      ints: 46
+      ints: 48
+      ints: 49
+      ints: 52
+      ints: 53
+      ints: 55
+      ints: 56
+      ints: 59
+      ints: 60
+      ints: 63
+      ints: 64
+      ints: 66
+      ints: 67
+      ints: 70
+      ints: 71
+      ints: 73
+      ints: 75
+      ints: 76
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_weights&quot;
+      floats: 7.0
+      floats: 8.0
+      floats: 9.0
+      floats: 12.0
+      floats: 13.0
+      floats: 15.0
+      floats: 16.0
+      floats: 20.0
+      floats: 21.0
+      floats: 23.0
+      floats: 24.0
+      floats: 26.0
+      floats: 28.0
+      floats: 29.0
+      floats: 31.0
+      floats: 33.0
+      floats: 34.0
+      floats: 36.0
+      floats: 38.0
+      floats: 39.0
+      floats: 42.0
+      floats: 46.0
+      floats: 48.0
+      floats: 49.0
+      floats: 52.0
+      floats: 53.0
+      floats: 55.0
+      floats: 56.0
+      floats: 59.0
+      floats: 60.0
+      floats: 63.0
+      floats: 64.0
+      floats: 66.0
+      floats: 67.0
+      floats: 70.0
+      floats: 71.0
+      floats: 73.0
+      floats: 75.0
+      floats: 76.0
+      type: FLOATS
+    }
+    domain: &quot;ai.onnx.ml&quot;
+  }
+  node {
     input: &quot;node_sample2_output0&quot;
     output: &quot;node_sample2_Y0&quot;
     name: &quot;node_sample2_TreeEnsembleRegressor&quot;
@@ -1048,85 +1445,67 @@ graph {
     }
     attribute {
       name: &quot;nodes_falsenodeids&quot;
-      ints: 54
-      ints: 19
-      ints: 18
-      ints: 7
-      ints: 6
+      ints: 2
       ints: 0
-      ints: 0
-      ints: 15
-      ints: 12
+      ints: 36
       ints: 11
+      ints: 8
+      ints: 7
       ints: 0
       ints: 0
-      ints: 14
+      ints: 10
       ints: 0
+      ints: 0
+      ints: 25
+      ints: 18
+      ints: 15
       ints: 0
       ints: 17
       ints: 0
       ints: 0
+      ints: 22
+      ints: 21
       ints: 0
-      ints: 33
-      ints: 32
-      ints: 25
+      ints: 0
       ints: 24
       ints: 0
       ints: 0
-      ints: 29
-      ints: 28
-      ints: 0
-      ints: 0
       ints: 31
+      ints: 30
+      ints: 29
       ints: 0
       ints: 0
       ints: 0
+      ints: 35
+      ints: 34
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 42
       ints: 41
       ints: 40
-      ints: 37
       ints: 0
-      ints: 39
       ints: 0
+      ints: 0
+      ints: 52
+      ints: 47
+      ints: 46
       ints: 0
       ints: 0
       ints: 49
-      ints: 46
-      ints: 45
+      ints: 0
+      ints: 51
       ints: 0
       ints: 0
-      ints: 48
+      ints: 58
+      ints: 55
+      ints: 0
+      ints: 57
       ints: 0
       ints: 0
-      ints: 53
-      ints: 52
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 56
-      ints: 0
-      ints: 62
-      ints: 61
       ints: 60
       ints: 0
-      ints: 0
-      ints: 0
-      ints: 70
-      ints: 65
-      ints: 0
-      ints: 69
-      ints: 68
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 74
-      ints: 73
-      ints: 0
-      ints: 0
-      ints: 78
-      ints: 77
-      ints: 0
-      ints: 0
-      ints: 80
+      ints: 62
       ints: 0
       ints: 0
       type: INTS
@@ -1135,34 +1514,10 @@ graph {
       name: &quot;nodes_featureids&quot;
       ints: 0
       ints: 0
-      ints: 1
-      ints: 0
-      ints: 1
-      ints: 0
       ints: 0
       ints: 1
       ints: 0
       ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -1179,10 +1534,6 @@ graph {
       ints: 1
       ints: 0
       ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
       ints: 0
       ints: 0
       ints: 0
@@ -1190,26 +1541,36 @@ graph {
       ints: 1
       ints: 0
       ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
       ints: 0
       ints: 0
       ints: 1
       ints: 0
       ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
       ints: 1
       ints: 1
       ints: 0
       ints: 0
       ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
       ints: 0
       ints: 1
-      ints: 1
-      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -1218,6 +1579,842 @@ graph {
     }
     attribute {
       name: &quot;nodes_hitrates&quot;
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      type: FLOATS
+    }
+    attribute {
+      name: &quot;nodes_missing_value_tracks_true&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_modes&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      type: STRINGS
+    }
+    attribute {
+      name: &quot;nodes_nodeids&quot;
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 3
+      ints: 4
+      ints: 5
+      ints: 6
+      ints: 7
+      ints: 8
+      ints: 9
+      ints: 10
+      ints: 11
+      ints: 12
+      ints: 13
+      ints: 14
+      ints: 15
+      ints: 16
+      ints: 17
+      ints: 18
+      ints: 19
+      ints: 20
+      ints: 21
+      ints: 22
+      ints: 23
+      ints: 24
+      ints: 25
+      ints: 26
+      ints: 27
+      ints: 28
+      ints: 29
+      ints: 30
+      ints: 31
+      ints: 32
+      ints: 33
+      ints: 34
+      ints: 35
+      ints: 36
+      ints: 37
+      ints: 38
+      ints: 39
+      ints: 40
+      ints: 41
+      ints: 42
+      ints: 43
+      ints: 44
+      ints: 45
+      ints: 46
+      ints: 47
+      ints: 48
+      ints: 49
+      ints: 50
+      ints: 51
+      ints: 52
+      ints: 53
+      ints: 54
+      ints: 55
+      ints: 56
+      ints: 57
+      ints: 58
+      ints: 59
+      ints: 60
+      ints: 61
+      ints: 62
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_truenodeids&quot;
+      ints: 1
+      ints: 0
+      ints: 3
+      ints: 4
+      ints: 5
+      ints: 6
+      ints: 0
+      ints: 0
+      ints: 9
+      ints: 0
+      ints: 0
+      ints: 12
+      ints: 13
+      ints: 14
+      ints: 0
+      ints: 16
+      ints: 0
+      ints: 0
+      ints: 19
+      ints: 20
+      ints: 0
+      ints: 0
+      ints: 23
+      ints: 0
+      ints: 0
+      ints: 26
+      ints: 27
+      ints: 28
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 32
+      ints: 33
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 37
+      ints: 38
+      ints: 39
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 43
+      ints: 44
+      ints: 45
+      ints: 0
+      ints: 0
+      ints: 48
+      ints: 0
+      ints: 50
+      ints: 0
+      ints: 0
+      ints: 53
+      ints: 54
+      ints: 0
+      ints: 56
+      ints: 0
+      ints: 0
+      ints: 59
+      ints: 0
+      ints: 61
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_values&quot;
+      floats: -0.6303035616874695
+      floats: 0.0
+      floats: 6.810025215148926
+      floats: 2.332279920578003
+      floats: 5.306211471557617
+      floats: 2.2403666973114014
+      floats: 0.0
+      floats: 0.0
+      floats: 6.084327220916748
+      floats: 0.0
+      floats: 0.0
+      floats: 4.165918827056885
+      floats: 0.5747607350349426
+      floats: 0.07197745144367218
+      floats: 0.0
+      floats: 0.1927095651626587
+      floats: 0.0
+      floats: 0.0
+      floats: 2.092876434326172
+      floats: 9.487494468688965
+      floats: 0.0
+      floats: 0.0
+      floats: 2.9904544353485107
+      floats: 0.0
+      floats: 0.0
+      floats: 4.562674522399902
+      floats: 5.022346019744873
+      floats: 4.299661159515381
+      floats: 0.0
+      floats: 0.0
+      floats: 0.0
+      floats: 5.5753397941589355
+      floats: 5.705692768096924
+      floats: 0.0
+      floats: 0.0
+      floats: 0.0
+      floats: 2.7767744064331055
+      floats: 6.954005241394043
+      floats: 6.819334983825684
+      floats: 0.0
+      floats: 0.0
+      floats: 0.0
+      floats: 7.266250133514404
+      floats: 3.8998355865478516
+      floats: 6.823193073272705
+      floats: 0.0
+      floats: 0.0
+      floats: 7.114825248718262
+      floats: 0.0
+      floats: 5.10211181640625
+      floats: 0.0
+      floats: 0.0
+      floats: 4.285070896148682
+      floats: 3.3939192295074463
+      floats: 0.0
+      floats: 8.233794212341309
+      floats: 0.0
+      floats: 0.0
+      floats: 4.646389961242676
+      floats: 0.0
+      floats: 7.999742031097412
+      floats: 0.0
+      floats: 0.0
+      type: FLOATS
+    }
+    attribute {
+      name: &quot;post_transform&quot;
+      s: &quot;NONE&quot;
+      type: STRING
+    }
+    attribute {
+      name: &quot;target_ids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_nodeids&quot;
+      ints: 1
+      ints: 6
+      ints: 7
+      ints: 9
+      ints: 10
+      ints: 14
+      ints: 16
+      ints: 17
+      ints: 20
+      ints: 21
+      ints: 23
+      ints: 24
+      ints: 28
+      ints: 29
+      ints: 30
+      ints: 33
+      ints: 34
+      ints: 35
+      ints: 39
+      ints: 40
+      ints: 41
+      ints: 45
+      ints: 46
+      ints: 48
+      ints: 50
+      ints: 51
+      ints: 54
+      ints: 56
+      ints: 57
+      ints: 59
+      ints: 61
+      ints: 62
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;target_weights&quot;
+      floats: 1.0
+      floats: 6.0
+      floats: 7.0
+      floats: 9.0
+      floats: 10.0
+      floats: 14.0
+      floats: 16.0
+      floats: 17.0
+      floats: 20.0
+      floats: 21.0
+      floats: 23.0
+      floats: 24.0
+      floats: 28.0
+      floats: 29.0
+      floats: 30.0
+      floats: 33.0
+      floats: 34.0
+      floats: 35.0
+      floats: 39.0
+      floats: 40.0
+      floats: 41.0
+      floats: 45.0
+      floats: 46.0
+      floats: 48.0
+      floats: 50.0
+      floats: 51.0
+      floats: 54.0
+      floats: 56.0
+      floats: 57.0
+      floats: 59.0
+      floats: 61.0
+      floats: 62.0
+      type: FLOATS
+    }
+    domain: &quot;ai.onnx.ml&quot;
+  }
+  node {
+    input: &quot;node_sample1_output0&quot;
+    output: &quot;node_sample1_Y0&quot;
+    name: &quot;node_sample1_TreeEnsembleRegressor&quot;
+    op_type: &quot;TreeEnsembleRegressor&quot;
+    attribute {
+      name: &quot;n_targets&quot;
+      i: 1
+      type: INT
+    }
+    attribute {
+      name: &quot;nodes_falsenodeids&quot;
+      ints: 40
+      ints: 35
+      ints: 8
+      ints: 7
+      ints: 6
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 24
+      ints: 17
+      ints: 14
+      ints: 13
+      ints: 0
+      ints: 0
+      ints: 16
+      ints: 0
+      ints: 0
+      ints: 21
+      ints: 20
+      ints: 0
+      ints: 0
+      ints: 23
+      ints: 0
+      ints: 0
+      ints: 30
+      ints: 29
+      ints: 28
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 32
+      ints: 0
+      ints: 34
+      ints: 0
+      ints: 0
+      ints: 39
+      ints: 38
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 76
+      ints: 57
+      ints: 50
+      ints: 45
+      ints: 0
+      ints: 47
+      ints: 0
+      ints: 49
+      ints: 0
+      ints: 0
+      ints: 52
+      ints: 0
+      ints: 56
+      ints: 55
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 63
+      ints: 60
+      ints: 0
+      ints: 62
+      ints: 0
+      ints: 0
+      ints: 69
+      ints: 68
+      ints: 67
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 73
+      ints: 72
+      ints: 0
+      ints: 0
+      ints: 75
+      ints: 0
+      ints: 0
+      ints: 78
+      ints: 0
+      ints: 86
+      ints: 81
+      ints: 0
+      ints: 83
+      ints: 0
+      ints: 85
+      ints: 0
+      ints: 0
+      ints: 92
+      ints: 91
+      ints: 90
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_featureids&quot;
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      type: INTS
+    }
+    attribute {
+      name: &quot;nodes_hitrates&quot;
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
@@ -1384,6 +2581,18 @@ graph {
       ints: 0
       ints: 0
       ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       type: INTS
     }
     attribute {
@@ -1395,40 +2604,8 @@ graph {
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
@@ -1441,24 +2618,17 @@ graph {
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
@@ -1466,7 +2636,58 @@ graph {
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       type: STRINGS
@@ -1554,10 +2775,34 @@ graph {
       ints: 78
       ints: 79
       ints: 80
+      ints: 81
+      ints: 82
+      ints: 83
+      ints: 84
+      ints: 85
+      ints: 86
+      ints: 87
+      ints: 88
+      ints: 89
+      ints: 90
+      ints: 91
+      ints: 92
       type: INTS
     }
     attribute {
       name: &quot;nodes_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -1650,163 +2895,187 @@ graph {
       ints: 5
       ints: 0
       ints: 0
-      ints: 8
+      ints: 0
       ints: 9
       ints: 10
+      ints: 11
+      ints: 12
       ints: 0
       ints: 0
-      ints: 13
+      ints: 15
       ints: 0
       ints: 0
-      ints: 16
+      ints: 18
+      ints: 19
       ints: 0
       ints: 0
-      ints: 0
-      ints: 20
-      ints: 21
       ints: 22
-      ints: 23
       ints: 0
       ints: 0
+      ints: 25
       ints: 26
       ints: 27
       ints: 0
       ints: 0
-      ints: 30
+      ints: 0
+      ints: 31
+      ints: 0
+      ints: 33
       ints: 0
       ints: 0
-      ints: 0
-      ints: 34
-      ints: 35
       ints: 36
-      ints: 0
-      ints: 38
-      ints: 0
+      ints: 37
       ints: 0
       ints: 0
+      ints: 0
+      ints: 41
       ints: 42
       ints: 43
       ints: 44
       ints: 0
+      ints: 46
       ints: 0
-      ints: 47
+      ints: 48
       ints: 0
       ints: 0
-      ints: 50
       ints: 51
       ints: 0
+      ints: 53
+      ints: 54
       ints: 0
       ints: 0
-      ints: 55
       ints: 0
-      ints: 57
       ints: 58
       ints: 59
       ints: 0
+      ints: 61
       ints: 0
       ints: 0
-      ints: 63
       ints: 64
-      ints: 0
+      ints: 65
       ints: 66
-      ints: 67
       ints: 0
       ints: 0
       ints: 0
+      ints: 70
       ints: 71
-      ints: 72
       ints: 0
       ints: 0
-      ints: 75
-      ints: 76
+      ints: 74
       ints: 0
+      ints: 0
+      ints: 77
       ints: 0
       ints: 79
+      ints: 80
+      ints: 0
+      ints: 82
+      ints: 0
+      ints: 84
+      ints: 0
+      ints: 0
+      ints: 87
+      ints: 88
+      ints: 89
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       type: INTS
     }
     attribute {
       name: &quot;nodes_values&quot;
-      floats: 2.0032904148101807
-      floats: -6.209061145782471
-      floats: 2.4299116134643555
-      floats: -8.292694091796875
-      floats: 1.3160936832427979
-      floats: 0.0
-      floats: 0.0
-      floats: 1.7886950969696045
-      floats: -6.89942741394043
-      floats: 0.7851880788803101
-      floats: 0.0
-      floats: 0.0
-      floats: -6.461877822875977
-      floats: 0.0
-      floats: 0.0
-      floats: -7.658167362213135
+      floats: 4.467800140380859
+      floats: 7.61240291595459
+      floats: 3.537864923477173
+      floats: 3.8354523181915283
+      floats: 3.049650192260742
       floats: 0.0
       floats: 0.0
       floats: 0.0
-      floats: -3.3593945503234863
-      floats: 1.7803665399551392
-      floats: -6.0912675857543945
-      floats: 0.07314535230398178
+      floats: 6.45329475402832
+      floats: 4.043688774108887
+      floats: 2.833808422088623
+      floats: 3.627296209335327
       floats: 0.0
       floats: 0.0
-      floats: 0.1444307118654251
-      floats: -0.418365478515625
+      floats: 4.062495231628418
       floats: 0.0
       floats: 0.0
-      floats: -4.883748531341553
+      floats: 2.619274854660034
+      floats: 6.36912727355957
       floats: 0.0
       floats: 0.0
-      floats: 0.0
-      floats: -1.2465370893478394
-      floats: -1.384573221206665
-      floats: -2.1142942905426025
-      floats: 0.0
-      floats: -1.6021642684936523
+      floats: 5.128162860870361
       floats: 0.0
       floats: 0.0
-      floats: 0.0
-      floats: -0.21163952350616455
-      floats: -0.611453115940094
-      floats: 8.857969284057617
-      floats: 0.0
-      floats: 0.0
-      floats: 10.202730178833008
-      floats: 0.0
-      floats: 0.0
-      floats: 10.389739990234375
-      floats: -0.07635292410850525
+      floats: 3.2521543502807617
+      floats: 3.0171778202056885
+      floats: 2.002281904220581
       floats: 0.0
       floats: 0.0
       floats: 0.0
-      floats: -4.430346965789795
+      floats: 6.6954827308654785
       floats: 0.0
-      floats: 5.218644618988037
-      floats: -3.7306814193725586
-      floats: -3.798800468444824
+      floats: 4.161968231201172
       floats: 0.0
       floats: 0.0
-      floats: 0.0
-      floats: -3.5737082958221436
-      floats: 6.634253978729248
-      floats: 0.0
-      floats: -3.635603904724121
-      floats: -4.017882347106934
+      floats: 3.933279037475586
+      floats: 3.4249308109283447
       floats: 0.0
       floats: 0.0
       floats: 0.0
-      floats: -3.31488037109375
-      floats: -3.4654769897460938
+      floats: 7.735074043273926
+      floats: 6.169698238372803
+      floats: 3.1155846118927
+      floats: 1.3285560607910156
+      floats: 0.0
+      floats: 5.994833469390869
+      floats: 0.0
+      floats: 1.8237919807434082
       floats: 0.0
       floats: 0.0
-      floats: -2.0693905353546143
-      floats: -2.7479217052459717
+      floats: 4.49558162689209
+      floats: 0.0
+      floats: 5.936429500579834
+      floats: 5.023820400238037
       floats: 0.0
       floats: 0.0
-      floats: 6.1918535232543945
+      floats: 0.0
+      floats: 6.504914283752441
+      floats: 1.588443398475647
+      floats: 0.0
+      floats: 2.118302822113037
+      floats: 0.0
+      floats: 0.0
+      floats: 7.33011531829834
+      floats: 3.272183418273926
+      floats: 2.025144338607788
+      floats: 0.0
+      floats: 0.0
+      floats: 0.0
+      floats: 1.1962969303131104
+      floats: 1.0284430980682373
+      floats: 0.0
+      floats: 0.0
+      floats: 2.162174940109253
+      floats: 0.0
+      floats: 0.0
+      floats: -0.03137509524822235
+      floats: 0.0
+      floats: 8.25961971282959
+      floats: 8.043098449707031
+      floats: 0.0
+      floats: 0.9344675540924072
+      floats: 0.0
+      floats: 8.235097885131836
+      floats: 0.0
+      floats: 0.0
+      floats: 2.6824114322662354
+      floats: 1.8882418870925903
+      floats: 9.012130737304688
+      floats: 0.0
+      floats: 0.0
       floats: 0.0
       floats: 0.0
       type: FLOATS
@@ -1859,55 +3128,73 @@ graph {
       ints: 0
       ints: 0
       ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       type: INTS
     }
     attribute {
       name: &quot;target_nodeids&quot;
       ints: 5
       ints: 6
-      ints: 10
-      ints: 11
+      ints: 7
+      ints: 12
       ints: 13
-      ints: 14
+      ints: 15
       ints: 16
-      ints: 17
-      ints: 18
+      ints: 19
+      ints: 20
+      ints: 22
       ints: 23
-      ints: 24
       ints: 27
       ints: 28
-      ints: 30
+      ints: 29
       ints: 31
-      ints: 32
-      ints: 36
+      ints: 33
+      ints: 34
+      ints: 37
       ints: 38
       ints: 39
-      ints: 40
       ints: 44
-      ints: 45
-      ints: 47
+      ints: 46
       ints: 48
+      ints: 49
       ints: 51
-      ints: 52
-      ints: 53
+      ints: 54
       ints: 55
+      ints: 56
       ints: 59
-      ints: 60
       ints: 61
-      ints: 64
+      ints: 62
+      ints: 66
       ints: 67
       ints: 68
-      ints: 69
+      ints: 71
       ints: 72
-      ints: 73
-      ints: 76
+      ints: 74
+      ints: 75
       ints: 77
-      ints: 79
       ints: 80
+      ints: 82
+      ints: 84
+      ints: 85
+      ints: 89
+      ints: 90
+      ints: 91
+      ints: 92
       type: INTS
     }
     attribute {
       name: &quot;target_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -1955,60 +3242,54 @@ graph {
       name: &quot;target_weights&quot;
       floats: 5.0
       floats: 6.0
-      floats: 10.0
-      floats: 11.0
+      floats: 7.0
+      floats: 12.0
       floats: 13.0
-      floats: 14.0
+      floats: 15.0
       floats: 16.0
-      floats: 17.0
-      floats: 18.0
+      floats: 19.0
+      floats: 20.0
+      floats: 22.0
       floats: 23.0
-      floats: 24.0
       floats: 27.0
       floats: 28.0
-      floats: 30.0
+      floats: 29.0
       floats: 31.0
-      floats: 32.0
-      floats: 36.0
+      floats: 33.0
+      floats: 34.0
+      floats: 37.0
       floats: 38.0
       floats: 39.0
-      floats: 40.0
       floats: 44.0
-      floats: 45.0
-      floats: 47.0
+      floats: 46.0
       floats: 48.0
+      floats: 49.0
       floats: 51.0
-      floats: 52.0
-      floats: 53.0
+      floats: 54.0
       floats: 55.0
+      floats: 56.0
       floats: 59.0
-      floats: 60.0
       floats: 61.0
-      floats: 64.0
+      floats: 62.0
+      floats: 66.0
       floats: 67.0
       floats: 68.0
-      floats: 69.0
+      floats: 71.0
       floats: 72.0
-      floats: 73.0
-      floats: 76.0
+      floats: 74.0
+      floats: 75.0
       floats: 77.0
-      floats: 79.0
       floats: 80.0
+      floats: 82.0
+      floats: 84.0
+      floats: 85.0
+      floats: 89.0
+      floats: 90.0
+      floats: 91.0
+      floats: 92.0
       type: FLOATS
     }
     domain: &quot;ai.onnx.ml&quot;
-  }
-  node {
-    input: &quot;node_sample0_Y0&quot;
-    output: &quot;path_length0_output0&quot;
-    name: &quot;path_length0_Cast&quot;
-    op_type: &quot;Cast&quot;
-    attribute {
-      name: &quot;to&quot;
-      i: 7
-      type: INT
-    }
-    domain: &quot;&quot;
   }
   node {
     input: &quot;node_sample0_Y0&quot;
@@ -2023,905 +3304,21 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;node_sample1_output0&quot;
-    output: &quot;node_sample1_Y0&quot;
-    name: &quot;node_sample1_TreeEnsembleRegressor&quot;
-    op_type: &quot;TreeEnsembleRegressor&quot;
+    input: &quot;node_sample0_Y0&quot;
+    output: &quot;path_length0_output0&quot;
+    name: &quot;path_length0_Cast&quot;
+    op_type: &quot;Cast&quot;
     attribute {
-      name: &quot;n_targets&quot;
-      i: 1
+      name: &quot;to&quot;
+      i: 7
       type: INT
     }
-    attribute {
-      name: &quot;nodes_falsenodeids&quot;
-      ints: 50
-      ints: 7
-      ints: 6
-      ints: 5
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 31
-      ints: 18
-      ints: 17
-      ints: 14
-      ints: 13
-      ints: 0
-      ints: 0
-      ints: 16
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 26
-      ints: 23
-      ints: 22
-      ints: 0
-      ints: 0
-      ints: 25
-      ints: 0
-      ints: 0
-      ints: 30
-      ints: 29
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 39
-      ints: 34
-      ints: 0
-      ints: 38
-      ints: 37
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 47
-      ints: 44
-      ints: 43
-      ints: 0
-      ints: 0
-      ints: 46
-      ints: 0
-      ints: 0
-      ints: 49
-      ints: 0
-      ints: 0
-      ints: 52
-      ints: 0
-      ints: 56
-      ints: 55
-      ints: 0
-      ints: 0
-      ints: 64
-      ints: 59
-      ints: 0
-      ints: 61
-      ints: 0
-      ints: 63
-      ints: 0
-      ints: 0
-      ints: 72
-      ints: 69
-      ints: 68
-      ints: 0
-      ints: 0
-      ints: 71
-      ints: 0
-      ints: 0
-      ints: 74
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_featureids&quot;
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 1
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 1
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_hitrates&quot;
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      type: FLOATS
-    }
-    attribute {
-      name: &quot;nodes_missing_value_tracks_true&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_modes&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;BRANCH_LEQ&quot;
-      strings: &quot;LEAF&quot;
-      strings: &quot;LEAF&quot;
-      type: STRINGS
-    }
-    attribute {
-      name: &quot;nodes_nodeids&quot;
-      ints: 0
-      ints: 1
-      ints: 2
-      ints: 3
-      ints: 4
-      ints: 5
-      ints: 6
-      ints: 7
-      ints: 8
-      ints: 9
-      ints: 10
-      ints: 11
-      ints: 12
-      ints: 13
-      ints: 14
-      ints: 15
-      ints: 16
-      ints: 17
-      ints: 18
-      ints: 19
-      ints: 20
-      ints: 21
-      ints: 22
-      ints: 23
-      ints: 24
-      ints: 25
-      ints: 26
-      ints: 27
-      ints: 28
-      ints: 29
-      ints: 30
-      ints: 31
-      ints: 32
-      ints: 33
-      ints: 34
-      ints: 35
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 39
-      ints: 40
-      ints: 41
-      ints: 42
-      ints: 43
-      ints: 44
-      ints: 45
-      ints: 46
-      ints: 47
-      ints: 48
-      ints: 49
-      ints: 50
-      ints: 51
-      ints: 52
-      ints: 53
-      ints: 54
-      ints: 55
-      ints: 56
-      ints: 57
-      ints: 58
-      ints: 59
-      ints: 60
-      ints: 61
-      ints: 62
-      ints: 63
-      ints: 64
-      ints: 65
-      ints: 66
-      ints: 67
-      ints: 68
-      ints: 69
-      ints: 70
-      ints: 71
-      ints: 72
-      ints: 73
-      ints: 74
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_treeids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_truenodeids&quot;
-      ints: 1
-      ints: 2
-      ints: 3
-      ints: 4
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 8
-      ints: 9
-      ints: 10
-      ints: 11
-      ints: 12
-      ints: 0
-      ints: 0
-      ints: 15
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 19
-      ints: 20
-      ints: 21
-      ints: 0
-      ints: 0
-      ints: 24
-      ints: 0
-      ints: 0
-      ints: 27
-      ints: 28
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 32
-      ints: 33
-      ints: 0
-      ints: 35
-      ints: 36
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 40
-      ints: 41
-      ints: 42
-      ints: 0
-      ints: 0
-      ints: 45
-      ints: 0
-      ints: 0
-      ints: 48
-      ints: 0
-      ints: 0
-      ints: 51
-      ints: 0
-      ints: 53
-      ints: 54
-      ints: 0
-      ints: 0
-      ints: 57
-      ints: 58
-      ints: 0
-      ints: 60
-      ints: 0
-      ints: 62
-      ints: 0
-      ints: 0
-      ints: 65
-      ints: 66
-      ints: 67
-      ints: 0
-      ints: 0
-      ints: 70
-      ints: 0
-      ints: 0
-      ints: 73
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;nodes_values&quot;
-      floats: 5.952066898345947
-      floats: -8.32945442199707
-      floats: 3.257793426513672
-      floats: -8.371736526489258
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 7.916901588439941
-      floats: 3.4221465587615967
-      floats: 2.7466180324554443
-      floats: -7.069864749908447
-      floats: -7.394391059875488
-      floats: 0.0
-      floats: 0.0
-      floats: 2.214641809463501
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: -1.8876245021820068
-      floats: -3.6819255352020264
-      floats: 4.914679050445557
-      floats: 0.0
-      floats: 0.0
-      floats: -1.9274080991744995
-      floats: 0.0
-      floats: 0.0
-      floats: -1.6454932689666748
-      floats: 5.700128555297852
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: -1.5346325635910034
-      floats: 8.378290176391602
-      floats: 0.0
-      floats: -1.7662030458450317
-      floats: -1.810862421989441
-      floats: 0.0
-      floats: 0.0
-      floats: 0.0
-      floats: 10.288527488708496
-      floats: 9.219876289367676
-      floats: -0.49714988470077515
-      floats: 0.0
-      floats: 0.0
-      floats: 0.15210890769958496
-      floats: 0.0
-      floats: 0.0
-      floats: 10.666532516479492
-      floats: 0.0
-      floats: 0.0
-      floats: -4.388154029846191
-      floats: 0.0
-      floats: -3.7998530864715576
-      floats: -3.9386119842529297
-      floats: 0.0
-      floats: 0.0
-      floats: 6.157165050506592
-      floats: 5.996542453765869
-      floats: 0.0
-      floats: -2.941122055053711
-      floats: 0.0
-      floats: 6.047923564910889
-      floats: 0.0
-      floats: 0.0
-      floats: 7.165082931518555
-      floats: 6.540538787841797
-      floats: -2.654188871383667
-      floats: 0.0
-      floats: 0.0
-      floats: 6.779207229614258
-      floats: 0.0
-      floats: 0.0
-      floats: 7.339571475982666
-      floats: 0.0
-      floats: 0.0
-      type: FLOATS
-    }
-    attribute {
-      name: &quot;post_transform&quot;
-      s: &quot;NONE&quot;
-      type: STRING
-    }
-    attribute {
-      name: &quot;target_ids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_nodeids&quot;
-      ints: 4
-      ints: 5
-      ints: 6
-      ints: 12
-      ints: 13
-      ints: 15
-      ints: 16
-      ints: 17
-      ints: 21
-      ints: 22
-      ints: 24
-      ints: 25
-      ints: 28
-      ints: 29
-      ints: 30
-      ints: 33
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 42
-      ints: 43
-      ints: 45
-      ints: 46
-      ints: 48
-      ints: 49
-      ints: 51
-      ints: 54
-      ints: 55
-      ints: 58
-      ints: 60
-      ints: 62
-      ints: 63
-      ints: 67
-      ints: 68
-      ints: 70
-      ints: 71
-      ints: 73
-      ints: 74
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_treeids&quot;
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      ints: 0
-      type: INTS
-    }
-    attribute {
-      name: &quot;target_weights&quot;
-      floats: 4.0
-      floats: 5.0
-      floats: 6.0
-      floats: 12.0
-      floats: 13.0
-      floats: 15.0
-      floats: 16.0
-      floats: 17.0
-      floats: 21.0
-      floats: 22.0
-      floats: 24.0
-      floats: 25.0
-      floats: 28.0
-      floats: 29.0
-      floats: 30.0
-      floats: 33.0
-      floats: 36.0
-      floats: 37.0
-      floats: 38.0
-      floats: 42.0
-      floats: 43.0
-      floats: 45.0
-      floats: 46.0
-      floats: 48.0
-      floats: 49.0
-      floats: 51.0
-      floats: 54.0
-      floats: 55.0
-      floats: 58.0
-      floats: 60.0
-      floats: 62.0
-      floats: 63.0
-      floats: 67.0
-      floats: 68.0
-      floats: 70.0
-      floats: 71.0
-      floats: 73.0
-      floats: 74.0
-      type: FLOATS
-    }
-    domain: &quot;ai.onnx.ml&quot;
+    domain: &quot;&quot;
   }
   node {
-    input: &quot;node_sample2_Y0&quot;
-    output: &quot;path_length2_output0&quot;
-    name: &quot;path_length2_Cast&quot;
+    input: &quot;node_sample1_Y0&quot;
+    output: &quot;path_length1_output0&quot;
+    name: &quot;path_length1_Cast&quot;
     op_type: &quot;Cast&quot;
     attribute {
       name: &quot;to&quot;
@@ -2944,6 +3341,18 @@ graph {
   }
   node {
     input: &quot;node_sample2_Y0&quot;
+    output: &quot;path_length2_output0&quot;
+    name: &quot;path_length2_Cast&quot;
+    op_type: &quot;Cast&quot;
+    attribute {
+      name: &quot;to&quot;
+      i: 7
+      type: INT
+    }
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;node_sample2_Y0&quot;
     output: &quot;node_sample2_output02&quot;
     name: &quot;node_sample2_Cast&quot;
     op_type: &quot;Cast&quot;
@@ -2955,138 +3364,51 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;path_length0_output0&quot;
-    output: &quot;path_length0_Y0&quot;
-    name: &quot;path_length0_LabelEncoder&quot;
-    op_type: &quot;LabelEncoder&quot;
-    attribute {
-      name: &quot;keys_int64s&quot;
-      ints: 2
-      ints: 5
-      ints: 6
-      ints: 11
-      ints: 12
-      ints: 13
-      ints: 16
-      ints: 17
-      ints: 19
-      ints: 20
-      ints: 24
-      ints: 25
-      ints: 26
-      ints: 28
-      ints: 29
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 41
-      ints: 42
-      ints: 44
-      ints: 45
-      ints: 48
-      ints: 50
-      ints: 51
-      ints: 54
-      ints: 55
-      ints: 57
-      ints: 58
-      ints: 62
-      ints: 63
-      ints: 65
-      ints: 66
-      ints: 69
-      ints: 70
-      ints: 71
-      ints: 72
-      type: INTS
-    }
-    attribute {
-      name: &quot;values_floats&quot;
-      floats: 3.0
-      floats: 5.0
-      floats: 5.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 6.0
-      floats: 3.0
-      type: FLOATS
-    }
-    domain: &quot;ai.onnx.ml&quot;
-  }
-  node {
     input: &quot;node_sample0_output02&quot;
     output: &quot;node_sample0_Y02&quot;
     name: &quot;node_sample0_LabelEncoder&quot;
     op_type: &quot;LabelEncoder&quot;
     attribute {
       name: &quot;keys_int64s&quot;
-      ints: 2
-      ints: 5
-      ints: 6
-      ints: 11
+      ints: 7
+      ints: 8
+      ints: 9
       ints: 12
       ints: 13
+      ints: 15
       ints: 16
-      ints: 17
-      ints: 19
       ints: 20
+      ints: 21
+      ints: 23
       ints: 24
-      ints: 25
       ints: 26
       ints: 28
       ints: 29
+      ints: 31
+      ints: 33
+      ints: 34
       ints: 36
-      ints: 37
       ints: 38
-      ints: 41
+      ints: 39
       ints: 42
-      ints: 44
-      ints: 45
+      ints: 46
       ints: 48
-      ints: 50
-      ints: 51
-      ints: 54
+      ints: 49
+      ints: 52
+      ints: 53
       ints: 55
-      ints: 57
-      ints: 58
-      ints: 62
+      ints: 56
+      ints: 59
+      ints: 60
       ints: 63
-      ints: 65
+      ints: 64
       ints: 66
-      ints: 69
+      ints: 67
       ints: 70
       ints: 71
-      ints: 72
+      ints: 73
+      ints: 75
+      ints: 76
       type: INTS
     }
     attribute {
@@ -3094,35 +3416,37 @@ graph {
       floats: 1.0
       floats: 1.0
       floats: 1.0
-      floats: 3.0
-      floats: 1.0
-      floats: 1.0
-      floats: 2.0
-      floats: 6.0
-      floats: 3.0
-      floats: 5.0
-      floats: 3.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
-      floats: 2.0
-      floats: 2.0
-      floats: 1.0
-      floats: 22.0
-      floats: 3.0
-      floats: 1.0
-      floats: 2.0
-      floats: 1.0
-      floats: 1.0
-      floats: 2.0
-      floats: 1.0
-      floats: 6.0
       floats: 8.0
-      floats: 9.0
+      floats: 2.0
+      floats: 4.0
+      floats: 11.0
+      floats: 1.0
+      floats: 7.0
+      floats: 2.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 3.0
+      floats: 2.0
+      floats: 10.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 4.0
+      floats: 2.0
+      floats: 12.0
+      floats: 7.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
@@ -3133,110 +3457,203 @@ graph {
     domain: &quot;ai.onnx.ml&quot;
   }
   node {
-    input: &quot;node_sample1_Y0&quot;
-    output: &quot;path_length1_output0&quot;
-    name: &quot;path_length1_Cast&quot;
-    op_type: &quot;Cast&quot;
+    input: &quot;path_length0_output0&quot;
+    output: &quot;path_length0_Y0&quot;
+    name: &quot;path_length0_LabelEncoder&quot;
+    op_type: &quot;LabelEncoder&quot;
     attribute {
-      name: &quot;to&quot;
-      i: 7
-      type: INT
+      name: &quot;keys_int64s&quot;
+      ints: 7
+      ints: 8
+      ints: 9
+      ints: 12
+      ints: 13
+      ints: 15
+      ints: 16
+      ints: 20
+      ints: 21
+      ints: 23
+      ints: 24
+      ints: 26
+      ints: 28
+      ints: 29
+      ints: 31
+      ints: 33
+      ints: 34
+      ints: 36
+      ints: 38
+      ints: 39
+      ints: 42
+      ints: 46
+      ints: 48
+      ints: 49
+      ints: 52
+      ints: 53
+      ints: 55
+      ints: 56
+      ints: 59
+      ints: 60
+      ints: 63
+      ints: 64
+      ints: 66
+      ints: 67
+      ints: 70
+      ints: 71
+      ints: 73
+      ints: 75
+      ints: 76
+      type: INTS
     }
-    domain: &quot;&quot;
+    attribute {
+      name: &quot;values_floats&quot;
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 5.0
+      floats: 6.0
+      floats: 6.0
+      floats: 4.0
+      floats: 5.0
+      floats: 5.0
+      floats: 4.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 5.0
+      floats: 5.0
+      floats: 5.0
+      floats: 6.0
+      floats: 6.0
+      type: FLOATS
+    }
+    domain: &quot;ai.onnx.ml&quot;
   }
   node {
-    input: &quot;path_length2_output0&quot;
-    output: &quot;path_length2_Y0&quot;
-    name: &quot;path_length2_LabelEncoder&quot;
+    input: &quot;path_length1_output0&quot;
+    output: &quot;path_length1_Y0&quot;
+    name: &quot;path_length1_LabelEncoder&quot;
     op_type: &quot;LabelEncoder&quot;
     attribute {
       name: &quot;keys_int64s&quot;
       ints: 5
       ints: 6
-      ints: 10
-      ints: 11
+      ints: 7
+      ints: 12
       ints: 13
-      ints: 14
+      ints: 15
       ints: 16
-      ints: 17
-      ints: 18
+      ints: 19
+      ints: 20
+      ints: 22
       ints: 23
-      ints: 24
       ints: 27
       ints: 28
-      ints: 30
+      ints: 29
       ints: 31
-      ints: 32
-      ints: 36
+      ints: 33
+      ints: 34
+      ints: 37
       ints: 38
       ints: 39
-      ints: 40
       ints: 44
-      ints: 45
-      ints: 47
+      ints: 46
       ints: 48
+      ints: 49
       ints: 51
-      ints: 52
-      ints: 53
+      ints: 54
       ints: 55
+      ints: 56
       ints: 59
-      ints: 60
       ints: 61
-      ints: 64
+      ints: 62
+      ints: 66
       ints: 67
       ints: 68
-      ints: 69
+      ints: 71
       ints: 72
-      ints: 73
-      ints: 76
+      ints: 74
+      ints: 75
       ints: 77
-      ints: 79
       ints: 80
+      ints: 82
+      ints: 84
+      ints: 85
+      ints: 89
+      ints: 90
+      ints: 91
+      ints: 92
       type: INTS
     }
     attribute {
       name: &quot;values_floats&quot;
       floats: 6.0
       floats: 6.0
+      floats: 5.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
       floats: 8.0
       floats: 8.0
       floats: 8.0
       floats: 8.0
       floats: 7.0
       floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 5.0
+      floats: 5.0
       floats: 4.0
-      floats: 7.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 5.0
+      floats: 6.0
       floats: 7.0
       floats: 8.0
       floats: 8.0
       floats: 6.0
       floats: 8.0
       floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
       floats: 7.0
-      floats: 3.0
       floats: 6.0
+      floats: 7.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 4.0
       floats: 6.0
-      floats: 5.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
       floats: 6.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 7.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
       type: FLOATS
     }
     domain: &quot;ai.onnx.ml&quot;
@@ -3248,44 +3665,53 @@ graph {
     op_type: &quot;LabelEncoder&quot;
     attribute {
       name: &quot;keys_int64s&quot;
-      ints: 4
       ints: 5
       ints: 6
+      ints: 7
       ints: 12
       ints: 13
       ints: 15
       ints: 16
-      ints: 17
-      ints: 21
+      ints: 19
+      ints: 20
       ints: 22
-      ints: 24
-      ints: 25
+      ints: 23
+      ints: 27
       ints: 28
       ints: 29
-      ints: 30
+      ints: 31
       ints: 33
-      ints: 36
+      ints: 34
       ints: 37
       ints: 38
-      ints: 42
-      ints: 43
-      ints: 45
+      ints: 39
+      ints: 44
       ints: 46
       ints: 48
       ints: 49
       ints: 51
       ints: 54
       ints: 55
-      ints: 58
-      ints: 60
+      ints: 56
+      ints: 59
+      ints: 61
       ints: 62
-      ints: 63
+      ints: 66
       ints: 67
       ints: 68
-      ints: 70
       ints: 71
-      ints: 73
+      ints: 72
       ints: 74
+      ints: 75
+      ints: 77
+      ints: 80
+      ints: 82
+      ints: 84
+      ints: 85
+      ints: 89
+      ints: 90
+      ints: 91
+      ints: 92
       type: INTS
     }
     attribute {
@@ -3293,9 +3719,30 @@ graph {
       floats: 1.0
       floats: 1.0
       floats: 1.0
-      floats: 7.0
       floats: 1.0
-      floats: 22.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 3.0
+      floats: 1.0
+      floats: 5.0
+      floats: 16.0
+      floats: 2.0
+      floats: 5.0
+      floats: 1.0
+      floats: 1.0
+      floats: 4.0
+      floats: 2.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 14.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
@@ -3304,18 +3751,7 @@ graph {
       floats: 1.0
       floats: 1.0
       floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 3.0
-      floats: 8.0
-      floats: 7.0
-      floats: 8.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
+      floats: 2.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
@@ -3323,11 +3759,89 @@ graph {
       floats: 1.0
       floats: 4.0
       floats: 1.0
-      floats: 2.0
       floats: 3.0
+      floats: 3.0
+      floats: 1.0
+      floats: 1.0
+      type: FLOATS
+    }
+    domain: &quot;ai.onnx.ml&quot;
+  }
+  node {
+    input: &quot;path_length2_output0&quot;
+    output: &quot;path_length2_Y0&quot;
+    name: &quot;path_length2_LabelEncoder&quot;
+    op_type: &quot;LabelEncoder&quot;
+    attribute {
+      name: &quot;keys_int64s&quot;
+      ints: 1
+      ints: 6
+      ints: 7
+      ints: 9
+      ints: 10
+      ints: 14
+      ints: 16
+      ints: 17
+      ints: 20
+      ints: 21
+      ints: 23
+      ints: 24
+      ints: 28
+      ints: 29
+      ints: 30
+      ints: 33
+      ints: 34
+      ints: 35
+      ints: 39
+      ints: 40
+      ints: 41
+      ints: 45
+      ints: 46
+      ints: 48
+      ints: 50
+      ints: 51
+      ints: 54
+      ints: 56
+      ints: 57
+      ints: 59
+      ints: 61
+      ints: 62
+      type: INTS
+    }
+    attribute {
+      name: &quot;values_floats&quot;
+      floats: 2.0
       floats: 6.0
-      floats: 1.0
-      floats: 1.0
+      floats: 6.0
+      floats: 6.0
+      floats: 6.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 6.0
+      floats: 6.0
+      floats: 5.0
+      floats: 7.0
+      floats: 7.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
+      floats: 7.0
+      floats: 8.0
+      floats: 8.0
       type: FLOATS
     }
     domain: &quot;ai.onnx.ml&quot;
@@ -3339,57 +3853,59 @@ graph {
     op_type: &quot;LabelEncoder&quot;
     attribute {
       name: &quot;keys_int64s&quot;
-      ints: 5
+      ints: 1
       ints: 6
+      ints: 7
+      ints: 9
       ints: 10
-      ints: 11
-      ints: 13
       ints: 14
       ints: 16
       ints: 17
-      ints: 18
+      ints: 20
+      ints: 21
       ints: 23
       ints: 24
-      ints: 27
       ints: 28
+      ints: 29
       ints: 30
-      ints: 31
-      ints: 32
-      ints: 36
-      ints: 38
+      ints: 33
+      ints: 34
+      ints: 35
       ints: 39
       ints: 40
-      ints: 44
+      ints: 41
       ints: 45
-      ints: 47
+      ints: 46
       ints: 48
+      ints: 50
       ints: 51
-      ints: 52
-      ints: 53
-      ints: 55
+      ints: 54
+      ints: 56
+      ints: 57
       ints: 59
-      ints: 60
       ints: 61
-      ints: 64
-      ints: 67
-      ints: 68
-      ints: 69
-      ints: 72
-      ints: 73
-      ints: 76
-      ints: 77
-      ints: 79
-      ints: 80
+      ints: 62
       type: INTS
     }
     attribute {
       name: &quot;values_floats&quot;
       floats: 1.0
       floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 2.0
+      floats: 18.0
+      floats: 1.0
       floats: 6.0
-      floats: 3.0
-      floats: 4.0
-      floats: 6.0
+      floats: 9.0
+      floats: 1.0
+      floats: 1.0
+      floats: 1.0
+      floats: 16.0
+      floats: 22.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
@@ -3397,50 +3913,17 @@ graph {
       floats: 1.0
       floats: 1.0
       floats: 1.0
-      floats: 4.0
       floats: 1.0
       floats: 1.0
       floats: 1.0
       floats: 2.0
       floats: 1.0
       floats: 1.0
-      floats: 3.0
-      floats: 3.0
-      floats: 4.0
-      floats: 1.0
-      floats: 3.0
-      floats: 13.0
       floats: 1.0
       floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 3.0
-      floats: 1.0
-      floats: 1.0
-      floats: 1.0
-      floats: 4.0
-      floats: 8.0
-      floats: 7.0
-      floats: 2.0
       type: FLOATS
     }
     domain: &quot;ai.onnx.ml&quot;
-  }
-  node {
-    input: &quot;node_sample0_Y02&quot;
-    input: &quot;path_length0_Reshapecst&quot;
-    output: &quot;node_sample0_reshaped0&quot;
-    name: &quot;node_sample0_Reshape&quot;
-    op_type: &quot;Reshape&quot;
-    attribute {
-      name: &quot;allowzero&quot;
-      i: 0
-      type: INT
-    }
-    domain: &quot;&quot;
   }
   node {
     input: &quot;path_length0_Y0&quot;
@@ -3456,101 +3939,10 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;path_length1_output0&quot;
-    output: &quot;path_length1_Y0&quot;
-    name: &quot;path_length1_LabelEncoder&quot;
-    op_type: &quot;LabelEncoder&quot;
-    attribute {
-      name: &quot;keys_int64s&quot;
-      ints: 4
-      ints: 5
-      ints: 6
-      ints: 12
-      ints: 13
-      ints: 15
-      ints: 16
-      ints: 17
-      ints: 21
-      ints: 22
-      ints: 24
-      ints: 25
-      ints: 28
-      ints: 29
-      ints: 30
-      ints: 33
-      ints: 36
-      ints: 37
-      ints: 38
-      ints: 42
-      ints: 43
-      ints: 45
-      ints: 46
-      ints: 48
-      ints: 49
-      ints: 51
-      ints: 54
-      ints: 55
-      ints: 58
-      ints: 60
-      ints: 62
-      ints: 63
-      ints: 67
-      ints: 68
-      ints: 70
-      ints: 71
-      ints: 73
-      ints: 74
-      type: INTS
-    }
-    attribute {
-      name: &quot;values_floats&quot;
-      floats: 5.0
-      floats: 5.0
-      floats: 4.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 6.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 6.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 7.0
-      floats: 3.0
-      floats: 5.0
-      floats: 5.0
-      floats: 6.0
-      floats: 7.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 8.0
-      floats: 7.0
-      floats: 7.0
-      type: FLOATS
-    }
-    domain: &quot;ai.onnx.ml&quot;
-  }
-  node {
-    input: &quot;path_length1_Y0&quot;
+    input: &quot;node_sample0_Y02&quot;
     input: &quot;path_length0_Reshapecst&quot;
-    output: &quot;path_length1_reshaped0&quot;
-    name: &quot;path_length1_Reshape&quot;
+    output: &quot;node_sample0_reshaped0&quot;
+    name: &quot;node_sample0_Reshape&quot;
     op_type: &quot;Reshape&quot;
     attribute {
       name: &quot;allowzero&quot;
@@ -3570,6 +3962,27 @@ graph {
       i: 0
       type: INT
     }
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;path_length1_Y0&quot;
+    input: &quot;path_length0_Reshapecst&quot;
+    output: &quot;path_length1_reshaped0&quot;
+    name: &quot;path_length1_Reshape&quot;
+    op_type: &quot;Reshape&quot;
+    attribute {
+      name: &quot;allowzero&quot;
+      i: 0
+      type: INT
+    }
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;node_sample0_reshaped0&quot;
+    input: &quot;dec_Powcst&quot;
+    output: &quot;plus2_0_C0&quot;
+    name: &quot;plus2_0_Greater&quot;
+    op_type: &quot;Greater&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3601,24 +4014,8 @@ graph {
   node {
     input: &quot;node_sample0_reshaped0&quot;
     input: &quot;dec_Powcst&quot;
-    output: &quot;plus2_0_C0&quot;
-    name: &quot;plus2_0_Greater&quot;
-    op_type: &quot;Greater&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;node_sample0_reshaped0&quot;
-    input: &quot;dec_Powcst&quot;
     output: &quot;eq2_0_C0&quot;
     name: &quot;eq2_0_Equal&quot;
-    op_type: &quot;Equal&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;node_sample1_reshaped0&quot;
-    input: &quot;dec_Powcst&quot;
-    output: &quot;eq2_1_C0&quot;
-    name: &quot;eq2_1_Equal&quot;
     op_type: &quot;Equal&quot;
     domain: &quot;&quot;
   }
@@ -3628,6 +4025,14 @@ graph {
     output: &quot;plus2_1_C0&quot;
     name: &quot;plus2_1_Greater&quot;
     op_type: &quot;Greater&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;node_sample1_reshaped0&quot;
+    input: &quot;dec_Powcst&quot;
+    output: &quot;eq2_1_C0&quot;
+    name: &quot;eq2_1_Equal&quot;
+    op_type: &quot;Equal&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3647,9 +4052,9 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eq2_0_C0&quot;
-    output: &quot;eq2_0_output0&quot;
-    name: &quot;eq2_0_Cast&quot;
+    input: &quot;plus2_0_C0&quot;
+    output: &quot;plus2_0_output0&quot;
+    name: &quot;plus2_0_Cast&quot;
     op_type: &quot;Cast&quot;
     attribute {
       name: &quot;to&quot;
@@ -3659,9 +4064,9 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;plus2_0_C0&quot;
-    output: &quot;plus2_0_output0&quot;
-    name: &quot;plus2_0_Cast&quot;
+    input: &quot;eq2_0_C0&quot;
+    output: &quot;eq2_0_output0&quot;
+    name: &quot;eq2_0_Cast&quot;
     op_type: &quot;Cast&quot;
     attribute {
       name: &quot;to&quot;
@@ -3695,6 +4100,14 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;plus2_0_output0&quot;
+    input: &quot;node_sample0_reshaped0&quot;
+    output: &quot;eqp2ps0_C0&quot;
+    name: &quot;eqp2ps0_Mul&quot;
+    op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;plus2_2_C0&quot;
     output: &quot;plus2_2_output0&quot;
     name: &quot;plus2_2_Cast&quot;
@@ -3719,19 +4132,19 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;plus2_0_output0&quot;
-    input: &quot;node_sample0_reshaped0&quot;
-    output: &quot;eqp2ps0_C0&quot;
-    name: &quot;eqp2ps0_Mul&quot;
-    op_type: &quot;Mul&quot;
-    domain: &quot;&quot;
-  }
-  node {
     input: &quot;plus2_1_output0&quot;
     input: &quot;node_sample1_reshaped0&quot;
     output: &quot;eqp2ps1_C0&quot;
     name: &quot;eqp2ps1_Mul&quot;
     op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;eqp2ps0_C0&quot;
+    input: &quot;eqp2p_m1_0_Maxcst&quot;
+    output: &quot;eqp_ns0_max0&quot;
+    name: &quot;eqp_ns0_Max&quot;
+    op_type: &quot;Max&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3751,14 +4164,6 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp2ps0_C0&quot;
-    input: &quot;eqp2p_m1_0_Maxcst&quot;
-    output: &quot;eqp_ns0_max0&quot;
-    name: &quot;eqp_ns0_Max&quot;
-    op_type: &quot;Max&quot;
-    domain: &quot;&quot;
-  }
-  node {
     input: &quot;eqp2ps1_C0&quot;
     input: &quot;eqp2p_m1_0_Maxcst&quot;
     output: &quot;eqp_ns1_max0&quot;
@@ -3771,22 +4176,6 @@ graph {
     input: &quot;eqp2p_m1_0_Addcst&quot;
     output: &quot;eqp2p_m1_1_C0&quot;
     name: &quot;eqp2p_m1_1_Add&quot;
-    op_type: &quot;Add&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eqp2ps2_C0&quot;
-    input: &quot;eqp2p_m1_0_Maxcst&quot;
-    output: &quot;eqp_ns2_max0&quot;
-    name: &quot;eqp_ns2_Max&quot;
-    op_type: &quot;Max&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eqp2ps2_C0&quot;
-    input: &quot;eqp2p_m1_0_Addcst&quot;
-    output: &quot;eqp2p_m1_2_C0&quot;
-    name: &quot;eqp2p_m1_2_Add&quot;
     op_type: &quot;Add&quot;
     domain: &quot;&quot;
   }
@@ -3807,6 +4196,22 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;eqp2ps2_C0&quot;
+    input: &quot;eqp2p_m1_0_Maxcst&quot;
+    output: &quot;eqp_ns2_max0&quot;
+    name: &quot;eqp_ns2_Max&quot;
+    op_type: &quot;Max&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;eqp2ps2_C0&quot;
+    input: &quot;eqp2p_m1_0_Addcst&quot;
+    output: &quot;eqp2p_m1_2_C0&quot;
+    name: &quot;eqp2p_m1_2_Add&quot;
+    op_type: &quot;Add&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;eqp2p_m1_1_C0&quot;
     input: &quot;eqp2p_m1_0_Maxcst&quot;
     output: &quot;eqp2p_m1_1_max0&quot;
@@ -3820,6 +4225,14 @@ graph {
     output: &quot;eqp2p_m1_1_max02&quot;
     name: &quot;eqp2p_m1_1_Max1&quot;
     op_type: &quot;Max&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;eqp2p_m1_0_max02&quot;
+    input: &quot;eqp_ns0_max0&quot;
+    output: &quot;eqp_ns0_C01&quot;
+    name: &quot;eqp_ns0_Div&quot;
+    op_type: &quot;Div&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3839,24 +4252,9 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp2p_m1_0_max02&quot;
-    input: &quot;eqp_ns0_max0&quot;
-    output: &quot;eqp_ns0_C01&quot;
-    name: &quot;eqp_ns0_Div&quot;
-    op_type: &quot;Div&quot;
-    domain: &quot;&quot;
-  }
-  node {
     input: &quot;eqp2p_m1_0_max0&quot;
     output: &quot;eqp_log0_output0&quot;
     name: &quot;eqp_log0_Log&quot;
-    op_type: &quot;Log&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eqp2p_m1_1_max0&quot;
-    output: &quot;eqp_log1_output0&quot;
-    name: &quot;eqp_log1_Log&quot;
     op_type: &quot;Log&quot;
     domain: &quot;&quot;
   }
@@ -3869,18 +4267,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp2p_m1_2_max0&quot;
-    output: &quot;eqp_log2_output0&quot;
-    name: &quot;eqp_log2_Log&quot;
+    input: &quot;eqp2p_m1_1_max0&quot;
+    output: &quot;eqp_log1_output0&quot;
+    name: &quot;eqp_log1_Log&quot;
     op_type: &quot;Log&quot;
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp2p_m1_2_max02&quot;
-    input: &quot;eqp_ns2_max0&quot;
-    output: &quot;eqp_ns2_C01&quot;
-    name: &quot;eqp_ns2_Div&quot;
-    op_type: &quot;Div&quot;
+    input: &quot;eqp_log0_output0&quot;
+    input: &quot;eqp_log0_Addcst&quot;
+    output: &quot;eqp_log0_C01&quot;
+    name: &quot;eqp_log0_Add&quot;
+    op_type: &quot;Add&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3892,11 +4290,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp_log0_output0&quot;
-    input: &quot;eqp_log0_Addcst&quot;
-    output: &quot;eqp_log0_C01&quot;
-    name: &quot;eqp_log0_Add&quot;
-    op_type: &quot;Add&quot;
+    input: &quot;eqp2p_m1_2_max02&quot;
+    input: &quot;eqp_ns2_max0&quot;
+    output: &quot;eqp_ns2_C01&quot;
+    name: &quot;eqp_ns2_Div&quot;
+    op_type: &quot;Div&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;eqp2p_m1_2_max0&quot;
+    output: &quot;eqp_log2_output0&quot;
+    name: &quot;eqp_log2_Log&quot;
+    op_type: &quot;Log&quot;
     domain: &quot;&quot;
   }
   node {
@@ -3912,6 +4317,14 @@ graph {
     input: &quot;eqp_ns0_Mulcst&quot;
     output: &quot;eqp_ns1_C0&quot;
     name: &quot;eqp_ns1_Mul&quot;
+    op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;eqp_log0_C01&quot;
+    input: &quot;dec_Powcst&quot;
+    output: &quot;eqp_log0_C0&quot;
+    name: &quot;eqp_log0_Mul&quot;
     op_type: &quot;Mul&quot;
     domain: &quot;&quot;
   }
@@ -3932,26 +4345,10 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;eqp_log0_C01&quot;
-    input: &quot;dec_Powcst&quot;
-    output: &quot;eqp_log0_C0&quot;
-    name: &quot;eqp_log0_Mul&quot;
-    op_type: &quot;Mul&quot;
-    domain: &quot;&quot;
-  }
-  node {
     input: &quot;eqp_log1_C01&quot;
     input: &quot;dec_Powcst&quot;
     output: &quot;eqp_log1_C0&quot;
     name: &quot;eqp_log1_Mul&quot;
-    op_type: &quot;Mul&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eqp_log2_C01&quot;
-    input: &quot;dec_Powcst&quot;
-    output: &quot;eqp_log2_C0&quot;
-    name: &quot;eqp_log2_Mul&quot;
     op_type: &quot;Mul&quot;
     domain: &quot;&quot;
   }
@@ -3964,18 +4361,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;eqp_log2_C01&quot;
+    input: &quot;dec_Powcst&quot;
+    output: &quot;eqp_log2_C0&quot;
+    name: &quot;eqp_log2_Mul&quot;
+    op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;eqp_log1_C0&quot;
     input: &quot;eqp_ns1_C0&quot;
     output: &quot;avlog1_C01&quot;
     name: &quot;avlog1_Add&quot;
-    op_type: &quot;Add&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eqp_log2_C0&quot;
-    input: &quot;eqp_ns2_C0&quot;
-    output: &quot;avlog2_C01&quot;
-    name: &quot;avlog2_Add&quot;
     op_type: &quot;Add&quot;
     domain: &quot;&quot;
   }
@@ -3988,18 +4385,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;eqp_log2_C0&quot;
+    input: &quot;eqp_ns2_C0&quot;
+    output: &quot;avlog2_C01&quot;
+    name: &quot;avlog2_Add&quot;
+    op_type: &quot;Add&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;avlog1_C01&quot;
     input: &quot;plus2_1_output0&quot;
     output: &quot;avlog1_C0&quot;
     name: &quot;avlog1_Mul&quot;
-    op_type: &quot;Mul&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;avlog2_C01&quot;
-    input: &quot;plus2_2_output0&quot;
-    output: &quot;avlog2_C0&quot;
-    name: &quot;avlog2_Mul&quot;
     op_type: &quot;Mul&quot;
     domain: &quot;&quot;
   }
@@ -4012,18 +4409,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;avlog2_C01&quot;
+    input: &quot;plus2_2_output0&quot;
+    output: &quot;avlog2_C0&quot;
+    name: &quot;avlog2_Mul&quot;
+    op_type: &quot;Mul&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;eq2_1_output0&quot;
     input: &quot;avlog1_C0&quot;
     output: &quot;avpl1_C0&quot;
     name: &quot;avpl1_Add&quot;
-    op_type: &quot;Add&quot;
-    domain: &quot;&quot;
-  }
-  node {
-    input: &quot;eq2_2_output0&quot;
-    input: &quot;avlog2_C0&quot;
-    output: &quot;avpl2_C0&quot;
-    name: &quot;avpl2_Add&quot;
     op_type: &quot;Add&quot;
     domain: &quot;&quot;
   }
@@ -4036,6 +4433,14 @@ graph {
     domain: &quot;&quot;
   }
   node {
+    input: &quot;eq2_2_output0&quot;
+    input: &quot;avlog2_C0&quot;
+    output: &quot;avpl2_C0&quot;
+    name: &quot;avpl2_Add&quot;
+    op_type: &quot;Add&quot;
+    domain: &quot;&quot;
+  }
+  node {
     input: &quot;path_length1_reshaped0&quot;
     input: &quot;avpl1_C0&quot;
     output: &quot;depth1_C01&quot;
@@ -4044,18 +4449,18 @@ graph {
     domain: &quot;&quot;
   }
   node {
-    input: &quot;path_length2_reshaped0&quot;
-    input: &quot;avpl2_C0&quot;
-    output: &quot;depth2_C01&quot;
-    name: &quot;depth2_Add&quot;
-    op_type: &quot;Add&quot;
-    domain: &quot;&quot;
-  }
-  node {
     input: &quot;depth0_C01&quot;
     input: &quot;eqp2p_m1_0_Addcst&quot;
     output: &quot;depth0_C0&quot;
     name: &quot;depth0_Add1&quot;
+    op_type: &quot;Add&quot;
+    domain: &quot;&quot;
+  }
+  node {
+    input: &quot;path_length2_reshaped0&quot;
+    input: &quot;avpl2_C0&quot;
+    output: &quot;depth2_C01&quot;
+    name: &quot;depth2_Add&quot;
     op_type: &quot;Add&quot;
     domain: &quot;&quot;
   }
@@ -4318,7 +4723,7 @@ than the default one, from 1 to the last available one.</p>
 
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">onnx_opset_version</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a><span class="p">)</span>
+        <span class="n">onx</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a><span class="p">(</span><span class="n">model</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a><span class="p">)</span>
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;target: </span><span class="si">%r</span><span class="s1"> error: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">continue</span>
@@ -4333,14 +4738,14 @@ target: 3 error: RuntimeError(&quot;Operator &#39;OnnxReshape_5&#39;: requested 
 target: 4 error: RuntimeError(&quot;Operator &#39;OnnxReshape_5&#39;: requested version 4 &lt; 5 schema version.&quot;)
 target: 5 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 5} 91
 target: 6 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 6} 91
-target: 7 --&gt; {&#39;&#39;: 7, &#39;ai.onnx.ml&#39;: 2} 91
-target: 8 --&gt; {&#39;&#39;: 8, &#39;ai.onnx.ml&#39;: 2} 91
+target: 7 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 7} 91
+target: 8 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 8} 91
 target: 9 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 9} 91
 target: 10 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 10} 91
 target: 11 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 11} 91
 target: 12 --&gt; {&#39;&#39;: 12, &#39;ai.onnx.ml&#39;: 2} 91
-target: 13 --&gt; {&#39;&#39;: 13, &#39;ai.onnx.ml&#39;: 2} 91
-target: 14 --&gt; {&#39;&#39;: 14, &#39;ai.onnx.ml&#39;: 2} 91
+target: 13 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 13} 91
+target: 14 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 14} 91
 target: 15 --&gt; {&#39;&#39;: 15, &#39;ai.onnx.ml&#39;: 2} 91
 </pre></div>
 </div>
@@ -4357,8 +4762,8 @@ does not support <em>opset &lt; 5</em> because runtimes usually do not.</p>
     <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset_ml</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
         <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tops</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a><span class="p">,</span> <span class="s1">&#39;ai.onnx.ml&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset_ml</span></a><span class="p">}</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
-                <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="sklearn.ensemble.IsolationForest" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tops</span></a><span class="p">)</span>
+            <span class="n">onx</span> <span class="o">=</span> <a href="https://onnx.ai/sklearn-onnx/api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx" class="sphx-glr-backref-module-skl2onnx sphx-glr-backref-type-py-function"><span class="n">to_onnx</span></a><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tops</span></a><span class="p">)</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;target: </span><span class="si">%r</span><span class="s1"> error: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">opset</span></a><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
             <span class="k">continue</span>
@@ -4376,14 +4781,14 @@ target: 11 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 11} 91
 target: 12 error: RuntimeError(&quot;This converter requires at least opset 2 for domain &#39;ai.onnx.ml&#39;.&quot;)
 target: 12 --&gt; {&#39;&#39;: 12, &#39;ai.onnx.ml&#39;: 2} 91
 target: 13 error: RuntimeError(&quot;This converter requires at least opset 2 for domain &#39;ai.onnx.ml&#39;.&quot;)
-target: 13 --&gt; {&#39;&#39;: 13, &#39;ai.onnx.ml&#39;: 2} 91
+target: 13 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 13} 91
 target: 14 error: RuntimeError(&quot;This converter requires at least opset 2 for domain &#39;ai.onnx.ml&#39;.&quot;)
-target: 14 --&gt; {&#39;&#39;: 14, &#39;ai.onnx.ml&#39;: 2} 91
+target: 14 --&gt; {&#39;ai.onnx.ml&#39;: 2, &#39;&#39;: 14} 91
 target: 15 error: RuntimeError(&quot;This converter requires at least opset 2 for domain &#39;ai.onnx.ml&#39;.&quot;)
 target: 15 --&gt; {&#39;&#39;: 15, &#39;ai.onnx.ml&#39;: 2} 91
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.292 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.253 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-cbegin-opset-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_cbegin_opset.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -4400,61 +4805,50 @@ target: 15 --&gt; {&#39;&#39;: 15, &#39;ai.onnx.ml&#39;: 2} 91
 </div>
 
 
-            <div class="clearer"></div>
-          </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="plot_bbegin_measure_time.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Benchmark ONNX conversion</p>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/logo_main.png" alt="Logo"/>
-            </a></p>
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">What is the opset number?</a><ul>
-<li><a class="reference internal" href="#data">Data</a></li>
-<li><a class="reference internal" href="#onnx">ONNX</a></li>
-<li><a class="reference internal" href="#onnx-and-opset">ONNX and opset</a></li>
-<li><a class="reference internal" href="#other-opsets">Other opsets</a></li>
-</ul>
-</li>
-</ul>
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation index</a><ul>
-  <li><a href="../index_tutorial.html">Tutorial</a><ul>
-  <li><a href="../tutorial_1_simple.html">The easy case</a><ul>
-      <li>Previous: <a href="plot_bbegin_measure_time.html" title="previous chapter">Benchmark ONNX conversion</a></li>
-      <li>Next: <a href="plot_dbegin_options.html" title="next chapter">One model, many possible conversions with options</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/auto_tutorial/plot_cbegin_opset.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
+    </a>
+    <a class='right-next' id="next-link" href="plot_dbegin_options.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">One model, many possible conversions with options</p>
     </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-  <div class="footer">
-    &copy; Copyright 2018-2021, Microsoft.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.
-  </div>
   
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018-2021, Microsoft.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
   </body>
 </html>

@@ -127,8 +127,8 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [2 0 0 1 0 2 0 1 0 2 0 2 1 2 1 2 0 0 1 2 0 2 0 1 2 0 0 1 1 0 2 0 1 1 2 0 2
-     1]
+    [1 2 0 0 0 0 0 2 1 2 1 1 0 0 1 2 1 0 0 0 2 2 0 0 0 0 0 2 1 1 2 0 1 1 2 1 1
+     0]
 
 
 
@@ -168,8 +168,8 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    [2 0 0 1 0 2 0 1 0 2 0 2 1 2 1 2 0 0 2 2 0 2 0 1 2 0 0 1 1 0 2 0 1 1 2 0 2
-     1]
+    [1 2 0 0 0 0 0 2 1 2 1 1 0 0 1 2 1 0 0 0 2 2 0 0 0 0 0 2 1 1 2 0 1 1 2 1 1
+     0]
 
 
 
@@ -198,11 +198,11 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     scikit-learn: 1.1.dev0
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -210,7 +210,7 @@ Full example with a logistic regression
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.318 seconds)
+   **Total running time of the script:** ( 0 minutes  0.462 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:

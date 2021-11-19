@@ -103,7 +103,7 @@ ONNX
 
     ir_version: 8
     producer_name: "skl2onnx"
-    producer_version: "1.10.0"
+    producer_version: "1.10.2"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -262,10 +262,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': 1.4783000000001319e-05,
-     'deviation': 4.973208722747064e-06,
-     'max_exec': 3.177000000000874e-05,
-     'min_exec': 8.039999999986946e-06,
+    {'average': 1.2469700000007574e-05,
+     'deviation': 4.969015386369786e-06,
+     'max_exec': 4.296500000009473e-05,
+     'min_exec': 7.395000000087748e-06,
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -299,10 +299,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': 2.0180450000010453e-05,
-     'deviation': 9.83413669559173e-06,
-     'max_exec': 6.819000000000131e-05,
-     'min_exec': 1.1265000000015846e-05,
+    {'average': 2.1676000000002918e-05,
+     'deviation': 1.885247861676318e-06,
+     'max_exec': 3.0064999999979137e-05,
+     'min_exec': 2.0254999999913537e-05,
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -347,9 +347,10 @@ Longer benchmark
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_benchmark_cdist_001.png
-    :alt: plot benchmark cdist
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_benchmark_cdist_001.png
+   :alt: plot benchmark cdist
+   :srcset: /auto_examples/images/sphx_glr_plot_benchmark_cdist_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -358,12 +359,12 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|                                                                                                                                                 | 0/4 [00:00<?, ?it/s]     50%|####################################################################5                                                                    | 2/4 [00:00<00:00, 15.44it/s]    100%|#########################################################################################################################################| 4/4 [00:03<00:00,  1.05it/s]    100%|#########################################################################################################################################| 4/4 [00:03<00:00,  1.22it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|#####     | 2/4 [00:00<00:00,  9.92it/s]     75%|#######5  | 3/4 [00:00<00:00,  4.03it/s]    100%|##########| 4/4 [00:04<00:00,  1.46s/it]    100%|##########| 4/4 [00:04<00:00,  1.04s/it]
            N     scipy       ort  scipy/ort
-    0     10  0.000008  0.000014   0.538307
-    1    100  0.000017  0.000024   0.724880
-    2   1000  0.000123  0.000037   3.285336
-    3  10000  0.001112  0.000291   3.821481
+    0     10  0.000013  0.000030   0.433800
+    1    100  0.000034  0.000025   1.353445
+    2   1000  0.000160  0.000060   2.653017
+    3  10000  0.001335  0.000421   3.173664
 
 
 
@@ -391,10 +392,10 @@ Longer benchmark
 
  .. code-block:: none
 
-    numpy: 1.21.2
+    numpy: 1.21.4
     onnx:  1.10.1
     onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.0
+    skl2onnx:  1.10.2
 
 
 
@@ -402,7 +403,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.172 seconds)
+   **Total running time of the script:** ( 0 minutes  4.584 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:

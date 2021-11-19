@@ -172,9 +172,10 @@ Visually.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_001.png
-    :alt: plot dbegin options
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_001.png
+   :alt: plot dbegin options
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -237,9 +238,10 @@ Visually.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_002.png
-    :alt: plot dbegin options
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_002.png
+   :alt: plot dbegin options
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -302,9 +304,10 @@ Visually.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_003.png
-    :alt: plot dbegin options
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_003.png
+   :alt: plot dbegin options
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_003.png
+   :class: sphx-glr-single-img
 
 
 
@@ -377,9 +380,10 @@ Visually.
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_004.png
-    :alt: plot dbegin options
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_dbegin_options_004.png
+   :alt: plot dbegin options
+   :srcset: /auto_tutorial/images/sphx_glr_plot_dbegin_options_004.png
+   :class: sphx-glr-single-img
 
 
 
@@ -581,8 +585,8 @@ decision path. It can be enabled by option *decision_path*.
 
  .. code-block:: none
 
-    [[1 0 1 0 1 1 0 1 0 1]
-     [1 0 1 0 1 1 0 1 0 1]]
+    [[1 0 1 0 1 1 0 0 0 1]
+     [1 0 1 0 1 1 0 0 0 1]]
 
 
 
@@ -635,8 +639,8 @@ Let's display the last one.
 
  .. code-block:: none
 
-    [['10101' '10101']
-     ['10101' '10101']]
+    [['10101' '10001']
+     ['10101' '10001']]
 
 
 
@@ -678,57 +682,57 @@ supported options while running the conversion.
 
     LightGbmLGBMClassifier         {'nocl': [True, False], 'zipmap': [True, False, 'columns']}
     LightGbmLGBMRegressor          {'split': None}
-    AdaBoostClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
-    BaggingClassifier              {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
+    AdaBoostClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
+    BaggingClassifier              {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     BayesianGaussianMixture        {'score_samples': [True, False]}
     BayesianRidge                  {'return_std': [True, False]}
-    BernoulliNB                    {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
-    CalibratedClassifierCV         {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
-    CategoricalNB                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
-    ComplementNB                   {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
+    BernoulliNB                    {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    CalibratedClassifierCV         {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    CategoricalNB                  {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    ComplementNB                   {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     CountVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False]}
-    DecisionTreeClassifier         {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
+    DecisionTreeClassifier         {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     DecisionTreeRegressor          {'decision_path': [True, False], 'decision_leaf': [True, False]}
-    ExtraTreeClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
+    ExtraTreeClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     ExtraTreeRegressor             {'decision_path': [True, False], 'decision_leaf': [True, False]}
-    ExtraTreesClassifier           {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
+    ExtraTreesClassifier           {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False], 'output_class_labels': [False, True], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     ExtraTreesRegressor            {'decision_path': [True, False], 'decision_leaf': [True, False]}
     GaussianMixture                {'score_samples': [True, False]}
-    GaussianNB                     {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
-    GaussianProcessClassifier      {'optim': [None, 'cdist'], 'nocl': [False, True], 'zipmap': [False, True]}
+    GaussianNB                     {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    GaussianProcessClassifier      {'optim': [None, 'cdist'], 'nocl': [False, True], 'output_class_labels': [False, True], 'zipmap': [False, True]}
     GaussianProcessRegressor       {'return_cov': [False, True], 'return_std': [False, True], 'optim': [None, 'cdist']}
-    GradientBoostingClassifier     {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
-    HistGradientBoostingClassifier {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
-    HistGradientBoostingRegressor  {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False]}
+    GradientBoostingClassifier     {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    HistGradientBoostingClassifier {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    HistGradientBoostingRegressor  {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
     IsolationForest                {'score_samples': [True, False]}
     KMeans                         {'gemm': [True, False]}
     KNNImputer                     {'optim': [None, 'cdist']}
-    KNeighborsClassifier           {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'optim': [None, 'cdist']}
+    KNeighborsClassifier           {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'optim': [None, 'cdist']}
     KNeighborsRegressor            {'optim': [None, 'cdist']}
     KNeighborsTransformer          {'optim': [None, 'cdist']}
     KernelPCA                      {'optim': [None, 'cdist']}
-    LinearClassifier               {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
-    LinearSVC                      {'nocl': [True, False], 'raw_scores': [True, False]}
+    LinearClassifier               {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
+    LinearSVC                      {'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     LocalOutlierFactor             {'score_samples': [True, False], 'optim': [None, 'cdist']}
-    MLPClassifier                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
+    MLPClassifier                  {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     MaxAbsScaler                   {'div': ['std', 'div', 'div_cast']}
     MiniBatchKMeans                {'gemm': [True, False]}
-    MultiOutputClassifier          {'nocl': [False, True]}
-    MultinomialNB                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
+    MultiOutputClassifier          {'nocl': [False, True], 'output_class_labels': [False, True], 'zipmap': [False, True]}
+    MultinomialNB                  {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     NearestNeighbors               {'optim': [None, 'cdist']}
-    OneVsRestClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
-    RadiusNeighborsClassifier      {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'optim': [None, 'cdist']}
+    OneVsRestClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
+    RadiusNeighborsClassifier      {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'optim': [None, 'cdist']}
     RadiusNeighborsRegressor       {'optim': [None, 'cdist']}
-    RandomForestClassifier         {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False], 'decision_path': [True, False], 'decision_leaf': [True, False]}
+    RandomForestClassifier         {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False], 'output_class_labels': [False, True], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     RandomForestRegressor          {'decision_path': [True, False], 'decision_leaf': [True, False]}
     RobustScaler                   {'div': ['std', 'div', 'div_cast']}
-    SGDClassifier                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
-    SVC                            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
+    SGDClassifier                  {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
+    SVC                            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     Scaler                         {'div': ['std', 'div', 'div_cast']}
-    StackingClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False]}
+    StackingClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     TfidfTransformer               {'nan': [True, False]}
     TfidfVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False]}
-    VotingClassifier               {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
+    VotingClassifier               {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     XGBoostXGBClassifier           {'nocl': [True, False], 'zipmap': [True, False, 'columns']}
     all options: ['decision_leaf',
      'decision_path',
@@ -738,6 +742,7 @@ supported options while running the conversion.
      'nan',
      'nocl',
      'optim',
+     'output_class_labels',
      'raw_scores',
      'return_cov',
      'return_std',
@@ -753,7 +758,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.410 seconds)
+   **Total running time of the script:** ( 0 minutes  3.738 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:

@@ -166,8 +166,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [2 0 2 2 2]
-    predict_proba [[0.24494482 0.33989718 0.415158  ]]
+    predict [1 0 1 0 2]
+    predict_proba [[0.2602997  0.38021716 0.35948314]]
 
 
 
@@ -197,8 +197,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [2 0 2 2 2]
-    predict_proba [{0: 0.24494479596614838, 1: 0.33989718556404114, 2: 0.4151580035686493}]
+    predict [1 0 1 0 2]
+    predict_proba [{0: 0.2602997124195099, 1: 0.38021716475486755, 2: 0.35948315262794495}]
 
 
 
@@ -221,9 +221,10 @@ Final graph
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gexternal_lightgbm_001.png
-    :alt: plot gexternal lightgbm
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gexternal_lightgbm_001.png
+   :alt: plot gexternal lightgbm
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gexternal_lightgbm_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -232,7 +233,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.699 seconds)
+   **Total running time of the script:** ( 0 minutes  1.028 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm.py:

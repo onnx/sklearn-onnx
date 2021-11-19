@@ -102,9 +102,9 @@ Train a XGBoost classifier
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\xgboost\sklearn.py:1146: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
+    C:\Python395_x64\lib\site-packages\xgboost\sklearn.py:1224: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
       warnings.warn(label_encoder_deprecation_msg, UserWarning)
-    [19:47:25] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    [13:08:05] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
 
 
 
@@ -191,8 +191,8 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 2 0 0 1]
-    predict_proba [[0.1893399  0.46317056 0.3474895 ]]
+    predict [0 0 1 1 1]
+    predict_proba [[0.69600695 0.1526681  0.15132491]]
 
 
 
@@ -221,8 +221,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 2 0 0 1]
-    predict_proba [{0: 0.18933990597724915, 1: 0.4631705582141876, 2: 0.34748950600624084}]
+    predict [0 0 1 1 1]
+    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
 
 
 
@@ -247,9 +247,10 @@ Final graph
 
 
 
-.. image:: /auto_tutorial/images/sphx_glr_plot_gexternal_xgboost_001.png
-    :alt: plot gexternal xgboost
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_tutorial/images/sphx_glr_plot_gexternal_xgboost_001.png
+   :alt: plot gexternal xgboost
+   :srcset: /auto_tutorial/images/sphx_glr_plot_gexternal_xgboost_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -291,7 +292,7 @@ Same example with XGBRegressor
 
  .. code-block:: none
 
-    predict [ 76.68777  94.63171 100.46227 169.5705   37.99636]
+    predict [146.17285 169.82909  72.02785 123.41196  71.51056]
 
 
 
@@ -321,7 +322,7 @@ ONNX
 
  .. code-block:: none
 
-    predict [ 76.68777  94.63171 100.46227 169.5705   37.99636]
+    predict [146.17285 169.82909  72.02785 123.41196  71.51056]
 
 
 
@@ -375,7 +376,7 @@ follow :epkg:`scikit-learn` API.
 
  .. code-block:: none
 
-    [19:47:26] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.4.0/src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softmax' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    [13:08:06] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.0/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softmax' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
     [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 0 1 1 1
      0 1 1 1 0 0 1 1 0 0 0 1 0]
 
@@ -385,7 +386,7 @@ follow :epkg:`scikit-learn` API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.741 seconds)
+   **Total running time of the script:** ( 0 minutes  1.985 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:
