@@ -9,7 +9,7 @@ import os
 import sys
 import warnings
 import skl2onnx
-import sphinx_readable_theme
+import pydata_sphinx_theme
 
 sys.path.append(os.path.abspath('exts'))
 from github_link import make_linkcode_resolve  # noqa
@@ -60,8 +60,8 @@ pygments_style = 'default'
 
 html_theme = "sphinx_mo"
 html_static_path = ['_static']
-html_theme = "readable"
-html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
+html_theme = "pydata_sphinx_theme"
+html_theme_path = pydata_sphinx_theme.get_html_theme_path()
 html_logo = "logo_main.png"
 
 # -- Options for graphviz ----------------------------------------------------
@@ -92,27 +92,16 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'pyquickhelper': (
         'http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/', None),
-    'onnxmltools': (
-        'http://www.xavierdupre.fr/app/onnxmltools/helpsphinx/index.html',
-        None),
-    'onnxruntime': (
-        'http://www.xavierdupre.fr/app/onnxruntime/helpsphinx/index.html',
-        None),
+    'onnxruntime': ('https://onnxruntime.ai/docs/api/python/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'seaborn': ('https://seaborn.pydata.org/', None),
     'scikit-learn': (
         'https://scikit-learn.org/stable/',
         None),
-    'sklearn': (
-        'https://scikit-learn.org/stable/',
-        None),
-    'skl2onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
-        None),
-    'sklearn-onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
-        None),
+    'sklearn': ('https://scikit-learn.org/stable/', None),
+    'skl2onnx': ('https://onnx.ai/sklearn-onnx/', None),
+    'sklearn-onnx': ('https://onnx.ai/sklearn-onnx/', None),
 }
 
 sphinx_gallery_conf = {
