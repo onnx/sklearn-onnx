@@ -9,6 +9,8 @@ from distutils.version import StrictVersion
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import make_pipeline
 from sklearn.datasets import load_iris, make_regression
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
@@ -38,7 +40,6 @@ except ImportError:
     NotImplemented = RuntimeError
 from onnxruntime import __version__ as ort_version
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
-
 
 _TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
 ort_version = ".".join(ort_version.split('.')[:2])
@@ -1054,6 +1055,20 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
+
+    def test_issue_789(self):
+        n_samples, n_features = 10000, 10
+        X, y = make_regression(n_samples, n_features)
+        tx1, vx1, ty1, vy1 = train_test_split(X, y)
+        model = GaussianProcessRegressor()
+        pipe = make_pipeline(MinMaxScaler(feature_range=(-1, 1)), model)
+        pipe.fit(tx1, ty1)
+        initial_type = [('data_in', FloatTensorType([None, X.shape[1]]))]
+        onx = to_onnx(pipe, initial_types=initial_type,
+                      target_opset=_TARGET_OPSET_)
+        sess = InferenceSession(onx.SerializeToString())
+        pred = sess.run(None, {'data_in': vx1.astype(np.float32)})
+        assert_almost_equal(pipe.predict(vx1.astype(np.float32)), pred[0])
 
 
 if __name__ == "__main__":
