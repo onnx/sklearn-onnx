@@ -115,7 +115,7 @@ class TestStackingConverter(unittest.TestCase):
                                0, 1, 0, 1, 0, 1])
         pipeline.fit(X_train, y_train)
         with self.assertRaises(RuntimeError):
-            to_onnx(pipeline, X=X_train[:1])
+            to_onnx(pipeline, X=X_train[:1], target_opset=TARGET_OPSET)
 
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
@@ -140,7 +140,8 @@ class TestStackingConverter(unittest.TestCase):
                                0, 1, 0, 1, 0, 1])
         pipeline.fit(X_train, y_train)
         onx = to_onnx(pipeline, X=X_train[:1],
-                      options={'zipmap': False})
+                      options={'zipmap': False},
+                      target_opset=TARGET_OPSET)
         # with open("ohe_debug.onnx", "wb") as f:
         #     f.write(onx.SerializeToString())
         sess = InferenceSession(onx.SerializeToString())
