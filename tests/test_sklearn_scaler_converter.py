@@ -4,7 +4,9 @@
 Tests scikit-learn's standard scaler converter.
 """
 import unittest
+from distutils.version import StrictVersion
 import numpy
+from onnxruntime import __version__ as ort_version
 from sklearn.preprocessing import (
     StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler)
 try:
@@ -17,6 +19,9 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType)
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnScalerConverter(unittest.TestCase):
@@ -321,6 +326,8 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model, model_onnx, basename="SklearnMinMaxScalerDouble")
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.9.0"),
+                     reason="Operator clip not fully implemented")
     def test_min_max_scaler_clip(self):
         model = MinMaxScaler(clip=True)
         data = [
@@ -340,6 +347,8 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model, model_onnx, basename="SklearnMinMaxScalerClip")
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.9.0"),
+                     reason="Operator clip not fully implemented")
     def test_min_max_scaler_double_clip(self):
         model = MinMaxScaler(clip=True)
         data = [
