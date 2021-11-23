@@ -2,9 +2,11 @@
 
 
 import numpy as np
-from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
+from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
-from ..algebra.onnx_ops import OnnxSub, OnnxDiv, OnnxCast
+from ..algebra.onnx_ops import (
+    OnnxSub, OnnxDiv, OnnxCast, OnnxMul, OnnxClip, OnnxAdd,
+    OnnxGather, OnnxConcat)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -82,11 +84,6 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
             1.0 / op.scale_ if op.with_scaling else
             np.array([1.0] * C, dtype=np.float32))
         inv_scale = op.scale_ if op.with_scaling else None
-    elif isinstance(op, MinMaxScaler):
-        attrs['scale'] = op.scale_
-        # Add 1e-8 to avoid divided by 0
-        attrs['offset'] = -op.min_ / (op.scale_ + 1e-8)
-        inv_scale = None
     elif isinstance(op, MaxAbsScaler):
         model_C = None
         if op.max_abs_ is not None:
@@ -130,13 +127,20 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
     use_scaler_op = container.is_allowed({'Scaler'})
     if not use_scaler_op or dtype == np.float64:
         opv = container.target_opset
-        sub = OnnxSub(
-            feature_name, attrs['offset'].astype(dtype),
-            op_version=opv)
-        div = OnnxDiv(sub, inv_scale.astype(dtype),
-                      op_version=opv,
-                      output_names=[operator.outputs[0].full_name])
-        div.add_to(scope, container)
+        if inv_scale is None:
+            sub = OnnxSub(
+                feature_name, attrs['offset'].astype(dtype),
+                op_version=opv,
+                output_names=[operator.outputs[0].full_name])
+            sub.add_to(scope, container)
+        else:
+            sub = OnnxSub(
+                feature_name, attrs['offset'].astype(dtype),
+                op_version=opv)
+            div = OnnxDiv(sub, inv_scale.astype(dtype),
+                          op_version=opv,
+                          output_names=[operator.outputs[0].full_name])
+            div.add_to(scope, container)
         return
 
     if inv_scale is not None:
@@ -176,10 +180,63 @@ def convert_sklearn_scaler(scope: Scope, operator: Operator,
         op_domain='ai.onnx.ml', **attrs)
 
 
+def convert_sklearn_min_max_scaler(
+        scope: Scope, operator: Operator,
+        container: ModelComponentContainer):
+    # If there are multiple input variables, we need to combine them as a
+    # whole tensor. Integer(s) would be converted to float(s).
+    # Options div use true division instead of Scaler operator
+    # which replaces a division by a multiplication.
+    # This leads to discrepencies in some cases.
+    if len(operator.inputs) > 1:
+        feature_name = concatenate_variables(scope, operator.inputs, container)
+    else:
+        feature_name = operator.inputs[0].full_name
+
+    op = operator.raw_operator
+    opv = container.target_opset
+
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+
+    dtype = guess_numpy_type(operator.inputs[0].type)
+    if dtype != np.float64:
+        dtype = np.float32
+
+    # X *= self.scale_
+    # X += self.min_
+    # if self.clip:
+    #     np.clip(X, self.feature_range[0], self.feature_range[1], out=X)
+
+    scaled = OnnxMul(feature_name, op.scale_.astype(dtype),
+                     op_version=opv)
+
+    if op.clip:
+        offset = OnnxAdd(scaled, op.min_.astype(dtype),
+                         op_version=opv)
+        collect = []
+        for i in range(op.data_min_.shape[0]):
+            gather = OnnxGather(offset, np.array([i], dtype=np.int64),
+                                axis=1, op_version=opv)
+            clipped = OnnxClip(gather, op.data_min_[i:i+1].astype(dtype),
+                               op.data_max_[i:i+1].astype(dtype),
+                               op_version=opv)
+            collect.append(clipped)
+        concat = OnnxConcat(*collect, op_version=opv, axis=1,
+                            output_names=[operator.outputs[0].full_name])
+        concat.add_to(scope, container)
+    else:
+        offset = OnnxAdd(scaled, op.min_.astype(dtype),
+                         op_version=opv,
+                         output_names=[operator.outputs[0].full_name])
+        offset.add_to(scope, container)
+
+
 register_converter('SklearnRobustScaler', convert_sklearn_scaler,
                    options={'div': ['std', 'div', 'div_cast']})
 register_converter('SklearnScaler', convert_sklearn_scaler,
                    options={'div': ['std', 'div', 'div_cast']})
-register_converter('SklearnMinMaxScaler', convert_sklearn_scaler)
+register_converter('SklearnMinMaxScaler', convert_sklearn_min_max_scaler)
 register_converter('SklearnMaxAbsScaler', convert_sklearn_scaler,
                    options={'div': ['std', 'div', 'div_cast']})
