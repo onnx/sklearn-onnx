@@ -22,7 +22,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 class TestSklearnScalerConverter(unittest.TestCase):
 
     @ignore_warnings(category=DeprecationWarning)
-    def test_standard_scaler(self):
+    def test_standard_scaler_int(self):
         model = StandardScaler()
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
         model.fit(data)
@@ -34,6 +34,20 @@ class TestSklearnScalerConverter(unittest.TestCase):
             numpy.array(data, dtype=numpy.int64),
             model, model_onnx,
             basename="SklearnStandardScalerInt64")
+
+    @ignore_warnings(category=DeprecationWarning)
+    def test_min_max_scaler_int(self):
+        model = MinMaxScaler()
+        data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
+        model.fit(data)
+        model_onnx = convert_sklearn(model, "scaler",
+                                     [("input", Int64TensorType([None, 3]))],
+                                     target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            numpy.array(data, dtype=numpy.int64),
+            model, model_onnx,
+            basename="SklearnMinMaxScalerInt64")
 
     @ignore_warnings(category=DeprecationWarning)
     def test_standard_scaler_double(self):

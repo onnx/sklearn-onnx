@@ -12,7 +12,7 @@ try:
 except ImportError:
     ColumnTransformer = None
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType, FloatTensorType,
@@ -23,7 +23,7 @@ from test_utils import TARGET_OPSET
 def _column_tranformer_fitted_from_df(data):
     def transformer_for_column(column: pd.Series):
         if column.dtype in ['float64', 'float32', 'int64']:
-            return MinMaxScaler()
+            return StandardScaler()
         if column.dtype in ['bool']:
             return 'passthrough'
         if column.dtype in ['O']:

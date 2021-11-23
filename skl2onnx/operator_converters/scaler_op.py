@@ -208,8 +208,8 @@ def convert_sklearn_min_max_scaler(
     # X += self.min_
     # if self.clip:
     #     np.clip(X, self.feature_range[0], self.feature_range[1], out=X)
-
-    scaled = OnnxMul(feature_name, op.scale_.astype(dtype),
+    casted = OnnxCast(feature_name, to=proto_dtype, op_version=opv)
+    scaled = OnnxMul(casted, op.scale_.astype(dtype),
                      op_version=opv)
 
     if op.clip:
