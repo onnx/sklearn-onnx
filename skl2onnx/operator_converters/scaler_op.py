@@ -212,7 +212,8 @@ def convert_sklearn_min_max_scaler(
     scaled = OnnxMul(casted, op.scale_.astype(dtype),
                      op_version=opv)
 
-    if op.clip:
+    if getattr(op, 'clip', False):
+        # parameter clip was introduced in scikit-learn 0.24
         offset = OnnxAdd(scaled, op.min_.astype(dtype),
                          op_version=opv)
         collect = []
