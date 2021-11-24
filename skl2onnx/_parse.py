@@ -223,9 +223,16 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         variable = scope.declare_local_variable('variable', otype)
         this_operator.outputs.append(variable)
     else:
-        # We assume that all scikit-learn operator produce a single output.
+        if hasattr(model, 'get_feature_names_out'):
+            out_names = model.get_feature_names_out()
+            this_operator.feature_names_out_ = out_names
+            if len(out_names) == 0:
+                raise RuntimeError(
+                    "get_feature_names_out() cannot return an empty value, "
+                    "model is %r." % type(model))
+        input_type = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable(
-            'variable', guess_tensor_type(inputs[0].type))
+            'variable', input_type)
         this_operator.outputs.append(variable)
 
     options = scope.get_options(model, dict(decision_path=False), fail=False)

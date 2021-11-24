@@ -112,7 +112,10 @@ def get_column_index(i, inputs):
             "Unable to find column name %r among names %r. "
             "Make sure the input names specified with parameter "
             "initial_types fits the column names specified in the "
-            "pipeline to convert." % (i, [n.onnx_name for n in inputs]))
+            "pipeline to convert. This may happen because a "
+            "ColumnTransformer follows a transformer without "
+            "any mapped converter in a pipeline." % (
+                i, [n.onnx_name for n in inputs]))
 
 
 def get_column_indices(indices, inputs, multiple):

@@ -11,6 +11,8 @@ import pandas
 from sklearn import __version__ as sklearn_version
 from sklearn import datasets
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.tree import DecisionTreeClassifier
 
 try:
     # scikit-learn >= 0.22
@@ -20,9 +22,13 @@ except ImportError:
     from sklearn.utils.testing import ignore_warnings
 try:
     from sklearn.compose import ColumnTransformer
+    from sklearn.compose import (
+        make_column_transformer, make_column_selector)
 except ImportError:
     # not available in 0.19
     ColumnTransformer = None
+    make_column_selector = None
+    make_column_transformer = None
 from sklearn.decomposition import PCA, TruncatedSVD
 
 try:
@@ -924,6 +930,76 @@ class TestSklearnPipeline(unittest.TestCase):
                             expected_proba[2:4], got[1][2:4], decimal=3)
                     else:
                         assert_almost_equal(expected_proba, got[1], decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @ignore_warnings(category=(FutureWarning, UserWarning))
+    def test_pipeline_make_column_selector(self):
+        X = pandas.DataFrame({
+            'city': ['London', 'London', 'Paris', 'Sallisaw'],
+            'rating': [5, 3, 4, 5]})
+        X['rating'] = X['rating'].astype(numpy.float32)
+        ct = make_column_transformer(
+            (StandardScaler(), make_column_selector(
+                dtype_include=numpy.number)),
+            (OneHotEncoder(), make_column_selector(
+                dtype_include=object)))
+        expected = ct.fit_transform(X)
+        onx = to_onnx(ct, X, target_opset=TARGET_OPSET)
+        sess = InferenceSession(onx.SerializeToString())
+        names = [i.name for i in sess.get_inputs()]
+        got = sess.run(None, {names[0]: X[names[0]].values.reshape((-1, 1)),
+                              names[1]: X[names[1]].values.reshape((-1, 1))})
+        assert_almost_equal(expected, got[0])
+
+    def test_feature_selector_no_converter(self):
+
+        class ColumnSelector(TransformerMixin, BaseEstimator):
+            def __init__(self, cols):
+                if not isinstance(cols, list):
+                    self.cols = [cols]
+                else:
+                    self.cols = cols
+
+            def fit(self, X, y):
+                return self
+
+            def transform(self, X):
+                X = X.copy()
+                return X[self.cols]
+
+        # Inspired from
+        # https://github.com/databricks/automl/blob/main/
+        # runtime/tests/automl_runtime/sklearn/column_selector_test.py
+        X_in = pandas.DataFrame(
+            numpy.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                        dtype=numpy.float32),
+            columns=["a", "b", "c"])
+        y = pandas.DataFrame(numpy.array([[1], [0], [1]]),
+                             columns=["label"])
+        X_out_expected = numpy.array([1, 0, 1])
+
+        standardizer = StandardScaler()
+        selected_cols = ["a", "b"]
+        col_selector = ColumnSelector(selected_cols)
+        preprocessor = ColumnTransformer(
+            [("standardizer", standardizer, selected_cols)], remainder="drop")
+
+        model = Pipeline([
+            ("column_selector", col_selector),
+            ("preprocessor", preprocessor),
+            ("decision_tree", DecisionTreeClassifier())
+        ])
+        model.fit(X=X_in, y=y)
+        # Add one column so that the dataframe for prediction is
+        # different with the data for training
+        X_in["useless"] = 1
+        X_out = model.predict(X_in)
+        assert_almost_equal(X_out, X_out_expected)
+
+        with self.assertRaises(RuntimeError) as e:
+            to_onnx(model, X_in)
+            self.assertIn('ColumnTransformer', str(e))
 
 
 if __name__ == "__main__":
