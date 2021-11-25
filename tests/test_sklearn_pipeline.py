@@ -8,7 +8,7 @@ import warnings
 import numpy
 from numpy.testing import assert_almost_equal
 import pandas
-from sklearn import __version__ as sklearn_version
+from sklearn import __version__ as skl_version
 from sklearn import datasets
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.base import TransformerMixin, BaseEstimator
@@ -58,13 +58,13 @@ from test_utils import (
 from onnxruntime import __version__ as ort_version, InferenceSession
 
 
+# StrictVersion does not work with development versions
 ort_version = ".".join(ort_version.split('.')[:2])
+skl_version = ".".join(skl_version.split('.')[:2])
 
 
 def check_scikit_version():
-    # StrictVersion does not work with development versions
-    vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.21.0")
+    return StrictVersion(skl_version) >= StrictVersion("0.22")
 
 
 class PipeConcatenateInput:
@@ -673,6 +673,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_pipeline_rf(self):
         cat_feat = ['A', 'B']
@@ -722,6 +725,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
     def test_issue_712_multio(self):
         dfx = pandas.DataFrame(
@@ -765,6 +771,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
     def test_issue_712_svc_multio(self):
         for sub_model in [LinearSVC(), SVC()]:
@@ -826,6 +835,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
     def test_issue_712_svc_binary0(self):
         for sub_model in [LinearSVC(), SVC()]:
@@ -877,6 +889,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
     def test_issue_712_svc_multi(self):
         for sub_model in [SVC(), LinearSVC()]:
@@ -933,6 +948,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_make_column_selector(self):
         X = pandas.DataFrame({
@@ -952,6 +970,9 @@ class TestSklearnPipeline(unittest.TestCase):
                               names[1]: X[names[1]].values.reshape((-1, 1))})
         assert_almost_equal(expected, got[0])
 
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     def test_feature_selector_no_converter(self):
 
         class ColumnSelector(TransformerMixin, BaseEstimator):
