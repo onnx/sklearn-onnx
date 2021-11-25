@@ -35,14 +35,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalUniform",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalUniform")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -67,14 +61,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalQuantile",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalQuantile")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -98,14 +86,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalKMeans",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalKMeans")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -125,13 +107,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseUniform",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseUniform")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -156,13 +133,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseQuantile",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseQuantile")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -187,13 +159,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseKMeans",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.float32), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseKMeans")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -212,13 +179,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalUniformInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalUniformInt")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -241,13 +203,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalQuantileInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalQuantileInt")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -268,13 +225,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOrdinalKMeansInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOrdinalKMeansInt")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -293,13 +245,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseUniformInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseUniformInt")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -318,13 +265,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseQuantileInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseQuantileInt")
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
@@ -347,13 +289,8 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnKBinsDiscretiserOneHotDenseKMeansInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X.astype(np.int64), model, model_onnx,
+            basename="SklearnKBinsDiscretiserOneHotDenseKMeansInt")
 
 
 if __name__ == "__main__":
