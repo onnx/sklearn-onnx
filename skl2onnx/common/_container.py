@@ -122,6 +122,12 @@ class _WhiteBlackContainer:
                 raise RuntimeError(
                     "Operator '{}' is black listed.".format(node_type))
 
+    def debug(self, *args, **kwargs):
+        """
+        Log debug information while converting a model.
+        """
+        logger.debug(*args, **kwargs)
+
 
 class RawModelContainerNode(_WhiteBlackContainer):
     """

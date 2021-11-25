@@ -258,6 +258,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
+    if verbose >= 1:
+        print("[to_onnx] initial_types=%r" % initial_types)
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
                            name=name, options=options,
