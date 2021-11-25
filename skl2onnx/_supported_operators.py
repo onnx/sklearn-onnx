@@ -2,6 +2,7 @@
 
 
 import warnings
+import logging
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
@@ -240,6 +241,8 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from .sklapi import CastRegressor, CastTransformer, ReplaceTransformer
 
 from .common._registration import register_converter, register_shape_calculator
+
+logger = logging.getLogger('skl2onnx')
 
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
@@ -505,9 +508,12 @@ def _get_sklearn_operator_name(model_type):
              our conversion framework
     """
     if model_type not in sklearn_operator_name_map:
-        # "No proper operator name found, it means a local operator.
-        return None
-    return sklearn_operator_name_map[model_type]
+        # No proper operator name found, it means a local operator.
+        alias = None
+    else:
+        alias = sklearn_operator_name_map[model_type]
+    logger.debug('[parsing] found alias=%r for type=%r.', alias, model_type)
+    return alias
 
 
 def get_model_alias(model_type):
