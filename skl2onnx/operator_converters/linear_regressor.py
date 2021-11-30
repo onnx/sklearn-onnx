@@ -25,13 +25,17 @@ def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
             type(operator.inputs[0].type) in (DoubleTensorType, )):
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name('coef')
-        model_coef = op.coef_.T
+        if len(op.coef_.shape) == 1:
+            model_coef = op.coef_.reshape((-1, 1))
+        else:
+            model_coef = op.coef_.T
         container.add_initializer(
             coef, proto_dtype, model_coef.shape, model_coef.ravel().tolist())
         intercept = scope.get_unique_variable_name('intercept')
+        value_intercept = op.intercept_.reshape((-1, ))
         container.add_initializer(
-            intercept, proto_dtype, op.intercept_.shape,
-            op.intercept_.ravel().tolist())
+            intercept, proto_dtype, value_intercept.shape,
+            value_intercept.ravel().tolist())
         multiplied = scope.get_unique_variable_name('multiplied')
         container.add_node(
             'MatMul', [operator.inputs[0].full_name, coef], multiplied,
