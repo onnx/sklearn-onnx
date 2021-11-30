@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
+import numpy as np
+from onnx.mapping import NP_TYPE_TO_TENSOR_TYPE
 from onnxconverter_common.onnx_ops import *  # noqa
 from ..proto import onnx_proto
 
@@ -61,6 +62,7 @@ def apply_normalizer(scope, inputs, outputs, container,
         else:
             raise NotImplementedError(
                 "Normalization not implemented for norm %r." % norm)
+
 
 def _create_name_or_use_existing_one(scope, op_type, name):
     if name is None:
