@@ -59,7 +59,8 @@ def _get_doc_template():
         {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
           if attr.required %} (required){% endif %}: {{attr.description}} {%
           if attr.default_value %}Default value is
-          ``{{str(attr.default_value).replace('\\n', ' ').strip()}}``{% endif %}
+          ``{{str(attr.default_value).replace('\\n', ' ').strip()}}``{%
+          endif %}
         {% endfor %}
         {% endif %}
 
