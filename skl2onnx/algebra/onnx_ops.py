@@ -4,12 +4,14 @@
 Place holder for all ONNX operators.
 """
 import sys
+import os
 import numpy as np
 from scipy.sparse.coo import coo_matrix
 import onnx
 from ..common.data_types import DataType
 from ..common._topology import Variable
 from .automation import get_rst_doc
+from ._cache import cache_folder
 
 
 def ClassFactory(class_name, op_name, inputs, outputs,
@@ -123,7 +125,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
     return newclass
 
 
-def dynamic_class_creation():
+def dynamic_class_creation(cache=False):
     """
     Automatically generates classes for each of the operators
     module *onnx* defines and described at
@@ -133,6 +135,7 @@ def dynamic_class_creation():
     <https://github.com/onnx/onnx/blob/master/docs/
     Operators-ml.md>`_.
     """
+    cache_dir = cache_folder()
     res = {}
     for schema in onnx.defs.get_all_schemas_with_history():
         if schema.support_level == schema.SupportType.EXPERIMENTAL:
@@ -155,7 +158,6 @@ def dynamic_class_creation():
 
     for name in sorted(res):
         schema = res[name]
-        doc = get_rst_doc(schema)
         inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
         outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
@@ -164,6 +166,18 @@ def dynamic_class_creation():
             class_name = "Onnx" + name
         else:
             class_name = "Onnx" + schema.name
+
+        filename = os.path.join(
+            cache_dir,
+            schema.name + '_' + str(schema.since_version) + ".rst")
+        if not cache and os.path.exists(filename):
+            with open(filename, "r", encoding="utf-8") as f:
+                doc = f.read()
+        else:
+            doc = get_rst_doc(schema)
+            if cache:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(doc)
 
         cl = ClassFactory(class_name, schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
