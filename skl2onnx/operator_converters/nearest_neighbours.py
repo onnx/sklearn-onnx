@@ -385,12 +385,9 @@ def convert_nearest_neighbors_regressor(scope: Scope, operator: Operator,
                 shape = OnnxShape(res, op_version=opv)
                 norm = OnnxReshapeApi13(norm, shape, op_version=opv)
                 norm.set_onnx_name_prefix('normr')
-            if opv >= 12:
-                res = OnnxDiv(res, norm, op_version=opv, output_names=out)
-            else:
-                res = OnnxDiv(res, norm, op_version=opv)
-                res = OnnxReshapeApi13(res, np.array([-1, 1], dtype=np.int64),
-                                       output_names=out, op_version=opv)
+            res = OnnxDiv(res, norm, op_version=opv)
+            res = OnnxReshapeApi13(res, np.array([-1, 1], dtype=np.int64),
+                                   output_names=out, op_version=opv)
     else:
         if (hasattr(operator.raw_operator, '_y') and
                 len(np.squeeze(operator.raw_operator._y).shape) == 1):
