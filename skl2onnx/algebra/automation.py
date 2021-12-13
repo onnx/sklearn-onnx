@@ -58,8 +58,9 @@ def _get_doc_template():
 
         {% for _, attr in sorted(sch.attributes.items()) %}* *{{attr.name}}*{%
           if attr.required %} (required){% endif %}: {{attr.description}} {%
-          if attr.default_value %}Default value is ``{{attr.default_value
-          }}``{% endif %}
+          if attr.default_value %}Default value is
+          ``{{str(attr.default_value).replace('\\n', ' ').strip()}}``{%
+          endif %}
         {% endfor %}
         {% endif %}
 
@@ -229,7 +230,8 @@ def get_rst_doc(op_name=None):
                        getname=getname, enumerate=enumerate,
                        format_name_with_domain=fnwd,
                        process_documentation=process_documentation,
-                       build_doc_url=build_doc_url)
+                       build_doc_url=build_doc_url,
+                       str=str)
     return docs
 
 

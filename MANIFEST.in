@@ -6,6 +6,7 @@ include LICENSE
 include README.md
 include MANIFEST.in
 include requirements.txt
+include skl2onnx/algebra/_cache/*.rst
 
 # exclude from sdist
 recursive-exclude benchmarks *
