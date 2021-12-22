@@ -79,9 +79,9 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_float(self):
-        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}, 
+        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
                 {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
-                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}, 
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
                 {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}]
         model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
         model.fit(data)
@@ -101,9 +101,9 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_int(self):
-        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}, 
+        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
                 {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
-                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}, 
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
                 {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}]
         model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
         model.fit(data)
@@ -123,11 +123,11 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_boolean(self):
-        data = [{'ALL_LOWER': True, 'NEXT_ALL_LOWER': True}, 
+        data = [{'ALL_LOWER': True, 'NEXT_ALL_LOWER': True},
                 {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
                  'NEXT_ALL_LOWER': True},
                 {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
-                 'NEXT_ALL_LOWER': True}, 
+                 'NEXT_ALL_LOWER': True},
                 {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
                  'NEXT_ALL_LOWER': True}]
 
