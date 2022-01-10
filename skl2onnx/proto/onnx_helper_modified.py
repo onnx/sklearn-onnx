@@ -182,11 +182,12 @@ def make_attribute(
                 doc_string=doc_string)
         else:
             raise ValueError(
-                "You passed in an iterable attribute but I cannot figure out "
-                "its applicable type, key='{}', type={}, dtype={}, "
-                "types={}.".format(
+                "You passed in an iterable attribute but the type cannot "
+                "be figured out, key='{}', type={}, dtype={}, "
+                "types[:5]={} set(types)={}.".format(
                     key, type(value), dtype,
-                    [type(_) for _, __ in zip(value, range(0, 5))]))
+                    [type(_) for _, __ in zip(value, range(0, 5))],
+                    set(type(t) for t in value)))
     else:
         raise ValueError(
             "Value '{}' is not valid attribute data type for attribute "
