@@ -157,11 +157,11 @@ def _predict_proba_log(scope, operator, container, scores, num_classes,
     sigmo = scope.get_unique_variable_name('sigmoid')
     norm = scope.get_unique_variable_name('norm')
     axes = scope.get_unique_variable_name('axes')
-    container.add_initializer(axes, onnx_proto.TensorProto.INT64, [], [1])
+    container.add_initializer(axes, onnx_proto.TensorProto.INT64, [1], [1])
     container.add_node('Sigmoid', [scores], [sigmo],
                        name=scope.get_unique_operator_name('Sigmoid'))
     container.add_node(
-        'ReduceSum', [sigmo, axes], [norm],
+        'ReduceSum', [sigmo, axes], [norm], keepdims=1,
         name=scope.get_unique_operator_name('ReduceSum'))
     container.add_node(
         'Div', [sigmo, norm], [operator.outputs[1].full_name],

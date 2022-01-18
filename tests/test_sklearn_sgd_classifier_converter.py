@@ -92,7 +92,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(np.float32)[:5], model, model_onnx,
             basename="SklearnSGDClassifierBinaryLog-Dec4",
-            verbose=True)
+            verbose=False)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
