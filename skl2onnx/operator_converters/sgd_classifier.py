@@ -125,26 +125,48 @@ def _predict_proba_log(scope, operator, container, scores, num_classes,
         1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
     """
-    negate_name = scope.get_unique_variable_name('negate')
-    negated_scores_name = scope.get_unique_variable_name('negated_scores')
-    exp_result_name = scope.get_unique_variable_name('exp_result')
-    unity_name = scope.get_unique_variable_name('unity')
-    add_result_name = scope.get_unique_variable_name('add_result')
-    proba_name = scope.get_unique_variable_name('proba')
+    if container.target_opset < 11:
+        negated_scores_name = scope.get_unique_variable_name('negated_scores')
+        negate_name = scope.get_unique_variable_name('negate')
+        exp_result_name = scope.get_unique_variable_name('exp_result')
+        unity_name = scope.get_unique_variable_name('unity')
+        add_result_name = scope.get_unique_variable_name('add_result')
+        proba_name = scope.get_unique_variable_name('proba')
 
-    container.add_initializer(negate_name, proto_type,
-                              [], [-1])
-    container.add_initializer(unity_name, proto_type,
-                              [], [1])
+        container.add_initializer(negate_name, proto_type, [], [-1])
+        container.add_initializer(unity_name, proto_type, [], [1])
 
-    apply_mul(scope, [scores, negate_name],
-              negated_scores_name, container, broadcast=1)
-    apply_exp(scope, negated_scores_name, exp_result_name, container)
-    apply_add(scope, [exp_result_name, unity_name],
-              add_result_name, container, broadcast=1)
-    apply_reciprocal(scope, add_result_name, proba_name, container)
-    return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes, unity_name, proto_type)
+        apply_mul(scope, [scores, negate_name],
+                  negated_scores_name, container, broadcast=1)
+        apply_exp(scope, negated_scores_name, exp_result_name, container)
+        apply_add(scope, [exp_result_name, unity_name],
+                  add_result_name, container, broadcast=1)
+        apply_reciprocal(scope, add_result_name, proba_name, container)
+        return _normalise_proba(scope, operator, container, proba_name,
+                                num_classes, unity_name, proto_type)
+
+    if num_classes == 2:
+        scores_n = scope.get_unique_variable_name('scores_n')
+        scores_2 = scope.get_unique_variable_name('scores_2')
+        container.add_node('Neg', [scores], [scores_n],
+                           name=scope.get_unique_operator_name('Neg'))
+        apply_concat(scope, [scores_n, scores], [scores_2],
+                     container, axis=1)
+        scores = scores_2
+
+    sigmo = scope.get_unique_variable_name('sigmoid')
+    norm = scope.get_unique_variable_name('norm')
+    axes = scope.get_unique_variable_name('axes')
+    container.add_initializer(axes, onnx_proto.TensorProto.INT64, [], [1])
+    container.add_node('Sigmoid', [scores], [sigmo],
+                       name=scope.get_unique_operator_name('Sigmoid'))
+    container.add_node(
+        'ReduceSum', [sigmo, axes], [norm],
+        name=scope.get_unique_operator_name('ReduceSum'))
+    container.add_node(
+        'Div', [sigmo, norm], [operator.outputs[1].full_name],
+        name=scope.get_unique_operator_name('Div'))
+    return operator.outputs[1].full_name
 
 
 def _predict_proba_modified_huber(scope, operator, container,
