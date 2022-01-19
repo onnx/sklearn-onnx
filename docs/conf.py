@@ -18,7 +18,7 @@ from github_link import make_linkcode_resolve  # noqa
 # -- Project information -----------------------------------------------------
 
 project = 'sklearn-onnx'
-copyright = '2018-2021, Microsoft'
+copyright = '2018-2022, Microsoft'
 author = 'Microsoft'
 version = skl2onnx.__version__
 release = version
