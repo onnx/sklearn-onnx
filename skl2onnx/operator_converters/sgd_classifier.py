@@ -48,7 +48,7 @@ def _decision_function(scope, operator, container, model, proto_type):
     return score_name
 
 
-def _handle_zeros(scope, container, proba, reduced_proba, num_classes,
+def _handle_zeros(scope, container, scores, proba, reduced_proba, num_classes,
                   proto_type):
     """Handle cases where reduced_proba values are zeros to avoid NaNs in
     class probability scores because of divide by 0 when we calculate
@@ -87,7 +87,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes,
     return proba_updated_name, reduced_proba_updated_name
 
 
-def _normalise_proba(scope, operator, container, proba, num_classes,
+def _normalise_proba(scope, operator, container, scores, proba, num_classes,
                      unity_name, proto_type):
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
@@ -110,7 +110,7 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
                 'ReduceSum', [proba, axis_name], reduced_proba_name,
                 name=scope.get_unique_operator_name('ReduceSum'))
         proba_updated, reduced_proba_updated = _handle_zeros(
-            scope, container, proba, reduced_proba_name, num_classes,
+            scope, container, scores, proba, reduced_proba_name, num_classes,
             proto_type)
         apply_div(scope, [proba_updated, reduced_proba_updated],
                   operator.outputs[1].full_name, container, broadcast=1)
@@ -125,7 +125,7 @@ def _predict_proba_log(scope, operator, container, scores, num_classes,
         1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
     """
-    if container.target_opset < 11:
+    if num_classes > 3 or container.target_opset < 13:
         negated_scores_name = scope.get_unique_variable_name('negated_scores')
         negate_name = scope.get_unique_variable_name('negate')
         exp_result_name = scope.get_unique_variable_name('exp_result')
@@ -142,30 +142,26 @@ def _predict_proba_log(scope, operator, container, scores, num_classes,
         apply_add(scope, [exp_result_name, unity_name],
                   add_result_name, container, broadcast=1)
         apply_reciprocal(scope, add_result_name, proba_name, container)
-        return _normalise_proba(scope, operator, container, proba_name,
+        return _normalise_proba(scope, operator, container, scores, proba_name,
                                 num_classes, unity_name, proto_type)
 
-    if num_classes == 2:
-        scores_n = scope.get_unique_variable_name('scores_n')
-        scores_2 = scope.get_unique_variable_name('scores_2')
-        container.add_node('Neg', [scores], [scores_n],
-                           name=scope.get_unique_operator_name('Neg'))
-        apply_concat(scope, [scores_n, scores], [scores_2],
-                     container, axis=1)
-        scores = scores_2
-
+    # Sigmoid cannot be used for num_classes > 2 because
+    # onnxruntime has a different implementation than numpy.
+    # It introduces discrepancies when x < 1e16.
+    # Below that threshold, Sigmoid must be replaced by Exp
+    # because Sigmoid is not an increasing function.
     sigmo = scope.get_unique_variable_name('sigmoid')
-    norm = scope.get_unique_variable_name('norm')
-    axes = scope.get_unique_variable_name('axes')
-    container.add_initializer(axes, onnx_proto.TensorProto.INT64, [1], [1])
     container.add_node('Sigmoid', [scores], [sigmo],
                        name=scope.get_unique_operator_name('Sigmoid'))
-    container.add_node(
-        'ReduceSum', [sigmo, axes], [norm], keepdims=1,
-        name=scope.get_unique_operator_name('ReduceSum'))
-    container.add_node(
-        'Div', [sigmo, norm], [operator.outputs[1].full_name],
-        name=scope.get_unique_operator_name('Div'))
+
+    unity_name = scope.get_unique_variable_name('unity')
+    container.add_initializer(unity_name, proto_type, [1], [1])
+
+    sigmo_0 = scope.get_unique_variable_name('sigmo_0')
+    container.add_node('Sub', [unity_name, sigmo], [sigmo_0],
+                       name=scope.get_unique_operator_name('Sub'))
+    apply_concat(scope, [sigmo_0, sigmo], [operator.outputs[1].full_name],
+                 container, axis=1)
     return operator.outputs[1].full_name
 
 

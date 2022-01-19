@@ -70,7 +70,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(TARGET_OPSET < 11,
+    @unittest.skipIf(TARGET_OPSET < 13,
                      reason="duplicated test")
     def test_model_sgd_binary_class_log_sigmoid(self):
         model, X = fit_classification_model(
@@ -83,7 +83,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X.astype(np.float32)[:5], model, model_onnx,
             basename="SklearnSGDClassifierBinaryLog-Dec4",
-            verbose=True)
+            verbose=False)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -91,7 +91,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32)[:5], model, model_onnx,
-            basename="SklearnSGDClassifierBinaryLog-Dec4",
+            basename="SklearnSGDClassifierBinaryLog13-Dec4",
             verbose=False)
 
     @unittest.skipIf(not onnx_built_with_ml(),
@@ -133,12 +133,33 @@ class TestSGDClassifierConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=min(12, TARGET_OPSET))
         X = np.array([X[1], X[1]])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,
             basename="SklearnSGDClassifierMultiLog")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @unittest.skipIf(TARGET_OPSET < 13, reason="duplicated test")
+    def test_model_sgd_multi_class_log_sigmoid(self):
+        model, X = fit_classification_model(
+            SGDClassifier(loss='log', random_state=42), 5)
+        model_onnx = convert_sklearn(
+            model, "scikit-learn SGD multi-class classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET, options={'zipmap': False})
+        X = np.array([X[1], X[1]])
+        print(X)
+        print("****", model.predict_proba(X))
+        from onnxruntime import InferenceSession
+        self.assertIsNotNone(model_onnx)
+        ort = InferenceSession(model_onnx.SerializeToString())
+        print(ort.run(None, {'input': X.astype(np.float32)}))
+        dump_data_and_model(
+            X.astype(np.float32), model, model_onnx, verbose=False,
+            basename="SklearnSGDClassifierMultiLog13")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
