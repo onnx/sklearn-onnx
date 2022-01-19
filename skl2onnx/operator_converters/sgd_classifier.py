@@ -125,7 +125,7 @@ def _predict_proba_log(scope, operator, container, scores, num_classes,
         1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
     """
-    if num_classes > 3 or container.target_opset < 13:
+    if num_classes >= 3 or container.target_opset < 13:
         negated_scores_name = scope.get_unique_variable_name('negated_scores')
         negate_name = scope.get_unique_variable_name('negate')
         exp_result_name = scope.get_unique_variable_name('exp_result')

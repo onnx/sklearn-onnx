@@ -151,12 +151,6 @@ class TestSGDClassifierConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET, options={'zipmap': False})
         X = np.array([X[1], X[1]])
-        print(X)
-        print("****", model.predict_proba(X))
-        from onnxruntime import InferenceSession
-        self.assertIsNotNone(model_onnx)
-        ort = InferenceSession(model_onnx.SerializeToString())
-        print(ort.run(None, {'input': X.astype(np.float32)}))
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx, verbose=False,
             basename="SklearnSGDClassifierMultiLog13")
