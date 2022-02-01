@@ -111,7 +111,7 @@ def convert_sklearn_mlp_classifier(scope: Scope, operator: Operator,
     if np.issubdtype(mlp_op.classes_.dtype, np.floating):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(mlp_op.classes_.dtype, np.signedinteger):
+    elif np.issubdtype(mlp_op.classes_.dtype, np.integer):
         class_type = onnx_proto.TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])

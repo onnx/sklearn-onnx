@@ -37,6 +37,9 @@ from test_utils import (
 )
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 class TestSklearnMLPConverters(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -52,13 +55,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierBinary",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierBinary")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -74,13 +72,25 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClass")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
+    def test_model_mlp_classifier_multiclass_default_uint8(self):
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42), 4, cls_dtype=np.uint8)
+        model_onnx = convert_sklearn(
             model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiClass",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
+            "scikit-learn MLPClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
         )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClassI8")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -96,13 +106,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiLabel",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiLabel")
 
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_regressor_default(self):
@@ -116,13 +121,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressor-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPRegressor-Dec4")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -139,13 +139,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiClassIdentityActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClassIdentityActivation")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -162,13 +157,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiLabelIdentityActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiLabelIdentityActivation")
 
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_regressor_identity(self):
@@ -182,13 +172,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressorIdentityActivation-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPRegressorIdentityActivation-Dec4")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -204,13 +189,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiClassLogisticActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClassLogisticActivation")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -226,13 +206,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiLabelLogisticActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiLabelLogisticActivation")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -248,13 +223,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressorLogisticActivation-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPRegressorLogisticActivation-Dec4")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -270,13 +240,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiClassTanhActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClassTanhActivation")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -292,13 +257,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPClassifierMultiLabelTanhActivation",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiLabelTanhActivation")
 
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_regressor_tanh(self):
@@ -312,13 +272,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressorTanhActivation-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPRegressorTanhActivation-Dec4")
 
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_regressor_bool(self):
@@ -332,13 +287,8 @@ class TestSklearnMLPConverters(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnMLPRegressorBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnMLPRegressorBool")
 
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion('1.0.0'),
