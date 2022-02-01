@@ -169,7 +169,7 @@ class TestStackingConverter(unittest.TestCase):
             ))
         ])
         model, X = fit_classification_model(
-            model_to_test_cl(), n_classes=2)
+            model_to_test, n_classes=2)
         model_onnx = convert_sklearn(
             model, "stacking classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],

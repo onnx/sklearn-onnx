@@ -148,7 +148,6 @@ class TestXGBoostModels(unittest.TestCase):
         assert_almost_equal(xgb.predict_proba(X), res[1])
         assert_almost_equal(xgb.predict(X), res[0])
 
-
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
     def test_model_stacking_classifier_column_transformer(self):
