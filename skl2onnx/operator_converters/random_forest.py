@@ -208,7 +208,8 @@ def convert_sklearn_random_forest_classifier(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attr_pairs[k] = np.array(attr_pairs[k], dtype=dtype).ravel()
+                    attr_pairs[k] = np.array(
+                        attr_pairs[k], dtype=dtype).ravel()
 
         container.add_node(
             op_type, input_name,
