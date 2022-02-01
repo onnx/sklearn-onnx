@@ -90,7 +90,24 @@ class TestSklearnMLPConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X_test, model, model_onnx,
-            basename="SklearnMLPClassifierMultiClassI8")
+            basename="SklearnMLPClassifierMultiClassU8")
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
+    def test_model_mlp_classifier_multiclass_default_uint64(self):
+        model, X_test = fit_classification_model(
+            MLPClassifier(random_state=42), 4, cls_dtype=np.uint64)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn MLPClassifier",
+            [("input", FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X_test, model, model_onnx,
+            basename="SklearnMLPClassifierMultiClassU64")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
