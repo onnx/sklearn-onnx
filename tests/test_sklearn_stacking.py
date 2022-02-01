@@ -7,10 +7,11 @@ import numpy
 from numpy.testing import assert_almost_equal
 import pandas
 from onnxruntime import InferenceSession
+from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.preprocessing import OneHotEncoder, Normalizer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import (
     RandomForestClassifier, GradientBoostingClassifier)
@@ -149,6 +150,35 @@ class TestStackingConverter(unittest.TestCase):
                               'val': X_train.val.values.reshape((-1, 1))})
         assert_almost_equal(pipeline.predict(X_train), res[0])
         assert_almost_equal(pipeline.predict_proba(X_train), res[1])
+
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    def test_model_stacking_classifier_column_transformer(self):
+        classifiers = {
+            'A': RandomForestClassifier(n_estimators=5, random_state=42),
+            'B': GradientBoostingClassifier(n_estimators=5, random_state=42)
+        }
+        model_to_test = Pipeline(steps=[
+            ('cbe', ColumnTransformer([
+                ("norm1", Normalizer(norm='l1'), [0, 1]),
+                ("norm2", Normalizer(norm='l2'), [2, 3])])),
+            ('sc',  StackingClassifier(
+                estimators=list(map(tuple, classifiers.items())),
+                stack_method='predict_proba',
+                passthrough=False
+            ))
+        ])
+        model, X = fit_classification_model(
+            model_to_test_cl(), n_classes=2)
+        model_onnx = convert_sklearn(
+            model, "stacking classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingClassifierPipe",
+            comparable_outputs=[0])
 
 
 if __name__ == "__main__":
