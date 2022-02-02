@@ -51,12 +51,14 @@ def fit_classification_model(model, n_classes, is_int=False,
                              pos_features=False, label_string=False,
                              random_state=42, is_bool=False,
                              n_features=20, n_redundant=None,
-                             n_repeated=None):
+                             n_repeated=None, cls_dtype=None):
     X, y = make_classification(
         n_classes=n_classes, n_features=n_features, n_samples=250,
         random_state=random_state, n_informative=min(7, n_features),
         n_redundant=n_redundant or min(2, n_features - min(7, n_features)),
         n_repeated=n_repeated or 0)
+    if cls_dtype is not None:
+        y = y.astype(cls_dtype)
     if label_string:
         y = numpy.array(['cl%d' % cl for cl in y])
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
