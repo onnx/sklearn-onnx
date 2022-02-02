@@ -35,7 +35,7 @@ def convert_sklearn_local_outlier_factor(
     metric = (op.effective_metric_ if hasattr(op, 'effective_metric_') else
               op.metric)
     neighb = op._fit_X.astype(dtype)
-    k = op.n_neighbors
+    k = op.n_neighbors_
     kwargs = {}
     if op.p != 2:
         if options['optim'] == 'cdist':
