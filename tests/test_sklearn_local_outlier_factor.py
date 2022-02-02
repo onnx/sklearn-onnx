@@ -53,6 +53,28 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_decif, got[1].ravel())
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
+    def test_local_outlier_factor_n_neighbors_greater_than_n_observations(self):
+        lof = LocalOutlierFactor(n_neighbors=25, novelty=True)
+        data = np.array([[-1.1, -1.2], [0.3, 0.2],
+                         [0.5, 0.4], [100., 99.]], dtype=np.float32)
+        model = lof.fit(data)
+        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
+        self.assertNotIn('CDist', str(model_onnx))
+
+        data = data.copy()
+        data[:, 0] += 0.1
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        names = [o.name for o in sess.get_outputs()]
+        self.assertEqual(names, ['label', 'scores'])
+        got = sess.run(None, {'X': data})
+        self.assertEqual(len(got), 2)
+        expected_label = lof.predict(data)
+        expected_decif = lof.decision_function(data)
+        assert_almost_equal(expected_label, got[0].ravel())
+        assert_almost_equal(expected_decif, got[1].ravel())
+
+    @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
                      reason="CDist")
     def test_local_outlier_factor_cdist(self):
