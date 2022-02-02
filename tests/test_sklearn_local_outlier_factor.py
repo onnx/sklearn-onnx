@@ -53,7 +53,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_decif, got[1].ravel())
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
-    def test_local_outlier_factor_n_neighbors_greater_than_n_observations(self):
+    def test_local_outlier_factor_n_neighbors_greater_than_observations(self):
         lof = LocalOutlierFactor(n_neighbors=25, novelty=True)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
                          [0.5, 0.4], [100., 99.]], dtype=np.float32)
