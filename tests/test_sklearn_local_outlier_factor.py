@@ -72,7 +72,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         expected_label = lof.predict(data)
         expected_decif = lof.decision_function(data)
         assert_almost_equal(expected_label, got[0].ravel())
-        assert_almost_equal(expected_decif, got[1].ravel())
+        assert_almost_equal(expected_decif, got[1].ravel(), decimal=5)
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
