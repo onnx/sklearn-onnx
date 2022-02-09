@@ -174,7 +174,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      python -m pip install typing-extensions
+      python -m pip install typing-extensions>=3.6.2.1
       python -m pip install $(onnx.version)
     displayName: 'Install onnx'
 
