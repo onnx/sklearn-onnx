@@ -150,7 +150,7 @@ class Variable:
             for k in self.type.shape:
                 if k is None:
                     continue
-                if not isinstance(k, (int, np.int64, np.intc)):
+                if not isinstance(k, (int, np.integer)):
                     raise ValueError(
                         "Unexpected type %r for shape %r."
                         "" % (type(k), self))
