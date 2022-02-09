@@ -1090,11 +1090,14 @@ class Topology:
         for operator in self.unordered_operator_iterator():
             operator.init_status(is_evaluated=False)
 
-    def _propagate_status(self, operator, container, fed_variables):
+    def _propagate_status(self, operator, container, fed_variables,
+                          verbose=0):
         """
         Propagates status *is_fed* based on output variable
         and node added in the container.
         """
+        if verbose > 1:
+            print("[_propagate_status] after op=%r" % operator)
         vars = {}
         for node in container.nodes:
             for i in node.input:
@@ -1102,8 +1105,10 @@ class Topology:
                     vars[i] = []
                 vars[i].append(node)
 
-        stack = [v.onnx_name for v in operator.outputs if v.is_fed]
-        stack.extend(v.onnx_name for v in operator.inputs if v.is_fed)
+        if verbose > 1:
+            print("[_propagate_status] newly fed=%r" % list(
+                v.onnx_name for v in operator.outputs if v.is_fed))
+        stack = list(fed_variables)
         scope = self.scopes[0]
         while len(stack) > 0:
             nodes = {}
@@ -1117,11 +1122,15 @@ class Topology:
                 if all(fed_variables.get(n, False) for n in node.input):
                     for o in node.output:
                         if o not in fed_variables:
+                            if verbose > 1:
+                                print("[_propagate_status] add=%r" % o)
                             fed_variables[o] = o
                             stack.append(o)
                             if o in scope.variables:
                                 var = scope.variables[o]
                                 var.init_status(is_fed=True)
+                                if verbose > 1:
+                                    print("[_propagate_status] fed=%r" % var)
 
     def convert_operators(self, container=None, verbose=0):
         """
@@ -1239,7 +1248,9 @@ class Topology:
                     fed_variables.update(
                         {i.name: i for i in container.initializers
                          if i.name not in fed_variables})
-                    self._propagate_status(operator, container, fed_variables)
+                    self._propagate_status(operator, container, fed_variables,
+                                           verbose=verbose)
+
                     # unfed some variables (it happens when a node
                     # shares an output with another node)
                     rem = []
