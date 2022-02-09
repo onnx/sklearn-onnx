@@ -20,6 +20,13 @@ from ._parse import update_registered_parser  # noqa
 from .proto import get_latest_tested_opset_version  # noqa
 
 
+# Temporary hack to enable CI for onnx rc version
+import onnx
+onnx_version = onnx.__version__
+rc_idx = onnx_version.find('rc')
+onnx.__version__ = onnx_version[:rc_idx] if rc_idx >= 0 else onnx_version
+
+
 def supported_converters(from_sklearn=False):
     """
     Returns the list of supported converters.
