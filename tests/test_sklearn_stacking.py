@@ -261,7 +261,7 @@ class TestStackingConverter(unittest.TestCase):
         y = numpy.random.randint(2, size=20).astype(numpy.int64)
         pipe.fit(x, y)
 
-        input_types = [("X", FloatTensorType([None, 2]))]
+        input_types = [("X", FloatTensorType([None, x.shape[1]]))]
         model_onnx = convert_sklearn(
             pipe, 'bug', input_types, target_opset=TARGET_OPSET,
             verbose=0, options={'zipmap': False})
@@ -276,6 +276,5 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestStackingConverter().test_issue_786()
     # TestStackingConverter().test_concat_stacking()
     unittest.main()
