@@ -252,6 +252,7 @@ jobs:
           if [ '$(onnx.version)' == 'test' ]
           then
             pip install typing-extensions>=3.6.2.1
+            pip install wget
             pip install -i https://test.pypi.org/simple/ onnx
           else
             pip install $(onnx.version)
