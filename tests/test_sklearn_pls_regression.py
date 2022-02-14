@@ -34,9 +34,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
-            basename="SklearnPLSRegression",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
+            basename="SklearnPLSRegression")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -56,9 +54,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
-            basename="SklearnPLSRegression64",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
+            basename="SklearnPLSRegression64")
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -78,9 +74,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
-            basename="SklearnPLSRegressionInt64",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)<= StrictVersion('0.2.1')")
+            basename="SklearnPLSRegressionInt64")
 
 
 if __name__ == "__main__":
