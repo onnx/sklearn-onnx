@@ -13,7 +13,7 @@ except ImportError:
     class OutlierMixin:
         pass
 
-from sklearn.ensemble import IsolationForest, RandomTreesEmbedding
+from sklearn.ensemble import IsolationForest, RandomTreesEmbedding, RandomForestClassifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
@@ -154,8 +154,9 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         # be fixed in shape inference phase.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
+        prob_dtype = FloatTensorType() if type(model) in [RandomForestClassifier] else guess_tensor_type(inputs[0].type)
         probability_tensor_variable = scope.declare_local_variable(
-            'probabilities', FloatTensorType())
+            'probabilities', prob_dtype)
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
 

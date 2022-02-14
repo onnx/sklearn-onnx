@@ -259,14 +259,16 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model, X = fit_classification_model(
             RandomForestClassifier(n_estimators=5, random_state=42),
             3, is_double=True)
-        model_onnx = convert_sklearn(
-            model, "random forest classifier",
-            [("input", DoubleTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnRandomForestClassifierInt")
+        for opv in [1, 2, 3]:
+            model_onnx = convert_sklearn(
+                model, "random forest classifier",
+                [("input", DoubleTensorType([None, X.shape[1]]))],
+                target_opset={'ai.onnx.ml': opv,
+                              '': TARGET_OPSET})
+            self.assertIsNotNone(model_onnx)
+            dump_data_and_model(
+                X, model, model_onnx,
+                basename="SklearnRandomForestClassifierDouble")
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):

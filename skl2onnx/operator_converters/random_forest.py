@@ -92,6 +92,7 @@ def convert_sklearn_random_forest_classifier(
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
+    attr_dtype = dtype if op_version >= 3 else np.float32
     op = operator.raw_operator
 
     if hasattr(op, 'n_outputs_'):
@@ -209,7 +210,7 @@ def convert_sklearn_random_forest_classifier(
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
                     attr_pairs[k] = np.array(
-                        attr_pairs[k], dtype=np.float32).ravel()
+                        attr_pairs[k], dtype=attr_dtype).ravel()
 
         container.add_node(
             op_type, input_name,
@@ -249,7 +250,7 @@ def convert_sklearn_random_forest_classifier(
                     if k in ('nodes_values', 'class_weights',
                              'target_weights', 'nodes_hitrates',
                              'base_values'):
-                        attrs[k] = np.array(attrs[k], dtype=np.float32).ravel()
+                        attrs[k] = np.array(attrs[k], dtype=attr_dtype).ravel()
 
             if options['decision_path']:
                 # decision_path
@@ -392,7 +393,7 @@ def convert_sklearn_random_forest_regressor_converter(
             if k in ('nodes_values', 'class_weights',
                      'target_weights', 'nodes_hitrates',
                      'base_values'):
-                attrs[k] = np.array(attrs[k], dtype=np.float32).ravel()
+                attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
     container.add_node(
         op_type, input_name,
@@ -433,7 +434,7 @@ def convert_sklearn_random_forest_regressor_converter(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attrs[k] = np.array(attrs[k], dtype=np.float32).ravel()
+                    attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
         if options.get('decision_path', False):
             # decision_path
