@@ -15,7 +15,7 @@ jobs:
     matrix:
       Py39-Onnx1110-Rt1100-Skl10:
         python.version: '3.9'
-        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.11.0rc1'
+        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
