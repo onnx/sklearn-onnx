@@ -44,8 +44,7 @@ ort_version = ".".join(ort_version.split('.')[:2])
 
 class TestOnnxOperatorsScan(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -122,8 +121,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(y, res[0])
         assert_almost_equal(z, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -159,8 +157,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(y, res[0])
         assert_almost_equal(z, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -214,8 +211,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(x, res[0])
         assert_almost_equal(exp, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -284,8 +280,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -334,8 +329,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0], decimal=4)
         assert "u_scan0_" not in str(model_def)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
@@ -387,8 +381,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.5.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)

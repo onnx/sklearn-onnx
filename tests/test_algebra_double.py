@@ -2,7 +2,6 @@
 
 import unittest
 from distutils.version import StrictVersion
-import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxSub
@@ -13,8 +12,7 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraDouble(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(StrictVersion(onnxruntime.__version__)
                      <= StrictVersion("0.4.0"),
                      reason="Sub(7) not available")

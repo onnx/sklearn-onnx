@@ -7,7 +7,6 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.datasets import make_regression
-from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.common.data_types import (
     FloatTensorType, DoubleTensorType)
 from skl2onnx import convert_sklearn
@@ -17,8 +16,6 @@ from test_utils import TARGET_OPSET
 
 class TestParsingOptions(unittest.TestCase):
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_pipeline(self):
         model = Pipeline(
             [('sc1', StandardScaler()), ('sc2', StandardScaler())])
@@ -53,8 +50,6 @@ class TestParsingOptions(unittest.TestCase):
         assert sess.get_outputs()[0].name == 'output4'
         assert str(sess.get_outputs()[0].type) == "tensor(double)"
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_decisiontree_regressor(self):
         model = DecisionTreeRegressor(max_depth=2)
         X, y = make_regression(n_features=4, random_state=42)
@@ -67,8 +62,6 @@ class TestParsingOptions(unittest.TestCase):
         sess = InferenceSession(model_onnx.SerializeToString())
         assert sess.get_outputs()[0].name == 'output4'
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_kmeans(self):
         model = KMeans()
         X, y = make_regression(n_features=4, random_state=42)

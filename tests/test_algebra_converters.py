@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
-import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -18,8 +16,7 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraConverters(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxSklearnStandardScaler is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_converter(self):
@@ -63,8 +60,7 @@ class TestAlgebraConverters(unittest.TestCase):
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, op.transform(X))
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_algebra_to_onnx(self):
         X = numpy.random.randn(5, 4)
         beta = numpy.array([1, 2, 3, 4]) / 10

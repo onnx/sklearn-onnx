@@ -1,10 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
-import onnx
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession
 try:
@@ -25,8 +23,7 @@ from test_utils import fit_regression_model, TARGET_OPSET
 
 class TestOnnxOperatorsCascade(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_cascade_add(self):
 
         def generate_onnx_graph(dim, nbnode, input_name='X1', opv=None):
@@ -97,8 +94,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             res = res_out[0]
             assert res.shape[1] == dim
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_cascade_scaler(self):
 
         def generate_onnx_graph(dim, nbnode, input_name='X1', opv=1):
@@ -153,8 +149,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         res = res_out[0]
         assert res.shape[1] == dim
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_scaler_converted(self):
         st = StandardScaler()
         X = np.array([[0, 1.5], [6.1, 2.3]])
@@ -205,8 +200,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 res = res_out[0]
                 assert_almost_equal(exp, res)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_model_mlp_regressor_default(self):
         model, X_test = fit_regression_model(
             MLPRegressor(random_state=42))
