@@ -21,7 +21,6 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     StringTensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -30,8 +29,6 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_function_transformer(self):
         def convert_dataframe_schema(df, drop=None):
             inputs = []
@@ -73,19 +70,12 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
             data[:5],
             pipe,
             model_onnx,
-            basename="SklearnFunctionTransformer-DF",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnFunctionTransformer-DF")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_passthrough(self):
         def convert_dataframe_schema(df, drop=None):
             inputs = []
@@ -122,19 +112,12 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
             data[:5],
             pipe,
             model_onnx,
-            basename="SklearnFunctionTransformer-DF",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnFunctionTransformer-DF")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_remainder_passthrough(self):
         def convert_dataframe_schema(df, drop=None):
             inputs = []
@@ -169,11 +152,7 @@ class TestSklearnFunctionTransformerConverter(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             data[:5], pipe, model_onnx,
-            basename="SklearnFunctionTransformer-DF",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+            basename="SklearnFunctionTransformer-DFP")
 
 
 if __name__ == "__main__":

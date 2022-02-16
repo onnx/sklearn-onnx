@@ -1,9 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
 import numpy
-import onnx
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -12,7 +10,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._apply_operation import apply_mul
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_multiple_classification,
     dump_binary_classification,
@@ -69,10 +66,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             Xd.astype(numpy.float32), model, model_onnx,
             basename="CustomTransformerMul")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_binary(self):
         model = VotingClassifier(
             voting="hard",
@@ -87,10 +81,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Hard", comparable_outputs=[0],
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_binary_weights(self):
         model = VotingClassifier(
             voting="hard",
@@ -106,8 +97,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="WeightsHard", comparable_outputs=[0],
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_binary(self):
         model = VotingClassifier(
             voting="soft",
@@ -121,8 +110,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Soft", comparable_outputs=[0, 1],
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_binary_weighted(self):
         model = VotingClassifier(
             voting="soft",
@@ -137,10 +124,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="WeightedSoft",
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_multi(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(
@@ -155,10 +139,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Hard", comparable_outputs=[0],
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_multi_weighted(self):
         # predict_proba is not defined when voting is hard.
         model = VotingClassifier(
@@ -174,8 +155,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="WeightedHard", comparable_outputs=[0],
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi(self):
         model = VotingClassifier(
             voting="soft",
@@ -188,8 +167,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
         dump_multiple_classification(
             model, suffix="Soft", target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi_string(self):
         model = VotingClassifier(
             voting="soft",
@@ -203,8 +180,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, label_string=True, suffix="Soft",
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi_weighted(self):
         model = VotingClassifier(
             voting="soft",
@@ -219,8 +194,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="WeightedSoft",
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi_weighted4(self):
         model = VotingClassifier(
             voting="soft",
@@ -237,8 +210,6 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Weighted4Soft",
             target_opset=TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_voting_soft_multi_weighted42(self):
         model = VotingClassifier(
             voting="soft",

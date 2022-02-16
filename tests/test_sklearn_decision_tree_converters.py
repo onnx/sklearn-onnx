@@ -11,7 +11,6 @@ from sklearn.tree import (
     ExtraTreeClassifier, ExtraTreeRegressor
 )
 from sklearn.datasets import make_classification
-from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
@@ -39,8 +38,6 @@ ort_version = ort_version.split('+')[0]
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion("0.3.0"),
         reason="No suitable kernel definition found "
@@ -59,8 +56,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         if res[1][0][0] != pred[0, 0]:
             raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_decisiontree_regressor0(self):
         model = DecisionTreeRegressor(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
@@ -75,8 +70,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         if res[0][0, 0] != pred[0]:
             raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_regressor_decision_path(self):
         model = DecisionTreeRegressor(max_depth=2)
@@ -96,8 +89,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         exp = binary_array_to_string(dec.todense())
         assert exp == res[1].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_regressor_decision_leaf(self):
         model = DecisionTreeRegressor(max_depth=2)
@@ -117,8 +108,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         exp = path_to_leaf(model.tree_, dec.todense())
         assert exp.tolist() == res[1].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_regressor_decision_path_leaf(self):
         model = DecisionTreeRegressor(max_depth=2)
@@ -141,8 +130,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         assert exp_path == res[1].ravel().tolist()
         assert exp_leaf.tolist() == res[2].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_classifier_decision_path(self):
         model = DecisionTreeClassifier(max_depth=2)
@@ -164,8 +151,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         exp = binary_array_to_string(dec.todense())
         assert exp == res[2].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_classifier_decision_leaf(self):
         model = DecisionTreeClassifier(max_depth=2)
@@ -187,8 +172,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         exp = path_to_leaf(model.tree_, dec.todense())
         assert exp.tolist() == res[2].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     def test_decisiontree_classifier_decision_path_leaf(self):
         model = DecisionTreeClassifier(max_depth=2)
@@ -215,8 +198,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         assert exp_path == res[2].ravel().tolist()
         assert exp_leaf.tolist() == res[3].ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_decision_tree_classifier(self):
         model = DecisionTreeClassifier()
         dump_one_class_classification(model)
@@ -225,8 +206,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         dump_multiple_classification(model, label_uint8=True)
         dump_multiple_classification(model, label_string=True)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_extra_tree_classifier(self):
         model = ExtraTreeClassifier()
         dump_one_class_classification(model)
@@ -255,8 +234,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnDecisionTreeRegressionInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
             DecisionTreeClassifier(),
@@ -274,8 +251,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             X, model, model_onnx, classes=model.classes_,
             basename="SklearnDTMultiNoCl")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_decision_tree_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             DecisionTreeClassifier(random_state=42))
@@ -290,8 +265,6 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnDecisionTreeClassifierMultiLabel-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_extra_tree_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             ExtraTreeClassifier(random_state=42))

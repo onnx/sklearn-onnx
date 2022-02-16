@@ -4,9 +4,7 @@
 Tests scikit-learn's polynomial features converter.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
-import onnx
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -21,8 +19,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 class TestSklearnPolynomialFeatures(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_float_degree_2(self):
         X = np.array([[1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -37,8 +34,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnPolynomialFeaturesFloatDegree2")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_int_degree_2(self):
         X = np.array([
@@ -58,8 +54,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
             X.astype(np.int64), model, model_onnx,
             basename="SklearnPolynomialFeaturesIntDegree2")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_float_degree_3(self):
         X = np.array([[1.2, 3.2, 1.2], [4.3, 3.2, 4.5], [3.2, 4.7, 1.1]])
@@ -73,8 +68,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnPolynomialFeaturesFloatDegree3")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_int_degree_3(self):
         X = np.array([
@@ -95,8 +89,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
             X.astype(np.int64), model, model_onnx,
             basename="SklearnPolynomialFeaturesIntDegree3")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_float_degree_4(self):
         X = np.array([[1.2, 3.2, 3.1, 1.3], [4.3, 3.2, 0.5, 1.3],
@@ -111,8 +104,7 @@ class TestSklearnPolynomialFeatures(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnPolynomialFeaturesFloatDegree4-Dec4")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_int_degree_4(self):
         X = np.array([[1, 3, 4, 1], [3, 7, 3, 5], [1, 0, 5, 4]])

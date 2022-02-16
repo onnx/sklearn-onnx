@@ -168,9 +168,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
-        reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
@@ -314,9 +312,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-        reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1_opset(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
@@ -789,9 +785,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.4.1")),
-                     reason="ConstantOfShape op not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer(self):
         x_train = numpy.array(
@@ -815,9 +809,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.4.1")),
-                     reason="ConstantOfShape op not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_cdist(self):
         x_train = numpy.array(
@@ -850,8 +842,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 x_test, model, model_onnx,
                 basename="SklearnKNNImputer%dcdist" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
@@ -896,8 +886,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnRadiusNeighborsRegressorMReg")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")
@@ -940,8 +928,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnRadiusNeighborsClassifierMReg2-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("0.5.0"),
         reason="not available")

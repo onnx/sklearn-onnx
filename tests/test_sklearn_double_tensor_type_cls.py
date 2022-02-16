@@ -44,6 +44,7 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 ort_version = ort_version.split('+')[0]
 ORT_VERSION = '1.7.0'
+onnx_version = ".".join(onnx_version.split('.')[:2])
 
 
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):

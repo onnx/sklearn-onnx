@@ -21,8 +21,7 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
-    Int64TensorType,
-    onnx_built_with_ml)
+    Int64TensorType)
 from test_utils import (
     dump_data_and_model,
     dump_multiple_classification,
@@ -34,8 +33,6 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr(self):
         model = OneVsRestClassifier(LogisticRegression())
@@ -46,8 +43,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.4.0'),
         reason="onnxruntime too old")
@@ -80,8 +75,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             # That explains why the test allows less than 3 differences.
             assert_almost_equal(exp_label, got[0])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.3.0'),
         reason="onnxruntime too old")
@@ -103,8 +96,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     X.astype(np.float32), model, model_onnx,
                     basename="SklearnOVRRFMultiLabelFloat%d" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.3.0'),
         reason="onnxruntime too old")
@@ -127,8 +118,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     X.astype(np.float32), model, model_onnx,
                     basename="SklearnOVRRFMultiLabelFloat%d" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.3.0'),
         reason="onnxruntime too old")
@@ -150,8 +139,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     X.astype(np.int64), model, model_onnx,
                     basename="SklearnOVRRFMultiLabelInt64%d" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.3.0'),
         reason="onnxruntime too old")
@@ -174,8 +161,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     X.astype(np.int64), model, model_onnx,
                     basename="SklearnOVRRFMultiLabelInt64%d" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_02(self):
         model = OneVsRestClassifier(LogisticRegression())
@@ -183,13 +168,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             first_class=2,
             suffix="F2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
             target_opset=TARGET_OPSET
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_string(self):
         model = OneVsRestClassifier(LogisticRegression())
@@ -198,13 +179,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             verbose=False,
             label_string=True,
             suffix="String",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
             target_opset=TARGET_OPSET
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float(self):
         model, X = fit_classification_model(
@@ -220,13 +197,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationFloat",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationFloat")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_decision_function(self):
         model, X = fit_classification_model(
@@ -244,11 +216,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationDecisionFunction",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function'],
-        )
+            basename="SklearnOVRClassificationDecisionFunction")
         if StrictVersion(ort_version) < StrictVersion("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
@@ -261,8 +229,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         dec = model.decision_function(X)
         assert_almost_equal(got, dec, decimal=4)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_decision_function_binary(self):
         model, X = fit_classification_model(
@@ -280,11 +246,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationDecisionFunctionBinary",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function_binary'],
-        )
+            basename="SklearnOVRClassificationDecisionFunctionBinary")
         if StrictVersion(ort_version) < StrictVersion("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
@@ -298,8 +260,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         assert_almost_equal(got[:, 1], dec, decimal=4)
         assert_almost_equal(-got[:, 0], dec, decimal=4)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int(self):
         model, X = fit_classification_model(
@@ -315,13 +275,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationInt",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_binary(self):
         model, X = fit_classification_model(
@@ -342,8 +297,6 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             "<= StrictVersion('0.2.1')",
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_binary_nozipmap(self):
         model, X = fit_classification_model(
@@ -356,12 +309,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnOVRClassificationFloatBinNoZipMap",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnOVRClassificationFloatBinNoZipMap")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int_binary(self):
         model, X = fit_classification_model(
@@ -377,13 +326,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationIntBin",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationIntBin")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_mlp(self):
         model, X = fit_classification_model(
@@ -399,13 +343,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationFloatMLP",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationFloatMLP")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int_ensemble(self):
         model, X = fit_classification_model(
@@ -421,13 +360,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationIntEnsemble",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationIntEnsemble")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_binary_ensemble(self):
         model, X = fit_classification_model(
@@ -443,13 +377,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationFloatBinEnsemble",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationFloatBinEnsemble")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int_binary_mlp(self):
         model, X = fit_classification_model(
@@ -465,13 +394,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationIntBinMLP",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationIntBinMLP")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_regression_float(self):
         """The test is unstable, some observations
@@ -493,13 +417,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X[:5],
             model,
             model_onnx,
-            basename="SklearnOVRRegressionFloat-Out0",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRRegressionFloat-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_regression_int(self):
         model, X = fit_classification_model(
@@ -515,13 +434,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRRegressionInt-Out0",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRRegressionInt-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_regression_float_mlp(self):
         model, X = fit_classification_model(
@@ -537,13 +451,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRRegressionFloatMLP-Out0",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRRegressionFloatMLP-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_regression_int_ensemble(self):
         model, X = fit_classification_model(
@@ -559,12 +468,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRRegressionIntEnsemble-Out0",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnOVRRegressionIntEnsemble-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.2.0"),
                      reason="fails to load the model")
     def test_ovr_raw_scores(self):

@@ -39,11 +39,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             np.array(data),
             model,
             model_onnx,
-            basename="SklearnLabelEncoder",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            basename="SklearnLabelEncoder")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"),
@@ -66,11 +62,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnLabelEncoderFloat",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            basename="SklearnLabelEncoderFloat")
 
     @unittest.skipIf(
         StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"),
@@ -96,11 +88,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
                     data,
                     model,
                     model_onnx,
-                    basename="SklearnLabelEncoderInt",
-                    allow_failure="StrictVersion("
-                    "onnxruntime.__version__)"
-                    "<= StrictVersion('0.5.0')",
-                )
+                    basename="SklearnLabelEncoderInt")
 
 
 if __name__ == "__main__":

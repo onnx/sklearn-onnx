@@ -4,20 +4,16 @@
 Tests scikit-learn's CountVectorizer converter.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-import onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnCountVectorizer(unittest.TestCase):
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer11(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -40,9 +36,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer22(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -65,9 +59,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer12(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -90,9 +82,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer13(self):
         corpus = numpy.array([
             "This is the first document.",
@@ -115,9 +105,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
                           " <= StrictVersion('0.3.0')",
         )
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_binary(self):
         corpus = numpy.array([
             "This is the first document.",

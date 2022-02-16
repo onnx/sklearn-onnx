@@ -2,9 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
 import numpy
-import onnx
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.datasets import load_digits, load_iris
 from skl2onnx import convert_sklearn
@@ -25,10 +23,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
             model, model_onnx,
-            basename="SklearnKMeans-Dec4",
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')")
+            basename="SklearnKMeans-Dec4")
 
     def test_kmeans_clustering_noshape(self):
         data = load_iris()
@@ -42,10 +37,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32)[40:60],
             model, model_onnx,
-            basename="SklearnKMeans-Dec4",
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')")
+            basename="SklearnKMeans-Dec4")
 
     def test_batchkmeans_clustering(self):
         data = load_iris()
@@ -60,13 +52,9 @@ class TestSklearnKMeansModel(unittest.TestCase):
             X.astype(numpy.float32)[40:60],
             model,
             model_onnx,
-            basename="SklearnKMeans-Dec4",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            basename="SklearnKMeans-Dec4")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="OnnxOperator not working")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_batchkmeans_clustering_opset9(self):
         data = load_iris()
         X = data.data
@@ -80,13 +68,9 @@ class TestSklearnKMeansModel(unittest.TestCase):
             X.astype(numpy.float32)[40:60],
             model,
             model_onnx,
-            basename="SklearnKMeansOp9-Dec4",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            basename="SklearnKMeansOp9-Dec4")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
-                     reason="OnnxOperator not working")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_batchkmeans_clustering_opset11(self):
         data = load_iris()
         X = data.data
@@ -100,9 +84,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
             X.astype(numpy.float32)[40:60],
             model,
             model_onnx,
-            basename="SklearnKMeansOp9-Dec4",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')")
+            basename="SklearnKMeansOp9-Dec4")
 
     def test_batchkmeans_clustering_opset1(self):
         data = load_iris()
@@ -130,13 +112,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
             X.astype(numpy.int64)[40:60],
             model,
             model_onnx,
-            basename="SklearnKMeansInt-Dec4",
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__) "
-                          "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnKMeansInt-Dec4")
 
     def test_batchkmeans_clustering_int(self):
         data = load_digits()
@@ -152,12 +128,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
             X.astype(numpy.int64)[40:60],
             model,
             model_onnx,
-            basename="SklearnBatchKMeansInt-Dec4",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__) "
-                          "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBatchKMeansInt-Dec4")
 
 
 if __name__ == "__main__":
