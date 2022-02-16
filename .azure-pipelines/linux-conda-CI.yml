@@ -243,6 +243,7 @@ jobs:
   - script: |
       if [ '$(onnx.version)' == 'git' ]
         then
+          pip install typing-extensions>=3.6.2.1
           git clone https://github.com/onnx/onnx.git --recursive
           export ONNX_ML=1
           cd onnx
@@ -254,6 +255,7 @@ jobs:
             pip install typing-extensions>=3.6.2.1
             pip install -i https://test.pypi.org/simple/ onnx
           else
+            pip install typing-extensions>=3.6.2.1
             pip install $(onnx.version)
           fi
       fi
