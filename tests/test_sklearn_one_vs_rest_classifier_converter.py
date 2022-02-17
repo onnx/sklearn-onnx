@@ -216,7 +216,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOVRClassificationDecisionFunction",
-            methods=['predict', 'decision_function_binary'])
+            methods=['predict', 'decision_function'])
         if StrictVersion(ort_version) < StrictVersion("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
