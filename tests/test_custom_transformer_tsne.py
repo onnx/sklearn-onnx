@@ -12,7 +12,6 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn import datasets
-import onnxruntime as ort
 from onnxruntime import __version__ as ort_version
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter

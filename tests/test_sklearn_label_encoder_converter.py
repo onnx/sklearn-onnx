@@ -5,7 +5,6 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
-import onnxruntime
 from onnxruntime import __version__ as ort_version
 from sklearn.preprocessing import LabelEncoder
 from skl2onnx import convert_sklearn

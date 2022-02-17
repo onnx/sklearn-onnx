@@ -4,9 +4,7 @@
 Tests scikit-learn's tfidf converter using downloaded data.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
-import onnx
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups

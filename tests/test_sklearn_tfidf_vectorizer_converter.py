@@ -22,7 +22,6 @@ except ImportError:
     apply_less = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
-import onnxruntime
 from onnxruntime import __version__ as ort_version
 from onnxruntime import InferenceSession
 from test_utils import dump_data_and_model, TARGET_OPSET

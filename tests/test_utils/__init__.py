@@ -87,7 +87,7 @@ if TARGET_OPSET <= 15:
     value_ml = 2
 if TARGET_OPSET <= 11:
     value_ml = 1
-    
+
 TARGET_OPSET_ML = int(os.environ.get('TEST_TARGET_OPSET_ML', value_ml))
 
 TARGET_IR = int(

@@ -3,6 +3,7 @@
 
 import unittest
 import numbers
+from distutils.version import StrictVersion
 import numpy as np
 from numpy.testing import assert_almost_equal
 import pandas
@@ -23,6 +24,7 @@ from skl2onnx.common.shape_calculator import (
     calculate_linear_regressor_output_shapes)
 from skl2onnx._parse import _parse_sklearn_classifier
 from xgboost import XGBRegressor, XGBClassifier
+import onnxmltools
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
     convert_xgboost  # noqa
 )
@@ -36,7 +38,8 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
-from test_utils import dump_multiple_classification, TARGET_OPSET
+from test_utils import (
+    dump_multiple_classification, TARGET_OPSET, TARGET_OPSET_ML)
 
 
 class TestXGBoostModels(unittest.TestCase):
@@ -65,6 +68,9 @@ class TestXGBoostModels(unittest.TestCase):
             calculate_linear_regressor_output_shapes,
             convert_xgboost)
 
+    @unittest.skipIf(
+        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
     def test_xgb_regressor(self):
         iris = load_iris()
         X = iris.data[:, :2]
@@ -76,7 +82,7 @@ class TestXGBoostModels(unittest.TestCase):
             xgb,
             initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
         dump_single_regression(xgb, suffix="-Dec4")
 
@@ -91,12 +97,15 @@ class TestXGBoostModels(unittest.TestCase):
             xgb, initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             options={id(xgb): {'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         sess = InferenceSession(conv_model.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(xgb.predict_proba(X), res[1])
         assert_almost_equal(xgb.predict(X), res[0])
 
+    @unittest.skipIf(
+        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
     def test_xgb_classifier_multi(self):
         iris = load_iris()
         X = iris.data[:, :2]
@@ -108,12 +117,13 @@ class TestXGBoostModels(unittest.TestCase):
             xgb,
             initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        dump_multiple_classification(
-            xgb, allow_failure="StrictVersion(onnx.__version__) "
-            "< StrictVersion('1.3.0')")
+        dump_multiple_classification(xgb)
 
+    @unittest.skipIf(
+        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
     def test_xgb_classifier_multi_reglog(self):
         iris = load_iris()
         X = iris.data[:, :2]
@@ -124,12 +134,9 @@ class TestXGBoostModels(unittest.TestCase):
         conv_model = convert_sklearn(
             xgb, initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        dump_multiple_classification(
-            xgb, suffix="RegLog",
-            allow_failure="StrictVersion(onnx.__version__) < "
-            "StrictVersion('1.3.0')")
+        dump_multiple_classification(xgb, suffix="RegLog")
 
     def test_xgb_classifier_reglog(self):
         iris = load_iris()
@@ -142,7 +149,7 @@ class TestXGBoostModels(unittest.TestCase):
             xgb, initial_types=[
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             options={id(xgb): {'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
         sess = InferenceSession(conv_model.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
@@ -173,7 +180,8 @@ class TestXGBoostModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model_to_test, "stacking classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET, options={'zipmap': False})
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML},
+            options={'zipmap': False})
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(model_to_test.predict_proba(X), res[1])
@@ -210,7 +218,8 @@ class TestXGBoostModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model_to_test, "stacking classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET, options={'zipmap': False})
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML},
+            options={'zipmap': False})
         sess = InferenceSession(model_onnx.SerializeToString())
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(model_to_test.predict_proba(df), res[1])
