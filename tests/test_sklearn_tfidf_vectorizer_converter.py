@@ -23,8 +23,12 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 import onnxruntime
+from onnxruntime import __version__ as ort_version
 from onnxruntime import InferenceSession
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+ort_version = '.'.join(ort_version.split('.')[:2])
 
 
 class TestSklearnTfidfVectorizer(unittest.TestCase):
@@ -34,7 +38,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
@@ -62,7 +66,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_nolowercase(self):
         corpus = numpy.array([
@@ -411,7 +415,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("0.3.0"),
+        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_64(self):
         corpus = numpy.array([
@@ -441,7 +445,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         apply_less is None, reason="onnxconverter-common too old")
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("1.3.0"),
+        StrictVersion(ort_version) < StrictVersion("1.3.0"),
         reason="Requires opset 9.")
     def test_tfidf_svm(self):
         data = [
@@ -474,7 +478,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) <= StrictVersion("1.0.0"),
+        StrictVersion(ort_version) <= StrictVersion("1.0.0"),
         reason="Requires opset 10.")
     def test_model_tfidf_vectorizer_nan(self):
         corpus = numpy.array([

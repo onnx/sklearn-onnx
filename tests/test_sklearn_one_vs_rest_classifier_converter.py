@@ -32,16 +32,15 @@ from test_utils import (
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
+ort_version = '.'.join(ort_version.split('.')[:2])
+
+
 class TestOneVsRestClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr(self):
         model = OneVsRestClassifier(LogisticRegression())
         dump_multiple_classification(
-            model,
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-            target_opset=TARGET_OPSET
-        )
+            model, target_opset=TARGET_OPSET)
 
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion('1.4.0'),
@@ -292,10 +291,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationFloatBin",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnOVRClassificationFloatBin")
 
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_binary_nozipmap(self):

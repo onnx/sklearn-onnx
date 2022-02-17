@@ -14,7 +14,7 @@ try:
 except ImportError:
     IsolationForest = None
 from skl2onnx import to_onnx
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import dump_data_and_model, TARGET_OPSET, TARGET_OPSET_ML
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import NotImplemented
 except ImportError:
@@ -34,7 +34,9 @@ class TestSklearnIsolationForest(unittest.TestCase):
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
                          [0.5, 0.4], [100., 99.]], dtype=np.float32)
         model = isol.fit(data)
-        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
+        model_onnx = to_onnx(
+            model, data,
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="IsolationForest")
@@ -47,8 +49,9 @@ class TestSklearnIsolationForest(unittest.TestCase):
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
                          [0.5, 0.4], [100., 99.]], dtype=np.float32)
         model = isol.fit(data)
-        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET,
-                             options={'score_samples': True})
+        model_onnx = to_onnx(
+            model, data, options={'score_samples': True},
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         sess = InferenceSession(model_onnx.SerializeToString())
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores', 'score_samples'])
@@ -83,7 +86,9 @@ class TestSklearnIsolationForest(unittest.TestCase):
         data[-1, 2:] = 99.
         data[-2, :2] = -99.
         model = isol.fit(data)
-        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
+        model_onnx = to_onnx(
+            model, data,
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(data, model, model_onnx,
                             basename="IsolationForestRnd")

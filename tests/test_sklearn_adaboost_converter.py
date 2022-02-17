@@ -4,7 +4,7 @@
 import unittest
 from distutils.version import StrictVersion
 from onnx.defs import onnx_opset_version
-import onnxruntime
+from onnxruntime import __version__ as ort_version
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -20,6 +20,9 @@ from test_utils import (
     fit_regression_model,
     TARGET_OPSET
 )
+
+
+ort_version = '.'.join(ort_version.split('.')[:2])
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
@@ -221,7 +224,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model_onnx,
             basename="SklearnAdaBoostRegressorLR-Dec4")
 
-    @unittest.skipIf((StrictVersion(onnxruntime.__version__) <
+    @unittest.skipIf((StrictVersion(ort_version) <
                       StrictVersion("0.5.9999")),
                      reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")

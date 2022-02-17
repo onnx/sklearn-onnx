@@ -65,7 +65,7 @@ def convert_sklearn_isolation_forest(
         attrs['post_transform'] = 'NONE'
         attrs['target_ids'] = [0 for _ in attrs['target_ids']]
         attrs['target_weights'] = [float(_) for _ in attrs['target_nodeids']]
-        leave = OnnxTreeEnsembleRegressor(gather, op_version=opv, **attrs)
+        leave = OnnxTreeEnsembleRegressor(gather, op_version=opvml, **attrs)
 
         # tree - retrieve node_sample
         labels = _build_labels(tree.tree_, output="node_sample")
