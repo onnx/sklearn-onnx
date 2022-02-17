@@ -60,7 +60,7 @@ from test_utils import (
 def dont_test_radius():
     return (
         StrictVersion(ort_version) <= StrictVersion("1.3.0") or
-        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"))
+        TARGET_OPSET <= 11)
 
 
 ort_version = ".".join(ort_version.split('.')[:2])

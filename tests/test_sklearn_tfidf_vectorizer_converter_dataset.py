@@ -17,9 +17,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_tfidf_20newsgroups(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
