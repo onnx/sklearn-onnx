@@ -29,6 +29,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
                      reason="tree structure is different.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest(self):
         isol = IsolationForest(n_estimators=3, random_state=0)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
@@ -44,6 +45,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
                      reason="tree structure is different.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_score_samples(self):
         isol = IsolationForest(n_estimators=3, random_state=0)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
@@ -67,6 +69,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
                      reason="tree structure is different.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_op1(self):
         isol = IsolationForest(n_estimators=3, random_state=0)
         data = np.array([[-1.1, -1.2], [0.3, 0.2],
@@ -79,6 +82,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
                      reason="tree structure is different.")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_rnd(self):
         isol = IsolationForest(n_estimators=2, random_state=0)
         rs = np.random.RandomState(0)

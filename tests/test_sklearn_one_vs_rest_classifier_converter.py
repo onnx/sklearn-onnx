@@ -215,7 +215,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationDecisionFunction")
+            basename="SklearnOVRClassificationDecisionFunction",
+            methods=['predict', 'decision_function_binary'])
         if StrictVersion(ort_version) < StrictVersion("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
@@ -245,7 +246,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnOVRClassificationDecisionFunctionBinary")
+            basename="SklearnOVRClassificationDecisionFunctionBinary",
+            methods=['predict', 'decision_function_binary'])
         if StrictVersion(ort_version) < StrictVersion("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}

@@ -61,10 +61,11 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test,
+            X_test[:5],
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierSAMMERDecisionFunction")
+            basename="SklearnAdaBoostClassifierSAMMERDecisionFunction",
+            methods=['predict', 'decision_function'])
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r_logreg(self):

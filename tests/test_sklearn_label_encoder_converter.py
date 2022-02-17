@@ -6,6 +6,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy as np
 import onnxruntime
+from onnxruntime import __version__ as ort_version
 from sklearn.preprocessing import LabelEncoder
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
@@ -16,10 +17,13 @@ from skl2onnx.common.data_types import (
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
+ort_version = ".".join(ort_version.split('.')[:2])
+
+
 class TestSklearnLabelEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"),
+        StrictVersion(ort_version) < StrictVersion("0.3.0"),
         reason="onnxruntime too old")
     def test_model_label_encoder(self):
         model = LabelEncoder()
@@ -42,7 +46,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             basename="SklearnLabelEncoder")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"),
+        StrictVersion(ort_version) < StrictVersion("0.3.0"),
         reason="onnxruntime too old")
     def test_model_label_encoder_float(self):
         model = LabelEncoder()
@@ -65,8 +69,9 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             basename="SklearnLabelEncoderFloat")
 
     @unittest.skipIf(
-        StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"),
+        StrictVersion(ort_version) < StrictVersion("0.3.0"),
         reason="onnxruntime too old")
+    @unittest.skipIf(TARGET_OPSET < 12, reason='not available')
     def test_model_label_encoder_int(self):
         model = LabelEncoder()
         data = np.array([10, 3, 5, -34, 0], dtype=np.int64)
