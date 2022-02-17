@@ -24,7 +24,7 @@ jobs:
         sklearn.version: '>=1.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'  # git
-        run.example: '1'
+        run.example: '0'
       Py39-Onnx1102-Rt110-Skl10:
         do.bench: '0'
         python.version: '3.9'
