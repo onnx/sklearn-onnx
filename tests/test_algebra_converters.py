@@ -16,7 +16,7 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraConverters(unittest.TestCase):
 
-    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @unittest.skipIf(OnnxSklearnStandardScaler is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_converter(self):
@@ -60,7 +60,7 @@ class TestAlgebraConverters(unittest.TestCase):
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, op.transform(X))
 
-    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_algebra_to_onnx(self):
         X = numpy.random.randn(5, 4)
         beta = numpy.array([1, 2, 3, 4]) / 10

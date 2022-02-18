@@ -58,6 +58,8 @@ def max_onnxruntime_opset():
     master/docs/Versioning.md>`_.
     """
     vi = StrictVersion(ort_version.split('+')[0])
+    if vi >= StrictVersion("1.10.0"):
+        return 16
     if vi >= StrictVersion("1.9.0"):
         return 15
     if vi >= StrictVersion("1.8.0"):

@@ -61,7 +61,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X_test[:5],
+            X_test,
             model,
             model_onnx,
             basename="SklearnAdaBoostClassifierSAMMERDecisionFunction",
