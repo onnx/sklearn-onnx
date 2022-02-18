@@ -18,7 +18,6 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_binary_classification, dump_multiple_classification,
     fit_classification_model, dump_data_and_model, fit_regression_model,
@@ -30,8 +29,6 @@ ort_version = ort_version.split('+')[0]
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.")
@@ -64,20 +61,14 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                 raise AssertionError("\n---\n".join(rows))
         dump_binary_classification(model, suffix="1Deviance")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier3(self):
         model = GradientBoostingClassifier(n_estimators=3)
         dump_binary_classification(model, suffix="3")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_classifier_multi(self):
         model = GradientBoostingClassifier(n_estimators=3)
         dump_multiple_classification(model)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_binary_classification(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=3), 2)
@@ -90,8 +81,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingBinaryClassifier")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_binary_classification_init_zero(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4, init='zero'), 2)
@@ -104,8 +93,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingBinaryClassifierInitZero")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_multiclass_classification(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5)
@@ -118,8 +105,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingMultiClassClassifier")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_int(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5, is_int=True)
@@ -132,8 +117,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_bool(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5, is_bool=True)
@@ -146,8 +129,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_multiclass_decision_function(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4), 5)
@@ -162,8 +143,6 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             basename="SklearnGradientBoostingMultiClassDecisionFunction",
             methods=['predict', 'decision_function'])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_gradient_boosting_multiclass_classification_init_zero(self):
         model, X = fit_classification_model(
             GradientBoostingClassifier(n_estimators=4, init='zero'), 4)

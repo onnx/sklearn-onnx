@@ -14,7 +14,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_selection import SelectKBest
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-import onnx
 from test_utils import TARGET_OPSET
 
 
@@ -100,9 +99,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
                 print(b)
             assert_almost_equal(a, b)
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.0.0"),
         reason="Too old")
@@ -111,9 +108,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
             with self.subTest(kind=kind):
                 self.common_test_model_tfidf_vectorizer_pipeline_cls(kind)
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="Wrong handling of stopwods and n-grams")

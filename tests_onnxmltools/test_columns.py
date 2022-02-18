@@ -27,7 +27,7 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import fit_classification_model
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, TARGET_OPSET_ML
 
 
 class TestOptionColumns(unittest.TestCase):
@@ -65,7 +65,7 @@ class TestOptionColumns(unittest.TestCase):
             model, "multi-class ridge classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'zipmap': 'columns'}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
         names = [_.name for _ in sess.get_outputs()]

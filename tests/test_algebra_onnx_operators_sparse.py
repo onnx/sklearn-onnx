@@ -20,7 +20,6 @@ try:
 except ImportError:
     # onnx is too old.
     OnnxConstantOfShape = None
-from onnx import __version__ as onnx__version__
 from test_utils import TARGET_OPSET
 
 THRESHOLD = "1.3.0"
@@ -28,7 +27,7 @@ THRESHOLD = "1.3.0"
 
 class TestOnnxOperatorsSparse(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)
@@ -45,7 +44,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
 
         assert_almost_equal(X + X, res)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
     @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)

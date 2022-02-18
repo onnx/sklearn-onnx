@@ -27,7 +27,6 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
@@ -41,8 +40,6 @@ ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnMLPConverters(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_binary(self):
         model, X_test = fit_classification_model(
@@ -58,8 +55,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierBinary")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_default(self):
         model, X_test = fit_classification_model(
@@ -75,8 +70,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClass")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_default_uint8(self):
         model, X_test = fit_classification_model(
@@ -92,8 +85,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClassU8")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_default_uint64(self):
         model, X_test = fit_classification_model(
@@ -109,8 +100,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClassU64")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multilabel_default(self):
         model, X_test = fit_multilabel_classification_model(
@@ -141,8 +130,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPRegressor-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_identity(self):
         model, X_test = fit_classification_model(
@@ -159,8 +146,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClassIdentityActivation")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multilabel_identity(self):
         model, X_test = fit_multilabel_classification_model(
@@ -192,8 +177,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPRegressorIdentityActivation-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_logistic(self):
         model, X_test = fit_classification_model(
@@ -209,8 +192,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClassLogisticActivation")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multilabel_logistic(self):
         model, X_test = fit_multilabel_classification_model(
@@ -226,8 +207,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiLabelLogisticActivation")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_regressor_logistic(self):
         model, X_test = fit_regression_model(
@@ -243,8 +222,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPRegressorLogisticActivation-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multiclass_tanh(self):
         model, X_test = fit_classification_model(
@@ -260,8 +237,6 @@ class TestSklearnMLPConverters(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnMLPClassifierMultiClassTanhActivation")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_multilabel_tanh(self):
         model, X_test = fit_multilabel_classification_model(

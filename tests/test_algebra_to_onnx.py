@@ -1,7 +1,6 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
-import onnx
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession, __version__ as ort_version
 try:
@@ -32,8 +31,7 @@ ort_version = ort_version.split('+')[0]
 
 class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_ml(self):
         def generate_onnx_graph(opv):
@@ -171,15 +169,13 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                     else:
                         self.assertEqual(res.shape, (1, 1))
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple(self):
         self.common_test_sub_graph(
             ('X1', FloatTensorType()), LinearRegression)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="not available")
@@ -189,14 +185,12 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
             ('X1', DoubleTensorType()), LinearRegression,
             cls_type=DoubleTensorType)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str(self):
         self.common_test_sub_graph('X1', LinearRegression)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="not available")
@@ -205,16 +199,14 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
         self.common_test_sub_graph('X1', LinearRegression,
                                    cls_type=DoubleTensorType)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_cls(self):
         self.common_test_sub_graph(
             ('X1', FloatTensorType()), LogisticRegression,
             {'zipmap': False})
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="not available")
@@ -228,15 +220,13 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
             options={'zipmap': False}, cls_type=DoubleTensorType,
             start=13)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str_cls(self):
         self.common_test_sub_graph('X1', LogisticRegression,
                                    {'zipmap': False})
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
         StrictVersion(ort_version) < StrictVersion("1.4.0"),
         reason="not available")

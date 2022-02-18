@@ -58,6 +58,8 @@ def max_onnxruntime_opset():
     master/docs/Versioning.md>`_.
     """
     vi = StrictVersion(ort_version.split('+')[0])
+    if vi >= StrictVersion("1.10.0"):
+        return 16
     if vi >= StrictVersion("1.9.0"):
         return 15
     if vi >= StrictVersion("1.8.0"):
@@ -81,6 +83,14 @@ TARGET_OPSET = int(
         min(max_onnxruntime_opset(),
             min(max_opset,
                 onnx.defs.onnx_opset_version()))))
+
+value_ml = 3
+if TARGET_OPSET <= 15:
+    value_ml = 2
+if TARGET_OPSET <= 11:
+    value_ml = 1
+
+TARGET_OPSET_ML = int(os.environ.get('TEST_TARGET_OPSET_ML', value_ml))
 
 TARGET_IR = int(
     os.environ.get(

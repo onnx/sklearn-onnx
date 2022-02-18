@@ -2,8 +2,6 @@
 
 import unittest
 import warnings
-from distutils.version import StrictVersion
-import onnx
 import numpy
 from numpy.random import rand
 from numpy.testing import assert_almost_equal
@@ -25,8 +23,7 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraSymbolic(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_abs(self):
@@ -47,8 +44,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, numpy.abs(X))
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="shape inference fails for Normalizer")
     def test_algebra_normalizer(self):
@@ -69,8 +65,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_shape(self):
@@ -90,8 +85,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_argmin(self):
@@ -109,8 +103,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin_named_output(self):
@@ -130,8 +123,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_normalizer_argmin(self):
@@ -152,8 +144,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})[0]
         assert_almost_equal(exp, Y)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
@@ -174,8 +165,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         assert_almost_equal(exp[0], Y[0])
         assert_almost_equal(exp[1], Y[1])
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(OnnxAbs is None,
                      reason="Cannot infer operators with current ONNX")
     def test_cascade_scaler(self):
@@ -215,5 +205,4 @@ class TestAlgebraSymbolic(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestAlgebraSymbolic().test_algebra_normalizer()
     unittest.main()

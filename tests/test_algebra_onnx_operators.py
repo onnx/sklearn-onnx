@@ -2,14 +2,12 @@
 
 import unittest
 import warnings
-from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 from onnx import (
-    helper, TensorProto, load_model,
-    __version__ as onnx__version__)
+    helper, TensorProto, load_model)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
@@ -247,8 +245,7 @@ class TestOnnxOperators(unittest.TestCase):
                             'X', value=value, op_version=opset,
                             output_names=['Y'])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnx_reversed_order(self):
         idi = np.identity(2)
         idi2 = np.identity(2) * 2
@@ -299,8 +296,7 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = helper.make_model(graph_def, producer_name='A')
         self.assertEqual(len(model_def.graph.output), 1)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnxt_array_feature_extractor(self):
         onx = OnnxArrayFeatureExtractor(
             'X', np.array([1], dtype=np.int64),
@@ -314,8 +310,7 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertEqual(got.shape, (2, 1))
         assert_almost_equal(X[:, 1:2], got)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_container_init(self):
         onx = OnnxReshapeApi13(
             OnnxReshapeApi13('X', np.array([1, -1], dtype=np.int64),
@@ -333,8 +328,7 @@ class TestOnnxOperators(unittest.TestCase):
                  if row.startswith("  initializer {")]
         self.assertEqual(len(inits), 1)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_default(self):
         pad = OnnxPad(mode='constant', value=1.5,
                       pads=[0, 1, 0, 1], op_version=10)
@@ -344,8 +338,7 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
         onnx.checker.check_model(model_def)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_batch_normalization(self):
 
         def _batchnorm_test_mode(x, s, bias, mean, var, epsilon=1e-5):
@@ -394,8 +387,7 @@ class TestOnnxOperators(unittest.TestCase):
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
-                     reason="only available for opset >= 11")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_onnxt_runtime_pad(self):
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
                         dtype=np.float32)

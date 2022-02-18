@@ -4,7 +4,6 @@
 import unittest
 from distutils.version import StrictVersion
 import numpy as np
-import onnx
 import onnxruntime
 from sklearn import __version__ as sklearn_version
 try:
@@ -59,9 +58,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         not ordinal_encoder_support(),
         reason="OrdinalEncoder was not available before 0.20",
     )
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_ordinal_encoder_mixed_string_int_drop(self):
         data = [
             ["c0.4", "c0.2", 3],
