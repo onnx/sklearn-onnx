@@ -65,14 +65,11 @@ def get_default_opset_for_domain(domain):
     if domain == '':
         return main_opset
     if domain == 'ai.onnx.ml':
-        for i in range(1, max(OPSET_ML_TO_OPSET) + 1):
-            if main_opset == OPSET_ML_TO_OPSET[i]:
-                return i
-            if main_opset > OPSET_ML_TO_OPSET[i]:
-                return max(1, i - 1)
-        raise ValueError(
-            "Unable to guess opset for 'ai.onnx.ml' from main opset %r."
-            "" % main_opset)
+        if main_opset >= 16:
+            return 3
+        if main_opset < 6:
+            return 1
+        return 2
     if domain == 'ai.onnx.training':
         return 1
     return None
@@ -1540,6 +1537,7 @@ def _update_domain_version(container, onnx_model, verbose=0):
         if op_set != '':
             max_supported = get_default_opset_for_domain(op_domain)
             if max_supported < op_version:
+                print(purified_operator_set)
                 raise RuntimeError(
                     "The model is using version %d of domain %r not supported "
                     "yet by this library. You need to specify "
