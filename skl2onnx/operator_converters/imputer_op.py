@@ -40,6 +40,13 @@ def convert_sklearn_imputer(scope: Scope, operator: Operator,
         for i in range(op.statistics_.size):
             # loop on features
             fill_value = scope.get_unique_variable_name("fillvalue")
+            if op.fill_value is None:
+                print('-----------')
+                print(op.statistics_)
+                print(op.indicator_)
+                print(op.strategy)
+                raise ValueError(
+                    "fill_value is not specified in the model %r." % op)
             container.add_node(
                 "LabelEncoder", [zero], [fill_value],
                 keys_int64s=[0], values_strings=[op.statistics_[i]],
