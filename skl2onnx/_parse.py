@@ -230,10 +230,6 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
                 # Catch a bug in scikit-learn.
                 out_names = None
             this_operator.feature_names_out_ = out_names
-            if out_names is not None and len(out_names) == 0:
-                raise RuntimeError(
-                    "get_feature_names_out() cannot return an empty value, "
-                    "model is %r." % type(model))
         input_type = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable(
             'variable', input_type)
