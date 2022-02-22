@@ -172,7 +172,7 @@ if IForest is not None:
 
 if IForest is not None:
     onx = to_onnx(model1, initial_types=initial_type,
-                  target_opset=14)
+                  target_opset={'': 14, 'ai.onnx.ml': 2})
 
 ###############################################
 # Checking discrepencies
