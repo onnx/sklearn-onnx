@@ -23,7 +23,7 @@ from .. import update_registered_converter
 from .._supported_operators import _get_sklearn_operator_name
 from ..algebra.onnx_ops import (
     OnnxIdentity, OnnxMatMul, OnnxGather, OnnxConcat, OnnxReshapeApi13,
-    OnnxTreeEnsembleRegressor, OnnxOneHotEncoder, OnnxCast)
+    OnnxTreeEnsembleRegressor_1, OnnxOneHotEncoder, OnnxCast)
 from .woe_transformer import WOETransformer
 
 
@@ -449,7 +449,7 @@ def woe_converter(scope: Scope, operator: Operator,
         mapping = tree.mapping(op.intervals_[i])
 
         if op.onehot:
-            node = OnnxTreeEnsembleRegressor(
+            node = OnnxTreeEnsembleRegressor_1(
                 X, op_version=1, domain='ai.onnx.ml', **atts)
             cats = list(sorted(set(int(n.onnx_value)
                                    for n in tree.nodes if n.is_leaf)))
@@ -471,7 +471,7 @@ def woe_converter(scope: Scope, operator: Operator,
             if verbose > 1:
                 print("[woe_converter] mapping=%r" % mapping)
                 print("[woe_converter] key_value=%r" % key_value)
-            node = OnnxTreeEnsembleRegressor(
+            node = OnnxTreeEnsembleRegressor_1(
                 X, op_version=1, domain='ai.onnx.ml', **atts)
             lab = OnnxReshapeApi13(node, new_shape, op_version=opv)
             columns.append(lab)
