@@ -42,7 +42,7 @@ def _default_OPSET_TO_IR_VERSION():
     return {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7, 14: 7, 15: 8
+        13: 7, 14: 7, 15: 8, 16: 8
     }
 
 
@@ -52,9 +52,27 @@ try:
 except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = _default_OPSET_TO_IR_VERSION()
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 15}
+OPSET_ML_TO_OPSET = {1: 11, 2: 15, 3: 16}
 
 logger = getLogger('skl2onnx')
+
+
+def get_default_opset_for_domain(domain):
+    """
+    Returns the associated for a domain given the main opset.
+    """
+    from .. import __max_supported_opset__ as main_opset
+    if domain == '':
+        return main_opset
+    if domain == 'ai.onnx.ml':
+        if main_opset >= 16:
+            return 3
+        if main_opset < 6:
+            return 1
+        return 2
+    if domain == 'ai.onnx.training':
+        return 1
+    return None
 
 
 class Variable:
@@ -1516,7 +1534,16 @@ def _update_domain_version(container, onnx_model, verbose=0):
             print('[_update_domain_version] +opset %d: name=%r, version=%s' % (
                 i, op_domain, op_version))
         op_set.domain = op_domain
+        if op_set != '':
+            max_supported = get_default_opset_for_domain(op_domain)
+            if max_supported is not None and max_supported < op_version:
+                raise RuntimeError(
+                    "The model is using version %d of domain %r not supported "
+                    "yet by this library. You need to specify "
+                    "target_opset={%r: %r}." % (
+                        op_version, op_domain, op_domain, max_supported))
         op_set.version = op_version
+
         i += 1
         if container.target_opset_any_domain(op_domain) < op_version:
             raise RuntimeError(
