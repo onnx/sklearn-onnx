@@ -12,6 +12,9 @@ def calculate_sklearn_zipmap(operator):
     if len(operator.inputs) == 2:
         operator.outputs[0].type = operator.inputs[0].type.__class__(
             operator.inputs[0].type.shape)
+        if operator.outputs[1].type is not None:
+            operator.outputs[1].type.element_type.value_type = \
+                operator.inputs[1].type.__class__([])
 
 
 def calculate_sklearn_zipmap_columns(operator):

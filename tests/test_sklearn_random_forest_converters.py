@@ -27,7 +27,9 @@ except ImportError:
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
-    Int64TensorType)
+    DoubleTensorType,
+    Int64TensorType,
+)
 from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
     binary_array_to_string,
@@ -251,6 +253,22 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnExtraTreesClassifierBool")
+
+    @ignore_warnings(category=FutureWarning)
+    def test_random_forest_classifier_double(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(n_estimators=5, random_state=42),
+            3, is_double=True)
+        for opv in [1, 2, 3]:
+            model_onnx = convert_sklearn(
+                model, "random forest classifier",
+                [("input", DoubleTensorType([None, X.shape[1]]))],
+                target_opset={'ai.onnx.ml': opv,
+                              '': TARGET_OPSET})
+            self.assertIsNotNone(model_onnx)
+            dump_data_and_model(
+                X, model, model_onnx,
+                basename="SklearnRandomForestClassifierDouble")
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
