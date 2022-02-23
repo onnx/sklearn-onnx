@@ -161,7 +161,8 @@ def make_pipelines(df_train, y_train, models=None,
                 pipe,
                 initial_types=[('input', FloatTensorType([None, 2])),
                                ('text', StringTensorType([None, 1]))],
-                target_opset=12, options=options)
+                target_opset={'': 12, 'ai.onnx.ml': 2},
+                options=options)
 
         with open('model.onnx', 'wb') as f:
             f.write(model_onnx.SerializeToString())
