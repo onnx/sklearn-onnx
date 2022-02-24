@@ -232,7 +232,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         if hasattr(model, 'get_feature_names_out'):
             try:
                 out_names = model.get_feature_names_out()
-            except AttributeError:
+            except (AttributeError, ValueError):
                 # Catch a bug in scikit-learn.
                 out_names = None
             this_operator.feature_names_out_ = out_names

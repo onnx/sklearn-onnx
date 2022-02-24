@@ -377,7 +377,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules -v -v
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 
