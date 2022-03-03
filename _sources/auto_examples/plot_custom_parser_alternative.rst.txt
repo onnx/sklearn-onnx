@@ -147,7 +147,7 @@ a threshold.
 
  .. code-block:: none
 
-    [0 0 1 1 0 0 1 0 0 1 1 1 1 0 0 0 0 0 0 1 0 1 1 0 0 0 0 1 0 1 1 1 1 1 0 0 0
+    [0 0 0 0 0 1 1 1 1 0 1 0 0 0 1 1 0 0 0 1 1 1 0 1 0 1 0 0 0 0 1 0 0 0 0 0 1
      0]
 
 
@@ -455,22 +455,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [2 2 2 0 1]
-    onnx [2 2 2 0 1]
+    sklearn [1 2 2 1 2]
+    onnx [1 2 2 1 2]
     --probabilities--
-    sklearn [[2.91056748e-03 2.94039087e-01 7.03050345e-01]
-     [2.10275580e-03 3.23268538e-01 6.74628706e-01]
-     [3.01157317e-04 1.57233602e-01 8.42465241e-01]
-     [8.56689521e-01 1.43266329e-01 4.41497682e-05]
-     [4.13279915e-03 6.19222795e-01 3.76644406e-01]]
-    onnx [[2.9105782e-03 2.9403901e-01 7.0305037e-01]
-     [2.1027566e-03 3.2326844e-01 6.7462873e-01]
-     [3.0118655e-04 1.5723361e-01 8.4246528e-01]
-     [8.5668957e-01 1.4326632e-01 4.4145989e-05]
-     [4.1328012e-03 6.1922276e-01 3.7664440e-01]]
+    sklearn [[0.00112034 0.52456535 0.47431431]
+     [0.00132435 0.28674876 0.71192689]
+     [0.0007723  0.33584156 0.66338614]
+     [0.04540803 0.63252491 0.32206707]
+     [0.00477428 0.37438644 0.62083927]]
+    onnx [[0.00112029 0.5245654  0.47431436]
+     [0.00132436 0.2867488  0.7119269 ]
+     [0.00077231 0.3358416  0.6633861 ]
+     [0.04540805 0.6325249  0.32206705]
+     [0.00477428 0.37438646 0.62083924]]
     --validation--
-    sklearn [0 0 1 1 0]
-    onnx [0 0 1 1 0]
+    sklearn [0 0 0 0 0]
+    onnx [0 0 0 0 0]
 
 
 
@@ -516,7 +516,7 @@ Display the ONNX graph
  .. code-block:: none
 
 
-    (-0.5, 2762.5, 4934.5, -0.5)
+    (-0.5, 2903.5, 4934.5, -0.5)
 
 
 
@@ -544,11 +544,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.4
+    numpy: 1.22.1
     scikit-learn: 1.1.dev0
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -556,7 +556,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.029 seconds)
+   **Total running time of the script:** ( 0 minutes  2.654 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser_alternative.py:

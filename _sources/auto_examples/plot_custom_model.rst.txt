@@ -561,8 +561,8 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[-0.6355032  -0.58680344]
-     [-0.55640924  1.2110656 ]]
+     [[1.0347298 1.2012889]
+     [1.2406418 1.1664357]]
 
 
 
@@ -591,7 +591,7 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[-0.6355032  -0.58680344]]
+    transform [[1.0347298 1.2012889]]
 
 
 
@@ -620,7 +620,7 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[-0.5564093  1.2110656]]
+    transform [[1.2406416 1.1664357]]
 
 
 
@@ -692,11 +692,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.4
+    numpy: 1.22.1
     scikit-learn: 1.1.dev0
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -704,7 +704,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.396 seconds)
+   **Total running time of the script:** ( 0 minutes  13.684 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:

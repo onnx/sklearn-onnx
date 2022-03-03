@@ -24,11 +24,12 @@ Two ways to implement a converter
 .. index:: syntax
 
 There are two ways to write a converter. The first one
-is very verbose (see `ada_boost.py <https://github.com/onnx/
-sklearn-onnx/blob/master/skl2onnx/operator_converters/ada_boost.py>`_
-for an example). The other is less verbose and easier to understand
+is less verbose and easier to understand
 (see `k_means.py <https://github.com/onnx/sklearn-onnx/blob/
 master/skl2onnx/operator_converters/k_means.py>`_).
+The other is very verbose (see `ada_boost.py <https://github.com/onnx/
+sklearn-onnx/blob/master/skl2onnx/operator_converters/ada_boost.py>`_
+for an example).
 
 The first way is used in :ref:`l-plot-custom-converter`.
 This one demonstrates the second way which is usually the one
@@ -44,7 +45,7 @@ Custom model
 It basically copies what is in example
 `:ref:`l-plot-custom-converter`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-87
+.. GENERATED FROM PYTHON SOURCE LINES 31-88
 
 .. code-block:: default
 
@@ -124,14 +125,14 @@ It basically copies what is in example
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-92
+.. GENERATED FROM PYTHON SOURCE LINES 89-93
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 The shape calculator does not change.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-104
+.. GENERATED FROM PYTHON SOURCE LINES 93-105
 
 .. code-block:: default
 
@@ -154,11 +155,11 @@ The shape calculator does not change.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-106
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 The converter is different.
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-145
+.. GENERATED FROM PYTHON SOURCE LINES 107-146
 
 .. code-block:: default
 
@@ -208,11 +209,11 @@ The converter is different.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-147
+.. GENERATED FROM PYTHON SOURCE LINES 147-148
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-171
+.. GENERATED FROM PYTHON SOURCE LINES 148-172
 
 .. code-block:: default
 
@@ -250,16 +251,16 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (6.046576279672422e-07, 0.000295141707503972)
+    (6.04657622749194e-07, 0.0002951417083751357)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 173-174
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-182
+.. GENERATED FROM PYTHON SOURCE LINES 174-183
 
 .. code-block:: default
 
@@ -282,19 +283,19 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (1.1102230246251565e-15, 3.4753904038774583e-13)
+    (0.0, 0.0)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-184
+.. GENERATED FROM PYTHON SOURCE LINES 184-185
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.197 seconds)
+   **Total running time of the script:** ( 0 minutes  0.071 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py:

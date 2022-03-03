@@ -225,7 +225,7 @@ supported by the converted.
  .. code-block:: none
 
     conversion: use_gemm= False
-    (6.046576279672422e-07, 0.000295141707503972)
+    (6.04657622749194e-07, 0.0002951417083751357)
 
 
 
@@ -260,7 +260,7 @@ We try the non default option, `use_gemm: True`.
  .. code-block:: none
 
     conversion: use_gemm= True
-    (2.017570426282589e-06, 0.000548376499009847)
+    (2.0175704209535184e-06, 0.0005483764998807899)
 
 
 
@@ -357,23 +357,23 @@ Let's compare the two computation.
       <tbody>
         <tr>
           <th>average</th>
-          <td>0.000054</td>
-          <td>0.000067</td>
+          <td>0.000017</td>
+          <td>0.000011</td>
         </tr>
         <tr>
           <th>deviation</th>
-          <td>0.000017</td>
-          <td>0.000024</td>
+          <td>0.000002</td>
+          <td>0.000001</td>
         </tr>
         <tr>
           <th>min_exec</th>
-          <td>0.000033</td>
-          <td>0.000038</td>
+          <td>0.000016</td>
+          <td>0.00001</td>
         </tr>
         <tr>
           <th>max_exec</th>
-          <td>0.00015</td>
-          <td>0.00012</td>
+          <td>0.000038</td>
+          <td>0.000018</td>
         </tr>
         <tr>
           <th>repeat</th>
@@ -400,7 +400,7 @@ Let's compare the two computation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.423 seconds)
+   **Total running time of the script:** ( 0 minutes  2.181 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_lcustom_options.py:

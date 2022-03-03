@@ -343,7 +343,7 @@ ONNX and scikit-learn outputs.
     difference 4.799262827148709e-07
     ----------------------------
     KMeans(n_clusters=3)
-    difference 1.0955376477106427e-06
+    difference 1.095537650763756e-06
 
 
 
@@ -391,11 +391,11 @@ fails due to nan values or a dimension mismatch.
     Onnx-Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0    (name='Mu_Mul')
     +kr='Mu_C0': (2, 1) (dtype=float32 min=0.0 max=0.0)
     Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0    (name='Ge_Gemm')
-    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967349052429199)
+    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967348575592041)
     Onnx-Add(Re_reduced0, Ge_Y0) -> Ad_C01    (name='Ad_Add')
-    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817854881286621)
+    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817853927612305)
     Onnx-Add(Ad_Addcst, Ad_C01) -> Ad_C0    (name='Ad_Add1')
-    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=16.14378547668457)
+    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=16.143783569335938)
     Onnx-ArgMin(Ad_C0) -> label    (name='Ar_ArgMin')
     +kr='label': (2,) (dtype=int64 min=1 max=1)
     Onnx-Sqrt(Ad_C0) -> scores    (name='Sq_Sqrt')
@@ -454,17 +454,17 @@ And to get a sense of the intermediate results.
     [[0.]
      [0.]]
     Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0    (name='Ge_Gemm')
-    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967349052429199)
-    [[  7.213233  -10.366023    3.3826268]
-     [  7.967349   -8.893578    1.3247826]]
+    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967348575592041)
+    [[  7.2132325 -10.366023    3.3826268]
+     [  7.9673486  -8.893578    1.3247827]]
     Onnx-Add(Re_reduced0, Ge_Y0) -> Ad_C01    (name='Ad_Add')
-    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817854881286621)
+    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817853927612305)
     [[12.58943   -4.9898257  8.758824 ]
-     [12.817855  -4.0430717  6.175288 ]]
+     [12.817854  -4.0430717  6.1752887]]
     Onnx-Add(Ad_Addcst, Ad_C01) -> Ad_C0    (name='Ad_Add1')
-    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=16.14378547668457)
+    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=16.143783569335938)
     [[15.9153595   0.04535151  9.741879  ]
-     [16.143785    0.9921055   7.1583433 ]]
+     [16.143784    0.9921055   7.158344  ]]
     Onnx-ArgMin(Ad_C0) -> label    (name='Ar_ArgMin')
     +kr='label': (2,) (dtype=int64 min=1 max=1)
     [1 1]
@@ -506,7 +506,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.224 seconds)
+   **Total running time of the script:** ( 0 minutes  0.657 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py:

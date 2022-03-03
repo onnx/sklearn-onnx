@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.proto &#8212; sklearn-onnx 1.10.2 documentation</title>
+    <title>skl2onnx.proto &#8212; sklearn-onnx 1.11 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -190,17 +190,6 @@
 <span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="n">split_complex_to_pairs</span>
 
 
-<span class="k">def</span> <span class="nf">_check_onnx_version</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">pkg_resources</span>
-    <span class="n">min_required_version</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">parse_version</span><span class="p">(</span><span class="s1">&#39;1.0.1&#39;</span><span class="p">)</span>
-    <span class="n">current_version</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s1">&#39;onnx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">parsed_version</span>
-    <span class="k">assert</span> <span class="n">current_version</span> <span class="o">&gt;=</span> <span class="n">min_required_version</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s1">&#39;ONNXMLTools requires ONNX version 1.0.1 or a newer one&#39;</span><span class="p">)</span>
-
-
-<span class="n">_check_onnx_version</span><span class="p">()</span>
-
-
 <span class="k">def</span> <span class="nf">make_tensor_fixed</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Make a TensorProto with specified arguments.  If raw is False, this</span>
@@ -266,13 +255,13 @@
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018-2021, Microsoft.<br>
+    &copy; Copyright 2018-2022, Microsoft.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

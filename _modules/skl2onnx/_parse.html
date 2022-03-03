@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx._parse &#8212; sklearn-onnx 1.10.2 documentation</title>
+    <title>skl2onnx._parse &#8212; sklearn-onnx 1.11 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -183,7 +183,8 @@
     <span class="k">class</span> <span class="nc">OutlierMixin</span><span class="p">:</span>
         <span class="k">pass</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">IsolationForest</span><span class="p">,</span> <span class="n">RandomTreesEmbedding</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IsolationForest</span><span class="p">,</span> <span class="n">RandomTreesEmbedding</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="kn">import</span> <span class="n">GaussianProcessRegressor</span>
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">BayesianRidge</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
@@ -217,7 +218,8 @@
 <span class="kn">from</span> <span class="nn">.common._topology</span> <span class="kn">import</span> <span class="n">Topology</span><span class="p">,</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">.common.data_types</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DictionaryType</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">,</span> <span class="n">SequenceType</span><span class="p">,</span>
-    <span class="n">StringTensorType</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">)</span>
+    <span class="n">StringTensorType</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">,</span>
+    <span class="n">guess_tensor_type</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.common.utils</span> <span class="kn">import</span> <span class="n">get_column_indices</span>
 <span class="kn">from</span> <span class="nn">.common.utils_checking</span> <span class="kn">import</span> <span class="n">check_signature</span>
 <span class="kn">from</span> <span class="nn">.common.utils_classifier</span> <span class="kn">import</span> <span class="n">get_label_classes</span>
@@ -323,8 +325,12 @@
         <span class="c1"># be fixed in shape inference phase.</span>
         <span class="n">label_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
             <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">Int64TensorType</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">RandomForestClassifier</span><span class="p">]:</span>
+            <span class="n">prob_dtype</span> <span class="o">=</span> <span class="n">FloatTensorType</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prob_dtype</span> <span class="o">=</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="n">probability_tensor_variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
-            <span class="s1">&#39;probabilities&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+            <span class="s1">&#39;probabilities&#39;</span><span class="p">,</span> <span class="n">prob_dtype</span><span class="p">)</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_variable</span><span class="p">)</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probability_tensor_variable</span><span class="p">)</span>
 
@@ -393,9 +399,16 @@
         <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">otype</span><span class="p">)</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># We assume that all scikit-learn operator produce a single output.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;get_feature_names_out&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out_names</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="c1"># Catch a bug in scikit-learn.</span>
+                <span class="n">out_names</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">this_operator</span><span class="o">.</span><span class="n">feature_names_out_</span> <span class="o">=</span> <span class="n">out_names</span>
+        <span class="n">input_type</span> <span class="o">=</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">declare_local_variable</span><span class="p">(</span>
-            <span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">guess_tensor_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+            <span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">input_type</span><span class="p">)</span>
         <span class="n">this_operator</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
 
     <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">decision_path</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">fail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1010,13 +1023,13 @@
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018-2021, Microsoft.<br>
+    &copy; Copyright 2018-2022, Microsoft.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

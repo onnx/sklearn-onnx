@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.convert &#8212; sklearn-onnx 1.10.2 documentation</title>
+    <title>skl2onnx.convert &#8212; sklearn-onnx 1.11 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -428,6 +428,8 @@
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ONNX(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="n">initial_types</span> <span class="o">=</span> <span class="n">guess_initial_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">initial_types</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[to_onnx] initial_types=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">initial_types</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_types</span><span class="p">,</span>
                            <span class="n">target_opset</span><span class="o">=</span><span class="n">target_opset</span><span class="p">,</span>
                            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
@@ -472,13 +474,13 @@
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018-2021, Microsoft.<br>
+    &copy; Copyright 2018-2022, Microsoft.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

@@ -5,58 +5,58 @@
 
 Computation times
 =================
-**03:53.721** total execution time for **auto_tutorial** files:
+**01:53.957** total execution time for **auto_tutorial** files:
 
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm_reg.py` (``plot_gexternal_lightgbm_reg.py``)       | 01:57.422 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm_reg.py` (``plot_gexternal_lightgbm_reg.py``)       | 00:42.889 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_bbegin_measure_time.py` (``plot_bbegin_measure_time.py``)             | 01:03.889 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_bbegin_measure_time.py` (``plot_bbegin_measure_time.py``)             | 00:39.023 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_lcustom_options.py` (``plot_lcustom_options.py``)                     | 00:06.423 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py` (``plot_cbegin_opset.py``)                           | 00:05.064 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py` (``plot_cbegin_opset.py``)                           | 00:05.253 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py` (``plot_gbegin_transfer_learning.py``)   | 00:04.265 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_woe_transformer.py` (``plot_woe_transformer.py``)                     | 00:05.249 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_woe_transformer.py` (``plot_woe_transformer.py``)                     | 00:03.582 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gbegin_transfer_learning.py` (``plot_gbegin_transfer_learning.py``)   | 00:05.106 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_lcustom_options.py` (``plot_lcustom_options.py``)                     | 00:02.181 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gbegin_dataframe.py` (``plot_gbegin_dataframe.py``)                   | 00:03.820 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gbegin_dataframe.py` (``plot_gbegin_dataframe.py``)                   | 00:01.874 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options.py` (``plot_dbegin_options.py``)                       | 00:03.738 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options.py` (``plot_dbegin_options.py``)                       | 00:01.845 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_list.py` (``plot_dbegin_options_list.py``)             | 00:03.424 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_abegin_convert_pipeline.py` (``plot_abegin_convert_pipeline.py``)     | 00:01.731 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py` (``plot_usparse_xgboost.py``)                     | 00:02.608 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py` (``plot_usparse_xgboost.py``)                     | 00:01.631 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_ebegin_float_double.py` (``plot_ebegin_float_double.py``)             | 00:02.432 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_list.py` (``plot_dbegin_options_list.py``)             | 00:01.458 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py` (``plot_gexternal_xgboost.py``)                 | 00:01.985 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_wext_pyod_forest.py` (``plot_wext_pyod_forest.py``)                   | 00:01.318 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_abegin_convert_pipeline.py` (``plot_abegin_convert_pipeline.py``)     | 00:01.972 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_ebegin_float_double.py` (``plot_ebegin_float_double.py``)             | 00:01.302 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_pextend_python_runtime.py` (``plot_pextend_python_runtime.py``)       | 00:01.442 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py` (``plot_catwoe_transformer.py``)               | 00:00.973 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_wext_pyod_forest.py` (``plot_wext_pyod_forest.py``)                   | 00:01.307 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py` (``plot_gexternal_xgboost.py``)                 | 00:00.908 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_kcustom_converter_wrapper.py` (``plot_kcustom_converter_wrapper.py``) | 00:01.250 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_fbegin_investigate.py` (``plot_fbegin_investigate.py``)               | 00:00.657 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_fbegin_investigate.py` (``plot_fbegin_investigate.py``)               | 00:01.224 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm.py` (``plot_gexternal_lightgbm.py``)               | 00:00.629 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_zipmap.py` (``plot_dbegin_options_zipmap.py``)         | 00:01.148 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_kcustom_converter_wrapper.py` (``plot_kcustom_converter_wrapper.py``) | 00:00.617 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm.py` (``plot_gexternal_lightgbm.py``)               | 00:01.028 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_mcustom_parser.py` (``plot_mcustom_parser.py``)                       | 00:00.471 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_mcustom_parser.py` (``plot_mcustom_parser.py``)                       | 00:00.909 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_icustom_converter.py` (``plot_icustom_converter.py``)                 | 00:00.440 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_icustom_converter.py` (``plot_icustom_converter.py``)                 | 00:00.891 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_zipmap.py` (``plot_dbegin_options_zipmap.py``)         | 00:00.423 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py` (``plot_catwoe_transformer.py``)               | 00:00.733 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_pextend_python_runtime.py` (``plot_pextend_python_runtime.py``)       | 00:00.399 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_jcustom_syntax.py` (``plot_jcustom_syntax.py``)                       | 00:00.197 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gbegin_cst.py` (``plot_gbegin_cst.py``)                               | 00:00.122 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gconverting.py` (``plot_gconverting.py``)                             | 00:00.186 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_gconverting.py` (``plot_gconverting.py``)                             | 00:00.085 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_tutorial_plot_gbegin_cst.py` (``plot_gbegin_cst.py``)                               | 00:00.085 | 0.0 MB |
+| :ref:`sphx_glr_auto_tutorial_plot_jcustom_syntax.py` (``plot_jcustom_syntax.py``)                       | 00:00.071 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_tutorial_plot_qextend_onnxruntime.py` (``plot_qextend_onnxruntime.py``)             | 00:00.000 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------+-----------+--------+

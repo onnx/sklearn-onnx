@@ -142,7 +142,7 @@ the discord areas.
  .. code-block:: none
 
 
-    <matplotlib.legend.Legend object at 0x00000152A4E95910>
+    <matplotlib.legend.Legend object at 0x000001D29CADD940>
 
 
 
@@ -239,7 +239,7 @@ look into the conversion.
 
  .. code-block:: none
 
-    (150.04988646629738, 4.00548157831363)
+    (96.64803014547294, 3.819890168605887)
 
 
 
@@ -338,7 +338,7 @@ The discrepencies.
 
  .. code-block:: none
 
-    (150.0498864662974, 4.00548157831363)
+    (96.64803014547294, 3.819890168605887)
 
 
 
@@ -384,7 +384,7 @@ double in ONNX normalizer.
 
  .. code-block:: none
 
-    (2.88393890741645e-05, 5.5638217231253836e-08)
+    (2.985038429414999e-05, 5.488668731064335e-08)
 
 
 
@@ -440,7 +440,7 @@ class :epkg:`OnnxPipeline`.
 
 
     OnnxPipeline(steps=[('scaler',
-                         OnnxTransformer(onnx_bytes=b'\x08\x08\x12\x08skl2onnx\x1a\x061.10.2"\x07ai.onnx(\x002\x00:\xf6\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=\xf1\xaa\xf4\xba=o\x12\x03;=\x14\x1a\x9b\xbd=\x9cX\xcd\xbb=\xcaTA==\r*\x04\xbd=;K\xa3\xbd=\xc0\xec\x9e\xbd=\xba\xdaJ\xbf=\xc8,\x08@\xa0\x01\x06*<\n\x...\x0e\x84==\xb2\x1f\x03==o\x0e\x81<=nD\x00<=\xe9\x17\x80;=\xc4\x96\x00;\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x18\n\x08variable\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nB\x0e\n\nai.onnx.ml\x10\x01B\x04\n\x00\x10\x0f')),
+                         OnnxTransformer(onnx_bytes=b'\x08\x08\x12\x08skl2onnx\x1a\x041.11"\x07ai.onnx(\x002\x00:\xf6\x01\n\xa6\x01\n\x01X\x12\x08variable\x1a\x06Scaler"\x06Scaler*=\n\x06offset=\xb9!\xb3\xbb=\x855\xa8<=\x0b!\xfa<=[\xd6j\xbe=\xe0R;==!\xfaH<=\xe23\x8c\xbf=\x0e-\xb2?=\xc8\x98\xc3\xc0=T\x08\xf9\xc0\xa0\x01\x06*<\n\x05scale=\x10\xf...84==\xd6$\x02==\x90\xe3\x7f<=\x13\x87\x01<=\x87\xa8\x7f;=\xdf\xe1\xfe:\xa0\x01\x06:\nai.onnx.ml\x12\x1emlprodict_ONNX(StandardScaler)Z\x11\n\x01X\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nb\x18\n\x08variable\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\nB\x0e\n\nai.onnx.ml\x10\x01B\x04\n\x00\x10\x0f')),
                         ('dt', DecisionTreeRegressor(max_depth=10))])
 
 
@@ -478,7 +478,7 @@ The conversion.
 
  .. code-block:: none
 
-    (2.8056060045855702e-05, 5.563821701238343e-08)
+    (2.947326606772549e-05, 5.4886687103120084e-08)
 
 
 
@@ -536,7 +536,9 @@ and a custom ONNX node `TreeEnsembleRegressorDouble
  .. code-block:: none
 
     OnnxInference(...)
-        def compiled_run(dict_inputs):
+        def compiled_run(dict_inputs, yield_ops=None):
+            if yield_ops is not None:
+                raise NotImplementedError('yields_ops should be None.')
             # inputs
             X = dict_inputs['X']
             (variable, ) = n0_treeensembleregressordouble(X)
@@ -644,7 +646,7 @@ Success!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.432 seconds)
+   **Total running time of the script:** ( 0 minutes  1.302 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_ebegin_float_double.py:
