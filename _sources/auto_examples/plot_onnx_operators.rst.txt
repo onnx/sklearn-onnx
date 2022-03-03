@@ -216,7 +216,7 @@ onnx package.
     The model is:
     ir_version: 5
     producer_name: "skl2onnx"
-    producer_version: "1.10.2"
+    producer_version: "1.11"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -485,11 +485,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.21.4
+    numpy: 1.22.1
     scikit-learn: 1.1.dev0
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -497,7 +497,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.703 seconds)
+   **Total running time of the script:** ( 0 minutes  1.104 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_onnx_operators.py:

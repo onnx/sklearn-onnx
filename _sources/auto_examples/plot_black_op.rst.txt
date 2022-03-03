@@ -71,8 +71,6 @@ of operators is for model *GaussianMixture*.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\cluster\_kmeans.py:1036: UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1.
-      warnings.warn(
 
     GaussianMixture()
 
@@ -109,12 +107,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-1.5455792  -1.40587209 -1.28135778 -1.22965555 -1.39791611]
-    [[-1.545579 ]
-     [-1.4058709]
-     [-1.2813582]
-     [-1.2296562]
-     [-1.3979163]]
+    [-7.60436825 -1.81983593 -1.14948678 -3.46242545 -2.03540971]
+    [[-7.6043735]
+     [-1.8198361]
+     [-1.1494861]
+     [-3.4624252]
+     [-2.03541  ]]
 
 
 
@@ -197,12 +195,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-1.5455792  -1.40587209 -1.28135778 -1.22965555 -1.39791611]
-    [[-1.545579 ]
-     [-1.4058709]
-     [-1.2813582]
-     [-1.2296562]
-     [-1.3979163]]
+    [-7.60436825 -1.81983593 -1.14948678 -3.46242545 -2.03540971]
+    [[-7.6043735]
+     [-1.8198361]
+     [-1.1494861]
+     [-3.4624257]
+     [-2.03541  ]]
 
 
 
@@ -246,7 +244,7 @@ Display the ONNX graph.
  .. code-block:: none
 
 
-    (-0.5, 4239.5, 13264.5, -0.5)
+    (-0.5, 4305.5, 13264.5, -0.5)
 
 
 
@@ -276,8 +274,8 @@ Processing time
 
  .. code-block:: none
 
-    0.8677382999999992
-    0.7461350000000024
+    0.30932419999999894
+    0.38210510000000397
 
 
 
@@ -352,11 +350,11 @@ a blacklisted operator (or only whitelisted operators),
 
  .. code-block:: none
 
-    numpy: 1.21.4
+    numpy: 1.22.1
     scikit-learn: 1.1.dev0
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -364,7 +362,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  33.046 seconds)
+   **Total running time of the script:** ( 0 minutes  20.711 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:

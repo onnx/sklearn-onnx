@@ -83,7 +83,7 @@ could be trained and produced by another converter library.
 
 
     model_name = "squeezenet1.1-7.onnx"
-    url_name = ("https://github.com/onnx/models/raw/master/vision/"
+    url_name = ("https://github.com/onnx/models/raw/main/vision/"
                 "classification/squeezenet/model")
     url_name += "/" + model_name
     try:
@@ -103,7 +103,8 @@ could be trained and produced by another converter library.
 
  .. code-block:: none
 
-    'squeezenet1.1-7.onnx' already downloaded
+    download 'https://github.com/onnx/models/raw/main/vision/classification/squeezenet/model/squeezenet1.1-7.onnx'
+    downloaded 4956208 bytes.
 
 
 
@@ -171,7 +172,8 @@ Classifying an image
 
  .. code-block:: none
 
-    'East_Coker_elm.jpg' already downloaded
+    download 'https://upload.wikimedia.org/wikipedia/commons/d/d2/East_Coker_elm%2C_2.jpg'
+    downloaded 712230 bytes.
 
 
 
@@ -356,18 +358,18 @@ on a graph.
 
  .. code-block:: none
 
-    [[-676.5762    -203.35452  ]
-     [-570.6653    -208.09772  ]
-     [-339.81155    -86.33981  ]
-     [ -14.5556345 -168.44846  ]
-     [ 357.22357   -157.61404  ]
-     [ 596.386      -90.210236 ]
-     [ 918.86115    -26.339563 ]
-     [ 499.87152    128.2728   ]
-     [ 306.68546    156.42905  ]
-     [-125.91206    119.218285 ]
-     [-446.60458    342.4586   ]
-     [-504.90234    194.02565  ]]
+    [[-676.5761   -203.35448 ]
+     [-570.6653   -208.0977  ]
+     [-339.81152   -86.33986 ]
+     [ -14.555634 -168.44836 ]
+     [ 357.22357  -157.61395 ]
+     [ 596.386     -90.210175]
+     [ 918.861     -26.339657]
+     [ 499.87155   128.27275 ]
+     [ 306.6855    156.42888 ]
+     [-125.912056  119.218124]
+     [-446.6046    342.4586  ]
+     [-504.9024    194.0259  ]]
 
 
 
@@ -631,7 +633,7 @@ Graph again.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.106 seconds)
+   **Total running time of the script:** ( 0 minutes  4.265 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_transfer_learning.py:

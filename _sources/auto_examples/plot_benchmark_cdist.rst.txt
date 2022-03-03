@@ -103,7 +103,7 @@ ONNX
 
     ir_version: 8
     producer_name: "skl2onnx"
-    producer_version: "1.10.2"
+    producer_version: "1.11"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -262,10 +262,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': 1.2469700000007574e-05,
-     'deviation': 4.969015386369786e-06,
-     'max_exec': 4.296500000009473e-05,
-     'min_exec': 7.395000000087748e-06,
+    {'average': 8.223000000002757e-06,
+     'deviation': 2.9731616168713808e-06,
+     'max_exec': 2.310500000000104e-05,
+     'min_exec': 5.42499999998114e-06,
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -299,10 +299,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': 2.1676000000002918e-05,
-     'deviation': 1.885247861676318e-06,
-     'max_exec': 3.0064999999979137e-05,
-     'min_exec': 2.0254999999913537e-05,
+    {'average': 1.5459150000008747e-05,
+     'deviation': 2.270178853640837e-06,
+     'max_exec': 2.3989999999862732e-05,
+     'min_exec': 1.2139999999938311e-05,
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -359,12 +359,12 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     50%|#####     | 2/4 [00:00<00:00,  9.92it/s]     75%|#######5  | 3/4 [00:00<00:00,  4.03it/s]    100%|##########| 4/4 [00:04<00:00,  1.46s/it]    100%|##########| 4/4 [00:04<00:00,  1.04s/it]
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|#####     | 2/4 [00:00<00:00, 14.49it/s]    100%|##########| 4/4 [00:03<00:00,  1.07it/s]    100%|##########| 4/4 [00:03<00:00,  1.24it/s]
            N     scipy       ort  scipy/ort
-    0     10  0.000013  0.000030   0.433800
-    1    100  0.000034  0.000025   1.353445
-    2   1000  0.000160  0.000060   2.653017
-    3  10000  0.001335  0.000421   3.173664
+    0     10  0.000006  0.000018   0.353662
+    1    100  0.000022  0.000021   1.040904
+    2   1000  0.000185  0.000085   2.181040
+    3  10000  0.000965  0.000302   3.198600
 
 
 
@@ -392,10 +392,10 @@ Longer benchmark
 
  .. code-block:: none
 
-    numpy: 1.21.4
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    numpy: 1.22.1
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -403,7 +403,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.584 seconds)
+   **Total running time of the script:** ( 0 minutes  3.862 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:

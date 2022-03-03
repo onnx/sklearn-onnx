@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.10.2 documentation</title>
+    <title>skl2onnx.common._topology &#8212; sklearn-onnx 1.11 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -212,7 +212,7 @@
     <span class="k">return</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
         <span class="mi">7</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-        <span class="mi">13</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">8</span>
+        <span class="mi">13</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">8</span>
     <span class="p">}</span>
 
 
@@ -222,9 +222,27 @@
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
     <span class="n">OPSET_TO_IR_VERSION</span> <span class="o">=</span> <span class="n">_default_OPSET_TO_IR_VERSION</span><span class="p">()</span>
 
-<span class="n">OPSET_ML_TO_OPSET</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+<span class="n">OPSET_ML_TO_OPSET</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;skl2onnx&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_default_opset_for_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the associated for a domain given the main opset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">__max_supported_opset__</span> <span class="k">as</span> <span class="n">main_opset</span>
+    <span class="k">if</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">main_opset</span>
+    <span class="k">if</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;ai.onnx.ml&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">main_opset</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">main_opset</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;ai.onnx.training&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="Variable"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.Variable">[docs]</a><span class="k">class</span> <span class="nc">Variable</span><span class="p">:</span>
@@ -320,7 +338,7 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="s2">&quot;Unexpected type </span><span class="si">%r</span><span class="s2"> for shape </span><span class="si">%r</span><span class="s2">.&quot;</span>
                         <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="bp">self</span><span class="p">))</span>
@@ -1260,11 +1278,14 @@
         <span class="k">for</span> <span class="n">operator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unordered_operator_iterator</span><span class="p">():</span>
             <span class="n">operator</span><span class="o">.</span><span class="n">init_status</span><span class="p">(</span><span class="n">is_evaluated</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_propagate_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">fed_variables</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_propagate_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">fed_variables</span><span class="p">,</span>
+                          <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Propagates status *is_fed* based on output variable</span>
 <span class="sd">        and node added in the container.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[_propagate_status] after op=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">operator</span><span class="p">)</span>
         <span class="nb">vars</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">:</span>
@@ -1272,8 +1293,10 @@
                     <span class="nb">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="nb">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
-        <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_fed</span><span class="p">]</span>
-        <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_fed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[_propagate_status] newly fed=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">outputs</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_fed</span><span class="p">))</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fed_variables</span><span class="p">)</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1287,11 +1310,15 @@
                 <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">fed_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">o</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fed_variables</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[_propagate_status] add=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span>
                             <span class="n">fed_variables</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span>
                             <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
                             <span class="k">if</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">scope</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
                                 <span class="n">var</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
                                 <span class="n">var</span><span class="o">.</span><span class="n">init_status</span><span class="p">(</span><span class="n">is_fed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[_propagate_status] fed=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">var</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">convert_operators</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1409,7 +1436,9 @@
                     <span class="n">fed_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                         <span class="p">{</span><span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">initializers</span>
                          <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fed_variables</span><span class="p">})</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_propagate_status</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">fed_variables</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_propagate_status</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">fed_variables</span><span class="p">,</span>
+                                           <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
                     <span class="c1"># unfed some variables (it happens when a node</span>
                     <span class="c1"># shares an output with another node)</span>
                     <span class="n">rem</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1675,7 +1704,16 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[_update_domain_version] +opset </span><span class="si">%d</span><span class="s1">: name=</span><span class="si">%r</span><span class="s1">, version=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">i</span><span class="p">,</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">op_domain</span>
+        <span class="k">if</span> <span class="n">op_set</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">max_supported</span> <span class="o">=</span> <span class="n">get_default_opset_for_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">max_supported</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_supported</span> <span class="o">&lt;</span> <span class="n">op_version</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;The model is using version </span><span class="si">%d</span><span class="s2"> of domain </span><span class="si">%r</span><span class="s2"> not supported &quot;</span>
+                    <span class="s2">&quot;yet by this library. You need to specify &quot;</span>
+                    <span class="s2">&quot;target_opset={</span><span class="si">%r</span><span class="s2">: </span><span class="si">%r</span><span class="s2">}.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">op_version</span><span class="p">,</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">max_supported</span><span class="p">))</span>
         <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">op_version</span>
+
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">op_version</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -1721,13 +1759,13 @@
     
     <div class="footer-item">
       <p class="copyright">
-    &copy; Copyright 2018-2021, Microsoft.<br>
+    &copy; Copyright 2018-2022, Microsoft.<br>
 </p>
     </div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

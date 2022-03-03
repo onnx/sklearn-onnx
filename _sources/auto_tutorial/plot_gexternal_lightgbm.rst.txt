@@ -128,7 +128,7 @@ Convert again
     model_onnx = convert_sklearn(
         pipe, 'pipeline_lightgbm',
         [('input', FloatTensorType([None, 2]))],
-        target_opset=12)
+        target_opset={'': 12, 'ai.onnx.ml': 2})
 
     # And save.
     with open("pipeline_lightgbm.onnx", "wb") as f:
@@ -166,8 +166,8 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [1 0 1 0 2]
-    predict_proba [[0.2602997  0.38021716 0.35948314]]
+    predict [1 0 1 1 2]
+    predict_proba [[0.25335584 0.45934348 0.28730068]]
 
 
 
@@ -197,8 +197,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 0 1 0 2]
-    predict_proba [{0: 0.2602997124195099, 1: 0.38021716475486755, 2: 0.35948315262794495}]
+    predict [1 0 1 1 2]
+    predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.287300705909729}]
 
 
 
@@ -233,7 +233,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.028 seconds)
+   **Total running time of the script:** ( 0 minutes  0.629 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm.py:

@@ -140,11 +140,11 @@ With *ONNX Runtime*:
 
  .. code-block:: none
 
-    numpy: 1.21.4
+    numpy: 1.22.1
     scikit-learn: 1.1.dev0
-    onnx:  1.10.1
-    onnxruntime:  1.10.0+cpu
-    skl2onnx:  1.10.2
+    onnx:  1.11.0
+    onnxruntime:  1.11.0+cpu
+    skl2onnx:  1.11
 
 
 
@@ -152,7 +152,7 @@ With *ONNX Runtime*:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.041 seconds)
+   **Total running time of the script:** ( 0 minutes  0.079 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metadata.py:

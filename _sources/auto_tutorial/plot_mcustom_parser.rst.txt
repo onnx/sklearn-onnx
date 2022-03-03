@@ -261,8 +261,8 @@ And conversion.
 
  .. code-block:: none
 
-    (6.046576279672422e-07, 0.000295141707503972)
-    (2.017570426282589e-06, 0.000548376499009847)
+    (6.04657622749194e-07, 0.0002951417083751357)
+    (2.0175704209535184e-06, 0.0005483764998807899)
 
 
 
@@ -290,15 +290,17 @@ It works. The final looks like the following.
  .. code-block:: none
 
     OnnxInference(...)
-        def compiled_run(dict_inputs):
+        def compiled_run(dict_inputs, yield_ops=None):
+            if yield_ops is not None:
+                raise NotImplementedError('yields_ops should be None.')
             # init: Ge_Gemmcst1 (Ge_Gemmcst1)
             # init: Ma_MatMulcst (Ma_MatMulcst)
             # init: Su_Subcst (Su_Subcst)
             # inputs
             X = dict_inputs['X']
             (Su_C0, ) = n0_sub(X, Su_Subcst)
-            (gemm, ) = n1_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
-            (nogemm, ) = n2_matmul(Su_C0, Ma_MatMulcst)
+            (nogemm, ) = n1_matmul(Su_C0, Ma_MatMulcst)
+            (gemm, ) = n2_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
             return {
                 'nogemm': nogemm,
                 'gemm': gemm,
@@ -335,7 +337,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.909 seconds)
+   **Total running time of the script:** ( 0 minutes  0.471 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:
