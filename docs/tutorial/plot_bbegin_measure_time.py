@@ -32,7 +32,10 @@ from mlprodict.onnxrt import OnnxInference
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.tutorial import measure_time
-
+import matplotlib
+# comment below line to show graph 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 N = 11000
 X, y = make_regression(N, n_features=10)
@@ -72,13 +75,15 @@ with config_context(assume_finite=True):
         obs.append(mt)
 
 df_skl = DataFrame(obs)
-df_skl
+print(df_skl)
 
 #####################################
 # Graphe.
 
 df_skl.set_index('size')[['mean_obs']].plot(
     title="scikit-learn", logx=True, logy=True)
+plt.show()
+
 
 ###############################
 # ONNX runtime
@@ -122,7 +127,7 @@ for batch_size, repeat in tqdm(sizes):
 
 
 df = DataFrame(obs)
-df
+print(df)
 
 #####################################
 # Graph.
@@ -130,6 +135,7 @@ df
 df.set_index('size')[['skl', 'ort', 'pyrt']].plot(
     title="Average prediction time per runtime",
     logx=True, logy=True)
+plt.show()
 
 #####################################
 # :epkg:`ONNX` runtimes are much faster than :epkg:`scikit-learn`

@@ -33,6 +33,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from skl2onnx import to_onnx
 from mlprodict.onnxrt import OnnxInference
+import matplotlib
+# comment below line to show graph 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 X, y = load_diabetes(return_X_y=True)
@@ -128,7 +132,4 @@ print(diff(pred_skl, pred_pyrt))
 ax = plot_graphviz(oinf.to_dot())
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
-
-# you may want to uncomment below two lines to show graph
-# import matplotlib.pyplot as plt
-# plt.show()
+plt.show()

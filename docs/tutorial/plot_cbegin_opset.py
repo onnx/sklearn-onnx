@@ -42,6 +42,10 @@ import numpy
 import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
 from sklearn.datasets import make_blobs
+import matplotlib
+# comment below line to show graph 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 X, y = make_blobs(n_samples=100, n_features=2)
 
@@ -50,9 +54,10 @@ model.fit(X)
 labels = model.predict(X)
 
 fig, ax = plt.subplots(1, 1)
-for k in (0, 1):
+for k in (-1, 1):
     ax.plot(X[labels == k, 0], X[labels == k, 1], 'o', label="cl%d" % k)
 ax.set_title("Sample")
+plt.show()
 
 #######################################
 # ONNX
@@ -116,6 +121,7 @@ for opset in range(6, onnx_opset_version() + 1):
 for opset in range(9, onnx_opset_version() + 1):
     for opset_ml in range(1, 4):
         tops = {'': opset, 'ai.onnx.ml': opset_ml}
+        print("try target_opsets:", tops)
         try:
             onx = to_onnx(
                 model, X[:1].astype(numpy.float32), target_opset=tops)
