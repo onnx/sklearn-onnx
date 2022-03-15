@@ -72,7 +72,7 @@ with config_context(assume_finite=True):
         obs.append(mt)
 
 df_skl = DataFrame(obs)
-print(df_skl)
+df_skl
 
 #####################################
 # Graphe.
@@ -122,7 +122,7 @@ for batch_size, repeat in tqdm(sizes):
 
 
 df = DataFrame(obs)
-print(df)
+df
 
 #####################################
 # Graph.
