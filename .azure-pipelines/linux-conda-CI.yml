@@ -20,7 +20,7 @@ jobs:
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.10.0'  # '-i https://test.pypi.org/simple/ ort-nightly'
+        onnxrt.version: ' -i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '>=1.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'  # git
