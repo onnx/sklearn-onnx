@@ -10,7 +10,7 @@ jobs:
 
 - job: 'CI_Windows'
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
       Py39-Onnx1110-Rt1100-Skl10:
