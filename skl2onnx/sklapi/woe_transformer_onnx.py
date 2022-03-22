@@ -577,10 +577,9 @@ def woe_transformer_to_onnx(op, opset=None):
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = opset
-        if op.onehot:
-            op_set = model_def.opset_import.add()
-            op_set.domain = 'ai.onnx.ml'
-            op_set.version = 2
+        op_set = model_def.opset_import.add()
+        op_set.domain = 'ai.onnx.ml'
+        op_set.version = 2
         irv = OPSET_TO_IR_VERSION.get(opset, onnx_proto.IR_VERSION)
         model_def.ir_version = irv
 
