@@ -13,7 +13,7 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
-      Py39-Onnx1110-Rt1100-Skl10:
+      Py39-Onnx1110-Rt1110-Skl10:
         python.version: '3.9'
         onnx.version:  'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
         onnx.target_opset: ''
