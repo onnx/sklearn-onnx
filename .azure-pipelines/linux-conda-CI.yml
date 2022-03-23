@@ -278,6 +278,11 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
+      pip install flatbuffers
+    displayName: 'install flatbuffers'
+
+
+  - script: |
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
