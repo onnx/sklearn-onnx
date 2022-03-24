@@ -200,8 +200,8 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      python -c "import numpy"
-    displayName: 'check numpy'
+      python -m pip install $(numpy.version)
+    displayName: 'install numpy'
 
   - script: |
       call activate skl2onnxEnvironment
