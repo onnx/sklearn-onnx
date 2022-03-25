@@ -191,7 +191,7 @@ jobs:
       call activate skl2onnxEnvironment
       echo "numpy version = $(numpy.version)"
       echo "python -m pip install $(numpy.version)"
-      python -m pip install $(numpy.version)
+      pip install $(numpy.version)
       python -c "from numpy import __version__;print('numpy', __version__)"
     displayName: 'install numpy'
 
