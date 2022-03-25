@@ -185,13 +185,17 @@ jobs:
       call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
+      pip show mumpy
     displayName: 'Install protobuf'
 
   - script: |
       call activate skl2onnxEnvironment
+      pip uninstall numpy -y
+      pip show numpy
       echo "numpy version = $(numpy.version)"
       echo "python -m pip install $(numpy.version)"
       pip install $(numpy.version)
+      
       python -c "from numpy import __version__;print('numpy', __version__)"
     displayName: 'install numpy'
 
