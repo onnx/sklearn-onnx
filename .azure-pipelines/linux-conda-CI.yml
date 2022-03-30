@@ -315,6 +315,8 @@ jobs:
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
+      pip show onnxmltools
+      echo "---------------"
     displayName: 'version'
 
   - script: |
