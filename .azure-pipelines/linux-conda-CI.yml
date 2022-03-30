@@ -346,7 +346,7 @@ jobs:
       conda install -c conda-forge "lightgbm${lgbm.version}" xgboost --no-deps
       pip install xgboost lightgbm hummingbird-ml hummingbird
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
-      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
+      pip install onnxmltools
     displayName: 'install onnxmltools'
 
   - script: |
