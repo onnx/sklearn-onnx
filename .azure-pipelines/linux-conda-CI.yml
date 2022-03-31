@@ -13,6 +13,18 @@ jobs:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
+      Py39-Onnx1110-Rt1110-Skl10:
+        do.bench: '0'
+        python.version: '3.9'
+        numpy.version: '>=1.21.0'
+        scipy.version: '>=1.7.0'
+        onnx.version: 'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.11.0' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
+        sklearn.version: '>=1.0'
+        lgbm.version: ''
+        onnxcc.version: '>=1.8.1'  # git
+        run.example: '1'
       Py39-Onnx1110-Rt1100-Skl10:
         do.bench: '0'
         python.version: '3.9'
@@ -303,6 +315,8 @@ jobs:
       echo "---------------"
       pip show scikit-learn
       echo "---------------"
+      pip show onnxmltools
+      echo "---------------"
     displayName: 'version'
 
   - script: |
@@ -332,7 +346,7 @@ jobs:
       conda install -c conda-forge "lightgbm${lgbm.version}" xgboost --no-deps
       pip install xgboost lightgbm hummingbird-ml hummingbird
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
-      pip install --no-deps git+https://github.com/onnx/onnxmltools.git
+      pip install onnxmltools
     displayName: 'install onnxmltools'
 
   - script: |
