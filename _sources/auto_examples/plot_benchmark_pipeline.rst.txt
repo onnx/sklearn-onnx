@@ -81,7 +81,7 @@ and must be removed. Look for comment starting with ``---`` below.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\linear_model\_logistic.py:444: ConvergenceWarning: lbfgs failed to converge (status=1):
+    D:\Program Files\Python\Python39\lib\site-packages\sklearn\linear_model\_logistic.py:814: ConvergenceWarning: lbfgs failed to converge (status=1):
     STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
 
     Increase the number of iterations (max_iter) or scale the data as shown in:
@@ -128,16 +128,16 @@ Conversion to ONNX
  .. code-block:: none
 
     skl predict_proba
-    [[9.99998536e-01 5.99063532e-19 3.48549155e-10 1.55765807e-08
-      3.32559909e-10 1.21314723e-06 3.98960115e-08 1.22513893e-07
-      2.23871287e-08 4.98148626e-08]
-     [1.47648497e-14 9.99999301e-01 1.05811969e-10 7.49298734e-13
-      2.48627456e-07 8.75686305e-12 5.39025172e-11 2.95899962e-11
-      4.50528996e-07 1.30607533e-13]]
+    [[9.99998536e-01 5.99063495e-19 3.48549134e-10 1.55765799e-08
+      3.32559893e-10 1.21314716e-06 3.98960096e-08 1.22513888e-07
+      2.23871285e-08 4.98148614e-08]
+     [1.47648491e-14 9.99999301e-01 1.05811969e-10 7.49298735e-13
+      2.48627452e-07 8.75686325e-12 5.39025169e-11 2.95899960e-11
+      4.50528981e-07 1.30607528e-13]]
     onnx predict_proba
     [[9.99998569e-01 5.99062501e-19 3.48550355e-10 1.55766493e-08
       3.32561811e-10 1.21315361e-06 3.98961184e-08 1.22514706e-07
-      2.23872494e-08 4.98151529e-08]
+      2.23872068e-08 4.98151529e-08]
      [1.47648956e-14 9.99999285e-01 1.05811991e-10 7.49297488e-13
       2.48627885e-07 8.75685548e-12 5.39024415e-11 2.95900075e-11
       4.50528631e-07 1.30607344e-13]]
@@ -193,9 +193,9 @@ Benchmarks
  .. code-block:: none
 
     scikit-learn
-    1.3873941999999957
+    0.9841911999999979
     onnxruntime
-    0.30984360000000066
+    0.26468200000000053
 
 
 
@@ -257,14 +257,14 @@ an smaller ONNX graph for every operator.
 
     benchmark <class 'sklearn.decomposition._pca.PCA'>
     scikit-learn
-    0.6001067999999989
+    0.3727778000000015
     onnxruntime
-    0.1690043999999986
+    0.1657182000000006
     benchmark <class 'sklearn.linear_model._logistic.LogisticRegression'>
     scikit-learn
-    0.8385802000000027
+    0.5525559000000015
     onnxruntime
-    0.29466279999999756
+    0.17771609999999782
 
 
 
@@ -293,11 +293,11 @@ an smaller ONNX graph for every operator.
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
 
 
 
@@ -305,7 +305,7 @@ an smaller ONNX graph for every operator.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.030 seconds)
+   **Total running time of the script:** ( 0 minutes  2.935 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_pipeline.py:

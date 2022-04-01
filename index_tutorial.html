@@ -4,11 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tutorial &#8212; sklearn-onnx 1.11 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tutorial &#8212; sklearn-onnx 1.11.1 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +20,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
@@ -31,7 +28,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -48,7 +46,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -143,7 +141,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -350,6 +349,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -382,8 +384,8 @@
               
               <div>
                 
-  <div class="section" id="tutorial">
-<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+  <section id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">#</a></h1>
 <p id="index-0">The tutorial goes from a simple example which
 converts a pipeline to a more complex example
 involving operator not actually implemented in
@@ -459,31 +461,27 @@ involving operator not actually implemented in
 </pre></div>
 </div>
 <p>&gt;&gt;&gt;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">C</span><span class="p">:</span>\<span class="n">Python395_x64</span>\<span class="n">lib</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">xgboost</span>\<span class="n">compat</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span> <span class="ne">FutureWarning</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Int64Index</span> <span class="ow">is</span> <span class="n">deprecated</span> <span class="ow">and</span> <span class="n">will</span> <span class="n">be</span> <span class="n">removed</span> <span class="kn">from</span> <span class="nn">pandas</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">future</span> <span class="n">version</span><span class="o">.</span> <span class="n">Use</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Index</span> <span class="k">with</span> <span class="n">the</span> <span class="n">appropriate</span> <span class="n">dtype</span> <span class="n">instead</span><span class="o">.</span>
-      <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Int64Index</span>
-    <span class="n">C</span><span class="p">:</span>\<span class="n">Python395_x64</span>\<span class="n">lib</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">xgboost</span>\<span class="n">compat</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span> <span class="ne">FutureWarning</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Int64Index</span> <span class="ow">is</span> <span class="n">deprecated</span> <span class="ow">and</span> <span class="n">will</span> <span class="n">be</span> <span class="n">removed</span> <span class="kn">from</span> <span class="nn">pandas</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">future</span> <span class="n">version</span><span class="o">.</span> <span class="n">Use</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Index</span> <span class="k">with</span> <span class="n">the</span> <span class="n">appropriate</span> <span class="n">dtype</span> <span class="n">instead</span><span class="o">.</span>
-      <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Int64Index</span>
-    <span class="n">lightgbm</span>      <span class="mf">3.3.2</span>
-    <span class="n">mlprodict</span>     <span class="mf">0.8.1727</span>
-    <span class="n">numpy</span>         <span class="mf">1.22.1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">lightgbm</span>      <span class="mf">3.3.2</span>
+    <span class="n">mlprodict</span>     <span class="mf">0.8.1697</span>
+    <span class="n">numpy</span>         <span class="mf">1.21.3</span>
     <span class="n">onnx</span>          <span class="mf">1.11.0</span>
-    <span class="n">onnxmltools</span>   <span class="mf">1.11.0</span>
-    <span class="n">onnxruntime</span>   <span class="mf">1.11.0</span><span class="o">+</span><span class="n">cpu</span>
+    <span class="n">onnxmltools</span>   <span class="mf">1.10.0</span>
+    <span class="n">onnxruntime</span>   <span class="mf">1.10.0</span>
     <span class="n">pyquickhelper</span> <span class="mf">1.11.3697</span>
-    <span class="n">scipy</span>         <span class="mf">1.8.0</span>
-    <span class="n">skl2onnx</span>      <span class="mf">1.11</span>
-    <span class="n">sklearn</span>       <span class="mf">1.1</span><span class="o">.</span><span class="n">dev0</span>
+    <span class="n">scipy</span>         <span class="mf">1.7.1</span>
+    <span class="n">skl2onnx</span>      <span class="mf">1.11.1</span>
+    <span class="n">sklearn</span>       <span class="mf">1.0</span>
     <span class="n">xgboost</span>       <span class="mf">1.5.2</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="introduction.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -506,7 +504,8 @@ involving operator not actually implemented in
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -518,7 +517,7 @@ involving operator not actually implemented in
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

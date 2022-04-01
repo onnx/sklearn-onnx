@@ -71,8 +71,8 @@ Basic example
  .. code-block:: none
 
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.11468965, 0.736708  , 0.14860237],
-           [0.01223885, 0.733508  , 0.25425318]], dtype=float32)]
+    [array([1, 1], dtype=int64), array([[0.09293693, 0.7624385 , 0.14462455],
+           [0.01529924, 0.52584857, 0.45885217]], dtype=float32)]
 
 
 
@@ -112,8 +112,8 @@ types as well.
  .. code-block:: none
 
     inputs=['X56'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.11468965, 0.736708  , 0.14860237],
-           [0.01223885, 0.733508  , 0.25425318]], dtype=float32)]
+    [array([1, 1], dtype=int64), array([[0.09293693, 0.7624385 , 0.14462455],
+           [0.01529924, 0.52584857, 0.45885217]], dtype=float32)]
 
 
 
@@ -152,8 +152,8 @@ parameter *final_types*.
  .. code-block:: none
 
     inputs=['X'], outputs=['L', 'P']
-    [array([1, 1], dtype=int64), array([[0.11468965, 0.736708  , 0.14860237],
-           [0.01223885, 0.733508  , 0.25425318]], dtype=float32)]
+    [array([1, 1], dtype=int64), array([[0.09293693, 0.7624385 , 0.14462455],
+           [0.01529924, 0.52584857, 0.45885217]], dtype=float32)]
 
 
 
@@ -206,8 +206,8 @@ to unique names. It does not impact the graph inputs or outputs.
     changed 'probability_tensor' into '_PROBABILITY_TENSOR'.
     changed 'Normalizer' into '_NORMALIZER'.
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.11468965, 0.736708  , 0.14860237],
-           [0.01223885, 0.733508  , 0.25425318]], dtype=float32)]
+    [array([1, 1], dtype=int64), array([[0.09293693, 0.7624385 , 0.14462455],
+           [0.01529924, 0.52584857, 0.45885217]], dtype=float32)]
 
 
 
@@ -215,7 +215,7 @@ to unique names. It does not impact the graph inputs or outputs.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.085 seconds)
+   **Total running time of the script:** ( 0 minutes  0.104 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gconverting.py:

@@ -4,11 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Convert a pipeline with a LightGBM regressor &#8212; sklearn-onnx 1.11 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Convert a pipeline with a LightGBM regressor &#8212; sklearn-onnx 1.11.1 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +20,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -31,7 +28,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +46,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -143,7 +141,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -350,6 +349,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -360,7 +362,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -422,8 +424,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-gexternal-lightgbm-reg-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<div class="sphx-glr-example-title section" id="convert-a-pipeline-with-a-lightgbm-regressor">
-<span id="example-lightgbm-reg"></span><span id="sphx-glr-auto-tutorial-plot-gexternal-lightgbm-reg-py"></span><h1>Convert a pipeline with a LightGBM regressor<a class="headerlink" href="#convert-a-pipeline-with-a-lightgbm-regressor" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="convert-a-pipeline-with-a-lightgbm-regressor">
+<span id="example-lightgbm-reg"></span><span id="sphx-glr-auto-tutorial-plot-gexternal-lightgbm-reg-py"></span><h1>Convert a pipeline with a LightGBM regressor<a class="headerlink" href="#convert-a-pipeline-with-a-lightgbm-regressor" title="Permalink to this headline">#</a></h1>
 <p id="index-0">The discrepancies observed when using float and TreeEnsemble operator
 (see <a class="reference internal" href="plot_ebegin_float_double.html#l-example-discrepencies-float-double"><span class="std std-ref">Issues when switching to float</span></a>)
 explains why the converter for <em>LGBMRegressor</em> may introduce significant
@@ -431,19 +433,19 @@ discrepancies even when it is used with float tensors.</p>
 <p>Library <em>lightgbm</em> is implemented with double. A random forest regressor
 with multiple trees computes its prediction by adding the prediction of
 every tree. After being converting into ONNX, this summation becomes
-<img class="math" src="../_images/math/a2d1c2f56276e05e34f6d2fc904dc71680fc1914.png" alt="\left[\sum\right]_{i=1}^F float(T_i(x))"/>,
+<span class="math">\left[\sum\right]_{i=1}^F float(T_i(x))</span>,
 where <em>F</em> is the number of trees in the forest,
-<img class="math" src="../_images/math/e524285af5f7483272c35f37cc163163c3e478dc.png" alt="T_i(x)"/> the output of tree <em>i</em> and <img class="math" src="../_images/math/c4db1c515ae99a7a1062382cd305c1692428c162.png" alt="\left[\sum\right]"/>
+<span class="math">T_i(x)</span> the output of tree <em>i</em> and <span class="math">\left[\sum\right]</span>
 a float addition. The discrepancy can be expressed as
-<img class="math" src="../_images/math/51210b969861f7df2fe22a76b7d03477a0aa7ce6.png" alt="D(x) = |\left[\sum\right]_{i=1}^F float(T_i(x)) -
-\sum_{i=1}^F T_i(x)|"/>.
+<span class="math">D(x) = |\left[\sum\right]_{i=1}^F float(T_i(x)) -
+\sum_{i=1}^F T_i(x)|</span>.
 This grows with the number of trees in the forest.</p>
 <p>To reduce the impact, an option was added to split the node
 <em>TreeEnsembleRegressor</em> into multiple ones and to do a summation
 with double this time. If we assume the node if split into <em>a</em> nodes,
 the discrepancies then become
-<img class="math" src="../_images/math/070692ac1405bf91a81a00816ad6fcaf5be87264.png" alt="D'(x) = |\sum_{k=1}^a \left[\sum\right]_{i=1}^{F/a}
-float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
+<span class="math">D'(x) = |\sum_{k=1}^a \left[\sum\right]_{i=1}^{F/a}
+float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|</span>.</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#train-a-lgbmregressor" id="id1">Train a LGBMRegressor</a></p></li>
@@ -454,8 +456,8 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
 <li><p><a class="reference internal" href="#split-influence" id="id6">Split influence</a></p></li>
 </ul>
 </div>
-<div class="section" id="train-a-lgbmregressor">
-<h2><a class="toc-backref" href="#id1">Train a LGBMRegressor</a><a class="headerlink" href="#train-a-lgbmregressor" title="Permalink to this headline">¶</a></h2>
+<section id="train-a-lgbmregressor">
+<h2><a class="toc-backref" href="#id1">Train a LGBMRegressor</a><a class="headerlink" href="#train-a-lgbmregressor" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.version</span> <span class="kn">import</span> <span class="n">StrictVersion</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">timeit</span>
@@ -463,7 +465,7 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <span class="n">LGBMRegressor</span>
+<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.RegressorMixin.html#sklearn.base.RegressorMixin" title="sklearn.base.RegressorMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMRegressor</span></a>
 <span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">update_registered_converter</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="kn">import</span> <span class="n">calculate_linear_regressor_output_shapes</span>  <span class="c1"># noqa</span>
@@ -476,7 +478,7 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.randn.html#numpy.random.randn" title="numpy.random.randn" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">)</span> <span class="o">+</span>
      <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.randn.html#numpy.random.randn" title="numpy.random.randn" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.randint.html#numpy.random.randint" title="numpy.random.randint" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
 
-<span class="n">reg</span> <span class="o">=</span> <span class="n">LGBMRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">reg</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.RegressorMixin.html#sklearn.base.RegressorMixin" title="sklearn.base.RegressorMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMRegressor</span></a><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
 </pre></div>
 </div>
@@ -484,9 +486,9 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LGBMRegressor(n_estimators=1000)
 </pre></div>
 </div>
-</div>
-<div class="section" id="register-the-converter-for-lgbmclassifier">
-<h2><a class="toc-backref" href="#id2">Register the converter for LGBMClassifier</a><a class="headerlink" href="#register-the-converter-for-lgbmclassifier" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="register-the-converter-for-lgbmclassifier">
+<h2><a class="toc-backref" href="#id2">Register the converter for LGBMClassifier</a><a class="headerlink" href="#register-the-converter-for-lgbmclassifier" title="Permalink to this headline">#</a></h2>
 <p>The converter is implemented in <a class="reference external" href="https://github.com/onnx/onnxmltools">onnxmltools</a>:
 <a class="reference external" href="https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py">onnxmltools…LightGbm.py</a>.
 and the shape calculator:
@@ -505,15 +507,15 @@ and the shape calculator:
 
 
 <span class="n">update_registered_converter</span><span class="p">(</span>
-    <span class="n">LGBMRegressor</span><span class="p">,</span> <span class="s1">&#39;LightGbmLGBMRegressor&#39;</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.RegressorMixin.html#sklearn.base.RegressorMixin" title="sklearn.base.RegressorMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMRegressor</span></a><span class="p">,</span> <span class="s1">&#39;LightGbmLGBMRegressor&#39;</span><span class="p">,</span>
     <span class="n">calculate_linear_regressor_output_shapes</span><span class="p">,</span>
     <span class="n">skl2onnx_convert_lightgbm</span><span class="p">,</span>
     <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;split&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="convert">
-<h2><a class="toc-backref" href="#id3">Convert</a><a class="headerlink" href="#convert" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="convert">
+<h2><a class="toc-backref" href="#id3">Convert</a><a class="headerlink" href="#convert" title="Permalink to this headline">#</a></h2>
 <p>We convert the same model following the two scenarios, one single
 TreeEnsembleRegressor node, or more. <em>split</em> parameter is the number of
 trees per node TreeEnsembleRegressor.</p>
@@ -524,9 +526,9 @@ trees per node TreeEnsembleRegressor.</p>
                            <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;split&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="discrepancies">
-<h2><a class="toc-backref" href="#id4">Discrepancies</a><a class="headerlink" href="#discrepancies" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="discrepancies">
+<h2><a class="toc-backref" href="#id4">Discrepancies</a><a class="headerlink" href="#discrepancies" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
 <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess_split</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">model_onnx_split</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
 
@@ -544,8 +546,8 @@ trees per node TreeEnsembleRegressor.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sum of discrepancies 1 node 0.0002193143788094794
-sum of discrepancies split node 4.325560761513341e-05 ratio: 5.070195308798531
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sum of discrepancies 1 node 0.0001083172664970196
+sum of discrepancies split node 4.064851498577167e-05 ratio: 2.6647287492528138
 </pre></div>
 </div>
 <p>The sum of the discrepancies were reduced 4, 5 times.
@@ -558,13 +560,13 @@ The maximum is much better too.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>max discrepancies 1 node 2.217631146717025e-06
-max discrepancies split node 2.6541342501573695e-07 ratio: 8.355384233429552
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>max discrepancies 1 node 1.3028355589916885e-06
+max discrepancies split node 3.7959419429967056e-07 ratio: 3.4321798872486577
 </pre></div>
 </div>
-</div>
-<div class="section" id="processing-time">
-<h2><a class="toc-backref" href="#id5">Processing time</a><a class="headerlink" href="#processing-time" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="processing-time">
+<h2><a class="toc-backref" href="#id5">Processing time</a><a class="headerlink" href="#processing-time" title="Permalink to this headline">#</a></h2>
 <p>The processing time is slower but not much.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processing time no split&quot;</span><span class="p">,</span>
       <a href="https://docs.python.org/3/library/timeit.html#timeit.timeit" title="timeit.timeit" class="sphx-glr-backref-module-timeit sphx-glr-backref-type-py-function"><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span></a><span class="p">(</span>
@@ -575,13 +577,13 @@ max discrepancies split node 2.6541342501573695e-07 ratio: 8.355384233429552
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>processing time no split 1.7366856000000155
-processing time split 1.7339740999999833
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>processing time no split 0.7455989000000045
+processing time split 0.7715491999999813
 </pre></div>
 </div>
-</div>
-<div class="section" id="split-influence">
-<h2><a class="toc-backref" href="#id6">Split influence</a><a class="headerlink" href="#split-influence" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="split-influence">
+<h2><a class="toc-backref" href="#id6">Split influence</a><a class="headerlink" href="#split-influence" title="Permalink to this headline">#</a></h2>
 <p>Let’s see how the sum of the discrepancies moves against
 the parameter <em>split</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">res</span></a> <span class="o">=</span> <span class="p">[]</span>
@@ -600,44 +602,44 @@ the parameter <em>split</em>.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/12 [00:00&lt;?, ?it/s]
-  8%|8         | 1/12 [00:03&lt;00:35,  3.21s/it]
- 17%|#6        | 2/12 [00:06&lt;00:32,  3.29s/it]
- 25%|##5       | 3/12 [00:09&lt;00:27,  3.02s/it]
- 33%|###3      | 4/12 [00:12&lt;00:23,  2.95s/it]
- 42%|####1     | 5/12 [00:14&lt;00:20,  2.92s/it]
- 50%|#####     | 6/12 [00:17&lt;00:16,  2.74s/it]
- 58%|#####8    | 7/12 [00:19&lt;00:13,  2.64s/it]
- 67%|######6   | 8/12 [00:22&lt;00:11,  2.78s/it]
- 75%|#######5  | 9/12 [00:25&lt;00:08,  2.68s/it]
- 83%|########3 | 10/12 [00:27&lt;00:05,  2.61s/it]
- 92%|#########1| 11/12 [00:30&lt;00:02,  2.66s/it]
-100%|##########| 12/12 [00:32&lt;00:00,  2.59s/it]
-100%|##########| 12/12 [00:32&lt;00:00,  2.75s/it]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                            | 0/12 [00:00&lt;?, ?it/s]
+  8%|#######                                                                             | 1/12 [00:02&lt;00:25,  2.33s/it]
+ 17%|##############                                                                      | 2/12 [00:04&lt;00:23,  2.35s/it]
+ 25%|#####################                                                               | 3/12 [00:06&lt;00:20,  2.25s/it]
+ 33%|############################                                                        | 4/12 [00:09&lt;00:18,  2.27s/it]
+ 42%|###################################                                                 | 5/12 [00:11&lt;00:15,  2.18s/it]
+ 50%|##########################################                                          | 6/12 [00:13&lt;00:13,  2.19s/it]
+ 58%|#################################################                                   | 7/12 [00:15&lt;00:10,  2.13s/it]
+ 67%|########################################################                            | 8/12 [00:17&lt;00:08,  2.16s/it]
+ 75%|###############################################################                     | 9/12 [00:19&lt;00:06,  2.14s/it]
+ 83%|#####################################################################1             | 10/12 [00:21&lt;00:04,  2.14s/it]
+ 92%|############################################################################       | 11/12 [00:23&lt;00:02,  2.11s/it]
+100%|###################################################################################| 12/12 [00:26&lt;00:00,  2.12s/it]
+100%|###################################################################################| 12/12 [00:26&lt;00:00,  2.17s/it]
                disc  baseline
 split
-20     1.715644e-07  0.000002
-40     2.129519e-07  0.000002
-60     2.319636e-07  0.000002
-80     2.363034e-07  0.000002
-100    2.654134e-07  0.000002
-120    3.072915e-07  0.000002
-140    3.705948e-07  0.000002
-160    4.550093e-07  0.000002
-200    4.550093e-07  0.000002
-300    8.036225e-07  0.000002
-400    9.228318e-07  0.000002
-500    1.536230e-06  0.000002
+20     1.547382e-07  0.000001
+40     2.112561e-07  0.000001
+60     3.021003e-07  0.000001
+80     3.385434e-07  0.000001
+100    3.795942e-07  0.000001
+120    3.961591e-07  0.000001
+140    3.500636e-07  0.000001
+160    3.385434e-07  0.000001
+200    6.313451e-07  0.000001
+300    6.713846e-07  0.000001
+400    5.337316e-07  0.000001
+500    6.345777e-07  0.000001
 </pre></div>
 </div>
 <p>Graph.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Sum of discrepancies against split</span><span class="se">\n</span><span class="s2">&quot;</span>
                    <span class="s2">&quot;split = number of tree per node&quot;</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" alt="Sum of discrepancies against split split = number of tree per node" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  42.889 seconds)</p>
+<img src="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" alt="Sum of discrepancies against split split = number of tree per node" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  32.329 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-gexternal-lightgbm-reg-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gexternal_lightgbm_reg.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -650,15 +652,15 @@ split
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="plot_gexternal_lightgbm.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -681,7 +683,8 @@ split
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -693,7 +696,7 @@ split
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

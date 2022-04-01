@@ -98,7 +98,7 @@ The first way: :func:`convert_sklearn`.
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
@@ -131,7 +131,7 @@ The second way: :func:`to_onnx`: no need to play with
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
@@ -318,7 +318,7 @@ Way 2
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -351,7 +351,7 @@ Way 3
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 1 1 1 1 1]
 
 
 
@@ -434,7 +434,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 2599.5, 6900.5, -0.5)
+    (-0.5, 2595.5, 6900.5, -0.5)
 
 
 
@@ -464,11 +464,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
 
 
 
@@ -476,7 +476,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.354 seconds)
+   **Total running time of the script:** ( 0 minutes  3.080 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_syntax.py:

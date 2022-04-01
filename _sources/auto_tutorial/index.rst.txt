@@ -74,27 +74,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Every library is versioned. scikit-learn may change the implementation of a specific model. Tha...">
-
-.. only:: html
-
- .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_cbegin_opset_thumb.png
-     :alt: What is the opset number?
-
-     :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_tutorial/plot_cbegin_opset
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into *ONNX* but many libraries implement scikit-...">
 
 .. only:: html
@@ -113,6 +92,27 @@ Examples
    :hidden:
 
    /auto_tutorial/plot_gexternal_lightgbm
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Every library is versioned. scikit-learn may change the implementation of a specific model. Tha...">
+
+.. only:: html
+
+ .. figure:: /auto_tutorial/images/thumb/sphx_glr_plot_cbegin_opset_thumb.png
+     :alt: What is the opset number?
+
+     :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_tutorial/plot_cbegin_opset
 
 .. raw:: html
 

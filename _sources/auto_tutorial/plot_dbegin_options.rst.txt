@@ -133,7 +133,7 @@ and which is not. So it is possible to specify options by id.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\linear_model\_logistic.py:444: ConvergenceWarning: lbfgs failed to converge (status=1):
+    D:\Program Files\Python\Python39\lib\site-packages\sklearn\linear_model\_logistic.py:814: ConvergenceWarning: lbfgs failed to converge (status=1):
     STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
 
     Increase the number of iterations (max_iter) or scale the data as shown in:
@@ -214,8 +214,8 @@ what it would give with operator *ZipMap*.
             # inputs
             X = dict_inputs['X']
             (label, probability_tensor, ) = n0_linearclassifier(X)
-            (output_label, ) = n1_cast(label)
-            (probabilities, ) = n2_normalizer(probability_tensor)
+            (probabilities, ) = n1_normalizer(probability_tensor)
+            (output_label, ) = n2_cast(label)
             (output_probability, ) = n3_zipmap(probabilities)
             return {
                 'output_label': output_label,
@@ -770,7 +770,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.845 seconds)
+   **Total running time of the script:** ( 0 minutes  1.684 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:

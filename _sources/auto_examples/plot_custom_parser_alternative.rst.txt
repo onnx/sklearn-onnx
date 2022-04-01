@@ -147,7 +147,7 @@ a threshold.
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 0 1 0 0 0 1 1 0 0 0 1 1 1 0 1 0 1 0 0 0 0 1 0 0 0 0 0 1
+    [0 0 1 0 0 1 0 0 1 0 1 1 0 0 0 0 1 0 0 1 0 1 0 0 1 1 1 0 0 1 1 0 0 1 1 0 0
      0]
 
 
@@ -455,22 +455,22 @@ We need now to check the results are the same with ONNX.
  .. code-block:: none
 
     --labels--
-    sklearn [1 2 2 1 2]
-    onnx [1 2 2 1 2]
+    sklearn [1 2 0 2 2]
+    onnx [1 2 0 2 2]
     --probabilities--
-    sklearn [[0.00112034 0.52456535 0.47431431]
-     [0.00132435 0.28674876 0.71192689]
-     [0.0007723  0.33584156 0.66338614]
-     [0.04540803 0.63252491 0.32206707]
-     [0.00477428 0.37438644 0.62083927]]
-    onnx [[0.00112029 0.5245654  0.47431436]
-     [0.00132436 0.2867488  0.7119269 ]
-     [0.00077231 0.3358416  0.6633861 ]
-     [0.04540805 0.6325249  0.32206705]
-     [0.00477428 0.37438646 0.62083924]]
+    sklearn [[1.38867098e-02 7.46856597e-01 2.39256693e-01]
+     [9.80716295e-05 4.20887226e-01 5.79014703e-01]
+     [8.99904370e-01 1.00066408e-01 2.92228310e-05]
+     [2.93713001e-04 2.99545940e-01 7.00160347e-01]
+     [2.52388423e-04 4.51502740e-01 5.48244872e-01]]
+    onnx [[1.3886702e-02 7.4685675e-01 2.3925661e-01]
+     [9.8086333e-05 4.2088726e-01 5.7901466e-01]
+     [8.9990449e-01 1.0006638e-01 2.9214405e-05]
+     [2.9365387e-04 2.9954606e-01 7.0016032e-01]
+     [2.5239261e-04 4.5150274e-01 5.4824489e-01]]
     --validation--
-    sklearn [0 0 0 0 0]
-    onnx [0 0 0 0 0]
+    sklearn [0 0 1 0 0]
+    onnx [0 0 1 0 0]
 
 
 
@@ -544,11 +544,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
 
 
 
@@ -556,7 +556,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.654 seconds)
+   **Total running time of the script:** ( 0 minutes  2.341 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_parser_alternative.py:

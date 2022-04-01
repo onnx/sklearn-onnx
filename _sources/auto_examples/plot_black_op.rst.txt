@@ -107,12 +107,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-7.60436825 -1.81983593 -1.14948678 -3.46242545 -2.03540971]
-    [[-7.6043735]
-     [-1.8198361]
-     [-1.1494861]
-     [-3.4624252]
-     [-2.03541  ]]
+    [-1.88677702 -1.95959623 -5.87824499 -0.91543293 -1.79604962]
+    [[-1.8867769 ]
+     [-1.9595971 ]
+     [-5.878242  ]
+     [-0.91543245]
+     [-1.7960496 ]]
 
 
 
@@ -195,12 +195,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-7.60436825 -1.81983593 -1.14948678 -3.46242545 -2.03540971]
-    [[-7.6043735]
-     [-1.8198361]
-     [-1.1494861]
-     [-3.4624257]
-     [-2.03541  ]]
+    [-1.88677702 -1.95959623 -5.87824499 -0.91543293 -1.79604962]
+    [[-1.8867769 ]
+     [-1.9595971 ]
+     [-5.878242  ]
+     [-0.91543245]
+     [-1.7960496 ]]
 
 
 
@@ -274,8 +274,8 @@ Processing time
 
  .. code-block:: none
 
-    0.30932419999999894
-    0.38210510000000397
+    0.34561639999999727
+    0.4203097999999983
 
 
 
@@ -350,11 +350,11 @@ a blacklisted operator (or only whitelisted operators),
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
 
 
 
@@ -362,7 +362,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.711 seconds)
+   **Total running time of the script:** ( 0 minutes  12.517 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:

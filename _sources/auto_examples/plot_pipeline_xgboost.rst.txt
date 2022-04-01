@@ -102,9 +102,9 @@ Train a XGBoost classifier
 
  .. code-block:: none
 
-    C:\Python395_x64\lib\site-packages\xgboost\sklearn.py:1224: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
+    D:\Program Files\Python\Python39\lib\site-packages\xgboost\sklearn.py:1224: UserWarning: The use of label encoder in XGBClassifier is deprecated and will be removed in a future release. To remove this warning, do the following: 1) Pass option use_label_encoder=False when constructing XGBClassifier object; and 2) Encode your labels (y) as integers starting with 0, i.e. 0, 1, 2, ..., [num_class - 1].
       warnings.warn(label_encoder_deprecation_msg, UserWarning)
-    [18:40:26] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.1/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    [17:33:51] WARNING: C:/Users/Administrator/workspace/xgboost-win64_release_1.5.1/src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'multi:softprob' was changed from 'merror' to 'mlogloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
     Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
     It usually means the pipeline being converted contains a
     transformer or a predictor with no corresponding converter
@@ -211,8 +211,8 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 1 0 2 1]
-    predict_proba [[0.14671634 0.48657113 0.36671248]]
+    predict [1 2 1 2 1]
+    predict_proba [[0.17581303 0.44687837 0.37730864]]
 
 
 
@@ -241,8 +241,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 1 0 2 1]
-    predict_proba [{0: 0.14671637117862701, 1: 0.48657119274139404, 2: 0.3667125403881073}]
+    predict [1 2 1 2 1]
+    predict_proba [{0: 0.17581303417682648, 1: 0.4468783736228943, 2: 0.37730860710144043}]
 
 
 
@@ -287,7 +287,7 @@ Display the ONNX graph
  .. code-block:: none
 
 
-    (-0.5, 2112.5, 2558.5, -0.5)
+    (-0.5, 1979.5, 2558.5, -0.5)
 
 
 
@@ -317,12 +317,12 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
-    onnxmltools:  1.11.0
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
+    onnxmltools:  1.10.0
     xgboost:  1.5.2
 
 
@@ -331,7 +331,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.584 seconds)
+   **Total running time of the script:** ( 0 minutes  2.009 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:

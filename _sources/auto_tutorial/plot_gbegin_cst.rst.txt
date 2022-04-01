@@ -73,7 +73,7 @@ could be trained and produced by another converter library.
 
  .. code-block:: none
 
-    C:\xadupre\github\scikit-learn\sklearn\linear_model\_sag.py:350: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
+    D:\Program Files\Python\Python39\lib\site-packages\sklearn\linear_model\_sag.py:352: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn(
 
 
@@ -131,9 +131,9 @@ Inference
 
     output names: ['label', 'probabilities', 'C', 'l1_ratio']
     outputs
-    [array([2, 1], dtype=int64),
-     array([[0.00238762, 0.32239848, 0.67521393],
-           [0.01530018, 0.89364463, 0.09105522]], dtype=float32),
+    [array([0, 2], dtype=int64),
+     array([[9.9800849e-01, 1.9915334e-03, 3.5919868e-11],
+           [1.1456419e-04, 1.7301913e-01, 8.2686633e-01]], dtype=float32),
      array([2.]),
      array([0.5])]
 
@@ -181,8 +181,8 @@ not only the constants. Next model only keeps the probabilities.
 
     output names: ['probabilities']
     outputs
-    [array([[0.00238762, 0.32239848, 0.67521393],
-           [0.01530018, 0.89364463, 0.09105522]], dtype=float32)]
+    [array([[9.9800849e-01, 1.9915334e-03, 3.5919868e-11],
+           [1.1456419e-04, 1.7301913e-01, 8.2686633e-01]], dtype=float32)]
 
 
 
@@ -240,8 +240,8 @@ Load a model
 
     output names: ['probabilities']
     outputs
-    [array([[0.00238762, 0.32239848, 0.67521393],
-           [0.01530018, 0.89364463, 0.09105522]], dtype=float32)]
+    [array([[9.9800849e-01, 1.9915334e-03, 3.5919868e-11],
+           [1.1456419e-04, 1.7301913e-01, 8.2686633e-01]], dtype=float32)]
 
 
 
@@ -249,7 +249,7 @@ Load a model
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.122 seconds)
+   **Total running time of the script:** ( 0 minutes  0.098 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_cst.py:

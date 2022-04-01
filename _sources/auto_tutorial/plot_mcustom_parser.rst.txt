@@ -261,8 +261,8 @@ And conversion.
 
  .. code-block:: none
 
-    (6.04657622749194e-07, 0.0002951417083751357)
-    (2.0175704209535184e-06, 0.0005483764998807899)
+    (6.046576181972796e-07, 0.0002951417065241126)
+    (2.01757041429218e-06, 0.0005483764980302357)
 
 
 
@@ -299,8 +299,8 @@ It works. The final looks like the following.
             # inputs
             X = dict_inputs['X']
             (Su_C0, ) = n0_sub(X, Su_Subcst)
-            (nogemm, ) = n1_matmul(Su_C0, Ma_MatMulcst)
-            (gemm, ) = n2_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
+            (gemm, ) = n1_gemm(X, Ma_MatMulcst, Ge_Gemmcst1)
+            (nogemm, ) = n2_matmul(Su_C0, Ma_MatMulcst)
             return {
                 'nogemm': nogemm,
                 'gemm': gemm,
@@ -337,7 +337,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.471 seconds)
+   **Total running time of the script:** ( 0 minutes  0.375 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:
