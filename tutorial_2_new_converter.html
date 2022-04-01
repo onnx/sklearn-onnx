@@ -4,11 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>A custom converter for a custom model &#8212; sklearn-onnx 1.11 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>A custom converter for a custom model &#8212; sklearn-onnx 1.11.1 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +20,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
@@ -31,7 +28,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -48,7 +46,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -143,7 +141,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -350,6 +349,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -382,8 +384,8 @@
               
               <div>
                 
-  <div class="section" id="a-custom-converter-for-a-custom-model">
-<h1>A custom converter for a custom model<a class="headerlink" href="#a-custom-converter-for-a-custom-model" title="Permalink to this headline">¶</a></h1>
+  <section id="a-custom-converter-for-a-custom-model">
+<h1>A custom converter for a custom model<a class="headerlink" href="#a-custom-converter-for-a-custom-model" title="Permalink to this headline">#</a></h1>
 <p>When <a class="reference external" href="https://github.com/onnx/sklearn-onnx">sklearn-onnx</a> converts a <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>
 pipeline, it looks into every transformer and predictor
 and fetches the associated converter. The resulting
@@ -408,7 +410,7 @@ it displays an error message telling it misses a converter.</p>
 </pre></div>
 </div>
 <p>&gt;&gt;&gt;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">pyquickhelper</span><span class="o">.</span><span class="n">sphinxext</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_1476506789376</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">pyquickhelper</span><span class="o">.</span><span class="n">sphinxext</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_2329367799808</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
     <span class="n">It</span> <span class="n">usually</span> <span class="n">means</span> <span class="n">the</span> <span class="n">pipeline</span> <span class="n">being</span> <span class="n">converted</span> <span class="n">contains</span> <span class="n">a</span>
     <span class="n">transformer</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">predictor</span> <span class="k">with</span> <span class="n">no</span> <span class="n">corresponding</span> <span class="n">converter</span>
     <span class="n">implemented</span> <span class="ow">in</span> <span class="n">sklearn</span><span class="o">-</span><span class="n">onnx</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">converted</span> <span class="ow">is</span> <span class="n">implemented</span>
@@ -438,14 +440,14 @@ an example.</p>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </div>
-</div>
+</section>
 
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="auto_tutorial/plot_gexternal_xgboost.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -468,7 +470,8 @@ an example.</p>
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -480,7 +483,7 @@ an example.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

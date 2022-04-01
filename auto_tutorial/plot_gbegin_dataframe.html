@@ -4,11 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dataframe as an input &#8212; sklearn-onnx 1.11 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Dataframe as an input &#8212; sklearn-onnx 1.11.1 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +20,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -31,7 +28,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +46,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -143,7 +141,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -350,6 +349,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -360,7 +362,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -417,8 +419,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-gbegin-dataframe-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<div class="sphx-glr-example-title section" id="dataframe-as-an-input">
-<span id="sphx-glr-auto-tutorial-plot-gbegin-dataframe-py"></span><h1>Dataframe as an input<a class="headerlink" href="#dataframe-as-an-input" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="dataframe-as-an-input">
+<span id="sphx-glr-auto-tutorial-plot-gbegin-dataframe-py"></span><h1>Dataframe as an input<a class="headerlink" href="#dataframe-as-an-input" title="Permalink to this headline">#</a></h1>
 <p id="index-0">A pipeline usually ingests data as a matrix. It may be converted in a matrix
 if all the data share the same type. But data held in a dataframe
 have usually multiple types, float, integer or string for categories.
@@ -432,8 +434,8 @@ ONNX also supports that case.</p>
 <li><p><a class="reference internal" href="#unhide-conversion-logic-with-a-dataframe" id="id5">Unhide conversion logic with a dataframe</a></p></li>
 </ul>
 </div>
-<div class="section" id="a-dataset-with-categories">
-<h2><a class="toc-backref" href="#id1">A dataset with categories</a><a class="headerlink" href="#a-dataset-with-categories" title="Permalink to this headline">¶</a></h2>
+<section id="a-dataset-with-categories">
+<h2><a class="toc-backref" href="#id1">A dataset with categories</a><a class="headerlink" href="#a-dataset-with-categories" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlinsights.plotting</span> <span class="kn">import</span> <span class="n">pipeline2dot</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
@@ -444,10 +446,10 @@ ONNX also supports that case.</p>
 <span class="kn">from</span> <span class="nn">mlprodict.onnx_conv</span> <span class="kn">import</span> <span class="n">to_onnx</span> <span class="k">as</span> <span class="n">to_onnx_ext</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="sklearn.compose.ColumnTransformer" class="sphx-glr-backref-module-sklearn-compose sphx-glr-backref-type-py-class"><span class="n">ColumnTransformer</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html#sklearn.preprocessing.OneHotEncoder" title="sklearn.preprocessing.OneHotEncoder" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">OneHotEncoder</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="sklearn.ensemble.RandomForestClassifier" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">RandomForestClassifier</span></a>
 
 
 <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a><span class="p">([</span>
@@ -463,15 +465,15 @@ ONNX also supports that case.</p>
 <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop.html#pandas.DataFrame.drop" title="pandas.DataFrame.drop" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-method"><span class="n">data</span><span class="o">.</span><span class="n">drop</span></a><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 
-<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
-<span class="n">preprocessor</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">categorical_transformer</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html#sklearn.preprocessing.OneHotEncoder" title="sklearn.preprocessing.OneHotEncoder" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">OneHotEncoder</span></a><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="sklearn.compose.ColumnTransformer" class="sphx-glr-backref-module-sklearn-compose sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preprocessor</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="sklearn.compose.ColumnTransformer" class="sphx-glr-backref-module-sklearn-compose sphx-glr-backref-type-py-class"><span class="n">ColumnTransformer</span></a><span class="p">(</span>
     <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cat_cols</span></a><span class="p">)],</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">categorical_transformer</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cat_cols</span></a><span class="p">)],</span>
     <span class="n">remainder</span><span class="o">=</span><span class="s1">&#39;passthrough&#39;</span><span class="p">)</span>
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;preprocess&#39;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span>
-                 <span class="p">(</span><span class="s1">&#39;rf&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
-<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a><span class="p">([(</span><span class="s1">&#39;preprocess&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="sklearn.compose.ColumnTransformer" class="sphx-glr-backref-module-sklearn-compose sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preprocessor</span></a><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;rf&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="sklearn.ensemble.RandomForestClassifier" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">RandomForestClassifier</span></a><span class="p">())])</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.fit" title="sklearn.pipeline.Pipeline.fit" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -486,40 +488,40 @@ ONNX also supports that case.</p>
 </pre></div>
 </div>
 <p>Display.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dot</span></a> <span class="o">=</span> <span class="n">pipeline2dot</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dot</span></a> <span class="o">=</span> <span class="n">pipeline2dot</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dot</span></a><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_gbegin_dataframe_001.png" srcset="../_images/sphx_glr_plot_gbegin_dataframe_001.png" alt="plot gbegin dataframe" class = "sphx-glr-single-img"/></div>
-<div class="section" id="conversion-to-onnx">
-<h2><a class="toc-backref" href="#id2">Conversion to ONNX</a><a class="headerlink" href="#conversion-to-onnx" title="Permalink to this headline">¶</a></h2>
+<img src="../_images/sphx_glr_plot_gbegin_dataframe_001.png" srcset="../_images/sphx_glr_plot_gbegin_dataframe_001.png" alt="plot gbegin dataframe" class = "sphx-glr-single-img"/></section>
+<section id="conversion-to-onnx">
+<h2><a class="toc-backref" href="#id2">Conversion to ONNX</a><a class="headerlink" href="#conversion-to-onnx" title="Permalink to this headline">#</a></h2>
 <p>Function <em>to_onnx</em> does not handle dataframes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
 <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>But it possible to use an extended one.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx_ext</span><span class="p">(</span>
-    <span class="n">pipe</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">RandomForestClassifier</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="sklearn.ensemble.RandomForestClassifier" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">RandomForestClassifier</span></a><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="graph">
-<h2><a class="toc-backref" href="#id3">Graph</a><a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="graph">
+<h2><a class="toc-backref" href="#id3">Graph</a><a class="headerlink" href="#graph" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a><span class="p">(</span><span class="n">onx</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_gbegin_dataframe_002.png" srcset="../_images/sphx_glr_plot_gbegin_dataframe_002.png" alt="plot gbegin dataframe" class = "sphx-glr-single-img"/></div>
-<div class="section" id="prediction-with-onnx">
-<h2><a class="toc-backref" href="#id4">Prediction with ONNX</a><a class="headerlink" href="#prediction-with-onnx" title="Permalink to this headline">¶</a></h2>
+<img src="../_images/sphx_glr_plot_gbegin_dataframe_002.png" srcset="../_images/sphx_glr_plot_gbegin_dataframe_002.png" alt="plot gbegin dataframe" class = "sphx-glr-single-img"/></section>
+<section id="prediction-with-onnx">
+<h2><a class="toc-backref" href="#id4">Prediction with ONNX</a><a class="headerlink" href="#prediction-with-onnx" title="Permalink to this headline">#</a></h2>
 <p><em>onnxruntime</em> does not support dataframes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
 <span class="k">try</span><span class="p">:</span>
@@ -532,7 +534,7 @@ ONNX also supports that case.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>run(): incompatible function arguments. The following argument types are supported:
     1. (self: onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession, arg0: List[str], arg1: Dict[str, object], arg2: onnxruntime.capi.onnxruntime_pybind11_state.RunOptions) -&gt; List[object]
 
-Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x000001D29D66AC70&gt;, [&#39;label&#39;, &#39;probabilities&#39;],   CAT1 CAT2  num1  num2
+Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession object at 0x0000021DD4C37DF0&gt;, [&#39;label&#39;, &#39;probabilities&#39;],   CAT1 CAT2  num1  num2
 0    a    c  0.50  0.60
 1    b    d  0.40  0.80
 2    a    d  0.50  0.56
@@ -544,7 +546,7 @@ Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession o
 <p>Let’s use a shortcut</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a><span class="p">(</span><span class="n">onx</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference.run" title="mlprodict.onnxrt.onnx_inference.OnnxInference.run" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-method"><span class="n">oinf</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got</span></a><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -554,30 +556,30 @@ Invoked with: &lt;onnxruntime.capi.onnxruntime_pybind11_state.InferenceSession o
 </pre></div>
 </div>
 <p>And probilities.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got</span></a><span class="p">[</span><span class="s1">&#39;probabilities&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.75 0.25]
- [0.29 0.71]
- [0.69 0.31]
- [0.2  0.8 ]
- [0.73 0.27]
- [0.3  0.7 ]]
-[[0.75       0.25      ]
- [0.29000008 0.7099999 ]
- [0.69000006 0.30999997]
- [0.2000001  0.7999999 ]
- [0.73       0.26999998]
- [0.30000013 0.69999987]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.89 0.11]
+ [0.43 0.57]
+ [0.78 0.22]
+ [0.36 0.64]
+ [0.74 0.26]
+ [0.29 0.71]]
+[[0.89       0.10999998]
+ [0.43000007 0.56999993]
+ [0.78000003 0.21999998]
+ [0.36       0.64      ]
+ [0.74       0.26      ]
+ [0.29000002 0.71      ]]
 </pre></div>
 </div>
 <p>It looks ok. Let’s dig into the details to
 directly use <em>onnxruntime</em>.</p>
-</div>
-<div class="section" id="unhide-conversion-logic-with-a-dataframe">
-<h2><a class="toc-backref" href="#id5">Unhide conversion logic with a dataframe</a><a class="headerlink" href="#unhide-conversion-logic-with-a-dataframe" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="unhide-conversion-logic-with-a-dataframe">
+<h2><a class="toc-backref" href="#id5">Unhide conversion logic with a dataframe</a><a class="headerlink" href="#unhide-conversion-logic-with-a-dataframe" title="Permalink to this headline">#</a></h2>
 <p>A dataframe can be seen as a set of columns with
 different types. That’s what ONNX should see:
 a list of inputs, the input name is the column name,
@@ -612,8 +614,8 @@ the input type is the column type.</p>
 </div>
 <p>Let’s convert with <em>skl2onnx</em> only.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx2</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span>
-    <span class="n">pipe</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">init</span></a><span class="p">,</span>
-    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">RandomForestClassifier</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">init</span></a><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="sklearn.ensemble.RandomForestClassifier" class="sphx-glr-backref-module-sklearn-ensemble sphx-glr-backref-type-py-class"><span class="n">RandomForestClassifier</span></a><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}})</span>
 </pre></div>
 </div>
 <p>Let’s run it with onnxruntime.
@@ -657,7 +659,7 @@ values.</p>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got2</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess2</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">inputs</span></a><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got2</span></a><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -667,26 +669,26 @@ values.</p>
 </pre></div>
 </div>
 <p>And probilities.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">train_data</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got2</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.75 0.25]
- [0.29 0.71]
- [0.69 0.31]
- [0.2  0.8 ]
- [0.73 0.27]
- [0.3  0.7 ]]
-[[0.75       0.25000003]
- [0.29000038 0.7099996 ]
- [0.69000006 0.30999997]
- [0.20000046 0.79999954]
- [0.73       0.27      ]
- [0.30000037 0.69999963]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[0.89 0.11]
+ [0.43 0.57]
+ [0.78 0.22]
+ [0.36 0.64]
+ [0.74 0.26]
+ [0.29 0.71]]
+[[0.89       0.10999998]
+ [0.43000025 0.56999975]
+ [0.78       0.22000003]
+ [0.3600003  0.6399997 ]
+ [0.74       0.26000002]
+ [0.29000038 0.7099996 ]]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.874 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.270 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-gbegin-dataframe-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gbegin_dataframe.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -699,15 +701,15 @@ values.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="plot_gbegin_cst.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -730,7 +732,8 @@ values.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -742,7 +745,7 @@ values.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -4,11 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Convert a pipeline with a LightGBM classifier &#8212; sklearn-onnx 1.11 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Convert a pipeline with a LightGBM classifier &#8212; sklearn-onnx 1.11.1 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +20,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -31,7 +28,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +46,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -143,7 +141,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -350,6 +349,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -360,7 +362,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -417,8 +419,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-gexternal-lightgbm-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<div class="sphx-glr-example-title section" id="convert-a-pipeline-with-a-lightgbm-classifier">
-<span id="example-lightgbm"></span><span id="sphx-glr-auto-tutorial-plot-gexternal-lightgbm-py"></span><h1>Convert a pipeline with a LightGBM classifier<a class="headerlink" href="#convert-a-pipeline-with-a-lightgbm-classifier" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="convert-a-pipeline-with-a-lightgbm-classifier">
+<span id="example-lightgbm"></span><span id="sphx-glr-auto-tutorial-plot-gexternal-lightgbm-py"></span><h1>Convert a pipeline with a LightGBM classifier<a class="headerlink" href="#convert-a-pipeline-with-a-lightgbm-classifier" title="Permalink to this headline">#</a></h1>
 <p id="index-0"><a class="reference external" href="https://github.com/onnx/sklearn-onnx">sklearn-onnx</a> only converts <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a> models into <em>ONNX</em>
 but many libraries implement <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a> API so that their models
 can be included in a <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a> pipeline. This example considers
@@ -434,8 +436,8 @@ a <em>LGBMClassifier</em>. Let’s see how to do it.</p>
 <li><p><a class="reference internal" href="#final-graph" id="id5">Final graph</a></p></li>
 </ul>
 </div>
-<div class="section" id="train-a-lightgbm-classifier">
-<h2><a class="toc-backref" href="#id1">Train a LightGBM classifier</a><a class="headerlink" href="#train-a-lightgbm-classifier" title="Permalink to this headline">¶</a></h2>
+<section id="train-a-lightgbm-classifier">
+<h2><a class="toc-backref" href="#id1">Train a LightGBM classifier</a><a class="headerlink" href="#train-a-lightgbm-classifier" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyquickhelper.helpgen.graphviz_helper</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a>
 <span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a>
 <span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
@@ -444,12 +446,12 @@ a <em>LGBMClassifier</em>. Let’s see how to do it.</p>
 <span class="kn">from</span> <span class="nn">onnxmltools.convert.lightgbm.operator_converters.LightGbm</span> <span class="kn">import</span> <span class="n">convert_lightgbm</span>  <span class="c1"># noqa</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <span class="n">LGBMClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a>
+<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.ClassifierMixin.html#sklearn.base.ClassifierMixin" title="sklearn.base.ClassifierMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMClassifier</span></a>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-function"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">target</span></a>
 
@@ -458,9 +460,9 @@ a <em>LGBMClassifier</em>. Let’s see how to do it.</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ind</span></a><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ind</span></a><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
-                 <span class="p">(</span><span class="s1">&#39;lgbm&#39;</span><span class="p">,</span> <span class="n">LGBMClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">3</span><span class="p">))])</span>
-<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a><span class="p">([(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a><span class="p">()),</span>
+                 <span class="p">(</span><span class="s1">&#39;lgbm&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.ClassifierMixin.html#sklearn.base.ClassifierMixin" title="sklearn.base.ClassifierMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMClassifier</span></a><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">3</span><span class="p">))])</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.fit" title="sklearn.pipeline.Pipeline.fit" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -468,24 +470,24 @@ a <em>LGBMClassifier</em>. Let’s see how to do it.</p>
                 (&#39;lgbm&#39;, LGBMClassifier(n_estimators=3))])
 </pre></div>
 </div>
-</div>
-<div class="section" id="register-the-converter-for-lgbmclassifier">
-<h2><a class="toc-backref" href="#id2">Register the converter for LGBMClassifier</a><a class="headerlink" href="#register-the-converter-for-lgbmclassifier" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="register-the-converter-for-lgbmclassifier">
+<h2><a class="toc-backref" href="#id2">Register the converter for LGBMClassifier</a><a class="headerlink" href="#register-the-converter-for-lgbmclassifier" title="Permalink to this headline">#</a></h2>
 <p>The converter is implemented in <a class="reference external" href="https://github.com/onnx/onnxmltools">onnxmltools</a>:
 <a class="reference external" href="https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py">onnxmltools…LightGbm.py</a>.
 and the shape calculator:
 <a class="reference external" href="https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/lightgbm/shape_calculators/Classifier.py">onnxmltools…Classifier.py</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">update_registered_converter</span><span class="p">(</span>
-    <span class="n">LGBMClassifier</span><span class="p">,</span> <span class="s1">&#39;LightGbmLGBMClassifier&#39;</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.ClassifierMixin.html#sklearn.base.ClassifierMixin" title="sklearn.base.ClassifierMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMClassifier</span></a><span class="p">,</span> <span class="s1">&#39;LightGbmLGBMClassifier&#39;</span><span class="p">,</span>
     <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span> <span class="n">convert_lightgbm</span><span class="p">,</span>
     <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nocl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">]})</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="convert-again">
-<h2><a class="toc-backref" href="#id3">Convert again</a><a class="headerlink" href="#convert-again" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="convert-again">
+<h2><a class="toc-backref" href="#id3">Convert again</a><a class="headerlink" href="#convert-again" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_onnx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span>
-    <span class="n">pipe</span><span class="p">,</span> <span class="s1">&#39;pipeline_lightgbm&#39;</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <span class="s1">&#39;pipeline_lightgbm&#39;</span><span class="p">,</span>
     <span class="p">[(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))],</span>
     <span class="n">target_opset</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;ai.onnx.ml&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 
@@ -494,17 +496,17 @@ and the shape calculator:
     <a href="https://docs.python.org/3/library/io.html#io.BufferedWriter" title="io.BufferedWriter" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">f</span></a><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="compare-the-predictions">
-<h2><a class="toc-backref" href="#id4">Compare the predictions</a><a class="headerlink" href="#compare-the-predictions" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="compare-the-predictions">
+<h2><a class="toc-backref" href="#id4">Compare the predictions</a><a class="headerlink" href="#compare-the-predictions" title="Permalink to this headline">#</a></h2>
 <p>Predictions with LightGbm.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="n">pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <span class="n">pipe</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [1 0 1 1 2]
-predict_proba [[0.25335584 0.45934348 0.28730068]]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 2 0 2 1]
+predict_proba [[0.52589117 0.23688316 0.23722567]]
 </pre></div>
 </div>
 <p>Predictions with onnxruntime.</p>
@@ -516,20 +518,20 @@ predict_proba [[0.25335584 0.45934348 0.28730068]]
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [1 0 1 1 2]
-predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.287300705909729}]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>predict [0 2 0 2 1]
+predict_proba [{0: 0.5258911848068237, 1: 0.23688316345214844, 2: 0.23722566664218903}]
 </pre></div>
 </div>
-</div>
-<div class="section" id="final-graph">
-<h2><a class="toc-backref" href="#id5">Final graph</a><a class="headerlink" href="#final-graph" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="final-graph">
+<h2><a class="toc-backref" href="#id5">Final graph</a><a class="headerlink" href="#final-graph" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a><span class="p">(</span><span class="n">model_onnx</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_gexternal_lightgbm_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_001.png" alt="plot gexternal lightgbm" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.629 seconds)</p>
+<img src="../_images/sphx_glr_plot_gexternal_lightgbm_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_001.png" alt="plot gexternal lightgbm" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.444 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-gexternal-lightgbm-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_gexternal_lightgbm.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -542,15 +544,15 @@ predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.28730070590
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../tutorial_1-5_external.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -573,7 +575,8 @@ predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.28730070590
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -585,7 +588,7 @@ predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.28730070590
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

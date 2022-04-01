@@ -124,7 +124,7 @@ Prediction with ONNX
 
 The first example uses :epkg:`onnxruntime`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-77
+.. GENERATED FROM PYTHON SOURCE LINES 69-78
 
 .. code-block:: default
 
@@ -134,7 +134,8 @@ The first example uses :epkg:`onnxruntime`.
 
     pred_skl = ereg.predict(X_test.astype(numpy.float32))
 
-    pred_ort[:5], pred_skl[:5]
+    print("Onnx Runtime prediction:\n", pred_ort[:5])
+    print("Sklearn rediction:\n", pred_skl[:5])
 
 
 
@@ -146,17 +147,19 @@ The first example uses :epkg:`onnxruntime`.
 
  .. code-block:: none
 
+    Onnx Runtime prediction:
+     [[172.50958 ]
+     [175.84848 ]
+     [ 90.13343 ]
+     [ 88.8568  ]
+     [ 99.741714]]
+    Sklearn rediction:
+     [172.50958206 175.84848608  90.13342835  88.85678768  99.74171089]
 
-    (array([[120.13089],
-           [157.94276],
-           [177.41113],
-           [169.00098],
-           [147.1565 ]], dtype=float32), array([120.13088318, 157.94275712, 177.41111238, 169.000977  ,
-           147.15647114]))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-85
+.. GENERATED FROM PYTHON SOURCE LINES 79-86
 
 .. _l-diff-dicrepencies:
 
@@ -166,7 +169,7 @@ Comparison
 Before deploying, we need to compare that both
 *scikit-learn* and *ONNX* return the same predictions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-96
+.. GENERATED FROM PYTHON SOURCE LINES 86-97
 
 .. code-block:: default
 
@@ -191,12 +194,12 @@ Before deploying, we need to compare that both
 
  .. code-block:: none
 
-    (3.083668033809772e-05, 1.563262350903267e-07)
+    (2.840921740698832e-05, 1.4969846103737152e-07)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-103
+.. GENERATED FROM PYTHON SOURCE LINES 98-104
 
 It looks good. Biggest errors (absolute and relative)
 are within the margin error introduced by using
@@ -205,7 +208,7 @@ We can save the model into ONNX
 format and compute the same predictions in many
 platform using :epkg:`onnxruntime`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-113
+.. GENERATED FROM PYTHON SOURCE LINES 106-114
 
 Python runtime
 ++++++++++++++
@@ -216,7 +219,7 @@ production (it still relies on python), but it is
 useful to investigate why the conversion went wrong.
 It uses module :epkg:`mlprodict`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 114-118
 
 .. code-block:: default
 
@@ -241,15 +244,15 @@ It uses module :epkg:`mlprodict`.
             # init: w0 (w0)
             # inputs
             X = dict_inputs['X']
-            (var_2, ) = n0_linearregressor(X)
-            (var_1, ) = n1_treeensembleregressor(X)
-            (var_0, ) = n2_treeensembleregressor(X)
-            (wvar_2, ) = n3_mul(var_2, w0)
-            (wvar_1, ) = n4_mul(var_1, w0)
-            (wvar_0, ) = n5_mul(var_0, w0)
-            (fvar_2, ) = n6_flatten(wvar_2)
-            (fvar_1, ) = n7_flatten(wvar_1)
-            (fvar_0, ) = n8_flatten(wvar_0)
+            (var_1, ) = n0_treeensembleregressor(X)
+            (var_0, ) = n1_treeensembleregressor(X)
+            (var_2, ) = n2_linearregressor(X)
+            (wvar_0, ) = n3_mul(var_0, w0)
+            (wvar_2, ) = n4_mul(var_2, w0)
+            (wvar_1, ) = n5_mul(var_1, w0)
+            (fvar_0, ) = n6_flatten(wvar_0)
+            (fvar_2, ) = n7_flatten(wvar_2)
+            (fvar_1, ) = n8_flatten(wvar_1)
             (variable, ) = n9_sum(fvar_0, fvar_1, fvar_2)
             return {
                 'variable': variable,
@@ -258,11 +261,11 @@ It uses module :epkg:`mlprodict`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-119
+.. GENERATED FROM PYTHON SOURCE LINES 119-120
 
 It works almost the same way.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-123
+.. GENERATED FROM PYTHON SOURCE LINES 120-124
 
 .. code-block:: default
 
@@ -280,17 +283,18 @@ It works almost the same way.
 
  .. code-block:: none
 
-    (3.083668033809772e-05, 1.563262350903267e-07)
+    (2.642235025973605e-05, 1.5140781740836594e-07)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-126
+.. GENERATED FROM PYTHON SOURCE LINES 125-128
 
 Final graph
+You may need to install graphviz from https://graphviz.org/download/
 +++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-130
+.. GENERATED FROM PYTHON SOURCE LINES 128-132
 
 .. code-block:: default
 
@@ -313,7 +317,7 @@ Final graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.731 seconds)
+   **Total running time of the script:** ( 0 minutes  1.567 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_abegin_convert_pipeline.py:

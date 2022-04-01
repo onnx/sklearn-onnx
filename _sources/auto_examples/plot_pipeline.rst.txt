@@ -78,7 +78,7 @@ That's the most simple way.
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.11"
+    producer_version: "1.11.1"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -284,11 +284,11 @@ Which we display...
 
  .. code-block:: none
 
-    numpy: 1.22.1
-    scikit-learn: 1.1.dev0
+    numpy: 1.21.3
+    scikit-learn: 1.0
     onnx:  1.11.0
-    onnxruntime:  1.11.0+cpu
-    skl2onnx:  1.11
+    onnxruntime:  1.10.0
+    skl2onnx:  1.11.1
 
 
 
@@ -296,7 +296,7 @@ Which we display...
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.801 seconds)
+   **Total running time of the script:** ( 0 minutes  0.935 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
