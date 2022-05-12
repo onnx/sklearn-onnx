@@ -53,6 +53,7 @@ from . import replace_op
 from . import scaler_op
 from . import sequence
 from . import sgd_classifier
+from . import sgd_oneclass_svm
 from . import stacking
 from . import support_vector_machines
 from . import text_vectoriser
@@ -113,6 +114,7 @@ __all__ = [
     scaler_op,
     sequence,
     sgd_classifier,
+    sgd_oneclass_svm,
     stacking,
     support_vector_machines,
     text_vectoriser,

@@ -17,13 +17,18 @@ try:
     from sklearn.neighbors import LocalOutlierFactor
 except ImportError:
     LocalOutlierFactor = None
-from skl2onnx import to_onnx
+#from skl2onnx import to_onnx
+import sys
+sys.path.append("D:\GitHub\onnx\sklearn-onnx")
+from skl2onnx.convert import to_onnx
+
 from test_utils import TARGET_OPSET
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import NotImplemented
 except ImportError:
     NotImplemented = RuntimeError
 
+import onnxmltools
 
 ort_version = ".".join(ort_version.split('.')[:2])
 
@@ -37,6 +42,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
                          [0.5, 0.4], [100., 99.]], dtype=np.float32)
         model = lof.fit(data)
         model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
+        onnxmltools.utils.save_model(model_onnx, "local_outlier_factor.onnx")
         self.assertNotIn('CDist', str(model_onnx))
 
         data = data.copy()
@@ -51,7 +57,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         expected_decif = lof.decision_function(data)
         assert_almost_equal(expected_label, got[0].ravel())
         assert_almost_equal(expected_decif, got[1].ravel())
-
+'''
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
     def test_local_outlier_factor_n_neighbors_greater_than_observations(self):
         lof = LocalOutlierFactor(n_neighbors=25, novelty=True)
@@ -265,7 +271,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         expected_decif = lof.decision_function(data)
         assert_almost_equal(expected_label, got[0].ravel())
         assert_almost_equal(expected_decif, got[1].ravel(), decimal=5)
-
+'''
 
 if __name__ == '__main__':
     unittest.main()

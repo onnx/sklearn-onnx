@@ -16,7 +16,7 @@ except ImportError:
 from sklearn.ensemble import (
     IsolationForest, RandomTreesEmbedding, RandomForestClassifier)
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.linear_model import BayesianRidge
+from sklearn.linear_model import BayesianRidge, SGDOneClassSVM
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors, LocalOutlierFactor
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture

@@ -10,12 +10,18 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM, LinearSVC
+
+import sys
+sys.path.append("D:\GitHub\onnx\sklearn-onnx")
+from skl2onnx.convert import convert_sklearn
+
 try:
     from skl2onnx.common._apply_operation import apply_less
 except ImportError:
     # onnxconverter-common is too old
     apply_less = None
-from skl2onnx import convert_sklearn
+#from skl2onnx import convert_sklearn
+
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
@@ -28,6 +34,8 @@ from test_utils import (
 
 
 ort_version = ort_version.split('+')[0]
+
+import onnxmltools
 
 
 class TestSklearnSVM(unittest.TestCase):
@@ -457,6 +465,7 @@ class TestSklearnSVM(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "OCSVM", [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
+        onnxmltools.utils.save_model(model_onnx, "sk_OCSVM.onnx")
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnBinOneClassSVM")

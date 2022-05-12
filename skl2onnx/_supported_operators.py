@@ -35,6 +35,7 @@ from sklearn.linear_model import (
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
+    SGDOneClassSVM,
     TheilSenRegressor
 )
 try:
@@ -386,6 +387,7 @@ def build_sklearn_operator_name_map():
         SelectKBest,
         SelectPercentile,
         SGDClassifier,
+        SGDOneClassSVM,
         SimpleImputer,
         StackingClassifier,
         StackingRegressor,
