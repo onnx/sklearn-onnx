@@ -9,8 +9,10 @@ from sklearn.linear_model import SGDOneClassSVM
 from onnxruntime import __version__ as ort_version
 #from skl2onnx import convert_sklearn
 import sys
-sys.path.append("D:\GitHub\onnx\sklearn-onnx")
+sys.path.append("C:\GitHub\sklearn-onnx")
 from skl2onnx.convert import convert_sklearn
+
+
 
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -36,9 +38,10 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
         ])
         model = SGDOneClassSVM(random_state=42)
         model.fit(X)
-        test_x = np.array([[0,0]])
-        a = model.predict(test_x)
-        print("predict:", test_x, a)
+        test_x = np.array([[0,0],[-1,-1],[1,1]])
+        result = model.predict(test_x)
+        print("predict:\n", test_x)
+        print("result:\n", result)
 
         model_onnx = convert_sklearn(
             model,
@@ -47,8 +50,7 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         onnxmltools.utils.save_model(model_onnx, "sk_SGD_OneClass_SVM.onnx")
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
+        dump_data_and_model(test_x.astype(np.float32), model, model_onnx,
             basename="SklearnSGDOneClassSVMBinaryHinge-Out0")
 
 
