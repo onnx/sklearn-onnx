@@ -18,60 +18,47 @@ from scipy.sparse import isspmatrix
 
 def convert_sklearn_sgd_oneclass_svm(scope: Scope, operator: Operator,
                                    container: ModelComponentContainer):
-  
+
+    input_name = operator.input_full_names
+    output_names = operator.output_full_names
     model = operator.raw_operator
+    coef = model.coef_.T
+    offset = model.offset_
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
-    input_name = operator.input_full_names
     if type(operator.inputs[0].type) in (
             BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
         apply_cast(scope, operator.input_full_names, cast_input_name,
                     container, to=proto_dtype)
-        input_name = cast_input_name
-
-#    scores = _decision_function(scope, operator, container, model, proto_dtype)
+        input_name = cast_input_name  
 
     coef_name = scope.get_unique_variable_name('coef')
-    offset_name = scope.get_unique_variable_name('offset')
-    matmul_result_name = scope.get_unique_variable_name('matmul_result')
-    score_name = scope.get_unique_variable_name('score')
-    coef = model.coef_.T
-    offset = model.offset_
-
     container.add_initializer(coef_name, proto_dtype, coef.shape, coef.ravel())
+
+    offset_name = scope.get_unique_variable_name('offset')
     container.add_initializer(offset_name, proto_dtype, offset.shape, offset)
 
     input_name = operator.inputs[0].full_name
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
-
         apply_cast(scope, operator.input_full_names, cast_input_name,
                    container, to=proto_dtype)
         input_name = cast_input_name
 
-    container.add_node('MatMul', 
-        [input_name, coef_name],
-        matmul_result_name, 
-        name=scope.get_unique_operator_name('MatMul'))
-    
-    apply_sub(scope, 
-        [matmul_result_name, offset_name],
-        score_name, 
-        container, broadcast=0)
+    op_name=scope.get_unique_operator_name('MatMul')
+    matmul_result_name = scope.get_unique_variable_name('matmul_result')
+    container.add_node('MatMul', [input_name, coef_name], matmul_result_name, op_name)
 
-    pred = scope.get_unique_variable_name('float_prediction')
+    apply_sub(scope, [matmul_result_name, offset_name], output_names[1], container, broadcast=0)
 
-    container.add_node('Sign', score_name, pred, op_version=9)
-    apply_cast(scope, pred, operator.output_full_names[0],
-                container, to=onnx_proto.TensorProto.INT64)
+    pred = scope.get_unique_variable_name('class_prediction')
+    container.add_node('Sign', output_names[1], pred, op_version=9)
 
-    label_name = operator.outputs[0].full_name
-    apply_cast(scope, score_name, operator.output_full_names[1],
-                container, to=onnx_proto.TensorProto.FLOAT)
-    
+    apply_cast(scope, pred, output_names[0], container, to=onnx_proto.TensorProto.INT64)
+
 
 register_converter('SklearnSGDOneClassSVM', convert_sklearn_sgd_oneclass_svm)
