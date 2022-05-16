@@ -7,10 +7,7 @@ from distutils.version import StrictVersion
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from onnxruntime import __version__ as ort_version
-#from skl2onnx import convert_sklearn
-import sys
-sys.path.append("D:\GitHub\onnx\sklearn-onnx")
-from skl2onnx.convert import convert_sklearn
+from skl2onnx import convert_sklearn
 
 from skl2onnx.common.data_types import (
     BooleanTensorType,
