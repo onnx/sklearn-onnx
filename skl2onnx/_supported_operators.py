@@ -13,7 +13,7 @@ from sklearn.linear_model import (
     PassiveAggressiveClassifier,
     Perceptron,
     RidgeClassifier, RidgeClassifierCV,
-    SGDClassifier,
+    SGDClassifier, SGDOneClassSVM
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -386,6 +386,7 @@ def build_sklearn_operator_name_map():
         SelectKBest,
         SelectPercentile,
         SGDClassifier,
+        SGDOneClassSVM,
         SimpleImputer,
         StackingClassifier,
         StackingRegressor,

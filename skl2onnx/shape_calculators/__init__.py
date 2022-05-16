@@ -39,6 +39,7 @@ from . import random_trees_embedding
 from . import replace_op
 from . import scaler
 from . import sequence
+from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
 from . import text_vectorizer
@@ -84,6 +85,7 @@ __all__ = [
     replace_op,
     scaler,
     sequence,
+    sgd_oneclass_svm,
     svd,
     support_vector_machines,
     text_vectorizer,
