@@ -240,7 +240,7 @@ jobs:
 
   - script: |
       conda install "numpy$(numpy.version)" "scipy$(scipy.version)"
-    displayName: 'install numpy, scipy'
+    displayName: 'install numpy, scipy, sympy'
 
   - script: |
       if [ '$(sklearn.version)' == 'git' ]
