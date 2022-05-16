@@ -6,11 +6,7 @@ import unittest
 import numpy as np
 from sklearn.linear_model import SGDOneClassSVM
 from onnxruntime import __version__ as ort_version
-
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from ..skl2onnx.convert import convert_sklearn
+from skl2onnx import convert_sklearn
 
 from skl2onnx.common.data_types import (
     FloatTensorType,
