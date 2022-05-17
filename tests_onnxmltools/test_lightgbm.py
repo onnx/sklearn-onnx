@@ -127,29 +127,34 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
         reason="converter for lightgbm is too old")
     def test_lightgbm_classifier(self):
         model = LGBMClassifier(n_estimators=3, min_child_samples=1)
-        dump_binary_classification(model, target_opset={'': 15, 'ai.onnx.ml': 2})
-        dump_multiple_classification(model, target_opset={'': 15, 'ai.onnx.ml': 2})
+        dump_binary_classification(model, 
+                                   target_opset={'': 15, 'ai.onnx.ml': 2})
+        dump_multiple_classification(model, 
+                                     target_opset={'': 15, 'ai.onnx.ml': 2})
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor(self):
         model = LGBMRegressor(n_estimators=3, min_child_samples=1)
-        dump_single_regression(model, target_opset={'': 15, 'ai.onnx.ml': 2})
+        dump_single_regression(model, 
+                               target_opset={'': 15, 'ai.onnx.ml': 2})
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor1(self):
         model = LGBMRegressor(n_estimators=1, min_child_samples=1)
-        dump_single_regression(model, suffix="1", target_opset={'': 15, 'ai.onnx.ml': 2})
+        dump_single_regression(model, suffix="1", 
+                               target_opset={'': 15, 'ai.onnx.ml': 2})
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor2(self):
         model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
-        dump_single_regression(model, suffix="2", target_opset={'': 15, 'ai.onnx.ml': 2})
+        dump_single_regression(model, suffix="2", 
+                               target_opset={'': 15, 'ai.onnx.ml': 2})
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
