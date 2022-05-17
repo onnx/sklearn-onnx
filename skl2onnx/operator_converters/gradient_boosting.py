@@ -20,7 +20,7 @@ def convert_sklearn_gradient_boosting_classifier(
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
-    if op.loss != 'deviance':
+    if op.loss not in ('deviance', 'log_loss'):
         raise NotImplementedError(
             "Loss '{0}' is not supported yet. You "
             "may raise an issue at "
