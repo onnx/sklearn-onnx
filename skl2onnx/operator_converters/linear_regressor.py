@@ -157,7 +157,8 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
 
     if hasattr(op, "_link_instance"):
         # scikit-learn < 1.1
-        from sklearn.linear_model._glm.link import IdentityLink, LogLink, LogitLink
+        from sklearn.linear_model._glm.link import (
+            IdentityLink, LogLink, LogitLink)
         if isinstance(op._link_instance, IdentityLink):
             Y = OnnxIdentity(eta, op_version=opv)
         elif isinstance(op._link_instance, LogLink):
@@ -166,8 +167,9 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
             Y = OnnxSigmoid(eta, op_version=opv)
         else:
             raise RuntimeError(
-                "Unexpected type %r for _link_instance in operator type %r."
-                "" % (type(op._link_instance), type(op)))
+                "Unexpected type %r for _link_instance "
+                "in operator type %r." % (
+                    type(op._link_instance), type(op)))
     else:
         # scikit-learn >= 1.1
         from sklearn._loss.loss import (
@@ -183,8 +185,8 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
         loss = op._get_loss()
         if isinstance(
             loss,
-            (AbsoluteError, HalfSquaredError, HalfTweedieLossIdentity, PinballLoss),
-        ):
+            (AbsoluteError, HalfSquaredError,
+             HalfTweedieLossIdentity, PinballLoss)):
             Y = OnnxIdentity(eta, op_version=opv)
         elif isinstance(loss, (HalfPoissonLoss, HalfGammaLoss, HalfTweedieLoss)):
             Y = OnnxExp(eta, op_version=opv)
@@ -192,8 +194,8 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
             Y = OnnxSigmoid(eta, op_version=opv)
         else:
             raise RuntimeError(
-                f"Unexpected type of link for {loss!r} loss in operator type {op!r}."
-            )
+                f"Unexpected type of link for {loss!r} loss "
+                "in operator type {op!r}.")
 
     last_dim = 1 if len(op.coef_.shape) == 1 else op.coef_.shape[-1]
     final = OnnxReshape(Y, np.array([-1, last_dim], dtype=np.int64),
