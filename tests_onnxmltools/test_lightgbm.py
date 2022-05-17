@@ -4,6 +4,7 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
@@ -126,6 +127,10 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
+        reason="converter for lightgbm is too old")
     def test_lightgbm_classifier(self):
         model = LGBMClassifier(n_estimators=3, min_child_samples=1)
         dump_binary_classification(model)
@@ -134,12 +139,20 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
+        reason="converter for lightgbm is too old")
     def test_lightgbm_regressor(self):
         model = LGBMRegressor(n_estimators=3, min_child_samples=1)
         dump_single_regression(model)
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for lightgbm is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor1(self):
         model = LGBMRegressor(n_estimators=1, min_child_samples=1)
@@ -148,12 +161,20 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
+        reason="converter for lightgbm is too old")
     def test_lightgbm_regressor2(self):
         model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
         dump_single_regression(model, suffix="2")
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for lightgbm is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_booster_multi_classifier(self):
         X = [[0, 1], [1, 1], [2, 0], [1, 2], [-1, 2], [1, -2]]

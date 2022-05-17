@@ -71,6 +71,10 @@ class TestXGBoostModels(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for xgboost is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
     def test_xgb_regressor(self):
         iris = load_iris()
         X = iris.data[:, :2]
@@ -106,6 +110,10 @@ class TestXGBoostModels(unittest.TestCase):
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for xgboost is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
     def test_xgb_classifier_multi(self):
         iris = load_iris()
         X = iris.data[:, :2]
@@ -123,6 +131,10 @@ class TestXGBoostModels(unittest.TestCase):
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        reason="converter for xgboost is too old")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) >= StrictVersion('1.11') and
+        StrictVersion(onnxmltools.__version__) <= StrictVersion('1.11'),
         reason="converter for xgboost is too old")
     def test_xgb_classifier_multi_reglog(self):
         iris = load_iris()
