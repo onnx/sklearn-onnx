@@ -37,8 +37,8 @@ except ImportError:
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import dump_single_regression
 from test_utils import (
-    dump_binary_classification, dump_multiple_classification,
-    TARGET_OPSET)
+    dump_binary_classification, dump_multiple_classification)
+    # TARGET_OPSET)
 
 
 def calculate_lightgbm_output_shapes(operator):
