@@ -17,11 +17,21 @@ from onnxconverter_common.data_types import (  # noqa
     Int32TensorType, BooleanTensorType,
     DoubleTensorType)
 try:
+    from onnxconverter_common.data_types import UInt32TensorType
+except ImportError:
+    UInt32TensorType = None
+try:
     from onnxconverter_common.data_types import (
         Int8TensorType, UInt8TensorType)
 except ImportError:
     Int8TensorType = None
     UInt8TensorType = None
+try:
+    from onnxconverter_common.data_types import (
+        Int16TensorType, UInt16TensorType)
+except ImportError:
+    Int16TensorType = None
+    UInt16TensorType = None
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
@@ -324,6 +334,15 @@ class Variable:
             elif (Int8TensorType is not None and
                     elem == onnx_proto.TensorProto.INT8):
                 ty = Int8TensorType(shape)
+            elif (UInt16TensorType is not None and
+                    elem == onnx_proto.TensorProto.UINT16):
+                ty = UInt16TensorType(shape)
+            elif (Int16TensorType is not None and
+                    elem == onnx_proto.TensorProto.INT16):
+                ty = Int16TensorType(shape)
+            elif (UInt32TensorType is not None and
+                    elem == onnx_proto.TensorProto.UINT32):
+                ty = UInt32TensorType(shape)
             elif elem == 0:
                 ty = FloatTensorType(shape)
             else:
