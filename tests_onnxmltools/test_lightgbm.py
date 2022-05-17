@@ -183,7 +183,8 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
         model_onnx = to_onnx(
             model, initial_types=[('X', FloatTensorType([None, 2]))],
             options={WrappedLightGbmBoosterClassifier: {'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': 15, 'ai.onnx.ml': 2}
+            # target_opset=TARGET_OPSET)
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
