@@ -260,7 +260,7 @@ jobs:
           git clone https://github.com/scikit-learn/scikit-learn.git --recursive
           python setup.py install
         else
-          conda install "scikit-learn$(sklearn.version)"
+          conda install -c conda-forge "scikit-learn$(sklearn.version)"
       fi
     displayName: 'install scikit-learn'
 
