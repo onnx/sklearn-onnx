@@ -188,7 +188,8 @@ def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
             (AbsoluteError, HalfSquaredError,
              HalfTweedieLossIdentity, PinballLoss)):
             Y = OnnxIdentity(eta, op_version=opv)
-        elif isinstance(loss, (HalfPoissonLoss, HalfGammaLoss, HalfTweedieLoss)):
+        elif isinstance(loss, (HalfPoissonLoss, HalfGammaLoss,
+                               HalfTweedieLoss)):
             Y = OnnxExp(eta, op_version=opv)
         elif isinstance(loss, HalfBinomialLoss):
             Y = OnnxSigmoid(eta, op_version=opv)
