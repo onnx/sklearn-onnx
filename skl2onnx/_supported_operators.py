@@ -13,7 +13,7 @@ from sklearn.linear_model import (
     PassiveAggressiveClassifier,
     Perceptron,
     RidgeClassifier, RidgeClassifierCV,
-    SGDClassifier, SGDOneClassSVM
+    SGDClassifier
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -52,6 +52,12 @@ try:
 except ImportError:
     # available since sklearn>=0.23
     TweedieRegressor = None
+try:
+    from sklearn.linear_model import SGDOneClassSVM
+except ImportError:
+    # available since sklearn>=1.0
+    SGDOneClassSVM = None
+
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
