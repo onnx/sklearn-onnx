@@ -38,7 +38,6 @@ except ImportError:
     from test_utils import dump_single_regression
 from test_utils import (
     dump_binary_classification, dump_multiple_classification)
-    # TARGET_OPSET)
 
 
 def calculate_lightgbm_output_shapes(operator):
@@ -184,7 +183,6 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             model, initial_types=[('X', FloatTensorType([None, 2]))],
             options={WrappedLightGbmBoosterClassifier: {'zipmap': False}},
             target_opset={'': 15, 'ai.onnx.ml': 2})
-            # target_opset=TARGET_OPSET)
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())
