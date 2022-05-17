@@ -4,7 +4,10 @@
 
 import unittest
 import numpy as np
-from sklearn.linear_model import SGDOneClassSVM
+try:
+    from sklearn.linear_model import SGDOneClassSVM
+except ImportError:
+    SGDOneClassSVM = None
 from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 
