@@ -88,7 +88,6 @@ class TestXGBoostModels(unittest.TestCase):
             xgb, suffix="-Dec4",
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
-
     def test_xgb_classifier(self):
         xgb = XGBClassifier(n_estimators=2, max_depth=2)
         iris = load_iris()
@@ -126,7 +125,6 @@ class TestXGBoostModels(unittest.TestCase):
             xgb,
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
-
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
         reason="converter for xgboost is too old")
@@ -145,7 +143,6 @@ class TestXGBoostModels(unittest.TestCase):
         dump_multiple_classification(
             xgb, suffix="RegLog",
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
-
 
     def test_xgb_classifier_reglog(self):
         iris = load_iris()
