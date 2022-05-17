@@ -33,7 +33,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         StrictVersion(ort_version) <= StrictVersion("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.")
     def test_gradient_boosting_classifier1Deviance(self):
-        model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
+        model = GradientBoostingClassifier(
+            n_estimators=1, max_depth=2, loss="deviance")
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
@@ -62,16 +63,16 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         dump_binary_classification(model, suffix="1Deviance")
 
     def test_gradient_boosting_classifier3(self):
-        model = GradientBoostingClassifier(n_estimators=3)
+        model = GradientBoostingClassifier(n_estimators=3, loss="deviance")
         dump_binary_classification(model, suffix="3")
 
     def test_gradient_boosting_classifier_multi(self):
-        model = GradientBoostingClassifier(n_estimators=3)
+        model = GradientBoostingClassifier(n_estimators=3, loss="deviance")
         dump_multiple_classification(model)
 
     def test_gradient_boosting_binary_classification(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=3), 2)
+            GradientBoostingClassifier(n_estimators=3, loss="deviance"), 2)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -83,7 +84,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_binary_classification_init_zero(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4, init='zero'), 2)
+            GradientBoostingClassifier(
+                n_estimators=4, init='zero', loss="deviance"), 2)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -95,7 +97,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_multiclass_classification(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4), 5)
+            GradientBoostingClassifier(n_estimators=4, loss="deviance"), 5)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -107,7 +109,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_int(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4), 5, is_int=True)
+            GradientBoostingClassifier(
+                n_estimators=4, loss="deviance"), 5, is_int=True)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
@@ -119,7 +122,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_bool(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4), 5, is_bool=True)
+            GradientBoostingClassifier(
+                n_estimators=4, loss="deviance"), 5, is_bool=True)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", BooleanTensorType([None, X.shape[1]]))],
@@ -131,7 +135,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_multiclass_decision_function(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4), 5)
+            GradientBoostingClassifier(n_estimators=4, loss="deviance"), 5)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
@@ -145,7 +149,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_multiclass_classification_init_zero(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4, init='zero'), 4)
+            GradientBoostingClassifier(
+                n_estimators=4, init='zero', loss="deviance"), 4)
         model_onnx = convert_sklearn(
             model, "gradient boosting classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -236,7 +241,8 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             n_features=100, n_samples=1000, n_classes=2, n_informative=8)
         X_train, X_test, y_train, _ = train_test_split(
             X, y, test_size=0.5, random_state=42)
-        model = GradientBoostingClassifier().fit(X_train, y_train)
+        model = GradientBoostingClassifier(
+            loss="deviance").fit(X_train, y_train)
         onnx_model = convert_sklearn(
             model, 'lr2', [('input', FloatTensorType(X_test.shape))],
             target_opset=TARGET_OPSET)

@@ -346,7 +346,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int_ensemble(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(GradientBoostingClassifier()), 5, is_int=True)
+            OneVsRestClassifier(
+                GradientBoostingClassifier(loss="deviance")), 5, is_int=True)
         model_onnx = convert_sklearn(
             model,
             "ovr classification",
@@ -363,7 +364,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_float_binary_ensemble(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(GradientBoostingClassifier()), 2)
+            OneVsRestClassifier(
+                GradientBoostingClassifier(loss="deviance")), 2)
         model_onnx = convert_sklearn(
             model,
             "ovr classification",
@@ -478,7 +480,8 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         X_train, X_test, y_train, _ = train_test_split(
             X, y, test_size=0.5, random_state=42)
         model = OneVsRestClassifier(
-            estimator=GradientBoostingClassifier(random_state=42))
+            estimator=GradientBoostingClassifier(
+                random_state=42, loss="deviance"))
         model.fit(X_train, y_train)
 
         options = {id(model): {'raw_scores': True, 'zipmap': False}}

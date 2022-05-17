@@ -139,7 +139,8 @@ class TestStackingConverter(unittest.TestCase):
                     ("rf", RandomForestClassifier(n_estimators=10,
                                                   random_state=42)),
                     ("gb", GradientBoostingClassifier(n_estimators=10,
-                                                      random_state=42)),
+                                                      random_state=42,
+                                                      loss="deviance")),
                     ("knn", KNeighborsClassifier(n_neighbors=2))
                 ], final_estimator=LogisticRegression(), cv=2))
 
@@ -169,7 +170,8 @@ class TestStackingConverter(unittest.TestCase):
     def test_model_stacking_classifier_column_transformer(self):
         classifiers = {
             'A': RandomForestClassifier(n_estimators=5, random_state=42),
-            'B': GradientBoostingClassifier(n_estimators=5, random_state=42)
+            'B': GradientBoostingClassifier(
+                n_estimators=5, random_state=42, loss="deviance")
         }
         model_to_test = Pipeline(steps=[
             ('cbe', ColumnTransformer([
