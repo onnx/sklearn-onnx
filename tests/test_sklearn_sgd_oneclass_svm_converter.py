@@ -21,7 +21,8 @@ ort_version = ".".join(ort_version.split(".")[:2])
 
 
 class TestSGDOneClassSVMConverter(unittest.TestCase):
-
+    @unittest.skipIf(SGDOneClassSVM is None,
+                     reason="scikit-learn<1.0")
     def test_model_sgd_oneclass_svm(self):
         X = np.array([
             [-1, -1], [-2, -1], [1, 1], [2, 1]
