@@ -196,8 +196,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     def test_bagging_classifier_sgd_multiclass_decision_function(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                GradientBoostingClassifier(
-                    random_state=42, n_estimators=4, loss="deviance"),
+                GradientBoostingClassifier(random_state=42, n_estimators=4),
                 random_state=42), 4, n_features=10)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
@@ -215,8 +214,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                GradientBoostingClassifier(
-                    n_estimators=10, loss="deviance")), 2)
+                GradientBoostingClassifier(n_estimators=10)), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -234,8 +232,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     def test_bagging_classifier_gradient_boosting_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                GradientBoostingClassifier(
-                    n_estimators=10, loss="deviance")), 3)
+                GradientBoostingClassifier(n_estimators=10)), 3)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",

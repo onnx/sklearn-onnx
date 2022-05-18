@@ -34,8 +34,6 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
         model.fit(X)
         test_x = np.array([[0, 0], [-1, -1], [1, 1]]).astype(np.float32)
         result = model.predict(test_x)
-        print("predict:\n", test_x)
-        print("result:\n", result)
 
         model_onnx = convert_sklearn(
             model,

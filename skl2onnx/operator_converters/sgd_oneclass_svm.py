@@ -24,8 +24,8 @@ def convert_sklearn_sgd_oneclass_svm(scope: Scope, operator: Operator,
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
-    if type(operator.inputs[0].type) in (
-            BooleanTensorType, Int64TensorType):
+    if isinstance(operator.inputs[0].type,
+            (BooleanTensorType, Int64TensorType)):
         cast_input_name = scope.get_unique_variable_name('cast_input')
         apply_cast(scope, operator.input_full_names, cast_input_name,
                    container, to=proto_dtype)

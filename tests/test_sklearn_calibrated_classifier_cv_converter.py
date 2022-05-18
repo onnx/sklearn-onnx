@@ -202,8 +202,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=GradientBoostingClassifier(
-                n_estimators=2, loss="deviance"),
+            base_estimator=GradientBoostingClassifier(n_estimators=2),
             method='sigmoid').fit(X, y)
         model_onnx = convert_sklearn(
             model, "clarf",
