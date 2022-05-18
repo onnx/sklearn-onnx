@@ -12,7 +12,8 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxCast, OnnxIdentity, OnnxMatMul, OnnxReshape)
+    OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul, 
+    OnnxReshape, OnnxSigmoid)
 
 
 def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,

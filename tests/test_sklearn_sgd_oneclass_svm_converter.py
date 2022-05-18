@@ -33,7 +33,7 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
         model = SGDOneClassSVM(random_state=42)
         model.fit(X)
         test_x = np.array([[0, 0], [-1, -1], [1, 1]]).astype(np.float32)
-        result = model.predict(test_x)
+        model.predict(test_x)
 
         model_onnx = convert_sklearn(
             model,
