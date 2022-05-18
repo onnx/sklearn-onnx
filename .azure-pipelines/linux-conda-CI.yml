@@ -239,8 +239,8 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
-      conda install "numpy$(numpy.version)" "scipy$(scipy.version)" "sympy$(sympy.version)"
-    displayName: 'install numpy, scipy, sympy'
+      conda install "numpy$(numpy.version)" "scipy$(scipy.version)"
+    displayName: 'install numpy, scipy'
 
   - script: |
       if [ '$(sklearn.version)' == 'git' ]
