@@ -14,7 +14,7 @@ from ..proto import onnx_proto
 def convert_sklearn_sgd_oneclass_svm(scope: Scope, operator: Operator,
                                      container: ModelComponentContainer):
 
-    input_name = operator.input_full_names
+    input_name = operator.inputs[0].full_name
     output_names = operator.output_full_names
     model = operator.raw_operator
     coef = model.coef_.T
@@ -38,17 +38,8 @@ def convert_sklearn_sgd_oneclass_svm(scope: Scope, operator: Operator,
     offset_name = scope.get_unique_variable_name('offset')
     container.add_initializer(offset_name, proto_dtype, offset.shape, offset)
 
-    input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
-        cast_input_name = scope.get_unique_variable_name('cast_input')
-        apply_cast(scope, operator.input_full_names, cast_input_name,
-                   container, to=proto_dtype)
-        input_name = cast_input_name
-
     matmul_result_name = scope.get_unique_variable_name('matmul_result')
-    container.add_node('MatMul',
-                       [input_name, coef_name],
-                       matmul_result_name,
+    container.add_node('MatMul', [input_name, coef_name], matmul_result_name,
                        name=scope.get_unique_operator_name('MatMul'))
 
     apply_sub(scope, [matmul_result_name, offset_name], output_names[1],
