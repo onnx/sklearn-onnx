@@ -9,6 +9,8 @@ try:
 except ImportError:
     SGDOneClassSVM = None
 from onnxruntime import __version__ as ort_version
+import sys
+sys.path.append("D:\GitHub\onnx\sklearn-onnx")
 from skl2onnx import convert_sklearn
 
 from skl2onnx.common.data_types import (
@@ -43,7 +45,7 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
 
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(test_x.astype(np.float32), model, model_onnx,
-                            basename="SklearnSGDOneClassSVMBinaryHinge-Out0")
+                            basename="SklearnSGDOneClassSVMBinaryHinge")
 
 
 if __name__ == "__main__":
