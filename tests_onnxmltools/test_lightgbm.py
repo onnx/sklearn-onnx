@@ -4,7 +4,6 @@ import unittest
 from distutils.version import StrictVersion
 import numpy
 from numpy.testing import assert_almost_equal
-import onnx
 from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument

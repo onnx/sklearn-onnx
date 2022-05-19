@@ -5,7 +5,6 @@ import unittest
 import numbers
 from distutils.version import StrictVersion
 import numpy as np
-import onnx
 from numpy.testing import assert_almost_equal
 import pandas
 from onnxruntime import InferenceSession
