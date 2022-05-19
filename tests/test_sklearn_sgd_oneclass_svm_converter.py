@@ -9,8 +9,6 @@ try:
 except ImportError:
     SGDOneClassSVM = None
 from onnxruntime import __version__ as ort_version
-import sys
-sys.path.append("D:\GitHub\onnx\sklearn-onnx")
 from skl2onnx import convert_sklearn
 
 from skl2onnx.common.data_types import (
