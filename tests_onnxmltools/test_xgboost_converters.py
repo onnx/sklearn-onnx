@@ -84,7 +84,9 @@ class TestXGBoostModels(unittest.TestCase):
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        dump_single_regression(xgb, suffix="-Dec4")
+        dump_single_regression(
+            xgb, suffix="-Dec4",
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     def test_xgb_classifier(self):
         xgb = XGBClassifier(n_estimators=2, max_depth=2)
@@ -119,7 +121,9 @@ class TestXGBoostModels(unittest.TestCase):
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        dump_multiple_classification(xgb)
+        dump_multiple_classification(
+            xgb,
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
         StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
@@ -136,7 +140,9 @@ class TestXGBoostModels(unittest.TestCase):
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        dump_multiple_classification(xgb, suffix="RegLog")
+        dump_multiple_classification(
+            xgb, suffix="RegLog",
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     def test_xgb_classifier_reglog(self):
         iris = load_iris()
