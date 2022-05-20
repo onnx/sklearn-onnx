@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import Int64TensorType, FloatTensorType
+from ..common.data_types import Int64TensorType
 
 
 def calculate_sgd_oneclass_svm_output_shapes(operator):
