@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -77,7 +77,7 @@ def decorrelate_transformer_convertor2(scope, operator, container):
 
 class TestOnnxOperatorsWrapped(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
                      reason="onnxruntime too old")
     def test_sub(self):
 
@@ -98,7 +98,7 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
                      reason="onnxruntime too old")
     def test_sub_double(self):
 
@@ -119,7 +119,7 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
                      reason="onnxruntime too old")
     def test_sub_output(self):
 
@@ -140,7 +140,7 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(StrictVersion(ortv) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
                      reason="onnxruntime too old")
     def test_sub_output_double(self):
 

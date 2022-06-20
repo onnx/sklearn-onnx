@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
@@ -27,7 +27,7 @@ ort_version = ".".join(ort_version.split('.')[:2])
 class TestOnnxOperatorsIf(unittest.TestCase):
 
     @ignore_warnings(category=DeprecationWarning)
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.5.0'),
                      reason="too old onnxruntime")
     def test_onnx_if_test1(self):
 
@@ -74,7 +74,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         assert_almost_equal(expected, res[0])
 
     @ignore_warnings(category=DeprecationWarning)
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.5.0'),
                      reason="too old onnxruntime")
     def test_onnx_if_test2(self):
 

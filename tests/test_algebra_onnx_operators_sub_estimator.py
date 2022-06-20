@@ -2,7 +2,7 @@
 
 import unittest
 import inspect
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import (
@@ -187,7 +187,7 @@ def subsub_mmtwo_converter(scope, operator, container):
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_estimator_exc(self):
         data = load_iris()
@@ -254,7 +254,7 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
             pass
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_estimator(self):
         data = load_iris()
@@ -280,7 +280,7 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         assert_almost_equal(model.validate(X32), res[2])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_sub_estimator(self):
         data = load_iris()

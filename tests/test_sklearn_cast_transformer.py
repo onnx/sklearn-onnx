@@ -5,7 +5,7 @@ Tests scikit-learn's cast transformer converter.
 """
 import unittest
 import math
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from pandas import DataFrame
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -47,26 +47,26 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             basename="SklearnCastTransformer{}".format(
                 input_type.__class__.__name__))
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_float(self):
         self.common_test_cast_transformer(
             numpy.float32, FloatTensorType)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_float64(self):
         self.common_test_cast_transformer(
             numpy.float64, DoubleTensorType)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_int64(self):
         self.common_test_cast_transformer(
             numpy.int64, Int64TensorType)
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_pipeline(self):
 

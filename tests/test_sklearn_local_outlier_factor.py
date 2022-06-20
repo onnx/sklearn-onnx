@@ -4,7 +4,7 @@
 Test scikit-learn's LocalOutlierFactor.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import __version__ as ort_version
@@ -75,7 +75,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_decif, got[1].ravel(), decimal=5)
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.5.0"),
                      reason="CDist")
     def test_local_outlier_factor_cdist(self):
         lof = LocalOutlierFactor(n_neighbors=2, novelty=True)
@@ -100,7 +100,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_decif, got[1].ravel())
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.5.0"),
                      reason="CDist")
     def test_local_outlier_factor_p3(self):
         lof = LocalOutlierFactor(n_neighbors=2, novelty=True, p=3)
@@ -124,7 +124,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_decif, got[1].ravel(), decimal=5)
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.5.0"),
                      reason="CDist")
     def test_local_outlier_factor_cdist_p3(self):
         lof = LocalOutlierFactor(n_neighbors=2, novelty=True, p=3)
@@ -179,7 +179,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
                 assert_almost_equal(expected_decif, got[1].ravel(), decimal=4)
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.5.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.5.0"),
                      reason="CDist")
     def test_local_outlier_factor_metric_cdist(self):
         for metric in ['euclidean', 'sqeuclidean']:
@@ -207,7 +207,7 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
 
     @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
     @unittest.skipIf(TARGET_OPSET < 13, reason="TopK")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.7.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.7.0"),
                      reason="TopK")
     def test_local_outlier_factor_double(self):
         lof = LocalOutlierFactor(n_neighbors=2, novelty=True)

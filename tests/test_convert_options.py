@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
@@ -164,14 +164,14 @@ class TestConvertOptions(unittest.TestCase):
                             expected_label, expected_proba,
                             *got, zipmap=zipmap)
 
-    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+    @unittest.skipIf(pv.Version(sklver) < pv.Version("0.24"),
                      reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
     def test_classifier_option_output_class_labels_int64(self):
         self.classifier_option_output_class_labels(False)
 
-    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+    @unittest.skipIf(pv.Version(sklver) < pv.Version("0.24"),
                      reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
@@ -204,7 +204,7 @@ class TestConvertOptions(unittest.TestCase):
             proba = probas[0]
             assert_almost_equal(expected_proba, proba, decimal=decimal)
 
-    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+    @unittest.skipIf(pv.Version(sklver) < pv.Version("0.24"),
                      reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
@@ -275,7 +275,7 @@ class TestConvertOptions(unittest.TestCase):
                     "Class labels mismatched %r != %r." % (
                         la1.tolist(), la2.tolist()))
 
-    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+    @unittest.skipIf(pv.Version(sklver) < pv.Version("0.24"),
                      reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))
@@ -326,7 +326,7 @@ class TestConvertOptions(unittest.TestCase):
                     expected_label, expected_proba, expected_class_labels,
                     *got)
 
-    @unittest.skipIf(StrictVersion(sklver) < StrictVersion("0.24"),
+    @unittest.skipIf(pv.Version(sklver) < pv.Version("0.24"),
                      reason="known issue with string")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning,
                                DeprecationWarning))

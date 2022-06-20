@@ -38,7 +38,7 @@ float(T_{ak + i}(x)) - \\sum_{i=1}^F T_i(x)|`.
 Train a LGBMRegressor
 +++++++++++++++++++++
 """
-from distutils.version import StrictVersion
+import packaging.version as pv
 import warnings
 import timeit
 import numpy
@@ -78,7 +78,7 @@ reg.fit(X, y)
 def skl2onnx_convert_lightgbm(scope, operator, container):
     options = scope.get_options(operator.raw_operator)
     if 'split' in options:
-        if StrictVersion(oml_version) < StrictVersion('1.9.2'):
+        if pv.Version(oml_version) < pv.Version('1.9.2'):
             warnings.warn(
                 "Option split was released in version 1.9.2 but %s is "
                 "installed. It will be ignored." % oml_version)
@@ -177,4 +177,4 @@ print(df)
 ax = df.plot(title="Sum of discrepancies against split\n"
                    "split = number of tree per node")
 
-plt.show()
+# plt.show()

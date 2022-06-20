@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 import onnx
 import onnxruntime as rt
@@ -20,7 +20,7 @@ ort_version = ort_version.split('+')[0]
 class TestShapes(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.0.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.0.0"),
                      reason="not available")
     def test_onnxruntime_shapes_reg(self):
         iris = load_iris()
@@ -45,7 +45,7 @@ class TestShapes(unittest.TestCase):
         assert pred_onx[0].shape[1] == shape2[1]
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("1.0.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("1.0.0"),
                      reason="not available")
     def test_onnxruntime_shapes_clr(self):
         iris = load_iris()

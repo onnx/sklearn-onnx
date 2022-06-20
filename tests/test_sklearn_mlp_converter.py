@@ -3,7 +3,7 @@
 """
 Tests scikit-learn's MLPClassifier and MLPRegressor converters.
 """
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -283,7 +283,7 @@ class TestSklearnMLPConverters(unittest.TestCase):
             basename="SklearnMLPRegressorBool")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion('1.0.0'),
+        pv.Version(ort_version) < pv.Version('1.0.0'),
         reason="onnxruntime %s" % '1.0.0')
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_model_mlp_classifier_nozipmap(self):

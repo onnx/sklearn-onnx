@@ -2,7 +2,7 @@
 
 """Tests scikit-learn's OrdinalEncoder converter."""
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import onnxruntime
 from sklearn import __version__ as sklearn_version
@@ -19,13 +19,13 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def ordinal_encoder_support():
-    # StrictVersion does not work with development versions
+    # pv.Version does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    if StrictVersion(vers) < StrictVersion("0.20.0"):
+    if pv.Version(vers) < pv.Version("0.20.0"):
         return False
-    if StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"):
+    if pv.Version(onnxruntime.__version__) < pv.Version("0.3.0"):
         return False
-    return StrictVersion(vers) >= StrictVersion("0.20.0")
+    return pv.Version(vers) >= pv.Version("0.20.0")
 
 
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
@@ -49,9 +49,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOrdinalEncoderInt64-SkipDim1",
-            allow_failure="StrictVersion("
+            allow_failure="pv.Version("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= pv.Version('0.5.0')",
         )
 
     @unittest.skipIf(
@@ -83,9 +83,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOrdinalEncoderMixedStringIntDrop",
-            allow_failure="StrictVersion("
+            allow_failure="pv.Version("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= pv.Version('0.5.0')",
         )
 
     @unittest.skipIf(
@@ -105,9 +105,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOrdinalEncoderOneStringCat",
-            allow_failure="StrictVersion("
+            allow_failure="pv.Version("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= pv.Version('0.5.0')",
         )
 
     @unittest.skipIf(
@@ -126,9 +126,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             data,
             model,
             model_onnx,
-            allow_failure="StrictVersion("
+            allow_failure="pv.Version("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= pv.Version('0.5.0')",
             basename="SklearnOrdinalEncoderTwoStringCat",
         )
 
@@ -154,9 +154,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnOrdinalEncoderCatList",
-            allow_failure="StrictVersion("
+            allow_failure="pv.Version("
             "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
+            "<= pv.Version('0.5.0')",
         )
 
 

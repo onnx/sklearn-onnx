@@ -32,8 +32,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnCountVectorizer11-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.0')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.3.0')",
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -55,8 +55,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnCountVectorizer22-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.0')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.3.0')",
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -78,8 +78,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnCountVectorizer12-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.0')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.3.0')",
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -101,8 +101,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnCountVectorizer13-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.0')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.3.0')",
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -124,8 +124,8 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnCountVectorizerBinary-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.3.0')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.3.0')",
         )
 
 

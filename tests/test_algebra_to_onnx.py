@@ -1,5 +1,5 @@
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from onnx.defs import onnx_opset_version
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -177,7 +177,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_double(self):
@@ -192,7 +192,7 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str_double(self):
@@ -208,10 +208,10 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.10.0"),
+        pv.Version(ort_version) < pv.Version("1.10.0"),
         reason="ArgMax not available for double")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_tuple_cls_double(self):
@@ -228,10 +228,10 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.10.0"),
+        pv.Version(ort_version) < pv.Version("1.10.0"),
         reason="ArgMax not available for double")
     @ignore_warnings(category=DeprecationWarning)
     def test_sub_graph_str_cls_double(self):
