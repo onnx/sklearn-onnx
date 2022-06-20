@@ -185,11 +185,18 @@ param = {'objective': 'multi:softmax', 'num_class': 3}
 bst = train_xgb(param, dtrain, 10)
 
 initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
-onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
 
-sess = rt.InferenceSession(onx.SerializeToString())
-input_name = sess.get_inputs()[0].name
-label_name = sess.get_outputs()[0].name
-pred_onx = sess.run(
-    [label_name], {input_name: X_test.astype(numpy.float32)})[0]
-print(pred_onx)
+try:
+    onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
+    cont = True
+except AssertionError as e:
+    print("XGBoost is too recent or onnxmltools too old.", e)
+    cont = False
+
+if cont:
+    sess = rt.InferenceSession(onx.SerializeToString())
+    input_name = sess.get_inputs()[0].name
+    label_name = sess.get_outputs()[0].name
+    pred_onx = sess.run(
+        [label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    print(pred_onx)
