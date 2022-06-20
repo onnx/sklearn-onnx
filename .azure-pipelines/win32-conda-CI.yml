@@ -16,7 +16,7 @@ jobs:
 
       Py39-Onnx1120-Rt1111-Skl11:
         python.version: '3.9'
-        onnx.version:  '-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
