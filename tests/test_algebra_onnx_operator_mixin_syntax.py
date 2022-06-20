@@ -90,6 +90,10 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
     def test_way3_mixin(self):
 
         X = np.arange(20).reshape(10, 2)
+        # avoids point of different cluster to be very close
+        # and avoid a small discrepancy due to double/float
+        # conversion to change a label.
+        X[:10] += 100
         tr = KMeans(n_clusters=2)
         tr.fit(X)
 
