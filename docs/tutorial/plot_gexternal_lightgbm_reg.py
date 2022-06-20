@@ -177,4 +177,4 @@ print(df)
 ax = df.plot(title="Sum of discrepancies against split\n"
                    "split = number of tree per node")
 
-plt.show()
+# plt.show()
