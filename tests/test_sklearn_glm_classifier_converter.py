@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -28,7 +28,7 @@ ort_version = ort_version.split('+')[0]
 def _sklearn_version():
     # Remove development version 0.22.dev0 becomes 0.22.
     v = ".".join(sklearn.__version__.split('.')[:2])
-    return StrictVersion(v)
+    return pv.Version(v)
 
 
 class TestGLMClassifierConverter(unittest.TestCase):
@@ -44,7 +44,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinary")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -64,7 +64,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryBlackList")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -84,7 +84,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinary")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -288,7 +288,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     def test_model_logistic_regression_multi_class_lbfgs(self):
         penalty = (
-            'l2' if _sklearn_version() < StrictVersion('0.21.0')
+            'l2' if _sklearn_version() < pv.Version('0.21.0')
             else 'none')
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -316,7 +316,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnLogitisticRegressionMultiLiblinearL1")
 
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
-        if _sklearn_version() < StrictVersion('0.21.0'):
+        if _sklearn_version() < pv.Version('0.21.0'):
             model, X = fit_classification_model(
                 linear_model.LogisticRegression(
                     solver='saga', max_iter=10000), 3)

@@ -7,7 +7,7 @@ import os
 import sys
 import glob
 import pickle
-from distutils.version import StrictVersion  # noqa
+import packaging.version as pv  # noqa
 import numpy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 import onnx
@@ -44,7 +44,7 @@ class OnnxRuntimeMissingNewOnnxOperatorException(OnnxRuntimeAssertionError):
 def evaluate_condition(backend, condition):
     """
     Evaluates a condition such as
-    ``StrictVersion(onnxruntime.__version__) <= StrictVersion('0.1.3')``
+    ``pv.Version(onnxruntime.__version__) <= pv.Version('0.1.3')``
     """
     if backend == "onnxruntime":
         import onnxruntime  # noqa

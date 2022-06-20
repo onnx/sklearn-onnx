@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from sklearn.datasets import load_digits, load_iris
 from sklearn.decomposition import PCA, TruncatedSVD
@@ -20,7 +20,7 @@ ort_version = ort_version.split('+')[0]
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     def test_feature_union_default(self):
         data = load_iris()
@@ -39,7 +39,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                             basename="SklearnFeatureUnionDefault")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     def test_feature_union_transformer_weights_0(self):
         data = load_iris()

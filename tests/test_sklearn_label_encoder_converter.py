@@ -3,7 +3,7 @@
 """Tests scikit-LabelEncoder converter"""
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from onnxruntime import __version__ as ort_version
 from sklearn.preprocessing import LabelEncoder
@@ -22,7 +22,7 @@ ort_version = ".".join(ort_version.split('.')[:2])
 class TestSklearnLabelEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.3.0"),
+        pv.Version(ort_version) < pv.Version("0.3.0"),
         reason="onnxruntime too old")
     def test_model_label_encoder(self):
         model = LabelEncoder()
@@ -45,7 +45,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             basename="SklearnLabelEncoder")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.3.0"),
+        pv.Version(ort_version) < pv.Version("0.3.0"),
         reason="onnxruntime too old")
     def test_model_label_encoder_float(self):
         model = LabelEncoder()
@@ -68,7 +68,7 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
             basename="SklearnLabelEncoderFloat")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.3.0"),
+        pv.Version(ort_version) < pv.Version("0.3.0"),
         reason="onnxruntime too old")
     @unittest.skipIf(TARGET_OPSET < 12, reason='not available')
     def test_model_label_encoder_int(self):

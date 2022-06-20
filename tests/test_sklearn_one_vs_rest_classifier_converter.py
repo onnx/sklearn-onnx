@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -43,7 +43,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model, target_opset=TARGET_OPSET)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('1.4.0'),
+        pv.Version(ort_version) <= pv.Version('1.4.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf(self):
@@ -75,7 +75,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             assert_almost_equal(exp_label, got[0])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        pv.Version(ort_version) <= pv.Version('1.3.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_float(self):
@@ -96,7 +96,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     basename="SklearnOVRRFMultiLabelFloat%d" % opset)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        pv.Version(ort_version) <= pv.Version('1.3.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_float_11(self):
@@ -118,7 +118,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     basename="SklearnOVRRFMultiLabelFloat%d" % opset)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        pv.Version(ort_version) <= pv.Version('1.3.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_int(self):
@@ -139,7 +139,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
                     basename="SklearnOVRRFMultiLabelInt64%d" % opset)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('1.3.0'),
+        pv.Version(ort_version) <= pv.Version('1.3.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_rf_multilabel_int_11(self):
@@ -217,7 +217,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRClassificationDecisionFunction",
             methods=['predict', 'decision_function'])
-        if StrictVersion(ort_version) < StrictVersion("1.0.0"):
+        if pv.Version(ort_version) < pv.Version("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
         model_onnx = convert_sklearn(
@@ -248,7 +248,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRClassificationDecisionFunctionBinary",
             methods=['predict', 'decision_function_binary'])
-        if StrictVersion(ort_version) < StrictVersion("1.0.0"):
+        if pv.Version(ort_version) < pv.Version("1.0.0"):
             return
         options = {id(model): {'raw_scores': True, 'zipmap': False}}
         model_onnx = convert_sklearn(
@@ -468,7 +468,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnOVRRegressionIntEnsemble-Out0")
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.2.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.2.0"),
                      reason="fails to load the model")
     def test_ovr_raw_scores(self):
         X, y = make_classification(

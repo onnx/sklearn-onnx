@@ -4,7 +4,7 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import copy
 import numpy
 from numpy.testing import assert_almost_equal
@@ -37,7 +37,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
+        pv.Version(ort_version) <= pv.Version("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
@@ -65,7 +65,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
+        pv.Version(ort_version) <= pv.Version("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_nolowercase(self):
         corpus = numpy.array([
@@ -414,7 +414,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
+        pv.Version(ort_version) <= pv.Version("0.3.0"),
         reason="Requires opset 9.")
     def test_model_tfidf_vectorizer11_64(self):
         corpus = numpy.array([
@@ -444,7 +444,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         apply_less is None, reason="onnxconverter-common too old")
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.3.0"),
+        pv.Version(ort_version) < pv.Version("1.3.0"),
         reason="Requires opset 9.")
     def test_tfidf_svm(self):
         data = [
@@ -477,7 +477,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("1.0.0"),
+        pv.Version(ort_version) <= pv.Version("1.0.0"),
         reason="Requires opset 10.")
     def test_model_tfidf_vectorizer_nan(self):
         corpus = numpy.array([

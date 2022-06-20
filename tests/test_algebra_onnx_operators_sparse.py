@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -29,7 +29,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)
     def test_onnx_init_dense(self):
         X = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -46,7 +46,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)
     def test_onnx_init_sparse_coo(self):
         row = np.array([0, 0, 1, 3, 1], dtype=np.float32)

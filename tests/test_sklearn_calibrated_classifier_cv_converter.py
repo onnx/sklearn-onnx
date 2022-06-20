@@ -5,7 +5,7 @@ Tests scikit-learn's CalibratedClassifierCV converters
 """
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -95,7 +95,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierCVInt-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -134,7 +134,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierCVBinaryMNB")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -154,7 +154,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierCVIsotonicBinaryKNN")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -173,7 +173,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierCVBinaryLogReg")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -193,7 +193,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierRF")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -215,7 +215,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         HistGradientBoostingClassifier is None, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -235,7 +235,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierHGBT")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(
         category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
@@ -255,7 +255,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierDT")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -275,7 +275,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierSVC")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -295,7 +295,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierLinearSVC")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(
@@ -317,7 +317,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             basename="SklearnCalibratedClassifierLinearSVC2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(

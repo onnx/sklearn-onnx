@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 from pandas import DataFrame
@@ -30,7 +30,7 @@ ort_version = ort_version.split('+')[0]
 class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.")
     def test_gradient_boosting_classifier1Deviance(self):
         model = GradientBoostingClassifier(n_estimators=1, max_depth=2)
@@ -229,7 +229,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             basename="SklearnGradientBoostingRegressionZeroInit-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.")
     def test_gradient_boosting_regressor_learning_rate(self):
         X, y = make_classification(
