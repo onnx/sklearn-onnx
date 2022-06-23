@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import onnx
 from onnxruntime import __version__ as ort_version
@@ -57,22 +57,22 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/
     master/docs/Versioning.md>`_.
     """
-    vi = StrictVersion(ort_version.split('+')[0])
-    if vi >= StrictVersion("1.10.0"):
+    vi = pv.Version(ort_version.split('+')[0])
+    if vi >= pv.Version("1.10.0"):
         return 16
-    if vi >= StrictVersion("1.9.0"):
+    if vi >= pv.Version("1.9.0"):
         return 15
-    if vi >= StrictVersion("1.8.0"):
+    if vi >= pv.Version("1.8.0"):
         return 14
-    if vi >= StrictVersion("1.6.0"):
+    if vi >= pv.Version("1.6.0"):
         return 13
-    if vi >= StrictVersion("1.3.0"):
+    if vi >= pv.Version("1.3.0"):
         return 12
-    if vi >= StrictVersion("1.0.0"):
+    if vi >= pv.Version("1.0.0"):
         return 11
-    if vi >= StrictVersion("0.4.0"):
+    if vi >= pv.Version("0.4.0"):
         return 10
-    if vi >= StrictVersion("0.3.0"):
+    if vi >= pv.Version("0.3.0"):
         return 9
     return 8
 

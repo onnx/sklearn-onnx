@@ -4,7 +4,7 @@
 Tests scikit-linear converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -202,7 +202,7 @@ class TestSklearnSVM(unittest.TestCase):
             basename="SklearnMclSVCLinearPT-Dec2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_svr_linear(self):
         model, X = self._fit_binary_classification(SVR(kernel="linear"))
@@ -251,7 +251,7 @@ class TestSklearnSVM(unittest.TestCase):
             basename="SklearnBinNuSVCPF-NoProbOpp")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvc_binary_ptrue(self):
         model, X = self._fit_binary_classification(NuSVC(probability=True))
@@ -368,7 +368,7 @@ class TestSklearnSVM(unittest.TestCase):
             basename="SklearnMclNuSVCPT-Dec3")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvr(self):
         model, X = self._fit_binary_classification(NuSVR())
@@ -392,7 +392,7 @@ class TestSklearnSVM(unittest.TestCase):
                             basename="SklearnRegNuSVR")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvr_default(self):
         model, X = self._fit_binary_classification(NuSVR())

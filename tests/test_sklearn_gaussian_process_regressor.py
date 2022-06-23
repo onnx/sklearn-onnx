@@ -5,7 +5,7 @@ import unittest
 import inspect
 import warnings
 from io import StringIO
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
@@ -149,7 +149,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                                 np.squeeze(got), decimal=decimal)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_constant1(self):
@@ -166,7 +166,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_cosine_float(self):
@@ -204,7 +204,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_cosine_double(self):
@@ -230,7 +230,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rbf1(self):
@@ -246,7 +246,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rbf10(self):
@@ -262,7 +262,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rbf2(self):
@@ -278,7 +278,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rbf_mul(self):
@@ -296,7 +296,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_ker1_def(self):
@@ -314,7 +314,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_ker12_def(self):
@@ -332,7 +332,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_ker2_def(self):
@@ -354,7 +354,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=0)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_ker2_dotproduct(self):
@@ -379,7 +379,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=2)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_ker2_exp_sine_squared(self):
@@ -408,7 +408,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_exp_sine_squared_diag(self):
@@ -426,7 +426,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rational_quadratic_diag(self):
@@ -444,7 +444,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=4)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_dot_product_diag(self):
@@ -462,7 +462,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_dot_product(self):
@@ -491,7 +491,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1 / 1000, m2 / 1000, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rational_quadratic(self):
@@ -519,7 +519,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(m1, m2, decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_unfitted(self):
@@ -575,10 +575,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             GaussianProcessRegressor])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        pv.Version(ort_version) < pv.Version("1.6.0"),
         reason="shape_inference fails")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_true(self):
@@ -598,10 +598,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                             basename="SklearnGaussianProcessRBFTDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        pv.Version(ort_version) < pv.Version("1.6.0"),
         reason="shape_inference fails")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_cosine_fitted_true_float(self):
@@ -622,10 +622,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                             basename="SklearnGaussianProcessCosineFloat-Dec2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.6.0"),
+        pv.Version(ort_version) < pv.Version("1.6.0"),
         reason="shape_inference fails")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_cosine_fitted_true_double(self):
@@ -646,7 +646,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                             basename="SklearnGaussianProcessCosineDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_false(self):
@@ -666,7 +666,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                             basename="SklearnGaussianProcessRBF-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_return_std_true(self):
@@ -698,7 +698,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                             disable_optimisation=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @unittest.skipIf(
         TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
@@ -738,7 +738,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             decimal=4, disable_optimisation=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_false(self):
@@ -773,7 +773,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_return_std_exp_sine_squared_double_true(self):
@@ -809,7 +809,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @unittest.skipIf(
         TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
@@ -848,7 +848,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             decimal=3, disable_optimisation=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @unittest.skipIf(
         TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
@@ -884,7 +884,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             disable_optimisation=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_fitted_shapes(self):
@@ -902,7 +902,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {}, skip_if_float32=True)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_fitted_partial_float64(self):
@@ -929,7 +929,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD2),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_fitted_partial_float64_operator_cdist_rbf(self):
@@ -972,7 +972,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD2),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_fitted_partial_float64_operator_cdist_sine(self):
@@ -1015,7 +1015,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.check_outputs(gp, model_onnx, X_test, {})
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+        pv.Version(ort_version) <= pv.Version(THRESHOLD2),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_fitted_partial_float64_operator_cdist_quad(self):

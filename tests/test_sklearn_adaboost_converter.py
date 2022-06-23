@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 from onnx.defs import onnx_opset_version
 from onnxruntime import __version__ as ort_version
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
@@ -225,8 +225,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model_onnx,
             basename="SklearnAdaBoostRegressorLR-Dec4")
 
-    @unittest.skipIf((StrictVersion(ort_version) <
-                      StrictVersion("0.5.9999")),
+    @unittest.skipIf((pv.Version(ort_version) <
+                      pv.Version("0.5.9999")),
                      reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lr11(self):

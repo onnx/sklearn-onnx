@@ -2,7 +2,7 @@
 
 import unittest
 import warnings
-from distutils.version import StrictVersion
+import packaging.version as pv
 from collections import OrderedDict
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -45,7 +45,7 @@ ort_version = ".".join(ort_version.split('.')[:2])
 class TestOnnxOperatorsScan(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example(self):
@@ -122,7 +122,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(z, res[1])
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_algebra(self):
@@ -158,7 +158,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(z, res[1])
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist(self):
@@ -199,7 +199,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         try:
             onnx.checker.check_model(model_def)
         except ValidationError as e:
-            if StrictVersion(onnx__version__) <= StrictVersion("1.5.0"):
+            if pv.Version(onnx__version__) <= pv.Version("1.5.0"):
                 warnings.warn(e)
             else:
                 raise e
@@ -212,7 +212,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[1])
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist_in(self):
@@ -250,7 +250,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0])
 
     @unittest.skipIf((OnnxConstantOfShape is None or
-                      StrictVersion(ort_version) <= StrictVersion(THRESHOLD)),
+                      pv.Version(ort_version) <= pv.Version(THRESHOLD)),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_constant_of_shape(self):
@@ -281,7 +281,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0])
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in(self):
@@ -330,7 +330,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert "u_scan0_" not in str(model_def)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_mink(self):
@@ -382,7 +382,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(exp, res[0], decimal=4)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_custom_ops(self):

@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
@@ -39,7 +39,7 @@ ort_version = ort_version.split('+')[0]
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.3.0"),
+        pv.Version(ort_version) <= pv.Version("0.3.0"),
         reason="No suitable kernel definition found "
                "for op Cast(9) (node Cast)")
     def test_decisiontree_classifier1(self):

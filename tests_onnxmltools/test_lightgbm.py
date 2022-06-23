@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -124,7 +124,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             convert_lightgbm)
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_classifier(self):
         model = LGBMClassifier(n_estimators=3, min_child_samples=1)
@@ -136,7 +136,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor(self):
         model = LGBMRegressor(n_estimators=3, min_child_samples=1)
@@ -145,7 +145,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor1(self):
         model = LGBMRegressor(n_estimators=1, min_child_samples=1)
@@ -154,7 +154,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_regressor2(self):
         model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
@@ -163,7 +163,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_booster_multi_classifier(self):
         X = [[0, 1], [1, 1], [2, 0], [1, 2], [-1, 2], [1, -2]]

@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 import scipy
@@ -109,7 +109,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum")
     @unittest.skipIf(GaussianProcessClassifier is None,
                      reason="scikit-learn is too old")
-    @unittest.skipIf(StrictVersion(sklver_) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(sklver_) < pv.Version("0.22"),
                      reason="not available")
     def test_gpc_float_bin(self):
         self.common_test_gpc(dtype=np.float32)
@@ -117,7 +117,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum, reciprocal")
     @unittest.skipIf(GaussianProcessClassifier is None,
                      reason="scikit-learn is too old")
-    @unittest.skipIf(StrictVersion(sklver_) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(sklver_) < pv.Version("0.22"),
                      reason="not available")
     def test_gpc_double_bin(self):
         self.common_test_gpc(dtype=np.float64)

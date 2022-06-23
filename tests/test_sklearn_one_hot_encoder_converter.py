@@ -2,7 +2,7 @@
 
 """Tests scikit-learn's OneHotEncoder converter."""
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from onnxruntime import __version__ as ort_version
 from sklearn import __version__ as sklearn_version
@@ -19,19 +19,19 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def one_hot_encoder_supports_string():
-    # StrictVersion does not work with development versions
+    # pv.Version does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.20.0")
+    return pv.Version(vers) >= pv.Version("0.20.0")
 
 
 def one_hot_encoder_supports_drop():
-    # StrictVersion does not work with development versions
+    # pv.Version does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.21.0")
+    return pv.Version(vers) >= pv.Version("0.21.0")
 
 
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -50,7 +50,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderInt64-SkipDim1")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -71,7 +71,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderInt32-SkipDim1")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -93,7 +93,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderInt32Scaler-SkipDim1")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
@@ -121,7 +121,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             test, model, model_onnx, verbose=False,
             basename="SklearnOneHotEncoderMixedStringIntDrop")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -138,7 +138,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderOneStringCat")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -155,7 +155,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderTwoStringCat")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
@@ -177,7 +177,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             test_data, model, model_onnx,
             basename="SklearnOneHotEncoderStringDropFirst")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -199,7 +199,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderCatSparse-SkipDim1")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_string(),
@@ -221,7 +221,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx,
             basename="SklearnOneHotEncoderCatDense-SkipDim1")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
@@ -250,7 +250,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             test, model, model_onnx,
             basename="SklearnOneHotEncoderIntDrop")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),
@@ -278,7 +278,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             test, model, model_onnx,
             basename="SklearnOneHotEncoderIntDropFirst")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @unittest.skipIf(
         not one_hot_encoder_supports_drop(),

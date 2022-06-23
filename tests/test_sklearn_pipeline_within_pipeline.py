@@ -78,8 +78,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPipelinePcaPipelineMinMax",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.2.1')",
         )
 
     def test_pipeline_pca_pipeline_none_lin(self):
@@ -132,8 +132,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPipelinePcaPipelineMinMaxLogReg",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.2.1')",
         )
 
     def test_pipeline_pca_pipeline_multinomial(self):
@@ -196,8 +196,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPipelinePcaPipelineMinMaxNB2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.2.1')",
         )
 
     def test_pipeline_pca_pipeline_multinomial_none(self):
@@ -257,8 +257,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPipelinePcaPipelineMinMaxNBNone",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.2.1')",
         )
 
     @unittest.skipIf(
@@ -304,8 +304,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnPipelineCTPipelineImputerScalerLR",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
+            allow_failure="pv.Version(onnxruntime.__version__)"
+                          " <= pv.Version('0.2.1')",
         )
 
     @unittest.skipIf(

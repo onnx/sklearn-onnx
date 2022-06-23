@@ -5,7 +5,7 @@ Tests scikit-learn's cast transformer converter.
 """
 import unittest
 import math
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn.datasets import make_regression
@@ -48,20 +48,20 @@ class TestSklearnCastRegressorConverter(unittest.TestCase):
             basename="SklearnCastRegressor{}".format(
                 input_type.__class__.__name__))
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_regressor_float(self):
         self.common_test_cast_regressor(
             numpy.float32, FloatTensorType)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_regressor_float64(self):
         self.common_test_cast_regressor(
             numpy.float64, DoubleTensorType)
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_pipeline(self):
 

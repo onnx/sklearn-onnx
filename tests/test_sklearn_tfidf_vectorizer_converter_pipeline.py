@@ -4,7 +4,7 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -22,7 +22,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
     def common_test_model_tfidf_vectorizer_pipeline_cls(
             self, kind=None, verbose=False):
         if kind == 'stop':
-            if StrictVersion(ort_version) >= StrictVersion('1.4.0'):
+            if pv.Version(ort_version) >= pv.Version('1.4.0'):
                 # regression with stopwords in onnxruntime 1.4+
                 stopwords = ['theh']
             else:
@@ -101,7 +101,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0.0"),
+        pv.Version(ort_version) < pv.Version("1.0.0"),
         reason="Too old")
     def test_model_tfidf_vectorizer_pipeline(self):
         for kind in [None, 'cls', 'reg']:
@@ -110,7 +110,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="Wrong handling of stopwods and n-grams")
     def test_model_tfidf_vectorizer_pipeline_stop_words(self):
         for kind in ['stop']:
