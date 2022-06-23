@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -74,7 +74,7 @@ class TestOpset13(unittest.TestCase):
                     None, {'X': x})
                 assert_almost_equal(y, got[0])
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.0.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.0.0'),
                      reason="onnxruntime too old, onnx too recent")
     def test_unsqueeze(self):
         x = numpy.random.randn(1, 3, 1, 5).astype(numpy.float32)

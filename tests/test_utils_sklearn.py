@@ -4,7 +4,7 @@
 Tests on functions in *onnx_helper*.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 import pandas
 from onnxruntime import __version__ as ort_version
@@ -114,7 +114,7 @@ class TestUtilsSklearn(unittest.TestCase):
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     def test_pipeline_column_transformer(self):
 

@@ -4,7 +4,7 @@
 Tests scikit-imputer converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
@@ -142,7 +142,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
     @unittest.skipIf(SimpleImputer is None,
                      reason="SimpleImputer changed in 0.20")
     @unittest.skipIf(
-        StrictVersion(skl_ver) < StrictVersion('0.24'),
+        pv.Version(skl_ver) < pv.Version('0.24'),
         reason="SimpleImputer does not support strings")
     def test_simple_imputer_string_inputs_int_mostf(self):
         model = SimpleImputer(
@@ -161,7 +161,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
     @unittest.skipIf(SimpleImputer is None,
                      reason="SimpleImputer changed in 0.20")
     @unittest.skipIf(
-        StrictVersion(skl_ver) < StrictVersion('0.24'),
+        pv.Version(skl_ver) < pv.Version('0.24'),
         reason="SimpleImputer does not support strings")
     def test_simple_imputer_string_inputs_int_mostf_default(self):
         model = SimpleImputer(strategy="most_frequent", missing_values='')

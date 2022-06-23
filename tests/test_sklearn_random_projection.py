@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import onnxruntime
 from sklearn.random_projection import GaussianRandomProjection
@@ -10,7 +10,7 @@ from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-nort = StrictVersion(onnxruntime.__version__) < StrictVersion('0.5.0')
+nort = pv.Version(onnxruntime.__version__) < pv.Version('0.5.0')
 
 
 class TestSklearnRandomProjection(unittest.TestCase):

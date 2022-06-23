@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -60,7 +60,7 @@ except ImportError:
 def _sklearn_version():
     # Remove development version 0.22.dev0 becomes 0.22.
     v = ".".join(sklearn.__version__.split('.')[:2])
-    return StrictVersion(v)
+    return pv.Version(v)
 
 
 ort_version = ".".join(ort_version.split('.')[:2])
@@ -293,21 +293,21 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnHGBRegressor", verbose=False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
@@ -357,37 +357,37 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                 verbose=False,
                 methods=['predict', 'decision_function_binary'])
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")

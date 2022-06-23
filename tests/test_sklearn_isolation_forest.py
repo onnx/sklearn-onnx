@@ -4,7 +4,7 @@
 Test scikit-learn's IsolationForest.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -27,7 +27,7 @@ sklv2 = '.'.join(sklv.split('.')[:2])
 class TestSklearnIsolationForest(unittest.TestCase):
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+    @unittest.skipIf(pv.Version(sklv2) < pv.Version('0.22.0'),
                      reason="tree structure is different.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest(self):
@@ -43,7 +43,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
                             basename="IsolationForest")
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+    @unittest.skipIf(pv.Version(sklv2) < pv.Version('0.22.0'),
                      reason="tree structure is different.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_score_samples(self):
@@ -67,7 +67,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
         assert_almost_equal(expected_score, got[2].ravel())
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+    @unittest.skipIf(pv.Version(sklv2) < pv.Version('0.22.0'),
                      reason="tree structure is different.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_op1(self):
@@ -80,7 +80,7 @@ class TestSklearnIsolationForest(unittest.TestCase):
                     target_opset={'': TARGET_OPSET, 'ai.onnx.ml': 1})
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
-    @unittest.skipIf(StrictVersion(sklv2) < StrictVersion('0.22.0'),
+    @unittest.skipIf(pv.Version(sklv2) < pv.Version('0.22.0'),
                      reason="tree structure is different.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_isolation_forest_rnd(self):

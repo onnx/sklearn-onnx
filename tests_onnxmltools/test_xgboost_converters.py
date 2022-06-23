@@ -3,7 +3,7 @@
 
 import unittest
 import numbers
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 import pandas
@@ -69,7 +69,7 @@ class TestXGBoostModels(unittest.TestCase):
             convert_xgboost)
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for xgboost is too old")
     def test_xgb_regressor(self):
         iris = load_iris()
@@ -106,7 +106,7 @@ class TestXGBoostModels(unittest.TestCase):
         assert_almost_equal(xgb.predict(X), res[0])
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for xgboost is too old")
     def test_xgb_classifier_multi(self):
         iris = load_iris()
@@ -126,7 +126,7 @@ class TestXGBoostModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.11'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for xgboost is too old")
     def test_xgb_classifier_multi_reglog(self):
         iris = load_iris()

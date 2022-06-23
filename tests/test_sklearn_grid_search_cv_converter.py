@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 import onnx
@@ -115,7 +115,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             basename="SklearnGridSearchRegressionFloat-OneOffArray-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
@@ -133,7 +133,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
                      "-OneOffArray-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_double(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]

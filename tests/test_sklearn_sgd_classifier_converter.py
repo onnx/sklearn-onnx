@@ -3,7 +3,7 @@
 """Tests scikit-learn's SGDClassifier converter."""
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from onnxruntime import __version__ as ort_version
@@ -165,7 +165,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
             X.astype(np.float32), model, model_onnx,
             basename="SklearnSGDClassifierBinaryLogL1NoIntercept-Dec4")
 
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("1.0.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("1.0.0"),
                      reason="discrepencies")
     def test_model_sgd_multi_class_log_l1_no_intercept(self):
         model, X = fit_classification_model(

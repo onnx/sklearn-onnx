@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import onnxruntime
 try:
     # scikit-learn >= 0.22
@@ -172,8 +172,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
             methods=['predict', 'decision_function_binary'])
 
-    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
-                     <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(onnxruntime.__version__)
+                     <= pv.Version("0.4.0"),
                      reason="Not implemented.")
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_sgd_multiclass(self):

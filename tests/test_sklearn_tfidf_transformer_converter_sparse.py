@@ -4,7 +4,7 @@
 """
 Tests examples from scikit-learn's documentation.
 """
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -20,7 +20,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         TARGET_OPSET < 9,
         # issue with encoding
         reason="https://github.com/onnx/onnx/pull/1734")
-    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.2.1"),
+    @unittest.skipIf(pv.Version(ort.__version__) <= pv.Version("0.2.1"),
                      reason="sparse not supported")
     def test_model_tfidf_transform_bug(self):
         categories = [
