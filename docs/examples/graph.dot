@@ -1,0 +1,45 @@
+digraph OnnxAdd {
+	graph [bb="0,0,284.37,444.33",
+		rankdir=TB
+	];
+	node [label="\N"];
+	"Mu_Mul/Mul (op#0)\n input0 X\n input1 Mu_Mulcst\n output0 Mu_C0"	[URL="javascript:alert('')",
+		height=1.3356,
+		pos="176.39,324.25",
+		width=2.5927];
+	Mu_C00	[height=0.5,
+		label=Mu_C0,
+		pos="176.39,222.17",
+		shape=octagon,
+		width=1.1529];
+	"Mu_Mul/Mul (op#0)\n input0 X\n input1 Mu_Mulcst\n output0 Mu_C0" -> Mu_C00	[pos="e,176.39,240.39 176.39,276.14 176.39,267.35 176.39,258.45 176.39,250.51"];
+	X0	[height=0.5,
+		label=X,
+		pos="125.39,426.33",
+		shape=octagon,
+		width=0.75];
+	X0 -> "Mu_Mul/Mul (op#0)\n input0 X\n input1 Mu_Mulcst\n output0 Mu_C0"	[pos="e,153.15,370.86 134.27,407.9 138.33,399.93 143.39,390 148.58,379.83"];
+	Mu_Mulcst0	[height=0.5,
+		label=Mu_Mulcst,
+		pos="227.39,426.33",
+		shape=octagon,
+		width=1.5829];
+	Mu_Mulcst0 -> "Mu_Mul/Mul (op#0)\n input0 X\n input1 Mu_Mulcst\n output0 Mu_C0"	[pos="e,199.63,370.86 218.51,407.9 214.44,399.93 209.39,390 204.2,379.83"];
+	"Ad_Add/Add (op#1)\n input0 Mu_C0\n input1 Ad_Addcst\n output0 Y"	[URL="javascript:alert('')",
+		height=1.3356,
+		pos="117.39,120.08",
+		width=2.6909];
+	Mu_C00 -> "Ad_Add/Add (op#1)\n input0 Mu_C0\n input1 Ad_Addcst\n output0 Y"	[pos="e,144.28,166.7 166.11,203.73 161.37,195.68 155.45,185.64 149.38,175.35"];
+	Y0	[height=0.5,
+		label=Y,
+		pos="117.39,18",
+		shape=octagon,
+		width=0.75];
+	"Ad_Add/Add (op#1)\n input0 Mu_C0\n input1 Ad_Addcst\n output0 Y" -> Y0	[pos="e,117.39,36.223 117.39,71.972 117.39,63.188 117.39,54.284 117.39,46.346"];
+	Ad_Addcst0	[height=0.5,
+		label=Ad_Addcst,
+		pos="58.39,222.17",
+		shape=octagon,
+		width=1.6219];
+	Ad_Addcst0 -> "Ad_Add/Add (op#1)\n input0 Mu_C0\n input1 Ad_Addcst\n output0 Y"	[pos="e,90.501,166.7 68.667,203.73 73.413,195.68 79.335,185.64 85.398,175.35"];
+}

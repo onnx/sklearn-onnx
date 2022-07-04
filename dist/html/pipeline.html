@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Convert a pipeline &#8212; sklearn-onnx 1.11.2 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Converters with options" href="parameterized.html" />
+    <link rel="prev" title="Write your own converter for your own model" href="auto_examples/plot_custom_model.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    <img src="_static/logo_main.png" class="logo__image only-light" alt="Logo image">
+    <img src="_static/logo_main.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="index_tutorial.html">
+  Tutorial
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="api_summary.html">
+  API Summary
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="auto_examples/index.html">
+  Gallery of examples
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Convert a pipeline
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="parameterized.html">
+  Converters with options
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="supported.html">
+  Supported scikit-learn Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#convert-complex-pipelines">
+   Convert complex pipelines
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parser-shape-calculator-converter">
+   Parser, shape calculator, converter
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#new-converters-in-a-pipeline">
+   New converters in a pipeline
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#titanic-example">
+   Titanic example
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parameterize-the-conversion">
+   Parameterize the conversion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#investigate-discrepencies">
+   Investigate discrepencies
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#investigate-missing-converters">
+   Investigate missing converters
+  </a>
+ </li>
+</ul>
+
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="convert-a-pipeline">
+<h1>Convert a pipeline<a class="headerlink" href="#convert-a-pipeline" title="Permalink to this heading">#</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#convert-complex-pipelines" id="id1">Convert complex pipelines</a></p></li>
+<li><p><a class="reference internal" href="#parser-shape-calculator-converter" id="id2">Parser, shape calculator, converter</a></p></li>
+<li><p><a class="reference internal" href="#new-converters-in-a-pipeline" id="id3">New converters in a pipeline</a></p></li>
+<li><p><a class="reference internal" href="#titanic-example" id="id4">Titanic example</a></p></li>
+<li><p><a class="reference internal" href="#parameterize-the-conversion" id="id5">Parameterize the conversion</a></p></li>
+<li><p><a class="reference internal" href="#investigate-discrepencies" id="id6">Investigate discrepencies</a></p></li>
+<li><p><a class="reference internal" href="#investigate-missing-converters" id="id7">Investigate missing converters</a></p></li>
+</ul>
+</div>
+<p><em>skl2onnx</em> converts any machine learning pipeline into
+<em>ONNX</em> pipelines. Every transformer or predictors is converted
+into one or multiple nodes into the <em>ONNX</em> graph.
+Any <a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/ImplementingAnOnnxBackend.md">ONNX backend</a>
+can then use this graph to compute equivalent outputs for the same inputs.</p>
+<section id="convert-complex-pipelines">
+<span id="l-complex-pipeline"></span><h2><a class="toc-backref" href="#id1">Convert complex pipelines</a><a class="headerlink" href="#convert-complex-pipelines" title="Permalink to this heading">#</a></h2>
+<p><em>scikit-learn</em> introduced
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html">ColumnTransformer</a>
+useful to build complex pipelines such as the following one:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+
+<span class="n">numeric_features</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="c1"># [&quot;vA&quot;, &quot;vB&quot;, &quot;vC&quot;]</span>
+<span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="c1"># [&quot;vcat&quot;, &quot;vcat2&quot;]</span>
+
+<span class="n">classifier</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">class_weight</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])),</span>
+                                <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;lbfgs&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())</span>
+<span class="p">])</span>
+
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;tsvd&#39;</span><span class="p">,</span> <span class="n">TruncatedSVD</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;arpack&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">))</span>
+<span class="p">])</span>
+
+<span class="n">preprocessor</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">numeric_features</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical_features</span><span class="p">)</span>
+    <span class="p">])</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;precprocessor&#39;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">classifier</span><span class="p">)</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>Which we can represents as:</p>
+<div class="align-default"><img height="440" src="_images/blockdiag-0e2bbe287bfc020181cb7981832f234c906f12a6.png" width="448" /></div>
+<p>Once fitted, the model is converted into <em>ONNX</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span><span class="p">,</span> <span class="n">StringTensorType</span>
+
+<span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;numfeat&#39;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">])),</span>
+                <span class="p">(</span><span class="s1">&#39;strfeat&#39;</span><span class="p">,</span> <span class="n">StringTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))]</span>
+<span class="n">model_onnx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The error <code class="docutils literal notranslate"><span class="pre">AttributeError:</span> <span class="pre">'ColumnTransformer'</span> <span class="pre">object</span> <span class="pre">has</span> <span class="pre">no</span> <span class="pre">attribute</span> <span class="pre">'transformers_'</span></code>
+means the model was not trained. The converter tries to access an attribute
+created by method <cite>fit</cite>.</p>
+</div>
+<p>It can be represented as a
+<a class="reference external" href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">DOT</a> graph:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">onnx.tools.net_drawer</span> <span class="kn">import</span> <span class="n">GetPydotGraph</span><span class="p">,</span> <span class="n">GetOpNodeProducer</span>
+<span class="n">pydot_graph</span> <span class="o">=</span> <span class="n">GetPydotGraph</span><span class="p">(</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">model_onnx</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">rankdir</span><span class="o">=</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span>
+                            <span class="n">node_producer</span><span class="o">=</span><span class="n">GetOpNodeProducer</span><span class="p">(</span><span class="s2">&quot;docstring&quot;</span><span class="p">))</span>
+<span class="n">pydot_graph</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="s2">&quot;graph.dot&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;dot -O -Tpng graph.dot&#39;</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/pipeline.png"><img alt="_images/pipeline.png" src="_images/pipeline.png" style="width: 1000px;" /></a>
+</section>
+<section id="parser-shape-calculator-converter">
+<h2><a class="toc-backref" href="#id2">Parser, shape calculator, converter</a><a class="headerlink" href="#parser-shape-calculator-converter" title="Permalink to this heading">#</a></h2>
+<p id="index-0">Three kinds of functions are involved into the conversion
+of a <em>scikit-pipeline</em>. Each of them is called in the following
+order:</p>
+<ul class="simple">
+<li><p><strong>parser(scope, model, inputs, custom_parser)</strong>:
+the parser builds the expected outputs of a model,
+as the resulting graph must contain unique names,
+<em>scope</em> contains all names already given,
+<em>model</em> is the model to convert,
+<em>inputs</em> are the <em>inputs</em> the model receives
+in the <em>ONNX</em> graph. It is a list of
+<a class="reference internal" href="api_summary.html#skl2onnx.common._topology.Variable" title="skl2onnx.common._topology.Variable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>.
+<em>custom_parsers</em> contains a map <code class="docutils literal notranslate"><span class="pre">{model</span> <span class="pre">type:</span> <span class="pre">parser}</span></code>
+which extends the default list of parsers.
+The parser defines default outputs for standard
+machine learned problems. The shape calculator
+changes the shapes and types for each of them
+depending on the model and is called after all
+outputs were defined (topology). This steps defines
+the number of outputs and their types for every node
+and sets them to a default shape <code class="docutils literal notranslate"><span class="pre">[None,</span> <span class="pre">None]</span></code>
+which the output node has one row and no known
+columns yet.</p></li>
+<li><p><strong>shape_calculator(model):</strong>
+The shape calculator changes the shape
+of the outputs created by the parser. Once this function
+returned its results, the graph structure is fully defined
+and cannot be changed. The shape calculator should
+not change types. Many runtimes are implemented in C++
+and do not support implicit casts. A change of type
+might make the runtime fail due to a type mismatch
+between two consecutive nodes produces by two different
+converters.</p></li>
+<li><p><strong>converter(scope, operator, container):</strong>
+The converter converts the transformers or predictors into
+<em>ONNX</em> nodes. Each node can an <em>ONNX</em>
+<a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators.md">operator</a> or
+<a class="reference external" href="https://github.com/onnx/onnx/blob/master/docs/Operators.md">ML operator</a> or
+custom <em>ONNX</em> operators.</p></li>
+</ul>
+<p>As <em>sklearn-onnx</em> may convert pipelines with model coming from other libraries,
+the library must handle parsers, shape calculators or converters coming
+from other packages. This can be done is two ways. The first one
+consists in calling function <a class="reference internal" href="api_summary.html#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn</span></code></a>
+by mapping the model type to a specific parser, a specific shape calculator
+or a specific converter. It is possible to avoid these specifications
+by registering the new parser or shape calculator or converter
+with one of the two functions
+<a class="reference internal" href="api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter"><code class="xref py py-func docutils literal notranslate"><span class="pre">update_registered_converter</span></code></a>,
+<a class="reference internal" href="api_summary.html#skl2onnx.update_registered_parser" title="skl2onnx.update_registered_parser"><code class="xref py py-func docutils literal notranslate"><span class="pre">update_registered_parser</span></code></a>.
+One example follows.</p>
+</section>
+<section id="new-converters-in-a-pipeline">
+<span id="l-register-converter"></span><h2><a class="toc-backref" href="#id3">New converters in a pipeline</a><a class="headerlink" href="#new-converters-in-a-pipeline" title="Permalink to this heading">#</a></h2>
+<p>Many libraries implement <em>scikit-learn</em> API and their models can
+be included in <em>scikit-learn</em> pipelines. However, <em>sklearn-onnx</em> cannot
+a pipeline which include a model such as <em>XGBoost</em> or <em>LightGbm</em>
+if it does not know the corresponding converters: it needs to be registered.
+That’s the purpose of function <a class="reference internal" href="api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter"><code class="xref py py-func docutils literal notranslate"><span class="pre">skl2onnx.update_registered_converter()</span></code></a>.
+The following example shows how to register a new converter or
+or update an existing one. Four elements are registered:</p>
+<ul class="simple">
+<li><p>the model class</p></li>
+<li><p>an alias, usually the class name prefixed by the library name</p></li>
+<li><p>a shape calculator which computes the type and shape of the expected outputs</p></li>
+<li><p>a model converter</p></li>
+</ul>
+<p>The following lines shows what these four elements are for a random forest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="kn">import</span> <span class="n">calculate_linear_classifier_output_shapes</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.operator_converters.RandomForest</span> <span class="kn">import</span> <span class="n">convert_sklearn_random_forest_classifier</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">update_registered_converter</span>
+<span class="n">update_registered_converter</span><span class="p">(</span><span class="n">SGDClassifier</span><span class="p">,</span> <span class="s1">&#39;SklearnLinearClassifier&#39;</span><span class="p">,</span>
+                            <span class="n">calculate_linear_classifier_output_shapes</span><span class="p">,</span>
+                            <span class="n">convert_sklearn_random_forest_classifier</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See example <a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm.html#example-lightgbm"><span class="std std-ref">Convert a pipeline with a LightGBM classifier</span></a> to see a complete example
+with a <em>LightGbm</em> model.</p>
+</section>
+<section id="titanic-example">
+<h2><a class="toc-backref" href="#id4">Titanic example</a><a class="headerlink" href="#titanic-example" title="Permalink to this heading">#</a></h2>
+<p>The first example was a simplified pipeline coming from <em>scikit-learn</em>’s documentation:
+<a class="reference external" href="https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py">Column Transformer with Mixed Types</a>.
+The full story is available in a runnable example: <a class="reference internal" href="auto_examples/plot_complex_pipeline.html#example-complex-pipeline"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a>
+which also shows up some mistakes that a user could come accross
+when trying to convert a pipeline.</p>
+</section>
+<section id="parameterize-the-conversion">
+<h2><a class="toc-backref" href="#id5">Parameterize the conversion</a><a class="headerlink" href="#parameterize-the-conversion" title="Permalink to this heading">#</a></h2>
+<p>Most of the converter do not require specific options
+to convert a <em>scikit-learn</em> model. It always produces the same
+results. However, in some cases, the conversion cannot produce
+a model which returns the exact same results. The user may want
+to optimize the conversion by giving the converter additional
+information, even if the model to convert is included in a
+pipeline. That why the option mechanism was implemented:
+<a class="reference internal" href="parameterized.html#l-conv-options"><span class="std std-ref">Converters with options</span></a>.</p>
+</section>
+<section id="investigate-discrepencies">
+<h2><a class="toc-backref" href="#id6">Investigate discrepencies</a><a class="headerlink" href="#investigate-discrepencies" title="Permalink to this heading">#</a></h2>
+<p>A wrong converter may introduce introduce discrepencies
+in a converter pipeline but it is not alway easy to
+isolate the source of the differences. The function
+<code class="xref py py-func docutils literal notranslate"><span class="pre">collect_intermediate_steps</span></code>
+may then be used to investigate each component independently.
+The following piece of code is extracted from unit test
+<a class="reference external" href="https://github.com/onnx/sklearn-onnx/blob/master/tests/test_investigate.py">test_investigate.py</a> and converts
+a pipeline and each of its components independently.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span> <span class="nn">onnxruntime</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
+
+<span class="c1"># Let&#39;s fit a model.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s2">&quot;scaler1&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+                  <span class="p">(</span><span class="s2">&quot;scaler2&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Convert and collect every operator in a pipeline</span>
+<span class="c1"># and modifies the current pipeline to keep</span>
+<span class="c1"># intermediate inputs and outputs when method</span>
+<span class="c1"># predict or transform is called.</span>
+<span class="n">operators</span> <span class="o">=</span> <span class="n">collect_intermediate_steps</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">,</span>
+                                       <span class="p">[(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span>
+                                         <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))])</span>
+
+<span class="c1"># Method and transform is called.</span>
+<span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Loop on every operator.</span>
+<span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+
+    <span class="c1"># The ONNX for this operator.</span>
+    <span class="n">onnx_step</span> <span class="o">=</span> <span class="n">op</span><span class="p">[</span><span class="s1">&#39;onnx_step&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Use onnxruntime to compute ONNX outputs</span>
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="n">onnx_step</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+    <span class="c1"># Let&#39;s use the initial data as the ONNX model</span>
+    <span class="c1"># contains all nodes from the first inputs to this node.</span>
+    <span class="n">onnx_outputs</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">})</span>
+    <span class="n">onnx_output</span> <span class="o">=</span> <span class="n">onnx_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">skl_outputs</span> <span class="o">=</span> <span class="n">op</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Compares the outputs between scikit-learn and onnxruntime.</span>
+    <span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">onnx_output</span><span class="p">,</span> <span class="n">skl_outputs</span><span class="p">)</span>
+
+    <span class="c1"># A function which is able to deal with different types.</span>
+    <span class="n">compare_objects</span><span class="p">(</span><span class="n">onnx_output</span><span class="p">,</span> <span class="n">skl_outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="investigate-missing-converters">
+<h2><a class="toc-backref" href="#id7">Investigate missing converters</a><a class="headerlink" href="#investigate-missing-converters" title="Permalink to this heading">#</a></h2>
+<p>Many converters can be missing before converting a pipeline.
+Exception <code class="xref py py-class docutils literal notranslate"><span class="pre">MissingShapeCalculator</span></code> is
+raised when the first missing one is found.
+The previous snippet of code can be modified to find all of
+them.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span> <span class="nn">onnxruntime</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">guess_data_type</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.exceptions</span> <span class="kn">import</span> <span class="n">MissingShapeCalculator</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span><span class="p">,</span> <span class="n">compare_objects</span><span class="p">,</span> <span class="n">enumerate_pipeline_models</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.helpers.investigate</span> <span class="kn">import</span> <span class="n">_alter_model_for_debugging</span>
+<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
+
+<span class="k">class</span> <span class="nc">MyScaler</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="c1"># Let&#39;s fit a model.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s2">&quot;scaler1&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+                  <span class="p">(</span><span class="s2">&quot;scaler2&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+                  <span class="p">(</span><span class="s2">&quot;scaler3&quot;</span><span class="p">,</span> <span class="n">MyScaler</span><span class="p">()),</span>
+                <span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># This function alters the pipeline, every time</span>
+<span class="c1"># methods transform or predict are used, inputs and outputs</span>
+<span class="c1"># are stored in every operator.</span>
+<span class="n">_alter_model_for_debugging</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s use the pipeline and keep intermediate</span>
+<span class="c1"># inputs and outputs.</span>
+<span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s get the list of all operators to convert</span>
+<span class="c1"># and independently process them.</span>
+<span class="n">all_models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">enumerate_pipeline_models</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+
+<span class="c1"># Loop on every operator.</span>
+<span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">last</span> <span class="ow">in</span> <span class="n">all_models</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="p">(</span><span class="mi">0</span><span class="p">,):</span>
+        <span class="c1"># whole pipeline</span>
+        <span class="k">continue</span>
+
+    <span class="c1"># The dump input data for this operator.</span>
+    <span class="n">data_in</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Let&#39;s infer some initial shape.</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">guess_data_type</span><span class="p">(</span><span class="n">data_in</span><span class="p">)</span>
+
+    <span class="c1"># Let&#39;s convert.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">onnx_step</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MissingShapeCalculator</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;MyScaler&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">raise</span>
+
+    <span class="c1"># If it does not fail, let&#39;s compare the ONNX outputs with</span>
+    <span class="c1"># the original operator.</span>
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="n">onnx_step</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+    <span class="n">onnx_outputs</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="n">data_in</span><span class="p">})</span>
+    <span class="n">onnx_output</span> <span class="o">=</span> <span class="n">onnx_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">skl_outputs</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+    <span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">onnx_output</span><span class="p">,</span> <span class="n">skl_outputs</span><span class="p">)</span>
+    <span class="n">compare_objects</span><span class="p">(</span><span class="n">onnx_output</span><span class="p">,</span> <span class="n">skl_outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="auto_examples/plot_custom_model.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Write your own converter for your own model</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="parameterized.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Converters with options</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2018-2022, Microsoft.<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>

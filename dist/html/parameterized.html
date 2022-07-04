@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Converters with options &#8212; sklearn-onnx 1.11.2 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Supported scikit-learn Models" href="supported.html" />
+    <link rel="prev" title="Convert a pipeline" href="pipeline.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    <img src="_static/logo_main.png" class="logo__image only-light" alt="Logo image">
+    <img src="_static/logo_main.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="index_tutorial.html">
+  Tutorial
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="api_summary.html">
+  API Summary
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="auto_examples/index.html">
+  Gallery of examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="pipeline.html">
+  Convert a pipeline
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Converters with options
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="supported.html">
+  Supported scikit-learn Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gaussianprocessregressor-nearestneighbors">
+   GaussianProcessRegressor, NearestNeighbors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tfidfvectorizer-countvectorizer">
+   TfidfVectorizer, CountVectorizer
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#classifiers">
+   Classifiers
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#zipmap">
+     ZipMap
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#class-information">
+     Class information
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#raw-scores">
+     Raw scores
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pickability-and-pipeline">
+   Pickability and Pipeline
+  </a>
+ </li>
+</ul>
+
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="converters-with-options">
+<span id="l-conv-options"></span><h1>Converters with options<a class="headerlink" href="#converters-with-options" title="Permalink to this heading">#</a></h1>
+<p>Most of the converters always produce the same converted model
+which computes the same outputs as the original model.
+However, some of them do not and the user may need to alter the
+conversion by giving additional information to the converter through
+functions <a class="reference internal" href="api_summary.html#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn</span></code></a>
+or <a class="reference internal" href="api_summary.html#skl2onnx.to_onnx" title="skl2onnx.to_onnx"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_onnx</span></code></a>.
+Every option ends up creating a different ONNX graph.
+Below is the list of models which enable this mechanism.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#gaussianprocessregressor-nearestneighbors" id="id6">GaussianProcessRegressor, NearestNeighbors</a></p></li>
+<li><p><a class="reference internal" href="#tfidfvectorizer-countvectorizer" id="id7">TfidfVectorizer, CountVectorizer</a></p></li>
+<li><p><a class="reference internal" href="#classifiers" id="id8">Classifiers</a></p>
+<ul>
+<li><p><a class="reference internal" href="#zipmap" id="id9">ZipMap</a></p></li>
+<li><p><a class="reference internal" href="#class-information" id="id10">Class information</a></p></li>
+<li><p><a class="reference internal" href="#raw-scores" id="id11">Raw scores</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#pickability-and-pipeline" id="id12">Pickability and Pipeline</a></p></li>
+</ul>
+</div>
+<section id="gaussianprocessregressor-nearestneighbors">
+<h2><a class="toc-backref" href="#id6">GaussianProcessRegressor, NearestNeighbors</a><a class="headerlink" href="#gaussianprocessregressor-nearestneighbors" title="Permalink to this heading">#</a></h2>
+<p id="index-0">Both models require to compure pairwise distances.
+Function <code class="xref py py-func docutils literal notranslate"><span class="pre">onnx_cdist</span></code>
+produces this part of the graph but there exist two options.
+The first one is using <em>Scan</em> operator, the second one is
+using a dedicated operator called <em>CDist</em> which is not part
+of the regular ONNX operator until issue
+<a class="reference external" href="https://github.com/onnx/onnx/issues/2442">2442</a>
+is addressed. By default, <em>Scan</em> is used, <em>CDist</em> can be used
+by giving:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="n">GaussianProcessRegressor</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;optim&#39;</span><span class="p">:</span> <span class="s1">&#39;cdist&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Previous line enables the optimization for every
+model <em>GaussianProcessRegressor</em> but it can be done
+only for one model by using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">model</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;optim&#39;</span><span class="p">:</span> <span class="s1">&#39;cdist&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+</section>
+<section id="tfidfvectorizer-countvectorizer">
+<h2><a class="toc-backref" href="#id7">TfidfVectorizer, CountVectorizer</a><a class="headerlink" href="#tfidfvectorizer-countvectorizer" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="skl2onnx.operator_converters.text_vectoriser.convert_sklearn_text_vectorizer">
+<span class="sig-prename descclassname"><span class="pre">skl2onnx.operator_converters.text_vectoriser.</span></span><span class="sig-name descname"><span class="pre">convert_sklearn_text_vectorizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api_summary.html#skl2onnx.common._topology.Scope" title="skl2onnx.common._topology.Scope"><span class="pre">Scope</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api_summary.html#skl2onnx.common._topology.Operator" title="skl2onnx.common._topology.Operator"><span class="pre">Operator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api_summary.html#skl2onnx.common._container.ModelComponentContainer" title="skl2onnx.common._container.ModelComponentContainer"><span class="pre">ModelComponentContainer</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skl2onnx/operator_converters/text_vectoriser.html#convert_sklearn_text_vectorizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#skl2onnx.operator_converters.text_vectoriser.convert_sklearn_text_vectorizer" title="Permalink to this definition">#</a></dt>
+<dd><p>Converters for class
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidfVectorizer</a>.
+The current implementation is a work in progress and the ONNX version
+does not produce the exact same results. The converter lets the user
+change some of its parameters.</p>
+<dl class="simple">
+<dt>tokenexp: string</dt><dd><p>The default will change to true in version 1.6.0.
+The tokenizer splits into words using this regular
+expression or the regular expression specified by
+<em>scikit-learn</em> is the value is an empty string.
+See also note below.
+Default value: None</p>
+</dd>
+<dt>separators: list of separators</dt><dd><p>These separators are used to split a string into words.
+Options <em>separators</em> is ignore if options <em>tokenexp</em> is not None.
+Default value: <code class="docutils literal notranslate"><span class="pre">['</span> <span class="pre">',</span> <span class="pre">'[.]',</span> <span class="pre">'\\?',</span> <span class="pre">',',</span> <span class="pre">';',</span> <span class="pre">':',</span> <span class="pre">'\\!']</span></code>.</p>
+</dd>
+</dl>
+<p>Example (from <a class="reference internal" href="auto_examples/plot_tfidfvectorizer.html#l-example-tfidfvectorizer"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">seps</span> <span class="o">=</span> <span class="p">{</span><span class="n">TfidfVectorizer</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;separators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;[.]&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">?&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">(&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                                         <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">[&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">]}}</span>
+<span class="n">model_onnx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="s2">&quot;tfidf&quot;</span><span class="p">,</span>
+                             <span class="n">initial_types</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="n">StringTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))],</span>
+                             <span class="n">options</span><span class="o">=</span><span class="n">seps</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The default regular expression of the tokenizer is <code class="docutils literal notranslate"><span class="pre">(?u)\\b\\w\\w+\\b</span></code>
+(see <a class="reference external" href="https://docs.python.org/3/library/re.html">re</a>).
+This expression may not supported by the library handling the backend.
+<a class="reference external" href="https://github.com/Microsoft/onnxruntime">onnxruntime</a> uses
+<a class="reference external" href="https://github.com/google/re2">re2</a>. You may need to switch
+to a custom tokenizer based on
+<a class="reference external" href="https://pypi.org/project/re2/">python wrapper for re2</a>
+or its sources <a class="reference external" href="https://github.com/facebook/pyre2">pyre2</a>
+(<a class="reference external" href="https://github.com/google/re2/blob/master/doc/syntax.txt">syntax</a>).
+If the regular expression is not specified and if
+the instance of TfidfVectorizer is using the default
+pattern <code class="docutils literal notranslate"><span class="pre">(?u)\\b\\w\\w+\\b</span></code>, it is replaced by
+<code class="docutils literal notranslate"><span class="pre">[a-zA-Z0-9_]+</span></code>. Any other case has to be
+manually handled.</p>
+<p>Regular expression <code class="docutils literal notranslate"><span class="pre">[^\\\\n]</span></code> is used to split
+a sentance into character (and not works) if <code class="docutils literal notranslate"><span class="pre">analyser=='char'</span></code>.
+The mode <code class="docutils literal notranslate"><span class="pre">analyser=='char_wb'</span></code> is not implemented.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.6: </span>Parameters have been renamed: <em>sep</em> into <em>separators</em>,
+<em>regex</em> into <em>tokenexp</em>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="classifiers">
+<h2><a class="toc-backref" href="#id8">Classifiers</a><a class="headerlink" href="#classifiers" title="Permalink to this heading">#</a></h2>
+<p>Converters for classifiers implement multiple options.</p>
+<section id="zipmap">
+<h3><a class="toc-backref" href="#id9">ZipMap</a><a class="headerlink" href="#zipmap" title="Permalink to this heading">#</a></h3>
+<p>The operator <em>ZipMap</em> produces a list of dictionaries.
+It repeats class names or ids but that’s not necessary
+(see issue <a class="reference external" href="https://github.com/onnx/onnx/issues/2149">2149</a>).
+By default, ZipMap operator is added, it can be deactivated by using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>It is implemented by PR <a class="reference external" href="https://github.com/onnx/sklearn-onnx/pull/327">327</a>.</p>
+</section>
+<section id="class-information">
+<h3><a class="toc-backref" href="#id10">Class information</a><a class="headerlink" href="#class-information" title="Permalink to this heading">#</a></h3>
+<p>Class information is usually repeated in the ONNX operator
+which classifies and the output of the ZipMap operator
+(see issue <a class="reference external" href="https://github.com/onnx/onnx/issues/2149">2149</a>).
+The following option can remove string information and class ids
+in the ONNX operator to get smaller models.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;nocl&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Classes are replaced by integers from 0 to the number of classes.</p>
+</section>
+<section id="raw-scores">
+<h3><a class="toc-backref" href="#id11">Raw scores</a><a class="headerlink" href="#raw-scores" title="Permalink to this heading">#</a></h3>
+<p>Almost all classifiers are converted in order to get probabilities
+and not raw scores. That’s the default behaviour. It can be deactivated
+by using option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;raw_scores&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>It is implemented by PR <a class="reference external" href="https://github.com/onnx/sklearn-onnx/pull/308">308</a>.</p>
+</section>
+</section>
+<section id="pickability-and-pipeline">
+<h2><a class="toc-backref" href="#id12">Pickability and Pipeline</a><a class="headerlink" href="#pickability-and-pipeline" title="Permalink to this heading">#</a></h2>
+<p>The proposed way to specify options is not always pickable.
+Function <code class="docutils literal notranslate"><span class="pre">id(model)</span></code> depends on the execution and map an option
+to one class may be not enough to customize the conversion.
+However, it is possible to specify an option the same way
+parameters are referenced in a <em>scikit-learn</em> pipeline
+with method <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.get_params">get_params</a>.
+Following syntax are supported:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">PCA</span><span class="p">()),</span> <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())])</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;classifier&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;classifier__zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Options applied to one model, not a pipeline as the converter
+replaces the pipeline structure by a single onnx graph.
+Following that rule, option <em>zipmap</em> would not have any impact
+if applied to a pipeline and to the last step of the pipeline.
+However, because there is no ambiguity about what the conversion
+should be, for options <em>zipmap</em> and <em>nocl</em>, the following
+options would have the same effect:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">PCA</span><span class="p">()),</span> <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())])</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]):</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">pipe</span><span class="p">):</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;classifier&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;classifier__zipmap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="pipeline.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Convert a pipeline</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="supported.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Supported scikit-learn Models</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2018-2022, Microsoft.<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>

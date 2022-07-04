@@ -1,0 +1,39 @@
+digraph OnnxTranspose {
+	graph [bb="0,0,295.57,401.91",
+		rankdir=TB
+	];
+	node [label="\N"];
+	"Tr_Transpose/Transpose (op#0)\n input0 X\n output0 Tr_transposed01"	[URL="javascript:alert('')",
+		color=yellow,
+		fillcolor=yellow,
+		height=1.041,
+		pos="147.79,292.43",
+		style=filled,
+		width=3.9677];
+	Tr_transposed010	[height=0.5,
+		label=Tr_transposed01,
+		pos="147.79,200.95",
+		shape=octagon,
+		width=2.2082];
+	"Tr_Transpose/Transpose (op#0)\n input0 X\n output0 Tr_transposed01" -> Tr_transposed010	[pos="e,147.79,219.1 147.79,254.78 147.79,246.28 147.79,237.39 147.79,229.37"];
+	X0	[height=0.5,
+		label=X,
+		pos="147.79,383.91",
+		shape=octagon,
+		width=0.75];
+	X0 -> "Tr_Transpose/Transpose (op#0)\n input0 X\n output0 Tr_transposed01"	[pos="e,147.79,330.26 147.79,365.65 147.79,358.35 147.79,349.45 147.79,340.42"];
+	"Tr_Transpose1/Transpose (op#1)\n input0 Tr_transposed01\n output0 Tr_transposed0"	[URL="javascript:alert('')",
+		color=yellow,
+		fillcolor=yellow,
+		height=1.041,
+		pos="147.79,109.48",
+		style=filled,
+		width=4.1051];
+	Tr_transposed010 -> "Tr_Transpose1/Transpose (op#1)\n input0 Tr_transposed01\n output0 Tr_transposed0"	[pos="e,147.79,147.31 147.79,182.7 147.79,175.4 147.79,166.49 147.79,157.47"];
+	Tr_transposed00	[height=0.5,
+		label=Tr_transposed0,
+		pos="147.79,18",
+		shape=octagon,
+		width=2.0714];
+	"Tr_Transpose1/Transpose (op#1)\n input0 Tr_transposed01\n output0 Tr_transposed0" -> Tr_transposed00	[pos="e,147.79,36.146 147.79,71.825 147.79,63.331 147.79,54.434 147.79,46.416"];
+}
