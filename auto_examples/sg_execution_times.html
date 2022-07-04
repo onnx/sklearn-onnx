@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Computation times &#8212; sklearn-onnx 1.11 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo_main.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../introduction.html">
+  Introduction
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../index_tutorial.html">
+  Tutorial
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_summary.html">
+  API Summary
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Gallery of examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../pipeline.html">
+  Convert a pipeline
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../parameterized.html">
+  Converters with options
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../supported.html">
+  Supported scikit-learn Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="computation-times">
+<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
+<p><strong>01:30.679</strong> total execution time for <strong>auto_examples</strong> files:</p>
+<table class="table">
+<colgroup>
+<col style="width: 85%" />
+<col style="width: 9%" />
+<col style="width: 6%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_black_op.html#sphx-glr-auto-examples-plot-black-op-py"><span class="std std-ref">Convert a model with a reduced list of operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_black_op.py</span></code>)</p></td>
+<td><p>00:20.711</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_model.py</span></code>)</p></td>
+<td><p>00:13.684</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tfidfvectorizer.py</span></code>)</p></td>
+<td><p>00:11.450</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_complex_pipeline.py</span></code>)</p></td>
+<td><p>00:07.062</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_lightgbm.py</span></code>)</p></td>
+<td><p>00:04.818</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_syntax.py</span></code>)</p></td>
+<td><p>00:04.354</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_pipeline.py</span></code>)</p></td>
+<td><p>00:04.030</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_cdist.py</span></code>)</p></td>
+<td><p>00:03.862</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_intermediate_outputs.py</span></code>)</p></td>
+<td><p>00:03.682</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_xgboost.py</span></code>)</p></td>
+<td><p>00:03.584</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_cast_transformer.html#sphx-glr-auto-examples-plot-cast-transformer-py"><span class="std std-ref">Discrepencies with StandardScaler</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_cast_transformer.py</span></code>)</p></td>
+<td><p>00:03.542</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser_alternative.py</span></code>)</p></td>
+<td><p>00:02.654</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser.py</span></code>)</p></td>
+<td><p>00:02.490</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_onnx_operators.py</span></code>)</p></td>
+<td><p>00:01.104</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline.py</span></code>)</p></td>
+<td><p>00:00.801</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_gpr.py</span></code>)</p></td>
+<td><p>00:00.753</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_nmf.py</span></code>)</p></td>
+<td><p>00:00.428</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_backend.py</span></code>)</p></td>
+<td><p>00:00.419</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_investigate_pipeline.py</span></code>)</p></td>
+<td><p>00:00.323</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_model.html#sphx-glr-auto-examples-plot-convert-model-py"><span class="std std-ref">Train, convert and predict a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_model.py</span></code>)</p></td>
+<td><p>00:00.273</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_zipmap.py</span></code>)</p></td>
+<td><p>00:00.264</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_logging.py</span></code>)</p></td>
+<td><p>00:00.158</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_decision_function.py</span></code>)</p></td>
+<td><p>00:00.087</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_metadata.html#sphx-glr-auto-examples-plot-metadata-py"><span class="std std-ref">Metadata</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_metadata.py</span></code>)</p></td>
+<td><p>00:00.079</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_errors_onnxruntime.html#sphx-glr-auto-examples-plot-errors-onnxruntime-py"><span class="std std-ref">Errors with onnxruntime</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_errors_onnxruntime.py</span></code>)</p></td>
+<td><p>00:00.064</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018-2022, Microsoft.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
