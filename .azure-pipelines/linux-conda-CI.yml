@@ -319,6 +319,7 @@ jobs:
   - script: |
       pip install coloredlogs
       pip install flatbuffers
+      pip install sympy
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
