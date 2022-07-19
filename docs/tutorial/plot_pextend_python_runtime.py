@@ -35,7 +35,7 @@ A transformer which decorrelates variables
 This time, the eigen values are not estimated at
 training time but at prediction time.
 """
-from mlprodict.onnxrt.shape_object import ShapeObject
+
 from mlprodict.onnxrt.ops_cpu import OpRunCustom, register_operator
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd,
@@ -337,19 +337,6 @@ class OpEig(OpRunCustom):
             return numpy.linalg.eig(x)
         return (numpy.linalg.eigvals(x), )
 
-    def infer_shapes(self, x):
-        # shape inference, if you don't know what to
-        # write, just return `ShapeObject(None)`
-        if self.eigv:
-            return (
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Values'),
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Vectors'))
-        return (ShapeObject(x.shape, dtype=x.dtype,
-                            name=self.__class__.__name__), )
 
 ########################################
 # Registration
