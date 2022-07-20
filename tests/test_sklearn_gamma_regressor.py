@@ -3,6 +3,7 @@
 """Tests scikit-learn's SGDClassifier converter."""
 
 import unittest
+from matplotlib import projections
 import numpy as np
 try:
     from sklearn.linear_model import GammaRegressor
@@ -23,7 +24,7 @@ from test_utils import (
 ort_version = ".".join(ort_version.split(".")[:2])
 
 
-class TestSGDOneClassSVMConverter(unittest.TestCase):
+class TestGammaRegressorConverter(unittest.TestCase):
     @unittest.skipIf(GammaRegressor is None,
                      reason="scikit-learn<1.0")
     def test_gamma_regressor(self):
@@ -32,11 +33,21 @@ class TestSGDOneClassSVMConverter(unittest.TestCase):
         X = [[1,2], [2,3], [3,4], [4,3]]
         y = [19, 26, 33, 30]
         clf.fit(X, y)
-        print(clf.score(X, y))
-        print(clf.coef_)
-        print(clf.intercept_)
-        result = clf.predict([[1,0], [2,8]])
-        print(result)
+        print("score=", clf.score(X, y))
+        print("coef=", clf.coef_)
+        print("intercept=", clf.intercept_)
+        test_x = [[1,2], [2,3], [3,4], [4,3], [1,0], [2,8]]
+        result = clf.predict(test_x)
+        print("predict result = ", result)
+        
+        import matplotlib.pyplot as plt
+        from mpl_toolkits import mplot3d
+
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        test_X = np.array(test_x)
+        ax.scatter(test_X[:,0], test_X[:,1], result)
+        plt.show()
 
         '''
         model_onnx = convert_sklearn(
