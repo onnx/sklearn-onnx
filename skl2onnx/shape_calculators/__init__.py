@@ -12,6 +12,7 @@ from . import dict_vectorizer
 from . import ensemble_shapes
 from . import flatten
 from . import function_transformer
+from . import gamma_regressor
 from . import gaussian_process
 from . import grid_search_cv
 from . import identity
@@ -58,6 +59,7 @@ __all__ = [
     ensemble_shapes,
     flatten,
     function_transformer,
+    gamma_regressor,
     gaussian_process,
     grid_search_cv,
     identity,

@@ -18,6 +18,7 @@ from . import dict_vectoriser
 from . import feature_selection
 from . import flatten_op
 from . import function_transformer
+from . import gamma_regressor
 from . import gaussian_process
 from . import gaussian_mixture
 from . import gradient_boosting
@@ -79,6 +80,7 @@ __all__ = [
     feature_selection,
     flatten_op,
     function_transformer,
+    gamma_regressor,
     gaussian_process,
     gaussian_mixture,
     gradient_boosting,
