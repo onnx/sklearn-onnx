@@ -320,6 +320,7 @@ def build_sklearn_operator_name_map():
         ComplementNB,
         CountVectorizer,
         DictVectorizer,
+        GammaRegressor,
         GaussianNB,
         DecisionTreeClassifier,
         DecisionTreeRegressor,
