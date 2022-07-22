@@ -14,7 +14,19 @@ jobs:
   strategy:
     matrix:
 
-      Py39-Onnx1120-Rt1111-Skl11:
+      Py310-Onnx120-Rt120-Skl11:
+        do.bench: '0'
+        python.version: '3.10'
+        numpy.version: '>=1.21.0'
+        scipy.version: '>=1.7.0'
+        onnx.version: 'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.12.0' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
+        sklearn.version: '>=1.1'
+        lgbm.version: ''
+        onnxcc.version: '>=1.8.1'  # git
+        run.example: '1'
+      Py39-Onnx120-Rt1111-Skl11:
         do.bench: '0'
         python.version: '3.9'
         numpy.version: '>=1.21.0'
@@ -26,7 +38,6 @@ jobs:
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'  # git
         run.example: '1'
-
       Py39-Onnx1110-Rt1111-Skl11:
         do.bench: '0'
         python.version: '3.9'
@@ -38,7 +49,7 @@ jobs:
         sklearn.version: '>=1.1'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'  # git
-        run.example: '1'
+        run.example: '0'
       Py39-Onnx1110-Rt1111-Skl10:
         do.bench: '0'
         python.version: '3.9'
