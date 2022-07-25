@@ -38,6 +38,11 @@ from sklearn.linear_model import (
     TheilSenRegressor
 )
 try:
+    from sklearn.linear_model import GammaRegressor
+except ImportError:
+    # available since sklearn>=1.1
+    GammaRegressor = None
+try:
     from sklearn.linear_model import QuantileRegressor
 except ImportError:
     # available since sklearn>=1.0
@@ -319,7 +324,6 @@ def build_sklearn_operator_name_map():
         ComplementNB,
         CountVectorizer,
         DictVectorizer,
-        GaussianNB,
         DecisionTreeClassifier,
         DecisionTreeRegressor,
         ExtraTreeClassifier,
@@ -328,6 +332,8 @@ def build_sklearn_operator_name_map():
         ExtraTreesRegressor,
         FeatureUnion,
         FunctionTransformer,
+        GammaRegressor,
+        GaussianNB,
         GaussianMixture,
         GaussianProcessClassifier,
         GaussianProcessRegressor,
