@@ -33,12 +33,7 @@ class TestGammaRegressorConverter(unittest.TestCase):
         X = np.array([[1,2], [2,3], [3,4], [4,3]])
         y = np.array([19, 26, 33, 30])
         model.fit(X, y)
-        print("score=", model.score(X, y))
-        print("coef=", model.coef_)
-        print("intercept=", model.intercept_)
         test_x = np.array([[1,0], [2,8]])
-        result = model.predict(test_x)
-        print("predict result = ", result)
         
         model_onnx = convert_sklearn(
             model,
