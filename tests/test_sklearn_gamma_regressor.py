@@ -3,7 +3,6 @@
 """Tests scikit-learn's SGDClassifier converter."""
 
 import unittest
-from matplotlib import projections
 import numpy as np
 try:
     from sklearn.linear_model import GammaRegressor
@@ -30,11 +29,11 @@ class TestGammaRegressorConverter(unittest.TestCase):
     def test_gamma_regressor(self):
 
         model = GammaRegressor()
-        X = np.array([[1,2], [2,3], [3,4], [4,3]])
+        X = np.array([[1, 2], [2, 3], [3, 4], [4, 3]])
         y = np.array([19, 26, 33, 30])
         model.fit(X, y)
-        test_x = np.array([[1,0], [2,8]])
-        
+        test_x = np.array([[1, 0], [2, 8]])
+
         model_onnx = convert_sklearn(
             model,
             "scikit-learn Gamma Regressor",
@@ -44,6 +43,7 @@ class TestGammaRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(test_x.astype(np.float32), model, model_onnx,
                             basename="SklearnGammaRegressor")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=3)

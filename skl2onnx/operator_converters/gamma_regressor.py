@@ -1,18 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from ..common._apply_operation import (
-    apply_cast, apply_sub)
-from ..common.data_types import (
-    BooleanTensorType, Int64TensorType, 
-    guess_numpy_type, guess_proto_type)
+from ..common.data_types import (Int64TensorType, guess_numpy_type)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..proto import onnx_proto
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul,
     OnnxReshape, OnnxSigmoid)
+
 
 def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
                                     container: ModelComponentContainer):
@@ -35,7 +31,6 @@ def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
     eta = OnnxAdd(
         OnnxMatMul(input_var, op.coef_.astype(dtype), op_version=opv),
         intercept, op_version=opv)
-
 
     if hasattr(op, "_link_instance"):
         # scikit-learn < 1.1
@@ -71,8 +66,8 @@ def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
             (AbsoluteError, HalfSquaredError,
                 HalfTweedieLossIdentity, PinballLoss)):
             Y = OnnxIdentity(eta, op_version=opv)
-        elif isinstance(loss, (HalfPoissonLoss, HalfGammaLoss,
-                                HalfTweedieLoss)):
+        elif isinstance(
+            loss, (HalfPoissonLoss, HalfGammaLoss, HalfTweedieLoss)):
             Y = OnnxExp(eta, op_version=opv)
         elif isinstance(loss, HalfBinomialLoss):
             Y = OnnxSigmoid(eta, op_version=opv)
@@ -85,5 +80,6 @@ def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
     final = OnnxReshape(Y, np.array([-1, last_dim], dtype=np.int64),
                         op_version=opv, output_names=out[:1])
     final.add_to(scope, container)
+
 
 register_converter('SklearnGammaRegressor', convert_sklearn_gamma_regressor)
