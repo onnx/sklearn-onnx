@@ -10,7 +10,7 @@ try:
 except ImportError:
     GammaRegressor = None
 from onnxruntime import __version__ as ort_version
-from ..skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn
 
 from skl2onnx.common.data_types import (
     FloatTensorType,
