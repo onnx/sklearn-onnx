@@ -31,7 +31,8 @@ clr = LogisticRegression(solver="liblinear")
 clr.fit(X_train, y_train)
 
 
-onx = to_onnx(clr, X, options={'zipmap': False})
+onx = to_onnx(clr, X, options={'zipmap': False},
+              target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 input_names = [i.name for i in sess.get_inputs()]
@@ -49,7 +50,8 @@ print(sess.run(None, {input_names[0]: X_test[:2]}))
 # types as well.
 
 onx = to_onnx(clr, X, options={'zipmap': False},
-              initial_types=[('X56', FloatTensorType([None, X.shape[1]]))])
+              initial_types=[('X56', FloatTensorType([None, X.shape[1]]))],
+              target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 input_names = [i.name for i in sess.get_inputs()]
@@ -67,7 +69,8 @@ print(sess.run(None, {input_names[0]: X_test[:2]}))
 
 onx = to_onnx(clr, X, options={'zipmap': False},
               final_types=[('L', Int64TensorType([None])),
-                           ('P', FloatTensorType([None, 3]))])
+                           ('P', FloatTensorType([None, 3]))],
+              target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 input_names = [i.name for i in sess.get_inputs()]
@@ -93,7 +96,7 @@ def rename_results(proposed_name, existing_names):
 
 
 onx = to_onnx(clr, X, options={'zipmap': False},
-              naming=rename_results)
+              naming=rename_results, target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 input_names = [i.name for i in sess.get_inputs()]
