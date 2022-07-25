@@ -58,8 +58,12 @@ def max_onnxruntime_opset():
     master/docs/Versioning.md>`_.
     """
     vi = pv.Version(ort_version.split('+')[0])
-    if vi >= pv.Version("1.10.0"):
+    if vi >= pv.Version("1.12.0"):
+        return 17
+    if vi >= pv.Version("1.11.0"):
         return 16
+    if vi >= pv.Version("1.10.0"):
+        return 15
     if vi >= pv.Version("1.9.0"):
         return 15
     if vi >= pv.Version("1.8.0"):
@@ -85,7 +89,9 @@ TARGET_OPSET = int(
                 onnx.defs.onnx_opset_version()))))
 
 value_ml = 3
-if TARGET_OPSET <= 15:
+if TARGET_OPSET <= 16:
+    # TreeEnsemble* for opset-ml == 3 is implemented in onnxruntime==1.12.0
+    # but not in onnxruntime==1.11.0.
     value_ml = 2
 if TARGET_OPSET <= 11:
     value_ml = 1

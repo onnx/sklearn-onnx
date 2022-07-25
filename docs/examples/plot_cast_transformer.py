@@ -77,7 +77,8 @@ exp1 = model1.predict(Xi_test)
 
 #################################
 # Conversion into ONNX.
-onx1 = to_onnx(model1, X_train[:1].astype(np.float32))
+onx1 = to_onnx(model1, X_train[:1].astype(np.float32),
+               target_opset=15)
 sess1 = InferenceSession(onx1.SerializeToString())
 
 ###################################
@@ -136,7 +137,8 @@ model2.fit(Xi_train, yi_train)
 exp2 = model2.predict(Xi_test)
 
 onx2 = to_onnx(model2, X_train[:1].astype(np.float32),
-               options={StandardScaler: {'div': 'div_cast'}})
+               options={StandardScaler: {'div': 'div_cast'}},
+               target_opset=15)
 
 sess2 = InferenceSession(onx2.SerializeToString())
 got2 = sess2.run(None, {'X': Xi_test})[0]
