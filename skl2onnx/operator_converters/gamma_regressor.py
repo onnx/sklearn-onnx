@@ -67,7 +67,7 @@ def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
                 HalfTweedieLossIdentity, PinballLoss)):
             Y = OnnxIdentity(eta, op_version=opv)
         elif isinstance(
-            loss, (HalfPoissonLoss, HalfGammaLoss, HalfTweedieLoss)):
+                loss, (HalfPoissonLoss, HalfGammaLoss, HalfTweedieLoss)):
             Y = OnnxExp(eta, op_version=opv)
         elif isinstance(loss, HalfBinomialLoss):
             Y = OnnxSigmoid(eta, op_version=opv)
