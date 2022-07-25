@@ -22,7 +22,6 @@ from sklearn.linear_model import (
     ARDRegression,
     BayesianRidge,
     ElasticNet, ElasticNetCV,
-    GammaRegressor,
     HuberRegressor,
     Lars, LarsCV,
     Lasso, LassoCV,
@@ -38,6 +37,11 @@ from sklearn.linear_model import (
     SGDRegressor,
     TheilSenRegressor
 )
+try:
+    from sklearn.linear_model import GammaRegressor
+except ImportError:
+    # available since sklearn>=1.1
+    GammaRegressor = None
 try:
     from sklearn.linear_model import QuantileRegressor
 except ImportError:
