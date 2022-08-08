@@ -149,8 +149,8 @@ class TestCustomTransformerTSNE(unittest.TestCase):
     def test_custom_pipeline_scaler(self):
 
         digits = datasets.load_digits(n_class=6)
-        Xd = digits.data[:20]
-        yd = digits.target[:20]
+        Xd = digits.data[:50]
+        yd = digits.target[:50]
         n_samples, n_features = Xd.shape
 
         ptsne_knn = PredictableTSNE()
