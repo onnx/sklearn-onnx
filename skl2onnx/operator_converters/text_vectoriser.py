@@ -168,7 +168,7 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only stip_accents=None is supported. "
+            "only strip_accents=None is supported. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
