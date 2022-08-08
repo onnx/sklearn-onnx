@@ -8,6 +8,13 @@ import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.exceptions import ConvergenceWarning
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
@@ -33,6 +40,24 @@ def _sklearn_version():
 
 class TestGLMClassifierConverter(unittest.TestCase):
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_model_logistic_regression_binary_class_boolean(self):
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]],
+                     dtype=np.float32)
+        y = np.array([True, True, True, False, False, False])
+        model = linear_model.LogisticRegression(max_iter=100).fit(X, y)
+        model_onnx = convert_sklearn(
+            model, "linear model",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {'zipmap': False}},
+            target_opset=TARGET_OPSET)
+        self.assertIn('name: "classlabels_ints"', str(model_onnx))
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnLogitisticRegressionBinaryBoolean")
+
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2)
@@ -52,6 +77,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             self.assertEqual(str(lb), "tensor(int64)")
             self.assertEqual(sh, [None])
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_blacklist(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2)
@@ -72,6 +98,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             self.assertEqual(str(lb), "tensor(int64)")
             self.assertEqual(sh, [None])
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_string(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2,
@@ -92,6 +119,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             self.assertEqual(str(lb), "tensor(string)")
             self.assertEqual(sh, [None])
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_int(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 3, is_int=True)
@@ -104,6 +132,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionInt")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_bool(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 3, is_bool=True)
@@ -116,6 +145,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBool")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_linear_discriminant_analysis(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
@@ -130,6 +160,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnLinearDiscriminantAnalysisBin-Dec3")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_linear_discriminant_analysis_decfunc(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
@@ -146,6 +177,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnLinearDiscriminantAnalysisBinRawScore-Out0",
             methods=['predict', 'decision_function'])
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_linear_discriminant_analysis_decfunc3(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 3])
@@ -162,6 +194,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnLinearDiscriminantAnalysisBinRawScore3-Out0",
             methods=['predict', 'decision_function'])
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_cv_binary_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegressionCV(max_iter=100), 2)
@@ -174,6 +207,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticCVRegressionBinary")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_cv_int(self):
         try:
             model, X = fit_classification_model(
@@ -192,6 +226,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionCVInt")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_cv_bool(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegressionCV(max_iter=100), 3, is_bool=True)
@@ -204,6 +239,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionCVBool")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_nointercept(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -217,6 +253,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryNoIntercept")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 4)
@@ -229,6 +266,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_nocl(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 4,
@@ -246,6 +284,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx, classes=model.classes_,
             basename="SklearnLogitisticRegressionMultiNoCl")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_ovr(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -259,6 +298,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_multinomial(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -273,6 +313,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_no_intercept(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -286,6 +327,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiNoIntercept")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_lbfgs(self):
         penalty = (
             'l2' if _sklearn_version() < pv.Version('0.21.0')
@@ -302,6 +344,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiLbfgs")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_liblinear_l1(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -315,6 +358,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiLiblinearL1")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
         if _sklearn_version() < pv.Version('0.21.0'):
             model, X = fit_classification_model(
@@ -334,6 +378,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiSagaElasticnet")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_linear_svc_binary_class(self):
         model, X = fit_classification_model(LinearSVC(max_iter=10000), 2)
         model_onnx = convert_sklearn(
@@ -345,6 +390,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCBinary-NoProb")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_linear_svc_multi_class(self):
         model, X = fit_classification_model(LinearSVC(max_iter=100), 5)
         model_onnx = convert_sklearn(
@@ -356,6 +402,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_linear_svc_int(self):
         model, X = fit_classification_model(
             LinearSVC(max_iter=100), 5, is_int=True)
@@ -368,6 +415,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCInt")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_linear_svc_bool(self):
         model, X = fit_classification_model(
             LinearSVC(max_iter=100), 5, is_bool=True)
@@ -380,6 +428,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCBool")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 2)
         model_onnx = convert_sklearn(
@@ -391,6 +440,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierBin")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_nozipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -420,6 +470,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierNZMBin")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_mispelled_zipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -434,6 +485,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except NameError as e:
             assert "Option 'zipmap ' not in" in str(e)
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_mispelled_zipmap_wrong_value(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -448,6 +500,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except ValueError as e:
             assert "Unexpected value ['True'] for option 'zipmap'" in str(e)
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_multi_class(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
         model_onnx = convert_sklearn(
@@ -459,6 +512,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_int(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 5, is_int=True)
@@ -471,6 +525,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierInt")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 4, is_bool=True)
@@ -483,6 +538,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierBool")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_cv_binary(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2)
@@ -495,6 +551,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVBin")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_cv_int(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2, is_int=True)
@@ -507,6 +564,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVInt")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_cv_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2, is_bool=True)
@@ -519,6 +577,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVBool")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_cv_multi_class(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 5)
@@ -531,6 +590,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVMulti")
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_decision_function(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -547,6 +607,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @unittest.skip(
         reason="Scikit-learn doesn't return multi-label output.")
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_cv_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             linear_model.RidgeClassifierCV(random_state=42))
@@ -561,6 +622,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnRidgeClassifierCVMultiLabel")
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_classifier_multi_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,
@@ -581,6 +643,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             assert_almost_equal(prob[:, i], got[i+1])
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_classifier_multi_class_string_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,
