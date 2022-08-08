@@ -16,12 +16,8 @@ from skl2onnx.common.data_types import (
     StringTensorType,
     FloatTensorType,
     Int64TensorType,
-<<<<<<< HEAD
     BooleanTensorType)
 from skl2onnx.common.data_types import onnx_built_with_ml
-=======
-)
->>>>>>> 6b93b465175f4486383695eed34a19fc3f99800d
 from test_utils import dump_data_and_model, TARGET_OPSET
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
